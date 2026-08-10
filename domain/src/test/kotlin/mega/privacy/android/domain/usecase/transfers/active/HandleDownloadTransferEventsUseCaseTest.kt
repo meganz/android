@@ -3,11 +3,14 @@ package mega.privacy.android.domain.usecase.transfers.active
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
+import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaEventUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -28,6 +31,8 @@ class HandleDownloadTransferEventsUseCaseTest {
     private val scanMediaFileUseCase = mock<ScanMediaFileUseCase>()
     private val handleAvailableOfflineEventUseCase = mock<HandleAvailableOfflineEventUseCase>()
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
+    private val broadcastTransferOverQuotaEventUseCase =
+        mock<BroadcastTransferOverQuotaEventUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -35,6 +40,7 @@ class HandleDownloadTransferEventsUseCaseTest {
             scanMediaFileUseCase = scanMediaFileUseCase,
             handleAvailableOfflineEventUseCase = handleAvailableOfflineEventUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
+            broadcastTransferOverQuotaEventUseCase = broadcastTransferOverQuotaEventUseCase,
         )
     }
 
@@ -44,6 +50,7 @@ class HandleDownloadTransferEventsUseCaseTest {
             scanMediaFileUseCase,
             handleAvailableOfflineEventUseCase,
             broadcastTransferOverQuotaUseCase,
+            broadcastTransferOverQuotaEventUseCase,
         )
     }
 
@@ -83,7 +90,7 @@ class HandleDownloadTransferEventsUseCaseTest {
             underTest(finishEvent, finishEvent)
 
             verify(scanMediaFileUseCase).invoke(
-                arrayOf(localPath, localPath), arrayOf("")
+                arrayOf(localPath, localPath), Array(2) { "" }
             )
         }
 
@@ -188,6 +195,65 @@ class HandleDownloadTransferEventsUseCaseTest {
             }
             underTest.invoke(transferEvent)
             verify(broadcastTransferOverQuotaUseCase).invoke(false)
+        }
+
+    @Test
+    fun `test that broadcastTransferOverQuotaEventUseCase is invoked with OverQuota when a QuotaExceededMegaException is received as a temporal error for download Event`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(TransferType.DOWNLOAD)
+            }
+            val transferEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { this.transfer }.thenReturn(transfer)
+                on { this.error }.thenReturn(QuotaExceededMegaException(1, value = 1))
+            }
+            underTest.invoke(transferEvent)
+            verify(broadcastTransferOverQuotaEventUseCase).invoke(TransferOverQuotaStatus.OverQuota)
+        }
+
+    @Test
+    fun `test that broadcastTransferOverQuotaEventUseCase is invoked with AlmostOverQuota when a NotEnoughQuotaMegaException is received as a temporal error for download Event`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(TransferType.DOWNLOAD)
+            }
+            val transferEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { this.transfer }.thenReturn(transfer)
+                on { this.error }.thenReturn(NotEnoughQuotaMegaException(1, errorString = null, value = 1))
+            }
+            underTest.invoke(transferEvent)
+            verify(broadcastTransferOverQuotaEventUseCase).invoke(TransferOverQuotaStatus.AlmostOverQuota)
+        }
+
+    @Test
+    fun `test that broadcastTransferOverQuotaEventUseCase is invoked with OverQuota when both over quota and almost over quota errors are received in the same batch`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(TransferType.DOWNLOAD)
+            }
+            val almostOverQuotaEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { this.transfer }.thenReturn(transfer)
+                on { this.error }.thenReturn(NotEnoughQuotaMegaException(1, errorString = null, value = 1))
+            }
+            val overQuotaEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { this.transfer }.thenReturn(transfer)
+                on { this.error }.thenReturn(QuotaExceededMegaException(1, value = 1))
+            }
+            underTest.invoke(almostOverQuotaEvent, overQuotaEvent)
+            verify(broadcastTransferOverQuotaEventUseCase).invoke(TransferOverQuotaStatus.OverQuota)
+        }
+
+    @Test
+    fun `test that broadcastTransferOverQuotaEventUseCase is not invoked when a Start event is received for download Event`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(TransferType.DOWNLOAD)
+            }
+            val transferEvent = mock<TransferEvent.TransferStartEvent> {
+                on { this.transfer }.thenReturn(transfer)
+            }
+            underTest.invoke(transferEvent)
+            verifyNoInteractions(broadcastTransferOverQuotaEventUseCase)
         }
 
     private fun provideFinishEvents(): List<TransferEvent.TransferFinishEvent> = buildList {

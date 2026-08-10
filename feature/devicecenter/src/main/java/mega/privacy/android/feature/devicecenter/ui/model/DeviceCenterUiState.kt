@@ -42,6 +42,8 @@ data class DeviceCenterUiState(
     val searchWidgetState: SearchWidgetState = SearchWidgetState.COLLAPSED,
     val infoSelectedItem: DeviceCenterUINode? = null,
     val enabledFlags: Set<Feature> = emptySet(),
+    val menuClickedFolder: DeviceFolderUINode? = null,
+    val removeFolderConnectionSuccess: StateEvent = consumed,
 ) {
     val itemsToDisplay: List<DeviceCenterUINode> = selectedDevice?.folders ?: devices
 }

@@ -1,0 +1,1057 @@
+package mega.privacy.android.feature.payment
+
+import app.cash.turbine.test
+import com.google.common.truth.Truth
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.domain.entity.SubscriptionStatus
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.AccountPlanDetail
+import mega.privacy.android.domain.entity.account.AccountSubscriptionDetail
+import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
+import mega.privacy.android.domain.entity.billing.Pricing
+import mega.privacy.android.domain.entity.payment.Subscriptions
+import mega.privacy.android.domain.exception.LocalPricingNotAvailableException
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
+import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
+import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
+import mega.privacy.android.domain.usecase.billing.IsSubscriptionFeatureAvailableUseCase
+import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import mega.privacy.android.feature.payment.model.PlanPeriod
+import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
+import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
+import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountViewModel
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
+import java.time.temporal.ChronoUnit
+
+@ExtendWith(CoroutineMainDispatcherExtension::class)
+@ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class UpgradeAccountViewModelTest {
+
+    private lateinit var underTest: UpgradeAccountViewModel
+
+    private val getPricing = mock<GetPricing>()
+    private val getSubscriptionsUseCase = mock<GetSubscriptionsUseCase>()
+    private val localisedPriceStringMapper = mock<LocalisedPriceStringMapper>()
+    private val localisedPriceCurrencyCodeStringMapper =
+        mock<LocalisedPriceCurrencyCodeStringMapper>()
+    private val formattedSizeMapper = mock<FormattedSizeMapper>()
+    private val localisedSubscriptionMapper =
+        LocalisedSubscriptionMapper(
+            localisedPriceCurrencyCodeStringMapper,
+            formattedSizeMapper,
+        )
+    private val getRecommendedSubscriptionUseCase =
+        mock<GetRecommendedSubscriptionUseCase>()
+    private val isSubscriptionFeatureAvailableUseCase =
+        mock<IsSubscriptionFeatureAvailableUseCase>()
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val ageSignalUseCase = mock<AgeSignalUseCase>()
+    private val getCurrentTimeInMillisUseCase = mock<GetCurrentTimeInMillisUseCase>()
+
+    @BeforeEach
+    fun setUp() {
+        reset(
+            getSubscriptionsUseCase,
+            localisedPriceStringMapper,
+            localisedPriceCurrencyCodeStringMapper,
+            formattedSizeMapper,
+            getRecommendedSubscriptionUseCase,
+            isSubscriptionFeatureAvailableUseCase,
+            getPricing,
+            monitorAccountDetailUseCase,
+            getFeatureFlagValueUseCase,
+            ageSignalUseCase,
+            getCurrentTimeInMillisUseCase,
+        )
+        wheneverBlocking { isSubscriptionFeatureAvailableUseCase() }.thenReturn(true)
+    }
+
+    private fun initViewModel(isUpgradeAccount: Boolean = true) {
+        underTest = UpgradeAccountViewModel(
+            getPricing = getPricing,
+            getSubscriptionsUseCase = getSubscriptionsUseCase,
+            localisedSubscriptionMapper = localisedSubscriptionMapper,
+            getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
+            isSubscriptionFeatureAvailableUseCase = isSubscriptionFeatureAvailableUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            ageSignalUseCase = ageSignalUseCase,
+            getCurrentTimeInMillisUseCase = getCurrentTimeInMillisUseCase,
+            isUpgradeAccount = isUpgradeAccount,
+        )
+    }
+
+    @Test
+    fun `test that exception when get pricing is not propagated`() = runTest {
+        whenever(getPricing(any())).thenAnswer { throw MegaException(1, "It's broken") }
+
+        with(underTest) {
+            refreshPricing()
+            state.map { it.product }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(emptyList<Product>())
+            }
+        }
+    }
+
+    @Test
+    fun `test that initial state has all Pro plans listed`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+        initViewModel()
+        underTest.state.map { it.localisedSubscriptionsList }.test {
+            Truth.assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
+        }
+    }
+
+    @Test
+    fun `test that initial state includes plan available only with yearly billing`() = runTest {
+        val monthlyOnlyProIProIIProIII = listOf(
+            subscriptionProIMonthly,
+            subscriptionProIIMonthly,
+            subscriptionProIIIMonthly
+        )
+        val yearlyWithProLite = listOf(
+            subscriptionProLiteYearly,
+            subscriptionProIYearly,
+            subscriptionProIIYearly,
+            subscriptionProIIIYearly
+        )
+        val expectedList = listOf(
+            LocalisedSubscription(
+                monthlySubscription = null,
+                yearlySubscription = subscriptionProLiteYearly,
+                localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                formattedSize = formattedSizeMapper,
+            ),
+            localisedSubscriptionProI,
+            localisedSubscriptionProII,
+            localisedSubscriptionProIII,
+        )
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(monthlyOnlyProIProIIProIII, yearlyWithProLite)
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+        initViewModel()
+        underTest.state.map { it.localisedSubscriptionsList }.test {
+            Truth.assertThat(awaitItem()).isEqualTo(expectedList)
+        }
+    }
+
+    @Test
+    fun `test that initial state includes plan available only with monthly billing`() = runTest {
+        val monthlyWithProLite = listOf(
+            subscriptionProLiteMonthly,
+            subscriptionProIMonthly,
+            subscriptionProIIMonthly,
+            subscriptionProIIIMonthly
+        )
+        val yearlyOnlyProIProIIProIII = listOf(
+            subscriptionProIYearly,
+            subscriptionProIIYearly,
+            subscriptionProIIIYearly
+        )
+        val expectedList = listOf(
+            LocalisedSubscription(
+                monthlySubscription = subscriptionProLiteMonthly,
+                yearlySubscription = null,
+                localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                formattedSize = formattedSizeMapper,
+            ),
+            localisedSubscriptionProI,
+            localisedSubscriptionProII,
+            localisedSubscriptionProIII
+        )
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(monthlyWithProLite, yearlyOnlyProIProIIProIII)
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+        initViewModel()
+        underTest.state.map { it.localisedSubscriptionsList }.test {
+            Truth.assertThat(awaitItem()).isEqualTo(expectedList)
+        }
+    }
+
+    @Test
+    fun `test that initial state has cheapest Pro plan`() = runTest {
+        val expectedResult = LocalisedSubscription(
+            monthlySubscription = subscriptionProLiteMonthly,
+            yearlySubscription = subscriptionProLiteMonthly, // ViewModel uses the same subscription for both
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getRecommendedSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+        initViewModel(isUpgradeAccount = false)
+        underTest.state.map { it.cheapestSubscriptionAvailable }.test {
+            Truth.assertThat(awaitItem()).isEqualTo(expectedResult)
+        }
+    }
+
+    @Test
+    fun `test that loadCurrentSubscriptionPlan updates state with current plan and subscription cycle`() =
+        runTest {
+            val expectedPlan = AccountType.PRO_I
+            val expectedCycle = AccountSubscriptionCycle.MONTHLY
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(expectedPlan)
+                on { accountSubscriptionCycle }.thenReturn(expectedCycle)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(
+                false
+            )
+            initViewModel()
+
+            underTest.state.test {
+                val initialState = awaitItem()
+                Truth.assertThat(initialState.currentSubscriptionPlan).isEqualTo(expectedPlan)
+                Truth.assertThat(initialState.subscriptionCycle).isEqualTo(expectedCycle)
+            }
+        }
+
+    @Test
+    fun `test that subscriptionCycle uses the matching subscription cycle when the account level cycle disagrees`() =
+        runTest {
+            val expectedPlan = AccountType.PRO_I
+            val matchingSubscription = AccountSubscriptionDetail(
+                subscriptionId = "sub-123",
+                subscriptionStatus = SubscriptionStatus.VALID,
+                subscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+                paymentMethodType = null,
+                renewalTime = 0L,
+                subscriptionLevel = expectedPlan,
+                featuresList = emptyList(),
+                isFreeTrial = false,
+            )
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(expectedPlan)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { accountSubscriptionDetailList }.thenReturn(listOf(matchingSubscription))
+                on { accountPlanDetail }.thenReturn(null)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().subscriptionCycle)
+                    .isEqualTo(AccountSubscriptionCycle.MONTHLY)
+            }
+        }
+
+    @Test
+    fun `test that recommended subscription is recomputed once the current plan loads`() =
+        runTest {
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.MONTHLY)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+            advanceUntilIdle()
+
+            verify(getRecommendedSubscriptionUseCase).invoke()
+        }
+
+    @Test
+    fun `test that subscriptionCycle uses subscriptionId match when accountPlanDetail is available`() =
+        runTest {
+            val expectedPlan = AccountType.PRO_I
+            val matchingSubscription = AccountSubscriptionDetail(
+                subscriptionId = "sub-123",
+                subscriptionStatus = SubscriptionStatus.VALID,
+                subscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+                paymentMethodType = null,
+                renewalTime = 0L,
+                subscriptionLevel = AccountType.PRO_II,
+                featuresList = emptyList(),
+                isFreeTrial = false,
+            )
+            val planDetail = mock<AccountPlanDetail> {
+                on { subscriptionId }.thenReturn("sub-123")
+            }
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(expectedPlan)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { accountSubscriptionDetailList }.thenReturn(listOf(matchingSubscription))
+                on { accountPlanDetail }.thenReturn(planDetail)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().subscriptionCycle)
+                    .isEqualTo(AccountSubscriptionCycle.MONTHLY)
+            }
+        }
+
+    @Test
+    fun `test that subscriptionCycle falls back to the account level cycle when the matching subscription cycle is unknown`() =
+        runTest {
+            val expectedPlan = AccountType.PRO_I
+            val matchingSubscription = AccountSubscriptionDetail(
+                subscriptionId = "sub-123",
+                subscriptionStatus = SubscriptionStatus.VALID,
+                subscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                paymentMethodType = null,
+                renewalTime = 0L,
+                subscriptionLevel = expectedPlan,
+                featuresList = emptyList(),
+                isFreeTrial = false,
+            )
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(expectedPlan)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { accountSubscriptionDetailList }.thenReturn(listOf(matchingSubscription))
+                on { accountPlanDetail }.thenReturn(null)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().subscriptionCycle)
+                    .isEqualTo(AccountSubscriptionCycle.YEARLY)
+            }
+        }
+
+    @Test
+    fun `test that userAgeComplianceStatus is AdultVerified when feature flag is disabled`() =
+        runTest {
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
+                .thenReturn(false)
+
+            initViewModel()
+
+            underTest.state.map { it.userAgeComplianceStatus }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(UserAgeComplianceStatus.AdultVerified)
+            }
+        }
+
+    @Test
+    fun `test that userAgeComplianceStatus is set to AdultVerified when feature flag is enabled and user is adult`() =
+        runTest {
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
+                .thenReturn(true)
+            wheneverBlocking { ageSignalUseCase() }.thenReturn(UserAgeComplianceStatus.AdultVerified)
+
+            initViewModel()
+
+            underTest.state.map { it.userAgeComplianceStatus }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(UserAgeComplianceStatus.AdultVerified)
+            }
+        }
+
+    @Test
+    fun `test that userAgeComplianceStatus is set to RequiresMinorRestriction when feature flag is enabled and user is under age`() =
+        runTest {
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
+                .thenReturn(true)
+            wheneverBlocking { ageSignalUseCase() }.thenReturn(
+                UserAgeComplianceStatus.RequiresMinorRestriction
+            )
+
+            initViewModel()
+
+            underTest.state.map { it.userAgeComplianceStatus }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(
+                    UserAgeComplianceStatus.RequiresMinorRestriction
+                )
+            }
+        }
+
+    @Test
+    fun `test that yearly-only subscriptions are sorted by yearly price divided by 12`() =
+        runTest {
+            // Pro Lite: yearly only at 49.99 → 49.99/12 ≈ 4.17
+            // Pro I: yearly only at 99.99 → 99.99/12 ≈ 8.33
+            // Pro II: yearly only at 199.99 → 199.99/12 ≈ 16.67
+            // Expected sort order: Pro Lite, Pro I, Pro II (ascending by yearly/12)
+            val yearlyOnly = listOf(
+                subscriptionProIIYearly,
+                subscriptionProLiteYearly,
+                subscriptionProIYearly,
+            )
+            val expectedList = listOf(
+                LocalisedSubscription(
+                    monthlySubscription = null,
+                    yearlySubscription = subscriptionProLiteYearly,
+                    localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                    formattedSize = formattedSizeMapper,
+                ),
+                LocalisedSubscription(
+                    monthlySubscription = null,
+                    yearlySubscription = subscriptionProIYearly,
+                    localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                    formattedSize = formattedSizeMapper,
+                ),
+                LocalisedSubscription(
+                    monthlySubscription = null,
+                    yearlySubscription = subscriptionProIIYearly,
+                    localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                    formattedSize = formattedSizeMapper,
+                ),
+            )
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(emptyList(), yearlyOnly)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+            initViewModel()
+            underTest.state.map { it.localisedSubscriptionsList }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(expectedList)
+            }
+        }
+
+    @Test
+    fun `test that mixed monthly and yearly-only subscriptions are sorted correctly using yearly price divided by 12 as fallback`() =
+        runTest {
+            // Pro I: monthly at 9.99
+            // Pro Lite: yearly only at 49.99 → 49.99/12 ≈ 4.17
+            // Expected: Pro Lite (4.17) first, then Pro I (9.99)
+            val monthlyOnly = listOf(subscriptionProIMonthly)
+            val yearlyOnly = listOf(subscriptionProLiteYearly, subscriptionProIYearly)
+            val expectedList = listOf(
+                LocalisedSubscription(
+                    monthlySubscription = null,
+                    yearlySubscription = subscriptionProLiteYearly,
+                    localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                    formattedSize = formattedSizeMapper,
+                ),
+                LocalisedSubscription(
+                    monthlySubscription = subscriptionProIMonthly,
+                    yearlySubscription = subscriptionProIYearly,
+                    localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                    formattedSize = formattedSizeMapper,
+                ),
+            )
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(monthlyOnly, yearlyOnly)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+            initViewModel()
+            underTest.state.map { it.localisedSubscriptionsList }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(expectedList)
+            }
+        }
+
+    @Test
+    fun `test that isSubscriptionFeatureAvailable is false when getSubscriptionsUseCase throws LocalPricingNotAvailableException`() =
+        runTest {
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenThrow(LocalPricingNotAvailableException())
+            wheneverBlocking { isSubscriptionFeatureAvailableUseCase() }.thenReturn(false)
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(
+                false
+            )
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.map { it.isSubscriptionFeatureAvailable }.test {
+                Truth.assertThat(awaitItem()).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that age signal check is not called when feature flag is disabled`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
+            .thenReturn(false)
+
+        initViewModel()
+
+        underTest.state.test {
+            awaitItem()
+        }
+
+        verify(ageSignalUseCase, never()).invoke()
+    }
+
+    @Test
+    fun `test that loadCurrentSubscriptionPlan updates state with subscription status, renew and expiry times`() =
+        runTest {
+            val expectedRenewTime = 1_815_000_000L
+            val expectedExpiryTime = 1_820_000_000L
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.VALID)
+                on { subscriptionRenewTime }.thenReturn(expectedRenewTime)
+                on { proExpirationTime }.thenReturn(expectedExpiryTime)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.subscriptionStatus).isEqualTo(SubscriptionStatus.VALID)
+                Truth.assertThat(state.subscriptionRenewTime).isEqualTo(expectedRenewTime)
+                Truth.assertThat(state.proExpirationTime).isEqualTo(expectedExpiryTime)
+                Truth.assertThat(state.isCurrentSubscriptionRenewing).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that renew and expiry times are null when level detail returns zero`() = runTest {
+        val levelDetail = mock<AccountLevelDetail> {
+            on { accountType }.thenReturn(AccountType.PRO_I)
+            on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+            on { subscriptionStatus }.thenReturn(SubscriptionStatus.INVALID)
+            on { subscriptionRenewTime }.thenReturn(0L)
+            on { proExpirationTime }.thenReturn(0L)
+        }
+        val accountDetail = mock<AccountDetail> {
+            on { this.levelDetail }.thenReturn(levelDetail)
+        }
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        initViewModel()
+
+        underTest.state.test {
+            val state = awaitItem()
+            Truth.assertThat(state.subscriptionRenewTime).isNull()
+            Truth.assertThat(state.proExpirationTime).isNull()
+            Truth.assertThat(state.isCurrentSubscriptionRenewing).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that a one-off plan derives its period in months from start and expiry times`() =
+        runTest {
+            val startTime = 1_783_500_245L
+            val expiryTime = 1_815_036_245L
+            val planDetail = mock<AccountPlanDetail> {
+                on { this.startTime }.thenReturn(startTime)
+            }
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.UNKNOWN)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.NONE)
+                on { proExpirationTime }.thenReturn(expiryTime)
+                on { accountPlanDetail }.thenReturn(planDetail)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.proPlanStartTime).isEqualTo(startTime)
+                Truth.assertThat(state.currentPlanPeriod)
+                    .isEqualTo(PlanPeriod(12, ChronoUnit.MONTHS))
+            }
+        }
+
+    @Test
+    fun `test that a short one-off plan period is expressed in days`() =
+        runTest {
+            val startTime = 1_783_500_245L
+            val expiryTime = startTime + 5 * 24 * 60 * 60
+            val planDetail = mock<AccountPlanDetail> {
+                on { this.startTime }.thenReturn(startTime)
+            }
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.UNKNOWN)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.NONE)
+                on { proExpirationTime }.thenReturn(expiryTime)
+                on { accountPlanDetail }.thenReturn(planDetail)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().currentPlanPeriod)
+                    .isEqualTo(PlanPeriod(5, ChronoUnit.DAYS))
+            }
+        }
+
+    @Test
+    fun `test that the plan period is null when the plan has no start time`() =
+        runTest {
+            val planDetail = mock<AccountPlanDetail> {
+                on { this.startTime }.thenReturn(0L)
+            }
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.VALID)
+                on { proExpirationTime }.thenReturn(1_815_036_245L)
+                on { accountPlanDetail }.thenReturn(planDetail)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.proPlanStartTime).isNull()
+                Truth.assertThat(state.currentPlanPeriod).isNull()
+            }
+        }
+
+    @Test
+    fun `test that isCurrentPlanExpiring is true when a one-off plan expires within 30 days`() =
+        runTest {
+            val nowSeconds = 1_800_000_000L
+            val expiryTime = nowSeconds + 10 * 24 * 60 * 60
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.UNKNOWN)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.NONE)
+                on { proExpirationTime }.thenReturn(expiryTime)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getCurrentTimeInMillisUseCase()).thenReturn(nowSeconds * 1000)
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().isCurrentPlanExpiring).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that isCurrentPlanExpiring is false when the plan expires beyond 30 days`() =
+        runTest {
+            val nowSeconds = 1_800_000_000L
+            val expiryTime = nowSeconds + 60 * 24 * 60 * 60
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.UNKNOWN)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.NONE)
+                on { proExpirationTime }.thenReturn(expiryTime)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getCurrentTimeInMillisUseCase()).thenReturn(nowSeconds * 1000)
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().isCurrentPlanExpiring).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isCurrentPlanExpiring is false for a recurring plan even within 30 days`() =
+        runTest {
+            val nowSeconds = 1_800_000_000L
+            val expiryTime = nowSeconds + 10 * 24 * 60 * 60
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.VALID)
+                on { proExpirationTime }.thenReturn(expiryTime)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getCurrentTimeInMillisUseCase()).thenReturn(nowSeconds * 1000)
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().isCurrentPlanExpiring).isFalse()
+            }
+        }
+
+
+    @Test
+    fun `test that offerValidUntil is populated from the discounted offer expiry`() = runTest {
+        val offerExpiry = 1_787_464_050L
+        val offerSubscription = subscriptionProIMonthly.copy(
+            offerValidUntil = offerExpiry,
+            discountedAmountMonthly = CurrencyAmount(5.99f, Currency("EUR")),
+        )
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(listOf(offerSubscription), emptyList())
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+        initViewModel(isUpgradeAccount = false)
+        underTest.state.map { it.offerValidUntil }.test {
+            Truth.assertThat(awaitItem()).isEqualTo(offerExpiry)
+        }
+    }
+
+    @Test
+    fun `test that offerValidUntil is null when the plan has an expiry but no discount`() = runTest {
+        val offerSubscription = subscriptionProIMonthly.copy(
+            offerValidUntil = 1_787_464_050L,
+            discountedAmountMonthly = null,
+        )
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(listOf(offerSubscription), emptyList())
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+        initViewModel(isUpgradeAccount = false)
+        underTest.state.map { it.offerValidUntil }.test {
+            Truth.assertThat(awaitItem()).isNull()
+        }
+    }
+
+    private val subscriptionProIMonthly = Subscription(
+        sku = "mega.android.pro1.onemonth",
+        accountType = AccountType.PRO_I,
+        handle = 1560943707714440503,
+        storage = PRO_I_STORAGE_TRANSFER,
+        transfer = PRO_I_STORAGE_TRANSFER,
+        amount = CurrencyAmount(PRO_I_PRICE_MONTHLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProIIMonthly = Subscription(
+        sku = "mega.android.pro2.onemonth",
+        accountType = AccountType.PRO_II,
+        handle = 7974113413762509455,
+        storage = PRO_II_STORAGE_TRANSFER,
+        transfer = PRO_II_STORAGE_TRANSFER,
+        amount = CurrencyAmount(PRO_II_PRICE_MONTHLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProIIIMonthly = Subscription(
+        sku = "mega.android.pro3.onemonth",
+        accountType = AccountType.PRO_III,
+        handle = -2499193043825823892,
+        storage = PRO_III_STORAGE_TRANSFER,
+        transfer = PRO_III_STORAGE_TRANSFER,
+        amount = CurrencyAmount(PRO_III_PRICE_MONTHLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProLiteMonthly = Subscription(
+        sku = "mega.android.prolite.onemonth",
+        accountType = AccountType.PRO_LITE,
+        handle = -4226692769210777158,
+        storage = PRO_LITE_STORAGE,
+        transfer = PRO_LITE_TRANSFER_MONTHLY,
+        amount = CurrencyAmount(PRO_LITE_PRICE_MONTHLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val expectedMonthlySubscriptionsList = listOf(
+        subscriptionProLiteMonthly,
+        subscriptionProIMonthly,
+        subscriptionProIIMonthly,
+        subscriptionProIIIMonthly
+    )
+
+    private val subscriptionProIYearly = Subscription(
+        sku = "mega.android.pro1.oneyear",
+        accountType = AccountType.PRO_I,
+        handle = 7472683699866478542,
+        storage = PRO_I_STORAGE_TRANSFER,
+        transfer = PRO_I_TRANSFER_YEARLY,
+        amount = CurrencyAmount(PRO_I_PRICE_YEARLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProIIYearly = Subscription(
+        sku = "mega.android.pro2.oneyear",
+        accountType = AccountType.PRO_II,
+        handle = 370834413380951543,
+        storage = PRO_II_STORAGE_TRANSFER,
+        transfer = PRO_II_TRANSFER_YEARLY,
+        amount = CurrencyAmount(PRO_II_PRICE_YEARLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProIIIYearly = Subscription(
+        sku = "mega.android.pro3.oneyear",
+        accountType = AccountType.PRO_III,
+        handle = 7225413476571973499,
+        storage = PRO_III_STORAGE_TRANSFER,
+        transfer = PRO_III_TRANSFER_YEARLY,
+        amount = CurrencyAmount(PRO_III_PRICE_YEARLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProLiteYearly = Subscription(
+        sku = "mega.android.prolite.oneyear",
+        accountType = AccountType.PRO_LITE,
+        handle = -5517769810977460898,
+        storage = PRO_LITE_STORAGE,
+        transfer = PRO_LITE_TRANSFER_YEARLY,
+        amount = CurrencyAmount(PRO_LITE_PRICE_YEARLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val expectedYearlySubscriptionsList = listOf(
+        subscriptionProLiteYearly,
+        subscriptionProIYearly,
+        subscriptionProIIYearly,
+        subscriptionProIIIYearly
+    )
+
+    private val localisedSubscriptionProI = LocalisedSubscription(
+        monthlySubscription = subscriptionProIMonthly,
+        yearlySubscription = subscriptionProIYearly,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+    )
+
+    private val localisedSubscriptionProII = LocalisedSubscription(
+        monthlySubscription = subscriptionProIIMonthly,
+        yearlySubscription = subscriptionProIIYearly,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+    )
+
+    private val localisedSubscriptionProIII = LocalisedSubscription(
+        monthlySubscription = subscriptionProIIIMonthly,
+        yearlySubscription = subscriptionProIIIYearly,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+    )
+
+    private val localisedSubscriptionProLite = LocalisedSubscription(
+        monthlySubscription = subscriptionProLiteMonthly,
+        yearlySubscription = subscriptionProLiteYearly,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+    )
+
+    private val expectedLocalisedSubscriptionsList = listOf(
+        localisedSubscriptionProLite,
+        localisedSubscriptionProI,
+        localisedSubscriptionProII,
+        localisedSubscriptionProIII
+    )
+
+    companion object {
+        const val PRO_I_STORAGE_TRANSFER = 2048
+        const val PRO_II_STORAGE_TRANSFER = 8192
+        const val PRO_III_STORAGE_TRANSFER = 16384
+        const val PRO_LITE_STORAGE = 400
+        const val PRO_LITE_TRANSFER_MONTHLY = 1024
+        const val PRO_LITE_TRANSFER_YEARLY = 12288
+        const val PRO_I_TRANSFER_YEARLY = 24576
+        const val PRO_II_TRANSFER_YEARLY = 98304
+        const val PRO_III_TRANSFER_YEARLY = 196608
+        const val PRO_I_PRICE_MONTHLY = 9.99F
+        const val PRO_II_PRICE_MONTHLY = 19.99F
+        const val PRO_III_PRICE_MONTHLY = 29.99F
+        const val PRO_LITE_PRICE_MONTHLY = 4.99F
+        const val PRO_I_PRICE_YEARLY = 99.99F
+        const val PRO_II_PRICE_YEARLY = 199.99F
+        const val PRO_III_PRICE_YEARLY = 299.99F
+        const val PRO_LITE_PRICE_YEARLY = 49.99F
+    }
+}

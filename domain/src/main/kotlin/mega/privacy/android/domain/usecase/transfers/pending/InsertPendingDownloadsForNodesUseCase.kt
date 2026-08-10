@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.pending
 
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -65,6 +66,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
                     appData = appDataList,
                     isHighPriority = isHighPriority,
                     fileName = node.name,
+                    pitagTrigger = PitagTrigger.NotApplicable,
                 )
             }
         )

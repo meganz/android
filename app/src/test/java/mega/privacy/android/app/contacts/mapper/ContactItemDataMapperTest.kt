@@ -1,6 +1,7 @@
 package mega.privacy.android.app.contacts.mapper
 
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import androidx.core.net.toUri
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.contacts.ContactData
@@ -8,16 +9,23 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import nz.mega.sdk.MegaChatApi
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.mockito.MockedStatic
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class ContactItemDataMapperTest {
     private lateinit var underTest: ContactItemDataMapper
+
+    private lateinit var uriMock: MockedStatic<Uri>
+    private val parsedUri = mock<Uri>()
 
     private val getUnformattedLastSeenDate = mock<(Int) -> String> {
         on { invoke(any()) } doReturn "default"
@@ -34,11 +42,18 @@ class ContactItemDataMapperTest {
 
     @BeforeEach
     internal fun setUp() {
+        uriMock = Mockito.mockStatic(Uri::class.java)
+        whenever(Uri.parse(any())).thenReturn(parsedUri)
         underTest = ContactItemDataMapper(
             getUnformattedLastSeenDate = getUnformattedLastSeenDate,
             getPlaceHolderDrawable = getPlaceHolderDrawable,
             wasRecentlyAdded = wasRecentlyAdded
         )
+    }
+
+    @AfterEach
+    internal fun tearDown() {
+        uriMock.close()
     }
 
     @Test

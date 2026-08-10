@@ -86,6 +86,20 @@ interface BillingRepository {
     suspend fun legacyCancelSubscriptions(feedback: String?): Boolean
 
     /**
+     * Get the billing country code
+     *
+     * @return the billing country code as a String
+     */
+    suspend fun getBillingCountryCode(): String?
+
+    /**
+     * Check if subscription feature is available on this device (e.g. Google Play supports subscriptions).
+     *
+     * @return [Boolean] true if subscriptions are supported, false otherwise
+     */
+    suspend fun isSubscriptionFeatureAvailable(): Boolean
+
+    /**
      * Provide API with cancellation survey answers
      */
     suspend fun cancelSubscriptionWithSurveyAnswers(
@@ -93,4 +107,6 @@ interface BillingRepository {
         subscriptionId: String,
         canContact: Int,
     )
+
 }
+

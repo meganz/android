@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.mapper
 
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import javax.inject.Inject
 
 /**

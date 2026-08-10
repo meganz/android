@@ -26,13 +26,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.largebundle.LargeBundleHolder
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
-import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
+import mega.privacy.android.shared.nodes.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -44,6 +46,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -63,20 +66,25 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.imagepreview.ClearImageResultUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
+import mega.privacy.android.domain.usecase.imagepreview.IsEditableImageUseCase
+import mega.privacy.android.domain.usecase.imagepreview.IsEditableVideoUseCase
+import mega.privacy.android.domain.usecase.imagepreview.mapper.OfflineFileInformationToImageNodeMapper
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedR
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -104,7 +112,6 @@ class ImagePreviewViewModel @Inject constructor(
     private val checkUri: CheckFileUriUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
     private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
     private val deleteNodesUseCase: DeleteNodesUseCase,
@@ -118,14 +125,23 @@ class ImagePreviewViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
+    private val getNodeByHandle: GetNodeByHandle,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val isEditableImageUseCase: IsEditableImageUseCase,
+    private val isEditableVideoUseCase: IsEditableVideoUseCase,
+    private val largeBundleHolder: LargeBundleHolder,
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
 
-    private val params: Bundle
-        get() = savedStateHandle[FETCHER_PARAMS] ?: Bundle()
+    private suspend fun loadParams(): Bundle {
+        val key = savedStateHandle.get<String>(FETCHER_PARAMS) ?: return Bundle()
+        return largeBundleHolder.get(key) ?: Bundle()
+    }
 
     private val currentImageNodeIdValue: Long
         get() = savedStateHandle[PARAMS_CURRENT_IMAGE_NODE_ID_VALUE] ?: 0L
@@ -147,12 +163,27 @@ class ImagePreviewViewModel @Inject constructor(
     init {
         monitorConnectivity()
         viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                handleInitFlow()
-            } else {
-                monitorImageNodes()
-            }
+            handleInitFlow()
             monitorOfflineNodeUpdates()
+        }
+        loadLinkAndLoginState()
+    }
+
+    private fun loadLinkAndLoginState() {
+        viewModelScope.launch {
+            val isFromLink = imagePreviewFetcherSource == ImagePreviewFetcherSource.FILE_LINK
+                    || imagePreviewFetcherSource == ImagePreviewFetcherSource.FOLDER_LINK
+                    || imagePreviewFetcherSource == ImagePreviewFetcherSource.ALBUM_SHARING
+                    || imagePreviewFetcherSource == ImagePreviewFetcherSource.PUBLIC_FILE
+            val isLoggedIn = runCatching { isUserLoggedInUseCase() }.getOrDefault(false)
+            val isFromOffline = imagePreviewFetcherSource == ImagePreviewFetcherSource.OFFLINE
+            _state.update {
+                it.copy(
+                    isFromLink = isFromLink,
+                    isLoggedIn = isLoggedIn,
+                    isFromOffline = isFromOffline,
+                )
+            }
         }
     }
 
@@ -164,15 +195,9 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
-    suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
-    }
-
     private suspend fun handleInitFlow() {
         val imageFetcher = imageNodeFetchers[imagePreviewFetcherSource] ?: return
+        val params = loadParams()
         combine(
             monitorShowHiddenItemsUseCase(),
             monitorAccountDetailUseCase(),
@@ -193,7 +218,7 @@ class ImagePreviewViewModel @Inject constructor(
                 showHiddenItems = showHiddenItems,
                 isPaid = accountType?.isPaid,
                 isBusinessAccountExpired = isBusinessAccountExpired,
-            )
+            ).distinctBy { it.id }
             val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(
                 filteredImageNodes
             )
@@ -233,33 +258,6 @@ class ImagePreviewViewModel @Inject constructor(
                             isCurrentImageNodeAvailableOffline = isAvailableOffline
                         )
                     }
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun monitorImageNodes() {
-        val imageFetcher = imageNodeFetchers[imagePreviewFetcherSource] ?: return
-        imageFetcher.monitorImageNodes(params)
-            .catch { Timber.e(it) }
-            .mapLatest { imageNodes ->
-                val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(
-                    imageNodes
-                )
-                val isCurrentImageNodeAvailableOffline =
-                    currentImageNode?.isAvailableOffline ?: false
-
-                Timber.d("ImagePreview VM imageNodes: ${imageNodes.size}")
-
-                _state.update {
-                    it.copy(
-                        isInitialized = true,
-                        imageNodes = imageNodes,
-                        currentImageNodeIndex = currentImageNodeIndex,
-                        currentImageNode = currentImageNode,
-                        isCurrentImageNodeAvailableOffline = isCurrentImageNodeAvailableOffline
-                    )
                 }
             }
             .launchIn(viewModelScope)
@@ -355,7 +353,12 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun isShareMenuVisible(imageNode: ImageNode): Boolean {
-        return menu?.isShareMenuVisible(imageNode) ?: false
+        return menu?.isShareMenuVisible(imageNode) == true
+    }
+
+    suspend fun isShareMenuVisibleInToolbar(imageNode: ImageNode): Boolean {
+        return menu?.isShareMenuVisible(imageNode) == true
+                && imagePreviewMenuSource == ImagePreviewMenuSource.PUBLIC_FILE
     }
 
     suspend fun isRenameMenuVisible(imageNode: ImageNode): Boolean {
@@ -368,6 +371,12 @@ class ImagePreviewViewModel @Inject constructor(
 
     suspend fun isUnhideMenuVisible(imageNode: ImageNode): Boolean {
         return menu?.isUnhideMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isNodeInBackups(imageNode: ImageNode): Boolean {
+        return runCatching { isNodeInBackupsUseCase(imageNode.id.longValue) }
+            .onFailure { Timber.e(it, "Failed to check if node is in backups") }
+            .getOrDefault(false)
     }
 
     // When ImageNode from ShareItems, then we always hide the hidden menus (Hide/Unhide) in Bottom Sheet
@@ -414,9 +423,6 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun isPhotoEditorMenuVisible(imageNode: ImageNode): Boolean {
-        val isFeatureFlagEnabled = runCatching {
-            getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)
-        }.getOrDefault(false)
         val hasWritePermission = runCatching {
             getNodeAccessPermission(imageNode.id) in setOf(
                 AccessPermission.READWRITE,
@@ -433,31 +439,40 @@ class ImagePreviewViewModel @Inject constructor(
             ImagePreviewFetcherSource.FAVOURITE,
             ImagePreviewFetcherSource.SHARED_ITEMS,
         )
-        return isFeatureFlagEnabled && isValidSource && hasWritePermission && imageNode.type.mimeType in
-                setOf(
-                    "image/jpeg",
-                    "image/jpg",
-                    "image/png",
-                    "image/bmp",
-                    "image/x-ms-bmp",
-                    "image/heif"
-                )
+        val isSupportedImage = runCatching {
+            isEditableImageUseCase(imageNode.type)
+        }.getOrDefault(false)
+        val isSupportedVideo = runCatching {
+            isEditableVideoUseCase(imageNode.type)
+        }.getOrDefault(false) && runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.VideoEditor)
+        }.getOrDefault(false)
+        val isNotInBackups = !isNodeInBackups(imageNode)
+        return isValidSource && hasWritePermission && isNotInBackups &&
+                (isSupportedImage || isSupportedVideo)
     }
 
     suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {
-        return if (imageNode.serializedData?.contains("local") == true) {
-            flow {
+        return when {
+            imageNode.serializedData?.contains("local") == true -> flow {
                 val file = File(imageNode.previewPath ?: return@flow)
                 emit(getImageFromFileUseCase(file))
             }
-        } else {
-            val typedNode = addImageTypeUseCase(imageNode)
-            getImageUseCase(
-                node = typedNode,
-                fullSize = true,
-                highPriority = true,
-                resetDownloads = {},
-            )
+
+            imageNode.serializedData == OfflineFileInformationToImageNodeMapper.OFFLINE_SERIALIZED_DATA_FLAG -> flow {
+                val file = File(imageNode.fullSizePath ?: return@flow)
+                emit(getImageFromFileUseCase(file))
+            }
+
+            else -> {
+                val typedNode = addImageTypeUseCase(imageNode)
+                getImageUseCase(
+                    node = typedNode,
+                    fullSize = true,
+                    highPriority = true,
+                    resetDownloads = {},
+                )
+            }
         }.catch { Timber.e("Failed to load image: $it") }
     }
 
@@ -602,6 +617,16 @@ class ImagePreviewViewModel @Inject constructor(
             Timber.e("Current Image node not found")
         }
     }
+
+    /**
+     * Resolve the underlying [MegaNode] for an [imageNode]. Prefers the cached
+     * `serializedData`; falls back to a handle lookup when the serialized blob is
+     * missing or fails to deserialize.
+     */
+    @Suppress("DEPRECATION")
+    suspend fun resolveMegaNode(imageNode: ImageNode): MegaNode? =
+        imageNode.serializedData?.let { MegaNode.unserialize(it) }
+            ?: getNodeByHandle(imageNode.id.longValue)
 
     /**
      * Consume transfer event
@@ -897,12 +922,14 @@ class ImagePreviewViewModel @Inject constructor(
         context: Context,
         imageNode: ImageNode,
     ) = viewModelScope.launch {
+        val params = loadParams()
         imagePreviewVideoLauncher.launchVideoScreen(
             context = context,
             imageNode = imageNode,
             source = imagePreviewFetcherSource,
             albumTitle = params.getString(AlbumContentImageNodeFetcher.ALBUM_TITLE),
-            albumId = params.getLong(AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID)
+            albumId = params.getLong(AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID),
+            publicLinkUrl = savedStateHandle[IMAGE_PREVIEW_PUBLIC_LINK_URL],
         )
     }
 
@@ -913,6 +940,8 @@ class ImagePreviewViewModel @Inject constructor(
      */
     fun isInOfflineMode() =
         imagePreviewFetcherSource == ImagePreviewFetcherSource.OFFLINE && !state.value.isOnline
+
+    fun isFileLink() = imagePreviewMenuSource == ImagePreviewMenuSource.PUBLIC_FILE
 
     fun launchPhotoEditor(imageNode: ImageNode) {
         viewModelScope.launch {
@@ -952,7 +981,8 @@ class ImagePreviewViewModel @Inject constructor(
                     size = currentImageNode.size,
                     lastModified = currentImageNode.modificationTime,
                     parentHandle = destinationId.longValue,
-                    path = UriPath(path)
+                    path = UriPath(path),
+                    pitagTrigger = PitagTrigger.NotApplicable,
                 )
                 val renameName = getNodeNameCollisionRenameNameUseCase(fileCollision)
                 _state.update { state ->
@@ -961,7 +991,8 @@ class ImagePreviewViewModel @Inject constructor(
                             TransferTriggerEvent.StartUpload.Files(
                                 pathsAndNames = mapOf(path to renameName),
                                 destinationId = destinationId,
-                                specificStartMessage = context.getString(sharedR.string.photo_editor_upload_message)
+                                specificStartMessage = context.getString(sharedR.string.photo_editor_upload_message),
+                                pitagTrigger = PitagTrigger.NotApplicable,
                             )
                         )
                     )
@@ -977,5 +1008,6 @@ class ImagePreviewViewModel @Inject constructor(
         const val PARAMS_CURRENT_IMAGE_NODE_ID_VALUE = "currentImageNodeIdValue"
         const val IMAGE_PREVIEW_IS_FOREIGN = "image_preview_is_foreign"
         const val IMAGE_PREVIEW_ADD_TO_ALBUM = "image_preview_add_to_album"
+        const val IMAGE_PREVIEW_PUBLIC_LINK_URL = "image_preview_public_link_url"
     }
 }

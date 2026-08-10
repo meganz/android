@@ -136,7 +136,7 @@ class MegaProviderAdapter(
             params.setMargins(margin, margin, margin, margin)
 
             holder.imageView.setImageResource(IconPackR.drawable.ic_folder_medium_solid)
-            holder.textViewFileSize.text = MegaApiUtils.getMegaNodeFolderInfo(node, context)
+            holder.textViewFileSize.text = MegaApiUtils.getMegaNodeFolderInfo(node, megaApi, context)
 
             if (node.isInShare) {
                 val sharesIncoming = megaApi.inSharesList
@@ -164,7 +164,7 @@ class MegaProviderAdapter(
                 }
             } else {
                 holder.permissionsIcon.visibility = View.GONE
-                holder.textViewFileSize.text = MegaApiUtils.getMegaNodeFolderInfo(node, context)
+                holder.textViewFileSize.text = MegaApiUtils.getMegaNodeFolderInfo(node, megaApi, context)
             }
 
             if (isMultipleSelect() && isItemChecked(position)) {
@@ -172,7 +172,7 @@ class MegaProviderAdapter(
             } else {
                 holder.imageView.setImageResource(
                     if (node.isInShare)
-                        IconPackR.drawable.ic_folder_incoming_medium_solid
+                        IconPackR.drawable.ic_folder_users_medium_solid
                     else
                         IconPackR.drawable.ic_folder_medium_solid
                 )

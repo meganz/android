@@ -1,0 +1,67 @@
+package mega.privacy.mobile.home.presentation.continuewhereleftoff
+
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.domain.entity.toDuration
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import javax.inject.Inject
+
+/**
+ * Resolves blank titles and audio/video durations in [ContinueWhereLeftOffItem] lists
+ * by fetching node data from [GetNodeByIdUseCase]. Results are cached by nodeHandle
+ * so each node is resolved at most once per instance lifetime.
+ *
+ * The incoming title is authoritative: it is kept whenever it is non-blank (the domain
+ * keeps it in sync with the current node name), and the cached name is only used as a
+ * fallback for a still-blank title. This prevents a stale cached name from clobbering a
+ * title that has since been refreshed (e.g. after a rename).
+ */
+internal class ContinueWhereLeftOffNameResolver @Inject constructor(
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val removeRecentlyUsedItemUseCase: RemoveRecentlyUsedItemUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+) {
+    private data class ResolvedData(val name: String, val duration: String?)
+
+    private val cache = mutableMapOf<Long, ResolvedData>()
+
+    fun applyCachedNames(items: List<ContinueWhereLeftOffItem>) = items.map { item ->
+        cache[item.nodeHandle]?.let { resolved ->
+            item.copy(
+                title = item.title.ifBlank { resolved.name },
+                duration = resolved.duration ?: item.duration,
+            )
+        } ?: item
+    }
+
+    suspend fun resolveBlankNames(items: List<ContinueWhereLeftOffItem>): Boolean {
+        // Resolving names/durations reads the account node tree, which may be unavailable while
+        // offline (or briefly during reconnect). Skip resolution entirely when disconnected:
+        // there is nothing to fetch, and a transient miss must not be mistaken for a deleted node
+        // and prune the item. Items keep their stored/cached names and resolve once back online.
+        if (!isConnectedToInternetUseCase()) return false
+        val unresolved = items.filter { it.nodeHandle !in cache && (it.title.isBlank() || it.duration == null) }
+        if (unresolved.isEmpty()) return false
+        val sizeBefore = cache.size
+        unresolved.forEach { item ->
+            val node = runCatching {
+                getNodeByIdUseCase(NodeId(item.nodeHandle))
+            }.getOrNull()
+            if (node != null) {
+                val duration = (node as? TypedFileNode)?.type?.toDuration()
+                cache[item.nodeHandle] = ResolvedData(
+                    name = node.name,
+                    duration = duration?.let { durationInSecondsTextMapper(it) },
+                )
+            } else {
+                runCatching { removeRecentlyUsedItemUseCase(item.nodeHandle) }
+            }
+        }
+        return cache.size > sizeBefore
+    }
+}

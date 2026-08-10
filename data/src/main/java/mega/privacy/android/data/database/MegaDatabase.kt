@@ -8,41 +8,55 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.FolderPreferenceDao
+import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
+import mega.privacy.android.data.database.dao.RecentSearchDao
+import mega.privacy.android.data.database.dao.RecentlyUsedDao
+import mega.privacy.android.data.database.dao.RecentlyUsedTypeDao
+import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
 import mega.privacy.android.data.database.dao.SyncShownNotificationDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
+import mega.privacy.android.data.database.dao.TextEditorScrollDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
-import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.ContactEntity
+import mega.privacy.android.data.database.entity.FolderPreferenceEntity
+import mega.privacy.android.data.database.entity.HomePinnedItemEntity
 import mega.privacy.android.data.database.entity.HomeWidgetConfigurationEntity
 import mega.privacy.android.data.database.entity.LastPageViewedInPdfEntity
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
 import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.PendingTransferEntity
+import mega.privacy.android.data.database.entity.RecentSearchEntity
+import mega.privacy.android.data.database.entity.RecentlyUsedEntity
+import mega.privacy.android.data.database.entity.RecentlyUsedTypeEntity
+import mega.privacy.android.data.database.entity.RecentlyViewedLinkEntity
 import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
 import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
+import mega.privacy.android.data.database.entity.TextEditorScrollEntity
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
+import mega.privacy.android.data.database.spec.AutoMigrationDeleteActiveTransfersSpec
 import mega.privacy.android.data.database.spec.AutoMigrationSpec100to101
 import mega.privacy.android.data.database.spec.AutoMigrationSpec102to103
+import mega.privacy.android.data.database.spec.AutoMigrationSpec118to119
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
 import mega.privacy.android.data.database.spec.AutoMigrationSpec81to82
 import mega.privacy.android.data.database.spec.AutoMigrationSpec95to96
@@ -53,7 +67,6 @@ import timber.log.Timber
         ContactEntity::class,
         CompletedTransferEntity::class,
         CompletedTransferEntityLegacy::class,
-        ActiveTransferEntity::class,
         ActiveTransferActionGroupEntity::class,
         BackupEntity::class,
         OfflineEntity::class,
@@ -67,6 +80,13 @@ import timber.log.Timber
         LastPageViewedInPdfEntity::class,
         MediaPlaybackInfoEntity::class,
         HomeWidgetConfigurationEntity::class,
+        HomePinnedItemEntity::class,
+        RecentSearchEntity::class,
+        RecentlyUsedTypeEntity::class,
+        RecentlyUsedEntity::class,
+        RecentlyViewedLinkEntity::class,
+        TextEditorScrollEntity::class,
+        FolderPreferenceEntity::class,
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
@@ -106,6 +126,13 @@ import timber.log.Timber
         AutoMigration(109, 110),
         AutoMigration(112, 113),
         AutoMigration(113, 114),
+        AutoMigration(114, 115),
+        AutoMigration(115, 116),
+        AutoMigration(116, 117),
+        AutoMigration(117, 118, spec = AutoMigrationDeleteActiveTransfersSpec::class),
+        AutoMigration(118, 119, spec = AutoMigrationSpec118to119::class),
+        AutoMigration(121, 122),
+        AutoMigration(122, 123),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -113,7 +140,6 @@ internal abstract class MegaDatabase : RoomDatabase() {
 
     abstract fun completedTransferDao(): CompletedTransferDao
 
-    abstract fun activeTransfersDao(): ActiveTransferDao
 
     abstract fun activeTransferGroupsDao(): ActiveTransferGroupDao
 
@@ -141,6 +167,20 @@ internal abstract class MegaDatabase : RoomDatabase() {
 
     abstract fun homeWidgetConfigurationDao(): HomeWidgetConfigurationDao
 
+    abstract fun homePinnedItemDao(): HomePinnedItemDao
+
+    abstract fun recentSearchDao(): RecentSearchDao
+
+    abstract fun recentlyUsedDao(): RecentlyUsedDao
+
+    abstract fun recentlyUsedTypeDao(): RecentlyUsedTypeDao
+
+    abstract fun recentlyViewedLinkDao(): RecentlyViewedLinkDao
+
+    abstract fun textEditorScrollDao(): TextEditorScrollDao
+
+    abstract fun folderPreferenceDao(): FolderPreferenceDao
+
     companion object {
 
         /**
@@ -162,6 +202,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
             startVersions = (1..66).toList()
                 .toIntArray() // allow destructive migration for version 1 to 66
         ).addMigrations(*MIGRATIONS)
+            .addCallback(SeedRecentlyUsedTypeCallback)
             .openHelperFactory(
                 MegaOpenHelperFactor(
                     factory,
@@ -170,6 +211,20 @@ internal abstract class MegaDatabase : RoomDatabase() {
             )
             .fallbackToDestructiveMigrationOnDowngrade(true)
             .build()
+
+        /**
+         * Seeds the recently_used_type lookup table on fresh install.
+         * AutoMigrationSpec118to119 only runs on upgrade; this callback
+         * ensures the seed data exists when the DB is created from scratch.
+         */
+        private object SeedRecentlyUsedTypeCallback : RoomDatabase.Callback() {
+            override fun onCreate(connection: SupportSQLiteDatabase) {
+                super.onCreate(connection)
+                MegaDatabaseConstant.SEED_RECENTLY_USED_TYPE_SQL.forEach {
+                    connection.execSQL(it)
+                }
+            }
+        }
 
         private val MIGRATION_67_68 = object : Migration(67, 68) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -294,12 +349,12 @@ internal abstract class MegaDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Update ActiveTransferEntity indices
                 db.execSQL(
-                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS}_uniqueId " +
-                            "ON ${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS} (uniqueId)"
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS_LEGACY}_uniqueId " +
+                            "ON ${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS_LEGACY} (uniqueId)"
                 )
                 db.execSQL(
-                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS}_tag " +
-                            "ON ${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS} (tag)"
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS_LEGACY}_tag " +
+                            "ON ${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS_LEGACY} (tag)"
                 )
 
                 // Update CompletedTransferEntity indices - drop composite index and create separate indices
@@ -340,6 +395,78 @@ internal abstract class MegaDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_119_120 = object : Migration(119, 120) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Remove duplicate offline entries keeping the one with the highest id (most recent)
+                db.execSQL(
+                    "DELETE FROM ${MegaDatabaseConstant.TABLE_OFFLINE} WHERE id NOT IN (" +
+                            "SELECT MAX(id) FROM ${MegaDatabaseConstant.TABLE_OFFLINE} GROUP BY handle, path" +
+                            ")"
+                )
+                // Add unique index on (handle, path) to prevent future duplicates
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_OFFLINE}_handle_path " +
+                            "ON ${MegaDatabaseConstant.TABLE_OFFLINE} (handle, path)"
+                )
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}` (" +
+                            "`node_handle` INTEGER NOT NULL, " +
+                            "`link_url` TEXT NOT NULL, " +
+                            "PRIMARY KEY(`node_handle`), " +
+                            "FOREIGN KEY(`node_handle`) REFERENCES `${MegaDatabaseConstant.TABLE_RECENTLY_USED}`(`node_handle`) " +
+                            "ON UPDATE NO ACTION ON DELETE CASCADE" +
+                            ")"
+                )
+            }
+        }
+
+        private val MIGRATION_120_121 = object : Migration(120, 121) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Decouple Recently Viewed Links from Recently Used (CWLO) by creating a same table
+                // suffixed with _new
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}_new` (" +
+                            "`node_handle` INTEGER NOT NULL, " +
+                            "`type_id` INTEGER NOT NULL, " +
+                            "`node_name` TEXT NOT NULL, " +
+                            "`link_url` TEXT NOT NULL, " +
+                            "`last_accessed_timestamp` INTEGER NOT NULL, " +
+                            "PRIMARY KEY(`node_handle`)" +
+                            ")"
+                )
+                db.execSQL(
+                    "INSERT INTO `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}_new` " +
+                            "(`node_handle`, `type_id`, `node_name`, `link_url`, `last_accessed_timestamp`) " +
+                            "SELECT rvl.`node_handle`, " +
+                            "CASE ru.`type_id` WHEN 5 THEN 1 WHEN 6 THEN 2 ELSE 1 END, " +
+                            "COALESCE(ru.`file_name`, ''), " +
+                            "rvl.`link_url`, " +
+                            "COALESCE(ru.`last_accessed_timestamp`, 0) " +
+                            "FROM `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}` rvl " +
+                            "LEFT JOIN `${MegaDatabaseConstant.TABLE_RECENTLY_USED}` ru " +
+                            "ON rvl.`node_handle` = ru.`node_handle`"
+                )
+                db.execSQL("DROP TABLE `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}`")
+                // Rename it to the same name after dropping the old table
+                db.execSQL(
+                    "ALTER TABLE `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}_new` " +
+                            "RENAME TO `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}`"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_recently_viewed_link_last_accessed` " +
+                            "ON `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}` (`last_accessed_timestamp`)"
+                )
+                // Viewed links are no longer mirrored in recently_used; drop the
+                // FileLink/FolderLink rows so the "Continue Where You Left Off"
+                // feature doesn't surface them anymore.
+                db.execSQL(
+                    "DELETE FROM `${MegaDatabaseConstant.TABLE_RECENTLY_USED}` " +
+                            "WHERE `type_id` IN (5, 6)"
+                )
+            }
+        }
+
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
             MIGRATION_68_69,
@@ -353,6 +480,8 @@ internal abstract class MegaDatabase : RoomDatabase() {
             MIGRATION_107_108,
             MIGRATION_110_111,
             MIGRATION_111_112,
+            MIGRATION_119_120,
+            MIGRATION_120_121,
         )
     }
 }

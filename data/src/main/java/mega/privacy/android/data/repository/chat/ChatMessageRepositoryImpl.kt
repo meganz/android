@@ -149,6 +149,7 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
                 nodeHandle = savePendingMessageRequest.nodeHandle,
                 fingerprint = savePendingMessageRequest.fingerprint,
                 name = savePendingMessageRequest.name,
+                pitagTrigger = savePendingMessageRequest.pitagTrigger,
             )
         }
     }

@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
@@ -25,15 +25,18 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceBottomSheetBody
+import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.DeviceFolderBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.lists.loading.DeviceCenterLoadingScreen
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.renamedevice.RenameDeviceDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * A [androidx.compose.runtime.Composable] that serves as the main View for the Device Center (Material 3 version)
@@ -65,10 +68,13 @@ internal fun DeviceCenterScreenM3(
     onDeviceMenuClicked: (DeviceUINode) -> Unit,
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit,
     onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit,
+    onFolderMenuClicked: (DeviceFolderUINode) -> Unit,
     onCameraUploadsClicked: () -> Unit,
     onInfoOptionClicked: (DeviceCenterUINode) -> Unit,
     onAddNewSyncOptionClicked: () -> Unit,
     onAddBackupOptionClicked: () -> Unit,
+    onRemoveConnectionClicked: (DeviceFolderUINode) -> Unit,
+    onRemoveFolderConnectionSuccessSnackbarShown: () -> Unit,
     onRenameDeviceOptionClicked: (DeviceUINode) -> Unit,
     onRenameDeviceCancelled: () -> Unit,
     onRenameDeviceSuccessful: () -> Unit,
@@ -77,10 +83,10 @@ internal fun DeviceCenterScreenM3(
     onFeatureExited: () -> Unit,
     paddingValues: PaddingValues = PaddingValues(),
 ) {
-    val context = LocalContext.current
     val selectedDevice = uiState.selectedDevice
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val snackbarHostState = LocalSnackBarHostState.current ?: SnackbarHostState()
+    val localResources = LocalResources.current
 
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
@@ -104,8 +110,20 @@ internal fun DeviceCenterScreenM3(
         onConsumed = onRenameDeviceSuccessfulSnackbarShown,
         action = {
             snackbarHostState.showAutoDurationSnackbar(
-                context.resources.getString(
+                localResources.getString(
                     R.string.device_center_snackbar_message_rename_device_successful
+                )
+            )
+        },
+    )
+
+    EventEffect(
+        event = uiState.removeFolderConnectionSuccess,
+        onConsumed = onRemoveFolderConnectionSuccessSnackbarShown,
+        action = {
+            snackbarHostState.showAutoDurationSnackbar(
+                localResources.getString(
+                    sharedR.string.device_center_snackbar_message_connection_removed
                 )
             )
         },
@@ -154,6 +172,13 @@ internal fun DeviceCenterScreenM3(
                     },
                     onBackupFolderClicked = onBackupFolderClicked,
                     onNonBackupFolderClicked = onNonBackupFolderClicked,
+                    onFolderMenuClicked = { folderNode ->
+                        keyboardController?.hide()
+                        onFolderMenuClicked(folderNode)
+                        if (!modalSheetState.isVisible) {
+                            coroutineScope.launch { modalSheetState.show() }
+                        }
+                    },
                     onInfoClicked = onInfoOptionClicked,
                 )
             }
@@ -194,6 +219,32 @@ internal fun DeviceCenterScreenM3(
                     },
                 )
             }
+        } ?: uiState.menuClickedFolder?.let { folder ->
+            MegaModalBottomSheet(
+                onDismissRequest = {
+                    coroutineScope.launch { modalSheetState.hide() }
+                },
+                sheetState = modalSheetState,
+                bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
+            ) {
+                DeviceFolderBottomSheetBody(
+                    folder = folder,
+                    onInfoClicked = {
+                        coroutineScope
+                            .launch { modalSheetState.hide() }
+                            .invokeOnCompletion {
+                                onInfoOptionClicked(folder)
+                            }
+                    },
+                    onRemoveConnectionClicked = {
+                        coroutineScope
+                            .launch { modalSheetState.hide() }
+                            .invokeOnCompletion {
+                                onRemoveConnectionClicked(folder)
+                            }
+                    },
+                )
+            }
         }
     }
 }
@@ -222,6 +273,9 @@ private fun DeviceCenterM3NoNetworkStatePreview() {
             onRenameDeviceSuccessfulSnackbarShown = {},
             onBackPressHandled = {},
             onFeatureExited = {},
+            onFolderMenuClicked = {},
+            onRemoveConnectionClicked = {},
+            onRemoveFolderConnectionSuccessSnackbarShown = {},
         )
     }
 }
@@ -251,6 +305,9 @@ private fun DeviceCenterM3NoItemsFoundPreview() {
             onRenameDeviceSuccessfulSnackbarShown = {},
             onBackPressHandled = {},
             onFeatureExited = {},
+            onFolderMenuClicked = {},
+            onRemoveConnectionClicked = {},
+            onRemoveFolderConnectionSuccessSnackbarShown = {},
         )
     }
 }
@@ -278,6 +335,9 @@ private fun DeviceCenterM3InInitialLoadingPreview() {
             onRenameDeviceSuccessfulSnackbarShown = {},
             onBackPressHandled = {},
             onFeatureExited = {},
+            onFolderMenuClicked = {},
+            onRemoveConnectionClicked = {},
+            onRemoveFolderConnectionSuccessSnackbarShown = {},
         )
     }
 }
@@ -315,6 +375,9 @@ private fun DeviceCenterM3InDeviceViewPreview() {
             onRenameDeviceSuccessfulSnackbarShown = {},
             onBackPressHandled = {},
             onFeatureExited = {},
+            onFolderMenuClicked = {},
+            onRemoveConnectionClicked = {},
+            onRemoveFolderConnectionSuccessSnackbarShown = {},
         )
     }
 }
@@ -349,6 +412,9 @@ private fun DeviceCenterM3InFolderViewEmptyStatePreview() {
             onRenameDeviceSuccessfulSnackbarShown = {},
             onBackPressHandled = {},
             onFeatureExited = {},
+            onFolderMenuClicked = {},
+            onRemoveConnectionClicked = {},
+            onRemoveFolderConnectionSuccessSnackbarShown = {},
         )
     }
 }
@@ -382,6 +448,9 @@ private fun DeviceCenterM3InFolderViewPreview() {
             onRenameDeviceSuccessfulSnackbarShown = {},
             onBackPressHandled = {},
             onFeatureExited = {},
+            onFolderMenuClicked = {},
+            onRemoveConnectionClicked = {},
+            onRemoveFolderConnectionSuccessSnackbarShown = {},
         )
     }
 }

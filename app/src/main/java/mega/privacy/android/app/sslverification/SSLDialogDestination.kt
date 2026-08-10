@@ -1,50 +1,54 @@
 package mega.privacy.android.app.sslverification
 
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.sslverification.model.SSLDialogState
 import mega.privacy.android.app.sslverification.view.SSLErrorDialog
-import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 
 @Serializable
-data object SSLErrorDialog : NavKey
+data object SSLErrorDialog : DialogNavKey
 
 data object SSLAppDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             sslDialogDestination(
-                navigateBack = navigationHandler::back,
+                remove = navigationHandler::remove,
                 navigateAndClear = navigationHandler::navigateAndClearTo,
                 onDialogHandled = onHandled
             )
         }
 }
 
-fun EntryProviderScope<NavKey>.sslDialogDestination(
-    navigateBack: () -> Unit,
+fun EntryProviderScope<in DialogNavKey>.sslDialogDestination(
+    remove: (NavKey) -> Unit,
     navigateAndClear: (NavKey, NavKey, Boolean) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
     entry<SSLErrorDialog>(
         metadata = DialogSceneStrategy.dialog()
-    ) {
+    ) { key ->
         val viewModel = hiltViewModel<SSLErrorViewModel>()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 
         when (val state = uiState) {
             SSLDialogState.Loading -> {}
             is SSLDialogState.Ready -> {
+                val context = LocalContext.current
                 SSLErrorDialog(
                     closeDialog = {
                         onDialogHandled()
-                        navigateBack()
+                        remove(key)
                     },
                     onRetry = viewModel::onRetry,
                     onOpenBrowser = {
@@ -55,10 +59,10 @@ fun EntryProviderScope<NavKey>.sslDialogDestination(
                         )
                     },
                     onDismiss = viewModel::onDismiss,
+                    launchUrl = context::launchUrl,
                 )
             }
         }
-
     }
 }
 

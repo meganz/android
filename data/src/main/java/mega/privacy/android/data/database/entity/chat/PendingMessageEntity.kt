@@ -3,7 +3,10 @@ package mega.privacy.android.data.database.entity.chat
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import mega.privacy.android.data.database.converter.PitagTriggerConverter
 import mega.privacy.android.domain.entity.chat.PendingMessageState
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 
 /**
  * Pending message entity
@@ -21,8 +24,10 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
  * @property fingerprint
  * @property name
  * @property originalUriPath
+ * @property pitagTrigger
  */
 @Entity(tableName = "pending_messages")
+@TypeConverters(PitagTriggerConverter::class)
 data class PendingMessageEntity(
     @PrimaryKey(autoGenerate = true) val pendingMessageId: Long? = null,
     @ColumnInfo("transferUniqueId") val transferUniqueId: Long?,
@@ -39,4 +44,5 @@ data class PendingMessageEntity(
     val name: String?,
     @ColumnInfo(name = "original_uri_path", defaultValue = "")
     val originalUriPath: String,
+    @ColumnInfo("pitagTrigger", defaultValue = "") val pitagTrigger: PitagTrigger,
 )

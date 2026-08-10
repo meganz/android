@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -32,7 +33,8 @@ internal class InsertPendingTransferRequestMapperTest {
         uriPath = UriPath("file/path"),
         appData = listOf(TransferAppData.ChatUpload(454L)),
         isHighPriority = true,
-        fileName = "renamed.txt"
+        fileName = "renamed.txt",
+        pitagTrigger = PitagTrigger.Picker,
     )
 
     @BeforeAll
@@ -63,7 +65,8 @@ internal class InsertPendingTransferRequestMapperTest {
             { assertThat(pendingTransferEntity.startedFiles).isEqualTo(0) },
             { assertThat(pendingTransferEntity.alreadyTransferred).isEqualTo(0) },
             { assertThat(pendingTransferEntity.state).isEqualTo(PendingTransferState.NotSentToSdk) },
-            { assertThat(pendingTransferEntity.fileName).isEqualTo(insertRequest.fileName) }
+            { assertThat(pendingTransferEntity.fileName).isEqualTo(insertRequest.fileName) },
+            { assertThat(pendingTransferEntity.pitagTrigger).isEqualTo(insertRequest.pitagTrigger) },
         )
     }
 }

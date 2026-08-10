@@ -19,9 +19,9 @@ internal class FlagTypesMapperTest {
     }
 
     private fun provideParameters() = listOf(
-        arrayOf(MegaFlag.FLAG_TYPE_FEATURE, FlagTypes.Feature),
-        arrayOf(MegaFlag.FLAG_TYPE_AB_TEST, FlagTypes.ABTest),
-        arrayOf(MegaFlag.FLAG_TYPE_INVALID, FlagTypes.Invalid),
-        arrayOf(-1, FlagTypes.Invalid)
+        arrayOf<Any>(MegaFlag.FLAG_TYPE_FEATURE, FlagTypes.Feature),
+        arrayOf<Any>(MegaFlag.FLAG_TYPE_AB_TEST, FlagTypes.ABTest),
+        arrayOf<Any>(MegaFlag.FLAG_TYPE_INVALID, FlagTypes.Invalid),
+        arrayOf<Any>(-1, FlagTypes.Invalid)
     )
 }

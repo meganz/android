@@ -92,6 +92,44 @@ class CredentialsPreferencesDataStoreTest {
             .isEqualTo(newLastName)
     }
 
+    @Test
+    fun test_that_data_store_saves_session_correctly() = runTest {
+        val credentialsPreferencesGateway = CredentialsPreferencesDataStore(createDataStore(this))
+        val userCredentials = UserCredentials(
+            email = "email",
+            session = "oldSession",
+            firstName = "firstName",
+            lastName = "lastName",
+            myHandle = "myHandle"
+        )
+        credentialsPreferencesGateway.save(userCredentials)
+        assertThat(credentialsPreferencesGateway.monitorCredentials().first()?.session)
+            .isEqualTo("oldSession")
+        val newSession = "newSession"
+        credentialsPreferencesGateway.saveSession(newSession)
+        assertThat(credentialsPreferencesGateway.monitorCredentials().first()?.session)
+            .isEqualTo(newSession)
+    }
+
+    @Test
+    fun test_that_data_store_saves_my_handle_correctly() = runTest {
+        val credentialsPreferencesGateway = CredentialsPreferencesDataStore(createDataStore(this))
+        val userCredentials = UserCredentials(
+            email = "email",
+            session = "session",
+            firstName = "firstName",
+            lastName = "lastName",
+            myHandle = "oldHandle"
+        )
+        credentialsPreferencesGateway.save(userCredentials)
+        assertThat(credentialsPreferencesGateway.monitorCredentials().first()?.myHandle)
+            .isEqualTo("oldHandle")
+        val newMyHandle = "newHandle"
+        credentialsPreferencesGateway.saveMyHandle(newMyHandle)
+        assertThat(credentialsPreferencesGateway.monitorCredentials().first()?.myHandle)
+            .isEqualTo(newMyHandle)
+    }
+
     @After
     fun tearDown() {
         file.delete()

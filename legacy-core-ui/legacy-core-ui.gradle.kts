@@ -2,16 +2,11 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
-    id("kotlin-android")
 }
 
 android {
     buildFeatures {
         buildConfig = true
-    }
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     lint {
@@ -24,7 +19,7 @@ android {
 dependencies {
     lintChecks(project(":lint"))
 
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:icon-pack"))
     implementation(project(":shared:original-core-ui"))
     testImplementation(project(":core-ui-test"))
 

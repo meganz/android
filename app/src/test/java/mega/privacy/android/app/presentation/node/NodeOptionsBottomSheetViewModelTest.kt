@@ -54,6 +54,7 @@ class NodeOptionsBottomSheetViewModelTest {
             outgoingSharesBottomSheetOptions = { emptySet() },
             linksBottomSheetOptions = { emptySet() },
             backupsBottomSheetOptions = { emptySet() },
+            videosBottomSheetOptions = { emptySet() },
             getNodeAccessPermission = getNodeAccessPermission,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,

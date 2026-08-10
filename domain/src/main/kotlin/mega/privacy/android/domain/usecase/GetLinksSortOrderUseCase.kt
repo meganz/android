@@ -10,7 +10,11 @@ import javax.inject.Inject
  * @property sortOrderRepository
  */
 class GetLinksSortOrderUseCase @Inject constructor(private val sortOrderRepository: SortOrderRepository) {
-    suspend operator fun invoke(isSingleActivityEnabled: Boolean): SortOrder =
-        sortOrderRepository.getLinksSortOrder(isSingleActivityEnabled)
-            ?: SortOrder.ORDER_DEFAULT_ASC
+
+    /**
+     * Returns the persisted Links sort order, or [SortOrder.ORDER_DEFAULT_ASC] when none is stored.
+     */
+    @Suppress("UNUSED_PARAMETER")
+    suspend operator fun invoke(isSingleActivityEnabled: Boolean = true): SortOrder =
+        sortOrderRepository.getLinksSortOrder() ?: SortOrder.ORDER_DEFAULT_ASC
 }

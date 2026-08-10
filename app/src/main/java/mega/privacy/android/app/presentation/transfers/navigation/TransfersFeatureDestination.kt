@@ -14,6 +14,7 @@ class TransfersFeatureDestination : FeatureDestination {
             transfersScreen3(
                 onBackPress = navigationHandler::back,
                 onNavigateToUpgradeAccount = { navigationHandler.navigate(UpgradeAccountNavKey()) },
+                navigationHandler = navigationHandler,
             )
         }
 

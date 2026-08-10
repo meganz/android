@@ -1,29 +1,37 @@
 package mega.privacy.mobile.home.presentation.home
 
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.analytics.decorator.withScreenViewEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.mobile.home.presentation.configuration.HomeConfiguration
+import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.mobile.analytics.event.HomeScreenEvent
 
 @Serializable
-data object Home : NavKey
+data object Home : MainNavItemNavKey
 
 fun EntryProviderScope<NavKey>.homeScreen(
     navigationHandler: NavigationHandler,
-    onTransfer: (TransferTriggerEvent) -> Unit,
+    transferHandler: TransferHandler,
 ) {
-    entry<Home> {
+    entry<Home>(
+        metadata = buildMetadata {
+            withScreenViewEvent(HomeScreenEvent)
+        }
+    ) {
         val viewmodel = hiltViewModel<HomeViewModel>()
         val state by viewmodel.state.collectAsStateWithLifecycle()
         HomeScreen(
             state = state,
-            onNavigateToConfiguration = { navigationHandler.navigate(HomeConfiguration) },
-            onNavigate = navigationHandler::navigate,
+            navigationHandler = navigationHandler,
+            transferHandler = transferHandler,
+            onHomeConfigurationTooltipDismissed = viewmodel::onHomeConfigurationTooltipDismissed,
         )
     }
 }

@@ -35,6 +35,7 @@ class RetryChatUploadUseCase @Inject constructor(
             startChatUploadsWithWorkerUseCase(
                 uriPath = pendingMessage.uriPath,
                 chatFilesFolderId = getOrCreateMyChatsFilesFolderIdUseCase(),
+                pitagTrigger = pendingMessage.pitagTrigger,
                 *chatUploadAppData.map { it.pendingMessageId }.toLongArray()
             ).collect()
         }

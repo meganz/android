@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.repository.BackupRepository.Companion.BACKUPS_FOLDER_DEFAULT_NAME
@@ -29,8 +30,9 @@ import mega.privacy.android.feature.sync.domain.usecase.backup.SetMyBackupsFolde
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.ui.mapper.sync.SyncRemoteFolderValidityMapper
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityMapper
-import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityResult
+import mega.privacy.android.feature.sync.ui.mapper.sync.SyncValidityResult
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = SyncNewFolderViewModel.SyncNewFolderViewModelFactory::class)
@@ -48,6 +50,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     private val setMyBackupsFolderUseCase: SetMyBackupsFolderUseCase,
     private val syncUriValidityMapper: SyncUriValidityMapper,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val syncRemoteFolderValidityMapper: SyncRemoteFolderValidityMapper,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -129,15 +132,30 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
             is SyncNewFolderAction.LocalFolderSelected -> {
                 viewModelScope.launch {
                     val documentFile = action.documentFile
-                    val validityResult = syncUriValidityMapper(documentFile.uri.toString())
-                    when (validityResult) {
-                        is SyncUriValidityResult.ShowSnackbar -> {
+                    when (val validityResult = syncUriValidityMapper(documentFile.uri.toString())) {
+                        is SyncValidityResult.ShowSnackbar -> {
                             _state.update { state ->
-                                state.copy(showSnackbar = triggered(validityResult.messageResId))
+                                state.copy(
+                                    showSnackbar = triggered(
+                                        LocalizedText.StringRes(validityResult.messageResId)
+                                    )
+                                )
                             }
                         }
 
-                        is SyncUriValidityResult.ValidFolderSelected -> {
+                        is SyncValidityResult.ShowSnackbarMessage -> {
+                            _state.update { state ->
+                                state.copy(
+                                    showSnackbar = triggered(
+                                        LocalizedText.Literal(
+                                            validityResult.message
+                                        )
+                                    )
+                                )
+                            }
+                        }
+
+                        is SyncValidityResult.ValidFolderSelected -> {
                             _state.update { state ->
                                 state.copy(
                                     selectedLocalFolder = validityResult.localFolderUri.value,
@@ -146,7 +164,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                             }
                         }
 
-                        SyncUriValidityResult.Invalid -> {
+                        SyncValidityResult.Invalid -> {
                             Timber.d("Invalid folder selected")
                             _state.update { state ->
                                 state.copy(
@@ -161,41 +179,159 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
 
             is SyncNewFolderAction.NextClicked -> {
                 viewModelScope.launch {
-                    when {
-                        isStorageOverQuotaUseCase() -> {
-                            _state.update { state ->
-                                state.copy(showStorageOverQuota = true)
+                    runCatching {
+                        _state.update { state ->
+                            state.copy(isLoading = true)
+                        }
+
+                        // NEW: Validate remote folder against Camera/Media Uploads for Sync types ONLY
+                        // Backup types auto-create folders, so skip validation
+                        if (state.value.syncType != SyncType.TYPE_BACKUP) {
+                            state.value.selectedMegaFolder?.let { remoteFolder ->
+                                val validationResult = syncRemoteFolderValidityMapper(
+                                    nodeId = remoteFolder.id,
+                                    remoteFolderDisplayName = remoteFolder.name,
+                                )
+
+                                when (validationResult) {
+                                    is SyncValidityResult.ShowSnackbar -> {
+                                        _state.update { state ->
+                                            state.copy(
+                                                showSnackbar = triggered(
+                                                    LocalizedText.StringRes(validationResult.messageResId)
+                                                ),
+                                                isLoading = false
+                                            )
+                                        }
+                                        return@launch
+                                    }
+
+                                    is SyncValidityResult.ShowSnackbarMessage -> {
+                                        _state.update { state ->
+                                            state.copy(
+                                                showSnackbar = triggered(
+                                                    LocalizedText.Literal(
+                                                        validationResult.message
+                                                    )
+                                                ),
+                                                isLoading = false
+                                            )
+                                        }
+                                        return@launch
+                                    }
+
+                                    is SyncValidityResult.Invalid -> {
+                                        _state.update { state ->
+                                            state.copy(isLoading = false)
+                                        }
+                                        return@launch
+                                    }
+
+                                    is SyncValidityResult.ValidFolderSelected -> {
+                                        // Continue with existing validation logic
+                                    }
+                                }
                             }
                         }
 
-                        else -> {
-                            when (state.value.syncType) {
-                                SyncType.TYPE_BACKUP -> {
-                                    if (myBackupsFolderExistsUseCase().not()) {
-                                        runCatching {
-                                            setMyBackupsFolderUseCase(BACKUPS_FOLDER_DEFAULT_NAME)
-                                        }.onSuccess {
-                                            if (createBackup().not()) return@launch
-                                        }.onFailure {
-                                            Timber.e(it)
-                                        }
-                                    } else {
-                                        if (createBackup().not()) return@launch
-                                    }
-                                }
-
-                                else -> {
-                                    state.value.selectedMegaFolder?.let { remoteFolder ->
-                                        syncFolderPairUseCase(
-                                            syncType = state.value.syncType,
-                                            name = remoteFolder.name,
-                                            localPath = state.value.selectedLocalFolder,
-                                            remotePath = remoteFolder,
-                                        )
-                                    }
+                        when {
+                            isStorageOverQuotaUseCase() -> {
+                                _state.update { state ->
+                                    state.copy(
+                                        showStorageOverQuota = true,
+                                        isLoading = false
+                                    )
                                 }
                             }
-                            openSyncListScreen()
+
+                            else -> {
+                                when (state.value.syncType) {
+                                    SyncType.TYPE_BACKUP -> {
+                                        if (myBackupsFolderExistsUseCase().not()) {
+                                            runCatching {
+                                                setMyBackupsFolderUseCase(
+                                                    BACKUPS_FOLDER_DEFAULT_NAME
+                                                )
+                                            }.onSuccess {
+                                                if (createBackup().not()) {
+                                                    _state.update { state ->
+                                                        state.copy(isLoading = false)
+                                                    }
+                                                    return@launch
+                                                }
+                                            }.onFailure {
+                                                Timber.e(it)
+                                            }
+                                        } else {
+                                            if (createBackup().not()) {
+                                                _state.update { state ->
+                                                    state.copy(isLoading = false)
+                                                }
+                                                return@launch
+                                            }
+                                        }
+                                    }
+
+                                    else -> {
+                                        state.value.selectedMegaFolder?.let { remoteFolder ->
+                                            val validationResult = syncRemoteFolderValidityMapper(
+                                                nodeId = remoteFolder.id,
+                                                remoteFolderDisplayName = remoteFolder.name,
+                                            )
+                                            when (validationResult) {
+                                                is SyncValidityResult.ShowSnackbar -> {
+                                                    _state.update { state ->
+                                                        state.copy(
+                                                            showSnackbar = triggered(
+                                                                LocalizedText.StringRes(
+                                                                    validationResult.messageResId
+                                                                )
+                                                            ),
+                                                            isLoading = false
+                                                        )
+                                                    }
+                                                    return@launch
+                                                }
+
+                                                is SyncValidityResult.ShowSnackbarMessage -> {
+                                                    _state.update { state ->
+                                                        state.copy(
+                                                            showSnackbar = triggered(
+                                                                LocalizedText.Literal(
+                                                                    validationResult.message
+                                                                )
+                                                            ),
+                                                            isLoading = false
+                                                        )
+                                                    }
+                                                    return@launch
+                                                }
+
+                                                is SyncValidityResult.Invalid -> {
+                                                    _state.update { state ->
+                                                        state.copy(isLoading = false)
+                                                    }
+                                                    return@launch
+                                                }
+
+                                                is SyncValidityResult.ValidFolderSelected -> {
+                                                    syncFolderPairUseCase(
+                                                        syncType = state.value.syncType,
+                                                        name = remoteFolder.name,
+                                                        localPath = state.value.selectedLocalFolder,
+                                                        remotePath = remoteFolder,
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                openSyncListScreen()
+                            }
+                        }
+                    }.onFailure {
+                        _state.update { state ->
+                            state.copy(isLoading = false)
                         }
                     }
                 }
@@ -225,7 +361,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
             )
         }.onSuccess { result ->
             onShowRenameAndCreateBackupDialogConsumed()
-            return result != false
+            return result
         }.onFailure { exception ->
             if (exception is BackupAlreadyExistsException) {
                 _state.update { state ->
@@ -251,13 +387,23 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
      * Consumes the event of showing rename and create backup dialog.
      */
     fun onShowRenameAndCreateBackupDialogConsumed() {
-        _state.update { state -> state.copy(showRenameAndCreateBackupDialog = null) }
+        _state.update { state ->
+            state.copy(
+                showRenameAndCreateBackupDialog = null,
+                isLoading = false
+            )
+        }
     }
 
     /**
      * Triggers the event to open sync list screen
      */
     fun openSyncListScreen() {
-        _state.update { state -> state.copy(openSyncListScreen = triggered) }
+        _state.update { state ->
+            state.copy(
+                openSyncListScreen = triggered,
+                isLoading = false
+            )
+        }
     }
 }

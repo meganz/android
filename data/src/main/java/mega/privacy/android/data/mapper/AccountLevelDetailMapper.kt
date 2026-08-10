@@ -22,6 +22,7 @@ internal class AccountLevelDetailMapper @Inject constructor() {
      * @param  subscriptionRenewCycleType
      * @param  planDetail
      * @param  subscriptionListDetail
+     * @param  subscriptionMethodId
      *
      * @return [AccountLevelDetail]
      */
@@ -33,6 +34,7 @@ internal class AccountLevelDetailMapper @Inject constructor() {
         subscriptionRenewCycleType: AccountSubscriptionCycle,
         planDetail: AccountPlanDetail?,
         subscriptionListDetail: List<AccountSubscriptionDetail>,
+        subscriptionMethodId: Int = 0,
     ) = AccountLevelDetail(
         subscriptionStatus = subscriptionStatus,
         accountType = accountType,
@@ -41,5 +43,6 @@ internal class AccountLevelDetailMapper @Inject constructor() {
         accountSubscriptionCycle = subscriptionRenewCycleType,
         accountPlanDetail = planDetail,
         accountSubscriptionDetailList = subscriptionListDetail,
+        subscriptionMethodId = subscriptionMethodId,
     )
 }

@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
@@ -43,7 +45,6 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAct
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.model.SyncModalSheetContent
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.STALLED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
@@ -72,8 +73,10 @@ import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
@@ -103,7 +106,6 @@ internal fun SyncListScreen(
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
-    applyRevampStyles: Boolean = false,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -193,6 +195,8 @@ internal fun SyncListScreen(
             onDispose { }
         }
 
+        val appBarWindowInsets = WindowInsets.statusBars
+
         MegaScaffold(
             scaffoldState = scaffoldState,
             contentWindowInsets = if (isInCloudDrive) WindowInsets(0.dp) else ScaffoldDefaults.contentWindowInsets,
@@ -207,7 +211,7 @@ internal fun SyncListScreen(
                         actions = actions,
                         onActionPressed = onActionPressed,
                         elevation = if (isWarningBannerDisplayed || syncFoldersState.isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
-                        windowInsets = WindowInsets(0.dp),
+                        windowInsets = appBarWindowInsets,
                     )
                 }
             },
@@ -234,7 +238,9 @@ internal fun SyncListScreen(
                                 },
                             ),
                         ),
-                        modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
+                        modifier = Modifier
+                            .testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
+                            .navigationBarsPadding(),
                         multiFabState = multiFabState,
                         onStateChanged = { state ->
                             if (state == MultiFloatingActionButtonState.EXPANDED) {
@@ -245,7 +251,7 @@ internal fun SyncListScreen(
                             onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
                             multiFabState.value = state
                         },
-                        isCircular = !applyRevampStyles,
+                        isCircular = false,
                     )
                 }
             },
@@ -318,6 +324,7 @@ private fun SyncListScreenContent(
         onRefresh = {
             syncFoldersViewModel.onSyncRefresh()
         })
+    val isSyncNotEmpty = syncFoldersUiState.syncUiItems.isNotEmpty()
 
     Column(modifier) {
         if (syncFoldersUiState.isStorageOverQuota) {
@@ -352,7 +359,9 @@ private fun SyncListScreenContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .pullRefresh(pullToRefreshState)
+                .conditional(isSyncNotEmpty) {
+                    pullRefresh(pullToRefreshState)
+                }
         ) {
             SelectedChipScreen(
                 onAddNewSyncClicked = onAddNewSyncClicked,
@@ -372,11 +381,13 @@ private fun SyncListScreenContent(
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
             )
-            PullRefreshIndicator(
-                modifier = Modifier.align(Alignment.TopCenter),
-                refreshing = syncFoldersUiState.isRefreshing,
-                state = pullToRefreshState
-            )
+            if (isSyncNotEmpty) {
+                PullRefreshIndicator(
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    refreshing = syncFoldersUiState.isRefreshing,
+                    state = pullToRefreshState
+                )
+            }
         }
     }
 }

@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import android.os.Vibrator
 import android.os.VibratorManager
-import androidx.datastore.preferences.preferencesDataStoreFile
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,9 +24,11 @@ import mega.privacy.android.app.data.gateway.MotionSensorGateway
 import mega.privacy.android.app.data.gateway.VibratorFacade
 import mega.privacy.android.app.data.gateway.VibratorGateway
 import mega.privacy.android.app.data.repository.DefaultQARepository
+import mega.privacy.android.app.data.repository.DefaultQASimulationRepository
 import mega.privacy.android.app.data.repository.DefaultShakeDetectorRepository
 import mega.privacy.android.app.data.usecase.DefaultDetectShake
 import mega.privacy.android.app.domain.repository.QARepository
+import mega.privacy.android.app.domain.repository.QASimulationRepository
 import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.DetectShake
@@ -45,6 +46,7 @@ import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.data.qualifier.ExcludeFileName
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
+import mega.privacy.android.domain.featuretoggle.qualifier.DefaultFeatureFlagProviders
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.navigation.contract.settings.FeatureSettingEntryPoint
@@ -95,6 +97,13 @@ internal class QAModule {
      */
     @Provides
     fun provideQARepository(repository: DefaultQARepository): QARepository = repository
+
+    /**
+     * Provide QA simulation repository (account data expiration / purge simulation)
+     */
+    @Provides
+    fun provideQASimulationRepository(repository: DefaultQASimulationRepository): QASimulationRepository =
+        repository
 
     /**
      * Provide update app use case
@@ -214,6 +223,12 @@ internal class QAModule {
     fun provideFeatureFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
         QAFeatures.Companion
 
+    @Provides
+    @IntoSet
+    @DefaultFeatureFlagProviders
+    fun provideQAFeaturesAsDefaultFlagProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+        QAFeatures.Companion
+
     /**
      * Provide feature flag runtime value provider
      *
@@ -245,8 +260,8 @@ internal class QAModule {
     @Provides
     @IntoSet
     @ExcludeFileName
-    fun provideFeatureFlagPreferencesFileName(@ApplicationContext context: Context): String =
-        context.preferencesDataStoreFile(FEATURE_FLAG_PREFERENCES).name
+    fun provideFeatureFlagPreferencesFileName(): String =
+        "$FEATURE_FLAG_PREFERENCES.preferences_pb"
 
     @Provides
     @IntoSet

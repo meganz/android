@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextMeasurer
@@ -22,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import java.text.NumberFormat
-import java.util.Locale
 
 /**
  * A composable that displays a numbered list of strings.
@@ -43,7 +43,8 @@ fun NumberedListView(
     itemSpacing: Dp = 10.dp,
 ) {
     val density = LocalDensity.current
-    val numberFormatter = remember { NumberFormat.getInstance(Locale.getDefault()) }
+    val locale = LocalLocale.current.platformLocale
+    val numberFormatter = remember { NumberFormat.getInstance(locale) }
     val textMeasurer = rememberTextMeasurer()
     val annotatedString = remember(list) {
         buildNumberedAnnotatedString(

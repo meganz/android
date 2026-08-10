@@ -4,8 +4,10 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.os.Build
+import android.os.Handler
+import android.os.HandlerThread
+import android.os.Message
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -21,9 +23,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.ConnectivityState
@@ -36,6 +41,10 @@ import javax.inject.Singleton
 
 /**
  * Default network repository implementation
+ *
+ * Don't migrate deprecated activeNetworkInfo to activeNetwork because it can detect VPN
+ * it's reference to
+ * https://github.com/androidx/androidx/blob/androidx-main/work/work-runtime/src/main/java/androidx/work/impl/constraints/trackers/NetworkStateTracker.kt
  *
  * @property context
  * @property megaApi
@@ -52,9 +61,15 @@ internal class DefaultNetworkRepository @Inject constructor(
     private val connectivityManager = getSystemService(context, ConnectivityManager::class.java)
 
     @Suppress("DEPRECATION")
-    override fun getCurrentConnectivityState(): ConnectivityState =
+    override suspend fun getCurrentConnectivityState(): ConnectivityState =
+        withContext(ioDispatcher) {
+            getCurrentConnectivityStateInternal()
+        }
+
+    @Suppress("DEPRECATION")
+    private fun getCurrentConnectivityStateInternal(): ConnectivityState =
         if (connectivityManager?.activeNetworkInfo?.isConnected == true) ConnectivityState.Connected(
-            isOnWifi()
+            isOnWifiInternal()
         ) else ConnectivityState.Disconnected
 
     private fun ConnectivityManager?.getActiveNetworkCapabilities(): NetworkCapabilities? =
@@ -74,14 +89,10 @@ internal class DefaultNetworkRepository @Inject constructor(
     // we can create single callback and share state in our application
     @OptIn(FlowPreview::class)
     private val monitorConnectivity = callbackFlow {
-        val networkRequest = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-
         // emit current network state every time app resumes from background
         val job = ProcessLifecycleOwner.get().lifecycleScope.launch {
             ProcessLifecycleOwner.get().lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                trySend(getCurrentConnectivityState())
+                trySend(getCurrentConnectivityStateInternal())
             }
         }
 
@@ -89,15 +100,13 @@ internal class DefaultNetworkRepository @Inject constructor(
             override fun onLost(network: Network) {
                 super.onLost(network)
                 Timber.d("onLost")
-                // we still check current connectivity state to ensure getting latest value
-                // I have no idea it's device specific issue
-                trySend(getCurrentConnectivityState())
+                trySend(getCurrentConnectivityStateInternal())
             }
 
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
                 Timber.d("onAvailable")
-                trySend(ConnectivityState.Connected(isOnWifi()))
+                trySend(ConnectivityState.Connected(isOnWifiInternal()))
             }
 
             override fun onCapabilitiesChanged(
@@ -106,35 +115,58 @@ internal class DefaultNetworkRepository @Inject constructor(
             ) {
                 super.onCapabilitiesChanged(network, networkCapabilities)
                 Timber.d("onCapabilitiesChanged")
-                trySend(getCurrentConnectivityState())
+                trySend(getCurrentConnectivityStateInternal())
             }
         }
-        connectivityManager?.apply {
-            registerNetworkCallback(networkRequest, callback)
-            registerDefaultNetworkCallback(callback)
+        val handlerThread = HandlerThread("NetworkCallbackThread").apply {
+            start()
+            uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { _, throwable ->
+                Timber.e(
+                    throwable,
+                    "NetworkCallback handler thread crashed due to framework parcel error"
+                )
+            }
         }
+        val safeHandler = object : Handler(handlerThread.looper) {
+            override fun dispatchMessage(msg: Message) {
+                try {
+                    super.dispatchMessage(msg)
+                } catch (t: Throwable) {
+                    Timber.e(t, "Dropped malformed network callback message")
+                }
+            }
+        }
+        connectivityManager?.registerDefaultNetworkCallback(callback, safeHandler)
 
         awaitClose {
             connectivityManager?.unregisterNetworkCallback(callback)
+            handlerThread.quitSafely()
             job.cancel()
         }
     }.flowOn(ioDispatcher)
-        .debounce(150L)
+        .debounce(300L)
+        .distinctUntilChanged()
+        .onEach { Timber.d("Current state $it") }
         .catch { Timber.e(it, "MonitorConnectivity Exception") }
         .stateIn(
             applicationScope,
             started = SharingStarted.Lazily,
-            initialValue = getCurrentConnectivityState()
+            initialValue = getCurrentConnectivityStateInternal()
         )
 
     override fun isConnectedToInternet() = monitorConnectivity.value.connected
 
-    override fun setUseHttps(enabled: Boolean) = megaApi.setUseHttpsOnly(enabled)
-
-    override fun isMeteredConnection() = connectivityManager?.isActiveNetworkMetered
+    override suspend fun isMeteredConnection() = withContext(ioDispatcher) {
+        connectivityManager?.isActiveNetworkMetered
+    }
 
     @Suppress("DEPRECATION")
-    override fun isOnWifi(): Boolean {
+    override suspend fun isOnWifi(): Boolean = withContext(ioDispatcher) {
+        isOnWifiInternal()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun isOnWifiInternal(): Boolean {
         return connectivityManager?.getActiveNetworkCapabilities()?.let {
             return@let when {
                 it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {

@@ -1,5 +1,15 @@
 package mega.privacy.android.app.components.textFormatter;
 
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.BOLD_FLAG;
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.Flag;
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX;
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.ITALIC_FLAG;
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.MONOSPACE_FLAG;
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.STRIKE_FLAG;
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.getText;
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.hasMultiFormatter;
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.hasSimpleFormatter;
+
 import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
@@ -7,11 +17,11 @@ import android.text.TextWatcher;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.widget.TextView;
+
 import java.util.ArrayList;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.components.CustomTypefaceSpan;
-import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 /**
  * @deprecated Use Composable GetMessageText.toFormattedText instead.
@@ -31,7 +41,7 @@ public class TextFormatterViewCompat {
      */
     @Deprecated
     public static CharSequence getFormattedText(String text) {
-        if (isTextEmpty(text))
+        if (text == null || text.trim().isEmpty())
             return null;
 
         return extractFlagsForTextView(text);

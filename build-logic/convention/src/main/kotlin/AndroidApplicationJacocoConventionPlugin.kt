@@ -2,11 +2,15 @@ import mega.privacy.android.gradle.extension.MegaJacocoPluginExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withGroovyBuilder
+import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 /**
  * Plugin to apply Jacoco configuration to Android application projects.
@@ -39,7 +43,7 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
                 }
             }
 
-            val jacocoVersion = "0.8.11"
+            val jacocoVersion = "0.8.14"
 
             dependencies {
                 "jacocoAnt"("org.jacoco:org.jacoco.ant:$jacocoVersion:nodeps")
@@ -47,6 +51,13 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
 
             extensions.configure<JacocoPluginExtension> {
                 toolVersion = jacocoVersion
+            }
+
+            tasks.withType<Test> {
+                configure<JacocoTaskExtension> {
+                    isIncludeNoLocationClasses = true
+                    excludes = listOf("jdk.internal.*")
+                }
             }
 
             tasks.register("instrumentClasses") {
@@ -75,23 +86,22 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
                             )
                         }
                     }
-                    /* Add the instrumented classes to the beginning of classpath */
-                    tasks.named("testGmsDebugUnitTest") {
-                        if (hasProperty("classpath")) {
-                            setProperty(
-                                "classpath",
-                                files(outputDir) + property("classpath") as FileCollection
-                            )
-                        }
-                    }
+                    /*
+                     * Previously this prepended offline-instrumented classes to the test
+                     * classpath. Under AGP 9, transformDebugUnitTestClassesWithAsm already
+                     * runs JaCoCo instrumentation when the jacoco plugin is applied, so
+                     * doing it again here causes "Cannot process instrumented class" errors
+                     * when the runtime agent re-encounters these classes.
+                     */
                 }
             }
 
             tasks.register("createUnitTestCoverageReport") {
-                dependsOn("instrumentClasses", "testGmsDebugUnitTest")
+                dependsOn("testGmsDebugUnitTest")
                 val jacocoAntConfig = configurations.getByName("jacocoAnt")
                 val buildDirPath = layout.buildDirectory.get()
                 doLast {
+                    val excludesPattern = excludedFiles.joinToString()
                     ant.withGroovyBuilder {
                         "taskdef"(
                             "name" to "report",
@@ -105,9 +115,20 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
                                 }
                             }
                             "structure"("name" to "Coverage") {
+                                /*
+                                 * Use the AGP-transformed classes as the classfiles input.
+                                 * The JaCoCo runtime agent records execution data against
+                                 * the bytecode that was loaded at test time — that is, the
+                                 * output of transformGmsDebugClassesWithAsm, not the raw
+                                 * javac/kotlinc output. Pointing at the raw output produces
+                                 * "Execution data does not match" warnings and missing
+                                 * coverage for any class whose ASM transforms changed it.
+                                 */
                                 "classfiles" {
-                                    "fileset"("dir" to "${buildDirPath}/intermediates/javac/gmsDebug/compileGmsDebugJavaWithJavac/classes")
-                                    "fileset"("dir" to "${buildDirPath}/tmp/kotlin-classes/gmsDebug")
+                                    "fileset"(
+                                        "dir" to "${buildDirPath}/intermediates/classes/gmsDebug/transformGmsDebugClassesWithAsm/dirs",
+                                        "excludes" to excludesPattern,
+                                    )
                                 }
                                 "sourcefiles" {
                                     "fileset"("dir" to "src/main/java")
@@ -137,6 +158,8 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
         "**/android/databinding/*Binding.class",
         "**/android/databinding/*",
         "**/androidx/databinding/*",
+        "**/databinding/**",
+        "**/*Binding.class",
         "**/BR.*",
         // android
         "**/R.class",
@@ -145,6 +168,8 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
         "**/Manifest*.*",
         "**/*Test*.*",
         "android/**/*.*",
+        // compose
+        "**/ComposableSingletons*.*",
         // dagger
         "**/*_MembersInjector.class",
         "**/Dagger*Component.class",
@@ -170,6 +195,7 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
         "**/*Module*.*",
         "**/*Dagger*.*",
         "**/*Hilt*.*",
+        "**/hilt_aggregated_deps/**",
         "**/*MembersInjector*.*",
         "**/*_MembersInjector.class",
         "**/*_Factory*.*",

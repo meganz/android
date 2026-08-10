@@ -3,6 +3,7 @@ package mega.privacy.android.feature.devicecenter.ui.model
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithoutIcon
 import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Device menu action.
@@ -13,7 +14,7 @@ sealed interface DeviceMenuAction : MenuAction {
      * Rename
      */
     object Rename : MenuActionWithoutIcon(
-        descriptionRes = R.string.device_center_device_top_menu_option_rename,
+        descriptionRes = sharedR.string.context_rename,
         testTag = TEST_TAG_RENAME_ACTION
     ), DeviceMenuAction
 

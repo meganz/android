@@ -49,7 +49,7 @@ data class Transfer(
     override val uniqueId: Long,
     override val transferType: TransferType,
     val startTime: Long,
-    val transferredBytes: Long,
+    override val transferredBytes: Long,
     override val totalBytes: Long,
     override val localPath: String,
     val parentPath: String,
@@ -81,7 +81,7 @@ data class Transfer(
      * True if the transfer finished without actually transferring bytes because it was already transferred
      */
     override val isAlreadyTransferred =
-        isFinished && transferredBytes == 0L && state != TransferState.STATE_FAILED && state != TransferState.STATE_CANCELLED
+        isFinished && totalBytes > 0L && transferredBytes == 0L && state == TransferState.STATE_COMPLETED
 
     override val isCancelled =
         state == TransferState.STATE_CANCELLED

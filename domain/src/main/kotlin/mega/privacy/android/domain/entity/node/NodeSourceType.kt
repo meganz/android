@@ -1,8 +1,11 @@
 package mega.privacy.android.domain.entity.node
 
+import kotlinx.serialization.Serializable
+
 /**
  * Enum class containing all Node Source types available
  */
+@Serializable
 enum class NodeSourceType {
 
     /**
@@ -63,5 +66,88 @@ enum class NodeSourceType {
     /**
      * When node source is offline
      */
-    OFFLINE
+    OFFLINE,
+
+    /**
+     * When node source is Videos tab
+     */
+    VIDEOS,
+
+    /**
+     * When node source is Search results
+     */
+    SEARCH,
+
+    /**
+     * When node source is Video Playlists
+     */
+    VIDEO_PLAYLISTS,
+
+    /**
+     * When node source is Recents Bucket
+     */
+    RECENTS_BUCKET,
+
+    /**
+     * When node source is Timeline
+     */
+    TIMELINE,
+
+    /**
+     * When node source is Recently Watched
+     */
+    VIDEO_RECENTLY_WATCHED,
+
+    /**
+     * When node source is Folder Link
+     */
+    FOLDER_LINK,
+
+    /**
+     * When node source is File Link
+     */
+    FILE_LINK,
+
+    /**
+     * When node source is Chat
+     */
+    CHAT,
+
+    /**
+     * When node source is Media Player default
+     */
+    MEDIA_PLAYER_DEFAULT,
+
+    /**
+     * When node source is Media Player opened from Versions
+     */
+    MEDIA_PLAYER_VERSIONS,
+
+    /**
+     * When node source is Media Player opened from Image Viewer
+     */
+    MEDIA_PLAYER_IMAGE_VIEWER,
+
+    /**
+     * When node source is Media Player opened from Zip File
+     */
+    MEDIA_PLAYER_ZIP_FILE,
+
+    /**
+     * When node source is Continue Where Left Off
+     */
+    CONTINUE_WHERE_LEFT_OFF
+
+}
+
+/**
+ * Checks if the [NodeSourceType] represents a shared item.
+ *
+ * Shared items include incoming shares, outgoing shares, and links.
+ *
+ * @return true if the node source is INCOMING_SHARES, OUTGOING_SHARES, or LINKS; false otherwise.
+ */
+fun NodeSourceType.isSharedSource(): Boolean = when (this) {
+    NodeSourceType.INCOMING_SHARES, NodeSourceType.OUTGOING_SHARES, NodeSourceType.LINKS -> true
+    else -> false
 }

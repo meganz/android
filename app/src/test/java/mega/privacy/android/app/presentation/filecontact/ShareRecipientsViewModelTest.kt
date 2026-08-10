@@ -1,8 +1,5 @@
 package mega.privacy.android.app.presentation.filecontact
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.testing.invoke
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
@@ -11,31 +8,40 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
-import mega.privacy.android.navigation.destination.FileContactInfoNavKey
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import mega.privacy.android.feature_flags.AppFeatures
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 
-@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(
+    InstantExecutorExtension::class,
+    CoroutineMainDispatcherExtension::class,
+)
 class ShareRecipientsViewModelTest {
     private lateinit var underTest: ShareRecipientsViewModel
 
@@ -44,29 +50,32 @@ class ShareRecipientsViewModelTest {
     private val shareFolderRequestMapper = mock<NodeMoveRequestMessageMapper>()
     private val getAllowedSharingPermissionsUseCase = mock<GetAllowedSharingPermissionsUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getShareFolderSensitiveWarningUseCase =
+        mock<GetShareFolderSensitiveWarningUseCase>()
 
     private val shareResultMapper = RemoveShareResultMapper(
         successString = { TestValues.SUCCESS_STRING },
         errorString = { TestValues.FAILURE_STRING }
     )
 
-    @Before
+    @BeforeEach
     fun setUp() {
         reset(
             monitorShareRecipientsUseCase,
             shareFolderUseCase,
             getAllowedSharingPermissionsUseCase,
             getContactVerificationWarningUseCase,
+            getFeatureFlagValueUseCase,
+            getShareFolderSensitiveWarningUseCase,
         )
     }
 
     private fun initUnderTest() {
         underTest = ShareRecipientsViewModel(
-            savedStateHandle = SavedStateHandle.Companion.invoke(
-                route = FileContactInfoNavKey(
-                    folderName = TestValues.FOLDER_NAME,
-                    folderHandle = TestValues.NODE_HANDLE,
-                ),
+            args = ShareRecipientsViewModel.Args(
+                folderName = TestValues.FOLDER_NAME,
+                folderHandle = TestValues.NODE_HANDLE,
             ),
             monitorShareRecipientsUseCase = monitorShareRecipientsUseCase,
             shareFolderUseCase = shareFolderUseCase,
@@ -74,6 +83,8 @@ class ShareRecipientsViewModelTest {
             nodeMoveRequestMessageMapper = shareFolderRequestMapper,
             getAllowedSharingPermissionsUseCase = getAllowedSharingPermissionsUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
         )
     }
 
@@ -89,22 +100,7 @@ class ShareRecipientsViewModelTest {
 
     @Test
     fun `test that data state is emitted once use case returns`() = runTest {
-        getAllowedSharingPermissionsUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(setOf(AccessPermission.READ))
-        }
-        monitorShareRecipientsUseCase.stub {
-            on { invoke(any()) }.thenReturn(
-                flow {
-                    emit(
-                        listOf(
-                            mock<ShareRecipient.Contact>(),
-                            mock<ShareRecipient.NonContact>(),
-                        )
-                    )
-                    awaitCancellation()
-                }
-            )
-        }
+        stubForData()
 
         initUnderTest()
 
@@ -137,9 +133,9 @@ class ShareRecipientsViewModelTest {
     @Test
     fun `test that error removing a share returns an error message in shareRemovedEvent`() =
         runTest {
-            monitorShareRecipientsUseCase.stub { on { invoke(any()) }.thenReturn(flow { awaitCancellation() }) }
+            stubForData()
             shareFolderUseCase.stub {
-                onBlocking {
+                on {
                     invoke(
                         any(),
                         any(),
@@ -150,7 +146,7 @@ class ShareRecipientsViewModelTest {
             initUnderTest()
 
             underTest.state.test {
-                assert(awaitItem() is FileContactListState.Loading)
+                awaitItem()
                 underTest.removeShare(
                     listOf(TestValues.contactMock)
                 )
@@ -162,9 +158,10 @@ class ShareRecipientsViewModelTest {
 
     @Test
     fun `test that removing a share success result is displayed if returned`() = runTest {
-        monitorShareRecipientsUseCase.stub { on { invoke(any()) }.thenReturn(flow { awaitCancellation() }) }
+        stubForData()
+
         shareFolderUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     any(),
                     any(),
@@ -181,7 +178,7 @@ class ShareRecipientsViewModelTest {
         initUnderTest()
 
         underTest.state.test {
-            assert(awaitItem() is FileContactListState.Loading)
+            assert(awaitItem() is FileContactListState.Data)
             underTest.removeShare(
                 listOf(
                     TestValues.contactMock,
@@ -195,9 +192,9 @@ class ShareRecipientsViewModelTest {
 
     @Test
     fun `test that when share removed event is handled it is set to consumed`() = runTest {
-        monitorShareRecipientsUseCase.stub { on { invoke(any()) }.thenReturn(flow { awaitCancellation() }) }
+        stubForData()
         shareFolderUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     any(),
                     any(),
@@ -208,7 +205,7 @@ class ShareRecipientsViewModelTest {
         initUnderTest()
 
         underTest.state.test {
-            assert(awaitItem() is FileContactListState.Loading)
+            awaitItem()
             underTest.removeShare(
                 listOf(
                     TestValues.contactMock,
@@ -228,7 +225,17 @@ class ShareRecipientsViewModelTest {
     @Test
     fun `test that share folder use case is called with correct parameters when shareFolder is called`() =
         runTest {
-            monitorShareRecipientsUseCase.stub { on { invoke(any()) }.thenReturn(flow { awaitCancellation() }) }
+            stubForData()
+            shareFolderRequestMapper.stub { on { invoke(any()) }.thenReturn(TestValues.SUCCESS_STRING) }
+            shareFolderUseCase.stub {
+                on {
+                    invoke(
+                        any(),
+                        any(),
+                        any()
+                    )
+                } doReturn MoveRequestResult.ShareMovement(2, 0, emptyList())
+            }
             initUnderTest()
 
             val expectedPermission = AccessPermission.READWRITE
@@ -249,11 +256,11 @@ class ShareRecipientsViewModelTest {
 
     @Test
     fun `test that sharing in progress is true while the use case is in progress`() = runTest {
-        monitorShareRecipientsUseCase.stub { on { invoke(any()) }.thenReturn(flow { awaitCancellation() }) }
+        stubForData()
         shareFolderRequestMapper.stub { on { invoke(any()) }.thenReturn(TestValues.SUCCESS_STRING) }
         val gate = CompletableDeferred<MoveRequestResult.ShareMovement>()
         shareFolderUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     any(),
                     any(),
@@ -272,7 +279,7 @@ class ShareRecipientsViewModelTest {
         initUnderTest()
 
         underTest.state.test {
-            assert(awaitItem() is FileContactListState.Loading)
+            awaitItem()
             underTest.shareFolder(
                 listOf(
                     TestValues.CONTACT_EMAIL,
@@ -295,10 +302,10 @@ class ShareRecipientsViewModelTest {
     @Test
     fun `test that error sharing a folder returns an error message in sharingCompletedEvent`() =
         runTest {
-            monitorShareRecipientsUseCase.stub { on { invoke(any()) }.thenReturn(flow { awaitCancellation() }) }
+            stubForData()
             shareFolderRequestMapper.stub { on { invoke(any()) }.thenReturn(TestValues.FAILURE_STRING) }
             shareFolderUseCase.stub {
-                onBlocking {
+                on {
                     invoke(
                         any(),
                         any(),
@@ -310,7 +317,7 @@ class ShareRecipientsViewModelTest {
             initUnderTest()
 
             underTest.state.test {
-                assert(awaitItem() is FileContactListState.Loading)
+                awaitItem()
                 underTest.shareFolder(
                     listOf(TestValues.CONTACT_EMAIL),
                     expectedPermission,
@@ -323,10 +330,10 @@ class ShareRecipientsViewModelTest {
 
     @Test
     fun `test that a share folder success result is displayed if returned`() = runTest {
-        monitorShareRecipientsUseCase.stub { on { invoke(any()) }.thenReturn(flow { awaitCancellation() }) }
+        stubForData()
         shareFolderRequestMapper.stub { on { invoke(any()) }.thenReturn(TestValues.SUCCESS_STRING) }
         shareFolderUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     any(),
                     any(),
@@ -344,7 +351,7 @@ class ShareRecipientsViewModelTest {
         initUnderTest()
 
         underTest.state.test {
-            assert(awaitItem() is FileContactListState.Loading)
+            awaitItem()
             underTest.shareFolder(
                 listOf(
                     TestValues.CONTACT_EMAIL,
@@ -359,10 +366,10 @@ class ShareRecipientsViewModelTest {
 
     @Test
     fun `test that when share folder completed event is handled it is set to consumed`() = runTest {
-        monitorShareRecipientsUseCase.stub { on { invoke(any()) }.thenReturn(flow { awaitCancellation() }) }
+        stubForData()
         shareFolderRequestMapper.stub { on { invoke(any()) }.thenReturn(TestValues.FAILURE_STRING) }
         shareFolderUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     any(),
                     any(),
@@ -374,7 +381,7 @@ class ShareRecipientsViewModelTest {
         initUnderTest()
 
         underTest.state.test {
-            assert(awaitItem() is FileContactListState.Loading)
+            awaitItem()
             underTest.shareFolder(
                 listOf(
                     TestValues.CONTACT_EMAIL,
@@ -422,7 +429,7 @@ class ShareRecipientsViewModelTest {
             mock<ShareRecipient.NonContact>(),
         )
         getAllowedSharingPermissionsUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(expectedPermissions)
+            on { invoke(any()) }.thenReturn(expectedPermissions)
         }
         monitorShareRecipientsUseCase.stub {
             on { invoke(any()) }.thenReturn(
@@ -451,8 +458,9 @@ class ShareRecipientsViewModelTest {
     @Test
     fun `test that show verified contact warning field is set to true if use case returns true`() =
         runTest {
+            stubForData()
             getContactVerificationWarningUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
 
             initUnderTest()
@@ -463,6 +471,143 @@ class ShareRecipientsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that navigateToAddContactEvent is triggered when onAddContactClicked and compose picker disabled`() =
+        runTest {
+            stubForData()
+            getFeatureFlagValueUseCase.stub {
+                on { invoke(AppFeatures.ContactsComposeUI) } doReturn false
+            }
+            initUnderTest()
+
+            underTest.state.test {
+                awaitItem()
+                underTest.onAddContactClicked()
+                val actual = awaitItem() as FileContactListState.Data
+                assertThat(actual.navigateToAddContactEvent.triggeredContent())
+                    .isEqualTo(TestValues.NODE_HANDLE)
+                assertThat(actual.sensitiveNodeShareWarning)
+                    .isEqualTo(SensitiveNodeShareWarning.None)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that navigateToAddContactEvent is triggered when onAddContactClicked and no sensitive warning`() =
+        runTest {
+            stubForData()
+            getFeatureFlagValueUseCase.stub {
+                on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+            }
+            getShareFolderSensitiveWarningUseCase.stub {
+                on { invoke(any()) } doReturn SensitiveNodeShareWarning.None
+            }
+            initUnderTest()
+
+            underTest.state.test {
+                awaitItem()
+                underTest.onAddContactClicked()
+                val actual = awaitItem() as FileContactListState.Data
+                assertThat(actual.navigateToAddContactEvent.triggeredContent())
+                    .isEqualTo(TestValues.NODE_HANDLE)
+                assertThat(actual.sensitiveNodeShareWarning)
+                    .isEqualTo(SensitiveNodeShareWarning.None)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that warning is shown when onAddContactClicked and folder is sensitive`() = runTest {
+        stubForData()
+        getFeatureFlagValueUseCase.stub {
+            on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+        }
+        getShareFolderSensitiveWarningUseCase.stub {
+            on { invoke(any()) } doReturn SensitiveNodeShareWarning.Folder
+        }
+        initUnderTest()
+
+        underTest.state.test {
+            awaitItem()
+            underTest.onAddContactClicked()
+            val actual = awaitItem() as FileContactListState.Data
+            assertThat(actual.sensitiveNodeShareWarning).isEqualTo(SensitiveNodeShareWarning.Folder)
+            assertThat(actual.navigateToAddContactEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that confirming the warning triggers navigateToAddContactEvent and clears the warning`() =
+        runTest {
+            stubForData()
+            getFeatureFlagValueUseCase.stub {
+                on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+            }
+            getShareFolderSensitiveWarningUseCase.stub {
+                on { invoke(any()) } doReturn SensitiveNodeShareWarning.Folder
+            }
+            initUnderTest()
+
+            underTest.state.test {
+                awaitItem()
+                underTest.onAddContactClicked()
+                awaitItem()
+                underTest.onShareHiddenNodeWarningConfirmed()
+                val actual = awaitItem() as FileContactListState.Data
+                assertThat(actual.sensitiveNodeShareWarning)
+                    .isEqualTo(SensitiveNodeShareWarning.None)
+                assertThat(actual.navigateToAddContactEvent.triggeredContent())
+                    .isEqualTo(TestValues.NODE_HANDLE)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that dismissing the warning clears it without navigating`() = runTest {
+        stubForData()
+        getFeatureFlagValueUseCase.stub {
+            on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+        }
+        getShareFolderSensitiveWarningUseCase.stub {
+            on { invoke(any()) } doReturn SensitiveNodeShareWarning.Folders
+        }
+        initUnderTest()
+
+        underTest.state.test {
+            awaitItem()
+            underTest.onAddContactClicked()
+            awaitItem()
+            underTest.clearAddContactState()
+            val actual = awaitItem() as FileContactListState.Data
+            assertThat(actual.sensitiveNodeShareWarning).isEqualTo(SensitiveNodeShareWarning.None)
+            assertThat(actual.navigateToAddContactEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun stubForData() {
+        getAllowedSharingPermissionsUseCase.stub {
+            on { invoke(any()) }.thenReturn(setOf(AccessPermission.FULL))
+        }
+        monitorShareRecipientsUseCase.stub {
+            on { invoke(any()) }.thenReturn(
+                flow {
+                    emit(
+                        listOf(
+                            mock<ShareRecipient.Contact>(),
+                            mock<ShareRecipient.NonContact>(),
+                        )
+                    )
+                    awaitCancellation()
+                }
+            )
+        }
+        getContactVerificationWarningUseCase.stub { on { invoke() } doReturn false }
+    }
 
 
     private data object TestValues {

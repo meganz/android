@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
-import mega.privacy.android.domain.usecase.contact.GetContactFromLinkUseCase
+import mega.privacy.android.domain.usecase.contact.ContactLinkQueryFromLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
@@ -19,7 +19,7 @@ import kotlin.coroutines.cancellation.CancellationException
  */
 @HiltViewModel
 class ChatLinksMessageViewModel @Inject constructor(
-    private val getContactFromLinkUseCase: GetContactFromLinkUseCase,
+    private val contactLinkQueryFromLinkUseCase: ContactLinkQueryFromLinkUseCase,
     private val checkChatLinkUseCase: CheckChatLinkUseCase,
     private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
@@ -40,24 +40,25 @@ class ChatLinksMessageViewModel @Inject constructor(
         onClick: (Long, String?, String?, Boolean) -> Unit,
     ): LinkContent? {
         return runCatching {
-            getLinkContentFromCache(link) ?: getContactFromLinkUseCase(link)?.let { contactLink ->
-                ContactLinkContent(
-                    content = contactLink,
-                    link = link,
-                    onClick = {
-                        onClick(
-                            contactLink.contactHandle,
-                            contactLink.email,
-                            contactLink.fullName,
-                            contactLink.isContact,
-                        )
-                    }
-                ).also {
-                    mutex.withLock {
-                        contactLinks[link] = it
+            getLinkContentFromCache(link)
+                ?: contactLinkQueryFromLinkUseCase(link)?.let { contactLink ->
+                    ContactLinkContent(
+                        content = contactLink,
+                        link = link,
+                        onClick = {
+                            onClick(
+                                contactLink.contactHandle,
+                                contactLink.email,
+                                contactLink.fullName,
+                                contactLink.isContact,
+                            )
+                        }
+                    ).also {
+                        mutex.withLock {
+                            contactLinks[link] = it
+                        }
                     }
                 }
-            }
         }.onFailure {
             Timber.e(it, "Failed to get contact from email")
         }.getOrNull()

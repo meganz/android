@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.res.Configuration
 import android.os.Parcelable
 import android.view.ViewTreeObserver
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -61,8 +62,7 @@ fun Activity.calculateWindowSizeClass(): WindowSizeClass {
     val actualHeight = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
         minOf(widthDp, heightDp) else maxOf(widthDp, heightDp)
 
-    val orientation = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) "LANDSCAPE" else "PORTRAIT"
-    Timber.v("calculateWindowSizeClass: Orientation: $orientation, actualWidth: $actualWidth, actualHeight: $actualHeight")
+    Timber.v("calculateWindowSizeClass: Orientation: ${configuration.orientation}, actualWidth: $actualWidth, actualHeight: $actualHeight")
 
     // Determine width size class based on Material Design 3 breakpoints
     val widthSizeClass = when {
@@ -88,32 +88,21 @@ fun Activity.calculateWindowSizeClass(): WindowSizeClass {
  * This extension function sets up automatic window size class monitoring
  * and triggers the callback when the window size changes.
  *
- * @param shouldShowAdaptiveLayoutUseCase Use case to determine if adaptive layout should be enabled
  * @param onSizeChanged Callback triggered when window size changes
  */
-fun BaseActivity.enableAdaptiveLayout(
-    shouldShowAdaptiveLayoutUseCase: ShouldShowAdaptiveLayoutUseCase,
-    onSizeChanged: (old: WindowSizeClass?, new: WindowSizeClass) -> Unit,
+fun AppCompatActivity.enableAdaptiveLayout(
+    onSizeChanged: ((old: WindowSizeClass?, new: WindowSizeClass) -> Unit)? = null,
 ) {
     Timber.d("enableAdaptiveLayout called for ${this::class.java.simpleName}")
-    lifecycleScope.launch {
-        val shouldEnable = shouldShowAdaptiveLayoutUseCase()
-        Timber.d("Should enable adaptive layout: $shouldEnable")
-        if (!shouldEnable) {
-            Timber.d("Adaptive layout disabled, returning early")
-            return@launch
+    var previous: WSC? = null
+
+    windowSizeClassFlow()
+        .onEach { newSize ->
+            Timber.d("Window size changed: $previous -> $newSize")
+            onSizeChanged?.invoke(previous, newSize)
+            previous = newSize
         }
-
-        var previous: WSC? = null
-
-        windowSizeClassFlow()
-            .onEach { newSize ->
-                Timber.d("Window size changed: $previous -> $newSize")
-                onSizeChanged(previous, newSize)
-                previous = newSize
-            }
-            .launchIn(this)
-    }
+        .launchIn(lifecycleScope)
 }
 
 /**
@@ -153,3 +142,11 @@ fun Activity.windowSizeClassFlow(): Flow<WindowSizeClass> =
             emit(getCurrentWindowSize())
         }
         .distinctUntilChanged()
+
+/**
+ * Extension function to determine if the screen is considered "compact" in either width or height.
+ *
+ * @return true if either the width or height size class is Compact, false otherwise.
+ */
+fun WindowSizeClass.compactScreen(): Boolean =
+    widthSizeClass == WindowWidthSizeClass.Compact || heightSizeClass == WindowHeightSizeClass.Compact

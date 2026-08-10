@@ -39,6 +39,10 @@ internal class ShareRepositoryImpl @Inject constructor(
                 nodeMapper(megaNode, offline = offline)
             }
         }
-        deferredResults.awaitAll()
+        deferredResults.awaitAll().filterNotNull()
+    }
+
+    override suspend fun doesHaveLinks(): Boolean = withContext(ioDispatcher) {
+        !megaApiGateway.getPublicLinks().isNullOrEmpty()
     }
 }

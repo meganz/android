@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestAction
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -403,12 +404,12 @@ interface ContactsRepository {
     )
 
     /**
-     * Get contact link
+     * Gets a contact link query result.
      *
      * @param userHandle
-     * @return
+     * @return [ContactLinkQueryResult]
      */
-    suspend fun getContactLink(userHandle: Long): ContactLink
+    suspend fun contactLinkQuery(userHandle: Long): ContactLinkQueryResult
 
     /**
      * Is contact request sent
@@ -470,6 +471,14 @@ interface ContactsRepository {
     suspend fun getLocalContacts(): List<LocalContact>
 
     /**
+     * Get list of local contacts from a contact picker session [UriPath].
+     *
+     * @param uriPath The [UriPath] returned by the contact picker.
+     * @return List of [LocalContact]
+     */
+    suspend fun getLocalContactsFromUri(uriPath: UriPath): List<LocalContact>
+
+    /**
      * Get list of local contact's numbers from the ContactGateway
      *
      * @return List of [LocalContact]
@@ -512,4 +521,6 @@ interface ContactsRepository {
      * @return The [Contact]
      */
     fun monitorContactByEmail(email: String): Flow<Contact?>
+
+    suspend fun updateContactCache(userUpdate: UserUpdate)
 }

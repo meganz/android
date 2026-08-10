@@ -35,10 +35,10 @@ import org.mockito.kotlin.verify
 class PasscodePreferenceWrapperTest {
     private lateinit var underTest: PasscodePreferenceWrapper
 
-    private val databaseHandler = mock<DatabaseHandler?>()
-    private val monitorPasscodeLockPreferenceUseCase = mock<MonitorPasscodeLockPreferenceUseCase?>()
-    private val passcodeRepository = mock<PasscodeRepository?>()
-    private val accountRepository = mock<AccountRepository?>()
+    private val databaseHandler = mock<DatabaseHandler>()
+    private val monitorPasscodeLockPreferenceUseCase = mock<MonitorPasscodeLockPreferenceUseCase>()
+    private val passcodeRepository = mock<PasscodeRepository>()
+    private val accountRepository = mock<AccountRepository>()
 
     @BeforeEach
     internal fun setUp() {
@@ -73,7 +73,7 @@ class PasscodePreferenceWrapperTest {
         internal fun `test that get passcode returns passcode repository value`() = runTest {
             val expected = "PasscodeRepoPasscode"
             passcodeRepository.stub {
-                onBlocking { getPasscode() }.thenReturn(expected)
+                on { getPasscode() }.thenReturn(expected)
             }
 
             assertThat(underTest.getPasscode()).isEqualTo(expected)

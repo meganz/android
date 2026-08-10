@@ -3,12 +3,12 @@ package mega.privacy.android.data.repository
 import android.app.Activity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -21,7 +21,9 @@ import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import nz.mega.sdk.MegaError
 import timber.log.Timber
@@ -30,7 +32,6 @@ import javax.inject.Inject
 /**
  * Default implementation of [BillingRepository]
  *
- * @property accountInfoWrapper
  * @property megaApiGateway
  * @property ioDispatcher
  * @property paymentMethodFlagsCache
@@ -38,12 +39,13 @@ import javax.inject.Inject
  */
 
 internal class DefaultBillingRepository @Inject constructor(
-    private val accountInfoWrapper: AccountInfoWrapper,
+    private val accountRepository: AccountRepository,
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val paymentMethodFlagsCache: Cache<PaymentMethodFlags>,
     private val pricingCache: Cache<Pricing>,
     private val skusCache: Cache<List<MegaSku>>,
+    private val sourceCache: Cache<UpgradeSource>,
     private val activeSubscriptionCache: Cache<MegaPurchase>,
     private val numberOfSubscriptionCache: Cache<Long>,
     private val pricingMapper: PricingMapper,
@@ -114,14 +116,22 @@ internal class DefaultBillingRepository @Inject constructor(
 
     override suspend fun launchPurchaseFlow(
         activity: Activity,
+        source: UpgradeSource,
         productId: String,
         offerId: String?,
-    ) = billingGateway.launchPurchaseFlow(activity, productId, offerId)
+    ) {
+        sourceCache.set(source)
+        val currentAccountType = accountRepository.getAccountType()
+        billingGateway.launchPurchaseFlow(activity, productId, offerId, currentAccountType)
+    }
 
-    override suspend fun getCurrentPaymentMethod(): PaymentMethod? =
-        PaymentMethod.entries.firstOrNull {
-            it.methodId == paymentMethodTypeMapper(accountInfoWrapper.subscriptionMethodId)
+    override suspend fun getCurrentPaymentMethod(): PaymentMethod? {
+        val subscriptionMethodId = accountRepository.monitorAccountDetail().first()
+            .levelDetail?.subscriptionMethodId ?: 0
+        return PaymentMethod.entries.firstOrNull {
+            it.methodId == paymentMethodTypeMapper(subscriptionMethodId)
         }
+    }
 
     override suspend fun legacyCancelSubscriptions(feedback: String?) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
@@ -132,6 +142,11 @@ internal class DefaultBillingRepository @Inject constructor(
     }
 
     override fun isBillingAvailable(): Boolean = skusCache.get().isNullOrEmpty().not()
+
+    override suspend fun getBillingCountryCode(): String? = billingGateway.getCountryCode()
+
+    override suspend fun isSubscriptionFeatureAvailable(): Boolean =
+        billingGateway.isSubscriptionFeatureAvailable()
 
     override fun getActiveSubscription() = activeSubscriptionCache.get()
 
@@ -155,4 +170,5 @@ internal class DefaultBillingRepository @Inject constructor(
             )
         }
     }
+
 }

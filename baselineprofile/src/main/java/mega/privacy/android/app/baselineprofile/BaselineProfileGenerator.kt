@@ -48,25 +48,28 @@ class BaselineProfileGenerator {
             pressHome()
             startActivityAndWait()
 
-            // find object by id
-            device.findObject(By.res("tour_screen:button_login"))
+            // Click Login on tour screen (usp_carousel_screen:log_in_button)
+            device.findObject(By.res("usp_carousel_screen:log_in_button"))
                 ?.click()
+            device.waitForWindowUpdate(null, 1000)
 
             require(BuildConfig.TEST_ACCOUNT_USER_NAME.isNotEmpty()) { "Please put test_account_username in local.properties" }
-            device.findObject(By.res("require_login:label_text_field_displaying_the_email_address_label"))
-                ?.children?.first()?.let {
-                    it.text = BuildConfig.TEST_ACCOUNT_USER_NAME
+            device.findObject(By.res("login_screen:email_input"))
+                ?.let {
+                    it.click()
+                    it.setText(BuildConfig.TEST_ACCOUNT_USER_NAME)
                     device.waitForWindowUpdate(null, 1000)
                 }
 
             require(BuildConfig.TEST_ACCOUNT_PASSWORD.isNotEmpty()) { "Please put test_account_password in local.properties" }
-            device.findObject(By.res("require_login:password_text_field_displaying_the_password"))
-                ?.children?.first()?.let {
-                    it.text = BuildConfig.TEST_ACCOUNT_PASSWORD
+            device.findObject(By.res("login_screen:password_input"))
+                ?.let {
+                    it.click()
+                    it.setText(BuildConfig.TEST_ACCOUNT_PASSWORD)
                     device.waitForWindowUpdate(null, 1000)
                 }
 
-            device.findObject(By.res("require_login:raised_default_mega_button_login"))
+            device.findObject(By.res("login_screen:login_button"))
                 ?.let {
                     it.click()
                     // wait for fetch nodes

@@ -1,0 +1,51 @@
+package mega.privacy.android.feature.texteditor.presentation
+
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
+import javax.inject.Inject
+
+/**
+ * Maps node metadata into the list of actions to show in the text editor bottom floating bar.
+ * Matches legacy text editor visibility rules; adapter-specific logic is passed in via the boolean flags.
+ *
+ * - **Download**: View mode, when [showDownload] (e.g. not offline or rubbish bin).
+ * - **Get Link**: View mode, when not in excluded adapter, access is OWNER, and node is not exported.
+ * - **Share**: View mode, when [showShare].
+ * - **Send to chat**: View mode, when [showSendToChat] (cloud node opens; not chat/local-only).
+ * - **Edit**: View mode, when not in excluded adapter, access >= READWRITE, and the node is not in
+ *   Backups (Backups nodes are read-only via normal operations). Always last when shown.
+ */
+class TextEditorBottomBarActionsMapper @Inject constructor() {
+
+    operator fun invoke(
+        mode: TextEditorMode,
+        accessPermission: AccessPermission?,
+        isNodeExported: Boolean?,
+        inExcludedAdapterForGetLinkAndEdit: Boolean,
+        showDownload: Boolean,
+        showShare: Boolean,
+        showSendToChat: Boolean,
+        isNodeInBackups: Boolean = false,
+    ): List<TextEditorBottomBarAction> {
+        if (mode != TextEditorMode.View) return emptyList()
+
+        val showGetLink = !inExcludedAdapterForGetLinkAndEdit
+                && accessPermission == AccessPermission.OWNER
+                && isNodeExported == false
+
+        val showEdit = !inExcludedAdapterForGetLinkAndEdit
+                && !isNodeInBackups
+                && (accessPermission == AccessPermission.OWNER
+                || accessPermission == AccessPermission.FULL
+                || accessPermission == AccessPermission.READWRITE)
+
+        return buildList {
+            if (showDownload) add(TextEditorBottomBarAction.Download)
+            if (showGetLink) add(TextEditorBottomBarAction.GetLink)
+            if (showShare) add(TextEditorBottomBarAction.Share)
+            if (showSendToChat) add(TextEditorBottomBarAction.SendToChat)
+            if (showEdit) add(TextEditorBottomBarAction.Edit)
+        }
+    }
+}

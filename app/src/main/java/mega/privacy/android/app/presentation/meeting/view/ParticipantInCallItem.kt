@@ -10,16 +10,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -30,10 +29,10 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.contact.component.ContactStatusDot
+import mega.android.core.ui.components.contact.state.ContactItemStatus
+import mega.android.core.ui.components.profile.MediumProfilePicture
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.view.ContactStatusView
-import mega.privacy.android.app.presentation.contact.view.DefaultAvatarView
-import mega.privacy.android.app.presentation.contact.view.UriAvatarView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.CallParticipantData
@@ -44,7 +43,8 @@ import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallSta
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.icon.pack.R as IconR
+import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
+import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaButtonWithIcon
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -52,6 +52,8 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white
+import java.io.File
+import mega.privacy.android.icon.pack.R as IconR
 
 /**
  * View of a participant in the list
@@ -81,6 +83,7 @@ fun ParticipantInCallItem(
     onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
     onRingParticipantClicked: (Long) -> Unit = {},
 ) {
+    val statusMapper = remember { ContactItemStatusMapper() }
     Column {
         Row(
             modifier = Modifier
@@ -106,10 +109,11 @@ fun ParticipantInCallItem(
                             .size(40.dp)
 
                         ParticipantAvatar(
-                            modifier = avatarModifier.clip(CircleShape),
-                            avatarUri = participant.data.avatarUri,
-                            avatarColor = participant.defaultAvatarColor,
-                            avatarFirstLetter = participant.getAvatarFirstLetter(),
+                            modifier = avatarModifier,
+                            avatar = participant.toAvatarData(),
+                            contentDescription = participant.data.fullName
+                                ?: participant.email
+                                ?: "",
                         )
 
                         if (participant.isRaisedHand) {
@@ -162,7 +166,9 @@ fun ParticipantInCallItem(
                         }
 
                         if (section == ParticipantsSection.NotInCallSection && participant.status != UserChatStatus.Invalid && !isGuest) {
-                            ContactStatusView(status = participant.status)
+                            Box(modifier = Modifier.padding(start = 6.dp)) {
+                                ContactStatusDot(status = statusMapper(participant.status))
+                            }
                         }
                     }
 
@@ -285,16 +291,36 @@ fun ParticipantInCallItem(
 
 @Composable
 private fun ParticipantAvatar(
-    avatarUri: String?,
-    avatarColor: Int,
-    avatarFirstLetter: String,
+    avatar: AvatarData,
+    contentDescription: String,
     modifier: Modifier = Modifier,
 ) {
-    if (avatarUri != null) {
-        UriAvatarView(modifier = modifier, uri = avatarUri)
+    Box(modifier = modifier) {
+        when (avatar) {
+            is AvatarData.Image -> MediumProfilePicture(
+                imageFile = avatar.file,
+                name = null,
+                contentDescription = contentDescription,
+            )
+
+            is AvatarData.Initials -> MediumProfilePicture(
+                imageFile = null,
+                name = avatar.initials,
+                contentDescription = contentDescription,
+                avatarColor = avatar.avatarColor,
+            )
+        }
+    }
+}
+
+private fun ChatParticipant.toAvatarData(): AvatarData {
+    val uri = data.avatarUri
+    return if (uri != null) {
+        AvatarData.Image(File(uri))
     } else {
-        DefaultAvatarView(
-            modifier = modifier, color = Color(avatarColor), content = avatarFirstLetter
+        AvatarData.Initials(
+            initials = getAvatarFirstLetter(),
+            avatarColor = Color(defaultAvatarColor),
         )
     }
 }

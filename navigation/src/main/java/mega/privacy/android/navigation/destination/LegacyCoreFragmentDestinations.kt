@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RubbishBinNavKey(
     val handle: Long? = null,
+    val highlightedNodeHandle: Long? = null,
 ) : NavKey
 
 @Serializable
@@ -15,4 +16,5 @@ data object NotificationsNavKey : NavKey
 data class MediaDiscoveryNavKey(
     val nodeHandle: Long,
     val nodeName: String? = null,
+    val isFromFolderLink: Boolean = false,
 ) : NavKey

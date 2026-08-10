@@ -11,24 +11,39 @@ import java.util.Locale
 /**
  * Localised Subscription
  *
- * @property monthlySubscription                Subscription option for monthly plan
- * @property yearlySubscription                 Subscription option for yearly plan
+ * @property monthlySubscription                Subscription option for monthly plan, null if only yearly is available
+ * @property yearlySubscription                 Subscription option for yearly plan, null if only monthly is available
  * @property localisedPriceCurrencyCode         Mapper to get localised price and currency code (e.g. "EUR")
  * @property formattedSize                      Mapper to get correctly formatted size for storage and transfer
  */
 data class LocalisedSubscription(
-    val monthlySubscription: Subscription,
-    val yearlySubscription: Subscription,
+    val monthlySubscription: Subscription?,
+    val yearlySubscription: Subscription?,
     val localisedPriceCurrencyCode: LocalisedPriceCurrencyCodeStringMapper,
     val formattedSize: FormattedSizeMapper,
 ) {
-    val accountType: AccountType = monthlySubscription.accountType
-    val storage: Int = monthlySubscription.storage
+    init {
+        require(monthlySubscription != null || yearlySubscription != null) {
+            "At least one of monthlySubscription or yearlySubscription must be non-null"
+        }
+    }
 
-    private val yearlyAmountPerMonth = CurrencyAmount(
-        yearlySubscription.amount.value / 12,
-        yearlySubscription.amount.currency,
-    )
+    val accountType: AccountType
+        get() = (monthlySubscription ?: yearlySubscription)!!.accountType
+
+    val storage: Int
+        get() = (monthlySubscription ?: yearlySubscription)!!.storage
+
+    private val yearlyAmountPerMonth: CurrencyAmount?
+        get() = yearlySubscription?.let {
+            CurrencyAmount(it.amount.value / 12, it.amount.currency)
+        }
+
+    /**
+     * Check if this subscription has an option for the given period.
+     */
+    fun hasSubscriptionFor(isMonthly: Boolean): Boolean =
+        if (isMonthly) monthlySubscription != null else yearlySubscription != null
 
     /**
      * method to call LocalisedPriceCurrencyCodeStringMapper to return pair of strings containing localised price, currency sign and currency code
@@ -37,11 +52,11 @@ data class LocalisedSubscription(
      * @param isMonthly [Boolean]
      * @return Pair<String, String>
      */
-    fun localisePriceCurrencyCode(locale: Locale, isMonthly: Boolean): LocalisedProductPrice =
-        when (isMonthly) {
-            true -> localisedPriceCurrencyCode(monthlySubscription.amount, locale)
-            false -> localisedPriceCurrencyCode(yearlySubscription.amount, locale)
-        }
+    fun localisePriceCurrencyCode(locale: Locale, isMonthly: Boolean): LocalisedProductPrice {
+        val subscription = if (isMonthly) monthlySubscription else yearlySubscription
+        requireNotNull(subscription) { "Subscription for isMonthly=$isMonthly is not available" }
+        return localisedPriceCurrencyCode(subscription.amount, locale)
+    }
 
     /**
      * method to call LocalisedPriceCurrencyCodeStringMapper to return pair of strings containing localised discounted price, currency sign and currency code
@@ -54,11 +69,11 @@ data class LocalisedSubscription(
         isMonthly: Boolean,
     ): LocalisedProductPrice? =
         if (isMonthly) {
-            monthlySubscription.discountedAmountMonthly?.let {
+            monthlySubscription?.discountedAmountMonthly?.let {
                 localisedPriceCurrencyCode(it, locale)
             }
         } else {
-            yearlySubscription.discountedAmountMonthly?.let {
+            yearlySubscription?.discountedAmountMonthly?.let {
                 localisedPriceCurrencyCode(it, locale)
             }
         }
@@ -74,20 +89,20 @@ data class LocalisedSubscription(
         isMonthly: Boolean,
     ): LocalisedProductPrice? =
         if (isMonthly) {
-            monthlySubscription.discountedAmountMonthly?.let {
+            monthlySubscription?.discountedAmountMonthly?.let {
                 localisedPriceCurrencyCode(CurrencyAmount(it.value * 12, it.currency), locale)
             }
         } else {
-            yearlySubscription.discountedAmountMonthly?.let {
+            yearlySubscription?.discountedAmountMonthly?.let {
                 localisedPriceCurrencyCode(CurrencyAmount(it.value * 12, it.currency), locale)
             }
         }
 
     /**
-     * product price of the yearly amount per month
+     * product price of the yearly amount per month. Returns null if yearly subscription is not available.
      */
-    fun localisePriceOfYearlyAmountPerMonth(locale: Locale): LocalisedProductPrice =
-        localisedPriceCurrencyCode(yearlyAmountPerMonth, locale)
+    fun localisePriceOfYearlyAmountPerMonth(locale: Locale): LocalisedProductPrice? =
+        yearlyAmountPerMonth?.let { localisedPriceCurrencyCode(it, locale) }
 
     /**
      * method to call FormattedSizeMapper to return pair of int and string containing correctly formatted size for storage
@@ -103,20 +118,20 @@ data class LocalisedSubscription(
      * @param isMonthly [Boolean]
      * @return Pair<Int, String>
      */
-    fun formatTransferSize(isMonthly: Boolean): FormattedSize =
-        if (isMonthly) {
-            formattedSize(size = monthlySubscription.transfer)
-        } else {
-            formattedSize(size = yearlySubscription.transfer)
-        }
+    fun formatTransferSize(isMonthly: Boolean): FormattedSize {
+        val subscription = if (isMonthly) monthlySubscription else yearlySubscription
+        requireNotNull(subscription) { "Subscription for isMonthly=$isMonthly is not available" }
+        return formattedSize(size = subscription.transfer)
+    }
 
     val hasDiscount: Boolean
-        get() = monthlySubscription.discountedAmountMonthly != null || yearlySubscription.discountedAmountMonthly != null
+        get() = monthlySubscription?.discountedAmountMonthly != null ||
+                yearlySubscription?.discountedAmountMonthly != null
 
     /**
-     * Get offer id based on subscription period
+     * Get subscription for the given period. Returns null if not available for that period.
      */
-    fun getSubscription(isMonthly: Boolean): Subscription = if (isMonthly) {
+    fun getSubscription(isMonthly: Boolean): Subscription? = if (isMonthly) {
         monthlySubscription
     } else {
         yearlySubscription

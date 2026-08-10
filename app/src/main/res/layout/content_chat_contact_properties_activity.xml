@@ -28,7 +28,7 @@
             android:paddingStart="72dp"
             android:paddingTop="14dp">
 
-            <mega.privacy.android.app.components.twemoji.EmojiTextView
+            <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
                 android:id="@+id/name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -221,7 +221,7 @@
                 android:layout_gravity="start|center_vertical"
                 android:layout_toEndOf="@+id/chat_contact_properties_incoming_shares_icon"
                 android:layout_marginStart="16dp"
-                android:text="@string/title_incoming_shares_explorer"
+                android:text="@string/general_title_incoming_shares"
                 android:textAppearance="@style/TextAppearance.Mega.Body1.Variant3" />
 
             <Button
@@ -535,7 +535,7 @@
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginStart="16dp"
                 android:src="@drawable/ic_remove_contact"
-                app:tint="@color/color_text_error" />
+                app:tint="@color/color_icon_brand" />
 
             <TextView
                 android:id="@+id/chat_contact_properties_remove_contact_label"
@@ -546,7 +546,8 @@
                 android:layout_marginStart="32dp"
                 android:layout_toEndOf="@id/chat_contact_properties_remove_contact_icon"
                 android:text="@string/title_properties_remove_contact"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
+                android:textColor="@color/color_text_brand" />
 
         </RelativeLayout>
 

@@ -48,16 +48,28 @@ class GetVideoPlaylistsUseCase @Inject constructor(
                 playlists.filterIsInstance<UserVideoPlaylist>().sortedByDescending { it.title }
             }
 
-            SortOrder.ORDER_MODIFICATION_ASC -> {
+            SortOrder.ORDER_CREATION_ASC -> {
                 playlists.filterIsInstance<UserVideoPlaylist>()
                     .sortedBy { it.title }
                     .sortedBy { it.creationTime }
             }
 
-            SortOrder.ORDER_MODIFICATION_DESC -> {
+            SortOrder.ORDER_CREATION_DESC -> {
                 playlists.filterIsInstance<UserVideoPlaylist>()
                     .sortedBy { it.title }
                     .sortedByDescending { it.creationTime }
+            }
+
+            SortOrder.ORDER_MODIFICATION_ASC -> {
+                playlists.filterIsInstance<UserVideoPlaylist>()
+                    .sortedBy { it.title }
+                    .sortedBy { it.modificationTime }
+            }
+
+            SortOrder.ORDER_MODIFICATION_DESC -> {
+                playlists.filterIsInstance<UserVideoPlaylist>()
+                    .sortedBy { it.title }
+                    .sortedByDescending { it.modificationTime }
             }
 
             else -> playlists.filterIsInstance<UserVideoPlaylist>()

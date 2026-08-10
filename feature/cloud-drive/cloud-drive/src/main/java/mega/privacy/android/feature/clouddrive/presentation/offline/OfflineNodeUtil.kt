@@ -3,13 +3,22 @@ package mega.privacy.android.feature.clouddrive.presentation.offline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
-import mega.privacy.android.feature.clouddrive.R
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.shared.resources.R as SharedR
 
 @Composable
 internal fun getFileTypeIcon(fileName: String): Int? {
@@ -41,12 +50,12 @@ private fun getFolderDescription(offlineFileInformation: OfflineFileInformation)
 
     return when {
         numFiles == 0 && numFolders == 0 -> {
-            stringResource(R.string.file_browser_empty_folder)
+            stringResource(SharedR.string.empty_file_browser_folder)
         }
 
         numFolders == 0 && numFiles > 0 -> {
             pluralStringResource(
-                R.plurals.num_files_with_parameter,
+                SharedR.plurals.num_of_files_with_parameter,
                 numFiles,
                 numFiles
             )
@@ -54,7 +63,7 @@ private fun getFolderDescription(offlineFileInformation: OfflineFileInformation)
 
         numFiles == 0 && numFolders > 0 -> {
             pluralStringResource(
-                R.plurals.num_folders_with_parameter,
+                SharedR.plurals.num_of_folders_with_parameter,
                 numFolders,
                 numFolders
             )
@@ -62,12 +71,12 @@ private fun getFolderDescription(offlineFileInformation: OfflineFileInformation)
 
         else -> {
             val foldersText = pluralStringResource(
-                R.plurals.num_folders_num_files,
+                SharedR.plurals.num_of_folders_and_num_of_files,
                 numFolders,
                 numFolders
             )
             val filesText = pluralStringResource(
-                R.plurals.num_folders_num_files_2,
+                SharedR.plurals.num_of_files_with_parameter,
                 numFiles,
                 numFiles
             )
@@ -92,5 +101,29 @@ private fun getFileDescription(offlineFileInformation: OfflineFileInformation): 
 @Composable
 private fun formatModifiedDate(offlineFileInformation: OfflineFileInformation): String {
     val addedTime = offlineFileInformation.addedTime ?: return ""
-    return formatModifiedDate(java.util.Locale.getDefault(), addedTime)
+    return formatModifiedDate(LocalLocale.current.platformLocale, addedTime)
 }
+
+/**
+ * Resolves the [ThumbnailData] to hand to Coil for an offline node.
+ *
+ * Prefers local sources so thumbnails render without a network connection: a cached thumbnail
+ * URI first, then the locally-stored original file for image/video nodes (Coil decodes it on
+ * device). Only when no local source is available does it fall back to a [ThumbnailRequest]
+ * keyed by node handle, which [mega.privacy.android.app.fetcher.MegaThumbnailFetcher] resolves
+ * from the SDK (requires connectivity).
+ */
+val OfflineFileInformation.thumbnailData: ThumbnailData?
+    get() {
+        if (isFolder) return null
+        return thumbnail?.let { ThumbnailUriRequest(UriPath(it)) }
+            ?: absolutePath
+                .takeIf { it.isNotEmpty() && fileTypeInfo.isMedia() }
+                ?.let { ThumbnailUriRequest(UriPath(it)) }
+            ?: handle.toLongOrNull()
+                ?.takeIf { it != -1L }
+                ?.let { ThumbnailRequest(NodeId(it)) }
+    }
+
+private fun FileTypeInfo?.isMedia() =
+    this is ImageFileTypeInfo || this is VideoFileTypeInfo

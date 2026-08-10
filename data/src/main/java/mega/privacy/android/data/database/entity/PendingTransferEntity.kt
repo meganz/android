@@ -8,6 +8,8 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_PENDING_TRANSFER
 import mega.privacy.android.data.database.converter.PendingTransferNodeIdentifierConverter
+import mega.privacy.android.data.database.converter.PitagTriggerConverter
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
@@ -35,7 +37,10 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
         Index(value = ["state"]),
         Index(value = ["transferType", "state"])]
 )
-@TypeConverters(PendingTransferNodeIdentifierConverter::class)
+@TypeConverters(
+    PendingTransferNodeIdentifierConverter::class,
+    PitagTriggerConverter::class
+)
 data class PendingTransferEntity(
     @PrimaryKey(autoGenerate = true) @ColumnInfo("pendingTransferId") val pendingTransferId: Long? = null,
     @ColumnInfo("transferUniqueId") val transferUniqueId: Long?,
@@ -49,6 +54,7 @@ data class PendingTransferEntity(
     @ColumnInfo("alreadyTransferred") val alreadyTransferred: Int,
     @ColumnInfo("state") val state: PendingTransferState,
     @ColumnInfo("fileName") val fileName: String?,
+    @ColumnInfo("pitagTrigger", defaultValue = "") val pitagTrigger: PitagTrigger,
 ) {
 
     /**

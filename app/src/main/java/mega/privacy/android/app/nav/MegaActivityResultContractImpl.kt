@@ -2,13 +2,14 @@ package mega.privacy.android.app.nav
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContract
+import mega.privacy.android.app.activities.contract.AddToAlbumActivityContract
 import mega.privacy.android.app.activities.contract.HiddenNodeOnboardingActivityContract
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
-import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
+import mega.privacy.android.app.activities.contract.VideoToPlaylistActivityContract
 import mega.privacy.android.app.camera.InAppCameraLauncher
 import mega.privacy.android.app.nav.contract.OpenMultipleDocumentsPersistable
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -31,9 +32,6 @@ class MegaActivityResultContractImpl @Inject constructor() : MegaActivityResultC
     override val selectFolderToCopyActivityResultContract: SelectFolderToCopyActivityContract =
         SelectFolderToCopyActivityContract()
 
-    override val shareFolderActivityResultContract: ShareFolderActivityContract =
-        ShareFolderActivityContract()
-
     override val sendToChatActivityResultContract: SendToChatActivityContract =
         SendToChatActivityContract()
 
@@ -48,4 +46,10 @@ class MegaActivityResultContractImpl @Inject constructor() : MegaActivityResultC
 
     override val openMultipleDocumentsPersistable: ActivityResultContract<Array<String>, List<@JvmSuppressWildcards Uri>>
         get() = OpenMultipleDocumentsPersistable()
+
+    override val addToAlbumResultContract: ActivityResultContract<Pair<Array<Long>, Int>, String?>
+        get() = AddToAlbumActivityContract()
+
+    override val videoToPlaylistActivityContract: VideoToPlaylistActivityContract =
+        VideoToPlaylistActivityContract()
 }

@@ -8,6 +8,7 @@ import javax.inject.Inject
  * The use case for updating video playlist title.
  */
 class UpdateVideoPlaylistTitleUseCase @Inject constructor(
+    private val validatePlaylistNameUseCase: ValidatePlaylistNameUseCase,
     private val videoSectionRepository: VideoSectionRepository,
 ) {
 
@@ -17,6 +18,8 @@ class UpdateVideoPlaylistTitleUseCase @Inject constructor(
      * @param playlistID playlist id
      * @param newTitle new title
      */
-    suspend operator fun invoke(playlistID: NodeId, newTitle: String) =
-        videoSectionRepository.updateVideoPlaylistTitle(playlistID, newTitle)
+    suspend operator fun invoke(playlistID: NodeId, newTitle: String): String {
+        validatePlaylistNameUseCase(newTitle)
+        return videoSectionRepository.updateVideoPlaylistTitle(playlistID, newTitle)
+    }
 }

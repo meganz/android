@@ -21,7 +21,7 @@ pipeline {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '1'))
-        timeout(time: 2, unit: 'HOURS')
+        timeout(time: 1, unit: 'HOURS')
         gitLabConnection('GitLabConnection')
     }
     environment {
@@ -41,8 +41,6 @@ pipeline {
 
         // Channel to add in the suffix of the version name
         APK_VERSION_NAME_CHANNEL_FOR_CD = "-internal-appsharing"
-
-        BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }
     post {
         failure {
@@ -127,14 +125,10 @@ pipeline {
                 }
 
                 withCredentials([
-                        file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG'),
                         file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE')
                 ]) {
                     script {
                         println("applying production google map api config... ")
-                        sh 'mkdir -p app/src/debug/res/values'
-                        sh 'mkdir -p app/src/release/res/values'
-                        sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_DEBUG} app/src/debug/res/values/google_maps_api.xml"
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_RELEASE} app/src/release/res/values/google_maps_api.xml"
                     }
                 }

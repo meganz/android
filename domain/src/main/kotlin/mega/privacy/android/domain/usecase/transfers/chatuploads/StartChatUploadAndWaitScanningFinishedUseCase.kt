@@ -1,11 +1,12 @@
 package mega.privacy.android.domain.usecase.transfers.chatuploads
 
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.onEach
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
-import mega.privacy.android.domain.entity.transfer.TransferAppData.ChatUploadAppData
 import mega.privacy.android.domain.entity.transfer.isFinishScanningEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.GetChatPitagTargetUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFileUseCase
 import javax.inject.Inject
 
@@ -17,6 +18,8 @@ import javax.inject.Inject
 class StartChatUploadAndWaitScanningFinishedUseCase @Inject constructor(
     private val uploadFileUseCase: UploadFileUseCase,
     private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase,
+    private val getPendingMessageUseCase: GetPendingMessageUseCase,
+    private val getChatPitagTargetUseCase: GetChatPitagTargetUseCase,
 ) {
     /**
      * Invoke
@@ -25,17 +28,25 @@ class StartChatUploadAndWaitScanningFinishedUseCase @Inject constructor(
         uriPath: UriPath,
         fileName: String?,
         extraAppData: TransferAppData? = null,
+        pitagTrigger: PitagTrigger,
         pendingMessageIds: List<Long>,
     ) {
         val appData = (pendingMessageIds.map {
             TransferAppData.ChatUpload(it)
         } + extraAppData).filterNotNull()
+        val pitagTarget = pendingMessageIds
+            .mapNotNull { getPendingMessageUseCase(it) }.let { pendingMessages ->
+                getChatPitagTargetUseCase(pendingMessages)
+            }
+
         uploadFileUseCase(
             uriPath = uriPath,
             fileName = fileName,
             appData = appData,
             getOrCreateMyChatsFilesFolderIdUseCase(),
-            false
+            false,
+            pitagTrigger = pitagTrigger,
+            pitagTarget = pitagTarget
         ).firstOrNull { event ->
             event.isFinishScanningEvent
         }

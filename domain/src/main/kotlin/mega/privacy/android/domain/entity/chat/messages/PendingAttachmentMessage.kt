@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
@@ -21,6 +22,7 @@ sealed interface PendingAttachmentMessage : AttachmentMessage {
     val transferUniqueId: Long?
     val state: PendingMessageState
     val nodeId: NodeId?
+    val pitagTrigger: PitagTrigger
     override val isMine get() = true
     override val duration get() = (fileType as? PlayableFileTypeInfo)?.duration
     override val rowId get() = -1L
@@ -49,6 +51,7 @@ data class PendingFileAttachmentMessage(
     override val fileName: String,
     override val fileSize: Long,
     override val uriPath: UriPath,
+    override val pitagTrigger: PitagTrigger,
 ) : PendingAttachmentMessage
 
 
@@ -75,4 +78,5 @@ data class PendingVoiceClipMessage(
     override val uriPath: UriPath,
 ) : PendingAttachmentMessage {
     override val fileSize = 0L //we don't need it in voice clips
+    override val pitagTrigger = PitagTrigger.VoiceClip
 }

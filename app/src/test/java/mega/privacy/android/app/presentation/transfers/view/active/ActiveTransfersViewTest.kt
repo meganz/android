@@ -15,9 +15,12 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.transfers.model.QuotaWarning
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
+import mega.privacy.android.shared.account.overquota.model.OverQuotaIssue
+import mega.privacy.android.shared.account.overquota.model.OverQuotaStatus
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
@@ -25,6 +28,7 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.feature.transfers.components.TEST_TAG_ACTIVE_TRANSFER_ITEM
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,6 +62,11 @@ class ActiveTransfersViewTest {
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore
+    }
+
+    @Before
+    fun setUp() {
+        Analytics.initialise(mock<AnalyticsTracker>())
     }
 
     @Test
@@ -155,52 +164,57 @@ class ActiveTransfersViewTest {
     }
 
     @Test
-    fun `test that over quota banner is displayed when quotaWarning is StorageAndTransfer`() =
+    fun `test that over quota banner is displayed when overQuotaStatus is StorageAndTransfer`() =
         runTest {
             initComposeTestRule(
                 inProgressTransfers = listOf(getTransfer(1)),
-                quotaWarning = QuotaWarning.StorageAndTransfer,
+                overQuotaStatus = OverQuotaStatus(
+                    storage = OverQuotaIssue.Storage.Full,
+                    transfer = OverQuotaIssue.Transfer.TransferOverQuotaFreeUser,
+                ),
             )
 
             composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertIsDisplayed()
         }
 
     @Test
-    fun `test that over quota banner is displayed when quotaWarning is Transfer`() =
+    fun `test that over quota banner is displayed when overQuotaStatus is Transfer`() =
         runTest {
             initComposeTestRule(
                 inProgressTransfers = listOf(getTransfer(1)),
-                quotaWarning = QuotaWarning.Transfer,
+                overQuotaStatus = OverQuotaStatus(
+                    transfer = OverQuotaIssue.Transfer.TransferOverQuotaFreeUser,
+                ),
             )
 
             composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertIsDisplayed()
         }
 
     @Test
-    fun `test that over quota banner is displayed when quotaWarning is Storage`() =
+    fun `test that over quota banner is displayed when overQuotaStatus is Storage`() =
         runTest {
             initComposeTestRule(
                 inProgressTransfers = listOf(getTransfer(1)),
-                quotaWarning = QuotaWarning.Storage,
+                overQuotaStatus = OverQuotaStatus(storage = OverQuotaIssue.Storage.Full),
             )
 
             composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertIsDisplayed()
         }
 
     @Test
-    fun `test that over quota banner is not displayed when quotaWarning is null`() = runTest {
-        initComposeTestRule(
-            inProgressTransfers = listOf(getTransfer(1)),
-            quotaWarning = null,
-        )
+    fun `test that over quota banner is not displayed when overQuotaStatus has no issues`() =
+        runTest {
+            initComposeTestRule(
+                inProgressTransfers = listOf(getTransfer(1)),
+                overQuotaStatus = OverQuotaStatus(),
+            )
 
-        composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertDoesNotExist()
-    }
+            composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertDoesNotExist()
+        }
 
     private fun initComposeTestRule(
         inProgressTransfers: List<InProgressTransfer> = emptyList(),
-        isOverQuota: Boolean = false,
-        quotaWarning: QuotaWarning? = null,
+        overQuotaStatus: OverQuotaStatus = OverQuotaStatus(),
         areTransfersPaused: Boolean = false,
         onReorderPreview: (from: Int, to: Int) -> Unit = { _, _ -> },
         onReorderConfirmed: (InProgressTransfer) -> Unit = {},
@@ -211,22 +225,22 @@ class ActiveTransfersViewTest {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
                 ActiveTransfersView(
                     activeTransfers = inProgressTransfers,
-                    isTransferOverQuota = isOverQuota,
-                    isStorageOverQuota = isOverQuota,
-                    quotaWarning = quotaWarning,
+                    selectedActiveTransfersIds = null,
+                    hasInternetConnection = true,
+                    overQuotaStatus = overQuotaStatus,
                     areTransfersPaused = areTransfersPaused,
                     enableSwipeToDismiss = true,
                     onPlayPauseClicked = { },
                     onReorderPreview = onReorderPreview,
                     onReorderConfirmed = onReorderConfirmed,
-                    selectedActiveTransfersIds = null,
                     onActiveTransferSelected = {},
-                    lazyListState = rememberLazyListState(),
                     onUpgradeClick = onUpgradeClick,
                     onConsumeQuotaWarning = onConsumeQuotaWarning,
                     onCancelActiveTransfer = {},
                     onSetActiveTransferToCancel = {},
                     onUndoCancelActiveTransfer = {},
+                    isTabSelected = true,
+                    lazyListState = rememberLazyListState(),
                 )
             }
         }

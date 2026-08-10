@@ -3,37 +3,40 @@ package mega.privacy.android.app.presentation.videosection.view.playlist
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.FavouritesPlaylistBottomSheetOption
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.resources.R as sharedR
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun FavouritesPlaylistBottomSheet(
-    modalSheetState: ModalBottomSheetState,
-    coroutineScope: CoroutineScope,
+    sheetState: SheetState,
     isHideMenuActionVisible: Boolean,
     isUnhideMenuActionVisible: Boolean,
+    onDismissRequest: () -> Unit,
     onBottomSheetOptionClicked: (FavouritesPlaylistBottomSheetOption) -> Unit,
 ) {
-    BottomSheet(modalSheetState = modalSheetState,
-        sheetBody = {
+    MegaModalBottomSheet(
+        sheetState = sheetState,
+        bottomSheetBackground = MegaModalBottomSheetBackground.PageBackground,
+        onDismissRequest = onDismissRequest,
+        content = {
             FavouritesPlaylistBottomSheetBody(
                 isHideMenuActionVisible,
                 isUnhideMenuActionVisible,
                 onOptionClicked = { option ->
-                    coroutineScope.launch { modalSheetState.hide() }
                     onBottomSheetOptionClicked(option)
                 }
             )

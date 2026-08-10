@@ -53,7 +53,7 @@ internal class MessageListViewModelTest {
     )
     private val setMessageSeenUseCase: SetMessageSeenUseCase = mock()
     private val monitorContactCacheUpdates: MonitorContactCacheUpdates = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
     private val chatMessageTimeSeparatorMapper: ChatMessageTimeSeparatorMapper = mock()
 

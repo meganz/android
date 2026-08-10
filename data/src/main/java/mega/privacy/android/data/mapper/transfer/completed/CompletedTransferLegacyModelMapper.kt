@@ -27,6 +27,8 @@ internal class CompletedTransferLegacyModelMapper @Inject constructor(
                 originalPath = decryptData(entity.originalPath).orEmpty(),
                 parentHandle = decryptData(entity.parentHandle)?.toLongOrNull() ?: -1L,
                 appData = decryptData(entity.appData),
+                uniqueId = 0,
+                totalBytes = 0,
             )
         )
 }

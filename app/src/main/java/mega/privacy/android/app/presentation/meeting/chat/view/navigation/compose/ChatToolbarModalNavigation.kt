@@ -7,16 +7,17 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.navOptions
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.bottomSheet
+import androidx.compose.material.navigation.bottomSheet
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
+import mega.privacy.android.navigation.destination.AddContactsNavKey
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.chatToolbarModal(
     navController: NavHostController,
     scaffoldState: ScaffoldState,
     onCameraPermissionDenied: () -> Unit,
+    onNavigate: (NavKey) -> Unit,
     closeBottomSheets: () -> Unit,
 ) {
     bottomSheet(route = "toolbarModal") { backStackEntry ->
@@ -24,7 +25,7 @@ internal fun NavGraphBuilder.chatToolbarModal(
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 
         ChatToolbarBottomSheet(
-            onAttachContacts = viewModel::onAttachContacts,
+            onNavigateToAddContacts = { onNavigate(AddContactsNavKey(preselectedHandles = emptyList())) },
             uiState = uiState,
             scaffoldState = scaffoldState,
             onPickLocation = {
@@ -38,7 +39,9 @@ internal fun NavGraphBuilder.chatToolbarModal(
             },
             onSendGiphyMessage = viewModel::onSendGiphyMessage,
             closeModal = navController::popBackStack,
-            onAttachFiles = viewModel::onAttachFiles,
+            onAttachFiles = { files, pitagTrigger ->
+                viewModel.onAttachFiles(files, pitagTrigger)
+            },
             hideSheet = closeBottomSheets,
             navigateToFileModal = navController::navigateChatFileModal,
             isVisible = true,

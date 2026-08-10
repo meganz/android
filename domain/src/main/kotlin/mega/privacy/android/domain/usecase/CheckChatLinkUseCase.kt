@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.repository.ChatRepository
-import mega.privacy.android.domain.usecase.chat.InitGuestChatSessionUseCase
+import mega.privacy.android.domain.usecase.chat.InitAnonymousChatModeUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ import javax.inject.Inject
 class CheckChatLinkUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
-    private val initGuestChatSessionUseCase: InitGuestChatSessionUseCase,
+    private val initAnonymousChatModeUseCase: InitAnonymousChatModeUseCase,
 ) {
 
     /**
@@ -29,10 +29,8 @@ class CheckChatLinkUseCase @Inject constructor(
     }
 
     private suspend fun initChatGuestSessionIfNeeded() {
-        runCatching {
-            if (!isUserLoggedInUseCase()) {
-                initGuestChatSessionUseCase(anonymousMode = true)
-            }
-        }.getOrNull()
+        if (!isUserLoggedInUseCase()) {
+            initAnonymousChatModeUseCase()
+        }
     }
 }

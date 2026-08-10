@@ -20,8 +20,8 @@ class DefaultFilterCloudDrivePhotosTest {
     private val cameraUploadFolderId = 1L
     private val mediaUploadFolderId = 2L
     private val photosRepository = mock<PhotosRepository> {
-        onBlocking { getCameraUploadFolderId() }.thenReturn(cameraUploadFolderId)
-        onBlocking { getMediaUploadFolderId() }.thenReturn(mediaUploadFolderId)
+        on { getCameraUploadFolderId() }.thenReturn(cameraUploadFolderId)
+        on { getMediaUploadFolderId() }.thenReturn(mediaUploadFolderId)
     }
 
     @Before

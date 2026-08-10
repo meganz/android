@@ -33,6 +33,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -40,6 +41,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
@@ -48,12 +50,15 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.setting.SetAskBeforePreviewDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.setting.ShouldAskBeforePreviewDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
@@ -69,8 +74,6 @@ import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptTo
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWorkerAndWaitUntilIsStartedUseCase
-import mega.privacy.android.domain.usecase.transfers.filespermission.MonitorRequestFilesPermissionDeniedUseCase
-import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
@@ -105,6 +108,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val isAskBeforeLargeDownloadsSettingUseCase: IsAskBeforeLargeDownloadsSettingUseCase,
     private val setAskBeforeLargeDownloadsSettingUseCase: SetAskBeforeLargeDownloadsSettingUseCase,
+    private val shouldAskBeforePreviewDownloadsSettingUseCase: ShouldAskBeforePreviewDownloadsSettingUseCase,
+    private val setAskBeforePreviewDownloadsSettingUseCase: SetAskBeforePreviewDownloadsSettingUseCase,
     private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     private val getCurrentDownloadSpeedUseCase: GetCurrentDownloadSpeedUseCase,
     private val shouldAskDownloadDestinationUseCase: ShouldAskDownloadDestinationUseCase,
@@ -120,8 +125,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val saveUriToDeviceUseCase: SaveUriToDeviceUseCase,
     private val getCurrentUploadSpeedUseCase: GetCurrentUploadSpeedUseCase,
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
-    private val monitorRequestFilesPermissionDeniedUseCase: MonitorRequestFilesPermissionDeniedUseCase,
-    private val setRequestFilesPermissionDeniedUseCase: SetRequestFilesPermissionDeniedUseCase,
     private val startDownloadsWorkerAndWaitUntilIsStartedUseCase: StartDownloadsWorkerAndWaitUntilIsStartedUseCase,
     private val startUploadsWorkerAndWaitUntilIsStartedUseCase: StartUploadsWorkerAndWaitUntilIsStartedUseCase,
     private val deleteAllPendingTransfersUseCase: DeleteAllPendingTransfersUseCase,
@@ -143,6 +146,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val getPreviewDownloadUseCase: GetPreviewDownloadUseCase,
     private val ratingHandler: RatingHandlerImpl,
     private val crashReporter: CrashReporter,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -155,10 +159,19 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     init {
         checkDownloadRating()
         checkUploadRating()
-        monitorRequestFilesPermissionDenied()
         monitorStorageOverQuota()
         monitorPreviews()
         monitorTransferToCancel()
+        loadQuotaWarningUpsellFlag()
+    }
+
+    private fun loadQuotaWarningUpsellFlag() {
+        viewModelScope.launch {
+            val enabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
+            }.getOrDefault(false)
+            _uiState.update { it.copy(isQuotaWarningUpsellEnabled = enabled) }
+        }
     }
 
     /**
@@ -188,8 +201,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     if (transferTriggerEvent.nodes.isEmpty() && !isCopyEvent) {
                         Timber.e("Node in $transferTriggerEvent must exist")
                         _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
-                    } else if (!checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent)) {
-                        startDownloadWithoutConfirmation(transferTriggerEvent)
+                    } else {
+                        if (!checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent)) {
+                            startDownloadWithoutConfirmation(transferTriggerEvent)
+                        }
                     }
                 }
 
@@ -199,9 +214,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         transferTriggerEvent.uris.size,
                     )
                     startChatUploads(
-                        chatId = transferTriggerEvent.chatId,
+                        chatIds = transferTriggerEvent.chatIds,
                         uris = transferTriggerEvent.uris,
-                        isVoiceClip = transferTriggerEvent.isVoiceClip
+                        isVoiceClip = transferTriggerEvent.isVoiceClip,
+                        pitagTrigger = transferTriggerEvent.pitagTrigger,
                     )
                 }
 
@@ -266,14 +282,12 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 when (event) {
                     is TransferTriggerEvent.DownloadTriggerEvent -> {
                         (if (event is TransferTriggerEvent.StartDownloadForOffline) {
-                            if (event.node == null) {
+                            if (event.nodes.isEmpty()) {
                                 Timber.e("Node in $event must exist")
                                 null
                             } else {
                                 runCatching {
-                                    val node = event.node
-                                    requireNotNull(node)
-                                    getOfflinePathForNodeUseCase(node)
+                                    getOfflinePathForNodeUseCase(event.nodes.first())
                                 }.onFailure { Timber.e(it) }
                                     .getOrNull()
                             }
@@ -318,7 +332,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                                 insertPendingUploadsForFilesUseCase(
                                     pathsAndNames = event.pathsAndNames,
                                     parentFolderId = event.destinationId,
-                                    isHighPriority = event.isHighPriority
+                                    isHighPriority = event.isHighPriority,
+                                    pitagTrigger = event.pitagTrigger,
                                 )
                             }.onSuccess {
                                 retryUploads = true
@@ -441,19 +456,16 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     }
 
     /**
-     * Start download with the destination manually set by the user
+     * Start download with the destination manually set by the user, it will trigger promptSaveDestination if needed or start download immediately if not
      * @param destinationUri the chosen destination or null if cancelled
      */
-    fun startDownloadWithDestination(
+    fun checkSaveDestinationAndStartDownload(
         destinationUri: Uri?,
     ) {
         Timber.d("Selected destination $destinationUri")
-        val originalEvent = uiState.value.askDestinationForDownload
-        consumeAskDestination()
-        if (destinationUri != null && originalEvent != null) {
+        if (destinationUri != null) {
             viewModelScope.launch {
                 val destination = destinationUri.toString()
-                startDownloadNodes(originalEvent, destination)
                 if (runCatching { shouldPromptToSaveDestinationUseCase() }.getOrDefault(false)) {
                     val destinationName =
                         runCatching { getFileNameFromStringUriUseCase(destination) }
@@ -470,10 +482,25 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                             )
                         )
                     }
+                } else {
+                    startDownloadingAfterCheckSaveDestination(destination)
                 }
+            }
+        } else {
+            consumeAskDestination()
+        }
+    }
+
+    fun startDownloadingAfterCheckSaveDestination(destination: String) {
+        val originalEvent = uiState.value.askDestinationForDownload
+        consumeAskDestination()
+        if (originalEvent != null) {
+            viewModelScope.launch {
+                startDownloadNodes(originalEvent, destination)
             }
         }
     }
+
 
     private fun consumeAskDestination() {
         _uiState.update {
@@ -626,18 +653,16 @@ internal class StartTransfersComponentViewModel @Inject constructor(
      * @param event the [TransferTriggerEvent.StartDownloadForOffline] event that starts this download
      */
     private fun startDownloadForOffline(event: TransferTriggerEvent.StartDownloadForOffline) {
-        if (event.node == null) {
+        if (event.nodes.isEmpty()) {
             return
         }
         viewModelScope.launch {
             startDownloadNodes(
-                nodes = listOfNotNull(event.node),
+                nodes = event.nodes,
                 isHighPriority = event.isHighPriority,
                 getUri = {
                     runCatching {
-                        val node = event.node
-                        requireNotNull(node)
-                        getOfflinePathForNodeUseCase(node)
+                        getOfflinePathForNodeUseCase(event.nodes.first())
                     }.onFailure { Timber.e(it) }
                         .getOrNull()
                 },
@@ -727,15 +752,19 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     }
 
     private suspend fun startChatUploads(
-        chatId: Long,
+        chatIds: List<Long>,
         uris: List<UriPath>,
         isVoiceClip: Boolean = false,
+        pitagTrigger: PitagTrigger,
     ) {
         runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
         runCatching {
             sendChatAttachmentsUseCase(
-                uris.map { it }.associateWith { null }, isVoiceClip, chatId
+                uris.associateWith { null },
+                isVoiceClip,
+                chatIds = chatIds.toLongArray(),
+                pitagTrigger = pitagTrigger,
             )
         }.onSuccess {
             _uiState.updateEventAndClearProgress(null)
@@ -825,8 +854,13 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         if (downloadTriggerEvent != null) {
             if (saveDoNotAskAgain) {
                 viewModelScope.launch {
-                    runCatching { setAskBeforeLargeDownloadsSettingUseCase(askForConfirmation = false) }
-                        .onFailure { Timber.e(it) }
+                    runCatching {
+                        if (downloadTriggerEvent is TransferTriggerEvent.StartDownloadForPreview) {
+                            setAskBeforePreviewDownloadsSettingUseCase(askForConfirmation = false)
+                        } else {
+                            setAskBeforeLargeDownloadsSettingUseCase(askForConfirmation = false)
+                        }
+                    }.onFailure { Timber.e(it) }
                 }
             }
             startDownloadWithoutConfirmation(
@@ -865,12 +899,26 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
 
     /**
+     * Whether confirmation should be asked for a large download.
+     *
+     * Preview downloads use the preview-specific setting and regular downloads use the existing one,
+     * so opting out of one type of confirmation doesn't silence the other.
+     */
+    private suspend fun shouldAskConfirmationForLargeDownload(
+        transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent,
+    ): Boolean = if (transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview) {
+        runCatching { shouldAskBeforePreviewDownloadsSettingUseCase() }.getOrDefault(false)
+    } else {
+        runCatching { isAskBeforeLargeDownloadsSettingUseCase() }.getOrDefault(false)
+    }
+
+    /**
      * Checks if confirmation dialog for large download should be shown and updates uiState if so
      *
      * @return true if the state has been handled to ask for confirmation, so no extra action should be done
      */
     private suspend fun checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent): Boolean {
-        if (runCatching { isAskBeforeLargeDownloadsSettingUseCase() }.getOrDefault(false)) {
+        if (shouldAskConfirmationForLargeDownload(transferTriggerEvent)) {
             val size = runCatching { totalFileSizeOfNodesUseCase(transferTriggerEvent.nodes) }
                 .getOrDefault(0L)
             if (size > TransfersConstants.CONFIRM_SIZE_MIN_BYTES) {
@@ -1084,7 +1132,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             insertPendingUploadsForFilesUseCase(
                 pathsAndNames = pathsAndNames,
                 parentFolderId = destinationId,
-                isHighPriority = transferTriggerEvent.isHighPriority
+                isHighPriority = transferTriggerEvent.isHighPriority,
+                pitagTrigger = transferTriggerEvent.pitagTrigger,
             )
             monitorPendingTransfersUntilProcessed(transferTriggerEvent)
             startUploadsWorkerAndWaitUntilIsStartedUseCase()
@@ -1133,21 +1182,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         }
                     }
             }
-        }
-    }
-
-    private fun monitorRequestFilesPermissionDenied() {
-        viewModelScope.launch {
-            monitorRequestFilesPermissionDeniedUseCase().collect { denied ->
-                _uiState.update { state -> state.copy(requestFilesPermissionDenied = denied) }
-            }
-        }
-    }
-
-    fun setRequestFilesPermissionDenied() {
-        viewModelScope.launch {
-            runCatching { setRequestFilesPermissionDeniedUseCase() }
-                .onFailure { Timber.e(it) }
         }
     }
 

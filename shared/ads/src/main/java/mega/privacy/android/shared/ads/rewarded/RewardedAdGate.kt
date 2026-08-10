@@ -1,0 +1,249 @@
+package mega.privacy.android.shared.ads.rewarded
+
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.LocalActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback
+import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
+import mega.privacy.android.shared.ads.BuildConfig
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.RewardedAdClickedEvent
+import mega.privacy.mobile.analytics.event.RewardedAdDialogWatchAdButtonPressedEvent
+import mega.privacy.mobile.analytics.event.RewardedAdImpressionEvent
+import mega.privacy.mobile.analytics.event.RewardedAdLoadedEvent
+import mega.privacy.mobile.analytics.event.RewardedAdRewardEarnedEvent
+import mega.privacy.mobile.analytics.event.RewardedAdUnavailableEvent
+import timber.log.Timber
+import java.lang.ref.WeakReference
+
+/**
+ * Handler for gating actions behind a rewarded ad.
+ *
+ * The pending action lambda is held here in the Compose scope,
+ * not in the ViewModel, to avoid stale references after config changes.
+ *
+ * @see rememberRewardedAdGate
+ */
+class RewardedAdGateHandler(
+    private val requestShowDialog: () -> Unit,
+) {
+    private var pendingAction: (() -> Unit)? = null
+
+    /**
+     * Gate an action behind a rewarded ad dialog.
+     *
+     * If the user is not eligible to see ads (e.g., feature flag disabled, Pro user),
+     * the action is executed immediately with no dialog. Otherwise the action is deferred
+     * until the user watches the ad.
+     */
+    fun requestAction(action: () -> Unit) {
+        pendingAction = action
+        requestShowDialog()
+    }
+
+    internal fun cancelPendingAction() {
+        pendingAction = null
+    }
+
+    internal fun executeAndReset() {
+        val action = pendingAction
+        pendingAction = null
+        runCatching { action?.invoke() }
+            .onFailure {
+                Timber.e(it, "Pending action failed, likely stale reference after config change")
+            }
+    }
+}
+
+/**
+ * Sets up a Rewarded Ad Gate and places the dialog in the composition tree.
+ *
+ * Returns a [RewardedAdGateHandler] so the caller can trigger it via [RewardedAdGateHandler.requestAction].
+ *
+ * @param onNavigate Called to navigate to a destination (e.g., upgrade account).
+ * @param isAdsAllowedForScreen Whether ads are allowed for the current screen. Defaults to `true`
+ * for callers with no extra constraint. For link screens this is the per-link `QueryAdsUseCase`
+ * result; when `false` (e.g. a link created by a Pro user) the gate skips the dialog and runs the
+ * action immediately.
+ */
+@Composable
+fun rememberRewardedAdGate(
+    onNavigate: (NavKey) -> Unit,
+    isAdsAllowedForScreen: Boolean = true,
+): RewardedAdGateHandler {
+    val viewModel: RewardedAdGateViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val handler = remember(viewModel) {
+        RewardedAdGateHandler(viewModel::requestShowDialog)
+    }
+
+    LaunchedEffect(isAdsAllowedForScreen) {
+        viewModel.setAdsAllowedForScreen(isAdsAllowedForScreen)
+    }
+
+    EventEffect(
+        event = uiState.skipAdEvent,
+        onConsumed = viewModel::onSkipAdEventConsumed,
+    ) {
+        handler.executeAndReset()
+    }
+
+    RewardedAdGate(
+        viewModel = viewModel,
+        handler = handler,
+        onNavigate = onNavigate,
+    )
+
+    // Dismiss dialog on config change so stale pendingAction is never invoked
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                handler.cancelPendingAction()
+                viewModel.dismiss()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    return handler
+}
+
+@Composable
+private fun RewardedAdGate(
+    viewModel: RewardedAdGateViewModel,
+    handler: RewardedAdGateHandler,
+    onNavigate: (NavKey) -> Unit,
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val activity = LocalActivity.current
+    val coroutineScope = rememberCoroutineScope()
+
+    if (state.showDialog) {
+        RewardedAdDialog(
+            isAdLoading = state.isAdLoading,
+            onDismiss = viewModel::dismiss,
+            onWatchAd = {
+                if (!state.isAdLoading && activity != null) {
+                    Analytics.tracker.trackEvent(RewardedAdDialogWatchAdButtonPressedEvent)
+                    val onComplete = {
+                        viewModel.dismiss()
+                        handler.executeAndReset()
+                    }
+                    loadAndShowRewardedAd(
+                        activity = activity,
+                        onLoading = viewModel::setAdLoading,
+                        onLoadingComplete = viewModel::setAdLoadingComplete,
+                        onRewardEarned = {
+                            viewModel.resetAttemptCount()
+                            onComplete()
+                        },
+                        onAdUnavailable = {
+                            Analytics.tracker.trackEvent(RewardedAdUnavailableEvent)
+                            coroutineScope.launch {
+                                Toast.makeText(
+                                    activity,
+                                    activity.getString(sharedR.string.rewarded_ad_unavailable_toast),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            onComplete()
+                        },
+                    )
+                }
+            },
+            onUpgradePro = {
+                handler.cancelPendingAction()
+                viewModel.dismiss()
+                onNavigate(UpgradeAccountNavKey(source = UpgradeAccountSource.ADS_FREE_SCREEN))
+            }
+        )
+    }
+}
+
+private fun loadAndShowRewardedAd(
+    activity: Activity,
+    onLoading: () -> Unit,
+    onLoadingComplete: () -> Unit,
+    onAdUnavailable: () -> Unit,
+    onRewardEarned: () -> Unit,
+) {
+    onLoading()
+    val activityRef = WeakReference(activity)
+    val adRequest = AdRequest.Builder(BuildConfig.REWARDED_AD_UNIT_ID).build()
+
+    RewardedAd.load(adRequest, object : AdLoadCallback<RewardedAd> {
+        override fun onAdLoaded(ad: RewardedAd) {
+            Timber.i("Rewarded ad loaded")
+            Analytics.tracker.trackEvent(RewardedAdLoadedEvent)
+            onLoadingComplete()
+
+            val activityInstance = activityRef.get()
+            if (activityInstance == null || activityInstance.isFinishing || activityInstance.isDestroyed) {
+                Timber.w("Activity is no longer valid, letting user continue")
+                onAdUnavailable()
+                return
+            }
+
+            ad.adEventCallback = object : RewardedAdEventCallback {
+                override fun onAdDismissedFullScreenContent() {
+                    Timber.d("Rewarded ad dismissed")
+                }
+
+                override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
+                    Timber.e("Rewarded ad failed to show: ${fullScreenContentError.message}")
+                    onAdUnavailable()
+                }
+
+                override fun onAdShowedFullScreenContent() {
+                    Timber.d("Rewarded ad showed full screen")
+                }
+
+                override fun onAdImpression() {
+                    Timber.d("Rewarded ad impression")
+                    Analytics.tracker.trackEvent(RewardedAdImpressionEvent)
+                }
+
+                override fun onAdClicked() {
+                    Timber.d("Rewarded ad clicked")
+                    Analytics.tracker.trackEvent(RewardedAdClickedEvent)
+                }
+            }
+
+            ad.show(activityInstance) { reward ->
+                Timber.i("User earned reward: ${reward.amount} ${reward.type}")
+                Analytics.tracker.trackEvent(RewardedAdRewardEarnedEvent)
+                onRewardEarned()
+            }
+        }
+
+        override fun onAdFailedToLoad(adError: LoadAdError) {
+            Timber.e("Rewarded ad failed to load: ${adError.message} (${adError.code})")
+            onAdUnavailable()
+        }
+    })
+}

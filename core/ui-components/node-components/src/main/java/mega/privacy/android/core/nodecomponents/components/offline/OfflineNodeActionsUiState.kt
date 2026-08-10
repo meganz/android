@@ -15,4 +15,5 @@ data class OfflineNodeActionsUiState(
     val shareFilesEvent: StateEventWithContent<List<File>> = consumed(),
     val openFileEvent: StateEventWithContent<OfflineNodeActionUiEntity> = consumed(),
     val sharesNodeLinksEvent: StateEventWithContent<Pair<String?, String>> = consumed(),
+    val isPdfViewerComposeEnabled: Boolean = false,
 )

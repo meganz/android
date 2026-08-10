@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferAppData.TransferGroup
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -88,7 +90,9 @@ class UploadFileUseCaseTest {
                 fileName = FILE_NAME,
                 appData = ordinaryAppData,
                 parentFolderId = parentFolderId,
-                isHighPriority = IS_HIGH_PRIORITY
+                isHighPriority = IS_HIGH_PRIORITY,
+                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.NotApplicable,
             ).test {
                 awaitComplete()
             }
@@ -101,6 +105,8 @@ class UploadFileUseCaseTest {
                 appData = ordinaryAppData,
                 isSourceTemporary = isSourceTemporary,
                 shouldStartFirst = IS_HIGH_PRIORITY,
+                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.NotApplicable,
             )
         }
 
@@ -120,7 +126,9 @@ class UploadFileUseCaseTest {
                 fileName = FILE_NAME,
                 appData = ordinaryAppData,
                 parentFolderId = parentFolderId,
-                isHighPriority = IS_HIGH_PRIORITY
+                isHighPriority = IS_HIGH_PRIORITY,
+                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.NotApplicable,
             ).test {
                 awaitComplete()
             }
@@ -133,6 +141,8 @@ class UploadFileUseCaseTest {
                 appData = ordinaryAppData,
                 isSourceTemporary = isSourceTemporary,
                 shouldStartFirst = IS_HIGH_PRIORITY,
+                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.NotApplicable,
             )
         }
 
@@ -156,7 +166,9 @@ class UploadFileUseCaseTest {
                 fileName = FILE_NAME,
                 appData = ordinaryAppData,
                 parentFolderId = parentFolderId,
-                isHighPriority = IS_HIGH_PRIORITY
+                isHighPriority = IS_HIGH_PRIORITY,
+                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.NotApplicable,
             ).test {
                 events.forEach {
                     assertThat(awaitItem()).isEqualTo(it)
@@ -180,7 +192,9 @@ class UploadFileUseCaseTest {
                     fileName = FILE_NAME,
                     appData = ordinaryAppData,
                     parentFolderId = parentFolderId,
-                    isHighPriority = IS_HIGH_PRIORITY
+                    isHighPriority = IS_HIGH_PRIORITY,
+                    pitagTrigger = PitagTrigger.NotApplicable,
+                    pitagTarget = PitagTarget.NotApplicable,
                 ).test {
                     awaitComplete()
                 }
@@ -193,6 +207,8 @@ class UploadFileUseCaseTest {
                     appData = expectedAppData,
                     isSourceTemporary = true,
                     shouldStartFirst = IS_HIGH_PRIORITY,
+                    pitagTrigger = PitagTrigger.NotApplicable,
+                    pitagTarget = PitagTarget.NotApplicable,
                 )
             }
 
@@ -206,6 +222,8 @@ class UploadFileUseCaseTest {
                     any(),
                     any(),
                     any(),
+                    pitagTrigger = any(),
+                    pitagTarget = any(),
                 )
             ) doReturn transferEventsFlow
         }
@@ -229,7 +247,9 @@ class UploadFileUseCaseTest {
                 fileName = FILE_NAME,
                 appData = chatAppData,
                 parentFolderId = parentFolderId,
-                isHighPriority = IS_HIGH_PRIORITY
+                isHighPriority = IS_HIGH_PRIORITY,
+                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.NotApplicable,
             ).test {
                 awaitComplete()
             }
@@ -241,7 +261,9 @@ class UploadFileUseCaseTest {
                 modificationTime = MODIFIED_TIME,
                 appData = chatAppData,
                 isSourceTemporary = isSourceTemporary,
-                shouldStartFirst = true
+                shouldStartFirst = true,
+                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.NotApplicable,
             )
         }
 
@@ -265,7 +287,9 @@ class UploadFileUseCaseTest {
                 fileName = FILE_NAME,
                 appData = chatAppData,
                 parentFolderId = parentFolderId,
-                isHighPriority = IS_HIGH_PRIORITY
+                isHighPriority = IS_HIGH_PRIORITY,
+                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.NotApplicable,
             ).test {
                 events.forEach {
                     assertThat(awaitItem()).isEqualTo(it)
@@ -288,7 +312,9 @@ class UploadFileUseCaseTest {
                     fileName = FILE_NAME,
                     appData = chatAppData,
                     parentFolderId = parentFolderId,
-                    isHighPriority = IS_HIGH_PRIORITY
+                    isHighPriority = IS_HIGH_PRIORITY,
+                    pitagTrigger = PitagTrigger.NotApplicable,
+                    pitagTarget = PitagTarget.NotApplicable,
                 ).test {
                     awaitComplete()
                 }
@@ -301,6 +327,8 @@ class UploadFileUseCaseTest {
                     appData = expectedAppData,
                     isSourceTemporary = true,
                     shouldStartFirst = true,
+                    pitagTrigger = PitagTrigger.NotApplicable,
+                    pitagTarget = PitagTarget.NotApplicable,
                 )
             }
 
@@ -314,6 +342,8 @@ class UploadFileUseCaseTest {
                     anyOrNull(),
                     any(),
                     any(),
+                    pitagTrigger = any(),
+                    pitagTarget = any(),
                 )
             ) doReturn transferEventsFlow
         }

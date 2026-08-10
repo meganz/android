@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import android.graphics.BitmapFactory
 import androidx.core.graphics.toColorInt
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -9,17 +10,20 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.AvatarWrapper
@@ -33,6 +37,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
+import java.util.Base64
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
@@ -50,6 +55,7 @@ internal class DefaultAvatarRepository @Inject constructor(
     private val cacheGateway: CacheGateway,
     private val avatarWrapper: AvatarWrapper,
     private val bitmapFactoryWrapper: BitmapFactoryWrapper,
+    private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AvatarRepository {
@@ -90,16 +96,14 @@ internal class DefaultAvatarRepository @Inject constructor(
             cacheGateway.buildAvatarFile(user.email + FileConstant.JPG_EXTENSION)
                 ?: return@withContext null
         return@withContext suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("getUserAvatar") {
-                avatarFile.takeIf { it.exists() }
-            }
+            val listener = continuation.getRequestListener("getUserAvatar") { avatarFile }
 
             megaApiGateway.getUserAvatar(
                 user,
                 avatarFile.absolutePath,
                 listener
             )
-        }
+        }.takeIf { it.exists() }
     }
 
     override suspend fun getMyAvatarColor(): Int = withContext(ioDispatcher) {
@@ -124,7 +128,8 @@ internal class DefaultAvatarRepository @Inject constructor(
                     return@withContext loadAvatarFile(it)
                 }
             }
-            return@withContext cacheGateway.buildAvatarFile(megaApiGateway.accountEmail.orEmpty() + FileConstant.JPG_EXTENSION)
+            val email = megaApiGateway.accountEmail ?: credentialsPreferencesGateway.get().monitorCredentials().first()?.email
+            return@withContext cacheGateway.buildAvatarFile(email.orEmpty() + FileConstant.JPG_EXTENSION)
                 ?.takeIf { it.exists() }
         }
 
@@ -173,6 +178,11 @@ internal class DefaultAvatarRepository @Inject constructor(
             getColor(megaApiGateway.getUserAvatarColor(userHandle))
         }
 
+    override suspend fun getAvatarSecondaryColor(userHandle: Long): Int =
+        withContext(ioDispatcher) {
+            getColor(megaApiGateway.getUserAvatarSecondaryColor(userHandle))
+        }
+
     private fun getColor(color: String?): Int =
         color?.toColorInt() ?: avatarWrapper.getSpecificAvatarColor(AVATAR_PRIMARY_COLOR)
 
@@ -215,6 +225,26 @@ internal class DefaultAvatarRepository @Inject constructor(
         }
         Unit
     }
+
+    override suspend fun getAvatarFromBase64String(userHandle: Long, base64StringAvatar: String) =
+        withContext(ioDispatcher) {
+            // Remove any data URL prefix if present
+            base64StringAvatar.substringAfter(",")
+                // Convert URL-safe Base64 to standard Base64
+                .replace('_', '/').replace('-', '+')
+                .let { standardBase64 ->
+                    // Decode Base64
+                    yield()
+                    Base64.getDecoder().decode(standardBase64).let { imageBytes ->
+                        cacheGateway
+                            .buildAvatarFile(userHandle.toString() + FileConstant.JPG_EXTENSION)
+                            .also {
+                                yield()
+                                it?.writeBytes(imageBytes)
+                            }
+                    }
+                }
+        }
 
     companion object {
         /**

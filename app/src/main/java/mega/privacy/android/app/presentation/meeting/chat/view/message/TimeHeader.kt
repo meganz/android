@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message
 
-import mega.privacy.android.shared.original.core.ui.controls.chat.messages.TimeHeader as CoreTimeHeader
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -8,8 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ManagementMessageViewModel
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.TimeHeader as CoreTimeHeader
 
 /**
  * Time header

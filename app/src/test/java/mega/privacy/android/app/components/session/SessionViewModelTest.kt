@@ -36,7 +36,7 @@ internal class SessionViewModelTest {
     fun setUp() {
         underTest = SessionViewModel(
             rootNodeExistsUseCase = rootNodeExistsUseCase,
-            retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase
+            retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase,
         )
     }
 
@@ -44,7 +44,7 @@ internal class SessionViewModelTest {
     fun resetMocks() {
         reset(
             rootNodeExistsUseCase,
-            retryConnectionsAndSignalPresenceUseCase
+            retryConnectionsAndSignalPresenceUseCase,
         )
     }
 
@@ -88,6 +88,16 @@ internal class SessionViewModelTest {
 
     @Test
     fun `test that retry connections and signal presence is called`() = runTest {
+        underTest.retryConnectionsAndSignalPresence()
+
+        verify(retryConnectionsAndSignalPresenceUseCase).invoke()
+    }
+
+    @Test
+    fun `test that retry connections and signal presence swallows use case failure`() = runTest {
+        whenever(retryConnectionsAndSignalPresenceUseCase())
+            .thenThrow(RuntimeException("ChatNotInitialized"))
+
         underTest.retryConnectionsAndSignalPresence()
 
         verify(retryConnectionsAndSignalPresenceUseCase).invoke()

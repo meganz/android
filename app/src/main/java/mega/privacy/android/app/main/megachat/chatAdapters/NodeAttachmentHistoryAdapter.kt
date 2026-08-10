@@ -33,7 +33,6 @@ import coil3.util.CoilUtils.dispose
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.ChatNonContactNameListener
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
@@ -41,6 +40,7 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.thumbnail.ChatThumbnailRequest
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatMessage
 import timber.log.Timber
@@ -48,6 +48,7 @@ import timber.log.Timber
 class NodeAttachmentHistoryAdapter(
     private val context: Context,
     private val listFragment: RecyclerView?,
+    private val chatController: ChatController,
 ) : RecyclerView.Adapter<NodeAttachmentHistoryAdapter.ViewHolderBrowserList?>(),
     View.OnClickListener, OnLongClickListener {
     private val megaChatApi: MegaChatApiAndroid =
@@ -71,7 +72,7 @@ class NodeAttachmentHistoryAdapter(
                 selectedItems = SparseBooleanArray()
             }
         }
-    private val cC: ChatController = ChatController(context)
+
     private val display = (context as Activity).windowManager.defaultDisplay
 
     init {
@@ -316,7 +317,7 @@ class NodeAttachmentHistoryAdapter(
             if (chatRoom == null) return
 
             if (chatRoom.isGroup) {
-                holder.fullNameTitle = cC.getParticipantFullName(userHandle) ?: ""
+                holder.fullNameTitle = chatController.getParticipantFullName(userHandle) ?: ""
 
                 if (holder.fullNameTitle.trim { it <= ' ' }.isEmpty()) {
                     Timber.w("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle")

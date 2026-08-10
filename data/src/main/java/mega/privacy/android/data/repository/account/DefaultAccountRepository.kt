@@ -8,16 +8,20 @@ import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getRequestListener
@@ -36,26 +40,27 @@ import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
-import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
+import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.account.AccountInactivityMapper
 import mega.privacy.android.data.mapper.account.RecoveryKeyToFileMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.contact.UserMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
-import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -65,14 +70,17 @@ import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
-import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.LastPurgeEvent
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountInactivity
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.contacts.User
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
@@ -84,6 +92,7 @@ import mega.privacy.android.domain.exception.NotMasterBusinessAccountException
 import mega.privacy.android.domain.exception.QRCodeException
 import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.ResetPasswordLinkException
+import mega.privacy.android.domain.exception.WrongMultiFactorAuthPinException
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
 import mega.privacy.android.domain.exception.account.ConfirmChangeEmailException
 import mega.privacy.android.domain.exception.account.CreateAccountException
@@ -92,6 +101,7 @@ import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkExcepti
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
+import mega.privacy.android.domain.usecase.logout.LogoutTask
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
@@ -114,18 +124,15 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaApiGateway               [MegaApiGateway]
  * @property megaChatApiGateway           [MegaChatApiGateway]
  * @property megaApiFolderGateway         [MegaApiFolderGateway]
- * @property dbHandler                    [DatabaseHandler]
  * @property ioDispatcher                 [CoroutineDispatcher]
  * @property userUpdateMapper             [UserUpdateMapper]
  * @property localStorageGateway          [MegaLocalStorageGateway]
  * @property userAccountMapper            [UserAccountMapper]
- * @property accountTypeMapper            [AccountTypeMapper]
  * @property currencyMapper               [CurrencyMapper]
  * @property subscriptionOptionListMapper [SubscriptionOptionListMapper]
  * @property megaAchievementMapper        [MegaAchievementMapper]
  * @property myAccountCredentialsMapper   [MyAccountCredentialsMapper]
  * @property accountDetailMapper          [AccountDetailMapper]
- * @property userCredentialsMapper        [UserCredentialsMapper]
  * @property accountSessionMapper         [AccountSessionMapper]
  * @property chatPreferencesGateway       [chatPreferencesGateway]
  * @property callsPreferencesGateway      [CallsPreferencesGateway]
@@ -148,19 +155,16 @@ internal class DefaultAccountRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
-    private val dbHandler: Lazy<DatabaseHandler>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userUpdateMapper: UserUpdateMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
     private val userAccountMapper: UserAccountMapper,
-    private val accountTypeMapper: AccountTypeMapper,
     private val currencyMapper: CurrencyMapper,
     private val subscriptionOptionListMapper: SubscriptionOptionListMapper,
     private val megaAchievementMapper: MegaAchievementMapper,
     private val achievementsOverviewMapper: AchievementsOverviewMapper,
     private val myAccountCredentialsMapper: MyAccountCredentialsMapper,
     private val accountDetailMapper: AccountDetailMapper,
-    private val userCredentialsMapper: UserCredentialsMapper,
     private val accountSessionMapper: AccountSessionMapper,
     private val chatPreferencesGateway: ChatPreferencesGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
@@ -173,6 +177,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val fileGateway: FileGateway,
     private val recoveryKeyToFileMapper: RecoveryKeyToFileMapper,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
+    private val chatSettingsPreferenceGateway: ChatSettingsPreferenceGateway,
     private val cookieSettingsMapper: CookieSettingsMapper,
     private val cookieSettingsIntMapper: CookieSettingsIntMapper,
     private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
@@ -181,7 +186,12 @@ internal class DefaultAccountRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     @ExcludeFileName val excludeFileNames: Set<String>,
     private val getDomainNameUseCase: GetDomainNameUseCase,
-) : AccountRepository {
+    private val eventMapper: EventMapper,
+    private val accountInactivityMapper: AccountInactivityMapper,
+) : AccountRepository, LogoutTask {
+    private val accountDetail = MutableStateFlow(AccountDetail())
+    private val suppressedPurgeTimestamp = MutableStateFlow<Long?>(null)
+
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
         val email = user?.email ?: megaChatApiGateway.getMyEmail() ?: ""
@@ -191,13 +201,9 @@ internal class DefaultAccountRepository @Inject constructor(
             fullName = megaChatApiGateway.getMyFullname(),
             isBusinessAccount = megaApiGateway.isBusinessAccount,
             isMasterBusinessAccount = megaApiGateway.isMasterBusinessAccount(),
-            accountTypeIdentifier = accountTypeMapper(myAccountInfoFacade.accountTypeId),
-            accountTypeString = myAccountInfoFacade.accountTypeString,
+            accountTypeIdentifier = accountDetail.value.levelDetail?.accountType,
         )
     }
-
-    override fun storageCapacityUsedIsBlank() =
-        myAccountInfoFacade.storageCapacityUsedAsFormattedString.isBlank()
 
     override suspend fun requestAccount() {
         withContext(ioDispatcher) {
@@ -284,6 +290,110 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             }
         }
+
+    override suspend fun requestDeleteAccountLinkWith2FA(pin: String) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                megaApiGateway.multiFactorAuthCancelAccount(
+                    pin,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = on2FARequestFinished(
+                            continuation = continuation,
+                            requestType = MegaRequest.TYPE_GET_CANCEL_LINK,
+                            methodName = "requestDeleteAccountLinkWith2FA",
+                        )
+                    )
+                )
+            }
+        }
+
+    override suspend fun requestChangeEmailWith2FA(newEmail: String, pin: String) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                megaApiGateway.multiFactorAuthChangeEmail(
+                    newEmail,
+                    pin,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = on2FARequestFinished(
+                            continuation = continuation,
+                            requestType = MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK,
+                            methodName = "requestChangeEmailWith2FA",
+                        )
+                    )
+                )
+            }
+        }
+
+    override suspend fun disableMultiFactorAuth(pin: String) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            megaApiGateway.multiFactorAuthDisable(
+                pin,
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = on2FARequestFinished(
+                        continuation = continuation,
+                        requestType = MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET,
+                        methodName = "disableMultiFactorAuth",
+                    )
+                )
+            )
+        }
+    }
+
+    override suspend fun changePasswordWith2FA(newPassword: String, pin: String): Boolean =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                megaApiGateway.multiFactorAuthChangePassword(
+                    null,
+                    newPassword,
+                    pin,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request: MegaRequest, error: MegaError ->
+                            if (request.isType(MegaRequest.TYPE_CHANGE_PW)) {
+                                when (error.errorCode) {
+                                    MegaError.API_OK ->
+                                        continuation.resumeWith(Result.success(true))
+
+                                    MegaError.API_EFAILED, MegaError.API_EEXPIRED ->
+                                        continuation.failWithException(
+                                            WrongMultiFactorAuthPinException(
+                                                error.errorCode,
+                                                error.errorString,
+                                            )
+                                        )
+
+                                    else -> continuation.failWithError(
+                                        error,
+                                        "changePasswordWith2FA",
+                                    )
+                                }
+                            }
+                        }
+                    )
+                )
+            }
+        }
+
+    private fun on2FARequestFinished(
+        continuation: Continuation<Unit>,
+        requestType: Int,
+        methodName: String,
+    ) = { request: MegaRequest, error: MegaError ->
+        if (request.isType(requestType)) {
+            when (error.errorCode) {
+                MegaError.API_OK -> continuation.resumeWith(Result.success(Unit))
+
+                MegaError.API_EFAILED, MegaError.API_EEXPIRED ->
+                    continuation.failWithException(
+                        WrongMultiFactorAuthPinException(
+                            error.errorCode,
+                            error.errorString,
+                        )
+                    )
+
+                else -> continuation.failWithError(error, methodName)
+            }
+        }
+    }
 
     override fun monitorUserUpdates() = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
@@ -380,12 +490,12 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun getAccountDetailsTimeStampInSeconds(): String? =
         withContext(ioDispatcher) {
-            dbHandler.get().attributes?.accountDetailsTimeStamp
+            localStorageGateway.getAttributes()?.accountDetailsTimeStamp
         }
 
     override suspend fun getExtendedAccountDetailsTimeStampInSeconds(): String? =
         withContext(ioDispatcher) {
-            dbHandler.get().attributes?.extendedAccountDetailsTimeStamp
+            localStorageGateway.getAttributes()?.extendedAccountDetailsTimeStamp
         }
 
     override suspend fun getSpecificAccountDetail(
@@ -435,11 +545,11 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun resetAccountDetailsTimeStamp() = withContext(ioDispatcher) {
-        dbHandler.get().resetAccountDetailsTimeStamp()
+        localStorageGateway.resetAccountDetailsTimeStamp()
     }
 
     override suspend fun resetExtendedAccountDetailsTimestamp() = withContext(ioDispatcher) {
-        dbHandler.get().resetExtendedAccountDetailsTimestamp()
+        localStorageGateway.resetExtendedAccountDetailsTimestamp()
     }
 
     override suspend fun createContactLink(renew: Boolean): String = withContext(ioDispatcher) {
@@ -532,6 +642,18 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
+    override suspend fun getNumberOfNodes(): Long = withContext(ioDispatcher) {
+        megaApiGateway.getNumNodes()
+    }
+
+    override suspend fun getOverDiskQuotaDeadline(): Long = withContext(ioDispatcher) {
+        megaApiGateway.getOverquotaDeadlineTs()
+    }
+
+    override suspend fun getOverDiskQuotaWarningTimestamps(): List<Long> = withContext(ioDispatcher) {
+        megaApiGateway.getOverquotaWarningsTs()
+    }
+
     private suspend fun handleAccountDetail(request: MegaRequest): AccountDetail {
         val newDetail = accountDetailMapper(
             request.megaAccountDetails,
@@ -541,7 +663,14 @@ internal class DefaultAccountRepository @Inject constructor(
             megaApiGateway.getIncomingSharesNode(null),
         )
         // keep previous info if new info null
-        myAccountInfoFacade.handleAccountDetail(newDetail)
+        accountDetail.update { oldDetail ->
+            oldDetail.copy(
+                storageDetail = newDetail.storageDetail ?: oldDetail.storageDetail,
+                sessionDetail = newDetail.sessionDetail ?: oldDetail.sessionDetail,
+                levelDetail = newDetail.levelDetail ?: oldDetail.levelDetail,
+                transferDetail = newDetail.transferDetail ?: oldDetail.transferDetail,
+            )
+        }
 
         // Send broadcast to to App Event
         appEventGateway.broadcastMyAccountUpdate(
@@ -553,8 +682,11 @@ internal class DefaultAccountRepository @Inject constructor(
         return newDetail
     }
 
-    override fun monitorAccountDetail(): Flow<AccountDetail> =
-        myAccountInfoFacade.monitorAccountDetail()
+    override fun monitorAccountDetail(): Flow<AccountDetail> = accountDetail.asStateFlow()
+
+    override suspend fun onLogoutSuccess() {
+        accountDetail.update { AccountDetail() }
+    }
 
     override suspend fun isMegaApiLoggedIn(): Boolean =
         withContext(ioDispatcher) {
@@ -573,12 +705,10 @@ internal class DefaultAccountRepository @Inject constructor(
             email = myUser.email
             myUserHandle = myUser.handle
         }
-
         val session = megaApiGateway.dumpSession
-        val credentials = userCredentialsMapper(email, session, null, null, myUserHandle.toString())
-        credentialsPreferencesGateway.get().save(credentials)
+        session?.let { credentialsPreferencesGateway.get().saveSession(it) }
+        myUserHandle?.let { credentialsPreferencesGateway.get().saveMyHandle(it.toString()) }
         ephemeralCredentialsGateway.get().clear()
-
         accountSessionMapper(email, session, myUserHandle)
     }
 
@@ -659,8 +789,8 @@ internal class DefaultAccountRepository @Inject constructor(
             clearNonContacts()
             clearChatItems()
             clearAttributes()
-            clearChatSettings()
         }
+        chatSettingsPreferenceGateway.clearPreferences()
         credentialsPreferencesGateway.get().clear()
         megaLocalRoomGateway.deleteAllBackups()
         megaLocalRoomGateway.deleteAllCompletedTransfers()
@@ -787,7 +917,11 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
 
-    override suspend fun resetAccountInfo() = myAccountInfoFacade.resetAccountInfo()
+    override suspend fun resetAccountInfo() {
+        myAccountInfoFacade.resetAccountInfo()
+        onLogoutSuccess()
+    }
+
     override suspend fun update2FADialogPreference(show2FA: Boolean) =
         withContext(ioDispatcher) { accountPreferencesGateway.setDisplay2FADialog(show2FA) }
 
@@ -801,35 +935,35 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    override suspend fun setLatestTargetPathCopyPreference(path: Long) = withContext(ioDispatcher) {
-        accountPreferencesGateway.setLatestTargetPathCopyPreference(path)
+    override suspend fun setLatestTargetCopyPreference(path: Long) = withContext(ioDispatcher) {
+        accountPreferencesGateway.setLatestTargetCopyPreference(path)
         accountPreferencesGateway.setLatestTargetTimestampCopyPreference(System.currentTimeMillis())
     }
 
-    override suspend fun getLatestTargetPathCopyPreference(): Long? {
+    override suspend fun getLatestTargetCopyPreference(): Long? {
         val timestamp =
             accountPreferencesGateway.getLatestTargetTimestampCopyPreference().firstOrNull()
         return timestamp?.let {
-            if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - it) > LATEST_TARGET_PATH_VALID_DURATION)
+            if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - it) > LATEST_TARGET_VALID_DURATION)
                 null
             else
-                accountPreferencesGateway.getLatestTargetPathCopyPreference().firstOrNull()
+                accountPreferencesGateway.getLatestTargetCopyPreference().firstOrNull()
         }
     }
 
-    override suspend fun setLatestTargetPathMovePreference(path: Long) {
-        accountPreferencesGateway.setLatestTargetPathMovePreference(path)
+    override suspend fun setLatestTargetMovePreference(path: Long) {
+        accountPreferencesGateway.setLatestTargetMovePreference(path)
         accountPreferencesGateway.setLatestTargetTimestampMovePreference(System.currentTimeMillis())
     }
 
-    override suspend fun getLatestTargetPathMovePreference(): Long? {
+    override suspend fun getLatestTargetMovePreference(): Long? {
         val timestamp =
             accountPreferencesGateway.getLatestTargetTimestampMovePreference().firstOrNull()
         return timestamp?.let {
-            if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - it) > LATEST_TARGET_PATH_VALID_DURATION)
+            if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - it) > LATEST_TARGET_VALID_DURATION)
                 null
             else
-                accountPreferencesGateway.getLatestTargetPathMovePreference().firstOrNull()
+                accountPreferencesGateway.getLatestTargetMovePreference().firstOrNull()
         }
     }
 
@@ -903,7 +1037,7 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun broadcastRefreshSession() = appEventGateway.broadcastRefreshSession()
 
     override fun getAccountType(): AccountType =
-        accountTypeMapper(myAccountInfoFacade.accountTypeId)
+        accountDetail.value.levelDetail?.accountType ?: AccountType.UNKNOWN
 
     override suspend fun retryPendingConnections() = withContext(ioDispatcher) {
         Timber.d("Retrying pending connections...")
@@ -1139,7 +1273,8 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    override suspend fun getUserData() = withContext(ioDispatcher) {
+    override suspend fun getUserData(): Unit = withContext(ioDispatcher) {
+        broadcastMiscState(MiscLoadedState.MethodCalled)
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
@@ -1158,6 +1293,9 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             )
             megaApiGateway.getUserData(listener = listener)
+        }
+        megaApiGateway.accountEmail?.let {
+            credentialsPreferencesGateway.get().saveEmail(it)
         }
     }
 
@@ -1315,9 +1453,9 @@ internal class DefaultAccountRepository @Inject constructor(
         credentialsPreferencesGateway.get().save(credentials)
     }
 
-    override fun monitorCredentials(): Flow<UserCredentials?> =
-        credentialsPreferencesGateway.get().monitorCredentials()
-            .flowOn(ioDispatcher)
+    override fun monitorCredentials(): Flow<UserCredentials?> = flow {
+        emitAll(credentialsPreferencesGateway.get().monitorCredentials())
+    }.flowOn(ioDispatcher)
 
     override suspend fun clearCredentials() = withContext(ioDispatcher) {
         credentialsPreferencesGateway.get().clear()
@@ -1410,11 +1548,12 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override fun getInvalidAffiliateType(): Int = megaApiGateway.getInvalidAffiliateType()
 
-    override fun monitorMiscLoaded() = appEventGateway.monitorMiscLoaded()
+    override fun monitorMiscState() = appEventGateway.monitorMiscState()
 
-    override suspend fun broadcastMiscLoaded() = appEventGateway.broadcastMiscLoaded()
+    override fun getCurrentMiscState() = appEventGateway.getCurrentMiscState()
 
-    override suspend fun broadcastMiscUnLoaded() = appEventGateway.broadcastMiscUnloaded()
+    override suspend fun broadcastMiscState(state: MiscLoadedState) =
+        appEventGateway.broadcastMiscState(state)
 
     override suspend fun resendVerificationEmail() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
@@ -1465,6 +1604,27 @@ internal class DefaultAccountRepository @Inject constructor(
         return appEventGateway.monitorIsUnverifiedBusinessAccount()
     }
 
+    override suspend fun setLastPurgeAcknowledged(ts: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("setLastPurgeAcknowledged") { }
+            megaApiGateway.setLastPurgeAcknowledged(ts, listener)
+        }
+    }
+
+    override fun monitorAccountInactivity(): Flow<AccountInactivity?> =
+        megaApiGateway.globalUpdates
+            .filterIsInstance<GlobalUpdate.OnEvent>()
+            .mapNotNull { (event) -> event?.let(eventMapper::invoke) }
+            .filterIsInstance<LastPurgeEvent>()
+            .mapNotNull(accountInactivityMapper::invoke)
+
+    override fun monitorSuppressedPurgeTimestamp(): Flow<Long?> =
+        suppressedPurgeTimestamp.asStateFlow()
+
+    override fun setSuppressedPurgeTimestamp(ts: Long) {
+        suppressedPurgeTimestamp.value = ts
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
@@ -1476,6 +1636,6 @@ internal class DefaultAccountRepository @Inject constructor(
             "settings_audio_background_play_enabled"
         private const val KEY_AUDIO_SHUFFLE_ENABLED = "settings_audio_shuffle_enabled"
         private const val KEY_AUDIO_REPEAT_MODE = "settings_audio_repeat_mode"
-        private const val LATEST_TARGET_PATH_VALID_DURATION = 60
+        private const val LATEST_TARGET_VALID_DURATION = 60
     }
 }

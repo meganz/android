@@ -36,10 +36,10 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
 
     private MegaChatApiAndroid megaChatApi;
 
-    private ChatController cC;
+    private ChatController chatController;
     private NodeController nC;
 
-    public MultipleForwardChatProcessor(Context context, long[] chatHandles, long[] idMessages, long idChat) {
+    public MultipleForwardChatProcessor(Context context, long[] chatHandles, long[] idMessages, long idChat, ChatController controller) {
 
         this.context = context;
         this.idMessages = idMessages;
@@ -50,7 +50,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
-        cC = new ChatController(context);
+        chatController = controller;
         nC = new NodeController(context);
     }
 
@@ -154,7 +154,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                 MegaNode temp = nodeList.get(j);
                                 MegaNode nodeToAttach = nC.checkIfNodeIsMine(temp);
                                 if (nodeToAttach != null) {
-                                    nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
+                                    nodeToAttach = chatController.authorizeNodeIfPreview(nodeToAttach, chatRoom);
                                     megaChatApi.attachNode(chatHandles[k], nodeToAttach.getHandle(), this);
                                 } else {
                                     Timber.w("The node: %d is not mine. Not attached.", temp.getHandle());

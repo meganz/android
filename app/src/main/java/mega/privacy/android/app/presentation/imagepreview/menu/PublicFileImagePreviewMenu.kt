@@ -33,7 +33,7 @@ internal class PublicFileImagePreviewMenu @Inject constructor() : ImagePreviewMe
     }
 
     override suspend fun isSaveToDeviceMenuVisible(imageNode: ImageNode): Boolean {
-        return false
+        return true
     }
 
     override suspend fun isImportMenuVisible(imageNode: ImageNode): Boolean {
@@ -49,7 +49,7 @@ internal class PublicFileImagePreviewMenu @Inject constructor() : ImagePreviewMe
     }
 
     override suspend fun isShareMenuVisible(imageNode: ImageNode): Boolean {
-        return false
+        return true
     }
 
     override suspend fun isRenameMenuVisible(imageNode: ImageNode): Boolean {

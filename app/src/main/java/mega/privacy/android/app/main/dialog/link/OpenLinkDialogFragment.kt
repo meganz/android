@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.dialog.link
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,6 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.OpenPasswordLinkActivity
@@ -22,17 +22,15 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
-import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -42,6 +40,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -69,7 +68,16 @@ internal class OpenLinkDialogFragment : DialogFragment() {
     @Inject
     lateinit var applicationScope: CoroutineScope
 
-    private val viewModel: OpenLinkViewModel by viewModels()
+    private val viewModel: OpenLinkViewModel by viewModels(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<OpenLinkViewModel.Factory> { factory ->
+                factory.create(
+                    isChatScreen = requireArguments().getBoolean(IS_CHAT_SCREEN),
+                    isJoinMeeting = requireArguments().getBoolean(IS_JOIN_MEETING),
+                )
+            }
+        }
+    )
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -129,7 +137,6 @@ internal class OpenLinkDialogFragment : DialogFragment() {
                     RegexPatternType.FILE_LINK -> openFileLink(viewModel.inputLink)
                     RegexPatternType.FOLDER_LINK -> openFolderLink(viewModel.inputLink)
                     RegexPatternType.PASSWORD_LINK -> openPasswordLink(viewModel.inputLink)
-                    RegexPatternType.ALBUM_LINK -> openAlbumLink(viewModel.inputLink)
                     else -> Unit
                 }
             }
@@ -180,19 +187,6 @@ internal class OpenLinkDialogFragment : DialogFragment() {
         dismissAllowingStateLoss()
     }
 
-    private fun openAlbumLink(url: String) {
-        Timber.d("openAlbumLink: $url")
-        startActivity(
-            AlbumScreenWrapperActivity.createAlbumImportScreen(
-                context = requireContext(),
-                albumLink = AlbumLink(url),
-            ).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-        )
-        dismissAllowingStateLoss()
-    }
-
     private fun handleCheckLinkResult(
         result: Result<ChatLinkContent>,
     ) {
@@ -210,7 +204,7 @@ internal class OpenLinkDialogFragment : DialogFragment() {
             is IAmOnAnotherCallException -> {
                 CallUtil.showConfirmationInACall(
                     requireActivity(),
-                    getString(R.string.text_join_call),
+                    getString(sharedR.string.can_only_join_one_call_error_message),
                 )
                 dismissAllowingStateLoss()
             }

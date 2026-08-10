@@ -28,7 +28,7 @@ class FolderTypeMapperTest {
     }
 
     private val getDeviceType = mock<GetDeviceType> {
-        onBlocking { invoke(any()) }.thenReturn(DeviceType.Unknown)
+        on { invoke(any()) }.thenReturn(DeviceType.Unknown)
     }
 
     private val megaApiGateway = mock<MegaApiGateway>()
@@ -112,7 +112,7 @@ class FolderTypeMapperTest {
             )
 
             megaApiGateway.stub {
-                onBlocking { getNodePathByHandle(folderId.longValue) }.thenReturn(childNodePath)
+                on { getNodePathByHandle(folderId.longValue) }.thenReturn(childNodePath)
             }
 
             val actual = underTest(testFolder, dataWithBackupPath)
@@ -131,7 +131,7 @@ class FolderTypeMapperTest {
             )
 
             megaApiGateway.stub {
-                onBlocking { getNodePathByHandle(folderId.longValue) }.thenReturn(differentNodePath)
+                on { getNodePathByHandle(folderId.longValue) }.thenReturn(differentNodePath)
             }
 
             val actual = underTest(testFolder, dataWithBackupPath)
@@ -160,7 +160,7 @@ class FolderTypeMapperTest {
         )
 
         megaApiGateway.stub {
-            onBlocking { getNodePathByHandle(folderId.longValue) }.thenReturn(null)
+            on { getNodePathByHandle(folderId.longValue) }.thenReturn(null)
         }
 
         val actual = underTest(testFolder, dataWithBackupPath)
@@ -177,7 +177,7 @@ class FolderTypeMapperTest {
         )
 
         megaApiGateway.stub {
-            onBlocking { getNodePathByHandle(folderId.longValue) }.thenReturn("")
+            on { getNodePathByHandle(folderId.longValue) }.thenReturn("")
         }
 
         val actual = underTest(testFolder, dataWithBackupPath)
@@ -194,7 +194,7 @@ class FolderTypeMapperTest {
         )
 
         megaApiGateway.stub {
-            onBlocking { getNodePathByHandle(folderId.longValue) }.thenReturn(backupFolderPath)
+            on { getNodePathByHandle(folderId.longValue) }.thenReturn(backupFolderPath)
         }
 
         val actual = underTest(testFolder, dataWithBackupPath)
@@ -212,7 +212,7 @@ class FolderTypeMapperTest {
         )
 
         megaApiGateway.stub {
-            onBlocking { getNodePathByHandle(folderId.longValue) }.thenReturn(nestedNodePath)
+            on { getNodePathByHandle(folderId.longValue) }.thenReturn(nestedNodePath)
         }
 
         val actual = underTest(testFolder, dataWithBackupPath)
@@ -243,7 +243,7 @@ class FolderTypeMapperTest {
             on { isSynced }.thenReturn(false)
         }
         getDeviceType.stub {
-            onBlocking { invoke(any()) }.thenReturn(expected)
+            on { invoke(any()) }.thenReturn(expected)
         }
 
         val actual = underTest(folderWithDevice, folderTypeData)
@@ -363,7 +363,7 @@ class FolderTypeMapperTest {
         )
 
         megaApiGateway.stub {
-            onBlocking { getNodePathByHandle(folderId.longValue) }.thenReturn(childNodePath)
+            on { getNodePathByHandle(folderId.longValue) }.thenReturn(childNodePath)
         }
 
         val actual = underTest(folderWithDevice, dataWithBackupPath)
@@ -387,7 +387,7 @@ class FolderTypeMapperTest {
         )
 
         megaApiGateway.stub {
-            onBlocking { getNodePathByHandle(folderId.longValue) }.thenReturn(childNodePath)
+            on { getNodePathByHandle(folderId.longValue) }.thenReturn(childNodePath)
         }
 
         val actual = underTest(syncedFolder, dataWithBackupPath)
@@ -405,7 +405,7 @@ class FolderTypeMapperTest {
         )
 
         megaApiGateway.stub {
-            onBlocking { getNodePathByHandle(folderId.longValue) }.thenReturn(complexNestedPath)
+            on { getNodePathByHandle(folderId.longValue) }.thenReturn(complexNestedPath)
         }
 
         val actual = underTest(testFolder, dataWithBackupPath)
@@ -423,7 +423,7 @@ class FolderTypeMapperTest {
         )
 
         megaApiGateway.stub {
-            onBlocking { getNodePathByHandle(folderId.longValue) }.thenReturn(differentPath)
+            on { getNodePathByHandle(folderId.longValue) }.thenReturn(differentPath)
         }
 
         val actual = underTest(testFolder, dataWithBackupPath)

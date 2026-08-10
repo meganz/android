@@ -26,7 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import mega.android.core.ui.components.MegaScaffold
@@ -36,27 +36,28 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.presentation.extensions.transfers.getProgressPercentString
-import mega.privacy.android.app.presentation.extensions.transfers.getProgressSizeString
-import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction
-import mega.privacy.android.app.presentation.photos.model.CameraUploadsTransferType
-import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.CameraUploadsTransferViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
-import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
+import mega.privacy.android.core.transfers.extension.getProgressPercentString
+import mega.privacy.android.core.transfers.extension.getProgressSizeString
+import mega.privacy.android.core.transfers.extension.getSpeedString
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.photos.CameraUploadsTransferType
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.transfers.components.CameraUploadsActiveTransferItem
 import mega.privacy.android.feature.transfers.components.CameraUploadsInQueueTransferItem
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
 import mega.privacy.android.shared.resources.R as sharedR
 import java.math.BigInteger
 
+@Deprecated(message = "Please use CameraUploadsProgressScreen instead")
 @Composable
 fun CameraUploadsTransferScreen(
     timelineViewModel: TimelineViewModel,
@@ -104,6 +105,7 @@ fun CameraUploadsTransferScreen(
     }
 }
 
+@Deprecated(message = "Please use CameraUploadsProgressScreen instead")
 @Composable
 internal fun CameraUploadsTranferView(
     uiState: TimelineViewState,
@@ -177,6 +179,7 @@ internal fun CameraUploadsTranferView(
     }
 }
 
+@Deprecated(message = "Please use CameraUploadsProgressScreen instead")
 @Composable
 internal fun CameraUploadsTransferEmptyView(modifier: Modifier = Modifier) {
     Column(

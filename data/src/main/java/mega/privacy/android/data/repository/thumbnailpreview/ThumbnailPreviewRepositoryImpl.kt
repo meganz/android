@@ -11,14 +11,12 @@ import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -74,6 +72,14 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
     override suspend fun getPublicNodeThumbnailFromServer(handle: Long): File? =
         withContext(ioDispatcher) {
             megaApiFolder.getMegaNodeByHandle(handle)?.let { node ->
+                if (!node.hasThumbnail()) {
+                    Timber.d(
+                        "Public node %s (%s) has no thumbnail attribute; skipping fetch",
+                        node.base64Handle,
+                        node.name,
+                    )
+                    return@withContext null
+                }
                 getThumbnailFile(node)?.let { thumbnail ->
                     suspendCancellableCoroutine { continuation ->
                         val listener =
@@ -124,26 +130,23 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
             }.getOrNull()
         }
 
-    override suspend fun downloadThumbnail(
-        handle: Long,
-        callback: (success: Boolean) -> Unit,
-    ) = withContext(ioDispatcher) {
-        val node = megaApi.getMegaNodeByHandle(handle)
-        val thumbnailFolderPath =
-            cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
+    override suspend fun downloadThumbnail(handle: Long) {
+        withContext(ioDispatcher) {
+            val node = megaApi.getMegaNodeByHandle(handle)
+            val thumbnailFolderPath =
+                cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
+            if (node == null || thumbnailFolderPath == null || !node.hasThumbnail()) {
+                throw IllegalStateException("Thumbnail node not found.")
+            }
 
-        if (node == null || thumbnailFolderPath == null || !node.hasThumbnail()) {
-            callback(false)
-        } else {
-            megaApi.getThumbnail(
-                node,
-                getThumbnailPath(thumbnailFolderPath, node),
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _, error ->
-                        callback(error.errorCode == MegaError.API_OK)
-                    }
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("downloadThumbnail") {}
+                megaApi.getThumbnail(
+                    node = node,
+                    thumbnailFilePath = getThumbnailPath(thumbnailFolderPath, node),
+                    listener = listener
                 )
-            )
+            }
         }
     }
 
@@ -227,22 +230,20 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
     private suspend fun getThumbnailFile(fileName: String): File? =
         cacheGateway.getCacheFile(CacheFolderConstant.THUMBNAIL_FOLDER, fileName)
 
-
     private suspend fun getPreviewFile(fileName: String): File? =
         cacheGateway.getCacheFile(CacheFolderConstant.PREVIEW_FOLDER, fileName)
 
     override suspend fun getThumbnailCacheFolderPath(): String? = withContext(ioDispatcher) {
-        cacheGateway.getThumbnailCacheFolder()?.path
+        cacheGateway.getThumbnailCacheFolderPath()
     }
 
     override suspend fun getPreviewCacheFolderPath(): String? = withContext(ioDispatcher) {
-        cacheGateway.getPreviewCacheFolder()?.path
+        cacheGateway.getPreviewCacheFolderPath()
     }
 
     override suspend fun getFullSizeCacheFolderPath(): String? = withContext(ioDispatcher) {
-        cacheGateway.getFullSizeCacheFolder()?.path
+        cacheGateway.getFullSizeCacheFolderPath()
     }
-
 
     override suspend fun createThumbnail(handle: Long, uriPath: UriPath) =
         withContext(ioDispatcher) {
@@ -251,7 +252,6 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
             requireNotNull(thumbnailFile)
             megaApi.createThumbnail(uriPath.value, thumbnailFile.absolutePath)
         }
-
 
     override suspend fun createPreview(handle: Long, uriPath: UriPath) = withContext(ioDispatcher) {
         val previewFileName = getPreviewFileName(handle)

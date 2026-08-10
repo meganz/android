@@ -7,7 +7,6 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import coil.annotation.ExperimentalCoilApi
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
@@ -18,7 +17,7 @@ import mega.privacy.android.app.presentation.videosection.view.videoselected.VID
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VIDEO_SELECTED_GRID_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VIDEO_SELECTED_LIST_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VideoSelectedView
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import org.junit.Rule
@@ -27,7 +26,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-@OptIn(ExperimentalCoilApi::class)
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class VideoSelectedViewTest {

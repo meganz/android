@@ -11,12 +11,15 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.presentation.meeting.RingingViewModel
 import mega.privacy.android.app.presentation.meeting.view.RingingScreen
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -55,6 +58,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        pauseAudioPlayer(meetingActivity)
         meetingActivity.binding.toolbar.apply {
             isVisible = false
         }
@@ -212,8 +216,10 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             .distinctUntilChanged()) {
             if (it) {
                 Timber.d("Show missed call notification")
-                ChatAdvancedNotificationBuilder.newInstance(requireContext())
-                    .showMissedCallNotification(ringingViewModel.state.value.chatId, -1L)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    ChatAdvancedNotificationBuilder.newInstance(requireContext())
+                        .showMissedCallNotification(ringingViewModel.state.value.chatId, -1L)
+                }
                 requireActivity().finish()
             }
         }

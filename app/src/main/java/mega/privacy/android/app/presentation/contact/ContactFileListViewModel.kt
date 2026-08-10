@@ -11,14 +11,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
-import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -161,7 +162,6 @@ class ContactFileListViewModel @Inject constructor(
         _state.update { state -> state.copy(moveRequestResult = result) }
     }
 
-
     private suspend fun copyNodes(nodes: Map<Long, Long>) {
         val result = runCatching {
             copyNodesUseCase(nodes)
@@ -185,14 +185,17 @@ class ContactFileListViewModel @Inject constructor(
      *
      * @param file The file to upload.
      * @param destination The destination where the file will be uploaded.
+     * @param pitagTrigger [PitagTrigger]
      */
     fun uploadFile(
         file: File,
         destination: Long,
+        pitagTrigger: PitagTrigger,
     ) {
         uploadFiles(
             mapOf(file.absolutePath to null),
-            NodeId(destination)
+            NodeId(destination),
+            pitagTrigger,
         )
     }
 
@@ -202,6 +205,7 @@ class ContactFileListViewModel @Inject constructor(
     fun uploadFiles(
         pathsAndNames: Map<String, String?>,
         destinationId: NodeId,
+        pitagTrigger: PitagTrigger,
     ) {
         _state.update { state ->
             state.copy(
@@ -209,6 +213,7 @@ class ContactFileListViewModel @Inject constructor(
                     TransferTriggerEvent.StartUpload.Files(
                         pathsAndNames = pathsAndNames,
                         destinationId = destinationId,
+                        pitagTrigger = pitagTrigger,
                     )
                 )
             )

@@ -20,12 +20,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.chatsession.ChatSessionContainer
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.contact.invite.navigation.InviteContactScreenResult
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -45,12 +44,6 @@ class InviteContactFragment : Fragment() {
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
-     * Passcode crypt object factory
-     */
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
-
-    /**
      * Called to have this fragment instantiate its user interface view.
      */
     override fun onCreateView(
@@ -65,7 +58,6 @@ class InviteContactFragment : Fragment() {
                 ChatSessionContainer {
                     OriginalTheme(isDark = themeMode.isDarkMode()) {
                         PasscodeContainer(
-                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                             loading = {},
                             content = {
                                 PsaContainer {

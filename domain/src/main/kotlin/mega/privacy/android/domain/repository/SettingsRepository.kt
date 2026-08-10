@@ -1,16 +1,23 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.AppVersion
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.entity.home.PinnedHomeItem
+import mega.privacy.android.domain.entity.home.PinnedHomeItemsSortField
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
+import mega.privacy.android.domain.entity.preference.SortingPreference
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
+import mega.privacy.android.domain.entity.preference.ViewModePreference
 import java.io.File
 
 /**
@@ -22,7 +29,7 @@ interface SettingsRepository {
     /**
      * Check if the automatic approval of incoming contact requests using contact links is enabled or disabled
      *
-     * If the option has never been set, the error code will be MegaError::API_ENOENT.
+     * If the option has never been set, it is treated as enabled, matching the server default behaviour.
      *
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
      *
@@ -87,6 +94,20 @@ interface SettingsRepository {
     suspend fun setMediaDiscoveryView(value: Int)
 
     /**
+     * Monitor the timeline grid size preference
+     *
+     * @return timeline grid size preference as a flow
+     */
+    fun monitorTimelineGridSize(): Flow<Int?>
+
+    /**
+     * Set the timeline grid size preference
+     *
+     * @param value
+     */
+    suspend fun setTimelineGridSize(value: Int)
+
+    /**
      * Monitor subfolder media discovery setting
      *
      * @return subfolder media discovery option enabled status as a flow
@@ -99,6 +120,34 @@ interface SettingsRepository {
      * @param enabled
      */
     suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean)
+
+    /**
+     * Monitor the sorting order preference
+     *
+     * @return the [SortingPreference] as a flow, or null if none has been set
+     */
+    fun monitorSortingPreference(): Flow<SortingPreference?>
+
+    /**
+     * Set the sorting order preference
+     *
+     * @param preference the [SortingPreference] to set
+     */
+    suspend fun setSortingPreference(preference: SortingPreference)
+
+    /**
+     * Monitor the view mode preference
+     *
+     * @return the [ViewModePreference] as a flow, or null if none has been set
+     */
+    fun monitorViewModePreference(): Flow<ViewModePreference?>
+
+    /**
+     * Set the view mode preference
+     *
+     * @param preference the [ViewModePreference] to set
+     */
+    suspend fun setViewModePreference(preference: ViewModePreference)
 
     /**
      * Monitor show hidden items
@@ -164,24 +213,25 @@ interface SettingsRepository {
     suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean)
 
     /**
+     * Monitor ask for confirmation before large preview downloads preference
+     */
+    fun monitorAskBeforePreviewDownloads(): Flow<Boolean>
+
+    /**
+     * Set ask for confirmation before large preview downloads preference
+     */
+    suspend fun setAskBeforePreviewDownloads(askForConfirmation: Boolean)
+
+    /**
      * Set if we want to show copyright notice
      */
     suspend fun setShowCopyright()
 
     /**
-     * Is use https preference set
-     *
-     * @return true if set
-     * @return true if set
+     * Set the show copyright flag directly
+     * @param show true to show copyright, false to hide it
      */
-    suspend fun isUseHttpsPreferenceEnabled(): Boolean
-
-    /**
-     * Set use https preference
-     *
-     * @param enabled
-     */
-    suspend fun setUseHttpsPreference(enabled: Boolean)
+    suspend fun setShowCopyright(show: Boolean)
 
     /**
      * Gets chat image quality.
@@ -560,6 +610,20 @@ interface SettingsRepository {
     suspend fun setColoredFoldersOnboardingShown(shown: Boolean)
 
     /**
+     * Monitor home configuration tooltip shown preference
+     *
+     * @return home configuration tooltip shown status as a flow
+     */
+    fun monitorHomeConfigurationTooltipShown(): Flow<Boolean>
+
+    /**
+     * Set home configuration tooltip shown
+     *
+     * @param shown true if the tooltip has been shown, false otherwise
+     */
+    suspend fun setHomeConfigurationTooltipShown(shown: Boolean)
+
+    /**
      * Monitor enabled home screen widget configuration
      *
      * @return latest widget configuration
@@ -581,4 +645,67 @@ interface SettingsRepository {
      * @param widgetIdentifier the identifier of the widget to delete
      */
     suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String)
+
+    /**
+     * Reset all home screen widget configurations.
+     * Typically used on logout to restore the default home layout for the next session.
+     */
+    suspend fun resetHomeScreenWidgetConfigurations()
+
+    /**
+     * Monitor the pinned home items, ordered oldest-pinned first.
+     *
+     * @return a flow of the list of [PinnedHomeItem]
+     */
+    fun monitorPinnedHomeItems(): Flow<List<PinnedHomeItem>>
+
+    /**
+     * Add pinned home items.
+     *
+     * @param items the [PinnedHomeItem]s to persist
+     */
+    suspend fun addPinnedHomeItems(items: List<PinnedHomeItem>)
+
+    /**
+     * Remove a pinned home item.
+     *
+     * @param nodeId the [NodeId] of the item to remove
+     */
+    suspend fun removePinnedHomeItem(nodeId: NodeId)
+
+    /**
+     * Update the stored name of a pinned home item, preserving its order.
+     *
+     * @param nodeId the [NodeId] of the item
+     * @param name the new name
+     */
+    suspend fun updatePinnedHomeItemName(nodeId: NodeId, name: String)
+
+    /**
+     * Remove all pinned home items.
+     */
+    suspend fun clearPinnedHomeItems()
+
+    /**
+     * Monitor the persisted sort preference for the pinned home items View-all list.
+     */
+    fun monitorPinnedItemsSortPreference(): Flow<Pair<PinnedHomeItemsSortField, SortDirection>>
+
+    /**
+     * Persist the sort preference for the pinned home items View-all list.
+     */
+    suspend fun setPinnedItemsSortPreference(
+        sortField: PinnedHomeItemsSortField,
+        sortDirection: SortDirection,
+    )
+
+    /**
+     * Get the last version feature shown to the user
+     */
+    suspend fun getLastVersionNewFeatureShown(): AppVersion?
+
+    /**
+     * Set the last version feature shown to the user
+     */
+    suspend fun setLastVersionNewFeatureShown(version: AppVersion)
 }

@@ -8,9 +8,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeSortOption
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -28,7 +28,6 @@ import mega.privacy.android.domain.usecase.sortorder.GetSortOrderByNodeSourceTyp
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import org.junit.Before
 import org.junit.Test
@@ -56,7 +55,6 @@ class OfflineViewModelTest {
     private val monitorViewType: MonitorViewType = mock()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val removeOfflineNodesUseCase: RemoveOfflineNodesUseCase = mock()
-    private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val setOfflineSortOrder: SetOfflineSortOrder = mock()
     private val getSortOrderByNodeSourceTypeUseCase: GetSortOrderByNodeSourceTypeUseCase = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
@@ -90,7 +88,6 @@ class OfflineViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorViewType = monitorViewType,
             removeOfflineNodesUseCase = removeOfflineNodesUseCase,
-            snackbarEventQueue = snackbarEventQueue,
             setOfflineSortOrder = setOfflineSortOrder,
             getSortOrderByNodeSourceTypeUseCase = getSortOrderByNodeSourceTypeUseCase,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
@@ -191,6 +188,46 @@ class OfflineViewModelTest {
                 .isEqualTo(item.offlineFileInformation)
         }
     }
+
+    @Test
+    fun `test that offlineNodes is deduped by id when getOfflineNodesByParentIdUseCase returns duplicates`() =
+        runTest {
+            val parentId = -1
+            val duplicateId = 42
+            val uniqueId = 43
+            val first = mock<OfflineFileInformation> {
+                on { id } doReturn duplicateId
+                on { name } doReturn "first"
+                on { handle } doReturn "100"
+                on { addedTime } doReturn 100000L
+            }
+            val duplicate = mock<OfflineFileInformation> {
+                on { id } doReturn duplicateId
+                on { name } doReturn "duplicate"
+                on { handle } doReturn "101"
+                on { addedTime } doReturn 100000L
+            }
+            val unique = mock<OfflineFileInformation> {
+                on { id } doReturn uniqueId
+                on { name } doReturn "unique"
+                on { handle } doReturn "200"
+                on { addedTime } doReturn 100000L
+            }
+
+            whenever(getOfflineNodesByParentIdUseCase(parentId))
+                .thenReturn(listOf(first, duplicate, unique))
+            whenever(monitorOfflineNodeUpdatesUseCase()) doReturn flowOf(emptyList())
+
+            initViewModel(nodeId = parentId)
+
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                assertThat(state.offlineNodes).hasSize(2)
+                assertThat(state.offlineNodes.map { it.offlineFileInformation.id })
+                    .containsExactly(duplicateId, uniqueId)
+                    .inOrder()
+            }
+        }
 
     @Test
     fun `test that the selected node size is equal to the total offline list size when select all is clicked`() =
@@ -442,6 +479,11 @@ class OfflineViewModelTest {
 
             underTest.removeOfflineNodes(selectedHandles)
 
+            underTest.uiState.test {
+                assertThat(awaitItem().removeNodesSuccessEvent)
+                    .isEqualTo(StateEventWithContentTriggered(selectedHandles.size))
+            }
+
             verify(removeOfflineNodesUseCase).invoke(selectedHandles.map { NodeId(it) })
         }
 
@@ -518,7 +560,7 @@ class OfflineViewModelTest {
                 sortOption = NodeSortOption.Name,
                 sortDirection = SortDirection.Ascending
             )
-            whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(
+            whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
                 expectedSortOrder
             )
             whenever(nodeSortConfigurationUiMapper.invoke(expectedSortOrder)).thenReturn(
@@ -536,7 +578,7 @@ class OfflineViewModelTest {
             }
 
             // Then
-            verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE, true)
+            verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE)
         }
 
     @Test
@@ -547,7 +589,7 @@ class OfflineViewModelTest {
             sortOption = NodeSortOption.Size,
             sortDirection = SortDirection.Descending
         )
-        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
             sizeDescOrder
         )
         whenever(nodeSortConfigurationUiMapper.invoke(sizeDescOrder)).thenReturn(sizeDescConfig)
@@ -561,7 +603,7 @@ class OfflineViewModelTest {
             assertThat(state.selectedSortConfiguration).isEqualTo(sizeDescConfig)
         }
 
-        verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE, true)
+        verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE)
     }
 
     @Test
@@ -580,7 +622,7 @@ class OfflineViewModelTest {
         whenever(nodeSortConfigurationUiMapper.invoke(sortConfiguration)).thenReturn(
             expectedSortOrder
         )
-        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
             expectedSortOrder
         )
         whenever(nodeSortConfigurationUiMapper.invoke(expectedSortOrder)).thenReturn(
@@ -593,7 +635,7 @@ class OfflineViewModelTest {
 
         verify(setOfflineSortOrder).invoke(expectedSortOrder)
         // Times(2) because initViewModel also calls getSortOrder
-        verify(getSortOrderByNodeSourceTypeUseCase, times(2)).invoke(NodeSourceType.OFFLINE, true)
+        verify(getSortOrderByNodeSourceTypeUseCase, times(2)).invoke(NodeSourceType.OFFLINE)
     }
 
     private suspend fun stubCommon() {
@@ -603,8 +645,12 @@ class OfflineViewModelTest {
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
-        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.default)
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
+            SortOrder.ORDER_DEFAULT_ASC
+        )
+        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
+            NodeSortConfiguration.default
+        )
         whenever(nodeSortConfigurationUiMapper(any<NodeSortConfiguration>())).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
 }

@@ -1,10 +1,10 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
-import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.shared.resources.R
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -47,11 +47,11 @@ class CleanRubbishBinListener(private val context: Context) : MegaRequestListene
         if (request.type == MegaRequest.TYPE_CLEAN_RUBBISH_BIN) {
             context.run {
                 if (e.errorCode == MegaError.API_OK) {
-                    Util.showSnackbar(this, getString(R.string.rubbish_bin_emptied))
+                    Util.showSnackbar(this, getString(R.string.empty_rubbish_bin_success_message))
                     DBUtil.resetAccountDetailsTimeStamp()
                     (this as? FileManagementPreferencesActivity)?.resetRubbishInfo()
                 } else {
-                    Util.showSnackbar(this, getString(R.string.rubbish_bin_no_emptied))
+                    Util.showSnackbar(this, getString(R.string.empty_rubbish_bin_error_message))
                 }
             }
         }

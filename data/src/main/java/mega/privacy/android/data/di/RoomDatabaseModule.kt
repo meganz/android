@@ -17,20 +17,26 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.SQLCipherManager
 import mega.privacy.android.data.database.chat.CHAT_DATABASE_NAME
 import mega.privacy.android.data.database.chat.ChatDatabase
-import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.FolderPreferenceDao
+import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
+import mega.privacy.android.data.database.dao.RecentSearchDao
+import mega.privacy.android.data.database.dao.RecentlyUsedDao
+import mega.privacy.android.data.database.dao.RecentlyUsedTypeDao
+import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
 import mega.privacy.android.data.database.dao.SyncShownNotificationDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
+import mega.privacy.android.data.database.dao.TextEditorScrollDao
 import mega.privacy.android.data.database.dao.TypedMessageDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
@@ -120,11 +126,6 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideCompletedTransferDao(database: MegaDatabase): CompletedTransferDao =
         database.completedTransferDao()
-
-    @Provides
-    @Singleton
-    internal fun provideActiveTransferDao(database: MegaDatabase): ActiveTransferDao =
-        database.activeTransfersDao()
 
     @Provides
     @Singleton
@@ -242,4 +243,38 @@ internal object RoomDatabaseModule {
     @Provides
     fun provideHomeWidgetConfigurationDao(database: MegaDatabase): HomeWidgetConfigurationDao =
         database.homeWidgetConfigurationDao()
+
+    @Provides
+    fun provideHomePinnedItemDao(database: MegaDatabase): HomePinnedItemDao =
+        database.homePinnedItemDao()
+
+    @Provides
+    @Singleton
+    internal fun provideRecentSearchDao(database: MegaDatabase): RecentSearchDao =
+        database.recentSearchDao()
+
+    @Provides
+    @Singleton
+    internal fun provideRecentlyUsedDao(database: MegaDatabase): RecentlyUsedDao =
+        database.recentlyUsedDao()
+
+    @Provides
+    @Singleton
+    internal fun provideRecentlyUsedTypeDao(database: MegaDatabase): RecentlyUsedTypeDao =
+        database.recentlyUsedTypeDao()
+
+    @Provides
+    @Singleton
+    internal fun provideTextEditorScrollDao(database: MegaDatabase): TextEditorScrollDao =
+        database.textEditorScrollDao()
+
+    @Provides
+    @Singleton
+    internal fun provideFolderPreferenceDao(database: MegaDatabase): FolderPreferenceDao =
+        database.folderPreferenceDao()
+
+    @Provides
+    @Singleton
+    internal fun provideRecentlyViewedLinkDao(database: MegaDatabase): RecentlyViewedLinkDao =
+        database.recentlyViewedLinkDao()
 }

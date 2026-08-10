@@ -9,7 +9,12 @@ interface SystemAlbum {
     /**
      * Name of the album
      */
-    val albumName: String
+    val albumNameResId: Int
+
+    /**
+     * Flag to determine if System album should be hidden when empty
+     */
+    val hideWhenEmpty: Boolean
 
     /**
      * Function to determine if a photo belongs to this album type

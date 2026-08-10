@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.mock
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class SyncDeeplinkProcessorTest {
@@ -13,7 +14,7 @@ internal class SyncDeeplinkProcessorTest {
 
     @BeforeEach
     fun init() {
-        syncDeeplinkProcessor = SyncDeeplinkProcessor()
+        syncDeeplinkProcessor = SyncDeeplinkProcessor(mock())
     }
 
     @ParameterizedTest

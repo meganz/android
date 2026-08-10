@@ -16,6 +16,31 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
 
+    /**
+     * Custom chat avatar
+     */
+    CustomChatAvatar(
+        "Ability to add a custom avatar to group chats",
+        false,
+    ),
+
+    /**
+     * Feature flag to route the revamped video player to its ComposeUI single-activity destination
+     * instead of launching VideoPlayerActivity.
+     */
+    VideoPlayerActivityRefactor(
+        "Open the revamped video player as a Compose route in the single activity",
+        false,
+    ),
+
+    /**
+     * Search revamp
+     */
+    FolderLinkRevamp(
+        "Enable folder link revamp screen",
+        true,
+    ),
+
     CameraUploadsPausedWarningBanner(
         "Enable Camera Uploads paused warning banner",
         true
@@ -34,16 +59,11 @@ enum class AppFeatures(override val description: String, private val defaultValu
         true
     ),
 
-    PhotoEditor(
-        "Enable photo editor in image viewer",
-        true,
-    ),
-
     /**
-     * Single activity
+     * Contact info compose u i
      */
-    SingleActivity(
-        "Enable single activity rewrite",
+    ContactInfoComposeUI(
+        "Enable compose version of the contact info screen",
         false,
     ),
 
@@ -52,14 +72,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     ContactsComposeUI(
         "Enable compose version of the contacts ui",
-        false,
-    ),
-
-    /**
-     * New psa state
-     */
-    NewPsaState(
-        "Use new psa state in stead of legacy psa state singleton. Legacy psa state exists to unify behaviour while legacy screens still exist",
         false,
     ),
 
@@ -80,14 +92,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables Map location
-     */
-    MapLocation(
-        "Enable map location feature",
-        true,
-    ),
-
-    /**
      * Enables prefetch timeline photos as soon initialization screen completed
      */
     PrefetchTimeline(
@@ -96,41 +100,9 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Shares compose
-     */
-    SharesCompose(
-        "Enable compose implementation of shares tabs",
-        false
-    ),
-
-    /**
      * App Test toggle
      */
     AppTest("This is a test toggle. It does nothing", false),
-
-    /**
-     * To enable search by node description
-     */
-    SearchWithDescription(
-        "Enable search with description",
-        true
-    ),
-
-    /**
-     * To enable search by node tags
-     */
-    SearchWithTags(
-        "Enable search with tags",
-        true
-    ),
-
-    /**
-     * To enable the new add and manage description feature to node
-     */
-    NodeWithTags(
-        "Enable node with tags",
-        true
-    ),
 
     /**
      * Enables Picture in Picture (Pip) in Meeting
@@ -141,27 +113,11 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * New import section
-     */
-    NewUploadDestinationActivity(
-        "Enable upload destination activity",
-        false
-    ),
-
-    /**
      * Call settings implemented with the new components library
      */
     CallSettingsNewComponents(
         "Call settings implemented with the new components library",
         false,
-    ),
-
-    /**
-     *  Onboarding Revamp with new components
-     */
-    OnboardingRevamp(
-        "Onboarding Revamp with new components",
-        true,
     ),
 
     /**
@@ -179,7 +135,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Convert the NodeLabelBottomSheetDialogFragment to Kotlin",
         true
     ),
-    ;
+
+    /**
+     * Feature flag to control the migration of FileExplorerActivity to ComposeUI and single activity.
+     */
+    CloudExplorer(
+        "Enable Cloud explorer revamp with ComposeUI and single activity",
+        false
+    );
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =

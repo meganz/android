@@ -1,16 +1,14 @@
 package mega.privacy.android.app.camera.setting
 
+import androidx.compose.material.navigation.bottomSheet
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.bottomSheet
 
 internal const val CAMERA_SETTING_ROUTE = "cameraSetting"
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.cameraSettingModal(
     showPermissionDeniedSnackbar: () -> Unit,
 ) {

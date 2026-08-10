@@ -1,17 +1,20 @@
 package mega.privacy.android.feature.clouddrive.presentation.rubbishbin
 
+import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -22,55 +25,53 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.sheets.MegaModalBottomSheet
-import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
-import mega.android.core.ui.model.LocalizedText
-import mega.android.core.ui.model.menu.MenuActionIconWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
+import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
-import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.list.NodesView
-import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
-import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeSortOption
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
-import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.HandleNodeOptionEvent
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.ClearRubbishBinDialog
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.RubbishBinAppBarAction
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
-import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.account.overquota.OverQuotaStatusViewModel
+import mega.privacy.android.shared.account.overquota.model.OverQuotaIssue
+import mega.privacy.android.shared.account.overquota.view.OverQuotaErrorBanner
+import mega.privacy.android.shared.account.overquota.view.OverQuotaWarningBanner
+import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
+import mega.privacy.android.shared.nodes.components.NodeSkeletons
+import mega.privacy.android.shared.nodes.components.NodesView
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * M3 Compose Screen for Rubbish Bin
- * This is a fully Compose replacement for RubbishBinComposeFragment when isSingleActivityEnabled == true
+ * M3 Compose Screen for Rubbish Bin.
  * Uses the new NodeViews implementation from core.nodecomponents
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,50 +80,48 @@ internal fun RubbishBinScreen(
     viewModel: NewRubbishBinViewModel,
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onFolderClick: (NodeId) -> Unit,
-    openSearch: (Boolean, Long) -> Unit,
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(NodeSourceType.RUBBISH_BIN) }
+        ),
+    overQuotaStatusViewModel: OverQuotaStatusViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val megaNavigator = rememberMegaNavigator()
-    val megaResultContract = rememberMegaResultContract()
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val overQuotaUiState by overQuotaStatusViewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
-    val actionHandler: NodeActionHandler = rememberNodeActionHandler(
+    val multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(
         viewModel = nodeOptionsActionViewModel,
         navigationHandler = navigationHandler
     )
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
-    var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
-    val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showClearRubbishBinDialog by remember { mutableStateOf(false) }
+    var showClearRubbishBinDialog by rememberSaveable { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
-
-
-    val nameCollisionLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            coroutineScope.launch {
-                snackbarHostState?.showAutoDurationSnackbar(message)
-            }
-        }
-    }
 
     val spanCount = rememberDynamicSpanCount(
         isListView = uiState.currentViewType == ViewType.LIST
     )
 
+    BackHandler(enabled = uiState.isInSelectionMode) {
+        viewModel.clearAllSelectedNodes()
+    }
+
     EventEffect(
         event = uiState.openFolderEvent,
         onConsumed = viewModel::onOpenFolderEventConsumed
     ) { folderId ->
-        onFolderClick(folderId)
+        navigationHandler.navigate(
+            CloudDriveNavKey(
+                nodeHandle = folderId.longValue,
+                nodeSourceType = NodeSourceType.RUBBISH_BIN
+            )
+        )
     }
 
     EventEffect(
@@ -135,16 +134,6 @@ internal fun RubbishBinScreen(
     }
 
     val isRootDirectory = uiState.parentFolderId == null
-    var shouldShowSkeleton by remember { mutableStateOf(false) }
-
-    LaunchedEffect(uiState.isLoading) {
-        if (uiState.isLoading) {
-            delay(100.milliseconds)
-            shouldShowSkeleton = true
-        } else {
-            shouldShowSkeleton = false
-        }
-    }
 
     LaunchedEffect(uiState.selectedNodes.size) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
@@ -152,26 +141,6 @@ internal fun RubbishBinScreen(
             NodeSourceType.RUBBISH_BIN
         )
     }
-
-    HandleNodeOptionEvent(
-        megaNavigator = megaNavigator,
-        nodeActionState = nodeActionState,
-        nameCollisionLauncher = nameCollisionLauncher,
-        snackbarHostState = snackbarHostState,
-        onNodeNameCollisionResultHandled = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
-        onInfoToShowEventConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
-        onForeignNodeDialogShown = nodeOptionsActionViewModel::markForeignNodeDialogShown,
-        onQuotaDialogShown = nodeOptionsActionViewModel::markQuotaDialogShown,
-        onHandleNodesWithoutConflict = { collisionType, nodes ->
-            when (collisionType) {
-                NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(nodes)
-                NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
-                else -> {
-                    /* No-op for other types */
-                }
-            }
-        },
-    )
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
@@ -181,136 +150,162 @@ internal fun RubbishBinScreen(
         topBar = {
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
+                    modifier = Modifier.testTag(RUBBISH_BIN_SELECTION_MODE_APP_BAR_TAG),
                     count = uiState.selectedNodes.size,
+                    isAllSelected = uiState.isAllSelected,
                     isSelecting = uiState.isSelecting,
                     onSelectAllClicked = { viewModel.selectAllNodes() },
                     onCancelSelectionClicked = { viewModel.clearAllSelectedNodes() }
                 )
             } else {
                 MegaTopAppBar(
-                    modifier = Modifier,
+                    modifier = Modifier.testTag(RUBBISH_BIN_MAIN_APP_BAR_TAG),
                     navigationType = AppBarNavigationType.Back(
                         onNavigationIconClicked = {
                             onBackPressedDispatcher?.onBackPressed()
                         }
                     ),
-                    title = when (uiState.title) {
-                        is LocalizedText.Literal -> uiState.title.text
-                        else -> stringResource(sharedR.string.general_section_rubbish_bin)
-                    },
+                    title = uiState.title.text,
                     maxActionsToShow = if (isRootDirectory) 1 else 2,
-                    actions = buildList {
-                        add(MenuActionIconWithClick(RubbishBinAppBarAction.Search) {
-                            openSearch(
-                                isRootDirectory,
-                                uiState.currentFolderId.longValue,
-                            )
-                        })
-                        if (isRootDirectory) {
-                            add(
-                                MenuActionIconWithClick(RubbishBinAppBarAction.Empty) {
-                                    showClearRubbishBinDialog = true
-                                },
-                            )
-                        } else {
-                            add(
-                                MenuActionIconWithClick(RubbishBinAppBarAction.More) {
-                                    visibleNodeOptionId = uiState.currentFolderId
-                                },
-                            )
+                    actions = if (uiState.items.isNotEmpty()) {
+                        buildList {
+                            add(MenuActionWithClick(RubbishBinAppBarAction.Search) {
+                                val searchNavKey =SearchNavKey(
+                                    parentHandle = uiState.currentFolderId.longValue,
+                                    nodeSourceType = NodeSourceType.RUBBISH_BIN
+                                )
+                                navigationHandler.navigate(searchNavKey)
+                            })
+                            if (isRootDirectory) {
+                                add(
+                                    MenuActionWithClick(RubbishBinAppBarAction.Empty) {
+                                        showClearRubbishBinDialog = true
+                                    },
+                                )
+                            } else {
+                                add(
+                                    MenuActionWithClick(RubbishBinAppBarAction.More) {
+                                        navigationHandler.navigate(
+                                            NodeOptionsBottomSheetNavKey(
+                                                nodeHandle = uiState.currentFolderId.longValue,
+                                                nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                                                partiallyExpand = false
+                                            )
+                                        )
+                                    },
+                                )
+                            }
                         }
-                    },
+                    } else emptyList(),
                 )
             }
         },
         bottomBar = {
+            @SuppressLint("ComposeViewModelForwarding")
             NodeSelectionModeBottomBar(
+                modifier = Modifier.testTag(RUBBISH_BIN_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeActionState.availableActions,
                 visibleActions = nodeActionState.visibleActions,
                 visible = nodeActionState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
-                nodeActionHandler = actionHandler,
+                multiNodeActionHandler = multiNodeActionHandler,
                 isSelecting = uiState.isSelecting,
                 selectedNodes = uiState.selectedNodes,
             )
         },
     ) { innerPadding ->
-        when {
-            uiState.isLoading -> {
-                if (shouldShowSkeleton) {
+        val showOverQuotaWarning =
+            overQuotaUiState.overQuotaStatus.severity is OverQuotaIssue.Severity.Warning && overQuotaUiState.shouldShowWarning
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding.excludingBottomPadding())
+        ) {
+            OverQuotaErrorBanner(
+                overQuotaStatus = overQuotaUiState.overQuotaStatus,
+                onUpgradeClicked = {
+                    megaNavigator.openUpgradeAccount(context)
+                },
+            )
+            when {
+                uiState.isLoading -> {
                     NodesViewSkeleton(
-                        contentPadding = innerPadding,
+                        contentPadding = PaddingValues(),
                         isListView = uiState.currentViewType == ViewType.LIST,
-                        spanCount = spanCount
+                        spanCount = spanCount,
+                        delay = NodeSkeletons.defaultDelay,
+                    )
+                }
+
+                uiState.items.isEmpty() && uiState.nodesLoadingState == NodesLoadingState.FullyLoaded -> {
+                    EmptyStateView(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag(NODES_EMPTY_VIEW_VISIBLE),
+                        imagePainter = painterResource(
+                            if (isRootDirectory) {
+                                iconPackR.drawable.ic_empty_trash_glass
+                            } else {
+                                iconPackR.drawable.ic_empty_folder_glass
+                            }
+                        ),
+                        title = stringResource(
+                            if (isRootDirectory) {
+                                sharedR.string.annotated_empty_rubbish_bin_menu
+                            } else {
+                                sharedR.string.annotated_empty_folder
+                            }
+                        )
+                    )
+                }
+
+                else -> {
+                    NodesView(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        items = uiState.items,
+                        listContentPadding = PaddingValues(
+                            bottom = innerPadding.calculateSafeBottomPadding()
+                        ),
+                        onMenuClicked = { nodeUiItem ->
+                            navigationHandler.navigate(
+                                NodeOptionsBottomSheetNavKey(
+                                    nodeHandle = nodeUiItem.node.id.longValue,
+                                    nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                                    partiallyExpand = false
+                                )
+                            )
+                        },
+                        onItemClicked = { nodeUiItem ->
+                            viewModel.onItemClicked(nodeUiItem)
+                        },
+                        onLongClicked = { nodeUiItem ->
+                            viewModel.onItemLongClicked(nodeUiItem)
+                        },
+                        sortConfiguration = uiState.sortConfiguration,
+                        isListView = uiState.currentViewType == ViewType.LIST,
+                        onSortOrderClick = { showSortBottomSheet = true },
+                        onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
+                        spanCount = spanCount,
+                        showHiddenNodes = true,
+                        isHiddenNodesEnabled = uiState.accountType?.isPaid == true && !uiState.isBusinessAccountExpired,
+                        inSelectionMode = uiState.isInSelectionMode,
+                        bannerHeader = if (showOverQuotaWarning) {
+                            {
+                                OverQuotaWarningBanner(
+                                    overQuotaUiState.overQuotaStatus,
+                                    onDismissed = {
+                                        overQuotaStatusViewModel.dismissWarning()
+                                    },
+                                    onUpgradeClicked = {
+                                        megaNavigator.openUpgradeAccount(context)
+                                    },
+                                )
+                            }
+                        } else null,
                     )
                 }
             }
-
-            uiState.items.isEmpty() && uiState.nodesLoadingState == NodesLoadingState.FullyLoaded -> {
-                MegaEmptyView(
-                    modifier = Modifier
-                        .testTag(NODES_EMPTY_VIEW_VISIBLE),
-                    imagePainter = painterResource(
-                        if (isRootDirectory) {
-                            iconPackR.drawable.ic_empty_trash_glass
-                        } else {
-                            iconPackR.drawable.ic_empty_folder_glass
-                        }
-                    ),
-                    text = stringResource(
-                        if (isRootDirectory) {
-                            R.string.context_empty_rubbish_bin
-                        } else {
-                            R.string.file_browser_empty_folder_new
-                        }
-                    )
-                )
-            }
-
-            else -> {
-                NodesView(
-                    items = uiState.items,
-                    listContentPadding = innerPadding,
-                    onMenuClicked = { nodeUiItem ->
-                        visibleNodeOptionId = nodeUiItem.node.id
-                    },
-                    onItemClicked = { nodeUiItem ->
-                        viewModel.onItemClicked(nodeUiItem)
-                    },
-                    onLongClicked = { nodeUiItem ->
-                        viewModel.onItemLongClicked(nodeUiItem)
-                    },
-                    sortConfiguration = uiState.sortConfiguration,
-                    isListView = uiState.currentViewType == ViewType.LIST,
-                    onSortOrderClick = { showSortBottomSheet = true },
-                    onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
-                    spanCount = spanCount,
-                    showHiddenNodes = uiState.isHiddenNodesEnabled
-                            && uiState.accountType?.isPaid == true
-                            && !uiState.isBusinessAccountExpired,
-                    isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
-                    inSelectionMode = uiState.isInSelectionMode,
-                )
-            }
-        }
-    }
-
-    // Show node options bottom sheet
-    visibleNodeOptionId?.let { nodeId ->
-        MegaModalBottomSheet(
-            modifier = Modifier.statusBarsPadding(),
-            sheetState = nodeOptionSheetState,
-            onDismissRequest = { visibleNodeOptionId = null },
-            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
-        ) {
-            NodeOptionsBottomSheetRoute(
-                navigationHandler = navigationHandler,
-                onDismiss = { visibleNodeOptionId = null },
-                nodeId = nodeId.longValue,
-                nodeSourceType = NodeSourceType.RUBBISH_BIN,
-                onTransfer = onTransfer,
-                actionHandler = actionHandler,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            )
         }
     }
 
@@ -318,15 +313,23 @@ internal fun RubbishBinScreen(
     uiState.openedFileNode?.let { fileNode ->
         HandleNodeAction3(
             typedFileNode = fileNode,
-            nodeSourceType = NodeSourceType.RUBBISH_BIN,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.RUBBISH_BIN),
             sortOrder = uiState.sortOrder,
             snackBarHostState = snackbarHostState,
             onActionHandled = {
                 viewModel.onOpenedFileNodeHandled()
             },
             onDownloadEvent = onTransfer,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
+            onNavigate = navigationHandler::navigate,
         )
+    }
+
+    EventEffect(
+        event = nodeActionState.dismissEvent,
+        onConsumed = nodeOptionsActionViewModel::resetDismiss
+    ) {
+        viewModel.clearAllSelectedNodes()
     }
 
     // Show clear rubbish bin confirmation dialog
@@ -371,3 +374,9 @@ internal fun RubbishBinScreen(
  * Test tag for empty view in nodes screen
  */
 const val NODES_EMPTY_VIEW_VISIBLE = "rubbish_bin_screen:empty_view"
+
+internal const val RUBBISH_BIN_MAIN_APP_BAR_TAG = "rubbish_bin_screen:main_app_bar"
+internal const val RUBBISH_BIN_SELECTION_MODE_APP_BAR_TAG =
+    "rubbish_bin_screen:selection_mode_app_bar"
+internal const val RUBBISH_BIN_SELECTION_MODE_BOTTOM_BAR_TAG =
+    "rubbish_bin_screen:selection_mode_bottom_bar"

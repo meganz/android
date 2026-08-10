@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.featuretoggle.PersistedFeatureFlagSnapshotGateway
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
@@ -11,7 +12,10 @@ import mega.privacy.android.domain.repository.FeatureFlagRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -20,32 +24,32 @@ class DefaultFeatureFlagRepositoryTest {
 
     private val defaultProviderMock =
         mock<FeatureFlagValueProvider> {
-            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { isEnabled(any()) }.thenReturn(null)
             on { priority }.thenReturn(FeatureFlagValuePriority.Default)
         }
     private val secondaryDefaultProviderMock =
         mock<FeatureFlagValueProvider> {
-            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { isEnabled(any()) }.thenReturn(null)
             on { priority }.thenReturn(FeatureFlagValuePriority.Default)
         }
     private val configurationFileProviderMock =
         mock<FeatureFlagValueProvider> {
-            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { isEnabled(any()) }.thenReturn(null)
             on { priority }.thenReturn(FeatureFlagValuePriority.ConfigurationFile)
         }
     private val buildTimeOverrideProviderMock =
         mock<FeatureFlagValueProvider> {
-            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { isEnabled(any()) }.thenReturn(null)
             on { priority }.thenReturn(FeatureFlagValuePriority.BuildTimeOverride)
         }
     private val remoteToggledProviderMock =
         mock<FeatureFlagValueProvider> {
-            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { isEnabled(any()) }.thenReturn(null)
             on { priority }.thenReturn(FeatureFlagValuePriority.RemoteToggled)
         }
     private val runtimeOverrideProviderMock =
         mock<FeatureFlagValueProvider> {
-            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { isEnabled(any()) }.thenReturn(null)
             on { priority }.thenReturn(FeatureFlagValuePriority.RuntimeOverride)
         }
 
@@ -69,11 +73,21 @@ class DefaultFeatureFlagRepositoryTest {
         Fake2(fake2, FeatureFlagValuePriority.RemoteToggled).fakeProvider
     )
 
+    private var persistedSnapshot: Map<Feature, Boolean> = emptyMap()
+
+    private val persistedFeatureFlagSnapshotGateway: PersistedFeatureFlagSnapshotGateway = mock {
+        on { currentSnapshot() } doAnswer { persistedSnapshot }
+    }
+
+    private val managedFeatures: Set<Feature> = setOf(TestFeature.A, TestFeature.B)
+
     @BeforeEach
     fun setUp() {
         underTest = DefaultFeatureFlagRepository(
             ioDispatcher = UnconfinedTestDispatcher(),
             featureFlagValueProviderSet = featureFlagValueProviders,
+            persistedFeatureFlagSnapshotGateway = persistedFeatureFlagSnapshotGateway,
+            managedFeatures = managedFeatures,
         )
     }
 
@@ -112,6 +126,53 @@ class DefaultFeatureFlagRepositoryTest {
     }
 
     @Test
+    fun `test that getFeatureValue with priorities filters providers to that set`() = runTest {
+        val feature = mock<Feature>()
+        whenever(remoteToggledProviderMock.isEnabled(feature)).thenReturn(true)
+        whenever(defaultProviderMock.isEnabled(feature)).thenReturn(false)
+
+        val onlyDefault = underTest.getFeatureValue(
+            feature,
+            setOf(FeatureFlagValuePriority.Default),
+        )
+        val onlyRemote = underTest.getFeatureValue(
+            feature,
+            setOf(FeatureFlagValuePriority.RemoteToggled),
+        )
+
+        assertThat(onlyDefault).isFalse()
+        assertThat(onlyRemote).isTrue()
+    }
+
+    @Test
+    fun `test that getCurrentPersistedSnapshot returns the gateway snapshot`() = runTest {
+        persistedSnapshot = mapOf(TestFeature.A to true, TestFeature.B to false)
+
+        assertThat(underTest.getCurrentPersistedSnapshot()).containsExactly(
+            TestFeature.A, true,
+            TestFeature.B, false,
+        )
+    }
+
+    @Test
+    fun `test that applySnapshot delegates the snapshot to the gateway`() = runTest {
+        val snapshot = mapOf<Feature, Boolean>(TestFeature.A to true, TestFeature.B to false)
+
+        underTest.applySnapshot(snapshot)
+
+        val captor = argumentCaptor<Map<Feature, Boolean>>()
+        verify(persistedFeatureFlagSnapshotGateway).applySnapshot(captor.capture())
+        assertThat(captor.firstValue).isEqualTo(snapshot)
+    }
+
+    @Test
+    fun `test that clearPersistedSnapshot delegates to the gateway`() = runTest {
+        underTest.clearPersistedSnapshot()
+
+        verify(persistedFeatureFlagSnapshotGateway).clear()
+    }
+
+    @Test
     internal fun `test that two providers with the same simple name are both used`() = runTest {
         val primaryFeature = mock<Feature>()
         val secondaryFeature = mock<Feature>()
@@ -123,6 +184,11 @@ class DefaultFeatureFlagRepositoryTest {
         assertThat(underTest.getFeatureValue(primaryFeature)).isTrue()
         assertThat(underTest.getFeatureValue(secondaryFeature)).isTrue()
     }
+}
+
+private enum class TestFeature(override val description: String) : Feature {
+    A("A"),
+    B("B"),
 }
 
 private interface FakeFeatureFlagValueProvider : FeatureFlagValueProvider

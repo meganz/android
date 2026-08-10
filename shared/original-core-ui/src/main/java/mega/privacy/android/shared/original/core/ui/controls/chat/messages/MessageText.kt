@@ -14,7 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -481,6 +481,7 @@ private fun String.getFormatsFromLinks(links: List<String>): List<Format> = buil
     links.forEach {
         val link = it.getLinkWithoutFormatTags()
         val startIndex = this@getFormatsFromLinks.indexOf(link)
+        if (startIndex < 0) return@forEach
         val endIndex = startIndex + link.length
         add(
             Format(
@@ -516,7 +517,7 @@ private fun String.getLinkWithoutFormatTags(): String {
 @Composable
 fun OpenMessageLink(link: String) {
     val uriHandler = LocalUriHandler.current
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackBarHostStateOriginal.current
 
@@ -524,7 +525,7 @@ fun OpenMessageLink(link: String) {
         uriHandler.openUri(link.completeURLProtocol())
     }.onFailure {
         coroutineScope.launch {
-            snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.chat_click_link_in_message_intent_not_available))
+            snackbarHostState?.showAutoDurationSnackbar(resources.getString(R.string.chat_click_link_in_message_intent_not_available))
         }
     }
 }

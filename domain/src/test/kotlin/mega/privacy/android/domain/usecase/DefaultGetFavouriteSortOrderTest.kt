@@ -16,7 +16,7 @@ class DefaultGetFavouriteSortOrderTest {
     private lateinit var underTest: GetFavouriteSortOrderUseCase
 
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
-        onBlocking {
+        on {
             invoke()
         }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }

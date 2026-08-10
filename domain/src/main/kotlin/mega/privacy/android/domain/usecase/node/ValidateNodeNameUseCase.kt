@@ -1,10 +1,14 @@
 package mega.privacy.android.domain.usecase.node
 
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.DotNameException
+import mega.privacy.android.domain.exception.DoubleDotNameException
 import mega.privacy.android.domain.exception.EmptyNodeNameException
 import mega.privacy.android.domain.exception.InvalidNodeNameException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -26,6 +30,8 @@ class ValidateNodeNameUseCase @Inject constructor(
     suspend operator fun invoke(name: String, parentNodeId: NodeId?) {
         when {
             name.isEmpty() -> throw EmptyNodeNameException()
+            name.isInvalidDotName() -> throw DotNameException()
+            name.isInvalidDoubleDotName() -> throw DoubleDotNameException()
             containsInvalidCharacters(name) -> throw InvalidNodeNameException()
             checkFolderNameExists(
                 name,

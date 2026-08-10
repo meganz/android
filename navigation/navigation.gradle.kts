@@ -12,6 +12,7 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":core:navigation-contract"))
     implementation(androidx.appcompat)
     implementation(androidx.navigation.compose)
     implementation(androidx.navigation3.runtime)

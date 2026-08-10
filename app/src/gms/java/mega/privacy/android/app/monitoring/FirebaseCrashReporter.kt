@@ -17,7 +17,8 @@ class FirebaseCrashReporter(
     }
 
     override fun setEnabled(enabled: Boolean) {
-        crashlytics.setCrashlyticsCollectionEnabled(enabled && !BuildConfig.DEBUG)
+        val isDebugBuildType = BuildConfig.BUILD_TYPE == "debug"
+        crashlytics.setCrashlyticsCollectionEnabled(enabled && !isDebugBuildType)
     }
 
     override fun log(message: String) {

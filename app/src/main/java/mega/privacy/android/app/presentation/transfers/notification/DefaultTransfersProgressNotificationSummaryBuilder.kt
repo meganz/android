@@ -1,18 +1,17 @@
 package mega.privacy.android.app.presentation.transfers.notification
 
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.PROGRESS_SUMMARY_GROUP
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import javax.inject.Inject
 
 /**
@@ -20,6 +19,7 @@ import javax.inject.Inject
  */
 class DefaultTransfersProgressNotificationSummaryBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val megaNavigator: MegaNavigator,
 ) : TransfersProgressNotificationSummaryBuilder {
 
     override suspend fun invoke(type: TransferType) =
@@ -29,14 +29,11 @@ class DefaultTransfersProgressNotificationSummaryBuilder @Inject constructor(
             .setGroup(PROGRESS_SUMMARY_GROUP + type.name)
             .setGroupSummary(true)
             .setContentTitle(context.getString(R.string.download_preparing_files))
-            .setContentIntent(createPendingIntent(TransfersActivity.getActiveTabIntent(context)))
+            .setContentIntent(
+                megaNavigator.getPendingIntentWithDestination(
+                    context = context,
+                    singleActivityDestination = { TransfersNavKey(TransfersNavKey.Tab.Active) }
+                )
+            )
             .build()
-
-    private fun createPendingIntent(intent: Intent) =
-        PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
 }

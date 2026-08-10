@@ -9,8 +9,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
  * Get the icon resource associated to the [FolderNode]
  */
 fun FolderNode.getIcon(): Int = when {
-    isIncomingShare -> IconPackR.drawable.ic_folder_incoming_medium_solid
-    isShared || isPendingShare -> IconPackR.drawable.ic_folder_outgoing_medium_solid
+    isIncomingShare || isShared || isPendingShare -> IconPackR.drawable.ic_folder_users_medium_solid
     isMediaSyncFolder() -> IconPackR.drawable.ic_folder_camera_uploads_medium_solid
     isChatFilesFolder() -> IconPackR.drawable.ic_folder_chat_medium_solid
     isSynced || isSyncedFolder() -> IconPackR.drawable.ic_folder_sync_medium_solid

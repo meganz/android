@@ -1,12 +1,14 @@
 package mega.privacy.android.navigation
 
 import android.app.Activity
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
@@ -14,10 +16,10 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import java.io.File
 
@@ -110,6 +112,28 @@ interface AppNavigator {
     )
 
     /**
+     * Open the quota-warning upsell screen in the single activity, launching it if the caller is a
+     * legacy activity.
+     *
+     * @param type the quota metric (storage or transfer) the warning is about
+     * @param trigger the user action that triggered the warning, used to select the screen copy
+     */
+    fun openQuotaWarningUpsell(
+        context: Context,
+        type: QuotaWarningType,
+        trigger: QuotaWarningTrigger,
+    )
+
+    /**
+     * Navigates to the Cancel Account Plan screen.
+     * Opens the activity directly (no single-activity navigation).
+     *
+     * @param context The context to use for navigation.
+     * @param usedStorage The formatted used storage string to display, or null for empty.
+     */
+    fun navigateToCancelAccountPlan(context: Context, usedStorage: String)
+
+    /**
      * Navigates to the Syncs page
      *
      * @param context       Context
@@ -121,7 +145,6 @@ interface AppNavigator {
      *
      * @param context       Context
      * @param syncType      The sync type from [SyncType]
-     * @param isFromManagerActivity Indicates if the sync is from Manager Activity. False by default.
      * @param isFromCloudDrive Indicates if the sync is from Cloud Drive. False by default.
      * @param remoteFolderHandle The remote folder handle
      * @param remoteFolderName The remote folder name
@@ -129,7 +152,6 @@ interface AppNavigator {
     fun openNewSync(
         context: Context,
         syncType: SyncType,
-        isFromManagerActivity: Boolean = false,
         isFromCloudDrive: Boolean = false,
         remoteFolderHandle: Long? = null,
         remoteFolderName: String? = null,
@@ -159,7 +181,7 @@ interface AppNavigator {
     fun openInviteContactActivity(context: Context, isFromAchievement: Boolean)
 
     /**
-     * Navigate to [TransfersActivity]
+     * Navigate to the transfers section.
      */
     fun openTransfers(context: Context)
 
@@ -177,8 +199,10 @@ interface AppNavigator {
      * @param mediaQueueTitle the title of the media queue
      * @param collectionTitle the title of the video collection
      * @param enableAddToAlbum the flag to show add to album in context menu
+     * @param publicLinkUrl the public file link URL, used when the video is opened from a file link
+     *   so the node can be fetched via [mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase]
      */
-    suspend fun openMediaPlayerActivityByFileNode(
+    fun openMediaPlayerActivityByFileNode(
         context: Context,
         contentUri: NodeContentUri,
         fileNode: TypedFileNode,
@@ -191,6 +215,8 @@ interface AppNavigator {
         collectionTitle: String? = null,
         collectionId: Long? = null,
         enableAddToAlbum: Boolean? = null,
+        serializedData: String? = null,
+        publicLinkUrl: String? = null,
     )
 
     /**
@@ -223,6 +249,8 @@ interface AppNavigator {
         searchedItems: List<Long>? = null,
         collectionTitle: String? = null,
         collectionId: Long? = null,
+        publicLinkUrl: String? = null,
+        localFilePath: String? = null,
     )
 
     /**
@@ -303,6 +331,22 @@ interface AppNavigator {
     )
 
     /**
+     * Opens the "add contacts to a shared folder" picker for a result. Behind
+     * `ContactsComposeUI`, launches the Compose picker (with phone contacts) when the flag is on
+     * and the legacy add-contact screen when it is off; both return the legacy result shape into
+     * [launcher].
+     *
+     * @param context the launching context.
+     * @param launcher the caller's result launcher receiving the picker's Activity result.
+     * @param nodeHandles the handle(s) of the folder(s) being shared.
+     */
+    fun openAddContactToShare(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        nodeHandles: List<Long>,
+    )
+
+    /**
      * Open Sync Mega folder
      * @param handle the handle of the remote folder
      */
@@ -351,6 +395,27 @@ interface AppNavigator {
     )
 
     /**
+     * Open the legacy PdfViewerActivity for a PDF attachment from chat. The Compose PDF viewer
+     * (when the PdfViewerComposeUI flag is enabled) is opened in-place by the chat host via its
+     * NavigationHandler, so this method only covers the legacy, flag-disabled path.
+     *
+     * @param context Context
+     * @param content NodeContentUri
+     * @param nodeHandle the handle of the file node
+     * @param chatId the chat room id
+     * @param messageId the message id
+     * @param mimeType the MIME type of the file
+     */
+    fun openPdfViewerFromChat(
+        context: Context,
+        content: NodeContentUri,
+        nodeHandle: Long,
+        chatId: Long,
+        messageId: Long,
+        mimeType: String,
+    )
+
+    /**
      * Open image viewer activity
      *
      * @param context Context
@@ -373,46 +438,30 @@ interface AppNavigator {
     fun openImageViewerForOfflineNode(
         context: Context,
         node: NodeId,
-        path: String
+        path: String,
     )
 
     /**
-     * Open text editor activity
+     * Open text editor. Routes by [params]: CloudNode/LocalFile/Chat navigate via a NavKey;
+     * FileLink starts the legacy Activity directly (Compose not supported for file link yet).
      *
      * @param context Context
-     * @param currentNodeId the NodeId of the current node
-     * @param mode the mode of the text editor, e.g., "view", "edit"
-     * @param nodeSourceType the adapter type of the view
-     * @param fileName the name of the file to be created
+     * @param params Determines source (cloud node, local/zip file, chat attachment, or file link)
      */
-    fun openTextEditorActivity(
+    fun openTextEditor(
         context: Context,
-        currentNodeId: NodeId,
-        nodeSourceType: Int?,
-        mode: TextEditorMode,
-        fileName: String? = null,
+        params: OpenTextEditorParams,
     )
 
     /**
      * Open Get Link Activity
      *
      * @param context Context
-     * @param handle Node handle
+     * @param handles Node handles (single or multiple)
      */
     fun openGetLinkActivity(
         context: Context,
-        handle: Long,
-    )
-
-    /**
-     * Open Get Link Activity
-     *
-     * @param context Context
-     * @param handles Node handles
-     */
-    fun openGetLinkActivity(
-        context: Context,
-        handles: LongArray,
+        vararg handles: Long,
     )
 
     /**
@@ -451,18 +500,6 @@ interface AppNavigator {
     )
 
     /**
-     * Open File Contact List Activity
-     *
-     * @param context Context
-     * @param handle Node handle
-     */
-    @Deprecated("Use the new openFileContactListActivity with nodeName parameter")
-    fun openFileContactListActivity(
-        context: Context,
-        handle: Long,
-    )
-
-    /**
      * Open Authenticity Credentials Activity
      *
      * @param context Context
@@ -480,40 +517,10 @@ interface AppNavigator {
      *
      * @param context The Context
      * @param url The URL to launch
+     * @param appendNoPlansParam When true (default), appends noplans=1 to mega.io/help.mega.io/mega.co.nz
+     * URLs to suppress checkout redirects. Pass false for links where checkout should be shown.
      */
-    fun launchUrl(context: Context?, url: String?)
-
-    /**
-     * Open SaveScannedDocumentsActivity
-     *
-     * @param context The context
-     * @param originatedFromChat Whether the scan originated from chat
-     * @param cloudDriveParentHandle The parent handle in cloud drive
-     * @param scanPdfUri The PDF URI from scan result
-     * @param scanSoloImageUri The solo image URI from scan result
-     */
-    fun openSaveScannedDocumentsActivity(
-        context: Context,
-        originatedFromChat: Boolean = false,
-        cloudDriveParentHandle: Long,
-        scanPdfUri: Uri,
-        scanSoloImageUri: Uri?,
-    )
-
-    /**
-     * Open Search Activity
-     *
-     * @param context The context
-     * @param nodeSourceType The source type of the node
-     * @param parentHandle The parent handle of the node
-     * @param isFirstNavigationLevel Indicates if this is the first navigation level
-     */
-    fun openSearchActivity(
-        context: Context,
-        nodeSourceType: NodeSourceType,
-        parentHandle: Long,
-        isFirstNavigationLevel: Boolean = false,
-    )
+    fun launchUrl(context: Context?, url: String?, appendNoPlansParam: Boolean = true)
 
     /**
      * Open take down policy link in custom tabs
@@ -550,17 +557,18 @@ interface AppNavigator {
     fun openMyAccountActivity(context: Context, flags: Int? = null)
 
     /**
-     * Open Manager Activity
+     * Get a PendingIntent that targets the single activity with the provided destination.
      *
-     * @param context The context
-     * @param bundle Optional bundle containing extras to be added to the intent
+     * If more than one destination is needed, please consider using getPendingIntentConsideringSingleActivity and create the intent with MegaActivity companion helper functions
+     *
+     * @param context The Context
+     * @param singleActivityDestination A lambda that creates the NavKey destination to use
+     * @return The PendingIntent targeting the single activity with the provided destination
      */
-    fun openManagerActivity(
+    suspend fun <T> getPendingIntentWithDestination(
         context: Context,
-        data: Uri? = null,
-        action: String? = null,
-        bundle: Bundle? = null,
-    )
+        singleActivityDestination: () -> T,
+    ): PendingIntent where T : NavKey, T : Parcelable
 
     /**
      * Open Media Discovery Activity
@@ -576,4 +584,150 @@ interface AppNavigator {
         folderName: String,
         isFromFolderLink: Boolean,
     )
+
+    /**
+     * Send a snackbar message via the single activity host.
+     * @param context The context
+     * @param message The message to send
+     */
+    suspend fun sendMessageConsideringSingleActivity(
+        context: Context,
+        message: String,
+    )
+
+    /**
+     * Method to open ContactInfoActivity.class.
+     *
+     * @param context Activity context.
+     * @param email    The email of the contact.
+     */
+    fun openContactInfoActivity(context: Context, email: String)
+
+    /**
+     * Method to open the contact info screen for the peer of a 1:1 chat.
+     *
+     * @param context Activity context.
+     * @param chatId  The ID of the 1:1 chat with the contact.
+     */
+    fun openContactInfoActivity(context: Context, chatId: Long)
+
+    /**
+     * Method to open ContactAttachmentActivity.class.
+     *
+     * @param context Activity context.
+     * @param chatId  The ID of a chat.
+     * @param msgId   The ID of a message.
+     */
+    fun openContactAttachmentActivity(context: Context, chatId: Long, msgId: Long)
+
+    /**
+     * Opens the meeting "add participants" picker for a result, choosing the Compose contacts UI
+     * or the legacy AddContactActivity based on the ContactsComposeUI flag. The result is delivered
+     * to [activity]'s onActivityResult under [requestCode], mirroring the legacy AddContactActivity
+     * contract (RESULT_OK + EXTRA_CONTACTS).
+     */
+    fun openAddMeetingParticipantsForResult(
+        activity: Activity,
+        chatId: Long,
+        callUsersLimit: Int?,
+        requestCode: Int,
+    )
+
+    /**
+     * Opens the chat "add participants" picker for a result, choosing the Compose contacts UI or
+     * the legacy AddContactActivity based on the ContactsComposeUI flag. The result is delivered to
+     * [activity]'s onActivityResult under [requestCode], mirroring the legacy AddContactActivity
+     * contract (RESULT_OK + EXTRA_CONTACTS).
+     */
+    fun openAddChatParticipantsForResult(
+        activity: Activity,
+        chatId: Long,
+        requestCode: Int,
+    )
+
+    /**
+     * Opens the chat "add participants" picker for a result, choosing the Compose contacts UI or
+     * the legacy AddContactActivity based on the ContactsComposeUI flag. The result is delivered to
+     * [launcher], mirroring the legacy AddContactActivity contract (RESULT_OK + EXTRA_CONTACTS).
+     */
+    fun openAddChatParticipantsForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        chatId: Long,
+    )
+
+    /**
+     * Opens the "create group chat" flow for a result, choosing the Compose contacts UI or the
+     * legacy AddContactActivity ("only create group" mode) based on the ContactsComposeUI flag. The
+     * result is delivered to [activity]'s onActivityResult under [requestCode], mirroring the legacy
+     * AddContactActivity contract (RESULT_OK + EXTRA_CONTACTS plus the group-chat extras).
+     *
+     * @param allowEmptyGroup when true the group may be created with no other participants (the
+     * StartConversation flow); the legacy path additionally sets `EXTRA_IS_START_CONVERSATION`.
+     */
+    fun openCreateGroupChatForResult(
+        activity: Activity,
+        requestCode: Int,
+        allowEmptyGroup: Boolean,
+    )
+
+    /**
+     * Opens the "create group chat" flow for a result, choosing the Compose contacts UI or the
+     * legacy AddContactActivity ("only create group" mode) based on the ContactsComposeUI flag. The
+     * result is delivered to [launcher], mirroring the legacy AddContactActivity contract (RESULT_OK
+     * + EXTRA_CONTACTS plus the group-chat extras).
+     *
+     * @param allowEmptyGroup when true the group may be created with no other participants (the
+     * StartConversation flow); the legacy path additionally sets `EXTRA_IS_START_CONVERSATION`.
+     */
+    fun openCreateGroupChatForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        allowEmptyGroup: Boolean,
+    )
+
+    /**
+     * Opens the "new chat" flow (the share/forward target pickers' new-chat entry) for a result,
+     * choosing the Compose contacts UI or the legacy AddContactActivity based on the ContactsComposeUI
+     * flag. The result is delivered to [activity]'s onActivityResult under [requestCode], mirroring the
+     * legacy AddContactActivity contract: RESULT_OK + EXTRA_CONTACTS, plus the group-chat extras when
+     * two or more contacts are selected.
+     */
+    fun openNewChatForResult(
+        activity: Activity,
+        requestCode: Int,
+    )
+
+    /**
+     * Opens the "new chat" flow (the share/forward target pickers' new-chat entry) for a result,
+     * choosing the Compose contacts UI or the legacy AddContactActivity based on the ContactsComposeUI
+     * flag. The result is delivered to [launcher], mirroring the legacy AddContactActivity contract:
+     * RESULT_OK + EXTRA_CONTACTS, plus the group-chat extras when two or more contacts are selected.
+     */
+    fun openNewChatForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+    )
+
+    /**
+     * Opens the "add contacts" picker for a result with the already-chosen participants
+     * pre-selected, choosing the Compose contacts UI or the legacy AddContactActivity based on the
+     * ContactsComposeUI flag. The result is delivered to [launcher], mirroring the legacy
+     * AddContactActivity contract (RESULT_OK + EXTRA_CONTACTS).
+     *
+     * The flag boundary is crossed with both [preselectedHandles] (used by the Compose path, which
+     * selects by handle) and [preselectedEmails] (used by the legacy path, which pre-checks by email).
+     *
+     * @param context the launching context.
+     * @param launcher the caller's result launcher receiving the picker's Activity result.
+     * @param preselectedHandles handles of contacts to pre-select in the Compose picker.
+     * @param preselectedEmails emails of contacts to pre-select in the legacy picker.
+     */
+    fun openAddContactsForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        preselectedHandles: List<Long>,
+        preselectedEmails: List<String>,
+    )
 }
+

@@ -1,4 +1,4 @@
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import mega.privacy.android.gradle.extension.MegaJacocoPluginExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -73,21 +73,21 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
                             description =
                                 "Generate Jacoco coverage reports on the ${capitalise(sourceName)} build."
 
-                            val javaTree = this@with.fileTree(
-                                "dir" to "${layout.buildDirectory.get()}/intermediates/javac/$sourceName/classes",
-                                "excludes" to excludedFiles,
+                            /*
+                             * Under AGP 9 the bytecode loaded at test time is the contents of
+                             * runtime_library_classes_jar — that's what the JaCoCo agent records
+                             * against, so it's also what the report task must analyze. Pointing at
+                             * tmp/kotlin-classes or the ASM transform output silently produces 0%
+                             * on classes whose bytecode has been further rewritten (Compose, Hilt,
+                             * etc.) before being packaged into that jar.
+                             */
+                            val runtimeJar = layout.buildDirectory.file(
+                                "intermediates/runtime_library_classes_jar/$sourceName/bundleLibRuntimeToJar${capitalise(sourceName)}/classes.jar"
                             )
-                            val kotlinTree = this@with.fileTree(
-                                "dir" to "${layout.buildDirectory.get()}/tmp/kotlin-classes/$sourceName",
-                                "excludes" to defaultExcludedFiles.toList()
-                            )
-
-                            classDirectories.setFrom(
-                                files(
-                                    listOf(javaTree),
-                                    listOf(kotlinTree),
-                                )
-                            )
+                            classDirectories.setFrom(files({
+                                this@with.zipTree(runtimeJar).matching { exclude(excludedFiles) }
+                            }))
+                            dependsOn("bundleLibRuntimeToJar${capitalise(sourceName)}")
                             executionData.setFrom(
                                 files("${layout.buildDirectory.get()}/jacoco/${testTaskName}.exec")
                             )
@@ -128,6 +128,8 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
         "**/android/databinding/*Binding.class",
         "**/android/databinding/*",
         "**/androidx/databinding/*",
+        "**/databinding/**",
+        "**/*Binding.class",
         "**/BR.*",
         // android
         "**/R.class",
@@ -135,7 +137,9 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/*Test*.*",
-        "ndroid/**/*.*",
+        "android/**/*.*",
+        // compose
+        "**/ComposableSingletons*.*",
         // dagger
         "**/*_MembersInjector.class",
         "**/Dagger*Component.class",
@@ -161,6 +165,7 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
         "**/*Module*.*",
         "**/*Dagger*.*",
         "**/*Hilt*.*",
+        "**/hilt_aggregated_deps/**",
         "**/*MembersInjector*.*",
         "**/*_MembersInjector.class",
         "**/*_Factory*.*",

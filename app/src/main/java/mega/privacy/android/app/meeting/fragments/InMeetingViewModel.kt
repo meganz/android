@@ -36,9 +36,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.GetUserEmailListener
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -126,6 +126,8 @@ import mega.privacy.android.domain.usecase.meeting.raisehandtospeak.SetRaiseToHa
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.user.MonitorUserAvatarUpdatesUseCase
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
@@ -227,6 +229,8 @@ class InMeetingViewModel @Inject constructor(
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     monitorContactCacheUpdates: MonitorContactCacheUpdates,
     monitorUserUpdates: MonitorUserUpdates,
+    private val megaChatApi: MegaChatApiAndroid,
+    private val chatController: ChatController,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -1392,7 +1396,7 @@ class InMeetingViewModel @Inject constructor(
     private fun chatLogout() {
         viewModelScope.launch {
             runCatching {
-                chatLogoutUseCase()
+                chatLogoutUseCase(disableChatApi = false)
             }.onSuccess {
                 _state.update {
                     it.copy(
@@ -1473,7 +1477,7 @@ class InMeetingViewModel @Inject constructor(
      * @return The name of a participant
      */
     fun getParticipantFullName(peerId: Long): String? =
-        CallUtil.getUserNameCall(MegaApplication.getInstance().applicationContext, peerId)
+        CallUtil.getUserNameCall(peerId, chatController, megaChatApi)
 
     /**
      * Method to find out if there is a participant in the call
@@ -2553,12 +2557,19 @@ class InMeetingViewModel @Inject constructor(
         isHiRes: Boolean,
     ) {
         Timber.d("Adding remote video listener, clientId $clientId, isHiRes $isHiRes")
-        inMeetingRepository.addChatRemoteVideoListener(
-            chatId,
-            clientId,
-            isHiRes,
-            listener
-        )
+        viewModelScope.launch {
+            runCatching {
+                inMeetingRepository.addChatRemoteVideoListener(
+                    chatId = chatId,
+                    clientId = clientId,
+                    hiRes = isHiRes,
+                    listener = listener
+                )
+            }.onFailure {
+                Timber.d(it, "Failed to add remote video listener for client $clientId")
+            }
+
+        }
     }
 
     /**
@@ -2576,12 +2587,19 @@ class InMeetingViewModel @Inject constructor(
         isHiRes: Boolean,
     ) {
         Timber.d("Removing remote video listener, clientId $clientId, isHiRes $isHiRes")
-        inMeetingRepository.removeChatRemoteVideoListener(
-            chatId,
-            clientId,
-            isHiRes,
-            listener
-        )
+        viewModelScope.launch {
+            runCatching {
+                inMeetingRepository.removeChatRemoteVideoListener(
+                    chatId,
+                    clientId,
+                    isHiRes,
+                    listener
+                )
+            }.onFailure {
+                Timber.e(it, "Failed to remove remote video listener for client $clientId")
+            }
+
+        }
     }
 
     /**
@@ -2720,7 +2738,7 @@ class InMeetingViewModel @Inject constructor(
      * @param participant The participant that is now visible
      */
     fun addParticipantVisible(participant: Participant) {
-        if (visibleParticipants.size == 0) {
+        if (visibleParticipants.isEmpty()) {
             visibleParticipants.add(participant)
             return
         }
@@ -2751,7 +2769,7 @@ class InMeetingViewModel @Inject constructor(
      * @param participant The participant that is not now visible
      */
     fun removeParticipantVisible(participant: Participant) {
-        if (visibleParticipants.size == 0) {
+        if (visibleParticipants.isEmpty()) {
             return
         }
         val checkParticipant = visibleParticipants.filter {

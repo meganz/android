@@ -9,9 +9,8 @@ import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.converterShortCodes
-import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.toCDATA
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
@@ -47,13 +46,12 @@ class GetLastMessageUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaChatApi: MegaChatApiAndroid,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
+    private val chatController: ChatController,
 ) {
 
     companion object {
         private const val LAST_MSG_LOADING = 255
     }
-
-    private val chatController: ChatController by lazy { ChatController(context) }
 
     /**
      * Get a formatted String with the last message given the chatId
@@ -91,7 +89,7 @@ class GetLastMessageUseCase @Inject constructor(
 
                 TYPE_SET_RETENTION_TIME -> {
                     val timeFormatted = ChatUtil.transformSecondsInString(chatRoom.retentionTime)
-                    if (timeFormatted.isTextEmpty()) {
+                    if (timeFormatted.isBlank()) {
                         String.format(
                             context.getString(R.string.retention_history_disabled),
                             chatListItem.getSenderName(true)
@@ -164,7 +162,7 @@ class GetLastMessageUseCase @Inject constructor(
                         "${chatListItem.getSenderName()}: ${converterShortCodes(chatListItem.lastMessage)}"
                     }
                 }
-            }
+            }.orEmpty()
         }
 
     private fun getChatCallStatusMessage(chatId: Long, isMeeting: Boolean): String? =
@@ -198,7 +196,7 @@ class GetLastMessageUseCase @Inject constructor(
         lastMessageSender == megaChatApi.myUserHandle
 
     private fun String.cleanHtmlText(): String =
-        Util.toCDATA(this)
+        this.toCDATA()
             .replace("[A]", "")
             .replace("[/A]", "")
             .replace("[B]", "")

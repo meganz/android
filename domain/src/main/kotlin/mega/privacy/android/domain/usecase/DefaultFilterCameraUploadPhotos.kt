@@ -9,6 +9,7 @@ import javax.inject.Inject
  *
  * @property photosRepository
  */
+@Deprecated("Please use FilterCameraUploadMediaUseCase")
 class DefaultFilterCameraUploadPhotos @Inject constructor(
     private val photosRepository: PhotosRepository,
 ) : FilterCameraUploadPhotos {

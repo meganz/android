@@ -11,13 +11,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.DialogTwoVerticalButtonsBinding
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
@@ -68,10 +68,10 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
     fun showClearOfflineDialog() {
         clearOfflineDialog = MaterialAlertDialogBuilder(this)
             .setMessage(getString(R.string.clear_offline_confirmation))
-            .setPositiveButton(getString(R.string.general_clear)) { _, _ ->
+            .setPositiveButton(getString(sharedR.string.general_clear)) { _, _ ->
                 viewModel.clearOffline()
             }
-            .setNegativeButton(getString(R.string.general_dismiss), null)
+            .setNegativeButton(getString(sharedR.string.general_dismiss_dialog), null)
             .create()
         clearOfflineDialog?.show()
     }
@@ -81,10 +81,10 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
      */
     fun showClearRubbishBinDialog() {
         val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(getFormattedStringOrDefault(R.string.context_clear_rubbish))
-        builder.setMessage(getFormattedStringOrDefault(R.string.clear_rubbish_confirmation))
+        builder.setTitle(getFormattedStringOrDefault(sharedR.string.empty_rubbish_bin_menu))
+        builder.setMessage(getFormattedStringOrDefault(sharedR.string.remove_all_rubbish_bin_confirmation))
         builder.setPositiveButton(
-            getFormattedStringOrDefault(R.string.general_clear)
+            getFormattedStringOrDefault(sharedR.string.general_clear)
         ) { _: DialogInterface?, _: Int ->
             val nC = NodeController(this)
             nC.cleanRubbishBin()
@@ -133,8 +133,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
         firstButton.text = getFormattedStringOrDefault(R.string.button_plans_almost_full_warning)
         firstButton.setOnClickListener {
             generalDialog?.dismiss()
-            megaNavigator.openUpgradeAccount(context = this)
-            myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.SETTINGS
+            megaNavigator.openUpgradeAccount(context = this, UpgradeAccountSource.SETTINGS_SCREEN)
         }
         val secondButton = binding.findViewById<Button>(R.id.dialog_second_button)
         secondButton.text = getFormattedStringOrDefault(R.string.button_not_now_rich_links)

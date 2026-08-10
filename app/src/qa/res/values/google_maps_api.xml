@@ -1,12 +1,11 @@
 <resources>
     <!--
-    TODO: Before you run your application, you need a Google Maps API key.
+    Placeholder Google Maps API key for the QA build variant.
+    CI/CD pipelines inject the real key automatically during builds.
 
-    To get one, follow the directions here:
+    For local geolocation testing, replace the empty value below with
+    your own key (it starts with "AIza"). Get one here:
     https://developers.google.com/maps/documentation/android/start#get-key
-
-    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
-    string in this file.
     -->
 
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false"></string>

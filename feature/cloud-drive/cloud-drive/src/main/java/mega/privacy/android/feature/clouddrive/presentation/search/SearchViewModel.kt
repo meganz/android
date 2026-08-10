@@ -1,0 +1,658 @@
+package mega.privacy.android.feature.clouddrive.presentation.search
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodesLoadingState
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
+import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.search.DateFilterOption
+import mega.privacy.android.domain.entity.search.SearchParameters
+import mega.privacy.android.domain.entity.search.TypeFilterOption
+import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
+import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.search.ClearRecentSearchesUseCase
+import mega.privacy.android.domain.usecase.search.MonitorRecentSearchesUseCase
+import mega.privacy.android.domain.usecase.search.SaveRecentSearchUseCase
+import mega.privacy.android.domain.usecase.search.SearchUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.SearchPlaceholderMapper
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.labelResId
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.titleResId
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterResult
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterType
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiState
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.search.presentation.model.SearchFilterChipState
+import mega.privacy.android.shared.search.presentation.model.SearchFilterOption
+import mega.privacy.android.shared.search.presentation.model.SearchFilterOptions
+import mega.privacy.android.shared.search.presentation.model.SearchShellState
+import timber.log.Timber
+import kotlin.coroutines.cancellation.CancellationException
+
+
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+@HiltViewModel(assistedFactory = SearchViewModel.Factory::class)
+class SearchViewModel @AssistedInject constructor(
+    @Assisted private val args: Args,
+    private val searchUseCase: SearchUseCase,
+    private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
+    private val nodeUiItemMapper: NodeUiItemMapper,
+    private val typeFilterToSearchMapper: TypeFilterToSearchMapper,
+    private val setViewTypeUseCase: SetViewType,
+    private val monitorViewTypeUseCase: MonitorViewType,
+    private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
+    private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
+    private val setCloudSortOrderUseCase: SetCloudSortOrder,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
+    private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
+    private val searchPlaceholderMapper: SearchPlaceholderMapper,
+    private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase,
+    private val saveRecentSearchUseCase: SaveRecentSearchUseCase,
+    private val monitorRecentSearchesUseCase: MonitorRecentSearchesUseCase,
+    private val clearRecentSearchesUseCase: ClearRecentSearchesUseCase,
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(
+        SearchUiState(
+            nodeSourceType = args.nodeSourceType
+        )
+    )
+    val uiState = _uiState.asStateFlow()
+
+    /**
+     * State consumed by the shared search shell, derived from [uiState].
+     */
+    val shellState: StateFlow<SearchShellState> = uiState
+        .map { it.toShellState() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(SHELL_STATE_STOP_TIMEOUT_MS),
+            _uiState.value.toShellState(),
+        )
+
+    private val searchQueryFlow = MutableStateFlow("")
+    private var nodeMultiSelectionJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            searchQueryFlow
+                .debounce(SEARCH_DEBOUNCE_MS)
+                .collectLatest { query -> performSearch(query) }
+        }
+        monitorViewType()
+        // TODO Handle others, links sort types
+        monitorSortOrder()
+        monitorHiddenNodeSettings()
+        monitorNodeUpdates()
+        updateSearchPlaceholder()
+        monitorRecentSearches()
+    }
+
+    fun processAction(action: SearchUiAction) {
+        when (action) {
+            is SearchUiAction.UpdateSearchText -> updateSearchText(action.text)
+            is SearchUiAction.SelectFilter -> updateFilter(action.result)
+            is SearchUiAction.ItemClicked -> onItemClicked(action.nodeUiItem)
+            is SearchUiAction.ItemLongClicked -> onItemLongClicked(action.nodeUiItem)
+            is SearchUiAction.SetSortOrder -> setSortOrder(action.sortConfiguration)
+            is SearchUiAction.ChangeViewTypeClicked -> onChangeViewTypeClicked()
+            is SearchUiAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
+            is SearchUiAction.SelectAllItems -> selectAllItems()
+            is SearchUiAction.DeselectAllItems -> deselectAllItems()
+            is SearchUiAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
+            is SearchUiAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
+            is SearchUiAction.SelectRecentSearch -> onSelectRecentSearch(action.query)
+            is SearchUiAction.ClearRecentSearches -> onClearRecentSearches()
+        }
+    }
+
+    /**
+     * Filter options for the tapped chip, or null if the id is unknown.
+     */
+    fun filterOptions(filterId: String): SearchFilterOptions? =
+        _uiState.value.filterOptionsFor(filterId)
+
+    /**
+     * Applies a filter option selection coming from the search shell.
+     */
+    fun onFilterOptionSelected(filterId: String, optionId: String?) {
+        toSearchFilterResult(filterId, optionId)?.let(::updateFilter)
+    }
+
+    private fun updateFilter(result: SearchFilterResult) {
+        _uiState.update { state ->
+            when (result) {
+                is SearchFilterResult.Type -> state.copy(typeFilterOption = result.option)
+                is SearchFilterResult.DateModified -> state.copy(dateModifiedFilterOption = result.option)
+                is SearchFilterResult.DateAdded -> state.copy(dateAddedFilterOption = result.option)
+            }
+        }
+        viewModelScope.launch { performSearch(_uiState.value.searchText) }
+    }
+
+    private fun updateSearchText(text: String) {
+        _uiState.update {
+            it.copy(
+                searchText = text,
+                nodesLoadingState = NodesLoadingState.Loading
+            )
+        }
+        searchQueryFlow.value = text
+    }
+
+    private suspend fun performSearch(
+        query: String = uiState.value.searchedQuery,
+    ) {
+        if (query.isEmpty()) {
+            _uiState.update { state ->
+                state.copy(
+                    items = emptyList(),
+                    searchedQuery = query,
+                    nodesLoadingState = NodesLoadingState.Idle,
+                )
+            }
+            return
+        }
+
+        deselectAllItems()
+        runCatching {
+            cancelCancelTokenUseCase()
+            val nodes = searchUseCase(
+                parentHandle = NodeId(args.parentHandle),
+                nodeSourceType = args.nodeSourceType,
+                searchParameters = getSearchParameters(query),
+            )
+            val nodeUiItems = nodeUiItemMapper(
+                nodeList = nodes,
+                nodeSourceType = args.nodeSourceType,
+                existingItems = _uiState.value.items,
+            )
+            _uiState.update { state ->
+                state.copy(
+                    items = nodeUiItems,
+                    searchedQuery = query,
+                    nodesLoadingState = NodesLoadingState.FullyLoaded,
+                )
+            }
+            saveRecentSearchUseCase(query)
+        }.onFailure { throwable ->
+            if (throwable !is CancellationException) {
+                _uiState.update { state ->
+                    state.copy(
+                        items = emptyList(),
+                        nodesLoadingState = NodesLoadingState.FullyLoaded,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun getSearchParameters(
+        query: String,
+    ) = SearchParameters(
+        query = query,
+        searchCategory = typeFilterToSearchMapper(
+            typeFilterOption = uiState.value.typeFilterOption,
+            nodeSourceType = args.nodeSourceType
+        ),
+        searchTarget = nodeSourceTypeToSearchTargetMapper(
+            nodeSourceType = args.nodeSourceType
+        ),
+        modificationDate = uiState.value.dateModifiedFilterOption,
+        creationDate = uiState.value.dateAddedFilterOption,
+        description = query,
+        tag = query.removePrefix("#").takeIf {
+            args.nodeSourceType != NodeSourceType.RUBBISH_BIN
+        }
+    )
+
+    private fun monitorNodeUpdates() {
+        viewModelScope.launch {
+            monitorNodeUpdatesByIdUseCase(
+                nodeId = NodeId(args.parentHandle),
+                nodeSourceType = args.nodeSourceType
+            )
+                .catch { Timber.e(it) }
+                .collectLatest { change ->
+                    if (change == NodeChanges.Remove) {
+                        // If current folder is moved to rubbish bin, navigate back
+                        _uiState.update {
+                            it.copy(navigateBack = triggered)
+                        }
+                    } else {
+                        // If nodes are currently loading, ignore updates
+                        if (!uiState.value.nodesLoadingState.isInProgress) {
+                            performSearch()
+                            updateSearchPlaceholder()
+                        }
+                    }
+                }
+        }
+    }
+
+    /**
+     * Handle item click - navigate to folder if it's a folder
+     */
+    private fun onItemClicked(nodeUiItem: NodeUiItem<TypedNode>) {
+        if (uiState.value.isInSelectionMode) {
+            toggleItemSelection(nodeUiItem)
+            return
+        }
+
+        when (val node = nodeUiItem.node) {
+            is TypedFolderNode -> {
+                _uiState.update { state ->
+                    state.copy(
+                        navigateToFolderEvent = triggered(node)
+                    )
+                }
+            }
+
+            is PublicLinkFile -> {
+                _uiState.update { state ->
+                    state.copy(
+                        openedFileNode = node
+                    )
+                }
+            }
+
+            is TypedFileNode -> {
+                _uiState.update { state ->
+                    state.copy(
+                        openedFileNode = node
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Handle item long click - toggle selection state
+     */
+    private fun onItemLongClicked(nodeUiItem: NodeUiItem<TypedNode>) {
+        toggleItemSelection(nodeUiItem)
+    }
+
+    private fun toggleItemSelection(nodeUiItem: NodeUiItem<TypedNode>) {
+        val updatedItems = uiState.value.items.map { item ->
+            if (item.node.id == nodeUiItem.node.id) {
+                item.copy(isSelected = !item.isSelected)
+            } else {
+                item
+            }
+        }
+        _uiState.update { state ->
+            state.copy(items = updatedItems)
+        }
+
+        // Cancel any ongoing multi-selection job if user manually deselects all items
+        if (!uiState.value.isInSelectionMode) {
+            nodeMultiSelectionJob?.cancel()
+        }
+    }
+
+    /**
+     * Deselect all items and reset selection state
+     */
+    private fun deselectAllItems() {
+        nodeMultiSelectionJob?.cancel()
+        val updatedItems = uiState.value.items.map { it.copy(isSelected = false) }
+        _uiState.update { state ->
+            state.copy(
+                items = updatedItems,
+                isSelecting = false
+            )
+        }
+    }
+
+    /**
+     * Select all items
+     */
+    private fun selectAllItems() {
+        nodeMultiSelectionJob?.cancel()
+        nodeMultiSelectionJob = viewModelScope.launch {
+            runCatching {
+                // Select all items that are already loaded
+                performAllItemSelection()
+                // If nodes are still loading, wait until fully loaded then select all
+                if (uiState.value.nodesLoadingState != NodesLoadingState.FullyLoaded) {
+                    _uiState.update { state ->
+                        state.copy(isSelecting = true)
+                    }
+                    uiState.first { it.nodesLoadingState == NodesLoadingState.FullyLoaded }
+                    if (isActive) {
+                        performAllItemSelection()
+                    }
+                }
+            }.onFailure {
+                _uiState.update { state ->
+                    state.copy(isSelecting = false)
+                }
+            }
+        }
+    }
+
+    private fun performAllItemSelection() {
+        val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
+        _uiState.update { state ->
+            state.copy(
+                items = updatedItems,
+                isSelecting = false
+            )
+        }
+    }
+
+    /**
+     * This method will toggle node view type between list and grid.
+     */
+    private fun onChangeViewTypeClicked() {
+        viewModelScope.launch {
+            runCatching {
+                val toggledViewType = when (uiState.value.currentViewType) {
+                    ViewType.LIST -> ViewType.GRID
+                    ViewType.GRID -> ViewType.LIST
+                }
+                setViewTypeUseCase(toggledViewType)
+            }.onFailure {
+                Timber.e(it, "Failed to change view type")
+            }
+        }
+    }
+
+    private fun monitorViewType() {
+        viewModelScope.launch {
+            monitorViewTypeUseCase()
+                .catch { Timber.e(it) }
+                .collect { viewType ->
+                    _uiState.update { it.copy(currentViewType = viewType) }
+                }
+        }
+    }
+
+    private fun monitorSortOrder() {
+        monitorSortCloudOrderUseCase()
+            .catch { Timber.e(it) }
+            .filterNotNull()
+            .onEach {
+                updateSortOrder(it)
+                performSearch()
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun updateSortOrder(sortOrder: SortOrder) {
+        val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
+        _uiState.update {
+            it.copy(
+                selectedSortConfiguration = sortOrderPair,
+                selectedSortOrder = sortOrder
+            )
+        }
+    }
+
+    private fun setSortOrder(sortConfiguration: NodeSortConfiguration) {
+        viewModelScope.launch {
+            runCatching {
+                val order = nodeSortConfigurationUiMapper(sortConfiguration)
+                setCloudSortOrderUseCase(order)
+            }.onFailure {
+                Timber.e(it, "Failed to set cloud sort order")
+            }
+        }
+    }
+
+    /**
+     * Consume navigation event
+     */
+    private fun onNavigateToFolderEventConsumed() {
+        _uiState.update { state ->
+            state.copy(navigateToFolderEvent = consumed())
+        }
+    }
+
+    /**
+     * Handle the event when a file node is opened
+     */
+    private fun onOpenedFileNodeHandled() {
+        _uiState.update { state ->
+            state.copy(openedFileNode = null)
+        }
+    }
+
+    private fun monitorHiddenNodeSettings() {
+        viewModelScope.launch {
+            combine(
+                monitorHiddenNodesEnabledUseCase()
+                    .catch { Timber.e(it) },
+                monitorShowHiddenItemsUseCase()
+                    .catch { Timber.e(it) },
+                ::Pair
+            ).collectLatest { pair ->
+                val isHiddenNodesEnabled = pair.first
+                val showHiddenItems = pair.second
+                _uiState.update { state ->
+                    state.copy(
+                        isHiddenNodeSettingsLoading = false,
+                        isHiddenNodesEnabled = isHiddenNodesEnabled,
+                        showHiddenNodes = showHiddenItems
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Consume navigate back event
+     */
+    private fun onNavigateBackEventConsumed() {
+        _uiState.update { state ->
+            state.copy(navigateBack = consumed)
+        }
+    }
+
+    private fun updateSearchPlaceholder() {
+        viewModelScope.launch {
+            val nodeId = NodeId(args.parentHandle)
+            val placeholder = runCatching {
+                val nodeName = args.parentHandle
+                    .takeIf { it != -1L }
+                    ?.let { getNodeInfoByIdUseCase(nodeId)?.name }
+                searchPlaceholderMapper(
+                    nodeName = nodeName,
+                    nodeSourceType = args.nodeSourceType
+                )
+            }.getOrElse {
+                LocalizedText.StringRes(sharedR.string.search_bar_placeholder_text)
+            }
+            _uiState.update {
+                it.copy(placeholderText = placeholder)
+            }
+        }
+    }
+
+    /**
+     * Monitor recent searches and update state
+     */
+    private fun monitorRecentSearches() {
+        viewModelScope.launch {
+            monitorRecentSearchesUseCase()
+                .catch { Timber.e(it) }
+                .collect { recentSearches ->
+                    _uiState.update { state ->
+                        state.copy(
+                            recentSearches = recentSearches,
+                            isRecentSearchesLoading = false
+                        )
+                    }
+                }
+        }
+    }
+
+    /**
+     * Handle select recent search action
+     */
+    private fun onSelectRecentSearch(query: String) {
+        updateSearchText(query)
+    }
+
+    /**
+     * Handle clear recent searches action
+     */
+    private fun onClearRecentSearches() {
+        viewModelScope.launch {
+            runCatching {
+                clearRecentSearchesUseCase()
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(args: Args): SearchViewModel
+    }
+
+    data class Args(
+        val parentHandle: Long,
+        val nodeSourceType: NodeSourceType,
+    )
+
+    private fun SearchUiState.toShellState(): SearchShellState = SearchShellState(
+        searchText = searchText,
+        searchedQuery = searchedQuery,
+        placeholder = placeholderText,
+        isLoading = isLoading,
+        isPreSearch = isPreSearch,
+        isEmpty = isEmpty,
+        recentSearches = recentSearches,
+        isRecentSearchesLoading = isRecentSearchesLoading,
+        filters = if (isFilterAllowed) toFilterChips() else emptyList(),
+    )
+
+    private fun SearchUiState.toFilterChips(): List<SearchFilterChipState> = listOf(
+        SearchFilterChipState(
+            id = SearchFilterType.TYPE.name,
+            label = LocalizedText.StringRes(
+                typeFilterOption?.labelResId ?: SearchFilterType.TYPE.titleResId
+            ),
+            isSelected = typeFilterOption != null,
+        ),
+        SearchFilterChipState(
+            id = SearchFilterType.LAST_MODIFIED.name,
+            label = LocalizedText.StringRes(
+                dateModifiedFilterOption?.labelResId ?: SearchFilterType.LAST_MODIFIED.titleResId
+            ),
+            isSelected = dateModifiedFilterOption != null,
+        ),
+        SearchFilterChipState(
+            id = SearchFilterType.DATE_ADDED.name,
+            label = LocalizedText.StringRes(
+                dateAddedFilterOption?.labelResId ?: SearchFilterType.DATE_ADDED.titleResId
+            ),
+            isSelected = dateAddedFilterOption != null,
+        ),
+    )
+
+    private fun SearchUiState.filterOptionsFor(filterId: String): SearchFilterOptions? {
+        val filterType =
+            runCatching { SearchFilterType.valueOf(filterId) }.getOrNull() ?: return null
+        return when (filterType) {
+            SearchFilterType.TYPE -> SearchFilterOptions(
+                id = filterId,
+                title = LocalizedText.StringRes(filterType.titleResId),
+                options = TypeFilterOption.entries.map {
+                    SearchFilterOption(it.name, LocalizedText.StringRes(it.labelResId))
+                },
+                selectedOptionId = typeFilterOption?.name,
+            )
+
+            SearchFilterType.LAST_MODIFIED ->
+                dateFilterOptions(filterId, filterType, dateModifiedFilterOption)
+
+            SearchFilterType.DATE_ADDED ->
+                dateFilterOptions(filterId, filterType, dateAddedFilterOption)
+        }
+    }
+
+    private fun dateFilterOptions(
+        filterId: String,
+        filterType: SearchFilterType,
+        selected: DateFilterOption?,
+    ) = SearchFilterOptions(
+        id = filterId,
+        title = LocalizedText.StringRes(filterType.titleResId),
+        options = DateFilterOption.entries.map {
+            SearchFilterOption(it.name, LocalizedText.StringRes(it.labelResId))
+        },
+        selectedOptionId = selected?.name,
+    )
+
+    private fun toSearchFilterResult(filterId: String, optionId: String?): SearchFilterResult? {
+        val filterType =
+            runCatching { SearchFilterType.valueOf(filterId) }.getOrNull() ?: return null
+        return when (filterType) {
+            SearchFilterType.TYPE ->
+                SearchFilterResult.Type(optionId?.let { TypeFilterOption.valueOf(it) })
+
+            SearchFilterType.LAST_MODIFIED ->
+                SearchFilterResult.DateModified(optionId?.let { DateFilterOption.valueOf(it) })
+
+            SearchFilterType.DATE_ADDED ->
+                SearchFilterResult.DateAdded(optionId?.let { DateFilterOption.valueOf(it) })
+        }
+    }
+
+    companion object {
+        const val SEARCH_DEBOUNCE_MS = 300L
+        private const val SHELL_STATE_STOP_TIMEOUT_MS = 5_000L
+    }
+}
+

@@ -29,41 +29,9 @@ class MyAccountInfo @Inject constructor(
         const val HAS_SESSIONS_DETAILS = 0x020
     }
 
-    enum class UpgradeFrom {
-        MANAGER, ACCOUNT, SETTINGS
-    }
-
-    var usedPercentage = INVALID_VALUE
-    var usedTransferPercentage = INVALID_VALUE
     var usedStorage = INVALID_VALUE.toLong()
     var accountType = INVALID_VALUE
-    var subscriptionStatus = INVALID_VALUE
-    var subscriptionRenewTime = INVALID_VALUE.toLong()
-    var proExpirationTime = INVALID_VALUE.toLong()
-    var usedFormatted = ""
-    var totalFormatted = ""
-    var formattedUsedCloud = ""
-    var formattedUsedIncoming = ""
     var formattedUsedRubbish = ""
-    private var formattedAvailableSpace = ""
-    var usedTransferFormatted = ""
-    var totalTransferFormatted = ""
-    var levelAccountDetails = INVALID_VALUE
-
-    var isAccountDetailsFinished = false
-    var isBusinessAlertShown = false
-    private var wasBusinessAlertAlreadyShown = false
-
-    var lastSessionFormattedDate: String? = null
-    var createSessionTimeStamp = INVALID_VALUE.toLong()
-
-    var numVersions = INVALID_VALUE
-    var previousVersionsSize = INVALID_VALUE.toLong()
-
-    var upgradeOpenedFrom = UpgradeFrom.MANAGER
-
-    // Added the subscriptionMethodId parameter for subscription dialog
-    var subscriptionMethodId = -1
 
     /**
      * Resets all values by default.
@@ -71,34 +39,9 @@ class MyAccountInfo @Inject constructor(
      * and call it each time the account logs out.
      */
     fun resetDefaults() {
-        usedPercentage = INVALID_VALUE
-        usedTransferPercentage = INVALID_VALUE
         usedStorage = INVALID_VALUE.toLong()
         accountType = INVALID_VALUE
-        subscriptionStatus = INVALID_VALUE
-        subscriptionRenewTime = INVALID_VALUE.toLong()
-        proExpirationTime = INVALID_VALUE.toLong()
-        usedFormatted = ""
-        totalFormatted = ""
-        formattedUsedCloud = ""
-        formattedUsedIncoming = ""
         formattedUsedRubbish = ""
-        formattedAvailableSpace = ""
-        usedTransferFormatted = ""
-        totalTransferFormatted = ""
-        levelAccountDetails = INVALID_VALUE
-
-        isAccountDetailsFinished = false
-        isBusinessAlertShown = false
-        wasBusinessAlertAlreadyShown = false
-
-        lastSessionFormattedDate = null
-        createSessionTimeStamp = INVALID_VALUE.toLong()
-
-        numVersions = INVALID_VALUE
-        previousVersionsSize = INVALID_VALUE.toLong()
-
-        upgradeOpenedFrom = UpgradeFrom.MANAGER
     }
 
     fun setAccountDetails(accountInfo: MegaAccountDetails, numDetails: Int, context: Context) {
@@ -109,90 +52,22 @@ class MyAccountInfo @Inject constructor(
         Timber.d("Expires on: ${getDateString(accountInfo.proExpiration)}")
 
         val storage = numDetails and HAS_STORAGE_DETAILS != 0
-        val transfer = numDetails and HAS_TRANSFER_DETAILS != 0
         val pro = numDetails and HAS_PRO_DETAILS != 0
 
         if (storage) {
-            val totalStorage = accountInfo.storageMax
-            val usedCloudDrive: Long
-            val usedRubbish: Long
-            var usedIncoming: Long = 0
-
-            //Check size of the different nodes
-            if (megaApi.rootNode != null) {
-                usedCloudDrive =
-                    accountInfo.getStorageUsed(megaApi.rootNode?.handle ?: INVALID_HANDLE)
-                formattedUsedCloud = getSizeString(usedCloudDrive, context)
-            }
-
             if (megaApi.rubbishNode != null) {
-                usedRubbish =
+                val usedRubbish =
                     accountInfo.getStorageUsed(megaApi.rubbishNode?.handle ?: INVALID_HANDLE)
                 formattedUsedRubbish = getSizeString(usedRubbish, context)
             }
 
-            val nodes = megaApi.inShares
-
-            if (nodes != null) {
-                for (i in nodes.indices) {
-                    usedIncoming += accountInfo.getStorageUsed(nodes[i].handle)
-                }
-            }
-
-            formattedUsedIncoming = getSizeString(usedIncoming, context)
-            totalFormatted = getSizeString(totalStorage, context)
             usedStorage = accountInfo.storageUsed
-            usedFormatted = getSizeString(usedStorage, context)
-            usedPercentage = 0
-            subscriptionMethodId = accountInfo.subscriptionMethodId
-
-            if (totalStorage != 0L) {
-                usedPercentage = (100 * usedStorage / totalStorage).toInt()
-            }
-
-            val availableSpace = totalStorage.minus(usedStorage)
-
-            formattedAvailableSpace =
-                getSizeString(if (availableSpace < 0) 0 else availableSpace, context)
-        }
-
-        if (transfer) {
-            totalTransferFormatted = getSizeString(accountInfo.transferMax, context)
-            usedTransferFormatted = getSizeString(accountInfo.transferUsed, context)
-            usedTransferPercentage = 0
-
-            if (accountInfo.transferMax != 0L) {
-                usedTransferPercentage =
-                    (100 * accountInfo.transferUsed / accountInfo.transferMax).toInt()
-            }
         }
 
         if (pro) {
             accountType = accountInfo.proLevel
-            subscriptionStatus = accountInfo.subscriptionStatus
-            subscriptionRenewTime = accountInfo.subscriptionRenewTime
-            proExpirationTime = accountInfo.proExpiration
-
-            when (accountType) {
-                0 -> levelAccountDetails = INVALID_VALUE
-                1 -> levelAccountDetails = 1
-                2 -> levelAccountDetails = 2
-                3 -> levelAccountDetails = 3
-                4 -> levelAccountDetails = 0
-            }
         }
 
-        isAccountDetailsFinished = true
-        Timber.d("LEVELACCOUNTDETAILS: $levelAccountDetails")
+        Timber.d("pro level: ${accountInfo.proLevel}")
     }
-
-    fun getFormattedPreviousVersionsSize(context: Context): String? {
-        return getSizeString(previousVersionsSize, context)
-    }
-
-    fun wasNotBusinessAlertShownYet(): Boolean = !wasBusinessAlertAlreadyShown
-
-    fun isUpgradeFromAccount(): Boolean = upgradeOpenedFrom == UpgradeFrom.ACCOUNT
-    fun isUpgradeFromManager(): Boolean = upgradeOpenedFrom == UpgradeFrom.MANAGER
-    fun isUpgradeFromSettings(): Boolean = upgradeOpenedFrom == UpgradeFrom.SETTINGS
 }

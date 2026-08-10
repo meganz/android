@@ -17,16 +17,21 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.passcode.rememberPasscodeAwareLauncher
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
+import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 
 /**
@@ -36,8 +41,11 @@ import timber.log.Timber
 fun ChatAttachFileBottomSheet(
     modifier: Modifier = Modifier,
     hideSheet: () -> Unit,
-    onAttachFiles: (List<UriPath>) -> Unit = {},
+    chatId: Long = -1L,
+    isCloudExplorerAvailable: Boolean = false,
+    onAttachFiles: (List<UriPath>, PitagTrigger) -> Unit = { _, _ -> },
     onAttachNodes: (List<NodeId>) -> Unit = {},
+    onNavigate: (NavKey) -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -55,7 +63,7 @@ fun ChatAttachFileBottomSheet(
         }
 
     val localLauncher =
-        rememberLauncherForActivityResult(
+        rememberPasscodeAwareLauncher(
             contract = ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -79,7 +87,8 @@ fun ChatAttachFileBottomSheet(
                     }
                 }
 
-                attachedFiles?.map { UriPath(it.toString()) }?.let(onAttachFiles)
+                attachedFiles?.map { UriPath(it.toString()) }
+                    ?.let { onAttachFiles(it, PitagTrigger.Picker) }
 
             }
             hideSheet()
@@ -97,11 +106,18 @@ fun ChatAttachFileBottomSheet(
             text = stringResource(id = R.string.attachment_upload_panel_from_cloud),
             icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Cloud),
             dividerType = null,
-            onActionClicked = { openCloudDrivePicker(context, cloudDriveLauncher) },
+            onActionClicked = {
+                if (isCloudExplorerAvailable) {
+                    hideSheet()
+                    onNavigate(ShareFilesToChatNavKey(chatId = chatId))
+                } else {
+                    openCloudDrivePicker(context, cloudDriveLauncher)
+                }
+            },
             modifier = Modifier.testTag(TEST_TAG_SEND_FROM_CLOUD)
         )
         MenuActionListTile(
-            text = stringResource(id = R.string.upload_files),
+            text = stringResource(id = sharedResR.string.upload_bottom_sheet_action_upload_files),
             icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FileUpload),
             dividerType = null,
             onActionClicked = { openFilePicker(localLauncher) },

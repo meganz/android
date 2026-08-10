@@ -32,7 +32,7 @@ internal class HasOfflineFilesUseCaseTest {
     @Test
     internal fun `test that false is returned if folder does not exist`() = runTest {
         fileSystemRepository.stub {
-            onBlocking { getOfflinePath() }.thenReturn(File(temporaryFolder, "NonExistent").path)
+            on { getOfflinePath() }.thenReturn(File(temporaryFolder, "NonExistent").path)
         }
 
         assertThat(underTest()).isFalse()
@@ -41,7 +41,7 @@ internal class HasOfflineFilesUseCaseTest {
     @Test
     internal fun `test that false is returned if folder does not contain any files`() = runTest {
         fileSystemRepository.stub {
-            onBlocking { getOfflinePath() }.thenReturn(temporaryFolder.path)
+            on { getOfflinePath() }.thenReturn(temporaryFolder.path)
         }
 
         assertThat(underTest()).isFalse()
@@ -53,7 +53,7 @@ internal class HasOfflineFilesUseCaseTest {
             File(temporaryFolder, "OfflineFile.txt").createNewFile()
         }
         fileSystemRepository.stub {
-            onBlocking { getOfflinePath() }.thenReturn(temporaryFolder.path)
+            on { getOfflinePath() }.thenReturn(temporaryFolder.path)
         }
 
         assertThat(underTest()).isTrue()

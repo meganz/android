@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import mega.privacy.android.data.database.MegaDatabaseConstant
 
@@ -17,7 +18,10 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
  * @property lastModifiedTime
  * @property lastModifiedTime
  */
-@Entity(MegaDatabaseConstant.TABLE_OFFLINE)
+@Entity(
+    tableName = MegaDatabaseConstant.TABLE_OFFLINE,
+    indices = [Index(value = ["handle", "path"], unique = true)]
+)
 internal data class OfflineEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id") val id: Int? = null,

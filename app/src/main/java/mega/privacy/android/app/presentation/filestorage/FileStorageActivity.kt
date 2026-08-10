@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.filestorage
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -49,7 +50,6 @@ import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.createViewFolderIntent
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
@@ -163,7 +163,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         }
 
         emptyImageView?.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_empty_folder_glass)
-        var textToShow = getString(R.string.file_browser_empty_folder_new)
+        var textToShow = getString(sharedR.string.annotated_empty_folder)
         try {
             textToShow = textToShow.replace(
                 "[A]", ("<font color=\'"
@@ -406,7 +406,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
      * @param pickFolderString the type of pick folder action.
      */
     private fun setPickFolderType(pickFolderString: String?) {
-        if (TextUtil.isTextEmpty(pickFolderString)) {
+        if (pickFolderString.isNullOrBlank()) {
             pickFolderType = PickFolderType.NONE_ONLY_DOWNLOAD
         } else if (pickFolderString == PickFolderType.CAMERA_UPLOADS_FOLDER.folderType) {
             pickFolderType = PickFolderType.CAMERA_UPLOADS_FOLDER
@@ -698,5 +698,34 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         const val EXTRA_FILE_NAMES: String = "filename"
         const val EXTRA_IS_FOLDER_IN_SD_CARD: String = "is_folder_in_sd_card"
         const val EXTRA_PROMPT: String = "prompt"
+
+        /**
+         * Get an intent to open the file storage activity
+         */
+        fun getBrowseFilesIntent(
+            context: Context,
+            uriPath: String,
+            selectedFileName: String,
+        ) = getBrowseFilesIntent(context, uriPath, listOf(selectedFileName))
+
+        /**
+         * Get an intent to open the file storage activity
+         */
+        fun getBrowseFilesIntent(
+            context: Context,
+            uriPath: String?,
+            selectedFileNames: List<String>,
+        ): Intent =
+            Intent(
+                context,
+                FileStorageActivity::class.java
+            ).apply {
+                action = FileStorageActivity.Mode.BROWSE_FILES.action
+                putExtra(EXTRA_PATH, uriPath)
+                putStringArrayListExtra(
+                    EXTRA_FILE_NAMES,
+                    selectedFileNames.toCollection(ArrayList())
+                )
+            }
     }
 }

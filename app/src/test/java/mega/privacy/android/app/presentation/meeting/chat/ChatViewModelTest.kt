@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessages
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ActionToManage
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatPdfNavigation
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesToChatsResult
@@ -45,6 +46,7 @@ import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.call.ChatCall
@@ -60,13 +62,17 @@ import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.ForwardResult
+import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserId
@@ -149,9 +155,12 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ChatConversationUnmuteMenuToolbarEvent
 import nz.mega.sdk.MegaChatError
 import org.junit.jupiter.api.AfterEach
@@ -202,25 +211,25 @@ internal class ChatViewModelTest {
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase = mock()
     private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase = mock {
-        onBlocking { invoke(any()) } doReturn emptyFlow()
+        on { invoke(any()) } doReturn emptyFlow()
     }
     private val monitorUpdatePushNotificationSettingsUseCase
             : MonitorUpdatePushNotificationSettingsUseCase = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase = mock {
-        onBlocking { invoke(any()) } doReturn emptyFlow()
+        on { invoke(any()) } doReturn emptyFlow()
     }
     private val monitorParticipatingInACallInOtherChatsUseCase: MonitorParticipatingInACallInOtherChatsUseCase =
         mock {
-            onBlocking { invoke(any()) } doReturn emptyFlow()
+            on { invoke(any()) } doReturn emptyFlow()
         }
     private val monitorCallInChatUseCase: MonitorCallInChatUseCase = mock {
-        onBlocking { invoke(any()) } doReturn emptyFlow()
+        on { invoke(any()) } doReturn emptyFlow()
     }
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock {
-        onBlocking { invoke() } doReturn MutableStateFlow(
+        on { invoke() } doReturn MutableStateFlow(
             StorageStateEvent(
                 handle = 1L,
                 storageState = StorageState.Unknown
@@ -228,11 +237,11 @@ internal class ChatViewModelTest {
         )
     }
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
     private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
 
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
@@ -242,7 +251,7 @@ internal class ChatViewModelTest {
         }
     private val getScheduledMeetingByChatUseCase = mock<GetScheduledMeetingByChatUseCase>()
     private val monitorHasAnyContactUseCase = mock<MonitorHasAnyContactUseCase> {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
     private val getCustomSubtitleListUseCase = mock<GetCustomSubtitleListUseCase>()
 
@@ -1533,6 +1542,77 @@ internal class ChatViewModelTest {
         }
     }
 
+    private fun stubPdfMessage(
+        handle: Long = 123L,
+        name: String = "document.pdf",
+        chatId: Long = 10L,
+        msgId: Long = 20L,
+    ): NodeAttachmentMessage {
+        val chatFile = mock<ChatDefaultFile> {
+            on { id } doReturn NodeId(handle)
+            on { this.name } doReturn name
+        }
+        return mock {
+            on { fileNode } doReturn chatFile
+            on { this.chatId } doReturn chatId
+            on { this.msgId } doReturn msgId
+        }
+    }
+
+    @Test
+    fun `test that onOpenPdfMessage triggers InPlace navigation with local content when compose pdf viewer flag is enabled`() =
+        runTest {
+            val message = stubPdfMessage()
+            val content = NodeContentUri.LocalContentUri(File("/local/path/document.pdf"))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)) doReturn true
+            initTestClass()
+
+            underTest.onOpenPdfMessage(message, content)
+
+            underTest.state.test {
+                val navigation =
+                    (awaitItem().openPdfEvent as StateEventWithContentTriggered).content
+                assertThat(navigation).isEqualTo(
+                    ChatPdfNavigation.InPlace(
+                        PdfViewerNavKey(
+                            nodeHandle = 123L,
+                            contentUri = "/local/path/document.pdf",
+                            isLocalContent = true,
+                            shouldStopHttpServer = false,
+                            nodeSourceType = NodeSourceType.CHAT,
+                            mimeType = PdfFileTypeInfo.mimeType,
+                            chatId = 10L,
+                            messageId = 20L,
+                            title = "document.pdf",
+                        )
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that onOpenPdfMessage triggers InPlace navigation with remote content when compose pdf viewer flag is enabled`() =
+        runTest {
+            val message = stubPdfMessage()
+            val content = NodeContentUri.RemoteContentUri(
+                url = "https://mega.nz/document.pdf",
+                shouldStopHttpSever = true,
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)) doReturn true
+            initTestClass()
+
+            underTest.onOpenPdfMessage(message, content)
+
+            underTest.state.test {
+                val navigation =
+                    (awaitItem().openPdfEvent as StateEventWithContentTriggered).content
+                val navKey = (navigation as ChatPdfNavigation.InPlace).navKey
+                assertThat(navKey.contentUri).isEqualTo("https://mega.nz/document.pdf")
+                assertThat(navKey.isLocalContent).isFalse()
+                assertThat(navKey.shouldStopHttpServer).isTrue()
+            }
+        }
+
     @Test
     fun `test that one contact is added to chat room`() = runTest {
         val contactList = listOf("user1")
@@ -2208,7 +2288,7 @@ internal class ChatViewModelTest {
             underTest.state.test {
                 val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
                     .content as InfoToShow.SimpleString).stringId
-                assertThat(result).isEqualTo(R.string.invalid_chat_link)
+                assertThat(result).isEqualTo(sharedR.string.invalid_chat_link_error_message)
             }
         }
 
@@ -2415,7 +2495,7 @@ internal class ChatViewModelTest {
             }
             underTest.state.test {
                 awaitItem() // Initial state doesn't matter
-                underTest.onAttachFiles(files)
+                underTest.onAttachFiles(files, PitagTrigger.Picker)
                 val actual = awaitItem().downloadEvent
                 assertThat(actual).isInstanceOf(StateEventWithContentTriggered::class.java)
                 val content = (actual as StateEventWithContentTriggered).content
@@ -3148,6 +3228,40 @@ internal class ChatViewModelTest {
         }
     }
 
+    @Test
+    fun `test that isCloudExplorerAvailable is true when CloudExplorer feature flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(true)
+            initTestClass()
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that isCloudExplorerAvailable is false when CloudExplorer feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(false)
+            initTestClass()
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isCloudExplorerAvailable defaults to false when the feature flag lookup throws`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer))
+                .thenThrow(RuntimeException("boom"))
+            initTestClass()
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
+            }
+        }
+
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown
             && ownPrivilege != ChatRoomPermission.Removed
@@ -3186,14 +3300,12 @@ internal class ChatViewModelTest {
 
 internal class StartCallArgumentsProvider : ArgumentsProvider {
 
-    override fun provideArguments(context: ExtensionContext): Stream<out Arguments>? {
-        return Stream.of(
-            Arguments.of(false, false, false),
-            Arguments.of(false, true, false),
-            Arguments.of(false, false, true),
-            Arguments.of(false, true, true),
-            Arguments.of(true, true, false),
-            Arguments.of(true, true, true),
-        )
-    }
+    override fun provideArguments(context: ExtensionContext) = Stream.of(
+        Arguments.of(false, false, false),
+        Arguments.of(false, true, false),
+        Arguments.of(false, false, true),
+        Arguments.of(false, true, true),
+        Arguments.of(true, true, false),
+        Arguments.of(true, true, true),
+    )
 }

@@ -13,12 +13,15 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.data.extensions.toUri
+import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadDocumentFileUseCase
@@ -41,6 +44,8 @@ class CompletedTransferActionsViewModel @Inject constructor(
     private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val getOfflineNodeInformationByNodeIdUseCase: GetOfflineNodeInformationByNodeIdUseCase,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CompletedTransferActionsUiState())
@@ -67,15 +72,34 @@ class CompletedTransferActionsViewModel @Inject constructor(
                 state.copy(
                     completedTransfer = this,
                     parentUri = null,
-                    fileUri = null
+                    fileUri = null,
+                    isNodeInRubbishBin = false,
+                    node = null,
                 )
             }
 
+            fetchNode(handle)
             checkShareOption(handle)
 
             if (isContentUriDownload) {
                 getParentDocumentFile(path)
                 getDocumentFile(path, fileName)
+            }
+        }
+    }
+
+    private fun fetchNode(transferHandle: Long) {
+        viewModelScope.launch {
+            runCatching {
+                if (!isNodeInRubbishBinUseCase(NodeId(transferHandle))) {
+                    getNodeByHandleUseCase(transferHandle)
+                } else {
+                    null
+                }
+            }.onSuccess { node ->
+                _uiState.update { it.copy(node = node) }
+            }.onFailure {
+                Timber.e("Error fetching node: $it")
             }
         }
     }
@@ -159,21 +183,54 @@ class CompletedTransferActionsViewModel @Inject constructor(
     }
 
     /**
+     * View in folder action
+     */
+    fun onViewInFolder(completedTransfer: CompletedTransfer) {
+        viewModelScope.launch {
+            val viewInFolderEvent = if (completedTransfer.type.isDownloadType()) {
+                if (completedTransfer.isOffline == true) {
+                    getOfflineNodeInformationByNodeIdUseCase(NodeId(completedTransfer.parentHandle))?.let { offlineInfo ->
+                        ViewInFolderEvent.DownloadToOffline(
+                            fileName = completedTransfer.fileName,
+                            parentNodeOfflineId = offlineInfo.id,
+                            title = offlineInfo.name,
+                            path = completedTransfer.path
+                        )
+                    }
+                } else {
+                    ViewInFolderEvent.Download(
+                        fileName = completedTransfer.fileName,
+                        uriPath = _uiState.value.parentUri
+                            ?.takeUnless { it.toString().isBlank() }
+                            ?.toUriPath()
+                            ?: completedTransfer.path.toUriPath()
+                    )
+                }
+            } else {
+                ViewInFolderEvent.Upload(
+                    completedTransfer.fileName,
+                    NodeId(
+                        uiState.value.node?.parentId?.longValue
+                            ?: completedTransfer.parentHandle
+                    )
+                )
+            }
+            _uiState.update { state ->
+                state.copy(
+                    viewInFolderEvent = triggered(
+                        viewInFolderEvent ?: ViewInFolderEvent.NotFound
+                    )
+                )
+            }
+        }
+    }
+
+    /**
      * Share link action for completed transfer.
      */
-    fun shareLink(handle: Long) {
-        viewModelScope.launch {
-            runCatching { getNodeByHandleUseCase(handle) }
-                .onFailure {
-                    Timber.e(it)
-                    _uiState.update { state ->
-                        state.copy(shareLinkEvent = triggered(ShareLinkEvent()))
-                    }
-                }.onSuccess {
-                    _uiState.update { state ->
-                        state.copy(shareLinkEvent = triggered(ShareLinkEvent(it)))
-                    }
-                }
+    fun shareLink() {
+        _uiState.update { state ->
+            state.copy(shareLinkEvent = triggered(ShareLinkEvent(state.node)))
         }
     }
 
@@ -182,6 +239,13 @@ class CompletedTransferActionsViewModel @Inject constructor(
      */
     fun onConsumeShareLinkEvent() {
         _uiState.update { state -> state.copy(shareLinkEvent = consumed()) }
+    }
+
+    /**
+     * Consume the view in folder event.
+     */
+    fun onConsumeViewInFolder() {
+        _uiState.update { state -> state.copy(viewInFolderEvent = consumed()) }
     }
 
     /**

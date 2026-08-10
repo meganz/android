@@ -6,7 +6,6 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.isActive
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
@@ -26,7 +25,6 @@ import kotlin.coroutines.coroutineContext
  * @property saveMessages
  * @property clearChatMessagesUseCase
  * @property chatId
- * @property coroutineScope
  */
 @OptIn(ExperimentalPagingApi::class)
 class PagedChatMessageRemoteMediator @AssistedInject constructor(
@@ -34,7 +32,6 @@ class PagedChatMessageRemoteMediator @AssistedInject constructor(
     private val saveMessages: SaveChatMessagesUseCase,
     private val clearChatMessagesUseCase: ClearChatMessagesUseCase,
     @Assisted private val chatId: Long,
-    @Assisted private val coroutineScope: CoroutineScope,
 ) : RemoteMediator<Int, TypedMessage>() {
 
     override suspend fun load(
@@ -60,7 +57,7 @@ class PagedChatMessageRemoteMediator @AssistedInject constructor(
             val messages = mutableListOf<ChatMessage>()
             lateinit var response: FetchMessagePageResponse
             while (messages.size < count && coroutineContext.isActive) {
-                response = fetchMessages(chatId, coroutineScope)
+                response = fetchMessages(chatId)
                 messages.addAll(response.messages)
                 if (response.loadResponse == ChatHistoryLoadStatus.NONE) break
             }

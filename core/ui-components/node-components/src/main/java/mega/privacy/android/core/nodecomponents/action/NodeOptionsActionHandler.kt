@@ -5,48 +5,58 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.CoroutineScope
-import mega.android.core.ui.model.menu.MenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DeferrableMenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.megaActivityResultContract
 
 /**
- * Composable function that provides single node action handling functionality.
+ * Creates a BottomSheetActionHandler for single node operations from bottom sheets.
  *
  * This Composable automatically handles activity result contracts and provides
- * a function to handle various menu actions for a single node. It uses the AndroidX
+ * a handler for various menu actions on a single node. It uses the AndroidX
  * Activity Result API internally and manages its own lifecycle.
  *
- * @param nodeOptionsActionViewModel The view model for handling node actions and callbacks
- * @param coroutineScope Optional coroutine scope, defaults to rememberCoroutineScope()
- * @return A function that handles menu actions for a single node
+ * @param viewModel The view model for handling node actions
+ * @param coroutineScope Optional coroutine scope. Defaults to rememberCoroutineScope()
+ * @param megaNavigator The mega navigator instance
+ * @param navigationHandler Optional navigation handler
+ * @param onDeferredAction Optional interceptor for [DeferrableMenuAction] actions
+ *  (e.g. for rewarded ad gating). When provided, the interceptor receives the
+ *  [DeferrableMenuAction] and a lambda to execute the action. The caller can use the action
+ *  type to decide whether to gate or execute immediately.
+ * @return A BottomSheetActionHandler instance
+ * @see SingleNodeActionHandler
  */
 @Composable
-internal fun rememberSingleNodeActionHandler(
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel,
-    navigationHandler: NavigationHandler?,
-    megaNavigator: MegaNavigator,
-    coroutineScope: CoroutineScope,
-): (MenuAction, TypedNode) -> Unit {
+fun rememberSingleNodeActionHandler(
+    viewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(null) }
+        ),
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    megaNavigator: MegaNavigator = rememberMegaNavigator(),
+    navigationHandler: NavigationHandler? = null,
+    onDeferredAction: ((DeferrableMenuAction, () -> Unit) -> Unit)? = null,
+): SingleNodeActionHandler {
     val context = LocalContext.current
     val megaActivityResultContract = remember { context.megaActivityResultContract }
 
     val versionsLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.versionsFileActivityResultContract
     ) { result ->
-        result?.let { nodeOptionsActionViewModel.deleteVersionHistory(it) }
+        viewModel.deleteVersionHistory(result)
     }
 
     val moveLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.selectFolderToMoveActivityResultContract
     ) { result ->
         result?.let { (nodeHandles, targetHandle) ->
-            nodeOptionsActionViewModel.checkNodesNameCollision(
+            viewModel.checkNodesNameCollision(
                 nodeHandles.toList(),
                 targetHandle,
                 NodeNameCollisionType.MOVE
@@ -58,7 +68,7 @@ internal fun rememberSingleNodeActionHandler(
         contract = megaActivityResultContract.selectFolderToCopyActivityResultContract
     ) { result ->
         result?.let { (nodeHandles, targetHandle) ->
-            nodeOptionsActionViewModel.checkNodesNameCollision(
+            viewModel.checkNodesNameCollision(
                 nodeHandles.toList(),
                 targetHandle,
                 NodeNameCollisionType.COPY
@@ -66,14 +76,11 @@ internal fun rememberSingleNodeActionHandler(
         }
     }
 
-    val shareFolderLauncher = rememberLauncherForActivityResult(
-        contract = megaActivityResultContract.shareFolderActivityResultContract
+    val publicCopyLauncher = rememberLauncherForActivityResult(
+        contract = megaActivityResultContract.selectFolderToCopyActivityResultContract
     ) { result ->
-        result?.let { (contactIds, nodeHandles) ->
-            nodeOptionsActionViewModel.contactSelectedForShareFolder(
-                contactIds,
-                nodeHandles
-            )
+        result?.let { (_, targetHandle) ->
+            viewModel.checkPublicCopyCollision(targetHandle)
         }
     }
 
@@ -81,7 +88,7 @@ internal fun rememberSingleNodeActionHandler(
         contract = megaActivityResultContract.nameCollisionActivityContract
     ) { message ->
         if (!message.isNullOrEmpty()) {
-            nodeOptionsActionViewModel.postMessage(message)
+            viewModel.postMessage(message)
         }
     }
 
@@ -89,7 +96,7 @@ internal fun rememberSingleNodeActionHandler(
         contract = megaActivityResultContract.sendToChatActivityResultContract
     ) { result ->
         result?.let { sendToChatResult ->
-            nodeOptionsActionViewModel.attachNodeToChats(
+            viewModel.attachNodeToChats(
                 nodeHandles = sendToChatResult.nodeIds,
                 chatIds = sendToChatResult.chatIds,
                 userHandles = sendToChatResult.userHandles
@@ -100,62 +107,111 @@ internal fun rememberSingleNodeActionHandler(
     val hiddenNodesOnboardingLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.hiddenNodeOnboardingActivityResultContract
     ) { result ->
-        nodeOptionsActionViewModel.handleHiddenNodesOnboardingResult(result, true)
+        viewModel.handleHiddenNodesOnboardingResult(result, true)
     }
 
-    return remember(
-        nodeOptionsActionViewModel,
+    val addToAlbumLauncher =
+        rememberLauncherForActivityResult(
+            contract = megaActivityResultContract.addToAlbumResultContract
+        ) { message ->
+            if (!message.isNullOrEmpty()) {
+                viewModel.postMessage(message)
+            }
+        }
+
+    val videoToPlaylistLauncher = rememberLauncherForActivityResult(
+        contract = megaActivityResultContract.videoToPlaylistActivityContract
+    ) { result ->
+        result?.let {
+            viewModel.triggerAddVideoToPlaylistResultEvent(it)
+        }
+    }
+
+    val baseHandler = remember(
+        viewModel,
         versionsLauncher,
         moveLauncher,
         copyLauncher,
-        shareFolderLauncher,
+        publicCopyLauncher,
         restoreLauncher,
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
+        addToAlbumLauncher,
+        videoToPlaylistLauncher,
         coroutineScope,
         navigationHandler,
         megaNavigator
     ) {
-        { action, node ->
-            nodeOptionsActionViewModel.updateSelectedNodes(listOf(node))
+        SingleNodeActionHandler { action, node ->
+            viewModel.updateSelectedNodes(listOf(node))
 
             val actionContext = SingleNodeActionProvider(
-                viewModel = nodeOptionsActionViewModel,
+                viewModel = viewModel,
                 context = context,
                 coroutineScope = coroutineScope,
-                postMessage = nodeOptionsActionViewModel::postMessage,
+                postMessage = viewModel::postMessage,
                 navigationHandler = navigationHandler,
                 megaNavigator = megaNavigator,
                 versionsLauncher = versionsLauncher,
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
-                shareFolderLauncher = shareFolderLauncher,
+                publicCopyLauncher = publicCopyLauncher,
                 restoreLauncher = restoreLauncher,
                 sendToChatLauncher = sendToChatLauncher,
-                hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher
+                hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
+                addToAlbumLauncher = addToAlbumLauncher,
+                videoToPlaylistLauncher = videoToPlaylistLauncher
             )
 
-            nodeOptionsActionViewModel.handleSingleNodeAction(action) { handler ->
+            viewModel.handleSingleNodeAction(action) { handler ->
                 handler.handle(action, node, actionContext)
             }
+        }
+    }
+    return remember(baseHandler, onDeferredAction) {
+        if (onDeferredAction != null) {
+            SingleNodeActionHandler { action, node ->
+                if (action is DeferrableMenuAction) {
+                    onDeferredAction(action) { baseHandler(action, node) }
+                } else {
+                    baseHandler(action, node)
+                }
+            }
+        } else {
+            baseHandler
         }
     }
 }
 
 /**
- * Composable function that provides multiple nodes action handling functionality.
+ * Creates a handler for multiple node operations from selection mode.
  *
- * @param nodeOptionsActionViewModel The view model for handling node actions and callbacks
- * @param coroutineScope Optional coroutine scope, defaults to rememberCoroutineScope()
- * @return A function that handles menu actions for multiple nodes
+ * This Composable automatically handles activity result contracts and provides
+ * a handler for various menu actions on multiple nodes. It uses the AndroidX
+ * Activity Result API internally and manages its own lifecycle.
+ *
+ * @param viewModel The view model for handling node actions
+ * @param coroutineScope Optional coroutine scope. Defaults to rememberCoroutineScope()
+ * @param megaNavigator The mega navigator instance
+ * @param navigationHandler Optional navigation handler
+ * @param onDeferredAction Optional interceptor for [DeferrableMenuAction] actions
+ *  (e.g. for rewarded ad gating). When provided, the interceptor receives the
+ *  [DeferrableMenuAction] and a lambda to execute the action. The caller can use the action
+ *  type to decide whether to gate or execute immediately.
+ * @return A SelectionModeActionHandler instance
+ * @see MultiNodeActionHandler
  */
 @Composable
-internal fun rememberMultipleNodesActionHandler(
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel,
-    navigationHandler: NavigationHandler?,
-    megaNavigator: MegaNavigator,
-    coroutineScope: CoroutineScope,
-): (MenuAction, List<TypedNode>) -> Unit {
+fun rememberMultiNodeActionHandler(
+    viewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(null) }
+        ),
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    megaNavigator: MegaNavigator = rememberMegaNavigator(),
+    navigationHandler: NavigationHandler? = null,
+    onDeferredAction: ((DeferrableMenuAction, () -> Unit) -> Unit)? = null,
+): MultiNodeActionHandler {
     val context = LocalContext.current
     val megaActivityResultContract = remember { context.megaActivityResultContract }
 
@@ -163,7 +219,7 @@ internal fun rememberMultipleNodesActionHandler(
         contract = megaActivityResultContract.selectFolderToMoveActivityResultContract
     ) { result ->
         result?.let { (nodeHandles, targetHandle) ->
-            nodeOptionsActionViewModel.checkNodesNameCollision(
+            viewModel.checkNodesNameCollision(
                 nodeHandles.toList(),
                 targetHandle,
                 NodeNameCollisionType.MOVE
@@ -175,7 +231,7 @@ internal fun rememberMultipleNodesActionHandler(
         contract = megaActivityResultContract.selectFolderToCopyActivityResultContract
     ) { result ->
         result?.let { (nodeHandles, targetHandle) ->
-            nodeOptionsActionViewModel.checkNodesNameCollision(
+            viewModel.checkNodesNameCollision(
                 nodeHandles.toList(),
                 targetHandle,
                 NodeNameCollisionType.COPY
@@ -183,14 +239,11 @@ internal fun rememberMultipleNodesActionHandler(
         }
     }
 
-    val shareFolderLauncher = rememberLauncherForActivityResult(
-        contract = megaActivityResultContract.shareFolderActivityResultContract
+    val publicCopyLauncher = rememberLauncherForActivityResult(
+        contract = megaActivityResultContract.selectFolderToCopyActivityResultContract
     ) { result ->
-        result?.let { (contactIds, nodeHandles) ->
-            nodeOptionsActionViewModel.contactSelectedForShareFolder(
-                contactIds,
-                nodeHandles
-            )
+        result?.let { (_, targetHandle) ->
+            viewModel.checkPublicCopyCollision(targetHandle)
         }
     }
 
@@ -198,7 +251,7 @@ internal fun rememberMultipleNodesActionHandler(
         contract = megaActivityResultContract.nameCollisionActivityContract
     ) { message ->
         if (!message.isNullOrEmpty()) {
-            nodeOptionsActionViewModel.postMessage(message)
+            viewModel.postMessage(message)
         }
     }
 
@@ -206,7 +259,7 @@ internal fun rememberMultipleNodesActionHandler(
         contract = megaActivityResultContract.sendToChatActivityResultContract
     ) { result ->
         result?.let { sendToChatResult ->
-            nodeOptionsActionViewModel.attachNodeToChats(
+            viewModel.attachNodeToChats(
                 nodeHandles = sendToChatResult.nodeIds,
                 chatIds = sendToChatResult.chatIds,
                 userHandles = sendToChatResult.userHandles
@@ -217,81 +270,66 @@ internal fun rememberMultipleNodesActionHandler(
     val hiddenNodesOnboardingLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.hiddenNodeOnboardingActivityResultContract
     ) { result ->
-        nodeOptionsActionViewModel.handleHiddenNodesOnboardingResult(result, true)
+        viewModel.handleHiddenNodesOnboardingResult(result, true)
     }
 
-    return remember(
-        nodeOptionsActionViewModel,
+    val addToAlbumLauncher =
+        rememberLauncherForActivityResult(
+            contract = megaActivityResultContract.addToAlbumResultContract
+        ) { message ->
+            if (!message.isNullOrEmpty()) {
+                viewModel.postMessage(message)
+            }
+        }
+
+    val baseHandler = remember(
+        viewModel,
         moveLauncher,
         copyLauncher,
-        shareFolderLauncher,
+        publicCopyLauncher,
         restoreLauncher,
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
+        addToAlbumLauncher,
         coroutineScope,
         navigationHandler,
         megaNavigator
     ) {
-        { action, nodes ->
-            nodeOptionsActionViewModel.updateSelectedNodes(nodes)
+        MultiNodeActionHandler { action, nodes ->
+            viewModel.updateSelectedNodes(nodes)
 
             val actionContext = MultipleNodesActionProvider(
-                viewModel = nodeOptionsActionViewModel,
+                viewModel = viewModel,
                 context = context,
                 coroutineScope = coroutineScope,
-                postMessage = nodeOptionsActionViewModel::postMessage,
+                postMessage = viewModel::postMessage,
                 navigationHandler = navigationHandler,
                 megaNavigator = megaNavigator,
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
-                shareFolderLauncher = shareFolderLauncher,
+                publicCopyLauncher = publicCopyLauncher,
                 restoreLauncher = restoreLauncher,
                 sendToChatLauncher = sendToChatLauncher,
-                hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher
+                hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
+                addToAlbumLauncher = addToAlbumLauncher
             )
 
-            nodeOptionsActionViewModel.handleMultipleNodesAction(action) { handler ->
+            viewModel.handleMultipleNodesAction(action) { handler ->
                 handler.handle(action, nodes, actionContext)
             }
         }
     }
-}
-
-/**
- * Creates a NodeActionHandler from Composable functions.
- *
- * @param viewModel The view model for handling node actions
- * @param coroutineScope Optional coroutine scope. Defaults to rememberCoroutineScope()
- * @return A NodeActionHandler instance
- * @see NodeActionHandler
- */
-@Composable
-fun rememberNodeActionHandler(
-    viewModel: NodeOptionsActionViewModel = hiltViewModel(),
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    megaNavigator: MegaNavigator = rememberMegaNavigator(),
-    navigationHandler: NavigationHandler? = null,
-): NodeActionHandler {
-    val singleNodeHandler =
-        rememberSingleNodeActionHandler(
-            nodeOptionsActionViewModel = viewModel,
-            navigationHandler = navigationHandler,
-            megaNavigator = megaNavigator,
-            coroutineScope = coroutineScope
-        )
-    val multipleNodesHandler =
-        rememberMultipleNodesActionHandler(
-            nodeOptionsActionViewModel = viewModel,
-            navigationHandler = navigationHandler,
-            megaNavigator = megaNavigator,
-            coroutineScope = coroutineScope
-        )
-
-    return remember(singleNodeHandler, multipleNodesHandler) {
-        NodeActionHandler(
-            singleNodeHandler = singleNodeHandler,
-            multipleNodesHandler = multipleNodesHandler
-        )
+    return remember(baseHandler, onDeferredAction) {
+        if (onDeferredAction != null) {
+            MultiNodeActionHandler { action, nodes ->
+                if (action is DeferrableMenuAction) {
+                    onDeferredAction(action) { baseHandler(action, nodes) }
+                } else {
+                    baseHandler(action, nodes)
+                }
+            }
+        } else {
+            baseHandler
+        }
     }
 }
-

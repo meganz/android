@@ -8,10 +8,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -23,16 +22,13 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.sharedViewModel
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.MegaNodeUtil.MegaNavigatorEntryPoint
-import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.navigation.OpenTextEditorParams
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -100,12 +96,9 @@ data class NodeAttachmentUiMessage(
                             coroutineScope
                         )
 
-                        is FileNodeContent.Pdf -> openPdfActivity(
-                            viewModel = viewModel,
-                            context = context,
+                        is FileNodeContent.Pdf -> chatViewModel.onOpenPdfMessage(
                             message = message,
-                            chatId = message.chatId,
-                            content = content.uri
+                            content = content.uri,
                         )
 
                         FileNodeContent.TextContent -> handleTextEditor(
@@ -144,44 +137,16 @@ data class NodeAttachmentUiMessage(
         coroutineScope.launch {
             runCatching {
                 val fileNode = message.fileNode
-                EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
-                    .megaNavigator().openMediaPlayerActivityFromChat(
-                        context = context,
-                        contentUri = uri,
-                        fileNode = fileNode,
-                        message = message,
-                    )
+                context.megaNavigator.openMediaPlayerActivityFromChat(
+                    context = context,
+                    contentUri = uri,
+                    fileNode = fileNode,
+                    message = message,
+                )
             }.onFailure {
                 Timber.e(it, "No activity found to open file")
             }
         }
-    }
-
-    private fun openPdfActivity(
-        context: Context,
-        viewModel: NodeAttachmentMessageViewModel,
-        message: NodeAttachmentMessage,
-        chatId: Long,
-        content: NodeContentUri,
-    ) {
-        val pdfIntent = Intent(
-            context,
-            PdfViewerActivity::class.java
-        )
-        pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-        pdfIntent.putExtra(
-            Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-            Constants.FROM_CHAT
-        )
-        pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_MSG_ID, message.msgId)
-        pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_CHAT_ID, chatId)
-        viewModel.applyNodeContentUri(
-            intent = pdfIntent,
-            content = content,
-            mimeType = PdfFileTypeInfo.mimeType
-        )
-        pdfIntent.putExtra("HANDLE", message.fileNode.id.longValue)
-        context.startActivity(pdfIntent)
     }
 
     private fun openImagePreview(
@@ -204,11 +169,9 @@ data class NodeAttachmentUiMessage(
     }
 
     private fun handleTextEditor(context: Context, msgId: Long, chatId: Long) {
-        context.startActivity(
-            Intent(context, TextEditorActivity::class.java)
-                .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FROM_CHAT)
-                .putExtra(Constants.MESSAGE_ID, msgId)
-                .putExtra(Constants.CHAT_ID, chatId)
+        context.megaNavigator.openTextEditor(
+            context = context,
+            params = OpenTextEditorParams.Chat(chatId = chatId, messageId = msgId),
         )
     }
 
@@ -260,10 +223,7 @@ data class NodeAttachmentUiMessage(
         coroutineScope: CoroutineScope,
     ) {
         Timber.d("The file is zip, open in-app.")
-        EntryPointAccessors.fromApplication(
-            context,
-            MegaNavigatorEntryPoint::class.java
-        ).megaNavigator().openZipBrowserActivity(
+        context.megaNavigator.openZipBrowserActivity(
             context = context,
             zipFilePath = localFile.absolutePath,
             nodeHandle = fileNode.id.longValue

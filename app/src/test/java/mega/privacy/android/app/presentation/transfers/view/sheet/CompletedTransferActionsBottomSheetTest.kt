@@ -12,15 +12,17 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.CompletedTransfersItemClearMenuItemEvent
 import mega.privacy.mobile.analytics.event.CompletedTransfersItemOpenMenuItemEvent
 import mega.privacy.mobile.analytics.event.CompletedTransfersItemShareMenuItemEvent
@@ -29,6 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -47,9 +50,10 @@ class CompletedTransferActionsBottomSheetTest {
     val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val onOpenWith = mock<(CompletedTransfer) -> Unit>()
-    private val onShareLink = mock<(Long) -> Unit>()
+    private val onShareLink = mock<() -> Unit>()
     private val onClearTransfer = mock<(CompletedTransfer) -> Unit>()
     private val onDismissSheet = mock<() -> Unit>()
+    private val onViewInFolder = mock<(CompletedTransfer) -> Unit>()
     private val fileName = "2023-03-24 00.13.20_1.pdf"
     private val completedDownload = CompletedTransfer(
         id = 0,
@@ -93,6 +97,7 @@ class CompletedTransferActionsBottomSheetTest {
                 completedTransfer = completedDownload,
                 fileUri = "fileUri".toUri(),
                 amINodeOwner = true,
+                node = mock<FileNode>(),
             )
         )
 
@@ -113,7 +118,7 @@ class CompletedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_SHARE_LINK_ACTION).assertIsDisplayed()
             onNodeWithText(R.string.context_get_link).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_CLEAR_ACTION).assertIsDisplayed()
-            onNodeWithText(R.string.general_clear).assertIsDisplayed()
+            onNodeWithText(SharedR.string.general_clear).assertIsDisplayed()
         }
     }
 
@@ -123,6 +128,7 @@ class CompletedTransferActionsBottomSheetTest {
             completedUpload, CompletedTransferActionsUiState(
                 completedTransfer = completedUpload,
                 amINodeOwner = true,
+                node = mock<FileNode>(),
             )
         )
 
@@ -142,7 +148,7 @@ class CompletedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_SHARE_LINK_ACTION).assertIsDisplayed()
             onNodeWithText(R.string.context_get_link).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_CLEAR_ACTION).assertIsDisplayed()
-            onNodeWithText(R.string.general_clear).assertIsDisplayed()
+            onNodeWithText(SharedR.string.general_clear).assertIsDisplayed()
         }
     }
 
@@ -153,6 +159,7 @@ class CompletedTransferActionsBottomSheetTest {
                 completedTransfer = completedUpload,
                 amINodeOwner = true,
                 isOnline = true,
+                node = mock<FileNode>(),
             )
         )
 
@@ -160,7 +167,7 @@ class CompletedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_VIEW_IN_FOLDER_ACTION)
                 .performSemanticsAction(SemanticsActions.OnClick)
 
-            verify(onDismissSheet).invoke()
+            verify(onViewInFolder).invoke(any())
         }
     }
 
@@ -191,6 +198,7 @@ class CompletedTransferActionsBottomSheetTest {
                 fileUri = "fileUri".toUri(),
                 amINodeOwner = true,
                 isOnline = true,
+                node = mock<FileNode>(),
             )
         )
 
@@ -198,7 +206,7 @@ class CompletedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_SHARE_LINK_ACTION)
                 .performSemanticsAction(SemanticsActions.OnClick)
 
-            verify(onShareLink).invoke(completedDownload.handle)
+            verify(onShareLink).invoke()
             verifyNoInteractions(onDismissSheet)
         }
     }
@@ -229,6 +237,7 @@ class CompletedTransferActionsBottomSheetTest {
                 completedTransfer = completedUpload,
                 amINodeOwner = true,
                 isOnline = true,
+                node = mock<FileNode>(),
             )
         )
 
@@ -268,6 +277,7 @@ class CompletedTransferActionsBottomSheetTest {
                 fileUri = "fileUri".toUri(),
                 amINodeOwner = true,
                 isOnline = true,
+                node = mock<FileNode>(),
             )
         )
 
@@ -311,6 +321,9 @@ class CompletedTransferActionsBottomSheetTest {
                 onConsumeOpenWithEvent = {},
                 onConsumeShareLinkEvent = {},
                 onDismissSheet = onDismissSheet,
+                onViewInFolder = onViewInFolder,
+                onConsumeViewInFolder = {},
+                navigationHandler = null,
             )
         }
     }

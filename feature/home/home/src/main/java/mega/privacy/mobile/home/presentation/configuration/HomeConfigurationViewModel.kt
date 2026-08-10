@@ -3,17 +3,21 @@ package mega.privacy.mobile.home.presentation.configuration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
-import mega.privacy.android.domain.usecase.home.DeleteWidgetConfigurationUseCase
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
+import mega.privacy.android.domain.usecase.home.ResetHomeWidgetConfigurationsUseCase
 import mega.privacy.android.domain.usecase.home.UpdateWidgetConfigurationsUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.mobile.home.presentation.configuration.mapper.WidgetConfigurationItemMapper
 import mega.privacy.mobile.home.presentation.configuration.model.HomeConfigurationUiState
 import mega.privacy.mobile.home.presentation.configuration.model.WidgetConfigurationItem
@@ -26,27 +30,35 @@ class HomeConfigurationViewModel @Inject constructor(
     private val monitorHomeWidgetConfigurationUseCase: MonitorHomeWidgetConfigurationUseCase,
     private val widgetConfigurationItemMapper: WidgetConfigurationItemMapper,
     private val updateWidgetConfigurationsUseCase: UpdateWidgetConfigurationsUseCase,
-    private val deleteWidgetConfigurationUseCase: DeleteWidgetConfigurationUseCase,
+    private val getEnabledFlaggedItemsUseCase: GetEnabledFlaggedItemsUseCase,
+    private val resetHomeWidgetConfigurationsUseCase: ResetHomeWidgetConfigurationsUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
+
     val state: StateFlow<HomeConfigurationUiState> by lazy {
         monitorHomeWidgetConfigurationUseCase()
             .onEach { Timber.d("Widget configurations: \n ${it.joinToString("\n")}") }
             .map { list ->
                 val configuration = list.associateBy { config -> config.widgetIdentifier }
-
                 val items = widgetProviders
-                    .flatMap {
-                        it.getWidgets().map { widget ->
-                            widgetConfigurationItemMapper(
-                                homeWidget = widget,
-                                widgetConfiguration = configuration[widget.identifier]
-                            )
-                        }
+                    .flatMap { provider ->
+                        getEnabledFlaggedItemsUseCase(provider.getWidgets())
+                            .first()
+                            .map { widget ->
+                                widgetConfigurationItemMapper(
+                                    homeWidget = widget,
+                                    widgetConfiguration = configuration[widget.identifier]
+                                )
+                            }
                     }
+                val allowRemoval = items.filter { it.isConfigurable }.count { it.enabled } > 1
+                val fixedWidgets = items.filterNot { it.isDraggable }.sortedBy { it.index }
+                val draggableWidgets = items.filter { it.isDraggable }.sortedBy { it.index }
 
                 HomeConfigurationUiState.Data(
-                    allowRemoval = items.count { widget -> widget.enabled } > 1,
-                    widgets = items,
+                    allowRemoval = allowRemoval,
+                    draggableWidgets = draggableWidgets,
+                    fixedWidgets = fixedWidgets
                 )
 
             }.catch { e ->
@@ -68,42 +80,51 @@ class HomeConfigurationViewModel @Inject constructor(
     }
 
     fun updateWidgetOrder(orderedItems: List<WidgetConfigurationItem>) {
-        updateWidgets(orderedItems.mapIndexed { index, widgetConfigurationItem ->
-            widgetConfigurationItem.copy(index = index)
-        })
+        applicationScope.launch {
+            runCatching {
+                val data = state.value as? HomeConfigurationUiState.Data ?: return@runCatching
+                val draggableOffset = (data.fixedWidgets.maxOfOrNull { it.index } ?: -1) + 1
+                val latestEnabledByIdentifier = monitorHomeWidgetConfigurationUseCase()
+                    .first()
+                    .associate { it.widgetIdentifier to it.enabled }
+                val updated = orderedItems.mapIndexed { index, item ->
+                    HomeWidgetConfiguration(
+                        widgetIdentifier = item.identifier,
+                        widgetOrder = draggableOffset + index,
+                        enabled = latestEnabledByIdentifier[item.identifier] ?: item.enabled,
+                    )
+                }
+                updateWidgetConfigurationsUseCase(updated)
+            }.onFailure {
+                Timber.e(it, "Failed to update widget order")
+            }
+        }
     }
 
     private fun updateWidgets(items: List<WidgetConfigurationItem>) {
-        Timber.d("Updated widget configurations: \n ${items.joinToString("\n")}")
-        viewModelScope.launch {
+        applicationScope.launch {
             runCatching {
-                updateWidgetConfigurationsUseCase(items.map {
+                val updated = items.map {
                     HomeWidgetConfiguration(
                         widgetIdentifier = it.identifier,
                         widgetOrder = it.index,
                         enabled = it.enabled
                     )
-                })
+                }
+                updateWidgetConfigurationsUseCase(updated)
             }.onFailure {
                 Timber.e(it, "Failed to update widget configurations")
             }
         }
     }
 
-    fun deleteWidget(item: WidgetConfigurationItem) {
-        if (!item.canDelete) return
+    fun resetWidgetStateToDefault() {
         viewModelScope.launch {
             runCatching {
-                for (provider in widgetProviders) {
-                    if (provider.deleteWidget(item.identifier)) {
-                        deleteWidgetConfigurationUseCase(item.identifier)
-                        break
-                    }
-                }
+                resetHomeWidgetConfigurationsUseCase()
             }.onFailure {
-                Timber.e(it, "Failed to delete widget: ${item.identifier}")
+                Timber.e(it, "Failed to reset widget configurations to default")
             }
         }
     }
-
 }

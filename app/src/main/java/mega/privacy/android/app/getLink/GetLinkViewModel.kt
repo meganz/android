@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
@@ -31,12 +32,33 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
+import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.LinkConfirmPasswordFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkConfirmPasswordFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeeNotNowPlanFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeeNotNowPlanFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeePlanFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeePlanFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkRemovePasswordFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkRemovePasswordFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFileButtonDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFileButtonEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFolderButtonDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFolderButtonEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFileButtonPressedDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFileButtonPressedEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFolderButtonPressedDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFolderButtonPressedEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetPasswordFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkSetPasswordFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFileDialogEvent
+import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFolderDialogEvent
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -47,7 +69,7 @@ import javax.inject.Inject
 
 /**
  * View Model used for manage data related to get or manage a link.
- * It is shared by the fragments [GetLinkFragment], [DecryptionKeyFragment], [CopyrightFragment],
+ * It is shared by the fragments [GetLinkFragment], [DecryptionKeyFragment],
  * [LinkPasswordFragment] and their activity [GetLinkActivity].
  *
  * @property megaApi                        MegaApiAndroid instance to use.
@@ -67,6 +89,7 @@ class GetLinkViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -157,14 +180,17 @@ class GetLinkViewModel @Inject constructor(
         viewModelScope.launch {
             node?.let {
                 runCatching {
-                    exportNodeUseCase(NodeId(it.handle))
+                    exportNodeUseCase(
+                        nodeToExport = NodeId(it.handle),
+                        callerName = "GetLinkViewModel"
+                    )
                 }.onSuccess {
                     updateLink(node?.handle)
                     if (isFirstTime) {
                         copyLink(true)
                     }
-                }.onFailure {
-                    Timber.e(it)
+                }.onFailure { error ->
+                    Timber.e(error)
                 }
             }
         }
@@ -179,11 +205,16 @@ class GetLinkViewModel @Inject constructor(
         viewModelScope.launch {
             node?.let {
                 runCatching {
-                    exportNodeUseCase(NodeId(it.handle), expiryDate)
+                    exportNodeUseCase(
+                        nodeToExport = NodeId(it.handle),
+                        expireTime = expiryDate,
+                        callerName = "GetLinkViewModel"
+                    )
                 }.onSuccess {
+                    onExpiryDateTrackEvent(isChecked = true)
                     updateLink(node?.handle)
-                }.onFailure {
-                    Timber.e(it)
+                }.onFailure { error ->
+                    Timber.e(error)
                 }
             }
         }
@@ -228,19 +259,31 @@ class GetLinkViewModel @Inject constructor(
      */
     fun removeLinkWithPassword() {
         resetLinkWithPassword()
+        this.node?.isFolder?.apply {
+            val event = when {
+                this -> LinkRemovePasswordFolderButtonPressedEvent
+                else -> LinkRemovePasswordFileButtonPressedEvent
+            }
+
+            Analytics.tracker.trackEvent(event)
+        }
+
         updateLink()
     }
 
     /**
-     * Checks if should show [CopyrightFragment].
+     * Checks if should show [mega.privacy.android.feature.photos.presentation.albums.copyright.CopyRightScreen].
      *
      * @return True if should show it, false otherwise.
      */
-    fun shouldShowCopyright(): Boolean =
-        dbH.shouldShowCopyright && megaApi.publicLinks.isNullOrEmpty()
+    suspend fun shouldShowCopyright(): Boolean = runCatching {
+        shouldShowCopyrightUseCase()
+    }.onFailure {
+        Timber.e(it)
+    }.getOrDefault(false)
 
     /**
-     * Updates the flag to show or not [CopyrightFragment] in DB.
+     * Updates the flag to show or not [mega.privacy.android.feature.photos.presentation.albums.copyright.CopyRightScreen] in DB.
      */
     fun updateShowCopyRight(show: Boolean) {
         dbH.setShowCopyright(show)
@@ -374,6 +417,14 @@ class GetLinkViewModel @Inject constructor(
      * @param password Password to encrypt the link.
      */
     fun encryptLink(password: String) {
+        this.node?.isFolder?.apply {
+            val event = when {
+                this -> LinkConfirmPasswordFolderButtonPressedEvent
+                else -> LinkConfirmPasswordFileButtonPressedEvent
+            }
+            Analytics.tracker.trackEvent(event)
+        }
+
         viewModelScope.launch {
             runCatching {
                 encryptLinkWithPasswordUseCase(node?.publicLink.orEmpty(), password)
@@ -472,5 +523,87 @@ class GetLinkViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+    }
+
+    /**
+     * On expiry date track event
+     *
+     * @param isChecked True, if switch is enabled. False, if it is disabled
+     */
+    fun onExpiryDateTrackEvent(isChecked: Boolean) {
+        this.node?.isFolder?.let { isFolder ->
+            Analytics.tracker.trackEvent(
+                when {
+                    isFolder && isChecked -> LinkSetExpiryDateFolderButtonPressedEnabledEvent
+                    isFolder && !isChecked -> LinkSetExpiryDateFolderButtonPressedDisabledEvent
+                    !isFolder && isChecked -> LinkSetExpiryDateFileButtonPressedEnabledEvent
+                    else -> LinkSetExpiryDateFileButtonPressedDisabledEvent
+                }
+            )
+        }
+    }
+
+    /**
+     * On send decrypted key separately track event
+     *
+     * @param isChecked True, if switch is enabled. False, if it is disabled
+     */
+    fun onSendDecryptedKeySeparatelyTrackEvent(isChecked: Boolean) {
+        this.node?.isFolder?.let { isFolder ->
+            Analytics.tracker.trackEvent(
+                when {
+                    isFolder && isChecked -> LinkSendDecryptionKeyFolderButtonEnabledEvent
+                    isFolder && !isChecked -> LinkSendDecryptionKeyFolderButtonDisabledEvent
+                    !isFolder && isChecked -> LinkSendDecryptionKeyFileButtonEnabledEvent
+                    else -> LinkSendDecryptionKeyFileButtonDisabledEvent
+                }
+            )
+        }
+    }
+
+    /**
+     * On set password track event
+     */
+    fun onSetPasswordTrackEvent() {
+        this.node?.isFolder?.apply {
+            Analytics.tracker.trackEvent(
+                when {
+                    this -> LinkSetPasswordFolderButtonPressedEvent
+                    else -> LinkSetPasswordFileButtonPressedEvent
+                }
+            )
+        }
+    }
+
+    /**
+     * On upgrade to Pro alert displayed track event
+     */
+    fun onUpgradeToProAlertDisplayedTrackEvent() {
+        this.node?.isFolder?.apply {
+            Analytics.tracker.trackEvent(
+                when {
+                    this -> LinkUpgradeToProFeatureFolderDialogEvent
+                    else -> LinkUpgradeToProFeatureFileDialogEvent
+                }
+            )
+        }
+    }
+
+    /**
+     * On upgrade to Pro plan options track event
+     *
+     * @param isPositiveButton True, if "See plan" is clicked. False if "Not now" is clicked.
+     */
+    fun onUpgradeToProPlanOptionsTrackEvent(isPositiveButton: Boolean) {
+        this.node?.isFolder?.apply {
+            Analytics.tracker.trackEvent(
+                when {
+                    this && isPositiveButton -> LinkProFeatureSeePlanFolderButtonPressedEvent
+                    this && !isPositiveButton -> LinkProFeatureSeeNotNowPlanFolderButtonPressedEvent
+                    !this && isPositiveButton -> LinkProFeatureSeePlanFileButtonPressedEvent
+                    else -> LinkProFeatureSeeNotNowPlanFileButtonPressedEvent
+                }
+            )
+        }
     }
 }

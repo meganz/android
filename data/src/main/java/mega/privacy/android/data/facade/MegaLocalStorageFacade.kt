@@ -1,11 +1,13 @@
 package mega.privacy.android.data.facade
 
 import dagger.Lazy
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
-import mega.privacy.android.domain.entity.settings.ChatSettings
+import mega.privacy.android.domain.qualifier.DatabaseDispatcher
 import nz.mega.sdk.MegaApiJava.ORDER_CREATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_CREATION_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -27,30 +29,26 @@ import javax.inject.Inject
  */
 internal class MegaLocalStorageFacade @Inject constructor(
     private val dbHandler: Lazy<DatabaseHandler>,
+    @DatabaseDispatcher private val databaseDispatcher: CoroutineDispatcher,
 ) : MegaLocalStorageGateway {
 
-    override suspend fun getCloudSortOrder(): Int =
+    override suspend fun getCloudSortOrder(): Int = withContext(databaseDispatcher) {
         dbHandler.get().preferences?.preferredSortCloud?.toInt() ?: ORDER_DEFAULT_ASC
+    }
 
-    override suspend fun getCameraSortOrder(): Int =
+    override suspend fun getCameraSortOrder(): Int = withContext(databaseDispatcher) {
         dbHandler.get().preferences?.preferredSortCameraUpload?.toInt() ?: ORDER_MODIFICATION_DESC
+    }
 
-    override suspend fun getOthersSortOrder(): Int =
+    override suspend fun getOthersSortOrder(): Int = withContext(databaseDispatcher) {
         dbHandler.get().preferences?.preferredSortOthers?.toInt() ?: ORDER_DEFAULT_ASC
+    }
 
-    override suspend fun getLinksSortOrder(isSingleActivityEnabled: Boolean): Int =
-        if (isSingleActivityEnabled) {
-            when (val order = getCloudSortOrder()) {
-                ORDER_CREATION_ASC -> ORDER_LINK_CREATION_ASC
-                ORDER_CREATION_DESC -> ORDER_LINK_CREATION_DESC
-                else -> order
-            }
-        } else {
-            when (val order = getCloudSortOrder()) {
-                ORDER_MODIFICATION_ASC -> ORDER_LINK_CREATION_ASC
-                ORDER_MODIFICATION_DESC -> ORDER_LINK_CREATION_DESC
-                else -> order
-            }
+    override suspend fun getLinksSortOrder(): Int =
+        when (val order = getCloudSortOrder()) {
+            ORDER_CREATION_ASC -> ORDER_LINK_CREATION_ASC
+            ORDER_CREATION_DESC -> ORDER_LINK_CREATION_DESC
+            else -> order
         }
 
     /**
@@ -71,113 +69,165 @@ internal class MegaLocalStorageFacade @Inject constructor(
             else -> ORDER_DEFAULT_ASC
         }
 
-    override suspend fun setOfflineSortOrder(order: Int) {
+    override suspend fun setOfflineSortOrder(order: Int) = withContext(databaseDispatcher) {
         dbHandler.get().setPreferredSortCloud(order.toString())
     }
 
-    override suspend fun setCloudSortOrder(order: Int) {
+    override suspend fun setCloudSortOrder(order: Int) = withContext(databaseDispatcher) {
         dbHandler.get().setPreferredSortCloud(order.toString())
     }
 
-    override suspend fun setCameraSortOrder(order: Int) {
+    override suspend fun setCameraSortOrder(order: Int) = withContext(databaseDispatcher) {
         dbHandler.get().setPreferredSortCameraUpload(order.toString())
     }
 
-    override suspend fun setOthersSortOrder(order: Int) {
+    override suspend fun setOthersSortOrder(order: Int) = withContext(databaseDispatcher) {
         dbHandler.get().setPreferredSortOthers(order.toString())
     }
 
-    override suspend fun doPreferencesExist(): Boolean = dbHandler.get().preferences != null
-
-    override suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo? =
-        dbHandler.get().findNonContactByHandle(userHandle.toString())
-
-    override suspend fun setNonContactEmail(userHandle: Long, email: String) {
-        dbHandler.get().setNonContactEmail(email, userHandle.toString())
+    override suspend fun doPreferencesExist(): Boolean = withContext(databaseDispatcher) {
+        dbHandler.get().preferences != null
     }
 
-    override suspend fun getContactByEmail(email: String?) =
-        dbHandler.get().findContactByEmail(email)
+    override suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo? =
+        withContext(databaseDispatcher) {
+            dbHandler.get().findNonContactByHandle(userHandle.toString())
+        }
 
-    override suspend fun setUserHasLoggedIn() {
+    override suspend fun setNonContactEmail(userHandle: Long, email: String) {
+        withContext(databaseDispatcher) {
+            dbHandler.get().setNonContactEmail(email, userHandle.toString())
+        }
+    }
+
+    override suspend fun setNonContactFirstName(userHandle: Long, firstName: String?) {
+        withContext(databaseDispatcher) {
+            dbHandler.get().setNonContactFirstName(firstName, userHandle.toString())
+        }
+    }
+
+    override suspend fun setNonContactLastName(userHandle: Long, lastName: String?) {
+        withContext(databaseDispatcher) {
+            dbHandler.get().setNonContactLastName(lastName, userHandle.toString())
+        }
+    }
+
+    override suspend fun getContactByEmail(email: String?) = withContext(databaseDispatcher) {
+        dbHandler.get().findContactByEmail(email)
+    }
+
+    override suspend fun setUserHasLoggedIn() = withContext(databaseDispatcher) {
         dbHandler.get().setFirstTime(false)
     }
 
-    override suspend fun getDownloadLocation(): String? =
+    override suspend fun getDownloadLocation(): String? = withContext(databaseDispatcher) {
         dbHandler.get().preferences?.storageDownloadLocation
-
-    override suspend fun isAskForDownloadLocation(): Boolean =
-        dbHandler.get().preferences?.storageAskAlways?.toBoolean() ?: true
-
-    override suspend fun setAskForDownloadLocation(isStorageAskAlways: Boolean) {
-        dbHandler.get().setStorageAskAlways(isStorageAskAlways)
     }
+
+    override suspend fun isAskForDownloadLocation(): Boolean = withContext(databaseDispatcher) {
+        dbHandler.get().preferences?.storageAskAlways?.toBoolean() ?: true
+    }
+
+    override suspend fun setAskForDownloadLocation(isStorageAskAlways: Boolean) =
+        withContext(databaseDispatcher) {
+            dbHandler.get().setStorageAskAlways(isStorageAskAlways)
+        }
 
     override suspend fun isShouldPromptToSaveDestination(): Boolean =
-        dbHandler.get().askSetDownloadLocation
+        withContext(databaseDispatcher) {
+            dbHandler.get().askSetDownloadLocation
+        }
 
-    override suspend fun setShouldPromptToSaveDestination(value: Boolean) {
-        dbHandler.get().askSetDownloadLocation = value
-    }
+    override suspend fun setShouldPromptToSaveDestination(value: Boolean) =
+        withContext(databaseDispatcher) {
+            dbHandler.get().askSetDownloadLocation = value
+        }
 
-    override suspend fun setDownloadLocation(downloadLocation: String?) {
-        dbHandler.get().setStorageDownloadLocation(downloadLocation)
-    }
+    override suspend fun setDownloadLocation(downloadLocation: String?) =
+        withContext(databaseDispatcher) {
+            dbHandler.get().setStorageDownloadLocation(downloadLocation)
+        }
 
-    override suspend fun isAskBeforeLargeDownloads() =
+    override suspend fun isAskBeforeLargeDownloads() = withContext(databaseDispatcher) {
         dbHandler.get().attributes?.askSizeDownload?.equals(true.toString()) ?: true
-
-    override suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean) {
-        dbHandler.get().setAttrAskSizeDownload(askForConfirmation.toString())
     }
 
-    override suspend fun setShowCopyright(showCopyrights: Boolean) {
-        dbHandler.get().setShowCopyright(showCopyrights)
-    }
+    override suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean) =
+        withContext(databaseDispatcher) {
+            dbHandler.get().setAttrAskSizeDownload(askForConfirmation.toString())
+        }
 
-    override suspend fun getAttributes(): MegaAttributes? =
+    override suspend fun setShowCopyright(showCopyrights: Boolean) =
+        withContext(databaseDispatcher) {
+            dbHandler.get().setShowCopyright(showCopyrights)
+        }
+
+    override suspend fun getAttributes(): MegaAttributes? = withContext(databaseDispatcher) {
         dbHandler.get().attributes
+    }
 
-    override suspend fun getChatFilesFolderHandle() = dbHandler.get().myChatFilesFolderHandle
+    override suspend fun resetAccountDetailsTimeStamp() = withContext(databaseDispatcher) {
+        dbHandler.get().resetAccountDetailsTimeStamp()
+    }
 
-    override suspend fun setLastPublicHandle(handle: Long) =
+    override suspend fun resetExtendedAccountDetailsTimestamp() = withContext(databaseDispatcher) {
+        dbHandler.get().resetExtendedAccountDetailsTimestamp()
+    }
+
+    override suspend fun getChatFilesFolderHandle() = withContext(databaseDispatcher) {
+        dbHandler.get().myChatFilesFolderHandle
+    }
+
+    override suspend fun setLastPublicHandle(handle: Long) = withContext(databaseDispatcher) {
         dbHandler.get().setLastPublicHandle(handle)
+    }
 
-    override suspend fun setLastPublicHandleTimeStamp() =
+    override suspend fun setLastPublicHandleTimeStamp() = withContext(databaseDispatcher) {
         dbHandler.get().setLastPublicHandleTimeStamp()
+    }
 
-    override suspend fun setLastPublicHandleType(type: Int) {
+    override suspend fun setLastPublicHandleType(type: Int) = withContext(databaseDispatcher) {
         dbHandler.get().lastPublicHandleType = type
     }
 
-    override suspend fun getChatSettings(): ChatSettings? = dbHandler.get().chatSettings
-
-    override suspend fun setChatSettings(chatSettings: ChatSettings) {
-        dbHandler.get().chatSettings = chatSettings
+    override suspend fun clearPreferences() = withContext(databaseDispatcher) {
+        dbHandler.get().clearPreferences()
     }
 
-    override suspend fun clearPreferences() = dbHandler.get().clearPreferences()
+    override suspend fun setFirstTime(firstTime: Boolean) = withContext(databaseDispatcher) {
+        dbHandler.get().setFirstTime(firstTime)
+    }
 
-    override suspend fun setFirstTime(firstTime: Boolean) = dbHandler.get().setFirstTime(firstTime)
-
-    override suspend fun getFirstTime(): Boolean? =
+    override suspend fun getFirstTime(): Boolean? = withContext(databaseDispatcher) {
         dbHandler.get().preferences?.firstTime?.toBooleanStrictOrNull()
-
-    override suspend fun clearContacts() = dbHandler.get().clearContacts()
-
-    override suspend fun clearNonContacts() = dbHandler.get().clearNonContacts()
-
-    override suspend fun clearChatItems() = dbHandler.get().clearChatItems()
-
-    override suspend fun clearAttributes() = dbHandler.get().clearAttributes()
-
-    override suspend fun clearChatSettings() = dbHandler.get().clearChatSettings()
-
-    override suspend fun setTransferQueueStatus(isPause: Boolean) {
-        dbHandler.get().transferQueueStatus = isPause
     }
 
-    override suspend fun getTransferQueueStatus() = dbHandler.get().transferQueueStatus
+    override suspend fun clearContacts() = withContext(databaseDispatcher) {
+        dbHandler.get().clearContacts()
+    }
 
-    override fun shouldShowCopyright(): Boolean = dbHandler.get().shouldShowCopyright
+    override suspend fun clearNonContacts() = withContext(databaseDispatcher) {
+        dbHandler.get().clearNonContacts()
+    }
+
+    override suspend fun clearChatItems() = withContext(databaseDispatcher) {
+        dbHandler.get().clearChatItems()
+    }
+
+    override suspend fun clearAttributes() = withContext(databaseDispatcher) {
+        dbHandler.get().clearAttributes()
+    }
+
+    override suspend fun setTransferQueueStatus(isPause: Boolean) =
+        withContext(databaseDispatcher) {
+            dbHandler.get().transferQueueStatus = isPause
+        }
+
+    override suspend fun getTransferQueueStatus() = withContext(databaseDispatcher) {
+        dbHandler.get().transferQueueStatus
+    }
+
+    override suspend fun shouldShowCopyright(): Boolean = withContext(databaseDispatcher) {
+        dbHandler.get().shouldShowCopyright
+    }
 }

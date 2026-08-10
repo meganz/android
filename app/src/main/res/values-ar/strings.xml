@@ -14,8 +14,6 @@
     <string name="general_select">تحديد</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">حدد المجلد</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">إنشاء</string>
     <!-- button -->
     <string name="general_add">إضافة</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -41,7 +39,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">جاري التحميل</string>
     <!-- state while importing the file -->
-    <string name="general_importing">إضافة</string>
+    <string name="general_importing">جاري الإضافة</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">إعادة توجيه</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
@@ -60,10 +58,6 @@
     <string name="action_logout">تسجيل&#160;خروج</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">رفع</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">مجلد جديد</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">ملف نصي جديد</string>
     <!-- Menu item -->
     <string name="action_settings">الإعدادات</string>
     <!-- Search button -->
@@ -160,10 +154,6 @@
     <string name="login_before_share">قم بتسجيل الدخول للمشاركة مع ميغا MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">رابط التأكيد الخاص بك لم يعد صالحًا. ربما تم تفعيل حسابك بالفعل أو ربما قمت بإلغاء اشتراكك.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">الاسم الأول</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">اسم العائلة</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">أدرك أنه[B] إذا فقدت كلمة المرور الخاصة بي، قد أفقد بياناتي[/B]. اقرأ المزيد حول [A]تشفير ميغا MEGA من طرف إلى طرف[/A].</string>
     <!-- warning dialog -->
@@ -288,8 +278,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">إعادة التسمية</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">فتح</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">تجهيز الملف</string>
@@ -309,8 +297,6 @@
     <string name="context_move_to_trash">نقل إلى سلة المحذوفات</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">إزالة من ميغا MEGA</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">إسم المجلد</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">إنشاء مجلد</string>
     <!-- Menu option title -->
@@ -399,8 +385,6 @@
     <string name="subscription_type_monthly">شهرياً</string>
     <!--  -->
     <string name="subscription_type_yearly">سنويًا</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">مجلد جديد</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">إضافة جهة اتصال</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -700,9 +684,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">تهانينا، عنوان بريدك الإلكتروني الجديد لحساب ميغا MEGA هذا هو: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Cannot be empty</string>
+    <string name="invalid_string">لا يمكن أن تكون فارغة</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
+    <string name="invalid_input">إدخال غير صالح</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">إعادة تعيين كلمة المرور</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -1064,12 +1048,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">دقائق</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>متصل بالانترنت</item>
-        <item>بعيد</item>
-        <item>مشغول</item>
-        <item>غير متصل بالانترنت</item>
-    </string-array>
+    <string name="settings_chat_status_online">متصل بالانترنت</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">بعيد</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">مشغول</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">غير متصل بالانترنت</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">تمكين</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1349,8 +1334,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">المساعدة</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">أرسل ملاحظاتك</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">ملاحظات الأندرويد Android</string>
     <!-- mail body -->
@@ -1359,8 +1342,6 @@
     <string name="settings_feedback_body_device_model">نموذج الجهاز</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">نسخة الأندرويد</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">ملف نصي جديد</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">اسم الملف</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1379,8 +1360,6 @@
     <string name="general_incorrect_names">صحح أسماء الملفات قبل المتابعة</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">محارف غير صالحة</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">المحارف التالية غير مسموح بها: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="zero">لا يمكن أن يكون اسم الملف فارغ.</item>
@@ -1402,12 +1381,6 @@
     <string name="invalid_connection_state">إعادة الاتصال بالمحادثة</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">حدث خطأ ولا يمكن توصيل المكالمة.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">هل يعجبك تطبيق ميغا للهاتف المحمول MEGA Mobile؟</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">نعم، قم بتقييم التطبيق</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">لا، أرسل الملاحظات</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">لا توجد لديك صلاحيات ممنوحة لجهات الاتصال</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1488,8 +1461,6 @@
     <string name="tab_received_requests">الطلبات المستلمة</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">تم تجاوز مساحة التخزين المتاحة</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">رابط غير متوفر، الرجاء طلب رابط جديد صالح</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">كلمة مرور الرابط غير صالحة</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1586,12 +1557,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">جودة الفيديو</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>منخفضة</item>
-        <item>متوسطة</item>
-        <item>عالية</item>
-        <item>الأصلية</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">منخفضة</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">متوسطة</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">عالية</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">الأصلية</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">مكالمة فائتة</string>
     <!-- Refers to a location of file -->
@@ -2052,7 +2024,7 @@
     <!-- General label for files -->
     <string name="general_files">ملفات</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">حفظ على الجهاز</string>
+    <string name="general_save_to_device">تنزيل</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">الترفيع إلى ميغا MEGA</string>
     <!-- Label choose destination -->
@@ -4588,7 +4560,10 @@
         <item quantity="many">تعذر نسخ %1$d عنصراً</item>
         <item quantity="other">تعذر نسخ %1$d عنصر</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="zero">تم نسخ %1$d عنصر،&#160;</item>
         <item quantity="one">تم نسخ %1$d عنصر،&#160;</item>
@@ -4597,7 +4572,10 @@
         <item quantity="many">تم نسخ %1$d عنصراً،&#160;</item>
         <item quantity="other">تم نسخ %1$d عنصر،&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="zero">تعذر نسخ %1$d عنصر</item>
         <item quantity="one">تعذر نسخ %1$d عنصر</item>
@@ -4878,10 +4856,6 @@
     <string name="dialog_taken_down_folder_title">لا يمكن فتح المجلد</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">لا يمكن فتح الملف</string>
-    <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
-    <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">برو Pro فقط</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -5276,15 +5250,15 @@
     <!-- Message after selected albums are deleted (singular) -->
     <string name="photos_album_deleted_message_singular">تم حذف ”%s“ ألبوم</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
-    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s في انتظار الانضمام إلى ”%2$s”.</string>
+    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s في انتظار الانضمام إلى ”%2$s\“.</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
-        <item quantity="zero">%1$d مشارك ينتظرون الانضمام إلى ”%2$s”.</item>
-        <item quantity="one">%1$d مشارك ينتظر الانضمام إلى ”%2$s”.</item>
-        <item quantity="two">%1$d مشاركان ينتظران الانضمام إلى ”%2$s”.</item>
-        <item quantity="few">%1$d مشاركون ينتظرون الانضمام إلى ”%2$s”.</item>
-        <item quantity="many">%1$d مشاركاً ينتظرون الانضمام إلى ”%2$s”.</item>
-        <item quantity="other">%1$d مشارك ينتظرون الانضمام إلى ”%2$s”.</item>
+        <item quantity="zero">%1$d مشارك ينتظرون الانضمام إلى ”%2$s\“.</item>
+        <item quantity="one">%1$d مشارك ينتظر الانضمام إلى ”%2$s\“.</item>
+        <item quantity="two">%1$d مشاركان ينتظران الانضمام إلى ”%2$s\“.</item>
+        <item quantity="few">%1$d مشاركون ينتظرون الانضمام إلى ”%2$s\“.</item>
+        <item quantity="many">%1$d مشاركاً ينتظرون الانضمام إلى ”%2$s\“.</item>
+        <item quantity="other">%1$d مشارك ينتظرون الانضمام إلى ”%2$s\“.</item>
     </plurals>
     <!-- Title of video option of snapshot-->
     <string name="media_player_video_option_snapshot_title">التقاط</string>
@@ -5362,16 +5336,6 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s يقوم بالتقديم</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">هذا الشخص يقوم بمشاركة الشاشة</string>
-    <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">هذا الاتصال يتم تسجيله</string>
-    <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">من خلال البقاء في المكالمة فإنك تمنح الإذن بالتسجيل. يتم تخزين التسجيل فقط على جهاز الشخص الذي يقوم بتسجيله.</string>
-    <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">حسنًا، فهمت ذلك</string>
-    <!-- Label for the negative or cancel button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_negative_button">غادر المكالمة</string>
-    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]اعرف المزيد[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">%1$s بدأ بالتسجيل</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
@@ -5660,4 +5624,7 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">تم تمكين ترفيعات الكاميرا</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">هذا الموقع لم يعد موجوداً.</string>
+    <string name="invalid_link">رابط غير صالح. الرجاء المحاولة مرة أخرى أو طلب رابط جديد.</string>
+    <string name="dialog_taken_down_folder_description">تمت إزالة هذا المجلد وفقًا لـ [A]سياسة إرشادات إزالة المحتوى[/A] الخاصة بنا. يمكنك الاعتراض على هذه الإزالة إذا كنت تعتقد أننا قد ارتكبنا خطأ.</string>
+    <string name="dialog_taken_down_file_description">تمت إزالة هذا الملف وفقًا لـ [A]سياسة إرشادات إزالة المحتوى[/A] الخاصة بنا. يمكنك الاعتراض على هذه الإزالة إذا كنت تعتقد أننا قد ارتكبنا خطأ.</string>
 </resources>

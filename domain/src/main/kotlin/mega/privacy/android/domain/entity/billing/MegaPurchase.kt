@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.billing
 
-import mega.privacy.android.domain.entity.account.Skus
+import mega.privacy.android.domain.entity.account.subscriptionSkuLevel
 
 /**
  * Generic purchase object, used to unify corresponding platform dependent purchase object.
@@ -37,26 +37,22 @@ data class MegaPurchase(
      * Time of the purchase, in milliseconds since epoch (Jan 1, 1970).
      */
     val time: Long = 0,
+
+    /**
+     * Whether the subscription is set to auto-renew.
+     */
+    val isAutoRenewing: Boolean = false,
+
+    /**
+     * Obfuscated account id stored on this purchase, reused when replacing the subscription.
+     */
+    val obfuscatedAccountId: String? = null,
 ) {
     /**
      * product level
      */
-    val level: Int = when (sku) {
-        Skus.SKU_PRO_LITE_MONTH, Skus.SKU_PRO_LITE_YEAR -> 0
-        Skus.SKU_PRO_I_MONTH, Skus.SKU_PRO_I_YEAR -> 1
-        Skus.SKU_PRO_II_MONTH, Skus.SKU_PRO_II_YEAR -> 2
-        Skus.SKU_PRO_III_MONTH, Skus.SKU_PRO_III_YEAR -> 3
-        else -> -1
-    }
+    val level: Int = sku.subscriptionSkuLevel
 
     val isMonthly: Boolean
-        get() = when (sku) {
-            Skus.SKU_PRO_LITE_MONTH,
-            Skus.SKU_PRO_I_MONTH,
-            Skus.SKU_PRO_II_MONTH,
-            Skus.SKU_PRO_III_MONTH,
-                -> true
-
-            else -> false
-        }
+        get() = sku?.contains("onemonth") == true
 }

@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils
 
 import android.content.Context
 import android.text.Spanned
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import nz.mega.sdk.MegaChatRoom
 import java.util.concurrent.TimeUnit
@@ -94,12 +93,17 @@ object MeetingUtil {
      * Get the appropriate string for call no answered
      *
      * @param lastMsgSender Handle of sender
+     * @param currentUserHandle Handle of the current user
      * @return appropriate string for call no answered
      */
     @JvmStatic
-    fun getAppropriateStringForCallNoAnswered(lastMsgSender: Long, context: Context): Spanned {
+    fun getAppropriateStringForCallNoAnswered(
+        lastMsgSender: Long,
+        currentUserHandle: Long,
+        context: Context,
+    ): Spanned {
         val textToShow: String =
-            if (lastMsgSender == MegaApplication.getInstance().megaChatApi.myUserHandle) context.getString(
+            if (lastMsgSender == currentUserHandle) context.getString(
                 R.string.call_not_answered_messages
             ) else context.getString(R.string.call_missed_messages)
 
@@ -121,12 +125,17 @@ object MeetingUtil {
      * Get the appropriate string for call cancelled
      *
      * @param lastMsgSender Handle of sender
+     * @param currentUserHandle Handle of the current user
      * @return appropriate string for call cancelled
      */
     @JvmStatic
-    fun getAppropriateStringForCallCancelled(lastMsgSender: Long, context: Context): Spanned {
+    fun getAppropriateStringForCallCancelled(
+        lastMsgSender: Long,
+        currentUserHandle: Long,
+        context: Context,
+    ): Spanned {
         val textToShow: String =
-            if (lastMsgSender == MegaApplication.getInstance().megaChatApi.myUserHandle) context.getString(
+            if (lastMsgSender == currentUserHandle) context.getString(
                 R.string.call_cancelled_messages
             ) else context.getString(R.string.call_missed_messages)
 

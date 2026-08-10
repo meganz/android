@@ -8,11 +8,18 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoSet
 import mega.privacy.android.data.featuretoggle.DataFeatures
+import mega.privacy.android.data.featuretoggle.persisted.PersistedFeatureFlagValueProvider
+import mega.privacy.android.data.featuretoggle.persisted.PersistentFeatureFlagMemoryCache
 import mega.privacy.android.data.featuretoggle.remote.ABTestFeatureFlagValueProvider
 import mega.privacy.android.data.featuretoggle.remote.ApiFeatureFlagProvider
+import mega.privacy.android.data.featuretoggle.remote.FirebaseFeatureFlagValueProvider
+import mega.privacy.android.data.gateway.featuretoggle.PersistedFeatureFlagSnapshotGateway
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
+import mega.privacy.android.domain.featuretoggle.qualifier.DefaultFeatureFlagProviders
+import mega.privacy.android.domain.featuretoggle.qualifier.PersistedFeatures
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 
 @Module
@@ -35,7 +42,42 @@ internal abstract class FeatureFlagModule {
     @IntoSet
     abstract fun provideRemoteFeatureFlagValueProvider(ABTestFeatureFlagValueProvider: ABTestFeatureFlagValueProvider): @JvmSuppressWildcards FeatureFlagValueProvider
 
+    /**
+     * Provide firebase remote config feature flag value provider
+     *
+     */
+    @Binds
+    @IntoSet
+    abstract fun provideFirebaseFeatureFlagValueProvider(firebaseFeatureFlagValueProvider: FirebaseFeatureFlagValueProvider): @JvmSuppressWildcards FeatureFlagValueProvider
+
+    /**
+     * Provide persisted feature flag value provider
+     */
+    @Binds
+    @IntoSet
+    abstract fun providePersistedFeatureFlagValueProvider(
+        persistedFeatureFlagValueProvider: PersistedFeatureFlagValueProvider,
+    ): @JvmSuppressWildcards FeatureFlagValueProvider
+
+    /**
+     * Provide persisted feature flag snapshot store
+     */
+    @Binds
+    abstract fun providePersistedFeatureFlagSnapshotStore(
+        cache: PersistentFeatureFlagMemoryCache,
+    ): PersistedFeatureFlagSnapshotGateway
+
     companion object {
+
+        /**
+         * Provide the set of features whose values should be persisted to disk.
+         */
+        @Provides
+        @ElementsIntoSet
+        @PersistedFeatures
+        fun provideApiFeaturesAsPersistedFeatures(): Set<@JvmSuppressWildcards Feature> =
+            ApiFeatures.entries.toSet()
+
         /**
          * Provide Data features
          *
@@ -52,6 +94,12 @@ internal abstract class FeatureFlagModule {
         @Provides
         @IntoSet
         fun provideDataFeatureFlagValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            DataFeatures.Companion
+
+        @Provides
+        @IntoSet
+        @DefaultFeatureFlagProviders
+        fun provideDataFeaturesAsDefaultFlagProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             DataFeatures.Companion
 
         /**
@@ -72,6 +120,12 @@ internal abstract class FeatureFlagModule {
         fun provideSyncFeatureFlagValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             SyncFeatures.Companion
 
+        @Provides
+        @IntoSet
+        @DefaultFeatureFlagProviders
+        fun provideSyncFeaturesAsDefaultFlagProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            SyncFeatures.Companion
+
         /**
          * Provide domain features
          *
@@ -88,6 +142,12 @@ internal abstract class FeatureFlagModule {
         @Provides
         @IntoSet
         fun provideDomainFeatureFlagValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            DomainFeatures.Companion
+
+        @Provides
+        @IntoSet
+        @DefaultFeatureFlagProviders
+        fun provideDomainFeaturesAsDefaultFlagProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             DomainFeatures.Companion
     }
 }

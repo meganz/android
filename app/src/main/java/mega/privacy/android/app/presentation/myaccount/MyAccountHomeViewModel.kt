@@ -19,8 +19,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
-import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
+import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
@@ -31,6 +30,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
+import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
@@ -44,6 +44,8 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
+import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -54,6 +56,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MyAccountHomeViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
+    private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val monitorVerificationStatusUseCase: MonitorVerificationStatusUseCase,
@@ -67,12 +70,20 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase,
-    private val accountNameMapper: AccountNameMapper,
+    private val accountTypeNameMapper: AccountTypeNameMapper,
+    private val accountTypeIconMapper: AccountTypeIconMapper,
     private val avatarContentMapper: AvatarContentMapper,
     private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase,
 ) : ViewModel() {
     private val _uiState =
-        MutableStateFlow(MyAccountHomeUIState(accountTypeNameResource = accountNameMapper(null)))
+        MutableStateFlow(
+            MyAccountHomeUIState(
+                accountTypeNameResource = accountTypeNameMapper(null),
+                accountTypeIcon = accountTypeIconMapper(
+                    accountType = null
+                )
+            )
+        )
 
     /**
      * My Account Home Fragment Ui State
@@ -82,6 +93,7 @@ class MyAccountHomeViewModel @Inject constructor(
 
     init {
         refreshAccountInfo()
+        refreshExtendedAccountDetail()
         refreshUserName(false)
         refreshCurrentUserEmail()
         getVisibleContacts()
@@ -148,8 +160,7 @@ class MyAccountHomeViewModel @Inject constructor(
                                     && (accountDetail.levelDetail?.subscriptionRenewTime ?: 0) > 0,
                             hasExpireAbleSubscription = accountDetail.levelDetail?.accountType !== AccountType.FREE && (accountDetail.levelDetail?.proExpirationTime
                                 ?: 0) > 0,
-                            lastSession = (accountDetail.sessionDetail?.mostRecentSessionTimeStamp)
-                                ?: 0,
+                            lastSession = accountDetail.sessionDetail?.mostRecentSessionTimeStamp,
                             usedStorage = accountDetail.storageDetail?.usedStorage ?: 0,
                             usedStoragePercentage = accountDetail.storageDetail?.usedPercentage
                                 ?: 0,
@@ -221,7 +232,10 @@ class MyAccountHomeViewModel @Inject constructor(
                         isBusinessAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
                         isProFlexiAccount = accountDetails.accountTypeIdentifier == AccountType.PRO_FLEXI,
                         isMasterBusinessAccount = accountDetails.isMasterBusinessAccount,
-                        accountTypeNameResource = accountNameMapper(accountDetails.accountTypeIdentifier)
+                        accountTypeNameResource = accountTypeNameMapper(accountDetails.accountTypeIdentifier),
+                        accountTypeIcon = accountTypeIconMapper(
+                            accountType = accountDetails.accountTypeIdentifier
+                        )
                     )
                 }
 
@@ -235,6 +249,21 @@ class MyAccountHomeViewModel @Inject constructor(
                         businessProFlexiStatus = businessStatus
                     )
                 }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    private fun refreshExtendedAccountDetail() {
+        viewModelScope.launch {
+            runCatching {
+                getExtendedAccountDetail(
+                    forceRefresh = true,
+                    sessions = true,
+                    purchases = true,
+                    transactions = false,
+                )
             }.onFailure {
                 Timber.e(it)
             }

@@ -2,14 +2,12 @@ package mega.privacy.android.data.repository
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -49,7 +47,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private val megaApi: MegaApiGateway,
     private val megaApiFolder: MegaApiFolderGateway,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
-    private val dbHandler: Lazy<DatabaseHandler>,
     private val fileNodeMapper: FileNodeMapper,
     private val typedAudioNodeMapper: TypedAudioNodeMapper,
     private val typedVideoNodeMapper: TypedVideoNodeMapper,
@@ -96,7 +93,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         getMegaNodeByCategory(
             searchCategory = SearchCategory.AUDIO,
             order = order
-        ).map { megaNode ->
+        ).mapNotNull { megaNode ->
             convertToTypedAudioNode(megaNode)
         }
 
@@ -105,7 +102,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         getMegaNodeByCategory(
             searchCategory = SearchCategory.VIDEO,
             order = order
-        ).map { megaNode ->
+        ).mapNotNull { megaNode ->
             convertToTypedVideoNode(megaNode)
         }
 
@@ -145,7 +142,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             searchCategory = SearchCategory.AUDIO,
             order = order,
             recursive = false
-        ).map { megaNode ->
+        ).mapNotNull { megaNode ->
             convertToTypedAudioNode(megaNode)
         }
     }
@@ -159,7 +156,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             searchCategory = SearchCategory.VIDEO,
             order = order,
             recursive = false
-        ).map { megaNode ->
+        ).mapNotNull { megaNode ->
             convertToTypedVideoNode(megaNode)
         }
     }
@@ -173,7 +170,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             searchCategory = SearchCategory.AUDIO,
             order = order,
             recursive = false
-        ).map { megaNode ->
+        ).mapNotNull { megaNode ->
             convertToTypedAudioNode(megaNode)
         }
     }
@@ -187,7 +184,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             searchCategory = SearchCategory.VIDEO,
             order = order,
             recursive = false
-        ).map { megaNode ->
+        ).mapNotNull { megaNode ->
             convertToTypedVideoNode(megaNode)
         }
     }
@@ -198,7 +195,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 searchCategory = SearchCategory.AUDIO,
                 order = order,
                 searchTarget = SearchTarget.LINKS_SHARE
-            ).map { node ->
+            ).mapNotNull { node ->
                 convertToTypedAudioNode(node)
             }
         }
@@ -209,7 +206,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 searchCategory = SearchCategory.VIDEO,
                 order = order,
                 searchTarget = SearchTarget.LINKS_SHARE
-            ).map { node ->
+            ).mapNotNull { node ->
                 convertToTypedVideoNode(node)
             }
         }
@@ -221,7 +218,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 searchCategory = SearchCategory.AUDIO,
                 order = order,
                 searchTarget = SearchTarget.INCOMING_SHARE
-            ).map { node ->
+            ).mapNotNull { node ->
                 convertToTypedAudioNode(node)
             }
         }
@@ -232,7 +229,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 searchCategory = SearchCategory.VIDEO,
                 order = order,
                 searchTarget = SearchTarget.INCOMING_SHARE
-            ).map { node ->
+            ).mapNotNull { node ->
                 convertToTypedVideoNode(node)
             }
         }
@@ -246,7 +243,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             order = order,
             parentId = NodeId(lastHandle),
             searchTarget = SearchTarget.OUTGOING_SHARE
-        ).map { node ->
+        ).mapNotNull { node ->
             convertToTypedAudioNode(node)
         }
     }
@@ -260,7 +257,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             order = order,
             parentId = NodeId(lastHandle),
             searchTarget = SearchTarget.OUTGOING_SHARE
-        ).map { megaNode ->
+        ).mapNotNull { megaNode ->
             convertToTypedVideoNode(megaNode)
         }
     }
@@ -270,7 +267,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             megaApi.getContact(email)?.let { megaUser ->
                 megaApi.getInShares(megaUser).filter { megaNode ->
                     megaNode.isFile && filterByNodeName(true, megaNode.name)
-                }.map { node ->
+                }.mapNotNull { node ->
                     convertToTypedAudioNode(node)
                 }
             }
@@ -281,7 +278,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             megaApi.getContact(email)?.let { megaUser ->
                 megaApi.getInShares(megaUser).filter { megaNode ->
                     megaNode.isFile && filterByNodeName(false, megaNode.name)
-                }.map { node ->
+                }.mapNotNull { node ->
                     convertToTypedVideoNode(node)
                 }
             }
@@ -291,7 +288,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         val offlineMap = getAllOfflineNodeHandle()
         return handles.mapNotNull { handle ->
             megaApi.getMegaNodeByHandle(handle)
-        }.map { node ->
+        }.mapNotNull { node ->
             convertToTypedAudioNode(node = node, offline = offlineMap[node.handle.toString()])
         }
     }
@@ -300,7 +297,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         val offlineMap = getAllOfflineNodeHandle()
         return handles.mapNotNull { handle ->
             megaApi.getMegaNodeByHandle(handle)
-        }.map { node ->
+        }.mapNotNull { node ->
             convertToTypedVideoNode(node = node, offline = offlineMap[node.handle.toString()])
         }
     }
@@ -534,8 +531,8 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    private fun getMegaUserNameDB(user: MegaUser): String? =
-        dbHandler.get().findContactByHandle(user.handle)?.let { megaContactDB ->
+    private suspend fun getMegaUserNameDB(user: MegaUser): String? =
+        megaLocalRoomGateway.getContactByHandle(user.handle)?.let { megaContactDB ->
             when {
                 megaContactDB.nickname.isNullOrEmpty().not() -> {
                     megaContactDB.nickname
@@ -572,7 +569,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             searchCategory = SearchCategory.VIDEO,
             order = order
         )
-        return nodes.map { node ->
+        return nodes.mapNotNull { node ->
             convertToTypedVideoNode(node)
         }
     }
@@ -639,18 +636,22 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private suspend fun convertToTypedVideoNode(
         node: MegaNode,
         offline: Offline? = null,
-    ): TypedVideoNode = typedVideoNodeMapper(
-        fileNode = node.convertToFileNode(offline),
-        node.duration
-    )
+    ): TypedVideoNode? = node.convertToFileNode(offline)?.let { fileNode ->
+        typedVideoNodeMapper(
+            fileNode = fileNode,
+            node.duration
+        )
+    }
 
     private suspend fun convertToTypedAudioNode(
         node: MegaNode,
         offline: Offline? = null,
-    ): TypedAudioNode = typedAudioNodeMapper(
-        fileNode = node.convertToFileNode(offline),
-        node.duration,
-    )
+    ): TypedAudioNode? = node.convertToFileNode(offline)?.let { fileNode ->
+        typedAudioNodeMapper(
+            fileNode = fileNode,
+            node.duration,
+        )
+    }
 
     private suspend fun MegaNode.convertToFileNode(offline: Offline?) = fileNodeMapper(
         megaNode = this, requireSerializedData = true, offline = offline

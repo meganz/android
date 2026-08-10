@@ -22,8 +22,9 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEv
 import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.FolderTreeInfo
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -74,9 +76,11 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -84,6 +88,10 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
+import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
+import mega.privacy.android.shared.contact.mapper.ContactPermissionUiStateMapper
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -92,6 +100,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -140,7 +149,6 @@ internal class FileInfoViewModelTest {
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase = mock()
     private val monitorChatOnlineStatusUseCase = mock<MonitorChatOnlineStatusUseCase>()
     private val clipboardGateway = mock<ClipboardGateway>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
@@ -154,11 +162,18 @@ internal class FileInfoViewModelTest {
     private val monitorAccountDetailsUseCase = mock<MonitorAccountDetailUseCase>()
     private val isMasterBusinessAccountUseCase = mock<IsMasterBusinessAccountUseCase>()
     private val isBusinessAccountActiveUseCase = mock<IsBusinessAccountActiveUseCase>()
+    private val getNodeLocationByIdUseCase = mock<GetNodeLocationByIdUseCase>()
 
     private val typedFileNode: TypedFileNode = mock()
 
     private val previewFile: File = mock()
     private val getImageNodeByIdUseCase = mock<GetImageNodeByIdUseCase>()
+    private val nodeDestinationMapper = mock<NodeDestinationMapper>()
+    private val contactItemStatusMapper = mock<ContactItemStatusMapper>()
+    private val contactPermissionUiStateMapper = mock<ContactPermissionUiStateMapper>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getShareFolderSensitiveWarningUseCase =
+        mock<GetShareFolderSensitiveWarningUseCase>()
 
     @BeforeEach
     fun cleanUp() = runTest {
@@ -200,7 +215,6 @@ internal class FileInfoViewModelTest {
             getAvailableNodeActionsUseCase,
             monitorChatOnlineStatusUseCase,
             clipboardGateway,
-            getFeatureFlagValueUseCase,
             getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase,
             isCameraUploadsEnabledUseCase,
@@ -211,7 +225,11 @@ internal class FileInfoViewModelTest {
             previewFile,
             isMasterBusinessAccountUseCase,
             isBusinessAccountActiveUseCase,
-            monitorAccountDetailsUseCase
+            monitorAccountDetailsUseCase,
+            getNodeLocationByIdUseCase,
+            nodeDestinationMapper,
+            getFeatureFlagValueUseCase,
+            getShareFolderSensitiveWarningUseCase,
         )
     }
 
@@ -247,7 +265,6 @@ internal class FileInfoViewModelTest {
             nodeActionMapper = nodeActionMapper,
             monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,
             clipboardGateway = clipboardGateway,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
@@ -259,7 +276,13 @@ internal class FileInfoViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailsUseCase,
             isMasterBusinessAccountUseCase = isMasterBusinessAccountUseCase,
             isBusinessAccountActiveUseCase = isBusinessAccountActiveUseCase,
-            iODispatcher = UnconfinedTestDispatcher()
+            getNodeLocationByIdUseCase = getNodeLocationByIdUseCase,
+            iODispatcher = UnconfinedTestDispatcher(),
+            nodeDestinationMapper = nodeDestinationMapper,
+            contactItemStatusMapper = contactItemStatusMapper,
+            contactPermissionUiStateMapper = contactPermissionUiStateMapper,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
         )
     }
 
@@ -283,6 +306,7 @@ internal class FileInfoViewModelTest {
             .thenReturn(File(null as File?, THUMB_URI))
         whenever(typedFileNode.name).thenReturn("File name")
         whenever(typedFileNode.id).thenReturn(nodeId)
+        whenever(typedFileNode.parentId).thenReturn(parentId)
         whenever(getNodeAccessPermission.invoke(nodeId)).thenReturn(AccessPermission.READ)
         whenever(getPreviewUseCase.invoke(any())).thenReturn(null)
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
@@ -567,6 +591,83 @@ internal class FileInfoViewModelTest {
         }
 
     @Test
+    fun `test that LaunchShareContactPicker is triggered when shareFolderWithContactsClicked and compose picker disabled`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+
+            underTest.shareFolderWithContactsClicked()
+
+            testEventIsOfType(FileInfoOneOffViewEvent.LaunchShareContactPicker::class.java)
+            assertThat(underTest.uiState.value.shareHiddenNodeWarning)
+                .isEqualTo(SensitiveNodeShareWarning.None)
+        }
+
+    @Test
+    fun `test that LaunchShareContactPicker is triggered when shareFolderWithContactsClicked and no sensitive warning`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getShareFolderSensitiveWarningUseCase(any()))
+                .thenReturn(SensitiveNodeShareWarning.None)
+
+            underTest.shareFolderWithContactsClicked()
+
+            testEventIsOfType(FileInfoOneOffViewEvent.LaunchShareContactPicker::class.java)
+            assertThat(underTest.uiState.value.shareHiddenNodeWarning)
+                .isEqualTo(SensitiveNodeShareWarning.None)
+        }
+
+    @Test
+    fun `test that warning is set when shareFolderWithContactsClicked and folder is sensitive`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getShareFolderSensitiveWarningUseCase(any()))
+                .thenReturn(SensitiveNodeShareWarning.Folder)
+
+            underTest.shareFolderWithContactsClicked()
+
+            assertThat(underTest.uiState.value.shareHiddenNodeWarning)
+                .isEqualTo(SensitiveNodeShareWarning.Folder)
+            assertThat(underTest.uiState.value.oneOffViewEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+
+    @Test
+    fun `test that confirming the warning triggers LaunchShareContactPicker and clears the warning`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getShareFolderSensitiveWarningUseCase(any()))
+                .thenReturn(SensitiveNodeShareWarning.Folder)
+            underTest.shareFolderWithContactsClicked()
+
+            underTest.shareHiddenNodeWarningConfirmed()
+
+            testEventIsOfType(FileInfoOneOffViewEvent.LaunchShareContactPicker::class.java)
+            assertThat(underTest.uiState.value.shareHiddenNodeWarning)
+                .isEqualTo(SensitiveNodeShareWarning.None)
+        }
+
+    @Test
+    fun `test that dismissing the warning clears it without launching the picker`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getShareFolderSensitiveWarningUseCase(any()))
+                .thenReturn(SensitiveNodeShareWarning.Folders)
+            underTest.shareFolderWithContactsClicked()
+
+            underTest.shareHiddenNodeWarningDismissed()
+
+            assertThat(underTest.uiState.value.shareHiddenNodeWarning)
+                .isEqualTo(SensitiveNodeShareWarning.None)
+            assertThat(underTest.uiState.value.oneOffViewEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+
+    @Test
     fun `test that NodeDescriptionUpdated event is triggered when setting the same description`() =
         runTest {
             whenever(setNodeDescriptionUseCase(NodeId(any()), any())).thenReturn(Unit)
@@ -837,17 +938,21 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test getOutShares result is set on uiState`() = runTest {
-        val expected = mock<List<ContactPermission>>()
-        whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(expected)
+        val result = listOf(mock<ContactPermission>())
+        whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(result)
+        val expected = mock<ContactPermissionUiState>()
+        whenever(contactPermissionUiStateMapper.invoke(any())).thenReturn(expected)
         underTest.setNode(node.handle, true)
-        assertThat(underTest.uiState.value.outShares).isEqualTo(expected)
+        assertThat(underTest.uiState.value.outShares).isEqualTo(listOf(expected))
     }
 
     @Test
     fun `test getOutShares is fetched when contacts update is received and there are out shares`() =
         runTest {
-            val expected = mock<List<ContactPermission>>()
-            whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(expected)
+            val result = listOf(mock<ContactPermission>())
+            whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(result)
+            val expected = mock<ContactPermissionUiState>()
+            whenever(contactPermissionUiStateMapper.invoke(any())).thenReturn(expected)
             val updateChanges = mapOf(Pair(UserId(1L), listOf(UserChanges.Alias)))
             val update = mock<UserUpdate> {
                 on { changes }.thenReturn(updateChanges)
@@ -992,8 +1097,11 @@ internal class FileInfoViewModelTest {
         }
     }
 
-    @Test
-    fun `test that when folder tree info is received then total size, folder content and available offline is updated correctly`() =
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that when folder tree info is received then total size, folder content and available offline is updated correctly`(
+        isKeyDecrypted: Boolean,
+    ) =
         runTest {
             val actualSize = 1024L
             val versionsSize = 512L
@@ -1001,6 +1109,7 @@ internal class FileInfoViewModelTest {
             val folderNode = mock<TypedFolderNode> {
                 on { id }.thenReturn(nodeId)
                 on { name }.thenReturn("Folder name")
+                on { isNodeKeyDecrypted }.thenReturn(isKeyDecrypted)
             }.also { folderNode ->
                 whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(folderNode)
                 whenever(getFolderTreeInfo.invoke(folderNode))
@@ -1011,7 +1120,7 @@ internal class FileInfoViewModelTest {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.folderTreeInfo).isEqualTo(folderTreeInfo)
-                assertThat(actual.isAvailableOfflineAvailable).isTrue()
+                assertThat(actual.isAvailableOfflineAvailable).isEqualTo(isKeyDecrypted)
                 assertThat(actual.sizeInBytes)
                     .isEqualTo(actualSize + versionsSize)
             }
@@ -1348,5 +1457,28 @@ internal class FileInfoViewModelTest {
         private val parentId = NodeId(PARENT_NODE_HANDLE)
         private const val THUMB_URI = "/thumb"
         private const val PREVIEW_URI = "/preview"
+    }
+
+    @Test
+    fun `test that getCurrentNodeId returns node id when typedNode is initialized`() = runTest {
+        underTest.setNode(node.handle, true)
+        assertThat(underTest.getCurrentNodeId()).isEqualTo(nodeId)
+    }
+
+    @Test
+    fun `test that getCurrentNodeId returns null when typedNode is not initialized`() {
+        assertThat(underTest.getCurrentNodeId()).isNull()
+    }
+
+    @Test
+    fun `test that getCurrentNodeParentId returns parent id when typedNode is initialized`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            assertThat(underTest.getCurrentNodeParentId()).isEqualTo(parentId)
+        }
+
+    @Test
+    fun `test that getCurrentNodeParentId returns null when typedNode is not initialized`() {
+        assertThat(underTest.getCurrentNodeParentId()).isNull()
     }
 }

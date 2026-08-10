@@ -1,19 +1,17 @@
 package mega.privacy.android.feature.clouddrive.presentation.offline
 
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.navigation.contract.transparent.transparentMetadata
-import mega.privacy.android.navigation.destination.OfflineInfoNavKey
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.OfflineNavKey
-import mega.privacy.android.navigation.megaNavigator
 
 fun EntryProviderScope<NavKey>.offlineScreen(
+    navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
+    onNavigateToTransfers: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     openFileInformation: (String) -> Unit,
 ) {
@@ -28,26 +26,10 @@ fun EntryProviderScope<NavKey>.offlineScreen(
             viewModel = viewModel,
             onBack = onBack,
             onNavigateToFolder = onNavigateToFolder,
+            onNavigateToTransfers = onNavigateToTransfers,
             onTransfer = onTransfer,
-            openFileInformation = openFileInformation
+            openFileInformation = openFileInformation,
+            onNavigate = navigationHandler::navigate,
         )
-    }
-}
-
-fun EntryProviderScope<NavKey>.offlineInfoScreen(
-    removeDestination: () -> Unit,
-) {
-    entry<OfflineInfoNavKey>(
-        metadata = transparentMetadata()
-    ) { args ->
-        val context = LocalContext.current
-
-        LaunchedEffect(Unit) {
-            context.megaNavigator.openOfflineFileInfoActivity(
-                context = context,
-                handle = args.handle
-            )
-            removeDestination()
-        }
     }
 }

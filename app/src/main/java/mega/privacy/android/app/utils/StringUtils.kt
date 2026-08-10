@@ -8,15 +8,14 @@ import androidx.core.text.HtmlCompat
 
 object StringUtils {
 
+    /**
+     * To spanned html text
+     *
+     * @return html formatted text
+     */
     @JvmStatic
     fun String.toSpannedHtmlText(): Spanned =
         HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_LEGACY)
-
-    @JvmStatic
-    fun String.isTextEmpty() = TextUtil.isTextEmpty(this)
-
-    @JvmStatic
-    fun String.toThrowable(): Throwable = Throwable(this)
 
     /**
      * Format String with HTML color tags

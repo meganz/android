@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers.pending
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -29,6 +30,8 @@ class InsertPendingUploadsForFilesUseCaseTest {
     private val transferRepository = mock<TransferRepository>()
     private val timeSystemRepository = mock<TimeSystemRepository>()
     private val nodeRepository = mock<NodeRepository>()
+
+    private val pitagTrigger = PitagTrigger.Picker
 
     @BeforeAll
     fun setUp() {
@@ -90,14 +93,16 @@ class InsertPendingUploadsForFilesUseCaseTest {
                 uriPath = UriPath(path),
                 appData = appData,
                 isHighPriority = isHighPriority,
-                fileName = name
+                fileName = name,
+                pitagTrigger = pitagTrigger,
             )
         }
 
         underTest(
-            pathsAndNames,
-            parentFolderId,
-            isHighPriority,
+            pathsAndNames = pathsAndNames,
+            parentFolderId = parentFolderId,
+            isHighPriority = isHighPriority,
+            pitagTrigger = pitagTrigger,
         )
 
         verify(transferRepository).insertPendingTransfers(expected)

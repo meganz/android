@@ -1,16 +1,24 @@
 package mega.privacy.mobile.navigation.snowflake
 
+import android.content.res.Configuration
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuite
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -19,14 +27,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirst
 import androidx.navigation3.runtime.NavKey
@@ -43,6 +52,9 @@ import mega.privacy.android.navigation.contract.DefaultNumberBadge
 import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.contract.state.LocalBottomNavigationVisible
+import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationIcon
 import mega.privacy.mobile.navigation.snowflake.model.NavigationAnimationConfig
@@ -60,7 +72,7 @@ val DefaultNavigationAnimationConfig = NavigationAnimationConfig(
 fun MainNavigationScaffold(
     modifier: Modifier = Modifier,
     mainNavItems: ImmutableSet<NavigationItem>,
-    onDestinationClick: (NavKey) -> Unit,
+    onDestinationClick: (MainNavItemNavKey) -> Unit,
     isSelected: (NavKey) -> Boolean,
     animationConfig: NavigationAnimationConfig = DefaultNavigationAnimationConfig,
     mainNavItemIcon: @Composable (ImageVector, String, Modifier) -> Unit = { icon, label, modifier ->
@@ -73,16 +85,19 @@ fun MainNavigationScaffold(
     navContent: @Composable (NavigationUiController) -> Unit,
     availableSlots: Int = 5,
 ) {
-
-    val navSuiteType =
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val navSuiteType = if (isLandscape) {
+        NavigationSuiteType.NavigationRail
+    } else {
         NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfo())
-
+    }
 
     // Order items based on preferredSlot
     val orderedItems = orderNavigationItems(items = mainNavItems, availableSlots = availableSlots)
     var isNavigationVisible by rememberSaveable { mutableStateOf(true) }
-    val navUiController = NavigationUiController {
-        isNavigationVisible = it
+    val navUiController = remember {
+        NavigationUiController { isNavigationVisible = it }
     }
 
     MegaNavigationSuiteScaffoldLayout(
@@ -100,7 +115,29 @@ fun MainNavigationScaffold(
         isNavigationVisible = isNavigationVisible,
         animationConfig = animationConfig,
         content = {
-            navContent(navUiController)
+            CompositionLocalProvider(
+                LocalBottomNavigationVisible provides isNavigationVisible,
+                LocalNavigationRailVisible provides (navSuiteType == NavigationSuiteType.NavigationRail)
+            ) {
+                Box(
+                    modifier = if (isNavigationVisible) {
+                        // we need to consume the displayCutout and other insets depending on MegaNavigationSuite orientation, otherwise it will be applied again to the top app bar or other components
+                        Modifier.consumeWindowInsets(
+                            insets = ScaffoldDefaults.contentWindowInsets.only(
+                                sides = if (navSuiteType == NavigationSuiteType.NavigationRail) {
+                                    WindowInsetsSides.Start
+                                } else {
+                                    WindowInsetsSides.Bottom
+                                }
+                            )
+                        )
+                    } else {
+                        Modifier
+                    }
+                ) {
+                    navContent(navUiController)
+                }
+            }
         }
     )
 }
@@ -111,28 +148,38 @@ private fun MegaNavigationSuite(
     orderedItems: List<NavigationItem>,
     mainNavItemIcon: @Composable ((ImageVector, String, Modifier) -> Unit),
     isSelected: (NavKey) -> Boolean,
-    onDestinationClick: (NavKey) -> Unit,
+    onDestinationClick: (MainNavItemNavKey) -> Unit,
 ) {
     val scaffoldColors = NavigationScaffoldColors.scaffoldColors()
     val itemColors = NavigationScaffoldColors.itemColors()
     val borderColor = DSTokens.colors.border.subtle
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     NavigationSuite(
+        layoutType = navSuiteType,
         colors = scaffoldColors,
         modifier = Modifier
-            .drawBehind {
-                val strokeWidth = 2.dp.toPx()
+            .testTag(if (navSuiteType == NavigationSuiteType.NavigationBar) MAIN_NAVIGATION_BAR_TEST_TAG else MAIN_NAVIGATION_RAIL_TEST_TAG)
+            .then(
+                if (navSuiteType == NavigationSuiteType.NavigationBar) Modifier
+                else Modifier.padding(top = 14.dp) // to align it to the toolbar title
+            )
+            .drawWithContent {
+                drawContent()
+                val strokeWidth = 1.dp.toPx()
+                val delta = strokeWidth / 2f
                 if (navSuiteType == NavigationSuiteType.NavigationBar) {
                     drawLine(
                         color = borderColor,
-                        start = Offset(0f, 0f),
-                        end = Offset(size.width, 0f),
+                        start = Offset(0f, delta),
+                        end = Offset(size.width, delta),
                         strokeWidth = strokeWidth
                     )
                 } else {
                     drawLine(
                         color = borderColor,
-                        start = Offset(size.width, 0f),
-                        end = Offset(size.width, size.height),
+                        start = Offset(size.width - delta, 0f),
+                        end = Offset(size.width - delta, size.height),
                         strokeWidth = strokeWidth
                     )
                 }
@@ -141,13 +188,14 @@ private fun MegaNavigationSuite(
         orderedItems.forEach { navItem ->
             val selected = isSelected(navItem.destination)
             item(
+                modifier = Modifier.testTag(navItem.testTag),
                 icon = {
                     mainNavItemIcon(
                         navItem.getIcon(selected),
                         stringResource(navItem.label),
                         Modifier
                             .size(24.dp)
-                            .testTag(navItem.testTag),
+                            .testTag("${navItem.testTag}:icon"),
                     )
                 },
                 badge = navItem.badge?.composeLet { badge ->
@@ -160,7 +208,22 @@ private fun MegaNavigationSuite(
                         }.testTag("${navItem.testTag}:badge")
                     )
                 },
-                label = { Text(text = stringResource(navItem.label)) },
+                label = {
+                    Text(
+                        text = stringResource(navItem.label),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .let { modifier ->
+                                if (isPortrait && navSuiteType == NavigationSuiteType.NavigationBar) {
+                                    modifier.widthIn(max = 80.dp)
+                                } else {
+                                    modifier
+                                }
+                            }
+                            .testTag("${navItem.testTag}:label")
+                    )
+                },
                 selected = selected,
                 onClick = {
                     navItem.analyticsEventIdentifier?.let { Analytics.tracker.trackEvent(it) }
@@ -206,76 +269,75 @@ private fun MegaNavigationSuiteScaffoldLayout(
     animationConfig: NavigationAnimationConfig,
     content: @Composable () -> Unit = {},
 ) {
-    LookaheadScope {
-        // Animate the navigation visibility using animateFloatAsState
-        val navigationVisibility by animateFloatAsState(
-            targetValue = if (isNavigationVisible) 1f else 0f,
-            animationSpec = animationConfig.createAnimationSpec(),
-            label = "navigation_visibility"
-        )
-        Layout(
-            modifier = modifier,
-            content = {
-                // Wrap the navigation suite and content composables each in a Box to not propagate the
-                // parent's (Surface) min constraints to its children (see b/312664933).
-                Box(
-                    Modifier.layoutId(NavigationSuiteLayoutIdTag)
-                ) { navigationSuite() }
-                Box(
-                    Modifier.layoutId(ContentLayoutIdTag)
-                ) { content() }
-            }
-        ) { measurables, constraints ->
-            val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
-            val isNavigationBar = layoutType == NavigationSuiteType.NavigationBar
-            val layoutHeight = constraints.maxHeight
-            val layoutWidth = constraints.maxWidth
+    // Animate the navigation visibility using animateFloatAsState
+    val navigationVisibility by animateFloatAsState(
+        targetValue = if (isNavigationVisible) 1f else 0f,
+        animationSpec = animationConfig.createAnimationSpec(),
+        label = "navigation_visibility"
+    )
+    Layout(
+        modifier = modifier,
+        content = {
+            // Wrap the navigation suite and content composables each in a Box to not propagate the
+            // parent's (Surface) min constraints to its children (see b/312664933).
+            Box(
+                Modifier.layoutId(NavigationSuiteLayoutIdTag)
+            ) { navigationSuite() }
+            Box(
+                Modifier.layoutId(ContentLayoutIdTag)
+            ) { content() }
+        }
+    ) { measurables, constraints ->
+        val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+        val isNavigationBar = layoutType == NavigationSuiteType.NavigationBar
+        val layoutHeight = constraints.maxHeight
+        val layoutWidth = constraints.maxWidth
 
-            // Find the navigation suite composable through its layoutId tag
-            val navigationPlaceable =
-                measurables
-                    .fastFirst { it.layoutId == NavigationSuiteLayoutIdTag }
-                    .measure(looseConstraints)
+        // Find the navigation suite composable through its layoutId tag
+        val navigationPlaceable =
+            measurables
+                .fastFirst { it.layoutId == NavigationSuiteLayoutIdTag }
+                .measure(looseConstraints)
 
-            // Calculate animated navigation dimensions
-            val animatedNavigationHeight =
-                (navigationPlaceable.height * navigationVisibility).toInt()
-            val animatedNavigationWidth = (navigationPlaceable.width * navigationVisibility).toInt()
+        // Calculate animated navigation dimensions
+        val animatedNavigationHeight =
+            (navigationPlaceable.height * navigationVisibility).toInt()
+        val animatedNavigationWidth =
+            (navigationPlaceable.width * navigationVisibility).toInt()
 
-            // Find the content composable through its layoutId tag
-            val contentPlaceable =
-                measurables
-                    .fastFirst { it.layoutId == ContentLayoutIdTag }
-                    .measure(
-                        if (isNavigationBar) {
-                            constraints.copy(
-                                minHeight = layoutHeight - animatedNavigationHeight,
-                                maxHeight = layoutHeight - animatedNavigationHeight
-                            )
-                        } else {
-                            constraints.copy(
-                                minWidth = layoutWidth - animatedNavigationWidth,
-                                maxWidth = layoutWidth - animatedNavigationWidth
-                            )
-                        }
-                    )
-
-            layout(layoutWidth, layoutHeight) {
-                if (isNavigationBar) {
-                    // Place content above the navigation component.
-                    contentPlaceable.placeRelative(0, 0)
-                    // Place the navigation component at the bottom of the screen with animated position.
-                    if (animatedNavigationHeight > 0) {
-                        val navigationY = layoutHeight - animatedNavigationHeight
-                        navigationPlaceable.placeRelative(0, navigationY)
+        // Find the content composable through its layoutId tag
+        val contentPlaceable =
+            measurables
+                .fastFirst { it.layoutId == ContentLayoutIdTag }
+                .measure(
+                    if (isNavigationBar) {
+                        constraints.copy(
+                            minHeight = layoutHeight - animatedNavigationHeight,
+                            maxHeight = layoutHeight - animatedNavigationHeight
+                        )
+                    } else {
+                        constraints.copy(
+                            minWidth = layoutWidth - animatedNavigationWidth,
+                            maxWidth = layoutWidth - animatedNavigationWidth
+                        )
                     }
-                } else {
-                    // Place the navigation component at the start of the screen with animated position.
-                    val navigationX = -navigationPlaceable.width + animatedNavigationWidth
-                    navigationPlaceable.placeRelative(navigationX, 0)
-                    // Place content to the side of the navigation component.
-                    contentPlaceable.placeRelative(animatedNavigationWidth, 0)
+                )
+
+        layout(layoutWidth, layoutHeight) {
+            if (isNavigationBar) {
+                // Place content above the navigation component.
+                contentPlaceable.placeRelative(0, 0)
+                // Place the navigation component at the bottom of the screen with animated position.
+                if (animatedNavigationHeight > 0) {
+                    val navigationY = layoutHeight - animatedNavigationHeight
+                    navigationPlaceable.placeRelative(0, navigationY)
                 }
+            } else {
+                // Place the navigation component at the start of the screen with animated position.
+                val navigationX = -navigationPlaceable.width + animatedNavigationWidth
+                navigationPlaceable.placeRelative(navigationX, 0)
+                // Place content to the side of the navigation component.
+                contentPlaceable.placeRelative(animatedNavigationWidth, 0)
             }
         }
     }
@@ -286,6 +348,9 @@ private const val ContentLayoutIdTag = "content"
 
 internal val WindowAdaptiveInfoDefault
     @Composable get() = currentWindowAdaptiveInfo()
+
+internal const val MAIN_NAVIGATION_BAR_TEST_TAG = "main_navigation:navigation_bar"
+internal const val MAIN_NAVIGATION_RAIL_TEST_TAG = "main_navigation:navigation_rail"
 
 
 @CombinedThemePreviews
@@ -312,7 +377,7 @@ private fun MainNavigationScaffoldPreview(modifier: Modifier = Modifier) {
                 IconPack.Medium.Thin.Outline.Menu01 to IconPack.Medium.Thin.Solid.Menu01,
             ).mapIndexed { index, icons ->
                 NavigationItem(
-                    destination = NavKeyForPreview(index),
+                    destination = MainNavItemNavKeyForPreview(index),
                     icon = icons.first,
                     selectedIcon = icons.second,
                     label = sharedR.string.general_menu,
@@ -325,12 +390,12 @@ private fun MainNavigationScaffoldPreview(modifier: Modifier = Modifier) {
                         else -> null
                     }
                 )
-            }.toImmutableSet(),
-            onDestinationClick = { selectedIndex = (it as? NavKeyForPreview)?.index ?: 1 },
-            isSelected = { selectedIndex == (it as? NavKeyForPreview)?.index },
+            }.toImmutableSet(), onDestinationClick = {
+                selectedIndex = (it as? MainNavItemNavKeyForPreview)?.index ?: 1
+            }, isSelected = { selectedIndex == (it as? MainNavItemNavKeyForPreview)?.index },
             navContent = {}
         )
     }
 }
 
-private data class NavKeyForPreview(val index: Int) : NavKey
+private data class MainNavItemNavKeyForPreview(val index: Int) : MainNavItemNavKey

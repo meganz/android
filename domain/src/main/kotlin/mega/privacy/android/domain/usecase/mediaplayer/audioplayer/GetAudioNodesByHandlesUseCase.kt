@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import javax.inject.Inject
 
@@ -16,5 +17,7 @@ class GetAudioNodesByHandlesUseCase @Inject constructor(
      * @return audio nodes
      */
     suspend operator fun invoke(handles: List<Long>) =
-        mediaPlayerRepository.getAudioNodesByHandles(handles)
+        mediaPlayerRepository.getAudioNodesByHandles(handles).filter { node ->
+            node.type is AudioFileTypeInfo
+        }
 }

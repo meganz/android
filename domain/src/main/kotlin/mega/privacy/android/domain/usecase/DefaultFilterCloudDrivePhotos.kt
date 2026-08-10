@@ -9,6 +9,7 @@ import javax.inject.Inject
  *
  * @property photosRepository
  */
+@Deprecated("Please use FilterCloudDriveMediaUseCase instead")
 class DefaultFilterCloudDrivePhotos @Inject constructor(
     private val photosRepository: PhotosRepository,
 ) : FilterCloudDrivePhotos {

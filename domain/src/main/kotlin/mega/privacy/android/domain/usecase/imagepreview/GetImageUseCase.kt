@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.imagepreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
@@ -111,6 +112,13 @@ class GetImageUseCase @Inject constructor(
                     }
                 }
             }
+        }.onCompletion {
+            // If this download flow terminates (normally, on error, or — most importantly —
+            // because the collector was cancelled, e.g. the user swiped to another page) before
+            // fully loading, evict the partial cache entry so the node is re-fetched on the next
+            // access instead of being stuck on a low-res preview or a black frame. No-op when the
+            // download completed (saveImageResult already removed the entry).
+            photosRepository.clearImageResult(node.id)
         }
     }
 

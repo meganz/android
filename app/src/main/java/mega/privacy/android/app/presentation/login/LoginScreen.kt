@@ -9,15 +9,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
+import mega.privacy.android.feature.signin.external.ui.rememberGoogleSignInLauncher
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.privacy.android.analytics.Analytics
@@ -50,14 +53,17 @@ fun LoginScreen(
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val googleSignInLauncher = rememberGoogleSignInLauncher(
+        onIdToken = viewModel::onGoogleSignIn,
+        onError = viewModel::onGoogleSignInError,
+    )
+    val onGoogleSignInClicked = remember(googleSignInLauncher) { googleSignInLauncher::invoke }
     val keyboardController = LocalSoftwareKeyboardController.current
     var showIncorrectRkDialog by rememberSaveable { mutableStateOf(false) }
     var recoveryKeyInput by rememberSaveable(uiState.recoveryKeyLink) { mutableStateOf("") }
     var recoveryKeyError by rememberSaveable(uiState.recoveryKeyLink) {
         mutableStateOf<String?>(null)
     }
-
-    LoginIntentActionHandler(viewModel = viewModel, uiState = uiState)
 
     EventEffect(uiState.checkRecoveryKeyEvent, viewModel::onCheckRecoveryKeyEventConsumed) {
         if (it.isSuccess) {
@@ -73,32 +79,34 @@ fun LoginScreen(
             when ((e as? MegaException)?.errorCode ?: Int.MIN_VALUE) {
                 MegaError.API_EKEY -> showIncorrectRkDialog = true
                 MegaError.API_EBLOCKED -> viewModel.setSnackbarMessageId(R.string.error_reset_account_blocked)
-                else -> viewModel.setSnackbarMessageId(R.string.general_text_error)
+                else -> viewModel.setSnackbarMessageId(sharedR.string.general_text_error)
             }
         }
     }
 
-    EventEffect(uiState.openRecoveryUrlEvent, viewModel::onOpenRecoveryUrlEventConsumed) {
-        openRecoveryUrl(context, it)
+    EventEffect(uiState.openUrlEvent, viewModel::onOpenUrlEventConsumed) {
+        Timber.d("Open url $it")
+        context.launchUrl(it)
     }
 
-    BackHandler {
+    val needsBackOverride = with(uiState) {
+        Constants.ACTION_REFRESH_API_SERVER == activity?.intent?.action ||
+                is2FARequired || multiFactorAuthState != null ||
+                viewModel.loginMutex.isLocked || isLoginInProgress
+    }
+
+    BackHandler(enabled = needsBackOverride) {
         with(uiState) {
             when {
-                Constants.ACTION_REFRESH == activity?.intent?.action || Constants.ACTION_REFRESH_API_SERVER == activity?.intent?.action ->
+                Constants.ACTION_REFRESH_API_SERVER == activity?.intent?.action ->
                     return@BackHandler
 
                 is2FARequired || multiFactorAuthState != null -> {
                     viewModel.stopLogin()
                 }
 
-                viewModel.loginMutex.isLocked || isLoginInProgress || isFastLoginInProgress || fetchNodesUpdate != null ->
+                viewModel.loginMutex.isLocked || isLoginInProgress ->
                     activity?.moveTaskToBack(true)
-
-                else -> {
-                    LoginActivity.isBackFromLoginPage = true
-                    viewModel.setPendingFragmentToShow(LoginScreen.Tour)
-                }
             }
         }
     }
@@ -111,7 +119,6 @@ fun LoginScreen(
         onEmailChanged = viewModel::onEmailChanged,
         onPasswordChanged = viewModel::onPasswordChanged,
         onLoginClicked = {
-            LoginActivity.isBackFromLoginPage = false
             viewModel.onLoginClicked(false)
             billingViewModel.loadPurchases()
         },
@@ -133,10 +140,12 @@ fun LoginScreen(
         onResendVerificationEmail = viewModel::resendVerificationEmail,
         onResetResendVerificationEmailEvent = viewModel::resetResendVerificationEmailEvent,
         stopLogin = viewModel::stopLogin,
+        onGoogleSignInClicked = onGoogleSignInClicked,
     )
 
     if (uiState.ongoingTransfersExist == true) {
         BasicDialog(
+            modifier = Modifier.testTag(LOGIN_SCREEN_CANCELLING_TRANSFER_CONFIRMATION_TAG),
             title = "",
             description = stringResource(id = R.string.login_warning_abort_transfers),
             positiveButtonText = stringResource(id = sharedR.string.login_text),
@@ -155,6 +164,7 @@ fun LoginScreen(
 
     if (showIncorrectRkDialog) {
         BasicDialog(
+            modifier = Modifier.testTag(LOGIN_SCREEN_RECOVERY_KEY_ERROR_TAG),
             title = stringResource(id = sharedR.string.recovery_key_error_title),
             description = stringResource(id = sharedR.string.recovery_key_error_description),
             positiveButtonText = stringResource(id = sharedR.string.general_ok),
@@ -167,6 +177,7 @@ fun LoginScreen(
     val recoveryKeyLink = uiState.recoveryKeyLink
     if (recoveryKeyLink != null) {
         BasicInputDialog(
+            modifier = Modifier.testTag(LOGIN_SCREEN_PASSWORD_RESET_TAG),
             title = stringResource(id = R.string.title_dialog_insert_MK),
             description = stringResource(id = R.string.text_dialog_insert_MK),
             inputLabel = stringResource(id = R.string.edit_text_insert_mk),
@@ -180,7 +191,7 @@ fun LoginScreen(
             onPositiveButtonClicked = {
                 val value = recoveryKeyInput.trim()
                 if (value.isEmpty()) {
-                    recoveryKeyError = context.getString(R.string.invalid_string)
+                    recoveryKeyError = context.getString(sharedR.string.general_invalid_string)
                 } else {
                     keyboardController?.hide()
                     viewModel.checkRecoveryKey(recoveryKeyLink, value)
@@ -194,11 +205,6 @@ fun LoginScreen(
         )
     }
 
-    // Hide splash after UI is rendered, to prevent blinking
-    LaunchedEffect(key1 = Unit) {
-        delay(100)
-        (activity as? LoginActivity)?.stopShowingSplashScreen()
-    }
 }
 
 private fun openLoginIssueHelpdeskPage(context: Context) {
@@ -213,7 +219,7 @@ private fun navigateToChangePassword(context: Context, link: String, value: Stri
     context.startActivity(intent)
 }
 
-private fun openRecoveryUrl(context: Context, url: String) {
-    Timber.d("Open recovery url $url")
-    context.launchUrl(url)
-}
+internal const val LOGIN_SCREEN_CANCELLING_TRANSFER_CONFIRMATION_TAG =
+    "login_screen:dialog_cancelling_transfer_confirmation"
+internal const val LOGIN_SCREEN_RECOVERY_KEY_ERROR_TAG = "login_screen:dialog_recovery_key_error"
+internal const val LOGIN_SCREEN_PASSWORD_RESET_TAG = "login_screen:dialog_password_reset"

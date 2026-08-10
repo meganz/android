@@ -6,17 +6,17 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.cache.MapCache
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -31,13 +31,15 @@ import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
+import mega.privacy.android.data.mapper.transfer.upload.MegaUploadOptionsMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.RequestEvent
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.times
-import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -56,9 +58,9 @@ import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransfer
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransferData
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -81,6 +83,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
+import java.math.BigInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -113,7 +116,10 @@ class DefaultTransfersRepositoryTest {
     private val deviceGateway = mock<DeviceGateway>()
     private val inProgressTransferMapper = mock<InProgressTransferMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
-    private val transfersPreferencesGateway = mock<TransfersPreferencesGateway>()
+    private val megaUploadOptionsMapper = mock<MegaUploadOptionsMapper>()
+    private val displayPathFromUriCache = mock<MapCache<String, String>>()
+    private val parentNodeCache = mock<MapCache<Long, MegaNode?>>()
+    private val transferPathCache = mock<MapCache<Pair<Long, TransferType>, String>>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -148,7 +154,10 @@ class DefaultTransfersRepositoryTest {
             deviceGateway = deviceGateway,
             inProgressTransferMapper = inProgressTransferMapper,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
-            transfersPreferencesGateway = { transfersPreferencesGateway },
+            megaUploadOptionsMapper = megaUploadOptionsMapper,
+            displayPathFromUriCache = displayPathFromUriCache,
+            parentNodeCache = parentNodeCache,
+            transferPathCache = transferPathCache
         )
     }
 
@@ -172,7 +181,10 @@ class DefaultTransfersRepositoryTest {
             transferAppDataStringMapper,
             activeTransferTotalsMapper,
             monitorFetchNodesFinishUseCase,
-            transfersPreferencesGateway,
+            megaUploadOptionsMapper,
+            displayPathFromUriCache,
+            parentNodeCache,
+            transferPathCache,
         )
     }
 
@@ -182,13 +194,21 @@ class DefaultTransfersRepositoryTest {
 
         private fun mockStartUpload() = megaApiGateway.startUpload(
             localPath = any(),
-            parentNode = any(),
+            parent = any(),
             fileName = anyOrNull(),
-            modificationTime = any(),
+            mtime = any(),
             appData = anyOrNull(),
             isSourceTemporary = any(),
-            shouldStartFirst = any(),
+            startFirst = any(),
             cancelToken = anyOrNull(),
+            listener = any(),
+        )
+
+        private fun mockStartUploadWithOptions() = megaApiGateway.startUpload(
+            localPath = any(),
+            parent = any(),
+            cancelToken = anyOrNull(),
+            options = any(),
             listener = any(),
         )
 
@@ -201,6 +221,8 @@ class DefaultTransfersRepositoryTest {
                 appData = appData,
                 isSourceTemporary = false,
                 shouldStartFirst = false,
+                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.NotApplicable,
             )
 
         private val appData = listOf(TransferAppData.CameraUpload)
@@ -437,6 +459,82 @@ class DefaultTransfersRepositoryTest {
                 any()
             )
         }
+
+        @Test
+        fun `test that correct startUpload is invoked if MegaUploadOptions is get`() = runTest {
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            whenever(mockStartUploadWithOptions()).thenAnswer {
+                (it.arguments.last() as OptionalMegaTransferListenerInterface).onTransferData(
+                    api = mock(),
+                    transfer = mock(),
+                    buffer = byteArrayOf(),
+                )
+            }
+            whenever(transferEventMapper.invoke(any())).thenReturn(mock<TransferEvent.TransferDataEvent>())
+            whenever(
+                megaUploadOptionsMapper(
+                    fileName = anyOrNull(),
+                    mtime = anyOrNull(),
+                    appData = anyOrNull(),
+                    isSourceTemporary = any(),
+                    startFirst = any(),
+                    pitagTrigger = any(),
+                    pitagTarget = any(),
+                )
+            ) doReturn mock()
+
+            startUploadFlow().test {
+                assertThat(awaitItem()).isNotNull()
+            }
+
+            verify(megaApiGateway).startUpload(
+                localPath = any(),
+                parent = any(),
+                cancelToken = anyOrNull(),
+                options = any(),
+                listener = any()
+            )
+        }
+
+        @Test
+        fun `test that correct startUpload is invoked if MegaUploadOptions is null`() = runTest {
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            whenever(mockStartUpload()).thenAnswer {
+                (it.arguments.last() as OptionalMegaTransferListenerInterface).onTransferData(
+                    api = mock(),
+                    transfer = mock(),
+                    buffer = byteArrayOf(),
+                )
+            }
+            whenever(transferEventMapper.invoke(any())).thenReturn(mock<TransferEvent.TransferDataEvent>())
+            whenever(
+                megaUploadOptionsMapper(
+                    fileName = anyOrNull(),
+                    mtime = anyOrNull(),
+                    appData = anyOrNull(),
+                    isSourceTemporary = any(),
+                    startFirst = any(),
+                    pitagTrigger = any(),
+                    pitagTarget = any(),
+                )
+            ) doReturn null
+
+            startUploadFlow().test {
+                assertThat(awaitItem()).isNotNull()
+            }
+
+            verify(megaApiGateway).startUpload(
+                localPath = any(),
+                parent = any(),
+                fileName = anyOrNull(),
+                mtime = anyOrNull(),
+                appData = anyOrNull(),
+                isSourceTemporary = any(),
+                startFirst = any(),
+                cancelToken = anyOrNull(),
+                listener = any()
+            )
+        }
     }
 
     @Test
@@ -642,25 +740,19 @@ class DefaultTransfersRepositoryTest {
     @Test
     fun `test that getInProgressTransfers empty when both getTransferData numDownloads and numUploads equal zero`() =
         runTest {
-            val data = mock<MegaTransferData> {
-                on { numDownloads }.thenReturn(0)
-                on { numUploads }.thenReturn(0)
-            }
-            whenever(megaApiGateway.getTransferData()).thenReturn(data)
-            assertThat(underTest.getInProgressTransfers()).isEmpty()
+            whenever(megaApiGateway.getTransfers(any())).thenReturn(emptyList())
+            assertThat(underTest.getInProgressTransfersFromSdk()).isEmpty()
         }
 
     @Test
     fun `test that getInProgressTransfers returns correctly when both getTransferData numDownloads and numUploads differ zero`() =
         runTest {
-            val data = mock<MegaTransferData> {
-                on { numDownloads }.thenReturn(5)
-                on { numUploads }.thenReturn(5)
-            }
-            whenever(megaApiGateway.getTransferData()).thenReturn(data)
+            whenever(megaApiGateway.getTransfers(MegaTransfer.TYPE_UPLOAD))
+                .thenReturn(listOf(mock(), mock()))
+            whenever(megaApiGateway.getTransfers(MegaTransfer.TYPE_DOWNLOAD))
+                .thenReturn(listOf(mock()))
             whenever(transferMapper.invoke(any())).thenReturn(mock())
-            whenever(megaApiGateway.getTransferByTag(any())).thenReturn(mock())
-            assertThat(underTest.getInProgressTransfers()).hasSize(data.numDownloads + data.numUploads)
+            assertThat(underTest.getInProgressTransfersFromSdk()).hasSize(3)
         }
 
     @Test
@@ -669,13 +761,11 @@ class DefaultTransfersRepositoryTest {
             val transfer = mock<Transfer> {
                 on { it.state } doReturn TransferState.STATE_FAILED
             }
-            val error = mock<MegaException>()
             val expected = listOf(mock<CompletedTransfer>())
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
-                on { it.error } doReturn error
             }
-            whenever(completedTransferMapper(transfer, error)).thenReturn(expected.first())
+            whenever(completedTransferMapper(event)).thenReturn(expected.first())
             underTest.addCompletedTransfers(listOf(event))
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
         }
@@ -686,13 +776,11 @@ class DefaultTransfersRepositoryTest {
             val transfer = mock<Transfer> {
                 on { it.state } doReturn TransferState.STATE_COMPLETED
             }
-            val error = mock<MegaException>()
             val expected = listOf(mock<CompletedTransfer>())
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
-                on { it.error } doReturn error
             }
-            whenever(completedTransferMapper(transfer, error)).thenReturn(expected.first())
+            whenever(completedTransferMapper(event)).thenReturn(expected.first())
             underTest.addCompletedTransfers(listOf(event))
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
         }
@@ -723,14 +811,6 @@ class DefaultTransfersRepositoryTest {
             }
             underTest.addCompletedTransferFromFailedPendingTransfers(transfers, error)
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
-        }
-
-    @Test
-    fun `test that insertOrUpdateActiveTransfer gateway is called when insertOrUpdateActiveTransfer is called`() =
-        runTest {
-            val activeTransfer = mock<ActiveTransfer>()
-            underTest.insertOrUpdateActiveTransfer(activeTransfer)
-            verify(megaLocalRoomGateway).insertOrUpdateActiveTransfer(activeTransfer)
         }
 
     @ParameterizedTest(name = "pauseTransfers: {0}")
@@ -973,124 +1053,97 @@ class DefaultTransfersRepositoryTest {
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class ActiveTransfersTest {
-        val transfer = mock<Transfer>()
 
-        @BeforeEach
-        internal fun resetMocks() {
-            reset(transfer)
+        private fun setActiveTransfers(transfers: List<Transfer>) = runTest {
+            underTest.deleteAllActiveTransfers()
+            advanceUntilIdle()
+            underTest.putActiveTransfers(transfers)
         }
 
-        @Test
-        fun `test that getActiveTransferByUniqueId gateway result is returned when getActiveTransferByUniqueId is called`() =
-            runTest {
-                val expected = mock<ActiveTransfer>()
-                whenever(megaLocalRoomGateway.getActiveTransferByUniqueId(1)).thenReturn(expected)
-                val actual = underTest.getActiveTransferByUniqueId(1)
-                assertThat(actual).isEqualTo(expected)
-            }
 
         @Test
-        fun `test that getActiveTransferByTag gateway result is returned when getActiveTransferByTag is called`() =
-            runTest {
-                val expected = mock<ActiveTransfer>()
-                whenever(megaLocalRoomGateway.getActiveTransferByTag(1)).thenReturn(expected)
-                val actual = underTest.getActiveTransferByTag(1)
-                assertThat(actual).isEqualTo(expected)
-            }
-
-        @ParameterizedTest
-        @EnumSource(TransferType::class)
-        fun `test that getActiveTransfersByType gateway result is returned when getActiveTransfersByType is called`(
-            transferType: TransferType,
-        ) =
-            runTest {
-                val expected = mock<List<ActiveTransfer>>()
-                val flow = flowOf(expected)
-                whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
-                    .thenReturn(flow)
-                val actual = underTest.getActiveTransfersByType(transferType).first()
-                assertThat(actual).isEqualTo(expected)
-            }
-
-        @ParameterizedTest
-        @EnumSource(TransferType::class)
-        fun `test that getActiveTransfersByType gateway result is returned when getCurrentActiveTransfersByType is called`(
-            transferType: TransferType,
-        ) =
-            runTest {
-                val expected = mock<List<ActiveTransfer>>()
-                whenever(megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType))
-                    .thenReturn(expected)
-                val actual = underTest.getCurrentActiveTransfersByType(transferType)
-                assertThat(actual).isEqualTo(expected)
-            }
-
-        @Test
-        fun `test that getActiveTransfers gateway result is returned when getCurrentActiveTransfers is called`() =
-            runTest {
-                val expected = mock<List<ActiveTransfer>>()
-                whenever(megaLocalRoomGateway.getCurrentActiveTransfers())
-                    .thenReturn(expected)
-                val actual = underTest.getCurrentActiveTransfers()
-                assertThat(actual).isEqualTo(expected)
-            }
-
-        @Test
-        fun `test that insertOrUpdateActiveTransfer gateway is called when insertOrUpdateActiveTransfer is called`() =
-            runTest {
-                val activeTransfer = mock<ActiveTransfer>()
-                underTest.insertOrUpdateActiveTransfer(activeTransfer)
-                verify(megaLocalRoomGateway).insertOrUpdateActiveTransfer(activeTransfer)
-            }
-
-        @Test
-        fun `test that insertOrUpdateActiveTransfers gateway is called when insertOrUpdateActiveTransfers is called`() =
-            runTest {
-                val activeTransfers = mock<List<ActiveTransfer>>()
-                underTest.insertOrUpdateActiveTransfers(activeTransfers)
-                verify(megaLocalRoomGateway).insertOrUpdateActiveTransfers(activeTransfers)
-            }
-
-        @ParameterizedTest
-        @EnumSource(TransferType::class)
-        fun `test that deleteAllActiveTransfersByType gateway is called when deleteAllActiveTransfersByType is called`(
-            transferType: TransferType,
-        ) = runTest {
-            underTest.deleteAllActiveTransfersByType(transferType)
-            verify(megaLocalRoomGateway).deleteAllActiveTransfersByType(transferType)
-        }
-
-        @Test
-        fun `test that deleteAllActiveTransfers gateway is called when deleteAllActiveTransfers is called`() =
+        fun `test that transfer added by insertOrUpdateActiveTransfer are returned by getCurrentActiveTransfers`() =
             runTest {
                 underTest.deleteAllActiveTransfers()
-                verify(megaLocalRoomGateway).deleteAllActiveTransfers()
+                val transfer = createActiveTransfer()
+                underTest.putActiveTransfer(transfer)
+
+                assertThat(underTest.getActiveTransfers()).containsExactly(transfer)
+            }
+
+        @Test
+        fun `test that all transfers are added when insertOrUpdateActiveTransfers is called`() =
+            runTest {
+                val expected = (0..5).map { stubTransfer(uniqueId = it.toLong()) }
+
+                setActiveTransfers(expected)
+
+                assertThat(underTest.getActiveTransfers()).containsExactlyElementsIn(expected)
             }
 
         @ParameterizedTest
-        @ValueSource(booleans = [true, false])
-        fun `test that setActiveTransferAsFinishedByTag gateway is called when setActiveTransferAsFinishedByTag is called`(
-            cancelled: Boolean,
+        @EnumSource(TransferType::class)
+        fun `test that flow with correct transfers is returned when getActiveTransfersByType is called`(
+            transferType: TransferType,
         ) = runTest {
-            val uniqueIds = mock<List<Long>>()
-            underTest.setActiveTransfersAsFinishedByUniqueId(uniqueIds, cancelled)
-            verify(megaLocalRoomGateway)
-                .setActiveTransfersAsFinishedByUniqueId(uniqueIds, cancelled)
+            var expected: List<Transfer>? = null
+            val list = TransferType.entries.flatMap { type ->
+                (0..5L).map { stubTransfer(uniqueId = it + type.ordinal * 10, transferType = type) }
+                    .also {
+                        if (type == transferType) {
+                            expected = it
+                        }
+                    }
+            }
+            setActiveTransfers(list)
+
+            val actual = underTest.monitorActiveTransfersByType(transferType).first()
+            assertThat(actual).isNotEmpty()
+            assertThat(actual.size).isLessThan(list.size)
+            assertThat(actual).containsExactlyElementsIn(expected)
         }
 
         @ParameterizedTest
         @EnumSource(TransferType::class)
-        fun `test that getActiveTransferTotalsByType gateway result is returned when getActiveTransferTotalsByType is called`(
+        fun `test that correct transfers are returned when getCurrentActiveTransfersByType is called`(
+            transferType: TransferType,
+        ) = runTest {
+            var expected: List<Transfer>? = null
+            val list = TransferType.entries.flatMap { type ->
+                (0..5L).map { stubTransfer(uniqueId = it + type.ordinal * 10, transferType = type) }
+                    .also {
+                        if (type == transferType) {
+                            expected = it
+                        }
+                    }
+            }
+            setActiveTransfers(list)
+
+            val actual = underTest.getActiveTransfersByType(transferType)
+            assertThat(actual).isNotEmpty()
+            assertThat(actual.size).isLessThan(list.size)
+            assertThat(actual).containsExactlyElementsIn(expected)
+        }
+
+        @ParameterizedTest
+        @EnumSource(TransferType::class, names = ["NONE"])
+        fun `test that mapped current active transfers are returned when getActiveTransferTotalsByType is called`(
             transferType: TransferType,
         ) = runTest {
             val expected = mock<ActiveTransferTotals>()
-            val list = mock<List<ActiveTransfer>>()
-            val flow = flowOf(list)
-            whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
-                .thenReturn(flow)
-            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any(), anyOrNull()))
+            val list =
+                (10..15L).map { createActiveTransfer(uniqueId = it, transferType = transferType) }
+            setActiveTransfers(list)
+            whenever(
+                activeTransferTotalsMapper(
+                    type = eq(transferType),
+                    transfers = argThat { this.size == list.size && this.containsAll(list) },
+                    previousActionGroups = anyOrNull()
+                )
+            )
                 .thenReturn(expected)
-            val actual = underTest.getActiveTransferTotalsByType(transferType).first()
+
+            val actual = underTest.monitorActiveTransferTotalsByType(transferType).first()
             assertThat(actual).isEqualTo(expected)
         }
 
@@ -1104,30 +1157,32 @@ class DefaultTransfersRepositoryTest {
                 on { this.actionGroups } doReturn actionGroups
             }
             val secondActiveTransferTotals = mock<ActiveTransferTotals>()
-            val firstList = listOf(mock<ActiveTransfer>())
-            val secondList = listOf(mock<ActiveTransfer>(), mock<ActiveTransfer>())
-            val flow = MutableStateFlow(firstList)
-            whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
-                .thenReturn(flow)
+            val firstList =
+                (0..5L).map { createActiveTransfer(uniqueId = it, transferType = transferType) }
+            val secondList =
+                (0..6L).map { createActiveTransfer(uniqueId = it, transferType = transferType) }
+            setActiveTransfers(firstList)
             whenever(
                 activeTransferTotalsMapper(
-                    type = transferType,
-                    list = firstList,
-                    transferredBytes = emptyMap(),
-                    previousActionGroups = null
+                    type = eq(transferType),
+                    transfers = argThat { this.size == firstList.size && this.containsAll(firstList) },
+                    previousActionGroups = anyOrNull()
                 )
             ) doReturn firstActiveTransferTotals
             whenever(
                 activeTransferTotalsMapper(
-                    type = transferType,
-                    list = secondList,
-                    transferredBytes = emptyMap(),
-                    previousActionGroups = actionGroups //this comes from first emission
+                    type = eq(transferType),
+                    transfers = argThat {
+                        this.size == secondList.size && this.containsAll(
+                            secondList
+                        )
+                    },
+                    previousActionGroups = eq(actionGroups) //this comes from first emission
                 )
             ) doReturn secondActiveTransferTotals
-            underTest.getActiveTransferTotalsByType(transferType).test {
+            underTest.monitorActiveTransferTotalsByType(transferType).test {
                 assertThat(awaitItem()).isEqualTo(firstActiveTransferTotals)
-                flow.emit(secondList)
+                underTest.putActiveTransfers(secondList)
                 assertThat(awaitItem()).isEqualTo(secondActiveTransferTotals)
             }
         }
@@ -1137,11 +1192,11 @@ class DefaultTransfersRepositoryTest {
         fun `test that getCurrentActiveTransferTotalsByType gateway result is returned when getCurrentActiveTransferTotalsByType is called`(
             transferType: TransferType,
         ) = runTest {
-            val list = mock<List<ActiveTransfer>>()
+            val list =
+                (0..5L).map { createActiveTransfer(uniqueId = it, transferType = transferType) }
             val expected = mock<ActiveTransferTotals>()
-            whenever(megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType))
-                .thenReturn(list)
-            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any(), anyOrNull()))
+            setActiveTransfers(list)
+            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), anyOrNull()))
                 .thenReturn(expected)
             val actual = underTest.getCurrentActiveTransferTotalsByType(transferType)
             assertThat(actual).isEqualTo(expected)
@@ -1152,13 +1207,11 @@ class DefaultTransfersRepositoryTest {
         fun `test that updateTransferredBytes adds currentTransferred bytes and deleteAllActiveTransfersByType clears the values`(
             transferType: TransferType,
         ) = runTest {
+            val transfer = createActiveTransfer(transferType = transferType)
             testCurrentActiveTransferTotals(
-                transferType = transferType,
-                expectedMap = { transfer ->
-                    mapOf(transfer.uniqueId to transfer.transferredBytes)
-                },
+                transfer = transfer,
                 callToTest = {
-                    underTest.updateTransferredBytes(listOf(transfer))
+                    underTest.updateActiveTransfersBytes(listOf(transfer))
                 }
             )
         }
@@ -1168,46 +1221,17 @@ class DefaultTransfersRepositoryTest {
         fun `test that updateTransferredBytes doesn't update when the new value is 0 bytes`(
             transferType: TransferType,
         ) = runTest {
+            val transfer = createActiveTransfer(transferType = transferType)
             testCurrentActiveTransferTotals(
-                transferType = transferType,
-                expectedMap = { transfer ->
-                    mapOf(transfer.uniqueId to transfer.transferredBytes)
-                },
+                transfer = transfer,
                 callToTest = {
-                    val transferZero = mock<Transfer>()
-                    stubActiveTransfer(transferZero, transferType, transferredBytes = 0L)
+                    val transferZero =
+                        stubTransfer(transferType = transferType, transferredBytes = 0L)
 
-                    underTest.updateTransferredBytes(listOf(transfer))
-                    underTest.updateTransferredBytes(listOf(transferZero))
+                    underTest.updateActiveTransfersBytes(listOf(transfer))
+                    underTest.updateActiveTransfersBytes(listOf(transferZero))
                 }
             )
-        }
-
-        @ParameterizedTest
-        @EnumSource(TransferType::class)
-        fun `test that updateTransferredBytes with non zero transferred bytes emits a new value`(
-            transferType: TransferType,
-        ) = runTest {
-            val transfer = mock<Transfer> {
-                on { this.transferType } doReturn transferType
-                on { this.transferredBytes } doReturn 34857L
-            }
-            val expected = mock<ActiveTransferTotals>()
-            val list = mock<List<ActiveTransfer>>()
-            val flow = flowOf(list)
-            whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
-                .thenReturn(flow)
-            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any(), anyOrNull()))
-                .thenReturn(expected)
-
-            underTest.getActiveTransferTotalsByType(transferType).test {
-                awaitItem() //initial
-                underTest.updateTransferredBytes(listOf(transfer))
-                val actual = awaitItem()
-                assertThat(actual).isEqualTo(expected)
-                cancelAndIgnoreRemainingEvents()
-            }
-            underTest.deleteAllActiveTransfersByType(transferType)
         }
 
         @ParameterizedTest
@@ -1215,21 +1239,19 @@ class DefaultTransfersRepositoryTest {
         fun `test that updateTransferredBytes is not updated when updateTransferredBytes is called with transfers with less progress`(
             transferType: TransferType,
         ) = runTest {
+            val transfer = createActiveTransfer()
             testCurrentActiveTransferTotals(
-                transferType = transferType,
-                expectedMap = { transfer ->
-                    mapOf(transfer.uniqueId to transfer.transferredBytes)
-                },
+                transfer = transfer,
                 callToTest = {
                     val transferZero = mock<Transfer>()
-                    stubActiveTransfer(
+                    stubTransfer(
                         transferZero,
                         transferType,
                         transferredBytes = transfer.transferredBytes - 1
                     )
 
-                    underTest.updateTransferredBytes(listOf(transfer))
-                    underTest.updateTransferredBytes(listOf(transferZero))
+                    underTest.updateActiveTransfersBytes(listOf(transfer))
+                    underTest.updateActiveTransfersBytes(listOf(transferZero))
                 }
             )
         }
@@ -1239,41 +1261,35 @@ class DefaultTransfersRepositoryTest {
          * This is a convenient function to test changes on this state and then reset it to its initial empty value.
          */
         private suspend fun testCurrentActiveTransferTotals(
-            transferType: TransferType,
-            expectedMap: (Transfer) -> Map<Long, Long>,
+            transfer: Transfer,
             callToTest: suspend () -> Unit,
         ) {
-            stubActiveTransfer(transfer, transferType)
-            val list = mock<List<ActiveTransfer>>()
-            whenever(megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType))
-                .thenReturn(list)
+            val transferType = transfer.transferType
+            val list = listOf(transfer)
+            setActiveTransfers(list)
 
             // test updateTransferredBytes
             callToTest()
             underTest.getCurrentActiveTransferTotalsByType(transferType)
             //here we check that the mapper is called with the proper expectedMap
-            val map = expectedMap(transfer)
             verify(activeTransferTotalsMapper).invoke(
                 eq(transferType),
                 eq(list),
-                eq(map),
                 anyOrNull()
             )
 
             // test deleteAllActiveTransfersByType so we also clear the cached values
-            underTest.deleteAllActiveTransfersByType(transferType)
+            underTest.deleteAllActiveTransfers()
             underTest.getCurrentActiveTransferTotalsByType(transferType)
-            //here we check that the mapper is called with the proper expectedMap
             verify(activeTransferTotalsMapper).invoke(
                 eq(transferType),
                 eq(list),
-                eq(emptyMap()),
                 anyOrNull()
             )
         }
     }
 
-    private fun stubActiveTransfer(
+    private fun stubTransfer(
         transfer: Transfer = mock(),
         transferType: TransferType = TransferType.DOWNLOAD,
         transferredBytes: Long = 900L,
@@ -1281,7 +1297,7 @@ class DefaultTransfersRepositoryTest {
         uniqueId: Long = 5L,
     ): Transfer {
         val tag = 1
-
+        whenever(transfer.isFinished).thenReturn(false)
         whenever(transfer.transferType).thenReturn(transferType)
         whenever(transfer.transferredBytes).thenReturn(transferredBytes)
         whenever(transfer.totalBytes).thenReturn(totalBytes)
@@ -1290,6 +1306,38 @@ class DefaultTransfersRepositoryTest {
         whenever(transfer.progress).thenReturn(Progress(transferredBytes, totalBytes))
         return transfer
     }
+
+    private fun createActiveTransfer(
+        uniqueId: Long = 5L,
+        transferType: TransferType = TransferType.DOWNLOAD,
+        fileName: String = "test_file.txt",
+        isFinished: Boolean = false,
+    ) = Transfer(
+        uniqueId = uniqueId,
+        transferType = transferType,
+        startTime = 0L,
+        transferredBytes = 100L,
+        totalBytes = 1000L,
+        localPath = "/path/to/file",
+        parentPath = "",
+        nodeHandle = 0L,
+        parentHandle = 0L,
+        fileName = fileName,
+        stage = TransferStage.STAGE_NONE,
+        tag = 1,
+        folderTransferTag = null,
+        speed = 0L,
+        isSyncTransfer = false,
+        isBackupTransfer = false,
+        isForeignOverQuota = false,
+        isStreamingTransfer = false,
+        isFinished = isFinished,
+        isFolderTransfer = false,
+        appData = emptyList(),
+        state = TransferState.STATE_ACTIVE,
+        priority = BigInteger.ZERO,
+        notificationNumber = 0L,
+    )
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -1496,13 +1544,13 @@ class DefaultTransfersRepositoryTest {
             val regressedProgress = Progress(0.1f)
             val totalBytes = 10_000L
             val uniqueId = 6L
-            val transfer1 = stubActiveTransfer(
+            val transfer1 = stubTransfer(
                 uniqueId = uniqueId,
                 transferredBytes = initialProgress * totalBytes,
                 totalBytes = totalBytes,
             )
 
-            val transfer2 = stubActiveTransfer(
+            val transfer2 = stubTransfer(
                 uniqueId = uniqueId,
                 transferredBytes = regressedProgress * totalBytes,
                 totalBytes = totalBytes,
@@ -1683,32 +1731,6 @@ class DefaultTransfersRepositoryTest {
         }
 
     @Test
-    fun `test that transfersPreferencesGateway invokes setRequestFilesPermissionDenied when setRequestFilesPermissionDenied is called`() =
-        runTest {
-            underTest.setRequestFilesPermissionDenied()
-            verify(transfersPreferencesGateway).setRequestFilesPermissionDenied()
-        }
-
-    @Test
-    fun `test that monitorRequestFilesPermissionDenied returns what transfersPreferencesGateway monitorRequestFilesPermissionDenied returns`() =
-        runTest {
-            val flow = flowOf(true)
-            whenever(transfersPreferencesGateway.monitorRequestFilesPermissionDenied())
-                .thenReturn(flow)
-            underTest.monitorRequestFilesPermissionDenied().test {
-                assertThat(awaitItem()).isEqualTo(true)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `test that transfersPreferencesGateway invokes clearPreferences when clearPreferences is called`() =
-        runTest {
-            underTest.clearPreferences()
-            verify(transfersPreferencesGateway).clearPreferences()
-        }
-
-    @Test
     fun `test that getBandwidthOverQuotaDelay invokes and returns correctly`() = runTest {
         val expected = 123L
 
@@ -1736,6 +1758,14 @@ class DefaultTransfersRepositoryTest {
         whenever(megaLocalRoomGateway.getActiveTransferGroup(groupId)).thenReturn(expected)
 
         assertThat(underTest.getActiveTransferGroupById(groupId)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that delete Active Transfer Group invokes room gateway`() = runTest {
+        val groupId = 454234
+        underTest.deleteActiveTransferGroup(groupId)
+
+        verify(megaLocalRoomGateway).deleteActiveTransferGroup(groupId)
     }
 
     @ParameterizedTest(name = " when tag is {0}")
@@ -1806,6 +1836,94 @@ class DefaultTransfersRepositoryTest {
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class OnLogoutSuccessTests {
+
+        @Test
+        fun `test that onLogoutSuccess resets paused transfers asked resume over quota timestamp error status and atomic timestamp`() =
+            runTest {
+                underTest = createDefaultTransfersRepository()
+                stubPauseTransfers(true)
+                underTest.pauseTransfers(true)
+                underTest.setAskedResumeTransfers()
+
+                val currentTime = 99L
+                whenever(deviceGateway.getCurrentTimeInMillis()).thenReturn(currentTime)
+                underTest.setTransferOverQuotaErrorTimestamp()
+
+                val failedTransfer = mock<Transfer> {
+                    on { it.state } doReturn TransferState.STATE_FAILED
+                }
+                val finishEvent = mock<TransferEvent.TransferFinishEvent> {
+                    on { it.transfer } doReturn failedTransfer
+                }
+                whenever(completedTransferMapper(finishEvent)).thenReturn(mock())
+                underTest.addCompletedTransfers(listOf(finishEvent))
+
+                underTest.transferOverQuotaTimestamp = AtomicLong(42L)
+
+                assertThat(underTest.monitorPausedTransfers().value).isTrue()
+                assertThat(underTest.monitorAskedResumeTransfers().value).isTrue()
+                assertThat(underTest.monitorTransferOverQuotaErrorTimestamp().value)
+                    .isEqualTo(Instant.fromEpochMilliseconds(currentTime))
+                assertThat(underTest.monitorTransferInErrorStatus().value).isTrue()
+                assertThat(underTest.transferOverQuotaTimestamp.get()).isEqualTo(42L)
+
+                underTest.onLogoutSuccess()
+
+                assertThat(underTest.monitorPausedTransfers().value).isFalse()
+                assertThat(underTest.monitorAskedResumeTransfers().value).isFalse()
+                assertThat(underTest.monitorTransferOverQuotaErrorTimestamp().value).isNull()
+                assertThat(underTest.monitorTransferInErrorStatus().value).isFalse()
+                assertThat(underTest.transferOverQuotaTimestamp.get()).isEqualTo(0L)
+
+                verify(displayPathFromUriCache).clear()
+                verify(parentNodeCache).clear()
+                verify(transferPathCache).clear()
+            }
+
+        @Test
+        fun `test that onLogoutSuccess clears in progress transfers and active transfers`() =
+            runTest {
+                underTest = createDefaultTransfersRepository()
+
+                val uniqueId = 7L
+                val transfer = mock<Transfer> {
+                    on { it.uniqueId } doReturn uniqueId
+                    on { it.isFolderTransfer } doReturn false
+                }
+                val inProgressTransfer = mock<InProgressTransfer.Download> {
+                    on { it.uniqueId } doReturn uniqueId
+                }
+                whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
+                underTest.updateInProgressTransfers(listOf(transfer))
+
+                val activeTransfer =
+                    stubTransfer(uniqueId = 8L, transferType = TransferType.DOWNLOAD)
+                underTest.putActiveTransfer(activeTransfer)
+
+                assertThat(underTest.monitorInProgressTransfers().value).isNotEmpty()
+                assertThat(underTest.getActiveTransfers()).isNotEmpty()
+
+                underTest.onLogoutSuccess()
+
+                assertThat(underTest.monitorInProgressTransfers().value).isEmpty()
+                assertThat(underTest.getActiveTransfers()).isEmpty()
+            }
+
+        @Test
+        fun `test that onLogoutSuccess clears transfer and storage over quota flags`() =
+            runTest {
+                underTest = createDefaultTransfersRepository()
+
+                underTest.onLogoutSuccess()
+
+                verify(appEventGateway).broadcastTransferOverQuota(false)
+                verify(appEventGateway).broadcastStorageOverQuota(false)
+            }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class MonitorTransferInErrorStatusTests {
         private fun mockFailedTransferEvent(): TransferEvent.TransferFinishEvent {
             val transfer = mock<Transfer>()
@@ -1859,6 +1977,115 @@ class DefaultTransfersRepositoryTest {
                     underTest.clearTransferErrorStatus()
                     assertThat(awaitItem()).isFalse()
                 }
+            }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class MaxTransferConnectionsTests {
+
+        @Test
+        fun `test that getMaxDownloadConnections returns the value when MegaApi returns API_OK`() =
+            runTest {
+                val expected = 4
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+                val megaRequest = mock<MegaRequest> {
+                    on { number }.thenReturn(expected.toLong())
+                }
+                whenever(megaApiGateway.getMaxDownloadConnections(any())).thenAnswer {
+                    ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        megaRequest,
+                        megaError,
+                    )
+                }
+
+                assertThat(underTest.getMaxDownloadConnections()).isEqualTo(expected)
+            }
+
+        @Test
+        fun `test that getMaxUploadConnections returns the value when MegaApi returns API_OK`() =
+            runTest {
+                val expected = 6
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+                val megaRequest = mock<MegaRequest> {
+                    on { number }.thenReturn(expected.toLong())
+                }
+                whenever(megaApiGateway.getMaxUploadConnections(any())).thenAnswer {
+                    ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        megaRequest,
+                        megaError,
+                    )
+                }
+
+                assertThat(underTest.getMaxUploadConnections()).isEqualTo(expected)
+            }
+
+        @Test
+        fun `test that setMaxDownloadConnections calls setMaxConnections with TYPE_DOWNLOAD`() =
+            runTest {
+                val connections = 4
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+                val megaRequest = mock<MegaRequest>()
+                whenever(
+                    megaApiGateway.setMaxConnections(
+                        eq(MegaTransfer.TYPE_DOWNLOAD),
+                        eq(connections),
+                        any(),
+                    )
+                ).thenAnswer {
+                    ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        megaRequest,
+                        megaError,
+                    )
+                }
+
+                underTest.setMaxDownloadConnections(connections)
+
+                verify(megaApiGateway).setMaxConnections(
+                    eq(MegaTransfer.TYPE_DOWNLOAD),
+                    eq(connections),
+                    any(),
+                )
+            }
+
+        @Test
+        fun `test that setMaxUploadConnections calls setMaxConnections with TYPE_UPLOAD`() =
+            runTest {
+                val connections = 6
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+                val megaRequest = mock<MegaRequest>()
+                whenever(
+                    megaApiGateway.setMaxConnections(
+                        eq(MegaTransfer.TYPE_UPLOAD),
+                        eq(connections),
+                        any(),
+                    )
+                ).thenAnswer {
+                    ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        megaRequest,
+                        megaError,
+                    )
+                }
+
+                underTest.setMaxUploadConnections(connections)
+
+                verify(megaApiGateway).setMaxConnections(
+                    eq(MegaTransfer.TYPE_UPLOAD),
+                    eq(connections),
+                    any(),
+                )
             }
     }
 }

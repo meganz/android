@@ -8,6 +8,7 @@ import dagger.hilt.testing.TestInstallIn
 import dagger.multibindings.ElementsIntoSet
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueReceiver
+import mega.privacy.android.app.appstate.global.event.NavigationEventQueueReceiver
 import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.qualifier.MegaApi
@@ -16,10 +17,12 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
-import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import org.mockito.kotlin.mock
@@ -68,6 +71,9 @@ object TestAppModule {
         emptySet<FeatureDestination>()
 
     @Provides
+    fun provideOrderedDeepLinkHandlers(): List<DeepLinkHandler> = emptyList()
+
+    @Provides
     fun provideDisableChatApiUseCase(): DisableChatApiUseCase = mock()
 
     @Provides
@@ -80,6 +86,12 @@ object TestAppModule {
 
     @Provides
     fun provideAppDialogsEventQueueReceiver(): AppDialogsEventQueueReceiver = mock()
+
+    @Provides
+    fun provideNavigationEventQueue(): NavigationEventQueue = mock()
+
+    @Provides
+    fun provideNavigationEventQueueReceiver(): NavigationEventQueueReceiver = mock()
 
     @Provides
     fun provideAppContainerProvider(): AppContainerProvider = mock()

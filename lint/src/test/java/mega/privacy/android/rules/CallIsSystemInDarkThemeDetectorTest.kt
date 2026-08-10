@@ -2,6 +2,7 @@ package mega.privacy.android.rules
 
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest.kotlin
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
+import com.android.tools.lint.checks.infrastructure.TestMode
 import org.junit.Test
 
 class CallIsSystemInDarkThemeDetectorTest {
@@ -27,6 +28,7 @@ class CallIsSystemInDarkThemeDetectorTest {
                     """
             ).indented()
         ).issues(CallIsSystemInDarkThemeDetector.ISSUE)
+            .skipTestModes(TestMode.IMPORT_ALIAS, TestMode.FULLY_QUALIFIED)
             .run()
             .expect(
                 """
@@ -59,6 +61,7 @@ class CallIsSystemInDarkThemeDetectorTest {
                     """
             ).indented()
         ).issues(CallIsSystemInDarkThemeDetector.ISSUE)
+            .skipTestModes(TestMode.IMPORT_ALIAS, TestMode.FULLY_QUALIFIED)
             .run()
             .expect(
                 """

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AppBarDefaults
@@ -30,13 +31,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
@@ -46,7 +48,6 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.ui.megapicker.AllFilesAccessDialog
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.renamebackup.model.RenameAndCreateBackupDialog
 import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
 import mega.privacy.android.feature.sync.ui.views.SyncStorageQuotaExceedWarning
@@ -68,6 +69,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDisplayedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPressedEvent
 
@@ -128,10 +130,10 @@ private fun SyncNewFolderScreenScaffold(
     val scaffoldState = rememberScaffoldState()
     val syncType = state.syncType
     var isWarningBannerDisplayed by rememberSaveable { mutableStateOf(false) }
+    val appBarWindowInsets = WindowInsets.statusBars
 
     MegaScaffold(
         scaffoldState = scaffoldState,
-        shouldAddSnackBarPadding = false,
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             MegaAppBar(
@@ -141,8 +143,12 @@ private fun SyncNewFolderScreenScaffold(
                     SyncType.TYPE_BACKUP -> stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title)
                     else -> stringResource(R.string.sync_toolbar_title)
                 },
-                onNavigationPressed = { onBackClicked() },
-                windowInsets = WindowInsets(0.dp),
+                onNavigationPressed = {
+                    if (state.isLoading.not()) {
+                        onBackClicked()
+                    }
+                },
+                windowInsets = appBarWindowInsets,
                 elevation = if (isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
             )
         },
@@ -179,11 +185,9 @@ private fun SyncNewFolderScreenScaffold(
                 EventEffect(
                     event = state.showSnackbar,
                     onConsumed = { onShowSnackbarConsumed() },
-                ) { stringId ->
-                    stringId?.let {
-                        scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                            context.getString(stringId)
-                        )
+                ) { message ->
+                    message?.let {
+                        scaffoldState.snackbarHostState.showAutoDurationSnackbar(it.get(context))
                     }
                 }
             }
@@ -213,7 +217,7 @@ private fun SyncNewFolderScreenContent(
     snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     var showSyncPermissionBanner by rememberSaveable {
         mutableStateOf(false)
     }
@@ -237,7 +241,7 @@ private fun SyncNewFolderScreenContent(
                     onSelectFolder()
                 }.onFailure {
                     coroutineScope.launch {
-                        snackBarHostState.showAutoDurationSnackbar(context.getString(sharedResR.string.general_no_picker_warning))
+                        snackBarHostState.showAutoDurationSnackbar(resources.getString(sharedResR.string.general_no_picker_warning))
                     }
                 }
             } else {
@@ -359,7 +363,7 @@ private fun SyncNewFolderScreenContent(
                         }.onFailure {
                             coroutineScope.launch {
                                 snackBarHostState.showAutoDurationSnackbar(
-                                    context.getString(
+                                    resources.getString(
                                         sharedResR.string.general_no_picker_warning
                                     )
                                 )

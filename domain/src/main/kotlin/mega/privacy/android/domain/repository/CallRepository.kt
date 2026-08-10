@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.call.AudioDevice
+import mega.privacy.android.domain.entity.call.CallRecordingConsentStatus
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
@@ -300,11 +301,11 @@ interface CallRepository {
      *
      * @param state handle list will be fetched with the calls having this state
      *              Instance of [ChatCallStatus]
-     * @return List [Long] of call handles which user is participating
+     * @return List [Long] of chat handles which user is participating
      *         empty list is output is null or throws any errors
      *         returns all calls regardless their state if state is [ChatCallStatus.Unknown]
      */
-    suspend fun getCallHandleList(state: ChatCallStatus): List<Long>
+    suspend fun getCallChatIdList(state: ChatCallStatus): List<Long>
 
     /**
      * Get a list with the ids of active calls
@@ -516,14 +517,14 @@ interface CallRepository {
      *
      * @return StateFlow of Boolean. True if consent has been accepted or False otherwise.
      */
-    fun monitorCallRecordingConsentEvent(): StateFlow<Boolean?>
+    fun monitorCallRecordingConsentEvent(): StateFlow<CallRecordingConsentStatus>
 
     /**
      * Broadcast call recording consent event (accepted/rejected).
      *
-     * @param isRecordingConsentAccepted True if recording consent has been accepted or False otherwise.
+     * @param consentStatus True if recording consent has been accepted or False otherwise.
      */
-    suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean?)
+    suspend fun broadcastCallRecordingConsentEvent(consentStatus: CallRecordingConsentStatus)
 
     /**
      * Monitor that a specific call has ended.

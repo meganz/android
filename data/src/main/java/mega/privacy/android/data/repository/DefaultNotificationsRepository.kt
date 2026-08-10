@@ -84,9 +84,7 @@ internal class DefaultNotificationsRepository @Inject constructor(
             .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
             .mapNotNull { (newUserAlerts) ->
                 withContext(dispatcher) {
-                    newUserAlerts
-                        ?.filter { !it.seen }
-                        ?.mapAndFilterMeetingIfNeeded()
+                    getNotSeenUserAlerts()
                 }
             }.flowOn(dispatcher)
 
@@ -120,6 +118,11 @@ internal class DefaultNotificationsRepository @Inject constructor(
         .mapNotNull { (event) ->
             event?.let { eventMapper(it) }
         }
+        .flowOn(dispatcher)
+
+    override fun monitorSdkReloadNeeded(): Flow<Boolean> = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnReloadNeeded>()
+        .mapNotNull { true }
         .flowOn(dispatcher)
 
     override suspend fun getUserAlerts(): List<UserAlert> =
@@ -253,6 +256,11 @@ internal class DefaultNotificationsRepository @Inject constructor(
     override suspend fun isChatDoNotDisturbEnabled(chatId: Long): Boolean =
         withContext(dispatcher) {
             _pushNotificationSettings.value.isChatDndEnabled(chatId)
+        }
+
+    override suspend fun getChatDoNotDisturbTime(chatId: Long): Long =
+        withContext(dispatcher) {
+            _pushNotificationSettings.value.getChatDnd(chatId)
         }
 
     override suspend fun setChatDoNotDisturb(chatId: Long, timestamp: Long) =

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.activities.settingsActivities.passcodelock
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,7 +14,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.AuthenticationResult
@@ -42,14 +41,15 @@ import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.logout.LogoutViewModel
-import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
 import mega.privacy.android.app.utils.Constants.PIN_4
 import mega.privacy.android.app.utils.Constants.PIN_6
 import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboardView
 import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
+import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeLogoutButtonPressedEvent
@@ -896,9 +896,9 @@ class PasscodeLockActivity : BaseActivity() {
 
         if (!this::promptInfo.isInitialized) {
             promptInfo = PromptInfo.Builder()
-                .setTitle(getString(R.string.title_unlock_fingerprint))
+                .setTitle(getString(sharedR.string.title_unlock_biometric))
                 .setNegativeButtonText(getString(R.string.action_use_passcode))
-                .setAllowedAuthenticators(BIOMETRIC_STRONG)
+                .setAllowedAuthenticators(BIOMETRIC_WEAK)
                 .build()
         }
 
@@ -964,6 +964,6 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun shouldShowFingerprintLock(): Boolean =
         !fingerprintSkipped && fingerprintEnabled && BiometricManager.from(this)
-            .canAuthenticate(BIOMETRIC_STRONG) == BIOMETRIC_SUCCESS
+            .canAuthenticate(BIOMETRIC_WEAK) == BIOMETRIC_SUCCESS
 
 }

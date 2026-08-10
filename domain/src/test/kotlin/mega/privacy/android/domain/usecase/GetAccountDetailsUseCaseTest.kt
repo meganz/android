@@ -26,7 +26,7 @@ class GetAccountDetailsUseCaseTest {
 
     @Test
     fun `test that account details are refreshed if stale`() = runTest {
-        whenever(accountRepository.storageCapacityUsedIsBlank()).thenReturn(true)
+        whenever(isDatabaseEntryStale()).thenReturn(true)
         underTest(false)
 
         verify(accountRepository).resetAccountDetailsTimeStamp()
@@ -35,7 +35,6 @@ class GetAccountDetailsUseCaseTest {
 
     @Test
     fun `test that account details are refreshed if forced`() = runTest {
-        whenever(accountRepository.storageCapacityUsedIsBlank()).thenReturn(false)
         whenever(isDatabaseEntryStale()).thenReturn(false)
         underTest(true)
 
@@ -45,7 +44,6 @@ class GetAccountDetailsUseCaseTest {
 
     @Test
     fun `test that account details are not refreshed if not stale or forced`() = runTest {
-        whenever(accountRepository.storageCapacityUsedIsBlank()).thenReturn(false)
         whenever(isDatabaseEntryStale()).thenReturn(false)
         underTest(false)
 

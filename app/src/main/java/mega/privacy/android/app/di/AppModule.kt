@@ -1,30 +1,52 @@
 package mega.privacy.android.app.di
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import android.content.pm.PackageManager.NameNotFoundException
-import android.os.Build
-import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
+import dagger.multibindings.IntoSet
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueImpl
-import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueReceiver
+import mega.privacy.android.app.NativeLibraryLoader
+import mega.privacy.android.app.activities.UpgradeAccountDeepLinkHandler
+import mega.privacy.android.app.activities.navigation.WebViewDeepLinkHandler
+import mega.privacy.android.app.appstate.global.event.CombinedEventQueueImpl
+import mega.privacy.android.app.appstate.global.event.NavigationEventQueueReceiver
 import mega.privacy.android.app.consent.ConsentDialogDestinations
+import mega.privacy.android.app.deeplinks.DeepLinksDialogDestinations
+import mega.privacy.android.app.main.dialog.link.OpenLinkDialogDestinations
+import mega.privacy.android.app.main.dialog.newfile.NewTextFileDialogDestinations
+import mega.privacy.android.app.main.dialog.newfolder.NewFolderDialogDestinations
+import mega.privacy.android.app.myAccount.navigation.MyAccountDeepLinkHandler
 import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
+import mega.privacy.android.app.presentation.business.BusinessAccountExpiredDialogDestinations
+import mega.privacy.android.app.presentation.business.BusinessGraceDialogDestinations
+import mega.privacy.android.app.presentation.contact.link.dialog.ContactLinkDialogDestinations
+import mega.privacy.android.app.presentation.contact.navigation.ContactsDeepLinkHandler
 import mega.privacy.android.app.presentation.container.MegaAppContainerProvider
+import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanWarningDialogDestinations
+import mega.privacy.android.app.presentation.filelink.FileLinkDeepLinkHandler
+import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogDestinations
+import mega.privacy.android.app.presentation.folderlink.FolderLinkDeepLinkHandler
+import mega.privacy.android.app.presentation.login.LoginDeepLinkHandler
+import mega.privacy.android.app.presentation.login.createaccount.AccountInvitationDeepLinkHandler
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountDeepLinkHandler
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutDialogDestinations
+import mega.privacy.android.app.presentation.meeting.navigation.FreePlanParticipantsLimitDialogDestination
+import mega.privacy.android.app.presentation.photos.albums.navigation.AlbumsDeepLinkHandler
+import mega.privacy.android.app.presentation.purchase.PurchaseResultDialogDestinations
+import mega.privacy.android.app.presentation.settings.SettingsDeepLinkHandler
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyDeepLinkHandler
+import mega.privacy.android.app.presentation.storage.OverQuotaDialogDestinations
 import mega.privacy.android.app.presentation.transfers.navigation.TransfersFeatureDestination
 import mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog.TransferOverQuotaDialogDestinations
+import mega.privacy.android.app.presentation.twofactorauthentication.Enable2FADialogDestinations
+import mega.privacy.android.app.presentation.whatsnew.WhatsNewDialogDestinations
 import mega.privacy.android.app.sslverification.SSLAppDialogDestinations
 import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
 import mega.privacy.android.data.database.LegacyDatabaseMigration
@@ -33,12 +55,15 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
+import mega.privacy.android.feature.chat.navigation.ChatDialogDestinations
 import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
-import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Singleton
@@ -53,28 +78,9 @@ internal class AppModule {
         @ApplicationContext context: Context,
         fileGateway: FileGateway,
     ): MegaApiAndroid {
+        NativeLibraryLoader.awaitLoaded()
         FileWrapper.initializeFactory(fileGateway)
-        val packageInfo: PackageInfo
-        var path: String? = null
-        try {
-            // PackageManager.PackageInfoFlags can only be used for devices
-            // running Android 13 and above. For devices running below Android 13,
-            // the normal getPackageInfo() is used
-            packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(
-                    context.packageName,
-                    PackageManager.PackageInfoFlags.of(0)
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getPackageInfo(context.packageName, 0)
-            }
-            path = (packageInfo.applicationInfo?.dataDir + "/")
-                ?: throw NullPointerException("Application info is null")
-        } catch (e: NameNotFoundException) {
-            e.printStackTrace()
-        }
-
+        val path = "${context.dataDir.path}/"
         val userAgent = "${BuildConfig.USER_AGENT} ${BuildConfig.ENVIRONMENT}".trim()
         return MegaApiAndroid(MegaApplication.APP_KEY, userAgent, path)
     }
@@ -82,28 +88,9 @@ internal class AppModule {
     @MegaApiFolder
     @Singleton
     @Provides
-    @Suppress("DEPRECATION")
     fun provideMegaApiFolder(@ApplicationContext context: Context): MegaApiAndroid {
-        val packageInfo: PackageInfo
-        var path: String? = null
-        try {
-            // PackageManager.PackageInfoFlags can only be used for devices
-            // running Android 13 and above. For devices running below Android 13,
-            // the normal getPackageInfo() is used
-            packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(
-                    context.packageName,
-                    PackageManager.PackageInfoFlags.of(0)
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getPackageInfo(context.packageName, 0)
-            }
-            path = packageInfo.applicationInfo?.dataDir + "/"
-        } catch (e: NameNotFoundException) {
-            e.printStackTrace()
-        }
-
+        NativeLibraryLoader.awaitLoaded()
+        val path = "${context.dataDir.path}/"
         return MegaApiAndroid(MegaApplication.APP_KEY, BuildConfig.USER_AGENT, path)
     }
 
@@ -112,11 +99,6 @@ internal class AppModule {
     fun provideMegaChatApi(@MegaApi megaApi: MegaApiAndroid): MegaChatApiAndroid {
         return MegaChatApiAndroid(megaApi)
     }
-
-    @Singleton
-    @Provides
-    fun providePreferences(@ApplicationContext context: Context): SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
 
     @Singleton
     @Provides
@@ -138,9 +120,26 @@ internal class AppModule {
     fun provideMainNavItems(): Set<@JvmSuppressWildcards MainNavItem> = emptySet<MainNavItem>()
 
     @Provides
-    @ElementsIntoSet
-    fun provideFeatureDestinations(): Set<@JvmSuppressWildcards FeatureDestination> =
-        setOf(TransfersFeatureDestination())
+    @IntoSet
+    fun provideTransferFeatureDestinations(): FeatureDestination = TransfersFeatureDestination()
+
+    @Provides
+    @IntoSet
+    fun provideFileLinkDeepLinkHandler(handler: FileLinkDeepLinkHandler): DeepLinkHandler = handler
+
+    @Provides
+    @IntoSet
+    fun provideFolderLinkDeepLinkHandler(handler: FolderLinkDeepLinkHandler): DeepLinkHandler =
+        handler
+
+    @Provides
+    @IntoSet
+    fun provideWebViewDeepLinkHandler(handler: WebViewDeepLinkHandler): DeepLinkHandler = handler
+
+    @Provides
+    fun provideOrderedDeepLinkHandlers(
+        handlers: Set<@JvmSuppressWildcards DeepLinkHandler>,
+    ): List<DeepLinkHandler> = handlers.sortedBy { it.priority }
 
     @Provides
     @ElementsIntoSet
@@ -150,21 +149,80 @@ internal class AppModule {
             ConsentDialogDestinations,
             TransferOverQuotaDialogDestinations,
             RemoteLogoutDialogDestinations,
+            ContactLinkDialogDestinations,
+            ChatDialogDestinations,
+            DeepLinksDialogDestinations,
+            OverQuotaDialogDestinations,
+            PurchaseResultDialogDestinations,
+            BusinessAccountExpiredDialogDestinations,
+            BusinessGraceDialogDestinations,
+            SecurityUpgradeDialogDestinations,
+            FreePlanParticipantsLimitDialogDestination,
+            Enable2FADialogDestinations,
+            WhatsNewDialogDestinations,
+            OpenLinkDialogDestinations,
+            NewTextFileDialogDestinations,
+            NewFolderDialogDestinations,
+            DiscardScanWarningDialogDestinations,
         )
 
     @Provides
     fun provideDisableChatApiUseCase(): DisableChatApiUseCase =
-        DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
+        DisableChatApiUseCase { MegaApplication.getInstance().disableMegaChatApi() }
 
     @Provides
-    fun provideAppDialogsEventQueue(queue: AppDialogsEventQueueImpl): AppDialogsEventQueue = queue
-
-    @Provides
-    fun provideAppDialogsEventQueueReceiver(queue: AppDialogsEventQueueImpl): AppDialogsEventQueueReceiver =
+    fun provideNavigationEventQueueReceiver(queue: CombinedEventQueueImpl): NavigationEventQueueReceiver =
         queue
+
+    @Provides
+    fun provideNavigationEventQueue(queue: CombinedEventQueueImpl): NavigationEventQueue = queue
+
+    @Provides
+    fun provideAppDialogEventQueue(queue: CombinedEventQueueImpl): AppDialogsEventQueue = queue
 
     @Provides
     fun provideAppContainerProvider(
         provider: MegaAppContainerProvider,
     ): AppContainerProvider = provider
+
+    @Provides
+    @IntoSet
+    fun provideCreateAccountDeepLinkHandler(handler: CreateAccountDeepLinkHandler): DeepLinkHandler =
+        handler
+
+    @Provides
+    @IntoSet
+    fun provideLoginDeepLinkHandler(handler: LoginDeepLinkHandler): DeepLinkHandler = handler
+
+    @Provides
+    @IntoSet
+    fun provideSettingsDeepLinkHandler(handler: SettingsDeepLinkHandler): DeepLinkHandler =
+        handler
+
+    @Provides
+    @IntoSet
+    fun provideExportRecoveryKeyDeepLinkHandler(handler: ExportRecoveryKeyDeepLinkHandler): DeepLinkHandler =
+        handler
+
+    @Provides
+    @IntoSet
+    fun provideAccountInvitationDeepLinkHandler(handler: AccountInvitationDeepLinkHandler): DeepLinkHandler =
+        handler
+
+    @Provides
+    @IntoSet
+    fun provideUpgradeAccountDeepLinkHandler(handler: UpgradeAccountDeepLinkHandler): DeepLinkHandler =
+        handler
+
+    @Provides
+    @IntoSet
+    fun provideContactsDeepLinkHandler(handler: ContactsDeepLinkHandler): DeepLinkHandler = handler
+
+    @Provides
+    @IntoSet
+    fun provideMyAccountDeepLinkHandle(handler: MyAccountDeepLinkHandler): DeepLinkHandler = handler
+
+    @Provides
+    @IntoSet
+    fun provideAlbumsDeepLinkHandle(handler: AlbumsDeepLinkHandler): DeepLinkHandler = handler
 }

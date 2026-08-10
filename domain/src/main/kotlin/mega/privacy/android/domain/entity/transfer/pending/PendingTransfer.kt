@@ -1,10 +1,10 @@
 package mega.privacy.android.domain.entity.transfer.pending
 
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.AppDataOwner
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer.ScanningFoldersData
 import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
  * @property alreadyTransferred
  * @property state the state of this pending transfer
  * @property fileName The name of the file to be shown in completed Transfers. It can be used to rename uploaded nodes. Current file name will be used if not specified.
+ * @property pitagTrigger [PitagTrigger]
  */
 data class PendingTransfer(
     val pendingTransferId: Long,
@@ -35,6 +36,7 @@ data class PendingTransfer(
     val alreadyTransferred: Int = 0,
     val state: PendingTransferState = PendingTransferState.NotSentToSdk,
     val fileName: String?,
+    val pitagTrigger: PitagTrigger,
 ) : AppDataOwner {
 
     /**

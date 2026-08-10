@@ -14,8 +14,6 @@
     <string name="general_select">Selecteren</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Map selecteren</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Creëren</string>
     <!-- button -->
     <string name="general_add">Toevoegen</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -41,7 +39,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Laden</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Toevoegen</string>
+    <string name="general_importing">Toevoegen&#8230;</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Doorsturen</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
@@ -60,10 +58,6 @@
     <string name="action_logout">Log&#160;uit</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Uploaden</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">Nieuwe map</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Nieuw tekst bestand</string>
     <!-- Menu item -->
     <string name="action_settings">Instellingen</string>
     <!-- Search button -->
@@ -93,7 +87,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Het abonnement is geannuleerd</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">We konden uw abonnement niet annuleren. Neem a.u.b. contact op met support&#64;mega.io voor assistentie.</string>
+    <string name="cancel_subscription_error">We konden uw abonnement niet annuleren. Neem a.u.b. contact op met https://mega.nz/support voor assistentie.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Sluit andere sessies</string>
     <!-- Message after kill all opened sessions -->
@@ -125,7 +119,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Nieuw bij MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">MEGA-account aanmaken</string>
+    <string name="create_account">Aanmelden</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Vul uw email in</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -152,10 +146,6 @@
     <string name="login_before_share">Log in om te delen met MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Uw bevestigingslink is niet langer geldig. Uw account is mogelijk al geactiveerd of u heeft uw aanmelding geannuleerd.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Voornaam</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Achternaam</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Ik begrijp dat [B] als ik mijn wachtwoord verlies, ik mijn gegevens kan verliezen[/B]. Lees meer over [A]MEGA’s end-to-end codering[/A].</string>
     <!-- warning dialog -->
@@ -276,8 +266,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Deze link is niet meer publiekelijk beschikbaar.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Hernoemen</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Openen</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Bestand voorbereiden</string>
@@ -297,8 +285,6 @@
     <string name="context_move_to_trash">Verplaatsen naar Prullenbak</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Verwijderen van MEGA</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Map naam</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Map creëren</string>
     <!-- Menu option title -->
@@ -387,8 +373,6 @@
     <string name="subscription_type_monthly">Maandelijks</string>
     <!--  -->
     <string name="subscription_type_yearly">Jaarlijks</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Nieuwe map</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Contact toevoegen</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -734,7 +718,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Ongeldig e-mailadres of wachtwoord. Probeer nogmaals.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Uw account is geschorst door schending van de Algemene Voorwaarden. Neem contact op met support&#64;mega.io</string>
+    <string name="error_account_suspended">Uw account is geschorst door schending van de Algemene Voorwaarden. Neem contact op met https://mega.nz/support</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Teveel mislukte pogingen om in te loggen, alstublieft wacht voor een uur.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -1004,12 +988,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">minuten</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Online</item>
-        <item>Afwezig</item>
-        <item>Bezig</item>
-        <item>Offline</item>
-    </string-array>
+    <string name="settings_chat_status_online">Online</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Afwezig</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Bezig</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Offline</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Inschakelen</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1111,7 +1096,7 @@
     <string name="download_show_info">Informatie weergeven</string>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
-        <item quantity="one">Link creatie mislukt. Probeer later nogmaals</item>
+        <item quantity="one">Mislukt om link te creëren. Probeer later nogmaals.</item>
         <item quantity="other">Mislukt om sommige links te creëren. Probeer later nogmaals.</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
@@ -1239,7 +1224,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Uitnodiging verstuurd</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Email address is malformed</string>
+    <string name="invalid_email_to_invite">Het e-mailadres is onjuist opgemaakt</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">U heeft %1$s extra opslagruimte voor het installeren van onze desktop applicatie ontvangen</string>
     <!-- info paragraph about the completed achievement install mobile app -->
@@ -1253,8 +1238,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Help</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Verstuur feedback</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Android feedback</string>
     <!-- mail body -->
@@ -1263,8 +1246,6 @@
     <string name="settings_feedback_body_device_model">Apparaat model</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Android versie</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">Nieuw tekst bestand</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Bestand Naam</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1283,8 +1264,6 @@
     <string name="general_incorrect_names">Corrigeer uw bestandsnamen voordat u verder gaat</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ongeldige tekens</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">De volgende karakters zijn niet toegestaan: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Bestandnaam kan niet leeg zijn.</item>
@@ -1302,12 +1281,6 @@
     <string name="invalid_connection_state">Opnieuw verbinden met het gesprek</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Er is een fout opgetreden en de oproep kan niet worden verbonden.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Vind u de MEGA-Mobiele Applicatie leuk?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Ja, geef deze applicatie uw mening</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Nee, verstuur feedback</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Geen contact toestemmingen toegekend</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1389,7 +1362,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Opslag tegoed overschreden</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Ongeldige link, vraag om een nieuwe geldige link</string>
+    <string name="invalid_link">Ongeldige link. Probeer het opnieuw of vraag een nieuwe aan.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Ongeldig link wachtwoord</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1474,12 +1447,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Video Kwaliteit</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Laag</item>
-        <item>Gemiddeld</item>
-        <item>Hoog</item>
-        <item>Orgineel</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Laag</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Gemiddeld</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Hoog</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Orgineel</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Gemiste oproep</string>
     <!-- Refers to a location of file -->
@@ -1643,7 +1617,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Uitschakelen</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_disable_2fa">Een fout heeft opgetreden tijdens het uitschakelen van twee-staps authenticatie. Probeer nogmaals</string>
+    <string name="error_disable_2fa">Een fout heeft opgetreden tijdens het uitschakelen van twee-staps authenticatie. Probeer nogmaals.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
     <string name="error_enable_2fa">Een fout heeft opgetreden tijdens het inschakelen van twee-staps authenticatie. Probeer nogmaals.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
@@ -1904,7 +1878,7 @@
     <!-- General label for files -->
     <string name="general_files">Bestanden</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Opslaan naar apparaat</string>
+    <string name="general_save_to_device">Downloaden</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Uploaden naar MEGA</string>
     <!-- Label choose destination -->
@@ -2196,7 +2170,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Negeren</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s heeft deze oproep gedempt</string>
+    <string name="muted_contact_micro">%s is gedempt</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">Gedempt</string>
     <!-- Subtitle of the call screen when the call is on hold -->
@@ -2437,9 +2411,9 @@
     <!-- Option in bottom sheet dialog for removing the associated phone number of current account. -->
     <string name="title_remove_phone_number">Verwijder telefoon nummer</string>
     <!-- Message showing to explain what will happen when the operation of -->
-    <string name="modify_phone_number_message">Met deze bewerking wordt uw huidige telefoonnummer verwijderd en wordt het proces gestart om een ​​nieuw telefoonnummer aan uw account te koppelen.</string>
+    <string name="modify_phone_number_message">Met deze bewerking wordt uw huidige telefoonnummer verwijderd en wordt het proces gestart om een nieuw telefoonnummer aan uw account te koppelen.</string>
     <!-- Message for action to remove the registered phone number. -->
-    <string name="remove_phone_number_message">Hiermee wordt uw gekoppelde telefoonnummer uit uw account verwijderd. Als u er later voor kiest om een ​​telefoonnummer toe te voegen, moet u dit verifiëren.</string>
+    <string name="remove_phone_number_message">Hiermee wordt uw gekoppelde telefoonnummer uit uw account verwijderd. Als u er later voor kiest om een telefoonnummer toe te voegen, moet u dit verifiëren.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Weergeven</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
@@ -2970,11 +2944,11 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">%1s abonnement</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">U heeft een actief MEGA abonnement bij %1$s. U moet het wel apart opzeggen via %2$s, aangezien MEGA het niet voor u kan opzeggen. Bezoek ons ​​Helpcentrum voor meer informatie.</string>
+    <string name="message_android_platform_subscription">U heeft een actief MEGA abonnement bij %1$s. U moet het wel apart opzeggen via %2$s, aangezien MEGA het niet voor u kan opzeggen. Bezoek ons Helpcentrum voor meer informatie.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription">U heeft een actief MEGA-abonnement. Het wordt automatisch geannuleerd nadat het account is verwijderd. Bezoek ons ​​Helpcentrum voor meer informatie.</string>
+    <string name="message_other_platform_subscription">U heeft een actief MEGA-abonnement. Het wordt automatisch geannuleerd nadat het account is verwijderd. Bezoek ons Helpcentrum voor meer informatie.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">U heeft een actief MEGA-abonnement bij Apple. U moet het apart van uw iTunes-account annuleren, omdat MEGA het niet voor u kan annuleren. Bezoek ons ​​Helpcentrum voor meer informatie.</string>
+    <string name="message_itunes_platform_subscription">U heeft een actief MEGA-abonnement bij Apple. U moet het apart van uw iTunes-account annuleren, omdat MEGA het niet voor u kan annuleren. Bezoek ons Helpcentrum voor meer informatie.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Bezoek %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -3308,7 +3282,7 @@
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">Bedankt voor uw Pro&#160;III jaarlijkse abonnement</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
-    <string name="chat_group_chat_info_allow_non_host_participants_option">Toestaan ​​dat non-hosts deelnemers kan toevoegen</string>
+    <string name="chat_group_chat_info_allow_non_host_participants_option">Toestaan dat non-hosts deelnemers kunnen toevoegen</string>
     <!-- Title of gif album. -->
     <string name="photos_album_title_gif">GIF</string>
     <!-- Title of raw album. -->
@@ -3341,7 +3315,7 @@
     <string name="photos_album_selection_title">Voeg items toe naar “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">%1$d Items naar “%2$s” toegevoegd</item>
+        <item quantity="one">%1$d Item naar “%2$s” toegevoegd</item>
         <item quantity="other">%1$d Items naar “%2$s” toegevoegd</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
@@ -3932,12 +3906,18 @@
         <item quantity="one">Kon %1$d item niet kopieren</item>
         <item quantity="other">Kon %1$d items niet kopieren</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">%1$d item gekopieerd,&#160;</item>
         <item quantity="other">%1$d items gekopieerd,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">kon %1$d item niet kopieren</item>
         <item quantity="other">kon %1$d items niet kopieren</item>
@@ -4134,10 +4114,6 @@
     <string name="dialog_taken_down_folder_title">Kan map niet openen</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Kan bestand niet openen</string>
-    <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
-    <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Alleen pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -4147,7 +4123,7 @@
     <!-- Text of setting password to link -->
     <string name="general_set_password">Wachtwoord instellen</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
-    <string name="general_link_updated_copy_again">Link bijgewerkt. Nogmaals kopiëren</string>
+    <string name="general_link_updated_copy_again">Link bijgewerkt. Nogmaals kopiëren.</string>
     <!-- Album import link label -->
     <string name="album_import_link">Album link</string>
     <!-- Album import error access title -->
@@ -4205,8 +4181,8 @@
     <string name="album_import_enter_album_name">Voer een albumnaam in</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
-        <item quantity="one">Iedereen met deze link kan uw gegevens bekijken en downloaden.</item>
-        <item quantity="other">Iedereen met deze links kan uw gegevens bekijken en downloaden.</item>
+        <item quantity="one">Iedereen met deze link kan uw gegevens bekijken en downloaden</item>
+        <item quantity="other">Iedereen met deze links kan uw gegevens bekijken en downloaden</item>
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">Opslaan op de Cloud schijf</string>
@@ -4454,8 +4430,8 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">Zie wachtkamer</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one">%1$d wacht op de de aansluiting van de oproep.</item>
-        <item quantity="other">%1$d deelnemers wachten op aansluiting van de oproep.</item>
+        <item quantity="one">%1$d deelnemer wacht op de aansluiting van de oproep.</item>
+        <item quantity="other">%1$d deelnemers wachten op de aansluiting van de oproep.</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">%1$s de toegang weigeren?</string>
@@ -4546,16 +4522,6 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s is aan het presenteren</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Deze persoon is aan het scherm delen</string>
-    <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">Deze oproep wordt opgenomen</string>
-    <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">Door in het gesprek te blijven geeft u toestemming om opgenomen te worden. De opname wordt alleen opgeslagen op het apparaat van de persoon die deze opneemt.</string>
-    <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">OK, ik snap het</string>
-    <!-- Label for the negative or cancel button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_negative_button">Oproep verlaten</string>
-    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Meer leren[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">%1$s is begonnen met opnemen</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
@@ -4587,7 +4553,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Iedereen bellen</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
-    <string name="chat_attach_pick_from_camera_deny_permission">MEGA heeft toegang tot uw camera nodig om foto\’s en video\’s vast te leggen</string>
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA heeft toegang tot uw camera nodig om foto\’s en video\’s vast te leggen.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
     <string name="chat_attach_location_deny_permission">U heeft MEGA toegang tot uw locatie geweigerd. Als u uw locatie wilt delen, geef MEGA toestemming om dat te doen.</string>
     <!-- Title for the confirmation dialog shown when the user is starting a large download -->
@@ -4641,7 +4607,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Het uploaden is gepauzeerd omdat de batterij lager is dan %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Het uploaden van de camera werkt niet meer. Probeer camera-uploads opnieuw in te schakelen om het probleem op te lossen. Als het probleem zich blijft voordoen, neem contact op met support&#64;mega.io.</string>
+    <string name="photos_camera_uploads_general_issue">Het uploaden van de camera werkt niet meer. Probeer camera-uploads opnieuw in te schakelen om het probleem op te lossen. Als het probleem zich blijft voordoen, neem contact op methttps://mega.nz/support</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Camera uploads zijn in behandeling,%1$d bestand in wachtrij</item>
@@ -4785,7 +4751,7 @@
     <string name="meetings_one_participant_raised_their_hand_message">%1$s heeft de hand opgestoken</string>
     <!-- The snackbar message two or more participants raised their hands -->
     <plurals name="meetings_other_participants_raised_their_hands_message">
-        <item quantity="one">%1$s en %2$d anderen staken hun hand op</item>
+        <item quantity="one">%1$s en %2$d andere stak hun hand op</item>
         <item quantity="other">%1$s en %2$d anderen staken hun hand op</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
@@ -4812,4 +4778,6 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Camera Uploads ingeschakeld</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Deze locatie bestaat niet langer.</string>
+    <string name="dialog_taken_down_folder_description">Deze map is verwijderd in overeenstemming met ons [A]Beleid voor verwijderingsrichtlijnen[/A]. U kunt bezwaar maken tegen deze verwijdering als u van mening bent dat wij een fout hebben gemaakt.</string>
+    <string name="dialog_taken_down_file_description">Dit bestand is verwijderd in overeenstemming met ons [A]Beleid voor verwijderingsrichtlijnen[/A]. U kunt bezwaar maken tegen deze verwijdering als u van mening bent dat wij een fout hebben gemaakt.</string>
 </resources>

@@ -1,0 +1,90 @@
+package mega.privacy.android.navigation.destination
+
+import android.os.Parcelable
+import androidx.navigation3.runtime.NavKey
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
+import mega.privacy.android.domain.entity.videosection.PlaylistType
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+
+@Serializable
+data object MediaMainNavKey : MainNavItemNavKey
+
+@Serializable
+data class AlbumContentNavKey(
+    val id: Long?,
+    val type: String?,
+    val isNewlyCreated: Boolean = false,
+) : NavKey
+
+@Serializable
+data class VideoPlaylistDetailNavKey(
+    val playlistHandle: Long,
+    val type: PlaylistType,
+) : NavKey
+
+@Serializable
+data object MediaSearchNavKey : NavKey
+
+@Serializable
+data class AlbumCoverSelectionNavKey(val albumId: Long) : NavKey
+
+@Serializable
+data class PhotosSelectionNavKey(
+    val albumId: Long,
+    val selectionMode: Int,
+) : NavKey
+
+@Serializable
+data object CreateAlbumDialogNavKey : NavKey {
+    const val RESULT = "CreateAlbumDialogNavKey::result"
+}
+
+/**
+ * Result returned once an album has been created from [CreateAlbumDialogNavKey].
+ */
+@Serializable
+data class CreateAlbumDialogResult(
+    val albumId: Long,
+    val albumName: String,
+)
+
+@Serializable
+data object AlbumDecryptionKeyNavKey : NavKey
+
+@Serializable
+@Parcelize
+data object CameraUploadsProgressNavKey : NavKey, Parcelable
+
+@Serializable
+@Parcelize
+data class SelectVideosForPlaylistNavKey(
+    val nodeHandle: Long = -1L,
+    val nodeName: String? = null,
+    val playlistHandle: Long = -1L,
+    val isNewlyCreated: Boolean = false,
+) : NavKey, Parcelable {
+    companion object {
+        const val RESULT = "SelectVideosForPlaylistNavKey::result"
+    }
+}
+
+@Serializable
+data class AlbumImportNavKey(val link: String?) : NoSessionNavKey.Optional
+
+@Serializable
+data object VideoRecentlyWatchedNavKey : NavKey
+
+@Serializable
+@Parcelize
+data class SelectVideosSearchNavKey(
+    val nodeHandle: Long = -1L,
+    val nodeName: String? = null,
+    val playlistHandle: Long = -1L,
+    val isNewlyCreated: Boolean = false,
+) : NavKey, Parcelable {
+    companion object {
+        const val RESULT = "SelectVideosSearchNavKey::result"
+    }
+}

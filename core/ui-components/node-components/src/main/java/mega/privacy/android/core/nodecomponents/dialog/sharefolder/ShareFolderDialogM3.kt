@@ -5,8 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -26,7 +28,7 @@ internal data class ShareFolderUiAttr(
  * @param nodeIds List of [NodeId]
  * @param shareFolderDialogViewModel [ShareFolderDialogViewModel]
  * @param onDismiss
- * @param onOkClicked
+ * @param onConfirm
  */
 @Composable
 fun ShareFolderDialogM3(
@@ -72,6 +74,7 @@ private fun ShareFolderDialogM3View(
         }
 
         BasicDialog(
+            modifier = Modifier.testTag(SHARE_FOLDER_DIALOG_TAG),
             title = stringResource(id = sharedR.string.backup_share_permission_title),
             description = stringResource(id = attr.info),
             positiveButtonText = stringResource(id = attr.positiveButton),
@@ -116,3 +119,5 @@ private fun ShareFolderDialogBodyPreviewSingle() {
         )
     }
 }
+
+internal const val SHARE_FOLDER_DIALOG_TAG = "share_folder:dialog"

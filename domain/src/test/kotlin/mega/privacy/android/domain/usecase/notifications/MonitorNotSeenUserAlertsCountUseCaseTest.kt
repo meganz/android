@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.NewShareAlert
 import mega.privacy.android.domain.entity.UserAlert
+import mega.privacy.android.domain.entity.UserAlertDestination
 import mega.privacy.android.domain.repository.NotificationsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -62,7 +63,8 @@ class MonitorNotSeenUserAlertsCountUseCaseTest {
                         createdTime = 0L,
                         isOwnChange = false,
                         nodeId = null,
-                        contact = mock()
+                        contact = mock(),
+                        destination = UserAlertDestination.CloudDrive
                     )
                 )
             }

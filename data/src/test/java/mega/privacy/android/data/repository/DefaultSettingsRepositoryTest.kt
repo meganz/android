@@ -11,8 +11,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
-import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -22,11 +20,20 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
+import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.data.preferences.PinnedItemsSortPreferenceDataStore
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.entity.home.PinnedHomeItem
+import mega.privacy.android.domain.entity.home.PinnedHomeItemsSortField
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
+import mega.privacy.android.domain.entity.preference.SortingPreference
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
+import mega.privacy.android.domain.entity.preference.ViewModePreference
 import mega.privacy.android.domain.exception.MegaException
-import nz.mega.sdk.MegaAccountDetails
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -37,6 +44,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
@@ -58,9 +66,6 @@ import kotlin.contracts.ExperimentalContracts
 internal class DefaultSettingsRepositoryTest {
     private lateinit var underTest: DefaultSettingsRepository
 
-    private val databaseHandler: DatabaseHandler = mock {
-        on { preferences }.thenReturn(mock())
-    }
     private val context: Context = mock()
     private val megaApiGateway: MegaApiGateway = mock()
     private val megaLocalStorageGateway: MegaLocalStorageGateway = mock()
@@ -73,13 +78,14 @@ internal class DefaultSettingsRepositoryTest {
     private val startScreenMapper: StartScreenMapper = mock()
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway = mock()
     private val fileVersionsOptionCache: Cache<Boolean> = mock()
-    private val myAccountInfoFacade: AccountInfoWrapper = mock()
+    private val getAccountTypeUseCase: GetAccountTypeUseCase = mock()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
+    private val appVersionMapper = mock<AppVersionMapper>()
+    private val pinnedItemsSortPreferenceDataStore = mock<PinnedItemsSortPreferenceDataStore>()
 
     @BeforeAll
     fun setUp() {
         underTest = DefaultSettingsRepository(
-            databaseHandler = { databaseHandler },
             context = context,
             megaApiGateway = megaApiGateway,
             megaLocalStorageGateway = megaLocalStorageGateway,
@@ -92,15 +98,16 @@ internal class DefaultSettingsRepositoryTest {
             startScreenMapper = startScreenMapper,
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
             fileVersionsOptionCache = fileVersionsOptionCache,
-            myAccountInfoFacade = myAccountInfoFacade,
-            megaLocalRoomGateway = megaLocalRoomGateway
+            getAccountTypeUseCase = getAccountTypeUseCase,
+            megaLocalRoomGateway = megaLocalRoomGateway,
+            appVersionMapper = appVersionMapper,
+            pinnedItemsSortPreferenceDataStore = pinnedItemsSortPreferenceDataStore,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            databaseHandler,
             context,
             megaApiGateway,
             megaLocalStorageGateway,
@@ -113,6 +120,8 @@ internal class DefaultSettingsRepositoryTest {
             fileManagementPreferencesGateway,
             fileVersionsOptionCache,
             megaLocalRoomGateway,
+            appVersionMapper,
+            pinnedItemsSortPreferenceDataStore,
         )
     }
 
@@ -338,6 +347,92 @@ internal class DefaultSettingsRepositoryTest {
             }
         }
 
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2])
+    fun `test setTimelineGridSize calls uiPreferencesGateway setTimelineGridSize`(value: Int) =
+        runTest {
+            underTest.setTimelineGridSize(value)
+            verify(uiPreferencesGateway).setTimelineGridSize(value)
+        }
+
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2])
+    fun `test monitorTimelineGridSize returns flow from uiPreferencesGateway`(value: Int) =
+        runTest {
+            whenever(uiPreferencesGateway.monitorTimelineGridSize()).thenReturn(flowOf(value))
+
+            underTest.monitorTimelineGridSize().test {
+                assertThat(awaitItem()).isEqualTo(value)
+                awaitComplete()
+            }
+        }
+
+    @ParameterizedTest
+    @EnumSource(SortingPreference::class)
+    fun `test setSortingPreference calls uiPreferencesGateway setSortingPreference`(
+        preference: SortingPreference,
+    ) = runTest {
+        underTest.setSortingPreference(preference)
+        verify(uiPreferencesGateway).setSortingPreference(preference.id)
+    }
+
+    @ParameterizedTest
+    @EnumSource(SortingPreference::class)
+    fun `test monitorSortingPreference maps the value from uiPreferencesGateway`(
+        preference: SortingPreference,
+    ) = runTest {
+        whenever(uiPreferencesGateway.monitorSortingPreference()).thenReturn(flowOf(preference.id))
+
+        underTest.monitorSortingPreference().test {
+            assertThat(awaitItem()).isEqualTo(preference)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test monitorSortingPreference returns null when uiPreferencesGateway returns null`() =
+        runTest {
+            whenever(uiPreferencesGateway.monitorSortingPreference()).thenReturn(flowOf(null))
+
+            underTest.monitorSortingPreference().test {
+                assertThat(awaitItem()).isNull()
+                awaitComplete()
+            }
+        }
+
+    @ParameterizedTest
+    @EnumSource(ViewModePreference::class)
+    fun `test setViewModePreference calls uiPreferencesGateway setViewModePreference`(
+        preference: ViewModePreference,
+    ) = runTest {
+        underTest.setViewModePreference(preference)
+        verify(uiPreferencesGateway).setViewModePreference(preference.id)
+    }
+
+    @ParameterizedTest
+    @EnumSource(ViewModePreference::class)
+    fun `test monitorViewModePreference maps the value from uiPreferencesGateway`(
+        preference: ViewModePreference,
+    ) = runTest {
+        whenever(uiPreferencesGateway.monitorViewModePreference()).thenReturn(flowOf(preference.id))
+
+        underTest.monitorViewModePreference().test {
+            assertThat(awaitItem()).isEqualTo(preference)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test monitorViewModePreference returns null when uiPreferencesGateway returns null`() =
+        runTest {
+            whenever(uiPreferencesGateway.monitorViewModePreference()).thenReturn(flowOf(null))
+
+            underTest.monitorViewModePreference().test {
+                assertThat(awaitItem()).isNull()
+                awaitComplete()
+            }
+        }
+
     @Test
     fun `setRubbishBinAutopurgePeriod completes successfully`() = runTest {
         val days = 30
@@ -391,7 +486,7 @@ internal class DefaultSettingsRepositoryTest {
                 on { errorCode }.thenReturn(MegaError.API_ENOENT)
             }
 
-            whenever(myAccountInfoFacade.accountTypeId).thenReturn(MegaAccountDetails.ACCOUNT_TYPE_FREE)
+            whenever(getAccountTypeUseCase()).thenReturn(AccountType.FREE)
             whenever(megaApiGateway.getRubbishBinAutopurgePeriod(any())).thenAnswer {
                 (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
                     api,
@@ -414,7 +509,7 @@ internal class DefaultSettingsRepositoryTest {
                 on { errorCode }.thenReturn(MegaError.API_ENOENT)
             }
 
-            whenever(myAccountInfoFacade.accountTypeId).thenReturn(MegaAccountDetails.ACCOUNT_TYPE_PROI)
+            whenever(getAccountTypeUseCase()).thenReturn(AccountType.PRO_I)
             whenever(megaApiGateway.getRubbishBinAutopurgePeriod(any())).thenAnswer {
                 (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
                     api,
@@ -511,6 +606,24 @@ internal class DefaultSettingsRepositoryTest {
         }
 
     @Test
+    fun `test that monitorAskBeforePreviewDownloads returns the value from the gateway`() =
+        runTest {
+            whenever(appPreferencesGateway.monitorBoolean(any(), any())).thenReturn(flowOf(false))
+
+            underTest.monitorAskBeforePreviewDownloads().test {
+                assertThat(awaitItem()).isFalse()
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that setAskBeforePreviewDownloads stores the value in the gateway`() = runTest {
+        underTest.setAskBeforePreviewDownloads(false)
+
+        verify(appPreferencesGateway).putBoolean(any(), eq(false))
+    }
+
+    @Test
     fun `test that monitorHomeScreenWidgetConfiguration returns the values from the gateway`() =
         runTest {
             val expected = listOf(mock<HomeWidgetConfiguration>())
@@ -526,4 +639,154 @@ internal class DefaultSettingsRepositoryTest {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
         }
+
+    @Test
+    fun `test that monitorPinnedHomeItems returns the values from the gateway`() =
+        runTest {
+            val expected = listOf(mock<PinnedHomeItem>())
+            megaLocalRoomGateway.stub {
+                on { monitorPinnedHomeItems() }.thenReturn(flow {
+                    emit(expected)
+                    awaitCancellation()
+                }
+                )
+            }
+
+            underTest.monitorPinnedHomeItems().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that addPinnedHomeItems delegates to the gateway`() = runTest {
+        val items = listOf(mock<PinnedHomeItem>())
+
+        underTest.addPinnedHomeItems(items)
+
+        verify(megaLocalRoomGateway).insertPinnedHomeItems(items)
+    }
+
+    @Test
+    fun `test that removePinnedHomeItem delegates to the gateway with the node handle`() = runTest {
+        underTest.removePinnedHomeItem(NodeId(123L))
+
+        verify(megaLocalRoomGateway).deletePinnedHomeItem(123L)
+    }
+
+    @Test
+    fun `test that updatePinnedHomeItemName delegates to the gateway with the node handle`() =
+        runTest {
+            underTest.updatePinnedHomeItemName(NodeId(123L), "Renamed")
+
+            verify(megaLocalRoomGateway).updatePinnedHomeItemName(123L, "Renamed")
+        }
+
+    @Test
+    fun `test that clearPinnedHomeItems delegates to the gateway`() = runTest {
+        underTest.clearPinnedHomeItems()
+
+        verify(megaLocalRoomGateway).deleteAllPinnedHomeItems()
+    }
+
+    @Test
+    fun `test that monitorPinnedItemsSortPreference returns the values from the data store`() =
+        runTest {
+            val expected = PinnedHomeItemsSortField.Name to SortDirection.Ascending
+            pinnedItemsSortPreferenceDataStore.stub {
+                on { monitorSortPreference() }.thenReturn(flow {
+                    emit(expected)
+                    awaitCancellation()
+                })
+            }
+
+            underTest.monitorPinnedItemsSortPreference().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that setPinnedItemsSortPreference delegates to the data store`() = runTest {
+        underTest.setPinnedItemsSortPreference(
+            PinnedHomeItemsSortField.DateAdded,
+            SortDirection.Descending,
+        )
+
+        verify(pinnedItemsSortPreferenceDataStore).setSortPreference(
+            PinnedHomeItemsSortField.DateAdded,
+            SortDirection.Descending,
+        )
+    }
+
+    @ParameterizedTest(name = "flag: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that getContactLinksOption returns the request flag when the request succeeds`(
+        flagValue: Boolean,
+    ) = runTest {
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION)
+            on { flag }.thenReturn(flagValue)
+        }
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        whenever(megaApiGateway.getContactLinksOption(any())).thenAnswer {
+            (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                error
+            )
+        }
+
+        assertThat(underTest.getContactLinksOption()).isEqualTo(flagValue)
+    }
+
+    @Test
+    fun `test that getContactLinksOption returns true when the option has never been set`() =
+        runTest {
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+                on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_ENOENT)
+            }
+
+            whenever(megaApiGateway.getContactLinksOption(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+
+            assertThat(underTest.getContactLinksOption()).isTrue()
+        }
+
+    @Test
+    fun `test that getContactLinksOption throws an exception when the request fails`() = runTest {
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION)
+        }
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_EFAILED)
+        }
+
+        whenever(megaApiGateway.getContactLinksOption(any())).thenAnswer {
+            (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                error
+            )
+        }
+
+        assertThrows<MegaException> {
+            underTest.getContactLinksOption()
+        }
+    }
 }

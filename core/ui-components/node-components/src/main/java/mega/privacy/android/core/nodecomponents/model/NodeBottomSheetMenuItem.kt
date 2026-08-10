@@ -5,8 +5,9 @@ import androidx.compose.runtime.Composable
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -15,8 +16,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
  * Bottom sheet click handler
  */
 data class BottomSheetClickHandler(
-    val onDismiss: () -> Unit,
-    val actionHandler: NodeActionHandler,
+    val actionHandler: SingleNodeActionHandler,
     val navigationHandler: NavigationHandler,
     val coroutineScope: CoroutineScope,
     val context: Context,
@@ -57,6 +57,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType
     ): Boolean
 
 
@@ -66,9 +67,8 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
     fun getOnClickFunction(
         node: TypedNode,
         handler: BottomSheetClickHandler
-    ): () -> Unit = {
+    ) = {
         handler.actionHandler(menuAction, node)
-        handler.onDismiss()
     }
 
     /**

@@ -16,9 +16,12 @@ interface FavouritesRepository {
 
     /**
      * Get favourites
+     *
+     * @param excludeSensitives When true, the SDK search filter excludes sensitive (hidden)
+     *   favourites so the UI never sees them. Defaults to false.
      * @return List<FavouriteInfo>
      */
-    suspend fun getAllFavorites(): List<UnTypedNode>
+    suspend fun getAllFavorites(excludeSensitives: Boolean = false): List<UnTypedNode>
 
     /**
      * Removing favourites

@@ -24,7 +24,10 @@ class GetShareChatNodesUseCase @Inject constructor(
         return if (files.size == chatNodes.size) {
             NodeShareContentUri.LocalContentUris(files)
         } else {
-            val links = exportChatNodesUseCase(chatNodes).map { (_, link) -> link }
+            val links = exportChatNodesUseCase(
+                chatNodes,
+                "GetShareChatNodesUseCase"
+            ).map { (_, link) -> link }
             if (links.isEmpty()) throw IllegalStateException("No links to share")
             NodeShareContentUri.RemoteContentUris(links)
         }

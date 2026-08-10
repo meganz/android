@@ -40,4 +40,19 @@ interface AdsRepository {
      * Monitor Google consent loaded state
      */
     fun monitorGoogleConsentLoaded(): Flow<Boolean>
+
+    /**
+     * Atomically increment the rewarded ad attempt count by 1.
+     */
+    suspend fun incrementRewardedAdAttemptCount()
+
+    /**
+     * Reset the rewarded ad attempt count back to 0.
+     */
+    suspend fun resetRewardedAdAttemptCount()
+
+    /**
+     * Monitor the rewarded ad attempt count.
+     */
+    fun monitorRewardedAdAttemptCount(): Flow<Int>
 }

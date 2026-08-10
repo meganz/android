@@ -56,7 +56,7 @@ class MonitorAllTransfersPausedByTypeUseCaseTest {
         val activeTransferTotals = mock<ActiveTransferTotals> {
             whenever(it.allPaused()) doReturn false
         }
-        whenever(transferRepository.getActiveTransferTotalsByType(type)) doReturn
+        whenever(transferRepository.monitorActiveTransferTotalsByType(type)) doReturn
                 flowOf(activeTransferTotals)
         underTest(type).test {
             assertThat(awaitItem()).isEqualTo(paused)
@@ -75,7 +75,7 @@ class MonitorAllTransfersPausedByTypeUseCaseTest {
         val activeTransferTotals = mock<ActiveTransferTotals> {
             whenever(it.allPaused()) doReturn paused
         }
-        whenever(transferRepository.getActiveTransferTotalsByType(type)) doReturn
+        whenever(transferRepository.monitorActiveTransferTotalsByType(type)) doReturn
                 flowOf(activeTransferTotals)
         underTest(type).test {
             assertThat(awaitItem()).isEqualTo(paused)
@@ -94,7 +94,7 @@ class MonitorAllTransfersPausedByTypeUseCaseTest {
             whenever(it.pausedFileTransfers) doReturn 0
             whenever(it.pendingFileTransfers) doReturn 0
         }
-        whenever(transferRepository.getActiveTransferTotalsByType(type)) doReturn
+        whenever(transferRepository.monitorActiveTransferTotalsByType(type)) doReturn
                 flowOf(activeTransferTotals)
         underTest(type).test {
             assertThat(awaitItem()).isEqualTo(false)
@@ -114,7 +114,7 @@ class MonitorAllTransfersPausedByTypeUseCaseTest {
             underTest(type).test {
                 assertThat(awaitItem()).isEqualTo(false)
             }
-            verify(transferRepository, never()).getActiveTransferTotalsByType(any())
+            verify(transferRepository, never()).monitorActiveTransferTotalsByType(any())
         }
 
     @ParameterizedTest
@@ -127,7 +127,7 @@ class MonitorAllTransfersPausedByTypeUseCaseTest {
             whenever(it.allPaused()) doReturn false
         })
         whenever(transferRepository.monitorPausedTransfers()).thenReturn(pausedFlow)
-        whenever(transferRepository.getActiveTransferTotalsByType(type)).thenReturn(
+        whenever(transferRepository.monitorActiveTransferTotalsByType(type)).thenReturn(
             activeTransferTotalsFlow
         )
         underTest(type).test {

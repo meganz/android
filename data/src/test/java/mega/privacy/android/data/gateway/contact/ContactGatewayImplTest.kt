@@ -3,6 +3,7 @@ package mega.privacy.android.data.gateway.contact
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
+import android.net.Uri
 import android.provider.ContactsContract
 import android.provider.ContactsContract.Contacts
 import com.google.common.truth.Truth.assertThat
@@ -13,7 +14,9 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -268,6 +271,102 @@ class ContactGatewayImplTest {
             val actual = underTest.getLocalContacts()
 
             assertThat(actual).isEqualTo(emptyList<LocalContact>())
+        }
+
+    @Test
+    fun `test that local contacts grouped per contact are returned when the picker Uri contains email rows`() =
+        runTest {
+            val pickerUriString = "content://com.android.contacts/session/1"
+            val firstLookupKey = "lookupKey1"
+            val secondLookupKey = "lookupKey2"
+            val firstName = "name1"
+            val secondName = "name2"
+            val firstEmail = "first@test.com"
+            val secondEmail = "second@test.com"
+            val thirdEmail = "third@test.com"
+            val emailType = ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE
+
+            val mockCursor = mock<Cursor> {
+                on { getString(0) }.thenReturn(
+                    firstLookupKey,
+                    firstLookupKey,
+                    secondLookupKey
+                )
+                on { getString(1) }.thenReturn(firstName, firstName, secondName)
+                on { getString(2) }.thenReturn(emailType, emailType, emailType)
+                on { getString(3) }.thenReturn(firstEmail, secondEmail, thirdEmail)
+                on { moveToNext() }.thenReturn(true, true, true, false)
+            }
+            val contentResolver = mock<ContentResolver> {
+                on { query(any(), any(), eq(null), eq(null), eq(null)) }.thenReturn(mockCursor)
+            }
+            whenever(context.contentResolver).thenReturn(contentResolver)
+
+            mockStatic(Uri::class.java).use {
+                val uri = mock<Uri>()
+                whenever(Uri.parse(pickerUriString)).thenReturn(uri)
+
+                val actual = underTest.getLocalContactsFromUri(UriPath(pickerUriString))
+
+                val expected = listOf(
+                    LocalContact(
+                        id = firstLookupKey.hashCode().toLong(),
+                        name = firstName,
+                        emails = listOf(firstEmail, secondEmail)
+                    ),
+                    LocalContact(
+                        id = secondLookupKey.hashCode().toLong(),
+                        name = secondName,
+                        emails = listOf(thirdEmail)
+                    )
+                )
+                assertThat(actual).containsExactlyElementsIn(expected)
+            }
+        }
+
+    @Test
+    fun `test that an empty list is returned when the picker Uri contains no email rows`() =
+        runTest {
+            val pickerUriString = "content://com.android.contacts/session/1"
+            val mockCursor = mock<Cursor> {
+                on { getString(0) }.thenReturn("lookupKey1")
+                on { getString(1) }.thenReturn("name1")
+                on { getString(2) }.thenReturn(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                on { getString(3) }.thenReturn("1234567890")
+                on { moveToNext() }.thenReturn(true, false)
+            }
+            val contentResolver = mock<ContentResolver> {
+                on { query(any(), any(), eq(null), eq(null), eq(null)) }.thenReturn(mockCursor)
+            }
+            whenever(context.contentResolver).thenReturn(contentResolver)
+
+            mockStatic(Uri::class.java).use {
+                val uri = mock<Uri>()
+                whenever(Uri.parse(pickerUriString)).thenReturn(uri)
+
+                val actual = underTest.getLocalContactsFromUri(UriPath(pickerUriString))
+
+                assertThat(actual).isEqualTo(emptyList<LocalContact>())
+            }
+        }
+
+    @Test
+    fun `test that an empty list is returned when the picker Uri query returns a NULL cursor`() =
+        runTest {
+            val pickerUriString = "content://com.android.contacts/session/1"
+            val contentResolver = mock<ContentResolver> {
+                on { query(any(), any(), any(), any(), any()) }.thenReturn(null)
+            }
+            whenever(context.contentResolver).thenReturn(contentResolver)
+
+            mockStatic(Uri::class.java).use {
+                val uri = mock<Uri>()
+                whenever(Uri.parse(pickerUriString)).thenReturn(uri)
+
+                val actual = underTest.getLocalContactsFromUri(UriPath(pickerUriString))
+
+                assertThat(actual).isEqualTo(emptyList<LocalContact>())
+            }
         }
 
     @Test

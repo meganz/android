@@ -20,18 +20,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState.Companion.MAX_NUMBER_OF_CONTACTS_IN_LIST
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHARES_HEADER
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHOW_MORE
 import mega.privacy.android.app.presentation.fileinfo.view.paddingStartDefault
-import mega.privacy.android.app.presentation.preview.contactItemForPreviews
-import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.shared.contact.model.AvatarData
+import mega.privacy.android.shared.contact.model.ContactItemUiState
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -41,16 +44,26 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPr
 
 /**
  * Expandable list of shared contacts
+ *
+ * @param contacts
+ * @param selectedContacts
+ * @param expanded
+ * @param onHeaderClick
+ * @param onContactClick
+ * @param onContactLongClick
+ * @param onContactMoreOptionsClick
+ * @param onShowMoreContactsClick
+ * @param modifier
  */
 @Composable
 internal fun SharedInfoView(
-    contacts: List<ContactPermission>,
+    contacts: List<ContactPermissionUiState>,
     selectedContacts: List<String>,
     expanded: Boolean,
     onHeaderClick: () -> Unit,
-    onContactClick: (ContactPermission) -> Unit,
-    onContactLongClick: (ContactPermission) -> Unit,
-    onContactMoreOptionsClick: (ContactPermission) -> Unit,
+    onContactClick: (ContactPermissionUiState) -> Unit,
+    onContactLongClick: (ContactPermissionUiState) -> Unit,
+    onContactMoreOptionsClick: (ContactPermissionUiState) -> Unit,
     onShowMoreContactsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -75,7 +88,7 @@ internal fun SharedInfoView(
 
 @Composable
 private fun Header(
-    contacts: List<ContactPermission>,
+    contacts: List<ContactPermissionUiState>,
     expanded: Boolean,
     onHeaderClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -96,15 +109,15 @@ private fun Header(
         )
         TextMegaButton(
             text =
-            if (expanded) {
-                stringResource(id = R.string.general_close)
-            } else {
-                pluralStringResource(
-                    id = R.plurals.general_selection_num_contacts,
-                    count = contacts.size,
-                    contacts.size
-                )
-            },
+                if (expanded) {
+                    stringResource(id = R.string.general_close)
+                } else {
+                    pluralStringResource(
+                        id = R.plurals.general_selection_num_contacts,
+                        count = contacts.size,
+                        contacts.size
+                    )
+                },
             modifier = Modifier
                 .padding(end = 16.dp),
             onClick = onHeaderClick
@@ -114,18 +127,18 @@ private fun Header(
 
 @Composable
 private fun ColumnScope.ContactsList(
-    contacts: List<ContactPermission>,
+    contacts: List<ContactPermissionUiState>,
     selectedContacts: List<String>,
-    onContactClick: (ContactPermission) -> Unit,
-    onContactLongClick: (ContactPermission) -> Unit,
-    onMoreOptionsClick: (ContactPermission) -> Unit,
+    onContactClick: (ContactPermissionUiState) -> Unit,
+    onContactLongClick: (ContactPermissionUiState) -> Unit,
+    onMoreOptionsClick: (ContactPermissionUiState) -> Unit,
     onShowMoreContactsClick: () -> Unit,
 ) {
     //maximum 5, so no LazyColumn needed
     contacts.take(MAX_CONTACTS_TO_SHOW).forEachIndexed { i, contactItem ->
         SharedInfoContactItemView(
             contactItem = contactItem,
-            selected = selectedContacts.contains(contactItem.contactItem.email),
+            selected = selectedContacts.contains(contactItem.email),
             onClick = { onContactClick(contactItem) },
             onMoreOptionsClick = { onMoreOptionsClick(contactItem) },
             onLongClick = { onContactLongClick(contactItem) },
@@ -160,13 +173,22 @@ internal const val MAX_CONTACTS_TO_SHOW = MAX_NUMBER_OF_CONTACTS_IN_LIST
 @CombinedThemePreviews
 @Composable
 private fun SharedInfoPreview() {
+    val contact = ContactItemUiState(
+        handle = 2L,
+        displayName = "Bob Brown",
+        status = ContactItemStatus.Away,
+        lastSeen = 65535,
+        avatar = AvatarData.Initials(initials = "B", avatarColor = Color(0xFF1565C0)),
+        isVerified = false,
+    )
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         var expanded by remember { mutableStateOf(true) }
         SharedInfoView(
             contacts = List(7) {
-                ContactPermission(
-                    contactItemForPreviews,
-                    AccessPermission.values()[it.mod(AccessPermission.values().size)]
+                ContactPermissionUiState(
+                    contactItemUiState = contact,
+                    email = "Bob@Brown.com",
+                    permission = AccessPermission.entries[it.mod(AccessPermission.entries.size)]
                 )
             },
             selectedContacts = emptyList(),

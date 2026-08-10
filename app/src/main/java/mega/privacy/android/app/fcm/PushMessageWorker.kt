@@ -7,6 +7,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.provider.Settings.System.DEFAULT_NOTIFICATION_URI
 import androidx.core.app.ActivityCompat
@@ -124,11 +125,6 @@ class PushMessageWorker @AssistedInject constructor(
         // legacy support, other places need to know logging in happen
         val pushMessage = getPushMessageFromWorkerData(inputData)
         val isRequiredLogin = isRequiredLogin(pushMessage)
-        Timber.d("Is required login: $isRequiredLogin")
-        if (loginMutex.isLocked && isRequiredLogin) {
-            Timber.w("Logging already running.")
-            return@withContext Result.failure()
-        }
 
         pushMessage?.let {
             if (it is CallPushMessage) {
@@ -142,6 +138,12 @@ class PushMessageWorker @AssistedInject constructor(
                     Timber.e(exception)
                 }
             }
+        }
+
+        Timber.d("Is required login: $isRequiredLogin")
+        if (loginMutex.isLocked && isRequiredLogin) {
+            Timber.w("Logging already running.")
+            return@withContext Result.failure()
         }
 
         if (isRequiredLogin) {
@@ -322,7 +324,15 @@ class PushMessageWorker @AssistedInject constructor(
             else -> getNotification(iconPackR.drawable.ic_stat_notify)
         }
 
-        return ForegroundInfo(NOTIFICATION_CHANNEL_ID, notification)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                NOTIFICATION_CHANNEL_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            )
+        } else {
+            ForegroundInfo(NOTIFICATION_CHANNEL_ID, notification)
+        }
     }
 
     private fun getNotification(iconId: Int, titleId: Int? = null): Notification {

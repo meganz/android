@@ -12,12 +12,14 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 
@@ -52,6 +54,7 @@ interface NodeRepository {
     /**
      * Provides all outgoing shares from SDK with proper sorting and filtering
      *
+     * @param order
      * @return List of [ShareData]
      */
     suspend fun getAllOutgoingShares(order: SortOrder): List<ShareData>
@@ -146,12 +149,15 @@ interface NodeRepository {
      * @param nodeId [NodeId]
      * @param order [SortOrder]
      * @param folderTypeData [FolderTypeData] Optional data for folder type determination
+     * @param sensitivityFilter [SensitivityFilterOption] Optional filter to include or
+     *   exclude sensitive (hidden) nodes via the SDK search filter
      * @return
      */
     suspend fun getTypedNodesById(
         nodeId: NodeId,
         order: SortOrder? = null,
         folderTypeData: FolderTypeData? = null,
+        sensitivityFilter: SensitivityFilterOption? = null,
     ): List<TypedNode>
 
     /**
@@ -163,15 +169,18 @@ interface NodeRepository {
      *
      * @param nodeId [NodeId] The parent node ID
      * @param order [SortOrder] Optional sorting order
-     * @param initialBatchSize [Int] Size of initial batch (default: 1000)
+     * @param initialBatchSize [Int] Size of initial batch
      * @param folderTypeData [FolderTypeData] Optional data for folder type determination
+     * @param sensitivityFilter [SensitivityFilterOption] Optional filter to include or
+     *   exclude sensitive (hidden) nodes via the SDK search filter
      * @return Flow of pairs containing typed node lists and hasMore flag for progressive loading
      */
     suspend fun getTypedNodesByIdInChunks(
         nodeId: NodeId,
         order: SortOrder? = null,
-        initialBatchSize: Int = 1000,
+        initialBatchSize: Int,
         folderTypeData: FolderTypeData? = null,
+        sensitivityFilter: SensitivityFilterOption? = null,
     ): Flow<Pair<List<TypedNode>, Boolean>>
 
     /**
@@ -227,6 +236,11 @@ interface NodeRepository {
     fun monitorOfflineNodeUpdates(): Flow<List<Offline>>
 
     /**
+     * Monitor offline node ids
+     */
+    fun monitorOfflineNodeIds(): Flow<List<Int?>>
+
+    /**
      * Check if node is in rubbish or deleted
      */
     suspend fun isNodeInRubbishOrDeleted(nodeHandle: Long): Boolean
@@ -255,6 +269,11 @@ interface NodeRepository {
      * Convert Base 64 string to handle
      */
     suspend fun convertBase64ToHandle(base64: String): Long
+
+    /**
+     * Convert a handle to its Base 64 string
+     */
+    suspend fun convertHandleToBase64(handle: Long): String
 
     /**
      * Get offline node information
@@ -495,6 +514,17 @@ interface NodeRepository {
     suspend fun getChildNode(parentNodeId: NodeId?, name: String?): UnTypedNode?
 
     /**
+     * Checks whether a child with the given name exists directly under the parent node.
+     *
+     * Lightweight: resolves a single node by name without mapping the whole children list.
+     *
+     * @param parentNodeId parent node id
+     * @param name name to be searched
+     * @return true if a child with the given name exists, false otherwise
+     */
+    suspend fun doesChildExistByName(parentNodeId: NodeId, name: String): Boolean
+
+    /**
      * Sets the original fingerprint of a [Node]
      *
      * @param nodeId the [NodeId] to attach the [originalFingerprint] to
@@ -579,22 +609,35 @@ interface NodeRepository {
      *
      * @param nodeToExport the node's [NodeId] that we want to export
      * @param expireTime the time in seconds since epoch to set as expiry date
+     * @param callerName Temporary param to try to identify a Firebase report.
      * @return the [String] The link if the request finished with success, error if not
      */
     suspend fun exportNode(
         nodeToExport: NodeId,
         expireTime: Long?,
+        callerName: String,
     ): String
 
     /**
      * Export node
      *
      * @param node [TypedNode]
+     * @param callerName Temporary param to try to identify a Firebase report.
      * @return the [String] The public link of the node
      */
     suspend fun exportNode(
         node: TypedNode,
+        callerName: String,
     ): String
+
+    /**
+     * Check if a node is accessible by probing its download URL.
+     *
+     * Throws [mega.privacy.android.domain.exception.BlockedMegaException] if the node is taken down (API_EBLOCKED).
+     *
+     * @param nodeId [NodeId] of the node to check
+     */
+    suspend fun checkNodeAccessibility(nodeId: NodeId)
 
     /**
      * Launches a request to stop sharing a file/folder
@@ -903,12 +946,12 @@ interface NodeRepository {
     suspend fun getRootNodeId(): NodeId?
 
     /**
-     * Get node name by id
+     * Get node info by id
      *
      * @param nodeId
-     * @return The node name if found else null
+     * @return The NodeInfo if found else null
      */
-    suspend fun getNodeNameById(nodeId: NodeId): String?
+    suspend fun getNodeInfoByIdUseCase(nodeId: NodeId): NodeInfo?
 
     /**
      * Get full node path by id.

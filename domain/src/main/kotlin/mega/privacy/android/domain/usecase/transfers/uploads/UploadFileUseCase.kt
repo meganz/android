@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -35,6 +37,8 @@ class UploadFileUseCase @Inject constructor(
      * @param appData the list of [TransferAppData] that will be added to this transfer
      * @param parentFolderId destination folder id where [uriPath] will be uploaded
      * @param isHighPriority Whether the file or folder should be placed on top of the upload queue or not, chat uploads are always priority regardless of this parameter
+     * @param pitagTrigger [PitagTrigger]
+     * @param pitagTarget [PitagTarget]
      *
      * @return a flow of [TransferEvent]s to monitor the download state and progress
      */
@@ -45,6 +49,8 @@ class UploadFileUseCase @Inject constructor(
         appData: List<TransferAppData>?,
         parentFolderId: NodeId,
         isHighPriority: Boolean,
+        pitagTrigger: PitagTrigger,
+        pitagTarget: PitagTarget,
     ): Flow<TransferEvent> = flow {
         val isSourceTemporary =
             cacheRepository.isFileInCacheDirectory(File(uriPath.value))
@@ -70,6 +76,8 @@ class UploadFileUseCase @Inject constructor(
                 appData = finalAppData,
                 isSourceTemporary = isSourceTemporary,
                 shouldStartFirst = shouldStartFirst,
+                pitagTrigger = pitagTrigger,
+                pitagTarget = pitagTarget,
             )
         )
     }

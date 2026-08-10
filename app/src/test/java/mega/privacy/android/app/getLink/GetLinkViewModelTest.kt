@@ -14,11 +14,15 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
+import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -31,6 +35,7 @@ class GetLinkViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val hasSensitiveInheritedUseCase = mock<HasSensitiveInheritedUseCase>()
     private val hasSensitiveDescendantUseCase = mock<HasSensitiveDescendantUseCase>()
+    private val shouldShowCopyrightUseCase = mock<ShouldShowCopyrightUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -50,6 +55,7 @@ class GetLinkViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = mock(),
             getNodeByIdUseCase = getNodeByIdUseCase,
+            shouldShowCopyrightUseCase = shouldShowCopyrightUseCase,
             get1On1ChatIdUseCase = mock(),
             sendTextMessageUseCase = mock(),
         )
@@ -61,7 +67,8 @@ class GetLinkViewModelTest {
             getNodeByIdUseCase,
             monitorAccountDetailUseCase,
             hasSensitiveDescendantUseCase,
-            hasSensitiveInheritedUseCase
+            hasSensitiveInheritedUseCase,
+            shouldShowCopyrightUseCase,
         )
     }
 
@@ -140,5 +147,16 @@ class GetLinkViewModelTest {
             underTest.hasSensitiveItemsFlow.test {
                 assertThat(awaitItem()).isEqualTo(HIDDEN_NODE_WARNING_TYPE_FOLDER)
             }
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the correct value is returned when checking the copyright visibility`(shouldShow: Boolean) =
+        runTest {
+            whenever(shouldShowCopyrightUseCase()) doReturn shouldShow
+
+            val result = underTest.shouldShowCopyright()
+
+            assertThat(result).isEqualTo(shouldShow)
         }
 }

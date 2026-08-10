@@ -2,9 +2,7 @@ package mega.privacy.android.app.notifications
 
 import android.Manifest
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
@@ -15,8 +13,7 @@ import androidx.core.net.toUri
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes
-import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
@@ -29,7 +26,11 @@ import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ChatListNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.toFormattedText
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
@@ -44,6 +45,7 @@ import kotlin.time.Duration.Companion.seconds
  */
 class ChatMessageNotificationManager @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
+    private val megaNavigator: MegaNavigator,
 ) {
     companion object {
         private const val GROUP_KEY = "Karere"
@@ -55,7 +57,7 @@ class ChatMessageNotificationManager @Inject constructor(
      * @param chatMessageNotificationData   [ChatMessageNotificationData]
      */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    fun show(
+    suspend fun show(
         context: Context,
         chatMessageNotificationData: ChatMessageNotificationData,
         fileDurationMapper: FileDurationMapper,
@@ -89,17 +91,9 @@ class ChatMessageNotificationManager @Inject constructor(
             }
         }
 
-        val intent = Intent(context, ManagerActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-            putExtra(Constants.CHAT_ID, chat.chatId)
-        }
-
-        val pendingIntent = PendingIntent.getActivity(
+        val pendingIntent = MegaActivity.getPendingIntentWithExtraDestinations(
             context,
-            msg.messageId.toInt(),
-            intent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+            listOf(ChatListNavKey(), ChatNavKey(chat.chatId, null))
         )
 
         val notificationColor = ContextCompat.getColor(context, R.color.red_600_red_300)

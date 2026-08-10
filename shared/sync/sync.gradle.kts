@@ -1,10 +1,7 @@
-import mega.privacy.android.build.shouldApplyDefaultConfiguration
-
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
-    id("kotlin-android")
 
 }
 
@@ -20,7 +17,7 @@ android {
 }
 dependencies {
     implementation(project(":domain"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:string-resources"))
 
     testImplementation(testlib.junit)
     testImplementation(testlib.junit.test.ktx)

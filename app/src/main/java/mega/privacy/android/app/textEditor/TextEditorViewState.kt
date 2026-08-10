@@ -2,6 +2,7 @@ package mega.privacy.android.app.textEditor
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.AccountType
 
@@ -13,6 +14,8 @@ import mega.privacy.android.domain.entity.AccountType
  * @property isNodeInBackups if the node is in backups
  * @property isBusinessAccountExpired if the business account is expired
  * @property isMarkDownFile if the file is a markdown file
+ * @property moveOrRemoveNodeEvent one-shot event emitted while moving or removing the
+ * current node, used to drive confirmation dialogs and snackbars from the activity.
  */
 data class TextEditorViewState(
     val transferEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
@@ -22,4 +25,5 @@ data class TextEditorViewState(
     val isBusinessAccountExpired: Boolean = false,
     val isMarkDownFile: Boolean = false,
     val markDownFileLoaded: Boolean = false,
+    val moveOrRemoveNodeEvent: StateEventWithContent<MoveOrRemoveNodeResult> = consumed(),
 )

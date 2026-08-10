@@ -53,15 +53,15 @@ internal class ChatSessionViewModelTest {
 
 
     @Test
-    fun `test that successful checkChatSession updates isChatSessionValid to true`() = runTest {
+    fun `test that successful checkChatSession updates sessionState to Valid`() = runTest {
         underTest.checkChatSession()
         underTest.state.test {
-            assertThat(awaitItem()).isEqualTo(ChatSessionState.Valid)
+            assertThat(awaitItem().sessionState).isEqualTo(ChatSessionState.Valid)
         }
     }
 
     @Test
-    fun `test that failed checkChatSession updates isChatSessionValid to false`() = runTest {
+    fun `test that failed checkChatSession updates sessionState to Invalid`() = runTest {
         whenever(checkChatSessionUseCase()).thenAnswer {
             throw Exception("Call failed")
         }
@@ -69,7 +69,7 @@ internal class ChatSessionViewModelTest {
         underTest.checkChatSession()
 
         underTest.state.test {
-            assertThat(awaitItem()).isEqualTo(ChatSessionState.Invalid)
+            assertThat(awaitItem().sessionState).isEqualTo(ChatSessionState.Invalid)
         }
     }
 
@@ -86,19 +86,18 @@ internal class ChatSessionViewModelTest {
             throw Exception("Call failed")
         }
 
-        assertThat(underTest.state.value).isEqualTo(ChatSessionState.Pending)
+        assertThat(underTest.state.value.sessionState).isEqualTo(ChatSessionState.Pending)
         underTest.checkChatSession(optimistic)
 
         underTest.state.test {
             if (optimistic) {
-                assertThat(awaitItem()).isEqualTo(ChatSessionState.Valid)
+                assertThat(awaitItem().sessionState).isEqualTo(ChatSessionState.Valid)
             } else {
-                assertThat(awaitItem()).isEqualTo(ChatSessionState.Pending)
+                assertThat(awaitItem().sessionState).isEqualTo(ChatSessionState.Pending)
             }
-            assertThat(awaitItem()).isEqualTo(ChatSessionState.Invalid)
+            assertThat(awaitItem().sessionState).isEqualTo(ChatSessionState.Invalid)
         }
 
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
-
 }

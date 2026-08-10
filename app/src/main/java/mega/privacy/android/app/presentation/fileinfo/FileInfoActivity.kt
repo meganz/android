@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -7,9 +8,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -19,6 +20,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,15 +34,13 @@ import mega.privacy.android.app.activities.contract.DeleteVersionsHistoryActivit
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
-import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
+import mega.privacy.android.app.extensions.handleLocationClick
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActionBackupListener
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
-import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
@@ -48,7 +48,6 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
-import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.tags.TagsActivity
 import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.NODE_ID
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
@@ -58,25 +57,35 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
+import mega.privacy.android.core.passcode.PasscodeCheck
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
+import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.navOptions
+import mega.privacy.android.navigation.contract.queue.NavPriority
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.shared.nodes.dialog.sharefolder.ShareHiddenNodeWarningDialog
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
@@ -109,7 +118,31 @@ class FileInfoActivity : BaseActivity() {
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
-    private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var navigationQueue: NavigationEventQueue
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
+
+    @Inject
+    lateinit var getNodeByIdUseCase: GetNodeByIdUseCase
+
+    @Inject
+    lateinit var isOutShareUseCase: IsOutShareUseCase
+
+    @Inject
+    lateinit var getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
+
+    private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<Intent>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
     private lateinit var copyLauncher: ActivityResultLauncher<LongArray>
     private lateinit var moveLauncher: ActivityResultLauncher<LongArray>
@@ -178,15 +211,20 @@ class FileInfoActivity : BaseActivity() {
                     onTakeDownLinkClick = {
                         this@FileInfoActivity.launchUrl(it)
                     },
-                    onLocationClick = { this.navigateToLocation(uiState.nodeLocationInfo) },
+                    onLocationClick = {
+                        this.navigateToLocation(
+                            uiState.nodeLocationInfo,
+                            uiState.nodeDestination
+                        )
+                    },
                     availableOfflineChanged = { availableOffline ->
                         viewModel.availableOfflineChanged(availableOffline)
                     },
                     onVersionsClick = this::navigateToVersions,
                     onSetDescriptionClick = viewModel::setNodeDescription,
-                    onSharedWithContactClick = { this.navigateToUserDetails(it.contactItem) },
-                    onSharedWithContactSelected = { viewModel.contactSelectedInSharedList(it.contactItem.email) },
-                    onSharedWithContactUnselected = { viewModel.contactUnselectedInSharedList(it.contactItem.email) },
+                    onSharedWithContactClick = { this.navigateToUserDetails(it.email) },
+                    onSharedWithContactSelected = { viewModel.contactSelectedInSharedList(it.email) },
+                    onSharedWithContactUnselected = { viewModel.contactUnselectedInSharedList(it.email) },
                     onSharedWithContactMoreOptionsClick = { viewModel.contactToShowOptions(it) },
                     onShowMoreSharedWithContactsClick = this::navigateToSharedContacts,
                     onPublicLinkCopyClick = viewModel::copyPublicLink,
@@ -198,12 +236,14 @@ class FileInfoActivity : BaseActivity() {
                     },
                     getAddress = viewModel::getAddress,
                     onShareContactOptionsDismissed = { viewModel.contactToShowOptions(null) },
-                    onSharedWithContactRemoveClicked = { viewModel.initiateRemoveContacts(listOf(it.contactItem.email)) },
+                    onSharedWithContactRemoveClicked = { viewModel.initiateRemoveContacts(listOf(it.email)) },
                     onSharedWithContactChangePermissionClicked = {
-                        viewModel.initiateChangePermission(listOf(it.contactItem.email))
+                        viewModel.initiateChangePermission(listOf(it.email))
                     },
                     onSharedWithContactMoreInfoClick = {
-                        ContactUtil.openContactInfoActivity(this, it.contactItem.email)
+                        val i = Intent(this, ContactInfoActivity::class.java)
+                        i.putExtra(Constants.NAME, it.email)
+                        startActivity(i)
                     }
                 )
                 uiState.leaveFolderNodeIds?.let { nodeIds ->
@@ -219,32 +259,22 @@ class FileInfoActivity : BaseActivity() {
                         onDismiss = viewModel::extraActionFinished,
                     )
                 }
+                if (uiState.shareHiddenNodeWarning != SensitiveNodeShareWarning.None) {
+                    ShareHiddenNodeWarningDialog(
+                        sharingMultipleFolders = uiState.shareHiddenNodeWarning == SensitiveNodeShareWarning.Folders,
+                        onConfirm = viewModel::shareHiddenNodeWarningConfirmed,
+                        onCancel = viewModel::shareHiddenNodeWarningDismissed,
+                    )
+                }
                 StartTransferComponent(
                     uiState.downloadEvent,
                     { viewModel.consumeDownloadEvent() },
                     snackBarHostState = snackBarHostState,
                 )
                 NodeAttachmentView(
-                    nodeAttachmentViewModel
-                ) { message, chatId ->
-                    coroutineScope.launch {
-                        val result = snackBarHostState.showAutoDurationSnackbar(
-                            message = message.ifBlank { getString(R.string.sent_as_message) },
-                            actionLabel = getString(R.string.action_see)
-                        )
-                        if (result == SnackbarResult.ActionPerformed) {
-                            startActivity(
-                                Intent(this@FileInfoActivity, ManagerActivity::class.java).apply {
-                                    action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-                                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                    putExtra(Constants.CHAT_ID, chatId)
-                                    putExtra(Constants.EXTRA_MOVE_TO_CHAT_SECTION, true)
-                                },
-                            )
-                            finish()
-                        }
-                    }
-                }
+                    viewModel = nodeAttachmentViewModel,
+                    snackbarHostState = snackBarHostState,
+                )
             }
         }
     }
@@ -307,6 +337,10 @@ class FileInfoActivity : BaseActivity() {
             },
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             megaNodeUtilWrapper = megaNodeUtilWrapper,
+            megaNavigator = megaNavigator,
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            isOutShareUseCase = isOutShareUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
         )
     }
 
@@ -319,9 +353,14 @@ class FileInfoActivity : BaseActivity() {
 
     private fun configureSelectContactForShareFolderLauncher() {
         selectContactForShareFolderLauncher =
-            registerForActivityResult(SelectUsersToShareActivityContract()) { result ->
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
                 if (!viewModel.checkAndHandleIsDeviceConnected()) {
                     return@registerForActivityResult
+                }
+                val result = if (activityResult.resultCode == Activity.RESULT_OK) {
+                    activityResult.data?.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
+                } else {
+                    null
                 }
                 result?.let {
                     val contactsData = ArrayList<String>().apply { addAll(result) }
@@ -405,10 +444,26 @@ class FileInfoActivity : BaseActivity() {
         }
     }
 
-    private fun navigateToLocation(locationInfo: LocationInfo?) {
-        locationInfo?.let {
-            handleLocationClick(this, adapterType, locationInfo)
-        }
+    private fun navigateToLocation(
+        locationInfo: LocationInfo?,
+        nodeDestination: List<NavKey>?,
+    ) {
+        nodeDestination?.let {
+            lifecycleScope.launch {
+                navigationQueue.emit(
+                    nodeDestination,
+                    NavPriority.Default,
+                    navOptions {
+                        launchSingleTop = true
+                    }
+                )
+                megaNavigator.launchMegaActivityIfNeeded(this@FileInfoActivity)
+            }
+        } ?: locationInfo?.handleLocationClick(
+            activity = this@FileInfoActivity,
+            adapterType = adapterType,
+            megaNavigator = megaNavigator
+        )
     }
 
     private fun navigateToVersions() {
@@ -416,31 +471,34 @@ class FileInfoActivity : BaseActivity() {
     }
 
     private fun navigateToShare(nodeId: NodeId = viewModel.nodeId) {
-        selectContactForShareFolderLauncher.launch(nodeId)
+        megaNavigator.openAddContactToShare(
+            context = this,
+            launcher = selectContactForShareFolderLauncher,
+            nodeHandles = listOf(nodeId.longValue),
+        )
     }
 
     private fun navigateToSharedContacts() {
-        lifecycleScope.launch {
-            val intent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                Intent(this@FileInfoActivity, FileContactListComposeActivity::class.java)
-            } else {
-                Intent(this@FileInfoActivity, FileContactListActivity::class.java)
-            }
-            startActivity(
-                intent.apply {
-                    putExtra(Constants.NAME, viewModel.nodeId.longValue)
-                }
-            )
-        }
-
+        megaNavigator.openFileContactListActivity(
+            context = this,
+            handle = viewModel.nodeId.longValue,
+            nodeName = viewModel.typedNode.name
+        )
     }
 
-    private fun navigateToUserDetails(contactItem: ContactItem) {
-        ContactUtil.openContactInfoActivity(this, contactItem.email)
+    private fun navigateToUserDetails(email: String) {
+        val i = Intent(this, ContactInfoActivity::class.java)
+        i.putExtra(Constants.NAME, email)
+        startActivity(i)
     }
 
-    private fun navigateToCopy() = copyLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
-    private fun navigateToMove() = moveLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
+    private fun navigateToCopy() {
+        copyLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
+    }
+
+    private fun navigateToMove() {
+        moveLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
+    }
 
     private fun navigateToGetLink() {
         if (showTakenDownNodeActionNotAvailableDialog(viewModel.node, this)) {
@@ -476,13 +534,34 @@ class FileInfoActivity : BaseActivity() {
                     )
                 }
             } else {
-                navigateToShare()
+                viewModel.shareFolderWithContactsClicked()
             }
         }
     }
 
     private fun showRenameDialog() =
-        showRenameNodeDialog(this, viewModel.node, this, null)
+        showRenameNodeDialog(
+            context = this,
+            node = viewModel.node,
+            snackbarShower = this,
+            actionNodeCallback = null,
+            onRenameConfirmed = { handle, newName -> renameNode(handle, newName) },
+            getRootNodeUseCase = getRootNodeUseCase,
+            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
+        )
+
+    private fun renameNode(nodeHandle: Long, newName: String) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    showSnackbar(content = getString(sharedR.string.context_correctly_renamed))
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    showSnackbar(content = getString(R.string.context_no_renamed))
+                }
+        }
+    }
 
     private suspend fun consumeEvent(
         event: FileInfoOneOffViewEvent,
@@ -549,6 +628,8 @@ class FileInfoActivity : BaseActivity() {
             }
 
             is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+
+            FileInfoOneOffViewEvent.LaunchShareContactPicker -> navigateToShare()
         }
     }
 

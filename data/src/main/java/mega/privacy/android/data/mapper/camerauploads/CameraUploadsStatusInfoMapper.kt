@@ -6,10 +6,15 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.ARE_
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CHECK_FILE_UPLOAD
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_ERROR
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_PROGRESS
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_BACKUP_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_DEVICE_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_FOLDER_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_IS_LOCAL
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_FILE_INDEX
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED_REASON
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NOT_ENOUGH_STORAGE
@@ -136,7 +141,18 @@ class CameraUploadsStatusInfoMapper @Inject constructor() {
 
                 NO_WIFI_CONNECTION -> CameraUploadsStatusInfo.NoWifiConnection
                 NO_NETWORK_CONNECTION -> CameraUploadsStatusInfo.NoNetworkConnection
-
+                FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP -> {
+                    val deviceName = progress.getString(CONFLICT_DEVICE_NAME)
+                    val backupName = progress.getString(CONFLICT_BACKUP_NAME)
+                    val folderName = progress.getString(CONFLICT_FOLDER_NAME)
+                    val isLocalFolder = progress.getBoolean(CONFLICT_IS_LOCAL, false)
+                    CameraUploadsStatusInfo.FolderConflictWithSyncOrBackup(
+                        deviceName = deviceName?.takeIf { it.isNotEmpty() },
+                        backupName = backupName?.takeIf { it.isNotEmpty() },
+                        folderName = folderName?.takeIf { it.isNotEmpty() },
+                        isLocalFolder = isLocalFolder,
+                    )
+                }
                 else -> {
                     null
                 }

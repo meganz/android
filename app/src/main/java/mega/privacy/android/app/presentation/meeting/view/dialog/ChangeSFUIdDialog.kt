@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.view.dialog
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -18,7 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.ChangeSFUIdViewModel
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
@@ -26,7 +26,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.resources.R as sharedR
 
 internal const val SFU_TITLE_TAG = "change_sfu_id_dialog:title"
 internal const val SFU_SUBTITLE_TAG = "change_sfu_id_dialog:subtitle"

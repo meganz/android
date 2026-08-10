@@ -34,12 +34,14 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -48,6 +50,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.Cl
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
@@ -56,12 +59,15 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.setting.SetAskBeforePreviewDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.setting.ShouldAskBeforePreviewDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
@@ -77,8 +83,6 @@ import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptTo
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWorkerAndWaitUntilIsStartedUseCase
-import mega.privacy.android.domain.usecase.transfers.filespermission.MonitorRequestFilesPermissionDeniedUseCase
-import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
@@ -132,6 +136,10 @@ class StartTransfersComponentViewModelTest {
         mock<IsAskBeforeLargeDownloadsSettingUseCase>()
     private val setAskBeforeLargeDownloadsSettingUseCase =
         mock<SetAskBeforeLargeDownloadsSettingUseCase>()
+    private val shouldAskBeforePreviewDownloadsSettingUseCase =
+        mock<ShouldAskBeforePreviewDownloadsSettingUseCase>()
+    private val setAskBeforePreviewDownloadsSettingUseCase =
+        mock<SetAskBeforePreviewDownloadsSettingUseCase>()
     private val getOrCreateDownloadLocationUseCase =
         mock<GetOrCreateDownloadLocationUseCase>()
     private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
@@ -151,12 +159,6 @@ class StartTransfersComponentViewModelTest {
     private val saveUriToDeviceUseCase = mock<SaveUriToDeviceUseCase>()
     private val getCurrentUploadSpeedUseCase = mock<GetCurrentUploadSpeedUseCase>()
     private val cancelCancelTokenUseCase = mock<CancelCancelTokenUseCase>()
-    private val monitorRequestFilesPermissionDeniedUseCase =
-        mock<MonitorRequestFilesPermissionDeniedUseCase> {
-            on { invoke() } doReturn emptyFlow()
-        }
-    private val setRequestFilesPermissionDeniedUseCase =
-        mock<SetRequestFilesPermissionDeniedUseCase>()
     private val startDownloadsWorkerAndWaitUntilIsStartedUseCase =
         mock<StartDownloadsWorkerAndWaitUntilIsStartedUseCase>()
     private val deleteAllPendingTransfersUseCase = mock<DeleteAllPendingTransfersUseCase>()
@@ -186,10 +188,12 @@ class StartTransfersComponentViewModelTest {
     private val getPreviewDownloadUseCase = mock<GetPreviewDownloadUseCase>()
     private val ratingHandlerImpl = mock<RatingHandlerImpl>()
     private val crashReporter = mock<CrashReporter>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
     private val parentNode: TypedFolderNode = mock()
+    private val fileTypeInfo = PdfFileTypeInfo
     private val startDownloadEvent = TransferTriggerEvent.StartDownloadNode(
         nodes = nodes,
         withStartMessage = false,
@@ -199,7 +203,11 @@ class StartTransfersComponentViewModelTest {
         withStartMessage = false,
     )
     private val startUploadFilesEvent =
-        TransferTriggerEvent.StartUpload.Files(mapOf(DESTINATION to null), parentId)
+        TransferTriggerEvent.StartUpload.Files(
+            pathsAndNames = mapOf(DESTINATION to null),
+            destinationId = parentId,
+            pitagTrigger = PitagTrigger.NotApplicable,
+        )
     private val startUploadTextFileEvent = TransferTriggerEvent.StartUpload.TextFile(
         DESTINATION,
         parentId,
@@ -208,7 +216,11 @@ class StartTransfersComponentViewModelTest {
     )
 
     private val startUploadEvent =
-        TransferTriggerEvent.StartUpload.Files(mapOf("foo" to null), NodeId(34678L))
+        TransferTriggerEvent.StartUpload.Files(
+            mapOf("foo" to null),
+            NodeId(34678L),
+            pitagTrigger = PitagTrigger.CameraCapture,
+        )
 
     @BeforeAll
     fun setup() {
@@ -227,6 +239,8 @@ class StartTransfersComponentViewModelTest {
             fileSizeStringMapper = fileSizeStringMapper,
             isAskBeforeLargeDownloadsSettingUseCase = isAskBeforeLargeDownloadsSettingUseCase,
             setAskBeforeLargeDownloadsSettingUseCase = setAskBeforeLargeDownloadsSettingUseCase,
+            shouldAskBeforePreviewDownloadsSettingUseCase = shouldAskBeforePreviewDownloadsSettingUseCase,
+            setAskBeforePreviewDownloadsSettingUseCase = setAskBeforePreviewDownloadsSettingUseCase,
             monitorOngoingActiveTransfersUseCase = monitorOngoingActiveTransfersUseCase,
             getCurrentDownloadSpeedUseCase = getCurrentDownloadSpeedUseCase,
             shouldAskDownloadDestinationUseCase = shouldAskDownloadDestinationUseCase,
@@ -242,8 +256,6 @@ class StartTransfersComponentViewModelTest {
             saveUriToDeviceUseCase = saveUriToDeviceUseCase,
             getCurrentUploadSpeedUseCase = getCurrentUploadSpeedUseCase,
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
-            monitorRequestFilesPermissionDeniedUseCase = monitorRequestFilesPermissionDeniedUseCase,
-            setRequestFilesPermissionDeniedUseCase = setRequestFilesPermissionDeniedUseCase,
             startDownloadsWorkerAndWaitUntilIsStartedUseCase = startDownloadsWorkerAndWaitUntilIsStartedUseCase,
             startUploadsWorkerAndWaitUntilIsStartedUseCase = startUploadsWorkerAndWaitUntilIsStartedUseCase,
             deleteAllPendingTransfersUseCase = deleteAllPendingTransfersUseCase,
@@ -265,6 +277,7 @@ class StartTransfersComponentViewModelTest {
             getPreviewDownloadUseCase = getPreviewDownloadUseCase,
             ratingHandler = ratingHandlerImpl,
             crashReporter = crashReporter,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -280,6 +293,8 @@ class StartTransfersComponentViewModelTest {
             fileSizeStringMapper,
             isAskBeforeLargeDownloadsSettingUseCase,
             setAskBeforeLargeDownloadsSettingUseCase,
+            shouldAskBeforePreviewDownloadsSettingUseCase,
+            setAskBeforePreviewDownloadsSettingUseCase,
             monitorOngoingActiveTransfersUseCase,
             getCurrentDownloadSpeedUseCase,
             shouldAskDownloadDestinationUseCase,
@@ -297,7 +312,6 @@ class StartTransfersComponentViewModelTest {
             saveUriToDeviceUseCase,
             getCurrentUploadSpeedUseCase,
             cancelCancelTokenUseCase,
-            setRequestFilesPermissionDeniedUseCase,
             startDownloadsWorkerAndWaitUntilIsStartedUseCase,
             deleteAllPendingTransfersUseCase,
             monitorPendingTransfersUntilResolvedUseCase,
@@ -314,15 +328,17 @@ class StartTransfersComponentViewModelTest {
             broadcastTransferTagToCancelUseCase,
             deleteCompletedTransfersByIdUseCase,
             monitorStorageStateEventUseCase,
+            getPreviewDownloadUseCase,
             crashReporter,
+            getFeatureFlagValueUseCase,
         )
         initialStub()
     }
 
     private fun initialStub() = runTest {
         whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
-        whenever(monitorRequestFilesPermissionDeniedUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)).thenReturn(false)
         val storageStateEvent = mock<StorageStateEvent> {
             on { storageState } doReturn StorageState.Unknown
         }
@@ -373,6 +389,18 @@ class StartTransfersComponentViewModelTest {
         verify(deleteCacheFilesUseCase).invoke(listOf(UriPath(previewCachePath + node.name)))
     }
 
+    @Test
+    fun `test that the preview download starts`() = runTest {
+        commonStub()
+        whenever(getPreviewDownloadUseCase(node)).thenReturn(null)
+        whenever(getFilePreviewDownloadPathUseCase()).thenReturn(DESTINATION)
+        val startEvent = TransferTriggerEvent.StartDownloadForPreview(node, isOpenWith = false)
+
+        underTest.startTransfer(startEvent)
+
+        verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase).invoke()
+    }
+
     @ParameterizedTest
     @MethodSource("provideStartChatUploadEvents")
     fun `test that send chat attachments use case is invoked with correct parameters when chat upload is started`(
@@ -384,6 +412,7 @@ class StartTransfersComponentViewModelTest {
             listOf(uploadUri).associateWith { null },
             false,
             CHAT_ID,
+            pitagTrigger = startEvent.pitagTrigger,
         )
     }
 
@@ -443,24 +472,67 @@ class StartTransfersComponentViewModelTest {
         )
     }
 
+    @Test
+    fun `test that a large preview download is confirmed based on the preview setting only`() =
+        runTest {
+            commonStub()
+            whenever(isAskBeforeLargeDownloadsSettingUseCase()).thenReturn(false)
+            whenever(shouldAskBeforePreviewDownloadsSettingUseCase()).thenReturn(true)
+            whenever(totalFileSizeOfNodesUseCase(any()))
+                .thenReturn(TransfersConstants.CONFIRM_SIZE_MIN_BYTES + 1)
+            val size = "x MB"
+            whenever(fileSizeStringMapper(any())).thenReturn(size)
+            val startEvent = TransferTriggerEvent.StartDownloadForPreview(node, isOpenWith = false)
+
+            underTest.startTransfer(startEvent)
+
+            assertThat(underTest.uiState.value.confirmLargeDownload)
+                .isEqualTo(ConfirmLargeDownloadInfo(size, startEvent))
+        }
+
+    @Test
+    fun `test that a large preview download is not confirmed when the preview setting is disabled`() =
+        runTest {
+            commonStub()
+            whenever(isAskBeforeLargeDownloadsSettingUseCase()).thenReturn(true)
+            whenever(shouldAskBeforePreviewDownloadsSettingUseCase()).thenReturn(false)
+            whenever(totalFileSizeOfNodesUseCase(any()))
+                .thenReturn(TransfersConstants.CONFIRM_SIZE_MIN_BYTES + 1)
+            whenever(getPreviewDownloadUseCase(node)).thenReturn(null)
+            whenever(getFilePreviewDownloadPathUseCase()).thenReturn(DESTINATION)
+            val startEvent = TransferTriggerEvent.StartDownloadForPreview(node, isOpenWith = false)
+
+            underTest.startTransfer(startEvent)
+
+            assertThat(underTest.uiState.value.confirmLargeDownload).isNull()
+            verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase).invoke()
+        }
+
     @ParameterizedTest
     @MethodSource("provideStartDownloadEvents")
-    fun `test that setAskBeforeLargeDownloadsSettingUseCase is invoked when specified in largeDownloadAnswered`(
+    fun `test that the matching ask before download setting is disabled when specified in largeDownloadAnswered`(
         startEvent: TransferTriggerEvent.DownloadTriggerEvent,
     ) = runTest {
         commonStub()
         underTest.largeDownloadAnswered(startEvent, true)
-        verify(setAskBeforeLargeDownloadsSettingUseCase).invoke(false)
+        if (startEvent is TransferTriggerEvent.StartDownloadForPreview) {
+            verify(setAskBeforePreviewDownloadsSettingUseCase).invoke(false)
+            verifyNoInteractions(setAskBeforeLargeDownloadsSettingUseCase)
+        } else {
+            verify(setAskBeforeLargeDownloadsSettingUseCase).invoke(false)
+            verifyNoInteractions(setAskBeforePreviewDownloadsSettingUseCase)
+        }
     }
 
     @ParameterizedTest
     @MethodSource("provideStartDownloadEvents")
-    fun `test that setAskBeforeLargeDownloadsSettingUseCase is not invoked when not specified in largeDownloadAnswered`(
+    fun `test that no ask before download setting is disabled when not specified in largeDownloadAnswered`(
         startEvent: TransferTriggerEvent.DownloadTriggerEvent,
     ) = runTest {
         commonStub()
         underTest.largeDownloadAnswered(startEvent, false)
         verifyNoInteractions(setAskBeforeLargeDownloadsSettingUseCase)
+        verifyNoInteractions(setAskBeforePreviewDownloadsSettingUseCase)
     }
 
     @Test
@@ -501,7 +573,7 @@ class StartTransfersComponentViewModelTest {
             whenever(getFileNameFromStringUriUseCase(uriString)).thenReturn(destinationName)
 
             underTest.startDownloadWithoutConfirmation(startDownloadNode)
-            underTest.startDownloadWithDestination(destinationUri)
+            underTest.checkSaveDestinationAndStartDownload(destinationUri)
 
             assertThat(underTest.uiState.value.promptSaveDestination)
                 .isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -529,13 +601,31 @@ class StartTransfersComponentViewModelTest {
             whenever(getFileNameFromStringUriUseCase(uriString)).thenReturn(destinationName)
 
             underTest.startDownloadWithoutConfirmation(startDownloadNode)
-            underTest.startDownloadWithDestination(destinationUri)
+            underTest.checkSaveDestinationAndStartDownload(destinationUri)
             underTest.consumePromptSaveDestination()
 
             assertThat(underTest.uiState.value.promptSaveDestination)
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
         }
 
+    @Test
+    fun `test that askDestinationForDownload is reset when checkSaveDestinationAndStartDownload is invoked with null uri`() =
+        runTest {
+            commonStub()
+            val startDownloadNode = TransferTriggerEvent.StartDownloadNode(
+                nodes = nodes,
+                withStartMessage = false,
+            )
+
+            whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
+
+            underTest.startDownloadWithoutConfirmation(startDownloadNode)
+            assertThat(underTest.uiState.value.askDestinationForDownload).isNotNull()
+
+            underTest.checkSaveDestinationAndStartDownload(null)
+
+            assertThat(underTest.uiState.value.askDestinationForDownload).isNull()
+        }
 
     @Test
     fun `test that setStorageDownloadAskAlwaysUseCase is set to true when alwaysAskForDestination is invoked`() =
@@ -579,7 +669,11 @@ class StartTransfersComponentViewModelTest {
             commonStub()
             whenever(shouldAskForResumeTransfersUseCase()).thenReturn(true)
             val triggerEvent =
-                TransferTriggerEvent.StartChatUpload.Files(CHAT_ID, listOf(uploadUri))
+                TransferTriggerEvent.StartChatUpload.Files(
+                    chatIds = listOf(CHAT_ID),
+                    uris = listOf(uploadUri),
+                    pitagTrigger = PitagTrigger.Picker,
+                )
             underTest.startTransfer(triggerEvent)
             assertCurrentEventIsEqualTo(StartTransferEvent.PausedTransfers(triggerEvent))
         }
@@ -617,7 +711,11 @@ class StartTransfersComponentViewModelTest {
             commonStub()
 
             underTest.startTransfer(
-                TransferTriggerEvent.StartUpload.Files(mapOf(), parentId)
+                TransferTriggerEvent.StartUpload.Files(
+                    pathsAndNames = mapOf(),
+                    destinationId = parentId,
+                    pitagTrigger = PitagTrigger.Picker
+                )
             )
 
             assertCurrentEventIsEqualTo(StartTransferEvent.Message.TransferCancelled)
@@ -651,6 +749,7 @@ class StartTransfersComponentViewModelTest {
             mapOf(DESTINATION to null),
             parentId,
             startEvent.isHighPriority,
+            pitagTrigger = startEvent.pitagTrigger,
         )
     }
 
@@ -692,7 +791,7 @@ class StartTransfersComponentViewModelTest {
             underTest.startDownloadWithoutConfirmation(
                 TransferTriggerEvent.CopyOfflineNode(listOf(nodeId))
             )
-            underTest.startDownloadWithDestination(
+            underTest.checkSaveDestinationAndStartDownload(
                 uri
             )
             assertCurrentEventIsEqualTo(
@@ -820,27 +919,6 @@ class StartTransfersComponentViewModelTest {
         )
     })
 
-    @Test
-    fun `test that monitorRequestFilesPermissionDeniedUseCase updates state`() =
-        runTest {
-            whenever(monitorRequestFilesPermissionDeniedUseCase())
-                .thenReturn(flowOf(true))
-
-            initTest()
-
-            underTest.uiState.map { it.requestFilesPermissionDenied }.test {
-                assertThat(awaitItem()).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that setRequestFilesPermissionDenied invokes correct use case`() = runTest {
-        whenever(setRequestFilesPermissionDeniedUseCase()).thenReturn(Unit)
-
-        underTest.setRequestFilesPermissionDenied()
-        verify(setRequestFilesPermissionDeniedUseCase).invoke()
-    }
-
     @ParameterizedTest(name = " if use case returns {0}")
     @ValueSource(booleans = [true, false])
     fun `test that monitorStorageOverQuota updates state`(
@@ -854,6 +932,39 @@ class StartTransfersComponentViewModelTest {
             assertThat(awaitItem()).isEqualTo(isStorageOverQuota)
         }
     }
+
+    @Test
+    fun `test that init sets isQuotaWarningUpsellEnabled to true when the feature flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen))
+                .thenReturn(true)
+            initTest()
+            underTest.uiState.map { it.isQuotaWarningUpsellEnabled }.test {
+                assertThat(awaitItem()).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that init sets isQuotaWarningUpsellEnabled to false when the feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen))
+                .thenReturn(false)
+            initTest()
+            underTest.uiState.map { it.isQuotaWarningUpsellEnabled }.test {
+                assertThat(awaitItem()).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that init sets isQuotaWarningUpsellEnabled to false when the feature flag check throws`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen))
+                .thenThrow(RuntimeException("error"))
+            initTest()
+            underTest.uiState.map { it.isQuotaWarningUpsellEnabled }.test {
+                assertThat(awaitItem()).isFalse()
+            }
+        }
 
     @Test
     fun `test that when storage state is paywall transfers are not started`() = runTest {
@@ -1229,6 +1340,7 @@ class StartTransfersComponentViewModelTest {
                     startUploadFilesEvent.pathsAndNames,
                     startUploadFilesEvent.destinationId,
                     startUploadFilesEvent.isHighPriority,
+                    PitagTrigger.NotApplicable,
                 )
 
                 verify(deleteCompletedTransfersByIdUseCase)(retriedTransferIds)
@@ -1254,6 +1366,7 @@ class StartTransfersComponentViewModelTest {
                     startUploadFilesEvent.pathsAndNames,
                     startUploadFilesEvent.destinationId,
                     startUploadFilesEvent.isHighPriority,
+                    PitagTrigger.NotApplicable,
                 )
 
                 verify(deleteCompletedTransfersByIdUseCase)(retriedTransferIds)
@@ -1655,8 +1768,16 @@ class StartTransfersComponentViewModelTest {
                 nodes = provideListOfNodes(),
                 withStartMessage = false,
             ),
-            TransferTriggerEvent.StartChatUpload.Files(CHAT_ID, provideListOfUris()),
-            TransferTriggerEvent.StartUpload.Files(provideMapOfPathsAndNames(), parentId),
+            TransferTriggerEvent.StartChatUpload.Files(
+                chatIds = listOf(CHAT_ID),
+                uris = provideListOfUris(),
+                pitagTrigger = PitagTrigger.Picker,
+            ),
+            TransferTriggerEvent.StartUpload.Files(
+                pathsAndNames = provideMapOfPathsAndNames(),
+                destinationId = parentId,
+                pitagTrigger = PitagTrigger.CameraCapture
+            ),
             TransferTriggerEvent.RetryTransfers(provideMapOfIdsAndEvents()),
         )
 
@@ -1704,7 +1825,11 @@ class StartTransfersComponentViewModelTest {
     )
 
     private fun provideStartChatUploadEvents() = listOf(
-        TransferTriggerEvent.StartChatUpload.Files(CHAT_ID, listOf(uploadUri)),
+        TransferTriggerEvent.StartChatUpload.Files(
+            chatIds = listOf(CHAT_ID),
+            uris = listOf(uploadUri),
+            pitagTrigger = PitagTrigger.Picker,
+        ),
     )
 
     private fun provideStartUploadEvents() = listOf(
@@ -1724,9 +1849,11 @@ class StartTransfersComponentViewModelTest {
 
     private suspend fun commonStub() {
         whenever(isAskBeforeLargeDownloadsSettingUseCase()).thenReturn(false)
+        whenever(shouldAskBeforePreviewDownloadsSettingUseCase()).thenReturn(true)
         whenever(node.id).thenReturn(nodeId)
         whenever(node.name).thenReturn(NODE_NAME)
         whenever(node.parentId).thenReturn(parentId)
+        whenever(node.type).thenReturn(fileTypeInfo)
         whenever(parentNode.id).thenReturn(parentId)
 
         whenever(getOrCreateDownloadLocationUseCase()).thenReturn(DESTINATION)
@@ -1734,7 +1861,6 @@ class StartTransfersComponentViewModelTest {
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(1)
         whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
-        whenever(monitorRequestFilesPermissionDeniedUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
     }
 

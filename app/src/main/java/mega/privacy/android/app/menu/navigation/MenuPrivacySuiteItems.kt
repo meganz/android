@@ -10,6 +10,9 @@ import mega.privacy.android.app.utils.DomainNameFacade
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.MyMenuMEGAPassNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuMEGAVPNNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuTransferITNavigationItemEvent
 
 object MegaVpnItem : NavDrawerItem.PrivacySuite(
     destination = object : NavKey {},
@@ -17,7 +20,8 @@ object MegaVpnItem : NavDrawerItem.PrivacySuite(
     title = sharedR.string.pro_plan_feature_vpn_title,
     subTitle = sharedR.string.menu_item_vpn_subtitle,
     link = megaVpnUrl(DomainNameFacade.getDomainName()),
-    appPackage = MEGA_VPN_PACKAGE_NAME
+    appPackage = MEGA_VPN_PACKAGE_NAME,
+    analyticsEventIdentifier = MyMenuMEGAVPNNavigationItemEvent,
 )
 
 object MegaPassItem : NavDrawerItem.PrivacySuite(
@@ -26,7 +30,8 @@ object MegaPassItem : NavDrawerItem.PrivacySuite(
     title = sharedR.string.pro_plan_feature_pass_title,
     subTitle = sharedR.string.menu_item_mega_pass_subtitle,
     link = megaPwmUrl(DomainNameFacade.getDomainName()),
-    appPackage = MEGA_PASS_PACKAGE_NAME
+    appPackage = MEGA_PASS_PACKAGE_NAME,
+    analyticsEventIdentifier = MyMenuMEGAPassNavigationItemEvent,
 )
 
 object TransferItItem : NavDrawerItem.PrivacySuite(
@@ -35,4 +40,5 @@ object TransferItItem : NavDrawerItem.PrivacySuite(
     title = sharedR.string.general_section_transfer_it,
     subTitle = sharedR.string.menu_item_transfer_it_subtitle,
     link = MEGA_TRANSFER_IT_URL,
+    analyticsEventIdentifier = MyMenuTransferITNavigationItemEvent,
 )

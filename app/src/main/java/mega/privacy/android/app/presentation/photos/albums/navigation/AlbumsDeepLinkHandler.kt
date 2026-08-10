@@ -1,0 +1,27 @@
+package mega.privacy.android.app.presentation.photos.albums.navigation
+
+import android.net.Uri
+import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.domain.entity.RegexPatternType
+import mega.privacy.android.domain.entity.RegexPatternType.ALBUM_LINK
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.AlbumImportNavKey
+import javax.inject.Inject
+
+class AlbumsDeepLinkHandler @Inject constructor(
+    snackbarEventQueue: SnackbarEventQueue,
+) : DeepLinkHandler(snackbarEventQueue) {
+    override suspend fun getNavKeys(
+        uri: Uri,
+        regexPatternType: RegexPatternType?,
+    ): List<NavKey>? = when (regexPatternType) {
+        ALBUM_LINK -> {
+            listOf(AlbumImportNavKey(uri.toString()))
+        }
+
+        else -> {
+            null
+        }
+    }
+}

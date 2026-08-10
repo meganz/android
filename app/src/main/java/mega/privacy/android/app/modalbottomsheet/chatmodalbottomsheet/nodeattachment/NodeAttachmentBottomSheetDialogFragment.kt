@@ -19,12 +19,12 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattach
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.NodeAttachmentBottomSheetViewModel.Companion.MESSAGE_ID
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.view.NodeAttachmentBottomSheetContent
 import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.utils.Constants.IMPORT_ONLY_OPTION
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -34,7 +34,9 @@ internal class NodeAttachmentBottomSheetDialogFragment : BottomSheetDialogFragme
     private val viewModel: NodeAttachmentBottomSheetViewModel by viewModels()
     private val nodeAttachmentHistoryViewModel: NodeAttachmentHistoryViewModel by activityViewModels()
     private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
-    private val chatController: ChatController by lazy { ChatController(requireActivity()) }
+
+    @Inject
+    lateinit var chatController: ChatController
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase

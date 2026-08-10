@@ -10,11 +10,11 @@ import timber.log.Timber
  * @ExtendWith(TimberJUnit5Extension::class)
  */
 class TimberJUnit5Extension : BeforeAllCallback, AfterAllCallback {
-    override fun beforeAll(context: ExtensionContext?) {
+    override fun beforeAll(context: ExtensionContext) {
         Timber.plant(timberDebugTree)
     }
 
-    override fun afterAll(context: ExtensionContext?) {
+    override fun afterAll(context: ExtensionContext) {
         Timber.uproot(timberDebugTree)
     }
 }

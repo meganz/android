@@ -1,21 +1,28 @@
 package mega.privacy.android.domain.usecase.login
 
 import com.google.common.truth.Truth
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import org.junit.Assert.assertThrows
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 
@@ -29,6 +36,7 @@ class BackgroundFastLoginUseCaseTest {
     private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
     private val getSessionUseCase = mock<GetSessionUseCase>()
     private val getRootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
+    private val getUserDataUseCase: GetUserDataUseCase = mock()
     private val loginMutex = mock<Mutex>()
     private val session = "User session"
 
@@ -39,6 +47,7 @@ class BackgroundFastLoginUseCaseTest {
             initialiseMegaChatUseCase = initialiseMegaChatUseCase,
             getSessionUseCase = getSessionUseCase,
             getRootNodeExistsUseCase = getRootNodeExistsUseCase,
+            getUserDataUseCase = getUserDataUseCase,
             loginMutex = loginMutex
         )
     }
@@ -51,6 +60,7 @@ class BackgroundFastLoginUseCaseTest {
             initialiseMegaChatUseCase,
             getSessionUseCase,
             getRootNodeExistsUseCase,
+            getUserDataUseCase,
             loginMutex,
         )
     }
@@ -120,6 +130,27 @@ class BackgroundFastLoginUseCaseTest {
             val inOrder = inOrder(loginMutex)
             inOrder.verify(loginMutex).lock()
             inOrder.verify(loginMutex).unlock()
+        }
+
+    @Test
+    fun `test that fetchNodes is not invoked until chat initialisation completes`() =
+        runTest {
+            val chatInitialised = CompletableDeferred<Unit>()
+            whenever(getSessionUseCase()).thenReturn(session)
+            whenever(getRootNodeExistsUseCase()).thenReturn(false)
+            whenever(initialiseMegaChatUseCase(session))
+                .doSuspendableAnswer { chatInitialised.await() }
+            whenever(loginRepository.fastLogin(session)).thenReturn(Unit)
+            whenever(loginRepository.fetchNodes()).thenReturn(Unit)
+
+            val loginJob = launch { underTest() }
+            advanceUntilIdle()
+            verify(loginRepository).fastLogin(session)
+            verify(loginRepository, never()).fetchNodes()
+
+            chatInitialised.complete(Unit)
+            loginJob.join()
+            verify(loginRepository).fetchNodes()
         }
 
     @Test

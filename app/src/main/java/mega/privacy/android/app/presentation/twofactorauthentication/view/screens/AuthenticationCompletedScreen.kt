@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
@@ -143,7 +144,7 @@ internal fun AuthenticationCompletedScreen(
                 TextMegaButton(
                     modifier = Modifier
                         .wrapContentSize(),
-                    textId = R.string.general_dismiss,
+                    textId = sharedR.string.general_dismiss_dialog,
                     onClick = onDismissClicked
                 )
             }

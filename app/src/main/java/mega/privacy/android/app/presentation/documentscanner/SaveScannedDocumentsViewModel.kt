@@ -3,15 +3,16 @@ package mega.privacy.android.app.presentation.documentscanner
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -19,9 +20,17 @@ import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDo
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
+import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToChatEvent
@@ -29,7 +38,6 @@ import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToCloudDriveEve
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Locale
-import javax.inject.Inject
 
 /**
  * The [ViewModel] for Save Scanned Documents
@@ -40,11 +48,16 @@ import javax.inject.Inject
  * the renamed File
  * @property savedStateHandle The Saved State Handle
  */
-@HiltViewModel
-internal class SaveScannedDocumentsViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = SaveScannedDocumentsViewModel.Factory::class)
+internal class SaveScannedDocumentsViewModel @AssistedInject constructor(
     private val validateScanFilenameUseCase: ValidateScanFilenameUseCase,
     private val renameFileAndDeleteOriginalUseCase: RenameFileAndDeleteOriginalUseCase,
-    private val savedStateHandle: SavedStateHandle,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase,
+    private val getAncestorsIdsUseCase: GetAncestorsIdsUseCase,
+    @Assisted private val args: Args,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SaveScannedDocumentsUiState())
@@ -55,57 +68,75 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            combine(
-                savedStateHandle.getStateFlow(
-                    key = EXTRA_ORIGINATED_FROM_CHAT,
-                    initialValue = false,
-                ),
-                savedStateHandle.getStateFlow(
-                    key = EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
-                    initialValue = -1L,
-                ),
-                savedStateHandle.getStateFlow(
-                    key = EXTRA_SCAN_PDF_URI,
-                    initialValue = null
-                ),
-                savedStateHandle.getStateFlow(
-                    key = EXTRA_SCAN_SOLO_IMAGE_URI,
-                    initialValue = null,
-                ),
-                savedStateHandle.getStateFlow(
-                    key = INITIAL_FILENAME_FORMAT,
-                    initialValue = "",
-                ),
-            ) { originatedFromChat: Boolean, cloudDriveParentHandle: Long, pdfUri: Uri?, soloImageUri: Uri?, fileFormat ->
-                { state: SaveScannedDocumentsUiState ->
-                    val formattedDateTime = String.format(
-                        Locale.getDefault(),
-                        DATE_TIME_FORMAT,
-                        Calendar.getInstance(),
-                    )
-                    val initialFilename = String.format(
-                        Locale.getDefault(),
-                        fileFormat,
-                        formattedDateTime,
-                    ) + _uiState.value.scanFileType.fileSuffix
+        checkFeatureFlags()
+        loadParentsList()
+        _uiState.update { state: SaveScannedDocumentsUiState ->
+            val formattedDateTime = String.format(
+                Locale.getDefault(),
+                DATE_TIME_FORMAT,
+                Calendar.getInstance(),
+            )
+            val initialFilename = String.format(
+                Locale.getDefault(),
+                args.fileFormat,
+                formattedDateTime,
+            ) + _uiState.value.scanFileType.fileSuffix
 
+            state.copy(
+                cloudDriveParentHandle = args.cloudDriveParentHandle ?: -1,
+                filename = initialFilename,
+                originatedFromChat = args.originatedFromChat,
+                pdfUri = args.pdfUri,
+                scanDestination = if (args.originatedFromChat) {
+                    ScanDestination.Chat
+                } else {
+                    ScanDestination.CloudDrive
+                },
+                soloImageUri = args.soloImageUri,
+            )
+        }
+    }
+
+    private fun checkFeatureFlags() {
+        viewModelScope.launch {
+            val isCloudExplorerAvailable = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+
+            _uiState.update { state ->
+                state.copy(isCloudExplorerAvailable = isCloudExplorerAvailable)
+            }
+        }
+    }
+
+    private fun loadParentsList() {
+        val parentHandle = args.cloudDriveParentHandle?.takeIf { it != -1L } ?: return
+        viewModelScope.launch {
+            runCatching {
+                val parentNodeId = NodeId(parentHandle)
+                if (getRootNodeIdUseCase() == parentNodeId) {
+                    return@runCatching
+                }
+                val parentNode = getNodeByIdUseCase(parentNodeId)
+                    ?: return@runCatching
+                val sourceType = if (isNodeInCloudDriveUseCase(parentHandle)) {
+                    NodeSourceType.CLOUD_DRIVE
+                } else {
+                    NodeSourceType.INCOMING_SHARES
+                }
+                val ancestors = getAncestorsIdsUseCase(parentNode).reversed()
+                val parentsList = when (sourceType) {
+                    NodeSourceType.CLOUD_DRIVE -> ancestors.drop(1)
+                    else -> ancestors
+                } + parentNodeId
+
+                _uiState.update { state ->
                     state.copy(
-                        cloudDriveParentHandle = cloudDriveParentHandle,
-                        filename = initialFilename,
-                        originatedFromChat = originatedFromChat,
-                        pdfUri = pdfUri,
-                        scanDestination = if (originatedFromChat) {
-                            ScanDestination.Chat
-                        } else {
-                            ScanDestination.CloudDrive
-                        },
-                        soloImageUri = soloImageUri,
+                        parentsList = parentsList,
+                        nodeSourceType = sourceType
                     )
                 }
-            }.collect {
-                _uiState.update(it)
-            }
+            }.onFailure { Timber.e(it) }
         }
     }
 
@@ -159,7 +190,9 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
                             )
                         }.onSuccess { renamedFile ->
                             logDocumentScanEvent(uiState.scanFileType, uiState.scanDestination)
-                            _uiState.update { it.copy(uploadScansEvent = triggered(renamedFile.toUri())) }
+                            _uiState.update { state ->
+                                state.copy(uploadScansEvent = triggered(renamedFile))
+                            }
                         }.onFailure { exception ->
                             Timber.e("Unable to upload the scan/s due to a renaming issue:\n ${exception.printStackTrace()}")
                         }
@@ -288,6 +321,19 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
     fun onUploadScansEventConsumed() {
         _uiState.update { it.copy(uploadScansEvent = consumed()) }
     }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(args: Args): SaveScannedDocumentsViewModel
+    }
+
+    data class Args(
+        val originatedFromChat: Boolean,
+        val cloudDriveParentHandle: Long?,
+        val pdfUri: Uri?,
+        val soloImageUri: Uri?,
+        val fileFormat: String,
+    )
 
     companion object {
         internal const val EXTRA_ORIGINATED_FROM_CHAT = "EXTRA_ORIGINATED_FROM_CHAT"

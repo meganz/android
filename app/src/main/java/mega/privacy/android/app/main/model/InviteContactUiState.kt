@@ -39,6 +39,7 @@ data class InviteContactUiState(
     val invitationStatusResult: InvitationStatusMessageUiState? = null,
     val emailValidationMessage: MessageTypeUiState? = null,
 ) {
+
     /**
      * A UI state represents the invitation status message
      */

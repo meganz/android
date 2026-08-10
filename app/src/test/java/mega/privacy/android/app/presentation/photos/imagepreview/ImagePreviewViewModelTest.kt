@@ -10,13 +10,17 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.largebundle.LargeBundleHolder
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewVideoLauncher
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_PUBLIC_LINK_URL
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
@@ -24,18 +28,24 @@ import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.triggeredContent
-import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
+import mega.privacy.android.shared.nodes.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
+import mega.privacy.android.domain.entity.node.TypedImageNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -47,9 +57,14 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.imagepreview.ClearImageResultUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
+import mega.privacy.android.domain.usecase.imagepreview.IsEditableImageUseCase
+import mega.privacy.android.domain.usecase.imagepreview.IsEditableVideoUseCase
+import mega.privacy.android.domain.usecase.imagepreview.mapper.OfflineFileInformationToImageNodeMapper
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
@@ -62,9 +77,9 @@ import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseC
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedResR
-import org.junit.jupiter.api.BeforeAll
+import nz.mega.sdk.MegaNode
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -73,12 +88,17 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
+import java.io.File
 import kotlin.time.Duration
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -107,7 +127,6 @@ class ImagePreviewViewModelTest {
     private val checkUri: CheckFileUriUseCase = mock()
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase = mock()
     private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase = mock()
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase =
         mock()
@@ -123,14 +142,31 @@ class ImagePreviewViewModelTest {
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase =
         mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
+    private val largeBundleHolder: LargeBundleHolder = mock()
 
-    @BeforeAll
-    fun setup() {
-        commonStub()
-        initViewModel()
+    @Suppress("DEPRECATION")
+    private val getNodeByHandle: GetNodeByHandle = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase = mock()
+    private val isEditableImageUseCase = IsEditableImageUseCase()
+    private val isEditableVideoUseCase = IsEditableVideoUseCase()
+
+    private val accountLevelDetail = mock<AccountLevelDetail> {
+        on { accountType }.thenReturn(AccountType.PRO_III)
+    }
+    private val accountDetail = mock<AccountDetail> {
+        on { levelDetail }.thenReturn(accountLevelDetail)
     }
 
     @BeforeEach
+    fun setup() {
+        wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(flowOf(false))
+        wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(flowOf(accountDetail))
+        initViewModel()
+    }
+
+    @AfterEach
     fun resetMocks() = reset(
         savedStateHandle,
         addImageTypeUseCase,
@@ -148,7 +184,6 @@ class ImagePreviewViewModelTest {
         checkUri,
         moveNodesToRubbishUseCase,
         nodeMoveRequestMessageMapper,
-        getFeatureFlagValueUseCase,
         getPublicChildNodeFromIdUseCase,
         getPublicNodeFromSerializedDataUseCase,
         deleteNodesUseCase,
@@ -161,6 +196,10 @@ class ImagePreviewViewModelTest {
         monitorConnectivityUseCase,
         getNodeNameCollisionRenameNameUseCase,
         getNodeAccessPermission,
+        isNodeInBackupsUseCase,
+        getNodeByHandle,
+        getFeatureFlagValueUseCase,
+        isUserLoggedInUseCase,
     ).also {
         imageNodeFetchers.clear()
         underTest.consumeTransferEvent()
@@ -186,7 +225,6 @@ class ImagePreviewViewModelTest {
             checkUri = checkUri,
             moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
             nodeMoveRequestMessageMapper = nodeMoveRequestMessageMapper,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPublicChildNodeFromIdUseCase = getPublicChildNodeFromIdUseCase,
             getPublicNodeFromSerializedDataUseCase = getPublicNodeFromSerializedDataUseCase,
             deleteNodesUseCase = deleteNodesUseCase,
@@ -201,12 +239,15 @@ class ImagePreviewViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            context = mock()
+            isNodeInBackupsUseCase = isNodeInBackupsUseCase,
+            getNodeByHandle = getNodeByHandle,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            isEditableImageUseCase = isEditableImageUseCase,
+            isEditableVideoUseCase = isEditableVideoUseCase,
+            largeBundleHolder = largeBundleHolder,
+            isUserLoggedInUseCase = isUserLoggedInUseCase,
+            context = mock(),
         )
-    }
-
-    private fun commonStub() = runTest {
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
     }
 
     @ParameterizedTest
@@ -240,7 +281,6 @@ class ImagePreviewViewModelTest {
     @Test
     fun `test that filterNonSensitiveNodes return nodes when from Rubbish Bin regardless of params`() =
         runTest {
-            commonStub()
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.RUBBISH_BIN)
             initViewModel()
@@ -626,7 +666,7 @@ class ImagePreviewViewModelTest {
             "image/heif"
         ]
     )
-    internal fun `test that isPhotoEditorMenuVisible returns true when feature flag is enabled and mime type is supported`(
+    internal fun `test that isPhotoEditorMenuVisible returns true when mime type is supported`(
         mimeType: String,
     ) =
         runTest {
@@ -637,7 +677,6 @@ class ImagePreviewViewModelTest {
                 )
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
@@ -647,43 +686,6 @@ class ImagePreviewViewModelTest {
             assertThat(result).isTrue()
         }
 
-    @Test
-    internal fun `test that isPhotoEditorMenuVisible returns false when feature flag is disabled`() =
-        runTest {
-            val imageNode = mock<ImageNode> {
-                on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
-                on { id } doReturn NodeId(123L)
-            }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(false)
-            whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
-            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
-                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
-
-            val result = underTest.isPhotoEditorMenuVisible(imageNode)
-
-            assertThat(result).isFalse()
-        }
-
-    @Test
-    internal fun `test that isPhotoEditorMenuVisible returns false when feature flag throws exception`() =
-        runTest {
-            val imageNode = mock<ImageNode> {
-                on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
-                on { id } doReturn NodeId(123L)
-            }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenThrow(
-                RuntimeException(
-                    "Feature flag error"
-                )
-            )
-            whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
-            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
-                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
-
-            val result = underTest.isPhotoEditorMenuVisible(imageNode)
-
-            assertThat(result).isFalse()
-        }
 
     @Test
     internal fun `test that isPhotoEditorMenuVisible returns false when user has no write permission`() =
@@ -692,10 +694,26 @@ class ImagePreviewViewModelTest {
                 on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.READ)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+
+            val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    internal fun `test that isPhotoEditorMenuVisible returns false when node is in backups`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
+                on { id } doReturn NodeId(123L)
+            }
+            whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.CLOUD_DRIVE)
+            whenever(isNodeInBackupsUseCase(123L)).thenReturn(true)
 
             val result = underTest.isPhotoEditorMenuVisible(imageNode)
 
@@ -709,7 +727,6 @@ class ImagePreviewViewModelTest {
                 on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenThrow(RuntimeException("Permission error"))
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
@@ -726,7 +743,6 @@ class ImagePreviewViewModelTest {
                 on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.OFFLINE)
@@ -758,7 +774,6 @@ class ImagePreviewViewModelTest {
                 )
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
@@ -769,21 +784,86 @@ class ImagePreviewViewModelTest {
         }
 
     @Test
-    internal fun `test that isPhotoEditorMenuVisible returns false when node type is video`() =
+    internal fun `test that isPhotoEditorMenuVisible returns false when node type is video and VideoEditor flag is disabled`() =
         runTest {
             val imageNode = mock<ImageNode> {
                 on { type } doReturn VideoFileTypeInfo("video/mp4", "mp4", Duration.parse("10s"))
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoEditor)).thenReturn(false)
 
             val result = underTest.isPhotoEditorMenuVisible(imageNode)
 
             assertThat(result).isFalse()
         }
+
+    @Test
+    internal fun `test that isPhotoEditorMenuVisible returns true when node type is video and VideoEditor flag is enabled`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { type } doReturn VideoFileTypeInfo("video/mp4", "mp4", Duration.parse("10s"))
+                on { id } doReturn NodeId(123L)
+            }
+            whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoEditor)).thenReturn(true)
+
+            val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+            assertThat(result).isTrue()
+        }
+
+    @Test
+    internal fun `test that isPhotoEditorMenuVisible returns false when VideoEditor flag check throws`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { type } doReturn VideoFileTypeInfo("video/mp4", "mp4", Duration.parse("10s"))
+                on { id } doReturn NodeId(123L)
+            }
+            whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoEditor))
+                .thenThrow(RuntimeException("Feature flag error"))
+
+            val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+            assertThat(result).isFalse()
+        }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "video/ogg",
+            "video/x-ms-wmv",
+            "video/divx",
+            "video/x-f4v",
+        ]
+    )
+    internal fun `test that isPhotoEditorMenuVisible returns false when video mime type is not supported`(
+        mimeType: String,
+    ) = runTest {
+        val imageNode = mock<ImageNode> {
+            on { type } doReturn VideoFileTypeInfo(
+                mimeType,
+                mimeType.substringAfterLast("/"),
+                Duration.parse("10s")
+            )
+            on { id } doReturn NodeId(123L)
+        }
+        whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoEditor)).thenReturn(true)
+
+        val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+        assertThat(result).isFalse()
+    }
 
     @Test
     internal fun `test that CopyOfflineNode transfer event is triggered when executeTransfer is invoked in offline mode`() =
@@ -803,13 +883,101 @@ class ImagePreviewViewModelTest {
                 listOf(imageNode)
             )
             initViewModel()
-
-            underTest.executeTransfer(false)
+            underTest.setCurrentImageNode(imageNode)
+            advanceUntilIdle()
 
             underTest.state.test {
+                underTest.executeTransfer(false)
                 val state = expectMostRecentItem()
                 assertThat(state.transferEvent.triggeredContent()).isInstanceOf(TransferTriggerEvent.CopyOfflineNode::class.java)
             }
+        }
+
+    @Test
+    internal fun `test that monitorImageResult loads offline node from its full size path via getImageFromFileUseCase`() =
+        runTest {
+            val fullSizePath =
+                "/storage/emulated/0/MEGA offline/Health/Мое лечение/СНИЛС.jpg"
+            val imageNode = mock<ImageNode> {
+                on { serializedData } doReturn OfflineFileInformationToImageNodeMapper.OFFLINE_SERIALIZED_DATA_FLAG
+                on { this.fullSizePath } doReturn fullSizePath
+            }
+            val expected = ImageResult(
+                fullSizeUri = "file://$fullSizePath",
+                isFullyLoaded = true,
+            )
+            whenever(getImageFromFileUseCase(File(fullSizePath))).thenReturn(expected)
+
+            val result = underTest.monitorImageResult(imageNode).toList()
+
+            assertThat(result).containsExactly(expected)
+            verify(getImageFromFileUseCase).invoke(File(fullSizePath))
+            verifyNoInteractions(addImageTypeUseCase, getImageUseCase)
+        }
+
+    @Test
+    internal fun `test that monitorImageResult does not build an invalid uri for an offline node without a full size path`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { serializedData } doReturn OfflineFileInformationToImageNodeMapper.OFFLINE_SERIALIZED_DATA_FLAG
+                on { this.fullSizePath } doReturn null
+            }
+
+            val result = underTest.monitorImageResult(imageNode).toList()
+
+            assertThat(result).isEmpty()
+            verifyNoInteractions(
+                getImageFromFileUseCase,
+                addImageTypeUseCase,
+                getImageUseCase,
+            )
+        }
+
+    @Test
+    internal fun `test that monitorImageResult routes a non-offline node through addImageTypeUseCase and getImageUseCase`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { serializedData } doReturn "someSerializedData"
+            }
+            val typedNode = mock<TypedImageNode>()
+            val expected = ImageResult(isFullyLoaded = true)
+            whenever(addImageTypeUseCase(imageNode)).thenReturn(typedNode)
+            whenever(getImageUseCase(any(), any(), any(), any())).thenReturn(flowOf(expected))
+
+            val result = underTest.monitorImageResult(imageNode).toList()
+
+            assertThat(result).containsExactly(expected)
+            verify(addImageTypeUseCase).invoke(imageNode)
+            verifyNoInteractions(getImageFromFileUseCase)
+        }
+
+    @Test
+    internal fun `test that resolveMegaNode falls back to getNodeByHandle when serializedData is null`() =
+        runTest {
+            val expected = mock<MegaNode>()
+            val imageNode = mock<ImageNode> {
+                on { id } doReturn NodeId(123L)
+                on { serializedData } doReturn null
+            }
+            wheneverBlocking { getNodeByHandle(123L) } doReturn expected
+
+            val result = underTest.resolveMegaNode(imageNode)
+
+            assertThat(result).isSameInstanceAs(expected)
+        }
+
+    @Test
+    internal fun `test that resolveMegaNode returns null when serializedData is null and getNodeByHandle returns null`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { id } doReturn NodeId(123L)
+                on { serializedData } doReturn null
+            }
+            wheneverBlocking { getNodeByHandle(123L) } doReturn null
+
+            val result = underTest.resolveMegaNode(imageNode)
+
+            assertThat(result).isNull()
         }
 
     @Test
@@ -935,6 +1103,139 @@ class ImagePreviewViewModelTest {
                             fileCollision.lastModified == 1234567890L &&
                             fileCollision.parentHandle == 456L
                 }
+            )
+        }
+
+    @Test
+    fun `test that duplicate image nodes are deduplicated in state`() = runTest {
+        val duplicateId = NodeId(123L)
+        val imageNode1 = mock<ImageNode> {
+            on { id } doReturn duplicateId
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+        }
+        val imageNode2 = mock<ImageNode> {
+            on { id } doReturn duplicateId
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+        }
+        val fetcher = mock<ImageNodeFetcher>()
+        whenever(fetcher.monitorImageNodes(any())) doReturn flowOf(
+            listOf(imageNode1, imageNode2)
+        )
+        whenever(monitorConnectivityUseCase()) doReturn flowOf(true)
+        wheneverBlocking { isHiddenNodesOnboardedUseCase() } doReturn false
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.DEFAULT)
+        whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE))
+            .thenReturn(123L)
+        imageNodeFetchers[ImagePreviewFetcherSource.DEFAULT] = fetcher
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = expectMostRecentItem()
+            assertThat(state.imageNodes).hasSize(1)
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is true when fetcher source is FILE_LINK`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.FILE_LINK)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isFromLink).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is true when fetcher source is FOLDER_LINK`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.FOLDER_LINK)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isFromLink).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is true when fetcher source is ALBUM_SHARING`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.ALBUM_SHARING)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isFromLink).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is true when fetcher source is PUBLIC_FILE`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.PUBLIC_FILE)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isFromLink).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is false when fetcher source is not a link source`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isFromLink).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that isLoggedIn is set to true when isUserLoggedInUseCase returns true`() = runTest {
+        whenever(isUserLoggedInUseCase()).thenReturn(true)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isLoggedIn).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isLoggedIn is set to false when isUserLoggedInUseCase returns false`() =
+        runTest {
+            whenever(isUserLoggedInUseCase()).thenReturn(false)
+            initViewModel()
+            underTest.state.test {
+                assertThat(expectMostRecentItem().isLoggedIn).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isLoggedIn remains false when isUserLoggedInUseCase throws an exception`() =
+        runTest {
+            whenever(isUserLoggedInUseCase()).thenThrow(RuntimeException("login check error"))
+            initViewModel()
+            underTest.state.test {
+                assertThat(expectMostRecentItem().isLoggedIn).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that playVideo passes publicLinkUrl from savedStateHandle to imagePreviewVideoLauncher`() =
+        runTest {
+            val expectedUrl = "https://mega.nz/album/test#key"
+            whenever(savedStateHandle.get<String>(IMAGE_PREVIEW_PUBLIC_LINK_URL))
+                .thenReturn(expectedUrl)
+            val context = mock<Context>()
+            val imageNode = mock<ImageNode>()
+            underTest.playVideo(context, imageNode)
+            advanceUntilIdle()
+            verify(imagePreviewVideoLauncher).launchVideoScreen(
+                context = any(),
+                imageNode = any(),
+                source = any(),
+                adapterType = any(),
+                albumTitle = anyOrNull(),
+                albumId = anyOrNull(),
+                publicLinkUrl = eq(expectedUrl),
             )
         }
 

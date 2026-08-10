@@ -9,37 +9,43 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.core.sharedcomponents.serializable
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.model.Sort
-import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.FilterCameraUploadImageNodesUseCase
 import mega.privacy.android.domain.usecase.FilterCloudDriveImageNodesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineNodesUseCase
+import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import javax.inject.Inject
 
 class TimelineImageNodeFetcher @Inject constructor(
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val monitorTimelineNodesUseCase: MonitorTimelineNodesUseCase,
     private val filterCloudDriveImageNodesUseCase: FilterCloudDriveImageNodesUseCase,
     private val filterCameraUploadImageNodesUseCase: FilterCameraUploadImageNodesUseCase,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ImageNodeFetcher {
 
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
-        val sortType = bundle.serializable<Sort>(TIMELINE_SORT_TYPE) ?: Sort.NEWEST
-        val mediaType =
-            bundle.serializable<FilterMediaType>(TIMELINE_FILTER_TYPE) ?: FilterMediaType.ALL_MEDIA
-        val source = bundle.serializable<TimelinePhotosSource>(TIMELINE_MEDIA_SOURCE)
+        val sortType = bundle.readEnum<Sort>(TIMELINE_SORT_TYPE) ?: Sort.NEWEST
+        val mediaType = bundle.readEnum<FilterMediaType>(TIMELINE_FILTER_TYPE)
+            ?: FilterMediaType.ALL_MEDIA
+        val source = bundle.readEnum<TimelinePhotosSource>(TIMELINE_MEDIA_SOURCE)
             ?: TimelinePhotosSource.ALL_PHOTOS
 
-        return monitorTimelineNodesUseCase().mapLatest { imageNodes ->
-            val filteredImageNodes = filterImageNodes(imageNodes, mediaType, source)
-            sortImageNodes(filteredImageNodes, sortType)
-        }.flowOn(defaultDispatcher)
+        return monitorTimelineNodesUseCase()
+            .mapLatest { imageNodes ->
+                val filteredImageNodes = filterImageNodes(imageNodes, mediaType, source)
+                sortImageNodes(filteredImageNodes, sortType)
+            }.flowOn(defaultDispatcher)
     }
+
+    private inline fun <reified T : Enum<T>> Bundle.readEnum(key: String): T? =
+        serializable<T>(key) ?: getString(key)?.let {
+            runCatching { enumValueOf<T>(it) }.getOrNull()
+        }
 
     private suspend fun filterImageNodes(
         imageNodes: List<ImageNode>,
@@ -73,4 +79,3 @@ class TimelineImageNodeFetcher @Inject constructor(
         const val TIMELINE_MEDIA_SOURCE = "MediaSource"
     }
 }
-

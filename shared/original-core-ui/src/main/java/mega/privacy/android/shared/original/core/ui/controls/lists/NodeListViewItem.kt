@@ -109,7 +109,7 @@ fun NodeListViewItem(
 ) {
     GenericMultilineListItem(
         modifier = modifier
-            .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
+            .alpha(if (isSensitive) 0.5f else 1f)
             .combinedClickable(
                 onLongClick = onLongClick,
                 onClick = {

@@ -15,28 +15,28 @@
         <item quantity="one">%d файл</item>
         <item quantity="few">%d файла</item>
         <item quantity="many">%d файлов</item>
-        <item quantity="other">%d файла</item>
+        <item quantity="other">%d файлов</item>
     </plurals>
     <!-- Sync folder counts to show ongoing syncing-->
     <plurals name="num_folders_with_parameter">
         <item quantity="one">%d папка</item>
         <item quantity="few">%d папки</item>
         <item quantity="many">%d папок</item>
-        <item quantity="other">%d папки</item>
+        <item quantity="other">%d папок</item>
     </plurals>
     <!-- Sync folder counts to show ongoing syncing-->
     <plurals name="num_folders_num_files">
         <item quantity="one">%1$d папка&#160;·&#160;</item>
         <item quantity="few">%1$d папки&#160;·&#160;</item>
         <item quantity="many">%1$d папок&#160;·&#160;</item>
-        <item quantity="other">%1$d папки&#160;·&#160;</item>
+        <item quantity="other">%1$d папок&#160;·&#160;</item>
     </plurals>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_folders_num_files_2">
         <item quantity="one">%1$d файл</item>
         <item quantity="few">%1$d файла</item>
         <item quantity="many">%1$d файлов</item>
-        <item quantity="other">%1$d файла</item>
+        <item quantity="other">%1$d файлов</item>
     </plurals>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Удалить решённые проблемы</string>

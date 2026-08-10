@@ -21,7 +21,8 @@ class MonitorRequestStatusProgressEventUseCase @Inject constructor(
         .monitorEvent()
         .filterIsInstance<RequestStatusProgressEvent>()
         .map {
-            if (it.progress > -1L) {
+            // Use 990 for buffer as the progress may not reach 1000 sometimes
+            if (it.progress > -1L && it.progress < 990L) {
                 Progress(current = it.progress, total = 1000)
             } else {
                 null

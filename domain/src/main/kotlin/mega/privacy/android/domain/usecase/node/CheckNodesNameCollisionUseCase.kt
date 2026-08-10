@@ -5,8 +5,8 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.NodeRepository
@@ -48,7 +48,15 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
                 getChildNodeUseCase(
                     parentNodeId = NodeId(parentNodeHandle),
                     name = currentNode.name
-                )?.let { conflictNode ->
+                )?.takeUnless { conflictNode ->
+                    // A MOVE of a node to the folder it already lives in is a no-op,
+                    // not a real collision (AND-23958); resolving it would delete the
+                    // user's file. A COPY to the same folder, by contrast, is a real
+                    // collision that must auto-rename into a duplicate (T21388935), so
+                    // only skip the collision for MOVE.
+                    type == NodeNameCollisionType.MOVE
+                            && currentNode.parentId.longValue == parentNodeHandle
+                }?.let { conflictNode ->
                     conflictNodes[nodeHandle] = createNodeNameCollision(
                         currentNode = currentNode,
                         parent = parent,
@@ -68,7 +76,7 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
         currentNode: UnTypedNode,
         parent: Node,
         conflictNode: UnTypedNode,
-        type: NodeNameCollisionType
+        type: NodeNameCollisionType,
     ) = NodeNameCollision.Default(
         collisionHandle = conflictNode.id.longValue,
         nodeHandle = currentNode.id.longValue,
@@ -79,7 +87,7 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
         childFileCount = (parent as? FolderNode)?.childFileCount ?: 0,
         lastModified = if (currentNode is FileNode) currentNode.modificationTime else currentNode.creationTime,
         isFile = currentNode is FileNode,
-        type = type
+        type = type,
     )
 
     private suspend fun getParentOrRootNode(parentHandle: Long) =

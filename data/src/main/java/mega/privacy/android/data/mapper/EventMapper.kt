@@ -1,23 +1,27 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.data.mapper.account.AccountBlockedTypeMapper
+import mega.privacy.android.data.mapper.meeting.IntegerListMapper
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.AccountConfirmationEvent
 import mega.privacy.android.domain.entity.BusinessStatusEvent
-import mega.privacy.android.domain.entity.ChangeToHttpsEvent
 import mega.privacy.android.domain.entity.CommitDbEvent
 import mega.privacy.android.domain.entity.DisconnectEvent
 import mega.privacy.android.domain.entity.Event
 import mega.privacy.android.domain.entity.KeyModifiedEvent
+import mega.privacy.android.domain.entity.LastPurgeEvent
 import mega.privacy.android.domain.entity.MediaInfoReadyEvent
 import mega.privacy.android.domain.entity.MiscFlagsReadyEvent
 import mega.privacy.android.domain.entity.NodesCurrentEvent
 import mega.privacy.android.domain.entity.RequestStatusProgressEvent
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.StorageSumChangedEvent
+import mega.privacy.android.domain.entity.StreamOverQuotaEvent
+import mega.privacy.android.domain.entity.TransfersResumedEvent
 import mega.privacy.android.domain.entity.UnknownEvent
 import nz.mega.sdk.MegaEvent
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Map [MegaEvent] to [Event]
@@ -25,6 +29,7 @@ import javax.inject.Inject
 internal class EventMapper @Inject constructor(
     private val storageStateMapper: StorageStateMapper,
     private val accountBlockedTypeMapper: AccountBlockedTypeMapper,
+    private val integerListMapper: IntegerListMapper,
 ) {
     /**
      * Map [MegaEvent] to [Event].
@@ -41,12 +46,6 @@ internal class EventMapper @Inject constructor(
 
         MegaEvent.EVENT_ACCOUNT_CONFIRMATION -> {
             AccountConfirmationEvent(
-                handle = megaEvent.handle,
-            )
-        }
-
-        MegaEvent.EVENT_CHANGE_TO_HTTPS -> {
-            ChangeToHttpsEvent(
                 handle = megaEvent.handle,
             )
         }
@@ -115,10 +114,42 @@ internal class EventMapper @Inject constructor(
             )
         }
 
+        MegaEvent.EVENT_TRANSFERS_RESUMED -> {
+            TransfersResumedEvent(
+                handle = megaEvent.handle,
+                uniqueIds = integerListMapper(megaEvent.integerList),
+            )
+        }
+
+        MegaEvent.EVENT_LAST_PURGE -> {
+            LastPurgeEvent(
+                handle = megaEvent.handle,
+                ts = megaEvent.getNumber(KEY_TS),
+                reason = megaEvent.getNumber(KEY_REASON).toInt(),
+                warningTs = KEY_WARNING_TS.takeIf(megaEvent::hasNumber)?.let(megaEvent::getNumber),
+                lastActiveTs = KEY_LAST_ACTIVE_TS.takeIf(megaEvent::hasNumber)
+                    ?.let(megaEvent::getNumber),
+            )
+        }
+
+        MegaEvent.EVENT_STREAM_OVERQUOTA -> {
+            StreamOverQuotaEvent(
+                handle = megaEvent.handle,
+                timeLeft = megaEvent.number.seconds,
+            )
+        }
+
         else -> {
             UnknownEvent(
                 handle = megaEvent.handle,
             )
         }
+    }
+
+    companion object {
+        private const val KEY_TS = "ts"
+        private const val KEY_REASON = "reason"
+        private const val KEY_WARNING_TS = "warningTs"
+        private const val KEY_LAST_ACTIVE_TS = "lastActiveTs"
     }
 }

@@ -89,6 +89,16 @@ interface DocumentFileWrapper {
     fun fromUri(uri: Uri): DocumentFile?
 
     /**
+     * Variant of [fromUri] that lets the caller skip the SAF `exists()` probe.
+     *
+     * Pass `existsCheck = false` from sync-flow hot paths where the URI's existence is already
+     * known (e.g. just after writing/renaming a file). Each `exists()` is a Binder IPC into the
+     * DocumentsProvider; on a busy SAF tree those serialize behind every other in-flight call,
+     * adding measurable latency per finalize.
+     */
+    fun fromUri(uri: Uri, existsCheck: Boolean): DocumentFile?
+
+    /**
      * Gets the absolute path of the given [uri]
      */
     fun getAbsolutePathFromContentUri(uri: Uri): String?

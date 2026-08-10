@@ -17,6 +17,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,36 +26,37 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryGlobalStateViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryViewModel
-import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.model.MediaListItem
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
-import mega.privacy.android.app.presentation.photos.timeline.view.PhotosSkeletonView
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.EmptyView
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
-import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.photos.DateCard
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.MediaListItem
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.domain.entity.photos.ZoomLevel
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
+import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
@@ -65,9 +67,9 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 fun MediaDiscoveryScreen(
     fileTypeIconMapper: FileTypeIconMapper,
     screenTitle: String? = null,
-    viewModel: MediaDiscoveryViewModel = viewModel(),
-    mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
-    photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
+    viewModel: MediaDiscoveryViewModel = hiltViewModel(),
+    mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = hiltViewModel(),
+    photoDownloaderViewModel: PhotoDownloaderViewModel = hiltViewModel(),
     onBackClicked: () -> Unit = {},
     onPhotoClicked: (Photo) -> Unit = {},
     onPhotoLongPressed: (Photo) -> Unit = {},
@@ -102,6 +104,18 @@ fun MediaDiscoveryScreen(
             showFilterDialog = false
         }
     )
+
+    LaunchedEffect(uiState.scrollStartIndex) {
+        if (uiState.scrollStartIndex > 0) {
+            val startIndex = if (uiState.selectedTimeBarTab == TimeBarTab.All) {
+                uiState.scrollStartIndex
+            } else {
+                // Since CardListView has two headers, the index needs to be incremented by 2.
+                uiState.scrollStartIndex + 2
+            }
+            lazyGridState.animateScrollToItem(startIndex)
+        }
+    }
 
     MegaScaffold(
         modifier = Modifier.systemBarsPadding(),
@@ -192,7 +206,9 @@ fun MediaDiscoveryScreen(
                     EmptyView(uiState.currentMediaType)
                 }
             } else {
-                PhotosSkeletonView()
+                MediaSkeletonView(
+                    Modifier.testTag(MEDIA_DISCOVERY_SKELETON_VIEW_TEST_TAG)
+                )
             }
             StartTransferComponent(
                 event = uiState.downloadEvent,
@@ -203,6 +219,10 @@ fun MediaDiscoveryScreen(
     )
 }
 
+/**
+ * Skeleton View Test Tag
+ */
+const val MEDIA_DISCOVERY_SKELETON_VIEW_TEST_TAG = "media_discovery:skeleton_view"
 
 @Composable
 private fun MDHeader(

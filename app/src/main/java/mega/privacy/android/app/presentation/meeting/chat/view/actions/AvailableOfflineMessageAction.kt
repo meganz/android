@@ -13,7 +13,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
@@ -24,8 +25,8 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.ChatConversationAvailableOfflineActionMenuItemEvent
 import timber.log.Timber
 
@@ -79,7 +80,7 @@ internal class AvailableOfflineMessageAction(
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
         Analytics.tracker.trackEvent(ChatConversationAvailableOfflineActionMenuItemEvent)
         val snackbarHostState = LocalSnackBarHostStateOriginal.current
-        val removeMessage = stringResource(id = R.string.file_removed_offline)
+        val removeMessage = stringResource(id = sharedResR.string.remove_from_offline_success_message)
         val viewModel = hiltViewModel<NodeAttachmentMessageViewModel>()
         LaunchedEffect(messages.size) {
             val fileNode = (messages.first() as NodeAttachmentMessage).fileNode

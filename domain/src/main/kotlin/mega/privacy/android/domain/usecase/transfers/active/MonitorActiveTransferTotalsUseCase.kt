@@ -16,5 +16,5 @@ class MonitorActiveTransferTotalsUseCase @Inject constructor(private val transfe
      * @return a flow of the [ActiveTransferTotals] of the given type
      */
     operator fun invoke(transferType: TransferType) =
-        transferRepository.getActiveTransferTotalsByType(transferType)
+        transferRepository.monitorActiveTransferTotalsByType(transferType)
 }

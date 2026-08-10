@@ -17,14 +17,14 @@ class IsParticipatingInChatCallUseCaseTest {
 
     @Test
     fun `test use-case returns true when call handle list is not empty`() = runTest {
-        whenever(repository.getCallHandleList(any())).thenReturn(listOf(123456))
+        whenever(repository.getCallChatIdList(any())).thenReturn(listOf(123456))
         val actual = underTest()
         Truth.assertThat(actual).isTrue()
     }
 
     @Test
     fun `test use-case returns false when call handle list is empty`() = runTest {
-        whenever(repository.getCallHandleList(any())).thenReturn(emptyList())
+        whenever(repository.getCallChatIdList(any())).thenReturn(emptyList())
         val actual = underTest()
         Truth.assertThat(actual).isFalse()
     }

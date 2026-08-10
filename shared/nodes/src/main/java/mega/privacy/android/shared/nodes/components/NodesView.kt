@@ -1,0 +1,345 @@
+package mega.privacy.android.shared.nodes.components
+
+import android.content.res.Configuration
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.devicetype.DeviceType
+import mega.android.core.ui.theme.devicetype.LocalDeviceType
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.SelectableNodeItem
+import mega.privacy.android.shared.nodes.model.TypedNodeItem
+import mega.privacy.android.shared.nodes.selection.NodeSelectionState
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
+
+
+/**
+ * NodesView
+ *
+ * @param items List of [NodeUiItem]
+ * @param onMenuClicked three dots click
+ * @param onItemClicked callback for item click
+ * @param onLongClicked callback for long item click
+ * @param sortConfiguration the sort order of the list
+ * @param isListView whether the current view is list view
+ * @param onSortOrderClick callback for sort order click
+ * @param onChangeViewTypeClicked callback for change view type click
+ * @param modifier
+ * @param isNextPageLoading whether to show shimmering skeleton at bottom
+ * @param listState the state of the list
+ * @param gridState the state of the grid
+ * @param spanCount the span count of the grid
+ * @param showHiddenNodes whether to forcefully show hidden nodes
+ * @param isHiddenNodesEnabled whether hidden nodes feature is enabled for the user
+ * @param showSortOrder whether to show change sort order button
+ * @param showLinkIcon whether to show public share link icon
+ * @param showChangeViewType whether to show change view type button
+ * @param showMediaDiscoveryButton whether to show media discovery button
+ * @param onEnterMediaDiscoveryClick callback for enter media discovery click
+ * @param listContentPadding the content padding of the list/lazyColumn
+ * @param isContactVerificationOn whether contact verification is enabled
+ */
+@Deprecated("Use NodesView with NodeSelectionState instead")
+@Composable
+fun <T : TypedNode> NodesView(
+    items: List<NodeUiItem<T>>,
+    onMenuClicked: (NodeUiItem<T>) -> Unit,
+    onItemClicked: (NodeUiItem<T>) -> Unit,
+    onLongClicked: (NodeUiItem<T>) -> Unit,
+    sortConfiguration: NodeSortConfiguration,
+    isListView: Boolean,
+    onSortOrderClick: () -> Unit,
+    onChangeViewTypeClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    isNextPageLoading: Boolean = false,
+    listState: LazyListState = rememberLazyListState(),
+    gridState: LazyGridState = rememberLazyGridState(),
+    highlightText: String = "",
+    spanCount: Int = 2,
+    showHiddenNodes: Boolean = false,
+    isHiddenNodesEnabled: Boolean = false,
+    showLinkIcon: Boolean = true,
+    showChangeViewType: Boolean = true,
+    showSortOrder: Boolean = true,
+    showMediaDiscoveryButton: Boolean = false,
+    isContactVerificationOn: Boolean = false,
+    inSelectionMode: Boolean = false,
+    onEnterMediaDiscoveryClick: () -> Unit = {},
+    bannerHeader: (@Composable () -> Unit)? = null,
+    listContentPadding: PaddingValues = PaddingValues(0.dp),
+) {
+    val nodeSelectionState = rememberNodeSelectionState(
+        initialSelectedIds = items.filter { it.isSelected }
+            .map { it.node.id }
+            .toSet(),
+        initialIsSelecting = inSelectionMode,
+    )
+
+    LaunchedEffect(inSelectionMode) {
+        if (inSelectionMode && !nodeSelectionState.selectAllAwaitingMoreItems) {
+            nodeSelectionState.startSelecting()
+        }
+    }
+
+    LaunchedEffect(items) {
+        val selectedItems = items.filter { it.isSelected }.map { it.node.id }.toSet()
+        nodeSelectionState.deselectAll()
+        nodeSelectionState.selectAll(selectedItems)
+    }
+
+    val onMenuNodeClicked: (TypedNode) -> Unit = { node ->
+        onMenuClicked(items.first { it.node.id == node.id })
+    }
+
+    val onNodeClicked: (TypedNode) -> Unit = { node ->
+        onItemClicked(items.first { it.node.id == node.id })
+    }
+
+    val onNodeLongClicked: (TypedNode) -> Unit = { node ->
+        onLongClicked(items.first { it.node.id == node.id })
+    }
+
+    val hiddenNodesAdjustedItems = items.map {
+        it.copy(
+            isSensitive = it.isSensitive && isHiddenNodesEnabled,
+            showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
+        )
+    }
+
+    NodesView(
+        items = hiddenNodesAdjustedItems,
+        onMenuClicked = onMenuNodeClicked,
+        onItemClicked = onNodeClicked,
+        onLongClicked = onNodeLongClicked,
+        sortConfiguration = sortConfiguration,
+        isListView = isListView,
+        onSortOrderClick = onSortOrderClick,
+        onChangeViewTypeClicked = onChangeViewTypeClicked,
+        modifier = modifier,
+        isNextPageLoading = isNextPageLoading,
+        listState = listState,
+        gridState = gridState,
+        highlightText = highlightText,
+        spanCount = spanCount,
+        showLinkIcon = showLinkIcon,
+        showChangeViewType = showChangeViewType,
+        showSortOrder = showSortOrder,
+        showMediaDiscoveryButton = showMediaDiscoveryButton,
+        inSelectionMode = inSelectionMode,
+        onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+        bannerHeader = bannerHeader,
+        listContentPadding = listContentPadding,
+        nodeSelectionState = nodeSelectionState,
+    )
+
+}
+
+/**
+ * NodesView
+ *
+ * @param items List of [NodeUiItem]
+ * @param onMenuClicked three dots click
+ * @param onItemClicked callback for item click
+ * @param onLongClicked callback for long item click
+ * @param sortConfiguration the sort order of the list
+ * @param isListView whether the current view is list view
+ * @param onSortOrderClick callback for sort order click
+ * @param onChangeViewTypeClicked callback for change view type click
+ * @param modifier
+ * @param isNextPageLoading whether to show shimmering skeleton at bottom
+ * @param listState the state of the list
+ * @param gridState the state of the grid
+ * @param spanCount the span count of the grid
+ * @param showSortOrder whether to show change sort order button
+ * @param showLinkIcon whether to show public share link icon
+ * @param showChangeViewType whether to show change view type button
+ * @param showMediaDiscoveryButton whether to show media discovery button
+ * @param onEnterMediaDiscoveryClick callback for enter media discovery click
+ * @param listContentPadding the content padding of the list/lazyColumn
+ * @param inSelectionMode whether to show selection mode
+ * @param bannerHeader the header to show at the top of the list
+ * @param nodeSelectionState the state of the selection
+ * @param highlightText the text to highlight in the title and description
+ */
+@Composable
+fun <T : TypedNode> NodesView(
+    items: List<TypedNodeItem<T>>,
+    onMenuClicked: (T) -> Unit,
+    onItemClicked: (T) -> Unit,
+    onLongClicked: (T) -> Unit,
+    sortConfiguration: NodeSortConfiguration,
+    isListView: Boolean,
+    onSortOrderClick: () -> Unit,
+    onChangeViewTypeClicked: () -> Unit,
+    nodeSelectionState: NodeSelectionState,
+    modifier: Modifier = Modifier,
+    isNextPageLoading: Boolean = false,
+    listState: LazyListState = rememberLazyListState(),
+    gridState: LazyGridState = rememberLazyGridState(),
+    highlightText: String = "",
+    spanCount: Int = 2,
+    showLinkIcon: Boolean = true,
+    showChangeViewType: Boolean = true,
+    showSortOrder: Boolean = true,
+    showMediaDiscoveryButton: Boolean = false,
+    inSelectionMode: Boolean = false,
+    onEnterMediaDiscoveryClick: () -> Unit = {},
+    bannerHeader: (@Composable () -> Unit)? = null,
+    listContentPadding: PaddingValues = PaddingValues(0.dp),
+) {
+    var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
+
+    val highlightedIndex = remember(items) {
+        items.indexOfFirst { it.isHighlighted }
+            .takeIf { items.indices.contains(it) }
+    }
+
+    LaunchedEffect(highlightedIndex) {
+        highlightedIndex?.let {
+            listState.animateScrollToItem(
+                index = highlightedIndex.plus(2).coerceAtMost(items.lastIndex),
+                scrollOffset = -(listState.layoutInfo.viewportSize.height / 2)
+            )
+        }
+    }
+
+    val nodeUiItems = remember(items, nodeSelectionState.selectedNodeIds) {
+        items.map {
+            SelectableNodeItem(it, nodeSelectionState.selectedNodeIds.contains(it.id))
+        }
+    }
+
+    if (isListView) {
+        NodeListView(
+            modifier = modifier,
+            listContentPadding = listContentPadding,
+            nodeUiItemList = nodeUiItems,
+            isNextPageLoading = isNextPageLoading,
+            onMenuClick = onMenuClicked,
+            onItemClicked = {
+                if (it.isTakenDown && it !is FolderNode) {
+                    showTakenDownDialog = true
+                } else {
+                    onItemClicked(it)
+                }
+            },
+            onLongClick = onLongClicked,
+            onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+            sortConfiguration = sortConfiguration,
+            highlightText = highlightText,
+            onSortOrderClick = onSortOrderClick,
+            onChangeViewTypeClick = onChangeViewTypeClicked,
+            showSortOrder = showSortOrder,
+            showChangeViewType = showChangeViewType,
+            showLinkIcon = showLinkIcon,
+            listState = listState,
+            showMediaDiscoveryButton = showMediaDiscoveryButton,
+            inSelectionMode = inSelectionMode,
+            bannerHeader = bannerHeader,
+        )
+    } else {
+        NodeGridView(
+            modifier = modifier,
+            listContentPadding = listContentPadding,
+            nodeUiItems = nodeUiItems,
+            isNextPageLoading = isNextPageLoading,
+            onMenuClicked = onMenuClicked,
+            onItemClicked = {
+                if (it.isTakenDown && it !is FolderNode) {
+                    showTakenDownDialog = true
+                } else {
+                    onItemClicked(it)
+                }
+            },
+            onLongClicked = onLongClicked,
+            onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+            spanCount = spanCount,
+            sortConfiguration = sortConfiguration,
+            highlightText = highlightText,
+            onSortOrderClick = onSortOrderClick,
+            onChangeViewTypeClick = onChangeViewTypeClicked,
+            showSortOrder = showSortOrder,
+            showChangeViewType = showChangeViewType,
+            gridState = gridState,
+            showMediaDiscoveryButton = showMediaDiscoveryButton,
+            inSelectionMode = inSelectionMode,
+            bannerHeader = bannerHeader,
+        )
+    }
+
+    if (showTakenDownDialog) {
+        TakeDownDialog(
+            isFolder = false,
+            onDismiss = {
+                showTakenDownDialog = false
+            }
+        )
+    }
+}
+
+/**
+ * Responsive grid span count for nodes view based on device type and orientation.
+ *
+ * @param defaultSpanCount fallback span count if no custom logic applies
+ * @param isListView if true, skips complex calculations and returns default span count
+ * @return responsive span count based on device type and orientation
+ */
+@Composable
+fun rememberDynamicSpanCount(
+    defaultSpanCount: Int = 2,
+    isListView: Boolean = false,
+): Int {
+    // Early return for list view, calculation is not required
+    if (isListView) {
+        return defaultSpanCount
+    }
+
+    val configuration = LocalConfiguration.current
+    val orientation = configuration.orientation
+    val isTablet = LocalDeviceType.current == DeviceType.Tablet
+    val screenWidthDp = configuration.screenWidthDp
+
+    return remember(orientation, isTablet, screenWidthDp) {
+        when {
+            // For phone, 2 span in portrait and 4 in landscape
+            !isTablet && orientation == Configuration.ORIENTATION_PORTRAIT -> 2
+            !isTablet && orientation == Configuration.ORIENTATION_LANDSCAPE -> 4
+            // Span count based on tablet screen size
+            isTablet -> {
+                when {
+                    // Large tablets (10+ inch)
+                    screenWidthDp >= 840 -> {
+                        if (orientation == Configuration.ORIENTATION_PORTRAIT) 5 else 8
+                    }
+                    // Medium tablets (7-9 inch)
+                    screenWidthDp >= 600 -> {
+                        if (orientation == Configuration.ORIENTATION_PORTRAIT) 4 else 6
+                    }
+                    // Small tablets
+                    else -> {
+                        if (orientation == Configuration.ORIENTATION_PORTRAIT) 3 else 5
+                    }
+                }
+            }
+
+            // Fallback
+            else -> defaultSpanCount
+        }
+    }
+}

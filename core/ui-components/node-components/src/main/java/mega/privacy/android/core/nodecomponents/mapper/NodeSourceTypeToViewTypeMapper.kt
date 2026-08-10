@@ -1,7 +1,7 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import javax.inject.Inject
 
 /**
@@ -24,6 +24,24 @@ class NodeSourceTypeToViewTypeMapper @Inject constructor() {
         NodeSourceType.FAVOURITES -> NodeSourceTypeInt.FAVOURITES_ADAPTER
         NodeSourceType.DOCUMENTS -> NodeSourceTypeInt.DOCUMENTS_BROWSE_ADAPTER
         NodeSourceType.AUDIO -> NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
-        NodeSourceType.OTHER, NodeSourceType.OFFLINE -> null
+        NodeSourceType.VIDEOS -> NodeSourceTypeInt.VIDEO_BROWSE_ADAPTER
+        NodeSourceType.SEARCH -> NodeSourceTypeInt.SEARCH_BY_ADAPTER
+        NodeSourceType.VIDEO_PLAYLISTS -> NodeSourceTypeInt.VIDEO_PLAYLISTS_ADAPTER
+        NodeSourceType.VIDEO_RECENTLY_WATCHED -> NodeSourceTypeInt.VIDEO_RECENTLY_WATCHED_ADAPTER
+        NodeSourceType.CHAT -> NodeSourceTypeInt.CHAT_ADAPTER
+
+        NodeSourceType.OTHER,
+        NodeSourceType.OFFLINE,
+        NodeSourceType.TIMELINE,
+        NodeSourceType.MEDIA_PLAYER_DEFAULT,
+        NodeSourceType.MEDIA_PLAYER_VERSIONS,
+        NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER,
+        NodeSourceType.MEDIA_PLAYER_ZIP_FILE,
+        NodeSourceType.CONTINUE_WHERE_LEFT_OFF,
+            -> null
+
+        NodeSourceType.RECENTS_BUCKET -> NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER
+        NodeSourceType.FOLDER_LINK -> NodeSourceTypeInt.FOLDER_LINK_ADAPTER
+        NodeSourceType.FILE_LINK -> NodeSourceTypeInt.FILE_LINK_ADAPTER
     }
 }

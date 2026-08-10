@@ -5,9 +5,7 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.hilt)
-    alias(plugin.plugins.de.mannodermaus.android.junit5)
     alias(plugin.plugins.kotlin.serialisation)
-    id("kotlin-android")
     id("kotlin-parcelize")
 }
 
@@ -23,7 +21,10 @@ android {
 
 dependencies {
     implementation(project(":navigation"))
+    implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":core:ui-components:node-components"))
+    implementation(project(":core:feature-flags"))
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     lintChecks(project(":lint"))
@@ -34,9 +35,10 @@ dependencies {
     implementation(project(":core:formatter"))
     implementation(project(":shared:original-core-ui"))
     implementation(project(":shared:sync"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:string-resources"))
+    implementation(project(":shared:nodes"))
     implementation(project(":legacy-core-ui"))
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:icon-pack"))
     implementation(project(":core:analytics:analytics-tracker"))
 
     implementation(lib.kotlin.ktx)
@@ -62,9 +64,12 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(google.guava)
     implementation(androidx.material3)
+    implementation(androidx.navigation3.runtime)
+    implementation(androidx.documentfile)
 
     testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(testlib.bundles.ui.test)
+    testImplementation(testlib.test.core.ktx)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
     testImplementation(google.hilt.android.test)

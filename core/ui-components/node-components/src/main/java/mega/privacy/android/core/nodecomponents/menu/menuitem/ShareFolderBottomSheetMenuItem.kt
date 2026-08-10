@@ -1,9 +1,11 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareFolderMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -25,11 +27,13 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType,
     ) = node.isTakenDown.not()
             && node is TypedFolderNode
             && isNodeInRubbish.not()
             && isOutShareUseCase(node).not()
             && accessPermission == AccessPermission.OWNER
+            && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override fun getOnClickFunction(
         node: TypedNode,

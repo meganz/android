@@ -22,12 +22,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.achievements.freetrial.view.FreeTrialViewTestTags.DESCRIPTION
+import mega.privacy.android.core.achievementcomponents.FreeTrailAchievementAwardedText
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -48,6 +51,8 @@ internal fun FreeTrialView(
     howItWorksText: String,
     modifier: Modifier = Modifier,
     isReceivedAward: Boolean = false,
+    isExpired: Boolean = false,
+    isPermanent: Boolean = false,
     installButtonClicked: () -> Unit = {},
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -72,6 +77,7 @@ internal fun FreeTrialView(
                 .fillMaxSize()
                 .background(MaterialTheme.colors.surface)
                 .verticalScroll(rememberScrollState())
+                .testTag(FreeTrialViewTestTags.ROOT)
         ) {
             Spacer(
                 modifier = Modifier
@@ -109,15 +115,17 @@ internal fun FreeTrialView(
                     }
                 }
 
-                Text(
+                FreeTrailAchievementAwardedText(
+                    freeTrialText = freeTrialText,
+                    isReceivedAward = isReceivedAward,
+                    isExpired = isReceivedAward && isExpired,
+                    isPermanent = isPermanent,
                     modifier = Modifier
-                        .testTag(FreeTrialViewTestTags.DESCRIPTION)
                         .padding(top = 30.dp, start = 24.dp, end = 24.dp)
-                        .align(Alignment.CenterHorizontally),
-                    text = freeTrialText,
-                    color = MaterialTheme.colors.textColorSecondary,
-                    textAlign = TextAlign.Center
+                        .align(Alignment.CenterHorizontally)
+                        .testTag(DESCRIPTION)
                 )
+
                 RaisedDefaultMegaButton(
                     modifier = Modifier
                         .testTag(FreeTrialViewTestTags.INSTALL_APP_BUTTON)
@@ -172,6 +180,7 @@ internal fun FreeTrialView(
 
 internal object FreeTrialViewTestTags {
     private const val FREE_TRIAL_VIEW = "achievement_free_trial"
+    const val ROOT = "$FREE_TRIAL_VIEW:root"
     const val TOOLBAR = "$FREE_TRIAL_VIEW:toolbar"
     const val IMAGE_MAIN = "$FREE_TRIAL_VIEW:image_main"
     const val CHECK_ICON = "$FREE_TRIAL_VIEW:image_check_icon"
@@ -201,13 +210,36 @@ fun FreeTrialViewDisableButtonPreview() {
     OriginalTheme(isSystemInDarkTheme()) {
         FreeTrialView(
             icon = iconPackR.drawable.ic_mega_vpn_free_trial,
-            freeTrialText = stringResource(sharedR.string.text_start_mega_vpn_free_trial, "5 GB"),
+            freeTrialText = LocalResources.current.getQuantityString(
+                sharedR.plurals.trial_awarded_achievement_days_left_detail_title,
+                100,
+                100
+            ),
             installButtonText = sharedR.string.button_text_install_mega_vpn,
             howItWorksText = stringResource(
                 sharedR.string.text_how_it_works_mega_vpn_free_trial,
                 "5 GB"
             ),
-            isReceivedAward = true
+            isReceivedAward = true,
+            isPermanent = true
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+fun FreeTrialViewDisableButtonExpiredPreview() {
+    OriginalTheme(isSystemInDarkTheme()) {
+        FreeTrialView(
+            icon = iconPackR.drawable.ic_mega_vpn_free_trial,
+            freeTrialText = stringResource(R.string.expired_label),
+            installButtonText = sharedR.string.button_text_install_mega_vpn,
+            howItWorksText = stringResource(
+                sharedR.string.text_how_it_works_mega_vpn_free_trial,
+                "5 GB"
+            ),
+            isReceivedAward = true,
+            isExpired = true
         )
     }
 }

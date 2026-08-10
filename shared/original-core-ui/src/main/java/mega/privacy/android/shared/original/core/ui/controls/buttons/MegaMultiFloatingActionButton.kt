@@ -250,6 +250,7 @@ private fun MegaMultiFloatingActionButtonCollapsedPreview(
             topBar = { MegaAppBar(appBarType = AppBarType.NONE, title = "Top bar title") },
             floatingActionButton = {
                 MegaMultiFloatingActionButton(
+                    isCircular = false,
                     items = listOf(
                         MultiFloatingActionButtonItem(
                             icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
@@ -288,6 +289,7 @@ private fun MegaMultiFloatingActionButtonExpandedPreview(
             topBar = { MegaAppBar(appBarType = AppBarType.NONE, title = "Top bar title") },
             floatingActionButton = {
                 MegaMultiFloatingActionButton(
+                    isCircular = false,
                     items = listOf(
                         MultiFloatingActionButtonItem(
                             icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),

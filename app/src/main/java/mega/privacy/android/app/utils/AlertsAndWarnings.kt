@@ -1,6 +1,5 @@
 package mega.privacy.android.app.utils
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -16,10 +15,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
-import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.domain.entity.AccountType
-import timber.log.Timber
+import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
+import timber.log.Timber
 
 object AlertsAndWarnings {
     private const val REMOVE_LINK_DIALOG_TEXT_MARGIN_LEFT = 25
@@ -44,21 +45,16 @@ object AlertsAndWarnings {
      */
     @JvmStatic
     fun showOverDiskQuotaPaywallWarning(activity: Activity?, loginFinished: Boolean) {
-        // If app is doing login, the ODQ will be displayed at login finish
-        if (activity is LoginActivity && !loginFinished) {
+        if (activity == null || activity is OverDiskQuotaPaywallActivity) {
             return
         }
 
-        if (activity is OverDiskQuotaPaywallActivity) {
-            return
-        }
-
-        val intent = Intent(
-            MegaApplication.getInstance().applicationContext,
-            OverDiskQuotaPaywallActivity::class.java
+        activity.startActivity(
+            MegaActivity.getIntentWithExtraDestinations(
+                activity,
+                listOf(OverDiskQuotaPaywallWarningNavKey)
+            )
         )
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        MegaApplication.getInstance().startActivity(intent)
     }
 
     /**
@@ -111,7 +107,7 @@ object AlertsAndWarnings {
     @JvmStatic
     fun showForeignStorageOverQuotaWarningDialog(context: Context) {
         MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setMessage(context.getString(R.string.warning_share_owner_storage_quota))
+            .setMessage(context.getString(sharedResR.string.incoming_share_storage_quota_warning_message))
             .setPositiveButton(context.getString(sharedResR.string.general_ok), null)
             .setCancelable(false)
             .create()
@@ -155,14 +151,19 @@ object AlertsAndWarnings {
      * Shows a taken down alert.
      *
      * @param activity   Required to create the dialog and finish the activity.
+     * @param onDismiss  The function that handles the behavior when the Dismiss button is clicked
      */
     @JvmStatic
-    fun showTakenDownAlert(activity: Activity): AlertDialog =
+    fun showTakenDownAlert(activity: Activity, onDismiss: (() -> Unit)? = null): AlertDialog =
         MaterialAlertDialogBuilder(activity)
             .setTitle(activity.getString(R.string.error_file_not_available))
             .setMessage(activity.getString(R.string.error_takendown_file))
-            .setNegativeButton(activity.getString(R.string.general_dismiss)) { _, _ ->
-                if (!activity.isFinishing) activity.finish()
+            .setNegativeButton(activity.getString(sharedR.string.general_dismiss_dialog)) { _, _ ->
+                if (onDismiss == null) {
+                    if (!activity.isFinishing) activity.finish()
+                } else {
+                    onDismiss()
+                }
             }
             .create().apply {
                 setCancelable(false)

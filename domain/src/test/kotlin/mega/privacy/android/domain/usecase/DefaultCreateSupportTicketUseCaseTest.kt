@@ -27,7 +27,7 @@ class DefaultCreateSupportTicketUseCaseTest {
     private val sdkVersion = "sdkVersion"
     private val accountEmail = "accountEmail"
     private val accountFullName = "accountFullName"
-    private val accountTypeString = "accountTypeString"
+    private val accountTypeString = "Free"
     private val fileName = "123-fileName.zip"
     private val description = "Issue description"
     private val deviceSdkVersionInt = 31
@@ -39,27 +39,26 @@ class DefaultCreateSupportTicketUseCaseTest {
         isBusinessAccount = true,
         isMasterBusinessAccount = true,
         accountTypeIdentifier = AccountType.FREE,
-        accountTypeString = accountTypeString
     )
 
     @Before
     fun setUp() {
         deviceRepository.stub {
-            onBlocking { getDeviceInfo() }.thenReturn(
+            on { getDeviceInfo() }.thenReturn(
                 DeviceInfo(
                     device = device,
                     language = languageCode
                 )
             )
 
-            onBlocking { getAppInfo() }.thenReturn(
+            on { getAppInfo() }.thenReturn(
                 AppInfo(
                     appVersion = appVersion,
                     sdkVersion = sdkVersion
                 )
             )
-            onBlocking { getDeviceSdkVersionInt() }.thenReturn(deviceSdkVersionInt)
-            onBlocking { getDeviceSdkVersionName() }.thenReturn(deviceSdkVersionName)
+            on { getDeviceSdkVersionInt() }.thenReturn(deviceSdkVersionInt)
+            on { getDeviceSdkVersionName() }.thenReturn(deviceSdkVersionName)
         }
 
         underTest = CreateSupportTicketUseCase(
@@ -69,7 +68,7 @@ class DefaultCreateSupportTicketUseCaseTest {
 
     @Test
     fun `test that device and app info is retrieved`() = runTest {
-        underTest(description = description, null, accountDetails)
+        underTest(description = description, null, accountDetails, accountTypeString)
 
         verify(deviceRepository).getDeviceInfo()
         verify(deviceRepository).getAppInfo()
@@ -77,13 +76,13 @@ class DefaultCreateSupportTicketUseCaseTest {
 
     @Test
     fun `test that device sdk version int is retrieved`() = runTest {
-        underTest(description = description, null, accountDetails)
+        underTest(description = description, null, accountDetails, accountTypeString)
         verify(deviceRepository).getDeviceSdkVersionInt()
     }
 
     @Test
     fun `test that device sdk version name is retrieved`() = runTest {
-        underTest(description = description, null, accountDetails)
+        underTest(description = description, null, accountDetails, accountTypeString)
         verify(deviceRepository).getDeviceSdkVersionName()
     }
 
@@ -102,7 +101,7 @@ class DefaultCreateSupportTicketUseCaseTest {
             deviceSdkVersionName = deviceSdkVersionName,
         )
 
-        val actual = underTest(description, fileName, accountDetails)
+        val actual = underTest(description, fileName, accountDetails, accountTypeString)
 
         assertThat(actual).isEqualTo(expected)
     }

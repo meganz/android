@@ -3,7 +3,7 @@ package mega.privacy.android.gradle
 
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.UnitTestOptions
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
@@ -17,6 +17,7 @@ import org.gradle.kotlin.dsl.withType
 fun Project.enableParallelTest() = tasks.withType<Test> {
     maxParallelForks =
         (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+    failOnNoDiscoveredTests.set(false)
 }
 
 /**
@@ -26,6 +27,7 @@ fun Project.enableParallelTest() = tasks.withType<Test> {
 fun Project.useJUnit5() {
     tasks.withType<Test> {
         useJUnitPlatform()
+        failOnNoDiscoveredTests.set(false)
     }
 }
 

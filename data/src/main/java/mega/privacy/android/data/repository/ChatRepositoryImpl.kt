@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
-import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +27,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.extensions.getRequestListener
@@ -38,6 +36,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
+import mega.privacy.android.data.gateway.preferences.ChatSettingsPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
@@ -89,6 +88,7 @@ import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatExcept
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
@@ -131,7 +131,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property appEventGateway
  * @property pendingMessageListMapper
  * @property megaLocalRoomGateway
- * @property databaseHandler
  * @property chatStorageGateway
  * @property typedMessageEntityMapper
  * @property richPreviewEntityMapper
@@ -162,7 +161,6 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val pendingMessageListMapper: PendingMessageListMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
-    private val databaseHandler: Lazy<DatabaseHandler>,
     private val chatStorageGateway: ChatStorageGateway,
     private val typedMessageEntityMapper: TypedMessageEntityMapper,
     private val richPreviewEntityMapper: RichPreviewEntityMapper,
@@ -175,6 +173,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val inviteContactRequestMapper: InviteContactRequestMapper,
+    private val chatSettingsPreferenceGateway: ChatSettingsPreferenceGateway,
 ) : ChatRepository {
     private val richLinkConfig = MutableStateFlow(RichLinkConfig())
     private var chatRoomUpdates: HashMap<Long, Flow<ChatRoomUpdate>> = hashMapOf()
@@ -345,7 +344,9 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
 
     override suspend fun getChatFilesFolderId(): NodeId? = withContext(ioDispatcher) {
-        localStorageGateway.getChatFilesFolderHandle()?.let { NodeId(it) }
+        // Avoid NodeId(INVALID_HANDLE); treat as not set and return null.
+        localStorageGateway.getChatFilesFolderHandle()?.takeIf { it != MegaApiJava.INVALID_HANDLE }
+            ?.let { NodeId(it) }
     }
 
     override suspend fun getChatRooms(): List<ChatRoom> =
@@ -729,9 +730,20 @@ internal class ChatRepositoryImpl @Inject constructor(
         .shareIn(sharingScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     override suspend fun resetChatSettings() = withContext(ioDispatcher) {
-        if (localStorageGateway.getChatSettings() == null) {
-            localStorageGateway.setChatSettings(ChatSettings())
+        if (chatSettingsPreferenceGateway.getChatSettings() == null) {
+            chatSettingsPreferenceGateway.setChatSettings(ChatSettings())
         }
+    }
+
+    override fun monitorChatSettings(): Flow<ChatSettings?> =
+        chatSettingsPreferenceGateway.monitorChatSettings()
+
+    override suspend fun getChatSettings(): ChatSettings? = withContext(ioDispatcher) {
+        chatSettingsPreferenceGateway.getChatSettings()
+    }
+
+    override suspend fun setChatSettings(chatSettings: ChatSettings) = withContext(ioDispatcher) {
+        chatSettingsPreferenceGateway.setChatSettings(chatSettings)
     }
 
     override suspend fun signalPresenceActivity() =
@@ -899,7 +911,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         defaultSound: String?,
     ) = withContext(ioDispatcher) {
         chatMessageNotificationBehaviourMapper(
-            localStorageGateway.getChatSettings(),
+            chatSettingsPreferenceGateway.getChatSettings(),
             beep,
             defaultSound
         )
@@ -943,8 +955,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getParticipantFirstName(handle: Long, contemplateEmail: Boolean): String? =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getContactByHandle(handle)?.shortName?.takeIf { it.isNotBlank() }
-                ?: databaseHandler.get()
-                    .findNonContactByHandle(handle.toString())?.shortName?.takeIf { it.isNotBlank() }
+                ?: localStorageGateway.getNonContactByHandle(handle)?.shortName?.takeIf { it.isNotBlank() }
                 ?: megaChatApiGateway.getUserAliasFromCache(handle)?.takeIf { it.isNotBlank() }
                 ?: megaChatApiGateway.getUserFirstnameFromCache(handle)?.takeIf { it.isNotBlank() }
                 ?: megaChatApiGateway.getUserLastnameFromCache(handle)?.takeIf { it.isNotBlank() }
@@ -955,8 +966,7 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun getParticipantFullName(handle: Long): String? = withContext(ioDispatcher) {
         megaLocalRoomGateway.getContactByHandle(handle)?.fullName?.takeIf { it.isNotBlank() }
-            ?: databaseHandler.get()
-                .findNonContactByHandle(handle.toString())?.fullName?.takeIf { it.isNotBlank() }
+            ?: localStorageGateway.getNonContactByHandle(handle)?.fullName?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserAliasFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserFullNameFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserFirstnameFromCache(handle)?.takeIf { it.isNotBlank() }
@@ -1309,6 +1319,14 @@ internal class ChatRepositoryImpl @Inject constructor(
             getMyChatsFilesFolderIdFromGateway()
         }
 
+    override suspend fun isGroupChat(chatId: Long): Boolean? = withContext(ioDispatcher) {
+        megaChatApiGateway.getChatRoom(chatId)?.isGroup
+    }
+
+    override suspend fun isNoteToSelfChat(chatId: Long): Boolean? = withContext(ioDispatcher) {
+        megaChatApiGateway.getChatRoom(chatId)?.isNoteToSelf
+    }
+
     private suspend fun getMyChatsFilesFolderIdFromGateway(): NodeId? = withContext(ioDispatcher) {
         runCatching {
             suspendCancellableCoroutine { continuation ->
@@ -1335,7 +1353,6 @@ internal class ChatRepositoryImpl @Inject constructor(
             megaApiGateway.globalUpdates
                 .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
                 .filter {
-                    println("filter") //TODO remove
                     val currentUserHandle = megaApiGateway.myUser?.handle
                     it.users?.any { user ->
                         user.isOwnChange == 0

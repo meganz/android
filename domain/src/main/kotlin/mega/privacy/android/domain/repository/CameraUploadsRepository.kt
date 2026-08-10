@@ -598,4 +598,9 @@ interface CameraUploadsRepository {
      * @param uniqueIds Set of unique IDs of the transfers to be removed
      */
     suspend fun removeCameraUploadsInProgressTransfers(uniqueIds: Set<Long>)
+
+    /**
+     * Monitor the Camera Uploads enabled status
+     */
+    val monitorCameraUploadsEnabled: Flow<Boolean?>
 }

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -48,6 +47,8 @@ import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsisText
@@ -56,6 +57,7 @@ import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_070
 import mega.privacy.android.shared.resources.R as SharedResources
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaNode
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -78,6 +80,7 @@ internal fun ImagePreviewBottomSheet(
     showHideMenu: suspend (ImageNode) -> Boolean,
     showUnhideMenu: suspend (ImageNode) -> Boolean,
     forceHideHiddenMenus: () -> Boolean,
+    isNodeInBackups: suspend (ImageNode) -> Boolean = { false },
     showMoveMenu: suspend (ImageNode) -> Boolean,
     showCopyMenu: suspend (ImageNode) -> Boolean,
     showRestoreMenu: suspend (ImageNode) -> Boolean,
@@ -91,7 +94,6 @@ internal fun ImagePreviewBottomSheet(
     isAvailableOffline: Boolean = false,
     accountType: AccountType? = null,
     isBusinessAccountExpired: Boolean = false,
-    isHiddenNodesEnabled: Boolean = false,
     isHiddenNodesOnboarded: Boolean? = null,
     onClickInfo: () -> Unit = {},
     onClickFavourite: () -> Unit = {},
@@ -194,6 +196,10 @@ internal fun ImagePreviewBottomSheet(
                 value = showUnhideMenu(imageNode)
             }
 
+            val isInBackups by produceState(false, imageNode) {
+                value = isNodeInBackups(imageNode)
+            }
+
             val isMoveMenuVisible by produceState(false, imageNode) {
                 value = showMoveMenu(imageNode)
             }
@@ -226,9 +232,39 @@ internal fun ImagePreviewBottomSheet(
                 value = showAddToAlbum(imageNode)
             }
 
+            // Temporary solution to handle group divider visibility in this legacy code
+            val isHideItemVisible = !isInBackups
+                    && !forceHideHiddenMenus()
+                    && accountType != null
+                    && (!accountType.isPaid || isBusinessAccountExpired
+                    || (isHideMenuVisible && isHiddenNodesOnboarded != null))
+            val isUnhideItemVisible = !isInBackups
+                    && !forceHideHiddenMenus()
+                    && accountType?.isPaid == true
+                    && !isBusinessAccountExpired && isUnhideMenuVisible
+
+            // Group visibility flags — a divider after group N shows only when
+            // group N is visible AND at least one later group is also visible.
+            val isGroup1Visible =
+                isInfoMenuVisible || isFavouriteMenuVisible || isLabelMenuVisible
+            val isGroup2Visible =
+                isDisputeMenuVisible || isOpenWithMenuVisible
+            val isGroup3Visible =
+                isForwardMenuVisible || isSaveToDeviceMenuVisible
+                        || isImportMenuVisible || isAvailableOfflineMenuVisible
+            val isGroup4Visible =
+                isGetLinkMenuVisible || isSendToChatMenuVisible || isShareMenuVisible
+            val isGroup5Visible =
+                isRenameMenuVisible || isHideItemVisible || isUnhideItemVisible
+                        || isMoveMenuVisible || isAddToAlbumMenuVisible
+            val isGroup6Visible =
+                isCopyMenuVisible || isRestoreMenuVisible || isRemoveMenuVisible
+                        || isRemoveOfflineMenuVisible || isMoveToRubbishBinMenuVisible
+
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
+                // Group 1: Info, Favourite, Label
                 if (isInfoMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Info),
@@ -288,12 +324,15 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                Divider(modifier = Modifier.padding(start = 72.dp))
+                if (isGroup1Visible && (isGroup2Visible || isGroup3Visible || isGroup4Visible || isGroup5Visible || isGroup6Visible)) {
+                    MegaDivider(dividerType = DividerType.BigStartPadding)
+                }
 
+                // Group 2: Dispute, OpenWith
                 if (isDisputeMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.AlertTriangle),
-                        text = stringResource(id = R.string.dispute_takendown_file),
+                        text = stringResource(id = sharedR.string.dispute_takendown_file),
                         onActionClicked = onClickDispute,
                         dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_DISPUTE),
@@ -310,8 +349,11 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                Divider(modifier = Modifier.padding(start = 72.dp))
+                if (isGroup2Visible && (isGroup3Visible || isGroup4Visible || isGroup5Visible || isGroup6Visible)) {
+                    MegaDivider(dividerType = DividerType.BigStartPadding)
+                }
 
+                // Group 3: Forward, SaveToDevice, Import, AvailableOffline
                 if (isForwardMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CornerUpRight),
@@ -358,8 +400,11 @@ internal fun ImagePreviewBottomSheet(
                     }
                 }
 
-                Divider(modifier = Modifier.padding(start = 72.dp))
+                if (isGroup3Visible && (isGroup4Visible || isGroup5Visible || isGroup6Visible)) {
+                    MegaDivider(dividerType = DividerType.BigStartPadding)
+                }
 
+                // Group 4: GetLink, RemoveLink, SendToChat, Share
                 if (isGetLinkMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Link01),
@@ -407,19 +452,22 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                Divider(modifier = Modifier.padding(start = 72.dp))
+                if (isGroup4Visible && (isGroup5Visible || isGroup6Visible)) {
+                    MegaDivider(dividerType = DividerType.BigStartPadding)
+                }
 
+                // Group 5: Rename, Hide, Unhide, Move, AddToAlbum
                 if (isRenameMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2),
-                        text = stringResource(id = R.string.context_rename),
+                        text = stringResource(id = sharedR.string.context_rename),
                         onActionClicked = onClickRename,
                         dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_RENAME),
                     )
                 }
 
-                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType != null && (!accountType.isPaid || isBusinessAccountExpired || (isHideMenuVisible && isHiddenNodesOnboarded != null))) {
+                if (isHideItemVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.EyeOff),
                         text = stringResource(id = R.string.general_hide_node),
@@ -449,7 +497,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType?.isPaid == true && !isBusinessAccountExpired && isUnhideMenuVisible) {
+                if (isUnhideItemVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eye),
                         text = stringResource(id = R.string.general_unhide_node),
@@ -478,8 +526,11 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                Divider(modifier = Modifier.padding(start = 72.dp))
+                if (isGroup5Visible && isGroup6Visible) {
+                    MegaDivider(dividerType = DividerType.BigStartPadding)
+                }
 
+                // Group 6: Copy, Restore, Remove, RemoveOffline, MoveToRubbishBin
                 if (isCopyMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Copy01),

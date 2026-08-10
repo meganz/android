@@ -53,8 +53,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.Constants.EMPTY_LIST_TEST_TAG
@@ -110,7 +110,7 @@ internal object Constants {
  */
 @Composable
 internal fun SelectSubtitleComposeView(
-    viewModel: SelectSubtitleFileViewModel = viewModel(),
+    viewModel: SelectSubtitleFileViewModel = hiltViewModel(),
     onAddSubtitle: (SubtitleFileInfo?) -> Unit,
     onBackPressed: () -> Unit,
 ) {

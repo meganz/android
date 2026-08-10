@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
@@ -182,7 +183,8 @@ class GetNodeNameCollisionsResultUseCaseTest {
                 lastModified = 123456L,
                 parentHandle = 456L,
                 isFile = true,
-                path = UriPath("path")
+                path = UriPath("path"),
+                pitagTrigger = PitagTrigger.Picker,
             )
             val nodeNameCollision = defaultNodeNameCollision.copy(
                 parentHandle = -1L

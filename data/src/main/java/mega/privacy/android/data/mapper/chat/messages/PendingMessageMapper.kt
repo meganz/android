@@ -31,6 +31,7 @@ class PendingMessageMapper @Inject constructor() {
                 fingerprint = fingerprint,
                 name = name,
                 originalUriPath = UriPath(originalUriPath),
+                pitagTrigger = pitagTrigger,
             )
         }
     }

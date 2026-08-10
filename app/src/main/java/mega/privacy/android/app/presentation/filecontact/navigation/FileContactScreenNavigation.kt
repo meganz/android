@@ -5,13 +5,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.filecontact.ShareRecipientsViewModel
+import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
 import mega.privacy.android.app.presentation.filecontact.view.FileContactHomeScreen
 import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
@@ -22,8 +24,19 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     resultFlow: (String) -> Flow<List<String>?>,
+    clearResults: (String) -> Unit,
 ) {
-    entry<FileContactInfoNavKey> {
+    entry<FileContactInfoNavKey> { key ->
+        val viewModel = hiltViewModel<ShareRecipientsViewModel, ShareRecipientsViewModel.Factory>(
+            creationCallback = { factory ->
+                factory.create(
+                    ShareRecipientsViewModel.Args(
+                        folderHandle = key.folderHandle,
+                        folderName = key.folderName,
+                    )
+                )
+            }
+        )
         LaunchedEffect(Unit) {
             Analytics.tracker.trackEvent(FileContactListScreenViewEvent)
         }
@@ -37,21 +50,28 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
             newShareRecipients = result
         }
 
-        val onShareFolder = { handle: Long ->
-            onNavigate(
-                AddContactToShareNavKey(
-                    contactType = AddContactToShareNavKey.ContactType.All,
-                    nodeHandle = listOf(handle),
+        val state by viewModel.state.collectAsStateWithLifecycle()
+
+        (state as? FileContactListState.Data)?.let { data ->
+            EventEffect(
+                event = data.navigateToAddContactEvent,
+                onConsumed = viewModel::clearAddContactState,
+            ) { handle ->
+                onNavigate(
+                    AddContactToShareNavKey(
+                        nodeHandle = listOf(handle),
+                    )
                 )
-            )
+            }
         }
 
-        val viewModel = hiltViewModel<ShareRecipientsViewModel>()
-        val state by viewModel.state.collectAsStateWithLifecycle()
         FileContactHomeScreen(
             state = state,
             newShareRecipients = newShareRecipients,
-            clearNewShareRecipients = { newShareRecipients = null },
+            clearNewShareRecipients = {
+                newShareRecipients = null
+                clearResults(AddContactToShareNavKey.KEY)
+            },
             onBackPressed = onNavigateBack,
             removeContacts = viewModel::removeShare,
             shareFolder = viewModel::shareFolder,
@@ -59,7 +79,9 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
             shareRemovedEventHandled = viewModel::onShareRemovedEventHandled,
             shareCompletedEventHandled = viewModel::onSharingCompletedEventHandled,
             navigateToInfo = { onNavigate(ContactInfoNavKey(it.email)) },
-            addContact = onShareFolder,
+            addContact = { viewModel.onAddContactClicked() },
+            onShareHiddenNodeWarningConfirmed = viewModel::onShareHiddenNodeWarningConfirmed,
+            onShareHiddenNodeWarningDismissed = viewModel::clearAddContactState,
         )
     }
 }

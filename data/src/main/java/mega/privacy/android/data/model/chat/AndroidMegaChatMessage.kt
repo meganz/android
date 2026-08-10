@@ -1,7 +1,7 @@
 package mega.privacy.android.data.model.chat
 
 import mega.privacy.android.domain.entity.chat.PendingMessage
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import nz.mega.sdk.MegaChatMessage
 
 /**
@@ -12,7 +12,7 @@ import nz.mega.sdk.MegaChatMessage
  * @property infoToShow
  * @property isShowAvatar
  * @property isUploading
- * @property contactLinkResult
+ * @property contactLinkQueryResult
  */
 data class AndroidMegaChatMessage(
     var message: MegaChatMessage? = null,
@@ -20,7 +20,7 @@ data class AndroidMegaChatMessage(
     var infoToShow: Int = -1,
     var isShowAvatar: Boolean = true,
     var isUploading: Boolean = false,
-    var contactLinkResult: ContactLink? = null,
+    var contactLinkQueryResult: ContactLinkQueryResult? = null,
 ) {
     constructor(message: MegaChatMessage?) : this() {
         this.message = message

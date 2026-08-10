@@ -17,11 +17,12 @@
         app:errorEnabled="true"
         app:layout_constraintTop_toTopOf="parent">
 
-        <mega.privacy.android.app.components.twemoji.EmojiEditText
+        <mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
             android:id="@+id/email_field"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
+            android:maxLength="190"
             android:textSize="16sp" />
 
     </com.google.android.material.textfield.TextInputLayout>

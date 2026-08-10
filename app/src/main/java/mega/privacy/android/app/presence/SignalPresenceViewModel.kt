@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -19,9 +20,24 @@ import javax.inject.Inject
 @HiltViewModel
 class SignalPresenceViewModel @Inject constructor(
     private val retryConnectionsAndSignalPresenceUseCase: RetryConnectionsAndSignalPresenceUseCase,
+    private val monitorChatSignalPresenceUseCase: MonitorChatSignalPresenceUseCase,
 ) : ViewModel() {
     private val updatePresenceFlow: MutableStateFlow<Boolean?> = MutableStateFlow(null)
     private var presenceJob: Job? = null
+    private var delaySignalPresence = false
+    private var needSignalPresence = true
+
+    init {
+        viewModelScope.launch {
+            monitorChatSignalPresenceUseCase().collect {
+                if (delaySignalPresence) {
+                    Timber.d("Delaying signal presence, now signaling presence")
+                    delaySignalPresence = false
+                    sendPresenceSignal()
+                }
+            }
+        }
+    }
 
     private fun trackPresence() {
         presenceJob = viewModelScope.launch {
@@ -39,15 +55,27 @@ class SignalPresenceViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Retries pending connections and optionally signals presence, then keeps repeating on each
+     * [monitorChatSignalPresenceUseCase] tick while presenceConfig is available and not pending.
+     * Stops automatically when presenceConfig is unavailable or pending.
+     */
     private suspend fun sendPresenceSignal() {
-        try {
-            retryConnectionsAndSignalPresenceUseCase()
-        } catch (e: Exception) {
-            Timber.e(e, "Error signaling presence")
+        runCatching {
+            retryConnectionsAndSignalPresenceUseCase(needSignalPresence)
+        }.onSuccess { presenceConfigAvailable ->
+            delaySignalPresence = presenceConfigAvailable
+        }.onFailure {
+            Timber.e(it, "Error signaling presence")
         }
     }
 
     fun signalPresence() {
+        retryConnections(signalPresence = true)
+    }
+
+    fun retryConnections(signalPresence: Boolean) {
+        this.needSignalPresence = signalPresence
         if (presenceJob == null) {
             trackPresence()
         } else {

@@ -1,6 +1,5 @@
 package mega.privacy.android.data.gateway.global
 
-import dagger.Lazy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.sync.Mutex
@@ -11,12 +10,10 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.domain.usecase.IsUseHttpsEnabledUseCase
-import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.ResetAccountDetailsTimeStampUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
@@ -26,9 +23,11 @@ import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpi
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.network.BroadcastSslVerificationFailedUseCase
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -61,9 +60,9 @@ class GlobalRequestListenerTest {
     private val setupMegaChatApiWrapper = mock<SetupMegaChatApiWrapper>()
     private val accountInfoWrapper = mock<AccountInfoWrapper>()
     private val megaChatApi = mock<MegaChatApiAndroid>()
-    private val dbH = mock<Lazy<DatabaseHandler>>()
-    private val databaseHandler = mock<DatabaseHandler>()
+    private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val megaApi = mock<MegaApiAndroid>()
+    private val ioDispatcher = UnconfinedTestDispatcher()
     private val applicationScope = TestScope(UnconfinedTestDispatcher())
     private val getFullAccountInfoUseCase = mock<GetFullAccountInfoUseCase>()
     private val broadcastFetchNodesFinishUseCase = mock<BroadcastFetchNodesFinishUseCase>()
@@ -76,14 +75,13 @@ class GlobalRequestListenerTest {
         mock<UpdatePushNotificationSettingsUseCase>()
     private val shouldShowRichLinkWarningUseCase = mock<ShouldShowRichLinkWarningUseCase>()
     private val isRichPreviewsEnabledUseCase = mock<IsRichPreviewsEnabledUseCase>()
-    private val isUseHttpsEnabledUseCase = mock<IsUseHttpsEnabledUseCase>()
-    private val setUseHttpsUseCase = mock<SetUseHttpsUseCase>()
     private val resetAccountDetailsTimeStampUseCase = mock<ResetAccountDetailsTimeStampUseCase>()
     private val broadcastSslVerificationFailedUseCase =
         mock<BroadcastSslVerificationFailedUseCase>()
     private val setLoggedOutFromAnotherLocationUseCase =
         mock<SetLoggedOutFromAnotherLocationUseCase>()
     private val setIsUnverifiedBusinessAccountUseCase = mock<SetUnverifiedBusinessAccountUseCase>()
+    private val getChatFilesFolderIdUseCase = mock<GetChatFilesFolderIdUseCase>()
 
     // Test data
     private val testEmail = "test@example.com"
@@ -96,9 +94,6 @@ class GlobalRequestListenerTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        whenever(dbH.get()).thenReturn(databaseHandler)
-        whenever(databaseHandler.myChatFilesFolderHandle).thenReturn(MegaApiJava.INVALID_HANDLE)
-
         underTest = GlobalRequestListener(
             appEventGateway = appEventGateway,
             setLogoutFlagWrapper = setLogoutFlagWrapper,
@@ -106,9 +101,10 @@ class GlobalRequestListenerTest {
             setupMegaChatApiWrapper = setupMegaChatApiWrapper,
             accountInfoWrapper = accountInfoWrapper,
             megaChatApi = megaChatApi,
-            dbH = dbH,
+            localStorageGateway = localStorageGateway,
             megaApi = megaApi,
             applicationScope = applicationScope,
+            ioDispatcher = ioDispatcher,
             getFullAccountInfoUseCase = getFullAccountInfoUseCase,
             broadcastFetchNodesFinishUseCase = broadcastFetchNodesFinishUseCase,
             localLogoutAppUseCase = localLogoutAppUseCase,
@@ -118,12 +114,11 @@ class GlobalRequestListenerTest {
             updatePushNotificationSettingsUseCase = updatePushNotificationSettingsUseCase,
             shouldShowRichLinkWarningUseCase = shouldShowRichLinkWarningUseCase,
             isRichPreviewsEnabledUseCase = isRichPreviewsEnabledUseCase,
-            isUseHttpsEnabledUseCase = isUseHttpsEnabledUseCase,
-            setUseHttpsUseCase = setUseHttpsUseCase,
             resetAccountDetailsTimeStampUseCase = resetAccountDetailsTimeStampUseCase,
             broadcastSslVerificationFailedUseCase = broadcastSslVerificationFailedUseCase,
             setLoggedOutFromAnotherLocationUseCase = setLoggedOutFromAnotherLocationUseCase,
             setIsUnverifiedBusinessAccountUseCase = setIsUnverifiedBusinessAccountUseCase,
+            getChatFilesFolderIdUseCase = getChatFilesFolderIdUseCase,
         )
     }
 
@@ -132,15 +127,15 @@ class GlobalRequestListenerTest {
         Dispatchers.resetMain()
         reset(
             appEventGateway, setLogoutFlagWrapper, userAttributeDatabaseUpdater,
-            setupMegaChatApiWrapper, accountInfoWrapper, megaChatApi, dbH,
-            databaseHandler, megaApi, getFullAccountInfoUseCase,
+            setupMegaChatApiWrapper, accountInfoWrapper, megaChatApi,
+            localStorageGateway, megaApi, getFullAccountInfoUseCase,
             broadcastFetchNodesFinishUseCase, localLogoutAppUseCase,
             setupDeviceNameUseCase, broadcastBusinessAccountExpiredUseCase,
             loginMutex, updatePushNotificationSettingsUseCase,
             shouldShowRichLinkWarningUseCase, isRichPreviewsEnabledUseCase,
-            isUseHttpsEnabledUseCase, setUseHttpsUseCase,
             resetAccountDetailsTimeStampUseCase, broadcastSslVerificationFailedUseCase,
-            setLoggedOutFromAnotherLocationUseCase, setIsUnverifiedBusinessAccountUseCase
+            setLoggedOutFromAnotherLocationUseCase, setIsUnverifiedBusinessAccountUseCase,
+            getChatFilesFolderIdUseCase,
         )
     }
 
@@ -326,12 +321,10 @@ class GlobalRequestListenerTest {
             val error = mock<MegaError> {
                 on { errorCode } doReturn MegaError.API_OK
             }
-            whenever(isUseHttpsEnabledUseCase.invoke()).doReturn(true)
 
             underTest.onRequestFinish(api, request, error)
             advanceUntilIdle()
 
-            verify(setUseHttpsUseCase).invoke(true)
             verify(resetAccountDetailsTimeStampUseCase).invoke()
         }
 
@@ -425,8 +418,8 @@ class GlobalRequestListenerTest {
 
             underTest.onRequestFinish(mock<MegaApiJava>(), request, error)
 
-            verify(databaseHandler).setNonContactEmail(testEmail, testUserHandle.toString())
-            verify(databaseHandler).setNonContactFirstName(testFirstName, testUserHandle.toString())
+            verify(localStorageGateway).setNonContactEmail(testUserHandle, testEmail)
+            verify(localStorageGateway).setNonContactFirstName(testUserHandle, testFirstName)
         }
 
     @Test
@@ -450,7 +443,7 @@ class GlobalRequestListenerTest {
 
             underTest.onRequestFinish(mock<MegaApiJava>(), request, error)
 
-            verify(databaseHandler).setNonContactLastName(testLastName, testUserHandle.toString())
+            verify(localStorageGateway).setNonContactLastName(testUserHandle, testLastName)
         }
 
     @Test
@@ -475,8 +468,8 @@ class GlobalRequestListenerTest {
 
             underTest.onRequestFinish(api, request, error)
 
-            verify(databaseHandler, never()).setNonContactEmail(any(), any())
-            verify(databaseHandler, never()).setNonContactFirstName(any(), any())
+            verify(localStorageGateway, never()).setNonContactEmail(any(), any())
+            verify(localStorageGateway, never()).setNonContactFirstName(any(), any())
         }
 
     @Test
@@ -497,8 +490,8 @@ class GlobalRequestListenerTest {
 
             underTest.onRequestFinish(api, request, error)
 
-            verify(databaseHandler, never()).setNonContactEmail(any(), any())
-            verify(databaseHandler, never()).setNonContactFirstName(any(), any())
+            verify(localStorageGateway, never()).setNonContactEmail(any(), any())
+            verify(localStorageGateway, never()).setNonContactFirstName(any(), any())
         }
 
     @Test
@@ -517,8 +510,29 @@ class GlobalRequestListenerTest {
 
             underTest.onRequestFinish(api, request, error)
 
-            verify(databaseHandler, never()).setNonContactEmail(any(), any())
-            verify(databaseHandler, never()).setNonContactFirstName(any(), any())
+            verify(localStorageGateway, never()).setNonContactEmail(any(), any())
+            verify(localStorageGateway, never()).setNonContactFirstName(any(), any())
+        }
+
+    @Test
+    fun `test that handleGetAttrUserRequest does not crash when getContact throws`() =
+        runTest {
+            val request = mock<MegaRequest> {
+                on { type } doReturn MegaRequest.TYPE_GET_ATTR_USER
+                on { paramType } doReturn MegaApiJava.USER_ATTR_FIRSTNAME
+                on { email } doReturn testEmail
+                on { text } doReturn testFirstName
+            }
+            val error = mock<MegaError> {
+                on { errorCode } doReturn MegaError.API_OK
+            }
+
+            whenever(megaApi.getContact(testEmail)).thenThrow(RuntimeException("boom"))
+
+            underTest.onRequestFinish(mock<MegaApiJava>(), request, error)
+
+            verify(localStorageGateway, never()).setNonContactEmail(any(), any())
+            verify(localStorageGateway, never()).setNonContactFirstName(any(), any())
         }
 
     @Test
@@ -567,4 +581,40 @@ class GlobalRequestListenerTest {
             verify(getFullAccountInfoUseCase, never()).invoke()
             verify(setupMegaChatApiWrapper, never()).invoke()
         }
-} 
+
+    @Test
+    fun `test that onRequestFinish calls getMyChatFilesFolder when FETCH_NODES and API_OK and chat files folder id is null`() =
+        runTest {
+            val request = mock<MegaRequest> {
+                on { type } doReturn MegaRequest.TYPE_FETCH_NODES
+            }
+            val api = mock<MegaApiJava>()
+            val error = mock<MegaError> {
+                on { errorCode } doReturn MegaError.API_OK
+            }
+            whenever(getChatFilesFolderIdUseCase()).thenReturn(null)
+
+            underTest.onRequestFinish(api, request, error)
+            advanceUntilIdle()
+
+            verify(megaApi).getMyChatFilesFolder(userAttributeDatabaseUpdater)
+        }
+
+    @Test
+    fun `test that onRequestFinish does not call getMyChatFilesFolder when FETCH_NODES and API_OK and chat files folder id is set`() =
+        runTest {
+            val request = mock<MegaRequest> {
+                on { type } doReturn MegaRequest.TYPE_FETCH_NODES
+            }
+            val api = mock<MegaApiJava>()
+            val error = mock<MegaError> {
+                on { errorCode } doReturn MegaError.API_OK
+            }
+            whenever(getChatFilesFolderIdUseCase()).thenReturn(NodeId(123L))
+
+            underTest.onRequestFinish(api, request, error)
+            advanceUntilIdle()
+
+            verify(megaApi, never()).getMyChatFilesFolder(any())
+        }
+}

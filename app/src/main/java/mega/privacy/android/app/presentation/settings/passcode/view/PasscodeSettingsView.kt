@@ -27,12 +27,11 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.passcode.model.PasscodeSettingsUIState
 import mega.privacy.android.app.presentation.settings.passcode.model.TimeoutOption
+import mega.privacy.android.app.presentation.settings.passcode.view.tile.BiometricIdTile
 import mega.privacy.android.app.presentation.settings.passcode.view.tile.ChangePasscodeTile
 import mega.privacy.android.app.presentation.settings.passcode.view.tile.EnablePasscodeTile
-import mega.privacy.android.app.presentation.settings.passcode.view.tile.FingerprintIdTile
 import mega.privacy.android.app.presentation.settings.passcode.view.tile.RequirePasscodeTile
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -40,6 +39,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -98,7 +98,7 @@ internal fun PasscodeSettingsView(
                         onItemClicked = { navigateToSetOrChangePasscode(true) }
                     )
                     if (hasBiometricCapability) {
-                        FingerprintIdTile(
+                        BiometricIdTile(
                             isChecked = state.isBiometricsEnabled,
                             onItemClicked = {
                                 if (state.isBiometricsEnabled) {
@@ -117,7 +117,7 @@ internal fun PasscodeSettingsView(
             }
 
             if (showBiometricPrompt) {
-                val message = stringResource(id = R.string.confirmation_fingerprint_enabled)
+                val message = stringResource(id = R.string.confirmation_biometric_enabled)
                 authenticateBiometrics(
                     {
                         coroutineScope.launch {

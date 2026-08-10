@@ -1,0 +1,391 @@
+package mega.privacy.android.core.passcode.presentation.view
+
+import android.content.Context
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.setText
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.button.MegaOutlinedButton
+import mega.android.core.ui.components.button.TextOnlyButton
+import mega.android.core.ui.components.inputfields.PasswordTextInputField
+import mega.android.core.ui.components.surface.BoxSurface
+import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.passcode.components.PasscodeField
+import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
+import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
+import mega.privacy.android.core.passcode.presentation.model.PasscodeUnlockState
+import mega.privacy.android.shared.resources.R
+import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
+import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
+import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
+import mega.privacy.mobile.analytics.event.PasscodeLogoutButtonPressedEvent
+import mega.privacy.mobile.analytics.event.PasscodeUnlockDialogEvent
+import timber.log.Timber
+
+/**
+ * Passcode dialog
+ *
+ * @param passcodeUnlockViewModel
+ * @param logoutConfirmationDialog
+ * @param biometricAuthIsAvailable
+ * @param showBiometricAuth
+ */
+@Composable
+fun PasscodeView(
+    passcodeUnlockViewModel: PasscodeUnlockViewModel = hiltViewModel(),
+    logoutConfirmationDialog: @Composable (onDismissed: () -> Unit) -> Unit = {},
+    biometricAuthIsAvailable: (Context) -> Boolean = ::areBiometricsEnabled,
+    showBiometricAuth: (
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        onFail: () -> Unit,
+        context: Context,
+        promptInfo: BiometricPrompt.PromptInfo,
+    ) -> Unit = ::biometricAuthPrompt,
+) {
+    LaunchedEffect(Unit) {
+        Timber.d("Passcode main UI composed")
+    }
+
+    val uiState by passcodeUnlockViewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState) {
+        Timber.d("Passcode state changed: $uiState")
+    }
+
+    val activity = LocalActivity.current
+    BackHandler {
+        activity?.moveTaskToBack(true)
+    }
+
+    MegaScaffold(
+        modifier = Modifier
+            .fillMaxSize()
+    ) { paddingValues ->
+        when (val currentState = uiState) {
+            is PasscodeUnlockState.Loading -> {}
+            is PasscodeUnlockState.Data -> {
+                val context = LocalContext.current
+                var showBiometricPrompt: Boolean by remember(currentState.passcodeType) {
+                    mutableStateOf(
+                        biometricPreferenceIsEnabled(uiState) && biometricAuthIsAvailable(
+                            context
+                        )
+                    )
+                }
+
+                if (showBiometricPrompt) {
+                    Timber.d("Show biometrics UI composed")
+                    val title = stringResource(id = R.string.title_unlock_biometric)
+                    val negativeButton = stringResource(R.string.action_use_passcode)
+                    val promptInfo = remember {
+                        BiometricPrompt.PromptInfo.Builder()
+                            .setTitle(title)
+                            .setNegativeButtonText(negativeButton)
+                            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK)
+                            .build()
+                    }
+
+                    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                        Analytics.tracker.trackEvent(PasscodeBiometricUnlockDialogEvent)
+                        showBiometricAuth(
+                            passcodeUnlockViewModel::unlockWithBiometrics,
+                            { showBiometricPrompt = false },
+                            passcodeUnlockViewModel::onBiometricAuthFailed,
+                            context,
+                            promptInfo,
+                        )
+                    }
+
+                } else {
+                    LaunchedEffect(key1 = showBiometricPrompt) {
+                        Analytics.tracker.trackEvent(PasscodeUnlockDialogEvent)
+                    }
+                    PasscodeContent(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .imePadding(),
+                        onPasswordEntered = passcodeUnlockViewModel::unlockWithPassword,
+                        onPasscodeEntered = { passcode ->
+                            Analytics.tracker.trackEvent(PasscodeEnteredEvent)
+                            passcodeUnlockViewModel.unlockWithPasscode(passcode)
+                        },
+                        failedAttemptCount = currentState.failedAttempts,
+                        showLogoutWarning = currentState.logoutWarning,
+                        passcodeType = currentState.passcodeType,
+                        logoutConfirmationDialog = logoutConfirmationDialog,
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun biometricPreferenceIsEnabled(uiState: PasscodeUnlockState) =
+    (uiState as? PasscodeUnlockState.Data)?.passcodeType?.biometricEnabled == true
+
+@Composable
+private fun PasscodeContent(
+    onPasswordEntered: (String) -> Unit,
+    onPasscodeEntered: (String) -> Unit,
+    failedAttemptCount: Int,
+    showLogoutWarning: Boolean,
+    passcodeType: PasscodeUIType,
+    logoutConfirmationDialog: @Composable (onDismissed: () -> Unit) -> Unit,
+    modifier: Modifier = Modifier,
+    usePasswordField: Boolean = false,
+) {
+    Timber.d("Passcode content UI composed")
+    var logoutDialog by rememberSaveable { mutableStateOf(false) }
+    var usePassword by rememberSaveable { mutableStateOf(usePasswordField) }
+
+    BackHandler(usePassword) {
+        usePassword = false
+    }
+
+
+    Column(
+        modifier = modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(40.dp))
+        MegaText(
+            modifier = Modifier,
+            text = if (usePassword) {
+                stringResource(
+                    id = R.string.settings_passcode_enter_password_title
+                )
+            } else {
+                stringResource(
+                    id = R.string.unlock_pin_title
+                )
+            },
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge,
+            textColor = TextColor.Primary,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        if (usePassword) {
+            ShowPasswordField(onPasswordEntered)
+        } else {
+            if (passcodeType is PasscodeUIType.Alphanumeric) {
+                ShowPasswordField(onPasscodeEntered)
+            } else if (passcodeType is PasscodeUIType.Pin) {
+                PasscodeField(
+                    onComplete = onPasscodeEntered,
+                    modifier = Modifier
+                        .testTag(PASSCODE_FIELD_TAG)
+                        .semantics(
+                            mergeDescendants = true,
+                            properties = {
+                                setText {
+                                    onPasscodeEntered(it.text)
+                                    true
+                                }
+                            }
+                        ),
+                    numberOfCharacters = passcodeType.digits
+                )
+            }
+        }
+        if (failedAttemptCount > 0) {
+            Spacer(modifier = Modifier.height(20.dp))
+            FailedAttemptsView(
+                failedAttempts = failedAttemptCount,
+                modifier = Modifier.testTag(FAILED_ATTEMPTS_TAG)
+            )
+        }
+        if (showLogoutWarning) {
+            Spacer(modifier = Modifier.height(20.dp))
+            MegaText(
+                modifier = Modifier.padding(
+                    horizontal = 40.dp
+                ),
+                text = stringResource(id = R.string.pin_lock_alert),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge,
+                textColor = TextColor.Primary,
+            )
+        }
+        if (failedAttemptCount > 0 && !usePassword) {
+            Spacer(modifier = Modifier.height(20.dp))
+            MegaOutlinedButton(
+                onClick = {
+                    Analytics.tracker.trackEvent(PasscodeLogoutButtonPressedEvent)
+                    logoutDialog = true
+                },
+                text = stringResource(R.string.action_logout),
+                modifier = Modifier.testTag(LOGOUT_BUTTON_TAG),
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            TextOnlyButton(
+                onClick = {
+                    Analytics.tracker.trackEvent(ForgotPasscodeButtonPressedEvent)
+                    usePassword = true
+                },
+                text = stringResource(R.string.settings_passcode_forgot_passcode_button),
+                modifier = Modifier.testTag(FORGOT_PASSCODE_BUTTON_TAG),
+            )
+        }
+    }
+    if (logoutDialog) {
+        BoxSurface(
+            modifier = Modifier.fillMaxSize(),
+            surfaceColor = SurfaceColor.PageBackground
+        ) {}
+        logoutConfirmationDialog { logoutDialog = false }
+    }
+}
+
+@Composable
+private fun ShowPasswordField(onPasswordEntered: (String) -> Unit) {
+    var password by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(key1 = Unit) {
+        focusRequester.requestFocus()
+    }
+    PasswordTextInputField(
+        modifier = Modifier
+            .fillMaxWidth(0.5f)
+            .testTag(PASSWORD_FIELD_TAG)
+            .focusRequester(focusRequester),
+        onValueChanged = { password = it },
+        text = password,
+        imeAction = ImeAction.Done,
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onPasswordEntered(password)
+            }
+        ),
+        label = null,
+    )
+}
+
+@Composable
+private fun FailedAttemptsView(
+    failedAttempts: Int,
+    modifier: Modifier = Modifier,
+) {
+    MegaText(
+        modifier = modifier
+            .background(
+                color = Color.Red,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        text = pluralStringResource(
+            id = R.plurals.passcode_lock_alert_attempts,
+            count = failedAttempts,
+            failedAttempts,
+        ),
+        textAlign = TextAlign.Center,
+        style = AppTheme.typography.bodyLarge,
+        textColor = TextColor.InverseAccent,
+    )
+}
+
+private fun areBiometricsEnabled(context: Context) = BiometricManager.from(context).canAuthenticate(
+    BiometricManager.Authenticators.BIOMETRIC_WEAK
+) == BiometricManager.BIOMETRIC_SUCCESS
+
+internal const val PASSCODE_FIELD_TAG = "passcode_dialog:passcode_field"
+internal const val PASSWORD_FIELD_TAG = "passcode_dialog:password_text_field"
+internal const val FAILED_ATTEMPTS_TAG = "passcode_dialog:text_field:failed_attempts"
+internal const val LOGOUT_BUTTON_TAG = "passcode_dialog:button:log_out"
+internal const val FORGOT_PASSCODE_BUTTON_TAG = "passcode_dialog:button:forgot_passcode"
+
+@CombinedThemePreviews
+@Composable
+private fun PasscodeDialogPreview(
+    @PreviewParameter(PasscodeDialogParameterProvider::class) previewParameters: PreviewParameters,
+) {
+    AndroidThemeForPreviews {
+        PasscodeContent(
+            modifier = Modifier,
+            onPasscodeEntered = {},
+            onPasswordEntered = {},
+            failedAttemptCount = previewParameters.attempts,
+            showLogoutWarning = previewParameters.showWarning,
+            usePasswordField = previewParameters.usePassword,
+            passcodeType = previewParameters.passcodeType,
+            logoutConfirmationDialog = {},
+        )
+    }
+}
+
+private class PreviewParameters(
+    val attempts: Int = 0,
+    val showWarning: Boolean = false,
+    val usePassword: Boolean = false,
+    val passcodeType: PasscodeUIType = PasscodeUIType.Pin(false, 4),
+)
+
+private class PasscodeDialogParameterProvider : PreviewParameterProvider<PreviewParameters> {
+    override val values: Sequence<PreviewParameters>
+        get() = sequenceOf(
+            PreviewParameters(attempts = 3),
+            PreviewParameters(attempts = 6, showWarning = true),
+            PreviewParameters(usePassword = true),
+            PreviewParameters(attempts = 3, usePassword = true),
+            PreviewParameters(attempts = 6, showWarning = true, usePassword = true),
+            PreviewParameters(attempts = 3, passcodeType = PasscodeUIType.Alphanumeric(false)),
+            PreviewParameters(
+                attempts = 6,
+                showWarning = true,
+                passcodeType = PasscodeUIType.Alphanumeric(false)
+            ),
+            PreviewParameters(attempts = 3, passcodeType = PasscodeUIType.Pin(false, 6)),
+            PreviewParameters(
+                attempts = 6,
+                showWarning = true,
+                passcodeType = PasscodeUIType.Pin(false, 6)
+            ),
+        )
+}

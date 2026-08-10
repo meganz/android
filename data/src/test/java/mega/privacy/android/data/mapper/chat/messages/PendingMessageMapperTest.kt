@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -32,7 +33,8 @@ internal class PendingMessageMapperTest {
         nodeHandle = 6543L,
         fingerprint = "903456L",
         name = "sample pending message",
-        originalUriPath = "original/file/path"
+        originalUriPath = "original/file/path",
+        pitagTrigger = PitagTrigger.Picker,
     )
 
     @BeforeAll
@@ -58,7 +60,8 @@ internal class PendingMessageMapperTest {
             { assertThat(pendingMessage.nodeHandle).isEqualTo(pendingMessageEntity.nodeHandle) },
             { assertThat(pendingMessage.fingerprint).isEqualTo(pendingMessageEntity.fingerprint) },
             { assertThat(pendingMessage.name).isEqualTo(pendingMessageEntity.name) },
-            { assertThat(pendingMessage.originalUriPath).isEqualTo(UriPath(pendingMessageEntity.originalUriPath)) }
+            { assertThat(pendingMessage.originalUriPath).isEqualTo(UriPath(pendingMessageEntity.originalUriPath)) },
+            { assertThat(pendingMessage.pitagTrigger).isEqualTo(pendingMessageEntity.pitagTrigger) },
         )
     }
 

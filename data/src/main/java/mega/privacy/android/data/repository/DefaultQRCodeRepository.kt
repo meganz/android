@@ -47,7 +47,7 @@ internal class DefaultQRCodeRepository @Inject constructor(
                         continuation.resumeWith(Result.success(request to error))
                     }
                 )
-                megaApiGateway.getContactLink(handle, listener)
+                megaApiGateway.contactLinkQuery(handle, listener)
             }
 
             scannedContactLinkResultMapper(

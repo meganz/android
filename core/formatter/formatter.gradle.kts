@@ -8,8 +8,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":resources:string-resources"))
+    implementation(project(":domain"))
     //test
-    implementation(project(":shared:resources"))
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     testImplementation(platform(testlib.junit5.bom))

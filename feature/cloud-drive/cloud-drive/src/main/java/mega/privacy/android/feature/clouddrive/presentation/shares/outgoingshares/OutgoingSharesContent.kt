@@ -9,31 +9,27 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import mega.privacy.android.core.nodecomponents.list.NodesView
-import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
-import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
-import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
+import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesUiState
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.shared.nodes.components.NodeSkeletons
+import mega.privacy.android.shared.nodes.components.NodesView
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
+import mega.privacy.android.shared.resources.R as SharedR
 
 @Composable
 fun OutgoingSharesContent(
@@ -47,38 +43,26 @@ fun OutgoingSharesContent(
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
 ) {
-    var shouldShowSkeleton by remember { mutableStateOf(false) }
-    LaunchedEffect(uiState.isLoading) {
-        if (uiState.isLoading) {
-            delay(200L)
-            if (this.isActive) {
-                shouldShowSkeleton = true
-            }
-        } else {
-            shouldShowSkeleton = false
-        }
-    }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     Column(
         modifier = modifier
-            .padding(top = contentPadding.calculateTopPadding()),
+            .padding(contentPadding.excludingBottomPadding()),
     ) {
         when {
             uiState.isLoading -> {
-                if (shouldShowSkeleton) {
-                    NodesViewSkeleton(
-                        isListView = isListView,
-                        spanCount = spanCount,
-                        contentPadding = PaddingValues(top = 12.dp),
-                    )
-                }
+                NodesViewSkeleton(
+                    isListView = isListView,
+                    spanCount = spanCount,
+                    contentPadding = PaddingValues(top = 12.dp),
+                    delay = NodeSkeletons.defaultDelay,
+                )
             }
 
             uiState.isEmpty -> {
-                MegaEmptyView(
+                EmptyStateView(
                     imagePainter = painterResource(iconPackR.drawable.ic_folder_arrow_down_glass),
-                    text = stringResource(R.string.context_empty_outgoing)
+                    title = stringResource(SharedR.string.shares_screen_outgoing_empty)
                 )
             }
 
@@ -88,7 +72,7 @@ fun OutgoingSharesContent(
                     .weight(1f),
                 listContentPadding = PaddingValues(
                     top = 12.dp,
-                    bottom = contentPadding.calculateBottomPadding() + 100.dp
+                    bottom = contentPadding.calculateSafeBottomPadding(),
                 ),
                 listState = listState,
                 gridState = gridState,

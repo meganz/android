@@ -9,9 +9,8 @@ import android.graphics.Typeface;
 import androidx.annotation.ColorRes;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.core.content.ContextCompat;
-import java.util.Objects;
 
-import mega.privacy.android.app.utils.TextUtil;
+import java.util.Objects;
 
 public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
 
@@ -56,7 +55,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
 
         final Rect bounds = getBounds();
 
-        if (TextUtil.isTextEmpty(text)) {
+        if (text == null || text.trim().isEmpty()) {
             return;
         }
 

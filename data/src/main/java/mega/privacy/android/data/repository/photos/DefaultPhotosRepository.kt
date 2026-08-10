@@ -3,60 +3,73 @@ package mega.privacy.android.data.repository.photos
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.decodeBase64
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
-import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getRequestListener
-import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.extensions.getValueFor
 import mega.privacy.android.data.extensions.toException
-import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
+import mega.privacy.android.data.gateway.preferences.MediaTimelinePreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.ImageMapper
+import mega.privacy.android.data.mapper.PhotoMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
+import mega.privacy.android.data.mapper.node.MegaNodeFromChatMessageMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
+import mega.privacy.android.data.mapper.node.TypedFileNodeToImageNodeMapper
+import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
+import mega.privacy.android.data.mapper.photos.MediaTimelineFilterMapper
+import mega.privacy.android.data.mapper.photos.MediaTimelineListFilterMapper
+import mega.privacy.android.data.mapper.photos.MediaTimelineSectionMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesRetriever
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.search.MegaSearchPageMapper
 import mega.privacy.android.data.repository.CancelTokenProvider
-import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.media.MediaTimelineFilter
+import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -65,11 +78,14 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
+import mega.privacy.android.domain.extension.getNodeMappingStrategy
 import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -99,11 +115,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val cacheGateway: CacheGateway,
     private val fileGateway: FileGateway,
-    private val dateUtilFacade: DateUtilWrapper,
-    private val imageMapper: ImageMapper,
-    private val videoMapper: VideoMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val imageNodeFileMapper: ImageNodeFileMapper,
     private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper,
@@ -111,6 +123,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val sensitivesMapper: MegaStringMapSensitivesMapper,
     private val sensitivesRetriever: MegaStringMapSensitivesRetriever,
     private val imageNodeMapper: ImageNodeMapper,
+    private val megaNodeFromChatMessageMapper: MegaNodeFromChatMessageMapper,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val megaNodeMapper: MegaNodeMapper,
@@ -119,19 +132,24 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val cancelTokenProvider: CancelTokenProvider,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val uiPreferencesGateway: UIPreferencesGateway,
+    private val mediaTimelinePreferencesGateway: MediaTimelinePreferencesGateway,
+    private val photoMapper: PhotoMapper,
+    private val typedNodeMapper: TypedNodeMapper,
+    private val typedFileNodeToImageNodeMapper: TypedFileNodeToImageNodeMapper,
+    private val mediaTimelineSectionMapper: MediaTimelineSectionMapper,
+    private val mediaTimelineFilterMapper: MediaTimelineFilterMapper,
+    private val mediaTimelineListFilterMapper: MediaTimelineListFilterMapper,
 ) : PhotosRepository {
     @Volatile
     private var isInitialized: Boolean = false
+
+    private val monitorPhotosMutex = Mutex()
 
     private var page = 0L
 
     private val paginatedPhotosCache: LinkedHashMap<NodeId, Photo> = LinkedHashMap()
 
     private val paginatedPhotosFlow: MutableStateFlow<List<Photo>?> = MutableStateFlow(null)
-
-    private var thumbnailFolderPath: String? = null
-
-    private var previewFolderPath: String? = null
 
     private val photosFlow: MutableStateFlow<List<Photo>?> = MutableStateFlow(null)
 
@@ -155,11 +173,6 @@ internal class DefaultPhotosRepository @Inject constructor(
     private var monitorNodeUpdatesJob: Job? = null
 
     private var monitorOfflineNodeJob: Job? = null
-
-    private val constraints: List<suspend (Node) -> Boolean> = listOf(
-        ::checkMediaNode,
-        ::checkCloudDriveNode,
-    )
 
     init {
         appScope.launch {
@@ -199,7 +212,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                         filter = getCategoryFilter(SearchCategory.IMAGES),
                         token = cancelTokenProvider.getOrCreateCancelToken(),
                         megaSearchPage = searchPage
-                    ).mapAsync { mapMegaNodeToImage(it) }
+                    ).mapAsync { mapMegaNodeToPhotoItem(it) }
                 },
                 async {
                     getNodeByCategorySearch(
@@ -207,9 +220,10 @@ internal class DefaultPhotosRepository @Inject constructor(
                         filter = getCategoryFilter(SearchCategory.VIDEO),
                         token = cancelTokenProvider.getOrCreateCancelToken(),
                         megaSearchPage = searchPage
-                    ).mapAsync { mapMegaNodeToVideo(it) }
+                    ).mapAsync { mapMegaNodeToPhotoItem(it) }
                 }
             ).flatten()
+                .filterNotNull()
                 .filterNot { NodeId(it.id) in paginatedPhotosCache.keys }
                 .sortedByDescending { it.modificationTime }
                 .forEach { photo ->
@@ -238,10 +252,128 @@ internal class DefaultPhotosRepository @Inject constructor(
             .onStart { Timber.d("DefaultPhotosRepository::monitorPaginatedPhotos") }
             .flowOn(ioDispatcher)
 
+    override suspend fun getMediaTypedNodes(): List<TypedNode> = withContext(ioDispatcher) {
+        val nodes = getMegaNodeByCategory(searchCategory = SearchCategory.ALL_MEDIA)
+        nodes.mapNotNull { node ->
+            if (!node.isFile) return@mapNotNull null
+            if (megaApiFacade.isInRubbish(node)) return@mapNotNull null
+
+            typedNodeMapper(
+                megaNode = node,
+                folderTypeData = null,
+                offline = offlineNodesCache[node.handle.toString()]
+            )
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    override val monitorMediaTypedNodes: Flow<List<TypedNode>> = flow {
+        val initialNodes = getMediaTypedNodes()
+        val currentNodes = LinkedHashMap<NodeId, TypedNode>(initialNodes.size)
+        initialNodes.forEach { currentNodes[it.id] = it }
+        emit(currentNodes.values.toList())
+
+        nodeRepository.monitorNodeUpdates()
+            .debounce(300L)
+            .conflate()
+            .collect { nodeUpdate ->
+                var changed = false
+                nodeUpdate.changes.forEach { (node, _) ->
+                    if (node !is FileNode ||
+                        nodeRepository.isNodeInRubbishBin(node.id) ||
+                        !checkMediaNode(node) ||
+                        !checkCloudDriveNode(node)
+                    ) {
+                        if (currentNodes.remove(node.id) != null) {
+                            changed = true
+                        }
+                        return@forEach
+                    }
+
+                    val megaNode = getMegaNode(node.id) ?: run {
+                        if (currentNodes.remove(node.id) != null) changed = true
+                        return@forEach
+                    }
+
+                    val mapped = typedNodeMapper(
+                        megaNode = megaNode,
+                        folderTypeData = null,
+                        offline = offlineNodesCache[megaNode.handle.toString()]
+                    ) ?: return@forEach
+                    val existing = currentNodes[node.id]
+                    if (existing != mapped) {
+                        currentNodes[node.id] = mapped
+                        changed = true
+                    }
+                }
+
+                if (changed) {
+                    emit(currentNodes.values.toList())
+                }
+            }
+    }
+        .flowOn(ioDispatcher)
+        .shareIn(
+            scope = appScope,
+            // Keep the media nodes warm briefly after the grid stops collecting, so
+            // opening the image viewer (a separate Activity) reuses the cached list via
+            // replay instead of re-running a full-account media search.
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = MEDIA_TYPED_NODES_KEEP_ALIVE_MS),
+            replay = 1
+        )
+
+    override suspend fun getMediaTimelineSections(
+        filter: MediaTimelineFilter,
+        order: SortOrder,
+    ) = withContext(ioDispatcher) {
+        val sections = megaApiFacade
+            .groupAllNodesByDate(
+                mediaTimelineFilterMapper(filter),
+                sortOrderIntMapper(order),
+                MegaCancelToken.createInstance()
+            ) ?: return@withContext emptyList()
+
+
+        mediaTimelineSectionMapper(sections)
+    }
+
+    override suspend fun listMediaNodesByPage(
+        filter: MediaTimelineFilter,
+        section: MediaTimelineSection,
+        order: SortOrder,
+        maxElements: Int,
+        offset: Long,
+    ): List<TypedFileNode> = withContext(ioDispatcher) {
+        // Scope the query to this section's date range so pagination stays within the section.
+        val sdkFilter = mediaTimelineListFilterMapper(filter).also {
+            it.byTimestampAnchor(section.startDate, section.endDate, sortOrderIntMapper(order))
+        }
+        val nodeList = megaApiFacade.listAllNodesByPageAtOffset(
+            filter = sdkFilter,
+            order = sortOrderIntMapper(order),
+            cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+            maxElements = maxElements,
+            offset = offset,
+        ) ?: return@withContext emptyList()
+
+        megaApiFacade.getNodesFromMegaNodeList(nodeList)
+            .mapNotNull { node ->
+                typedNodeMapper(
+                    megaNode = node,
+                    folderTypeData = null,
+                    offline = offlineNodesCache[node.handle.toString()],
+                )
+            }
+            .filterIsInstance<TypedFileNode>()
+    }
+
+    @Deprecated("Please consider using monitorMediaTypedNodes")
     override fun monitorPhotos(): Flow<List<Photo>> {
         Timber.d("DefaultPhotosRepository::monitorPhotos")
         initialize()
-        return photosFlow.filterNotNull()
+        return photosFlow
+            .filterNotNull()
+            .distinctUntilChanged()
     }
 
     private fun initialize() {
@@ -269,27 +401,35 @@ internal class DefaultPhotosRepository @Inject constructor(
     private fun populateNodes() {
         populateNodesJob?.cancel()
         populateNodesJob = appScope.launch {
-            val (imageNodes, videoNodes) = fetchNodes()
-
-            updatePhotos(imageNodes, videoNodes)
-            updateImageNodes(imageNodes, videoNodes)
+            monitorPhotosMutex.withLock {
+                val mediaNodes = fetchMedia()
+                updatePhotos(mediaNodes)
+                launch { updateImageNodes(mediaNodes) }
+            }
         }
     }
 
-    private suspend fun fetchNodes(): List<List<MegaNode>> = withContext(ioDispatcher) {
-        awaitAll(
-            async { fetchImageNodes() },
-            async { fetchVideoNodes() },
-        )
-    }
+    private suspend fun fetchMedia(): List<MegaNode> =
+        withContext(ioDispatcher) {
+            val nodes = getMegaNodeByCategory(searchCategory = SearchCategory.ALL_MEDIA)
+            nodes.mapNotNull { node ->
+                if (!node.isFile) return@mapNotNull null
 
-    private suspend fun fetchImageNodes(): List<MegaNode> = withContext(ioDispatcher) {
-        getMegaNodeByCategory(searchCategory = SearchCategory.IMAGES).filter { isImageNodeValid(it) }
-    }
+                val isNodeInRubbishBin = nodeRepository.isNodeInRubbishBin(NodeId(node.handle))
+                if (isNodeInRubbishBin) return@mapNotNull null
 
-    private suspend fun fetchVideoNodes(): List<MegaNode> = withContext(ioDispatcher) {
-        getMegaNodeByCategory(searchCategory = SearchCategory.VIDEO).filter { isVideoNodeValid(it) }
-    }
+                val fileType = fileTypeInfoMapper(
+                    fileName = node.name,
+                    duration = node.duration
+                )
+                if (
+                    (fileType is ImageFileTypeInfo && fileType !is SvgFileTypeInfo) ||
+                    fileType is VideoFileTypeInfo
+                ) {
+                    node
+                } else null
+            }
+        }
 
     private suspend fun isImageNodeValid(
         node: MegaNode,
@@ -313,110 +453,147 @@ internal class DefaultPhotosRepository @Inject constructor(
                 && (!nodeRepository.isNodeInRubbishBin(NodeId(node.handle)) || includeRubbishBin)
     }
 
-    private fun updatePhotos(
-        imageNodes: List<MegaNode>,
-        videoNodes: List<MegaNode>,
-    ) = appScope.launch {
-        val photos = awaitAll(
-            async { imageNodes.map { mapMegaNodeToImage(it) } },
-            async { videoNodes.map { mapMegaNodeToVideo(it) } },
-        ).flatten()
+    private suspend fun updatePhotos(mediaNodes: List<MegaNode>) {
+        withContext(ioDispatcher) {
+            val photos = mediaNodes.mapAsync(getNodeMappingStrategy(mediaNodes.size)) { node ->
+                mapMegaNodeToPhotoItem(megaNode = node)
+            }.filterNotNull()
 
-        withContext(photosDispatcher) {
-            photosCache.clear()
-            photosCache.putAll(photos.associateBy { NodeId(it.id) })
-
-            val newPhotos = photosCache.values.toList()
-            photosFlow.update { newPhotos }
+            withContext(photosDispatcher) {
+                photos.forEach { photosCache[NodeId(it.id)] = it }
+                photosFlow.value = photosCache.values.toList()
+            }
         }
     }
 
-    private fun updateImageNodes(
-        imageNodes: List<MegaNode>,
-        videoNodes: List<MegaNode>,
-    ) = appScope.launch {
-        val nodes = (imageNodes + videoNodes).map { node ->
-            imageNodeMapper(
-                megaNode = node,
-                requireSerializedData = true,
-                offline = offlineNodesCache[node.handle.toString()],
-                numVersion = megaApiFacade::getNumVersions
-            )
-        }
+    private suspend fun updateImageNodes(mediaNodes: List<MegaNode>) {
+        withContext(ioDispatcher) {
+            val nodes = mediaNodes.mapAsync(getNodeMappingStrategy(mediaNodes.size)) { node ->
+                imageNodeMapper(
+                    megaNode = node,
+                    requireSerializedData = true,
+                    offline = offlineNodesCache[node.handle.toString()],
+                    numVersion = megaApiFacade::getNumVersions
+                )
+            }
 
-        withContext(imageNodesDispatcher) {
-            imageNodesCache.clear()
-            imageNodesCache.putAll(nodes.associateBy { it.id })
-
-            val newNodes = imageNodesCache.values.toList()
-            imageNodesFlow.update { newNodes }
+            withContext(imageNodesDispatcher) {
+                nodes.forEach { imageNodesCache[it.id] = it }
+                imageNodesFlow.value = imageNodesCache.values.toList()
+            }
         }
     }
 
     private fun monitorNodeUpdates() {
         monitorNodeUpdatesJob?.cancel()
         monitorNodeUpdatesJob = nodeRepository.monitorNodeUpdates()
-            .onEach(::handleNodeUpdate)
+            .onEach {
+                monitorPhotosMutex.withLock {
+                    handleNodeUpdate(nodeUpdate = it)
+                }
+            }
             .launchIn(appScope)
     }
 
     private suspend fun handleNodeUpdate(nodeUpdate: NodeUpdate) {
+        val nodesToUpdate = mutableListOf<Node>()
+        val nodesToRemove = mutableListOf<NodeId>()
+        var shouldRefreshSensitiveContent = false
         for ((node, changes) in nodeUpdate.changes) {
             if (node is FolderNode && changes.contains(NodeChanges.Sensitive)) {
-                refreshSensitivePhotos()
-                refreshSensitiveImageNodes()
+                shouldRefreshSensitiveContent = true
             } else {
-                val isPotentialNode = constraints.all { it(node) }
-
-                refreshPhotos(node, isPotentialNode)
-                refreshImageNodes(node, isPotentialNode)
+                val isPotentialNode = checkMediaNode(node) && checkCloudDriveNode(node)
+                if (!isPotentialNode) {
+                    nodesToRemove += node.id
+                } else {
+                    nodesToUpdate += node
+                }
             }
         }
-
-        withContext(photosDispatcher) {
-            val newPhotos = photosCache.values.toList()
-            photosFlow.update { newPhotos }
-        }
-
-        withContext(imageNodesDispatcher) {
-            val newNodes = imageNodesCache.values.toList()
-            imageNodesFlow.update { newNodes }
+        handlePhotosUpdate(
+            nodesToUpdate = nodesToUpdate,
+            nodesToRemove = nodesToRemove,
+            shouldRefreshSensitiveContent = shouldRefreshSensitiveContent
+        )
+        handleImageNodesUpdate(
+            nodesToUpdate = nodesToUpdate,
+            nodesToRemove = nodesToRemove,
+            shouldRefreshSensitiveContent = shouldRefreshSensitiveContent
+        )
+        if (shouldRefreshSensitiveContent) {
+            refreshSensitivePhotos()
+            refreshSensitiveImageNodes()
         }
     }
 
-    private suspend fun refreshPhotos(
-        node: Node,
-        isPotentialNode: Boolean,
-    ) = withContext(photosDispatcher) {
-        if (!isPotentialNode) {
-            photosCache.remove(node.id)
-            return@withContext
-        }
+    private suspend fun handlePhotosUpdate(
+        nodesToUpdate: List<Node>,
+        nodesToRemove: List<NodeId>,
+        shouldRefreshSensitiveContent: Boolean,
+    ) {
+        var photosChanged = false
+        withContext(photosDispatcher) {
+            nodesToRemove.forEach {
+                photosChanged = photosCache.remove(it) != null || photosChanged
+            }
 
-        val photo = getMegaNode(nodeId = node.id)?.let { megaNode ->
-            if (isImageNodeValid(megaNode)) {
-                mapMegaNodeToImage(megaNode)
-            } else if (isVideoNodeValid(megaNode)) {
-                mapMegaNodeToVideo(megaNode)
-            } else {
-                null
+            nodesToUpdate.forEach { node ->
+                val photo = getMegaNode(nodeId = node.id)?.let { megaNode ->
+                    when {
+                        isImageNodeValid(megaNode) || isVideoNodeValid(megaNode) -> {
+                            mapMegaNodeToPhotoItem(megaNode)
+                        }
+
+                        else -> null
+                    }
+                }
+                if (photo == null) {
+                    photosChanged = photosCache.remove(node.id) != null || photosChanged
+                } else {
+                    photosCache[NodeId(photo.id)] = photo
+                    photosChanged = true
+                }
+            }
+
+            if (photosChanged && !shouldRefreshSensitiveContent) {
+                photosFlow.value = photosCache.values.toList()
             }
         }
+    }
 
-        if (photo == null) {
-            photosCache.remove(node.id)
-        } else {
-            photosCache[NodeId(photo.id)] = photo
+    private suspend fun handleImageNodesUpdate(
+        nodesToUpdate: List<Node>,
+        nodesToRemove: List<NodeId>,
+        shouldRefreshSensitiveContent: Boolean,
+    ) {
+        var imageNodesChanged = false
+        withContext(imageNodesDispatcher) {
+            nodesToRemove.forEach {
+                imageNodesChanged = imageNodesCache.remove(it) != null || imageNodesChanged
+            }
+
+            nodesToUpdate.forEach { node ->
+                val imageNode = fetchImageNode(nodeId = node.id)
+                if (imageNode == null) {
+                    imageNodesChanged = imageNodesCache.remove(node.id) != null || imageNodesChanged
+                } else {
+                    imageNodesCache[imageNode.id] = imageNode
+                    imageNodesChanged = true
+                }
+            }
+
+            if (imageNodesChanged && !shouldRefreshSensitiveContent) {
+                imageNodesFlow.value = imageNodesCache.values.toList()
+            }
         }
     }
 
     private suspend fun refreshSensitivePhotos() = withContext(photosDispatcher) {
         val photos = photosCache.mapNotNull { (nodeId, _) ->
             getMegaNode(nodeId)?.let { megaNode ->
-                if (isImageNodeValid(megaNode)) {
-                    mapMegaNodeToImage(megaNode)
-                } else if (isVideoNodeValid(megaNode)) {
-                    mapMegaNodeToVideo(megaNode)
+                if (isImageNodeValid(megaNode) || isVideoNodeValid(megaNode)) {
+                    mapMegaNodeToPhotoItem(megaNode)
                 } else {
                     null
                 }
@@ -425,23 +602,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
         photosCache.clear()
         photosCache.putAll(photos.associateBy { NodeId(it.id) })
-    }
-
-    private suspend fun refreshImageNodes(
-        node: Node,
-        isPotentialNode: Boolean,
-    ) = withContext(imageNodesDispatcher) {
-        if (!isPotentialNode) {
-            imageNodesCache.remove(node.id)
-            return@withContext
-        }
-
-        val imageNode = fetchImageNode(nodeId = node.id)
-        if (imageNode == null) {
-            imageNodesCache.remove(node.id)
-        } else {
-            imageNodesCache[imageNode.id] = imageNode
-        }
+        photosFlow.value = photosCache.values.toList()
     }
 
     private suspend fun refreshSensitiveImageNodes() = withContext(imageNodesDispatcher) {
@@ -451,12 +612,26 @@ internal class DefaultPhotosRepository @Inject constructor(
 
         imageNodesCache.clear()
         imageNodesCache.putAll(imageNodes.associateBy { it.id })
+        imageNodesFlow.value = imageNodesCache.values.toList()
     }
 
-    override fun monitorImageNodes(): Flow<List<ImageNode>> = imageNodesFlow
-        .filterNotNull()
+    override fun monitorImageNodes(): Flow<List<ImageNode>> {
+        return imageNodesFlow
+            .filterNotNull()
+            .map { nodes -> nodes.distinctBy { it.id } }
+            .onStart { initialize() }
+    }
 
-    private suspend fun checkMediaNode(node: Node): Boolean {
+    override fun monitorTimelineImageNodes(): Flow<List<ImageNode>> =
+        monitorMediaTypedNodes
+            .map { nodes ->
+                nodes.filterIsInstance<TypedFileNode>()
+                    .filter(::checkMediaNode)
+                    .map(typedFileNodeToImageNodeMapper::invoke)
+            }
+            .flowOn(ioDispatcher)
+
+    private fun checkMediaNode(node: Node): Boolean {
         return node is FileNode && (node.type is ImageFileTypeInfo || node.type is VideoFileTypeInfo)
     }
 
@@ -501,10 +676,8 @@ internal class DefaultPhotosRepository @Inject constructor(
 
             else -> withContext(ioDispatcher) {
                 getMegaNode(nodeId)?.let { megaNode ->
-                    if (isImageNodeValid(megaNode)) {
-                        mapMegaNodeToImage(megaNode, albumPhotoId?.id)
-                    } else if (isVideoNodeValid(megaNode)) {
-                        mapMegaNodeToVideo(megaNode, albumPhotoId?.id)
+                    if (isImageNodeValid(megaNode) || isVideoNodeValid(megaNode)) {
+                        mapMegaNodeToPhotoItem(megaNode, albumPhotoId?.id)
                     } else {
                         null
                     }
@@ -613,11 +786,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                 || (fileType is ImageFileTypeInfo && checkSvg(filterSvg, fileType))
                 && !megaApiFacade.isInRubbish(megaNode))
         if (isValid.not()) return null
-        return if (fileType is ImageFileTypeInfo) {
-            mapMegaNodeToImage(megaNode)
-        } else {
-            mapMegaNodeToVideo(megaNode)
-        }
+        return mapMegaNodeToPhotoItem(megaNode)
     }
 
     private fun checkSvg(filterSvg: Boolean, fileType: ImageFileTypeInfo): Boolean {
@@ -642,7 +811,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                         megaNode.duration
                     ) !is SvgFileTypeInfo && megaNode.isValidPhotoNode())
                         .takeIf { it }
-                        ?.let { mapMegaNodeToImage(megaNode) }
+                        ?.let { mapMegaNodeToPhotoItem(megaNode) }
                 }.getOrNull()
             }
         }
@@ -661,7 +830,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                         megaNode.duration
                     ) is VideoFileTypeInfo && megaNode.isValidPhotoNode())
                         .takeIf { it }
-                        ?.let { mapMegaNodeToVideo(megaNode) }
+                        ?.let { mapMegaNodeToPhotoItem(megaNode) }
                 }.getOrNull()
             }
         }
@@ -673,72 +842,26 @@ internal class DefaultPhotosRepository @Inject constructor(
         !nodeRepository.isNodeInRubbishBin(NodeId(handle))
 
     /**
-     * Convert the MegaNode to Image
+     * Convert the MegaNode to Photo
      * @param megaNode MegaNode
      * @return Photo / Image
      */
-    private suspend fun mapMegaNodeToImage(megaNode: MegaNode, albumPhotoId: Long? = null) =
-        imageMapper(
-            megaNode.handle,
-            albumPhotoId,
-            megaNode.parentHandle,
-            megaNode.name,
-            megaNode.isFavourite,
-            dateUtilFacade.fromEpoch(megaNode.creationTime),
-            dateUtilFacade.fromEpoch(megaNode.modificationTime),
-            getThumbnailCacheFilePath(megaNode),
-            getPreviewCacheFilePath(megaNode),
-            fileTypeInfoMapper(megaNode.name, megaNode.duration),
-            megaNode.size,
-            megaNode.isTakenDown,
-            megaNode.isMarkedSensitive,
-            megaApiFacade.isSensitiveInherited(megaNode),
-            megaNode.base64Handle
-        )
-
-    /**
-     * Convert the MegaNode to Video
-     * @param megaNode MegaNode
-     * @return Photo / Video
-     */
-    private suspend fun mapMegaNodeToVideo(megaNode: MegaNode, albumPhotoId: Long? = null) =
-        videoMapper(
-            megaNode.handle,
-            albumPhotoId,
-            megaNode.parentHandle,
-            megaNode.name,
-            megaNode.isFavourite,
-            dateUtilFacade.fromEpoch(megaNode.creationTime),
-            dateUtilFacade.fromEpoch(megaNode.modificationTime),
-            getThumbnailCacheFilePath(megaNode),
-            getPreviewCacheFilePath(megaNode),
-            fileTypeInfoMapper(megaNode.name, megaNode.duration),
-            megaNode.size,
-            megaNode.isTakenDown,
-            megaNode.isMarkedSensitive,
-            megaApiFacade.isSensitiveInherited(megaNode),
-            megaNode.base64Handle
-        )
-
-    private suspend fun getThumbnailCacheFilePath(megaNode: MegaNode): String? {
-        if (thumbnailFolderPath == null) {
-            thumbnailFolderPath =
-                cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
-        }
-        return thumbnailFolderPath?.let {
-            "$it${File.separator}${megaNode.getThumbnailFileName()}"
-        }
-    }
-
-    private suspend fun getPreviewCacheFilePath(megaNode: MegaNode): String? {
-        if (previewFolderPath == null) {
-            previewFolderPath =
-                cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.path
-        }
-        return previewFolderPath?.let {
-            "$it${File.separator}${megaNode.getPreviewFileName()}"
-        }
-    }
+    private suspend fun mapMegaNodeToPhotoItem(
+        megaNode: MegaNode,
+        albumPhotoId: Long? = null,
+        requireSerializedData: Boolean = false,
+    ) = photoMapper(
+        node = megaNode,
+        albumPhotoId = albumPhotoId?.let {
+            AlbumPhotoId(
+                id = it,
+                nodeId = NodeId(longValue = megaNode.handle),
+                albumId = AlbumId(-1)
+            )
+        },
+        requireSerializedData = requireSerializedData,
+        isAvailableOffline = offlineNodesCache[megaNode.handle.toString()] != null
+    )
 
     override suspend fun getPhotosByIds(ids: List<NodeId>): List<Photo> =
         withContext(ioDispatcher) {
@@ -758,19 +881,10 @@ internal class DefaultPhotosRepository @Inject constructor(
         messageId: Long,
     ): Photo? =
         withContext(ioDispatcher) {
-            getChatNode(chatId, messageId)?.let { mapMegaNodeToPhoto(it, filterSvg = false) }
+            megaNodeFromChatMessageMapper(chatId, messageId, 0)?.let {
+                mapMegaNodeToPhoto(it, filterSvg = false)
+            }
         }
-
-    private fun getChatNode(chatId: Long, messageId: Long): MegaNode? {
-        val chatRoom = megaChatApiGateway.getChatRoom(chatId)
-        val chatMessage = megaChatApiGateway.getMessage(chatId, messageId)
-            ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId)
-        var node = chatMessage?.megaNodeList?.get(0)
-        if (chatRoom?.isPreview == true && node != null) {
-            node = megaApiFacade.authorizeChatNode(node, chatRoom.authorizationToken)
-        }
-        return node
-    }
 
     override suspend fun getPhotoByPublicLink(link: String): Photo? =
         withContext(ioDispatcher) {
@@ -780,7 +894,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun getTimelineFilterPreferences(): Map<String, String?>? =
         withContext(ioDispatcher) {
-            getContentConsumptionPreferences()?.let { allPreferences ->
+            getContentConsumptionPreferences(methodName = "getTimelineFilterPreferences")?.let { allPreferences ->
                 val allCurrentPreferences = allPreferences.getValueFor(
                     TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION.value
                 )?.decodeBase64()
@@ -790,7 +904,8 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun setTimelineFilterPreferences(preferences: Map<String, String>): String? =
         withContext(ioDispatcher) {
-            val latestPreferencesStringMap = getContentConsumptionPreferences()
+            val latestPreferencesStringMap =
+                getContentConsumptionPreferences(methodName = "setTimelineFilterPreferences")
             val valueToPut = contentConsumptionMegaStringMapMapper(
                 latestPreferencesStringMap,
                 preferences,
@@ -812,34 +927,35 @@ internal class DefaultPhotosRepository @Inject constructor(
             }
         }
 
-    private suspend fun getContentConsumptionPreferences() = withContext(ioDispatcher) {
-        val request = suspendCancellableCoroutine { continuation ->
-            val listener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    when (error.errorCode) {
-                        MegaError.API_OK -> {
-                            continuation.resumeWith(Result.success(request))
-                        }
+    private suspend fun getContentConsumptionPreferences(methodName: String) =
+        withContext(ioDispatcher) {
+            val request = suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        when (error.errorCode) {
+                            MegaError.API_OK -> {
+                                continuation.resumeWith(Result.success(request))
+                            }
 
-                        MegaError.API_ENOENT -> {
-                            continuation.resumeWith(Result.success(null))
-                        }
+                            MegaError.API_ENOENT -> {
+                                continuation.resumeWith(Result.success(null))
+                            }
 
-                        else -> {
-                            continuation.failWithError(error, "getTimelineFilterPreferences")
+                            else -> {
+                                continuation.failWithError(error, methodName)
+                            }
                         }
                     }
-                }
-            )
-            megaApiFacade.getUserAttribute(
-                MegaApiJava.USER_ATTR_CC_PREFS,
-                listener
-            )
+                )
+                megaApiFacade.getUserAttribute(
+                    MegaApiJava.USER_ATTR_CC_PREFS,
+                    listener
+                )
+            }
+            request?.let {
+                request.megaStringMap
+            }
         }
-        request?.let {
-            request.megaStringMap
-        }
-    }
 
     private suspend fun getPublicNode(nodeFileLink: String): MegaNode? =
         suspendCancellableCoroutine { continuation ->
@@ -1002,13 +1118,16 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun getImageNodeFromChatMessage(chatId: Long, messageId: Long): ImageNode? =
         withContext(ioDispatcher) {
-            getChatNode(chatId, messageId)?.let { megaNode ->
+            megaNodeFromChatMessageMapper(chatId, messageId)?.let { megaNode ->
                 if (isImageNodeValid(megaNode) || isVideoNodeValid(megaNode)) {
                     imageNodeMapper(
                         megaNode = megaNode,
                         requireSerializedData = true,
                         offline = offlineNodesCache[megaNode.handle.toString()],
-                        numVersion = megaApiFacade::getNumVersions
+                        numVersion = megaApiFacade::getNumVersions,
+                        // If image is from chat message, should use chatId+messageId instead of megaNode
+                        chatId = chatId,
+                        messageId = messageId
                     )
                 } else {
                     null
@@ -1023,7 +1142,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun isHiddenNodesOnboarded(): Boolean = withContext(ioDispatcher) {
         try {
-            val prefs = getContentConsumptionPreferences()
+            val prefs = getContentConsumptionPreferences(methodName = "isHiddenNodesOnboarded")
             sensitivesRetriever(prefs)
         } catch (e: Throwable) {
             Timber.e(e)
@@ -1033,7 +1152,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun setHiddenNodesOnboarded() = withContext(ioDispatcher) {
         val newPrefs = sensitivesMapper(
-            prefs = getContentConsumptionPreferences(),
+            prefs = getContentConsumptionPreferences(methodName = "setHiddenNodesOnboarded"),
             data = mapOf(TimelinePreferencesJSON.JSON_SENSITIVES_ONBOARDED.value to true),
         )
 
@@ -1068,6 +1187,17 @@ internal class DefaultPhotosRepository @Inject constructor(
                 .emit(imageResult.copy())
 
             if (imageResult.isFullyLoaded) {
+                imageResultCache.remove(nodeId)
+            }
+        } catch (e: Throwable) {
+            Timber.e(e)
+        }
+    }
+
+    override suspend fun clearImageResult(nodeId: NodeId) {
+        try {
+            val entry = imageResultCache[nodeId]
+            if (entry != null && !entry.value.isFullyLoaded) {
                 imageResultCache.remove(nodeId)
             }
         } catch (e: Throwable) {
@@ -1116,7 +1246,35 @@ internal class DefaultPhotosRepository @Inject constructor(
         appScope.launch { uiPreferencesGateway.setPhotosRecentQueries(listOf()) }
     }
 
+    override val cameraUploadShownFlow: Flow<Boolean> = mediaTimelinePreferencesGateway
+        .cameraUploadShownFlow
+        .flowOn(ioDispatcher)
+
+    override suspend fun setCameraUploadShown() {
+        withContext(ioDispatcher) {
+            mediaTimelinePreferencesGateway.setCameraUploadShown()
+        }
+    }
+
+    override val enableCameraUploadBannerDismissedTimestamp: Flow<Long?> =
+        mediaTimelinePreferencesGateway
+            .enableCameraUploadBannerDismissedTimestamp
+            .flowOn(ioDispatcher)
+
+    override suspend fun setEnableCameraUploadBannerDismissedTimestamp() {
+        withContext(ioDispatcher) {
+            mediaTimelinePreferencesGateway.setEnableCameraUploadBannerDismissedTimestamp()
+        }
+    }
+
+    override suspend fun resetEnableCameraUploadBannerDismissedTimestamp() {
+        withContext(ioDispatcher) {
+            mediaTimelinePreferencesGateway.resetEnableCameraUploadBannerDismissedTimestamp()
+        }
+    }
+
     companion object {
         private const val PHOTOS_FETCH_LIMIT = 500L
+        private const val MEDIA_TYPED_NODES_KEEP_ALIVE_MS = 5_000L
     }
 }

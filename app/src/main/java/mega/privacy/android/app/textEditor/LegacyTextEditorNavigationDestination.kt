@@ -1,0 +1,380 @@
+package mega.privacy.android.app.textEditor
+
+import android.content.Intent
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.FileProvider
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.flow.drop
+import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
+import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
+import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogResult
+import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
+import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.LeaveShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareDropdownMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
+import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.entity.texteditor.textEditorModeFromValue
+import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel
+import mega.privacy.android.feature.texteditor.presentation.TextEditorScreen
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
+import nz.mega.sdk.MegaApiJava
+import java.io.File
+
+/**
+ * Returns true when the node options bottom sheet result indicates the editor should close
+ * immediately because the node may no longer be valid (moved, link removed, share removed).
+ * Non-destructive actions (share, label, download, etc.) keep the editor open.
+ *
+ * Move-to-Rubbish and Delete-Permanently route through a confirmation dialog and are NOT
+ * closed here — the editor closes when the dialog publishes
+ * [MoveToRubbishOrDeleteDialogArgs.RESULT] (see the monitor in [TextEditorComposeContent]).
+ */
+internal fun shouldCloseTextEditorOnNodeOptionsResult(
+    result: NodeOptionsBottomSheetResult?,
+): Boolean = when (result?.action) {
+    is RemoveMenuAction,
+    is MoveMenuAction,
+    is LeaveShareMenuAction,
+    is RemoveShareMenuAction,
+    is RemoveShareDropdownMenuAction -> true
+    else -> false
+}
+
+/** True when adapter is rubbish bin, offline, folder link, zip, file link, chat, or versions (hides Get Link and Edit). */
+private fun inExcludedAdapterForGetLinkAndEdit(nodeSourceType: Int?): Boolean {
+    if (nodeSourceType == null) return false
+    return nodeSourceType in setOf(
+        RUBBISH_BIN_ADAPTER,
+        OFFLINE_ADAPTER,
+        FOLDER_LINK_ADAPTER,
+        ZIP_ADAPTER,
+        FILE_LINK_ADAPTER,
+        FROM_CHAT,
+        VERSIONS_ADAPTER,
+    )
+}
+
+/** True when Download should be shown for this source type (not offline, not rubbish bin). */
+private fun shouldShowDownload(nodeSourceType: Int?): Boolean {
+    if (nodeSourceType == null) return true
+    return nodeSourceType != OFFLINE_ADAPTER && nodeSourceType != RUBBISH_BIN_ADAPTER
+}
+
+/** True when the editor was opened from a Shared folder (incoming/outgoing shares or links). Save will create a new file with (1)(2) naming instead of overwriting. */
+private fun isFromSharedFolder(nodeSourceType: Int?): Boolean {
+    if (nodeSourceType == null) return false
+    return nodeSourceType in setOf(
+        INCOMING_SHARES_ADAPTER,
+        OUTGOING_SHARES_ADAPTER,
+        LINKS_ADAPTER,
+    )
+}
+
+/**
+ * True when Share should be shown for this source type.
+ * Matches [TextEditorActivity.refreshMenuOptionsVisibility]: rubbish bin hides Share (only Remove + line numbers);
+ * also hidden for folder link, versions, incoming shares, and chat.
+ */
+internal fun shouldShowShare(nodeSourceType: Int?): Boolean {
+    if (nodeSourceType == null) return true
+    return nodeSourceType !in setOf(
+        RUBBISH_BIN_ADAPTER,
+        FOLDER_LINK_ADAPTER,
+        VERSIONS_ADAPTER,
+        INCOMING_SHARES_ADAPTER,
+        FROM_CHAT,
+    )
+}
+
+/** True when Send to chat should be shown (cloud opens only; hidden for rubbish, versions, links, chat, offline). */
+internal fun shouldShowSendToChat(nodeSourceType: Int?): Boolean {
+    if (nodeSourceType == null) return true
+    return nodeSourceType !in setOf(
+        RUBBISH_BIN_ADAPTER,
+        VERSIONS_ADAPTER,
+        FOLDER_LINK_ADAPTER,
+        FILE_LINK_ADAPTER,
+        FROM_CHAT,
+        OFFLINE_ADAPTER,
+    )
+}
+
+/**
+ * Builds [TextEditorComposeViewModel.Args] from [navKey].
+ */
+internal fun buildTextEditorViewModelArgs(
+    navKey: LegacyTextEditorNavKey,
+): TextEditorComposeViewModel.Args {
+    val nodeSourceType = navKey.nodeSourceType
+    return when {
+        navKey.chatId != null && navKey.messageId != null ->
+            TextEditorComposeViewModel.Args(
+                nodeHandle = MegaApiJava.INVALID_HANDLE,
+                mode = TextEditorMode.View,
+                fileName = null,
+                inExcludedAdapterForGetLinkAndEdit = true,
+                showDownload = true,
+                showShare = false,
+                showSendToChat = false,
+                chatId = navKey.chatId,
+                messageId = navKey.messageId,
+            )
+        navKey.localPath != null -> {
+            val sourceType = nodeSourceType ?: OFFLINE_ADAPTER
+            TextEditorComposeViewModel.Args(
+                nodeHandle = MegaApiJava.INVALID_HANDLE,
+                mode = TextEditorMode.View,
+                fileName = navKey.fileName ?: "",
+                inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(sourceType),
+                showDownload = shouldShowDownload(sourceType),
+                showShare = shouldShowShare(sourceType),
+                showSendToChat = false,
+                localPath = navKey.localPath,
+            )
+        }
+        // Folder link and file link are routed as distinct cases by source type. Folder link is
+        // matched first so it is resolved via the folder API by handle (isFolderLink), and never
+        // as a public file node through the publicUrl branch — which would call getPublicNode()
+        // on a folder URL and throw PublicNodeException.
+        nodeSourceType == FOLDER_LINK_ADAPTER -> cloudNodeArgs(navKey, isFolderLink = true)
+        // File link: resolved from its public URL via getPublicNode().
+        navKey.publicUrl != null ->
+            TextEditorComposeViewModel.Args(
+                nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE,
+                mode = textEditorModeFromValue(navKey.mode),
+                fileName = navKey.fileName,
+                inExcludedAdapterForGetLinkAndEdit = true,
+                showDownload = true,
+                showShare = true,
+                showSendToChat = false,
+                publicUrl = navKey.publicUrl,
+            )
+        // Regular Cloud Drive / shares / rubbish node.
+        else -> cloudNodeArgs(navKey, isFolderLink = false)
+    }
+}
+
+/**
+ * Builds [TextEditorComposeViewModel.Args] for a Cloud Drive node or a folder-link node. Both share
+ * the same source-type-derived menu visibility and differ only by [isFolderLink], which makes the
+ * ViewModel resolve the node via the folder API (folder link) instead of the main API (Cloud Drive).
+ */
+private fun cloudNodeArgs(
+    navKey: LegacyTextEditorNavKey,
+    isFolderLink: Boolean,
+): TextEditorComposeViewModel.Args {
+    val nodeSourceType = navKey.nodeSourceType
+    return TextEditorComposeViewModel.Args(
+        nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE,
+        mode = textEditorModeFromValue(navKey.mode),
+        fileName = navKey.fileName,
+        inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(nodeSourceType),
+        showDownload = shouldShowDownload(nodeSourceType),
+        showShare = shouldShowShare(nodeSourceType),
+        showSendToChat = shouldShowSendToChat(nodeSourceType),
+        isFromSharedFolder = isFromSharedFolder(nodeSourceType),
+        fromHome = navKey.fromHome,
+        isFolderLink = isFolderLink,
+    )
+}
+
+/**
+ * Text editor destination. Renders the Compose [TextEditorScreen].
+ * Tapping More opens the Node Options Bottom Sheet (cloud node only). When the user deletes or
+ * moves the node (Navigation or most Transfer results), the editor is closed; preview/Open-with
+ * downloads stay on the editor and forward the transfer.
+ */
+fun EntryProviderScope<NavKey>.legacyTextEditorScreen(
+    navigationHandler: NavigationHandler,
+    viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
+    transferHandler: TransferHandler,
+) {
+    entry<LegacyTextEditorNavKey> { key ->
+        TextEditorEntry(
+            navKey = key,
+            navigationHandler = navigationHandler,
+            viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
+            transferHandler = transferHandler,
+        )
+    }
+}
+
+@Composable
+private fun TextEditorEntry(
+    navKey: LegacyTextEditorNavKey,
+    navigationHandler: NavigationHandler,
+    viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
+    transferHandler: TransferHandler,
+) {
+    TextEditorComposeContent(
+        navKey = navKey,
+        navigationHandler = navigationHandler,
+        removeDestination = navigationHandler::back,
+        transferHandler = transferHandler,
+        viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
+    )
+}
+
+@Composable
+private fun TextEditorComposeContent(
+    navKey: LegacyTextEditorNavKey,
+    navigationHandler: NavigationHandler,
+    removeDestination: () -> Unit,
+    transferHandler: TransferHandler,
+    viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
+) {
+    val args = remember(navKey) {
+        buildTextEditorViewModelArgs(navKey)
+    }
+
+    val viewModel =
+        hiltViewModel<TextEditorComposeViewModel, TextEditorComposeViewModel.Factory> { factory ->
+            factory.create(args)
+        }
+
+    val showNodeOptions = navKey.chatId == null && navKey.localPath == null
+        && navKey.publicUrl == null
+        && textEditorModeFromValue(navKey.mode) != TextEditorMode.Create
+
+    if (showNodeOptions) {
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = {
+                    it.create(viewTypeToNodeSourceTypeMapper(navKey.nodeSourceType))
+                }
+            )
+        val nodeActionHandler = rememberSingleNodeActionHandler(
+            viewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            onDeferredAction = { action, executeAction ->
+                if (action is EditMenuAction) {
+                    viewModel.setEditMode()
+                } else {
+                    executeAction()
+                }
+            },
+        )
+        HandleNodeOptionsActionResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            nodeActionHandler = nodeActionHandler,
+            onTransfer = transferHandler::setTransferEvent,
+            onNavResultConsumed = { result ->
+                if (shouldCloseTextEditorOnNodeOptionsResult(result)) {
+                    removeDestination()
+                }
+            },
+        )
+
+        // Close the editor when the user confirms the Move to Rubbish / Delete dialog.
+        // The result key is shared across the app (other screens use the same dialog and may
+        // not clear it after consumption), so we (a) clear any stale value on entry and (b)
+        // drop the StateFlow's sticky replay so the editor only reacts to a value produced
+        // during this composition's lifetime.
+        LaunchedEffect(navigationHandler) {
+            navigationHandler.clearResult(MoveToRubbishOrDeleteDialogArgs.RESULT)
+        }
+        val moveToRubbishResult by remember(navigationHandler) {
+            navigationHandler
+                .monitorResult<MoveToRubbishOrDeleteDialogResult?>(MoveToRubbishOrDeleteDialogArgs.RESULT)
+                .drop(1)
+        }.collectAsStateWithLifecycle(null)
+        LaunchedEffect(moveToRubbishResult) {
+            if (moveToRubbishResult == null) return@LaunchedEffect
+            navigationHandler.clearResult(MoveToRubbishOrDeleteDialogArgs.RESULT)
+            removeDestination()
+        }
+    }
+    val onOpenNodeOptions: (() -> Unit)? = if (showNodeOptions) {
+        remember(
+            navKey.nodeHandle,
+            navKey.nodeSourceType,
+            navigationHandler,
+            viewTypeToNodeSourceTypeMapper,
+        ) {
+            val nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE
+            val sourceType = navKey.nodeSourceType
+            {
+                navigationHandler.navigate(
+                    NodeOptionsBottomSheetNavKey(
+                        nodeHandle = nodeHandle,
+                        nodeSourceType = viewTypeToNodeSourceTypeMapper(sourceType),
+                    )
+                )
+            }
+        }
+    } else {
+        null
+    }
+
+    val context = LocalContext.current
+    val onShare: (String?, String?) -> Unit = remember {
+        { localPath, fileName ->
+            if (!localPath.isNullOrBlank()) {
+                val file = File(localPath)
+                if (file.exists()) {
+                    val name = fileName?.ifBlank { null } ?: file.name
+                    val uri = FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.providers.fileprovider",
+                        file,
+                    )
+                    val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                        type = "*/*"
+                        putParcelableArrayListExtra(
+                            Intent.EXTRA_STREAM,
+                            arrayListOf(uri),
+                        )
+                        putExtra(Intent.EXTRA_SUBJECT, name)
+                        addFlags(
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                    or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        )
+                    }
+                    context.startActivity(
+                        Intent.createChooser(
+                            shareIntent,
+                            context.getString(R.string.context_share),
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    TextEditorScreen(
+        viewModel = viewModel,
+        onBack = removeDestination,
+        onOpenNodeOptions = onOpenNodeOptions.takeUnless { uiState.value.isLoading },
+        onTransfer = { transferHandler.setTransferEvent(it) },
+        onShare = onShare,
+    )
+}

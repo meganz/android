@@ -4,6 +4,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
@@ -18,7 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
@@ -27,7 +27,10 @@ import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.file.ApplySortOrderToDocumentFolderUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.file.GetFilesInDocumentFolderUseCase
@@ -47,6 +50,7 @@ class UploadFolderViewModel @Inject constructor(
     private val documentEntityDataMapper: DocumentEntityDataMapper,
     private val searchFilesInDocumentFolderRecursiveUseCase: SearchFilesInDocumentFolderRecursiveUseCase,
     private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase,
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UploadFolderViewState())
@@ -72,7 +76,7 @@ class UploadFolderViewModel @Inject constructor(
     fun getCurrentFolder(): LiveData<FolderContent.Data> = currentFolder
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
-    fun getCollisions(): LiveData<ArrayList<NameCollision>> = collisions
+    fun getCollisions(): LiveData<ArrayList<NameCollision>> = collisions.distinctUntilChanged()
     fun onActionResult(): LiveData<String?> = actionResult
 
     /**
@@ -361,7 +365,8 @@ class UploadFolderViewModel @Inject constructor(
                             numFolders = it.numberOfFolders,
                         )
                     },
-                    parentNodeId = NodeId(parentHandle)
+                    parentNodeId = NodeId(parentHandle),
+                    pitagTrigger = PitagTrigger.Picker,
                 )
             }.onSuccess { fileCollisions ->
                 pendingUploads.addAll(files)
@@ -385,25 +390,44 @@ class UploadFolderViewModel @Inject constructor(
     fun proceedWithUpload(
         collisionsResolution: List<NameCollisionResultUiEntity>? = null,
     ) {
-        val collisionRename =
-            collisionsResolution?.filter { it.choice == NameCollisionChoice.RENAME }
-        val pathsAndNames = pendingUploads.associate { folderContentData ->
-            val fileName = (collisionRename
-                ?.firstOrNull { it.nameCollision.name == folderContentData.name }
-                ?.nameCollision?.renameName
-                    ) ?: folderContentData.name
-            folderContentData.uri.toString() to fileName
-        }
-        _uiState.update { viewState ->
-            viewState.copy(
-                transferTriggerEvent = triggered(
-                    TransferTriggerEvent.StartUpload.Files(
-                        pathsAndNames,
-                        NodeId(parentHandle),
-                        waitNotificationPermissionResponseToStart = true
+        viewModelScope.launch {
+            val cancelledNames = collisionsResolution
+                ?.filter { it.choice == NameCollisionChoice.CANCEL }
+                ?.map { it.nameCollision.name }
+                .orEmpty()
+                .toSet()
+            val collisionRename =
+                collisionsResolution?.filter { it.choice == NameCollisionChoice.RENAME }
+            val pathsAndNames = pendingUploads
+                .filterNot { it.name in cancelledNames }
+                .associate { folderContentData ->
+                    val fileName = (collisionRename
+                        ?.firstOrNull { it.nameCollision.name == folderContentData.name }
+                        ?.nameCollision?.renameName
+                            ) ?: folderContentData.name
+                    folderContentData.uri.toString() to fileName
+                }
+            if (pathsAndNames.isEmpty()) {
+                actionResult.value = null
+                return@launch
+            }
+            val parentOrRootNodeId = if (parentHandle == INVALID_HANDLE) {
+                runCatching { getRootNodeIdUseCase() }.getOrNull() ?: return@launch
+            } else {
+                NodeId(parentHandle)
+            }
+            _uiState.update { viewState ->
+                viewState.copy(
+                    transferTriggerEvent = triggered(
+                        TransferTriggerEvent.StartUpload.Files(
+                            pathsAndNames,
+                            parentOrRootNodeId,
+                            waitNotificationPermissionResponseToStart = true,
+                            pitagTrigger = PitagTrigger.Picker,
+                        )
                     )
                 )
-            )
+            }
         }
     }
 
@@ -417,4 +441,11 @@ class UploadFolderViewModel @Inject constructor(
      * Cancels the name collision job.
      */
     fun isInList() = isList
+
+    /**
+     * Clears the collisions.
+     */
+    fun consumeCollisions() {
+        collisions.value = ArrayList()
+    }
 }

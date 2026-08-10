@@ -30,7 +30,7 @@ import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 internal class AudioTrackInfoViewKtTest {
-    @get: Rule
+    @get:Rule
     val composeTestRule = createComposeRule()
 
     private val expectTitleString = "Title test"
@@ -62,7 +62,7 @@ internal class AudioTrackInfoViewKtTest {
     private fun setComposeContent(
         trackInfoState: TrackInfoState,
         metadata: Metadata,
-        onLocationClicked: (location: LocationInfo?) -> Unit = {},
+        onLocationClicked: () -> Unit = {},
         onCheckedChange: (isChecked: Boolean) -> Unit = {},
     ) {
         composeTestRule.setContent {
@@ -98,9 +98,10 @@ internal class AudioTrackInfoViewKtTest {
         onCheckedChange: (isChecked: Boolean) -> Unit = {},
         sizeValue: String? = null,
         locationValue: LocationInfo? = null,
-        onLocationClicked: (location: LocationInfo?) -> Unit = {},
+        onLocationClicked: () -> Unit = {},
         addedValue: String? = null,
         lastModifiedValue: String? = null,
+        showLocation: Boolean = true,
     ) {
         composeTestRule.setContent {
             AudioNodeInfoView(
@@ -110,7 +111,8 @@ internal class AudioTrackInfoViewKtTest {
                 locationValue = locationValue,
                 onLocationClicked = onLocationClicked,
                 addedValue = addedValue,
-                lastModifiedValue = lastModifiedValue
+                lastModifiedValue = lastModifiedValue,
+                showLocation = showLocation,
             )
         }
     }
@@ -181,5 +183,17 @@ internal class AudioTrackInfoViewKtTest {
             .assertTextEquals(testValue)
         composeTestRule.onNodeWithTag(AUDIO_LAST_MODIFIED_TEST_TAG).assertIsDisplayed()
             .assertTextEquals(lastModifiedValue)
+    }
+
+    @Test
+    fun `test that location is hidden when showLocation is false`() {
+        setContentForAudioNodeInfoView(
+            sizeValue = expectedSizeValue,
+            locationValue = expectedLocationInfo,
+            showLocation = false,
+        )
+
+        composeTestRule.onNodeWithTag(AUDIO_LOCATION_TEST_TAG, true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(AUDIO_SIZE_TEST_TAG, true).assertExists()
     }
 }

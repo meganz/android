@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <!-- Triangle up: apex (8,2), base (3,7)-(13,7) -->
+  <path
+      android:pathData="M8,2 L3,7 L13,7 Z"
+      android:fillColor="#303233"/>
+  <!-- Triangle down: apex (8,14), base (3,9)-(13,9) -->
+  <path
+      android:pathData="M8,14 L13,9 L3,9 Z"
+      android:fillColor="#303233"/>
+</vector>

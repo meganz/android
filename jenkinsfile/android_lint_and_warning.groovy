@@ -39,8 +39,6 @@ pipeline {
         // Jenkins build log will be saved in this file.
         CONSOLE_LOG_FILE = "console.txt"
 
-        BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
-
         COMBINE_LINT_REPORTS = "true"
         DO_NOT_SUPPRESS_WARNINGS = "true"
     }
@@ -91,14 +89,6 @@ pipeline {
             }
         }
 
-        stage('Download Dependency Lib for SDK') {
-            steps {
-                script {
-                    BUILD_STEP = "Download Dependency Lib for SDK"
-                    common.downloadDependencyLibForSdk()
-                }
-            }
-        }
         stage('Build APK (GMS)') {
             steps {
                 script {
@@ -139,9 +129,7 @@ pipeline {
                     sh "./gradlew --no-daemon lint"
 
                     script {
-                        MODULE_LIST.each { module ->
-                            LINT_REPORT_SUMMARY_MAP.put(module, generateLintSummary(module))
-                        }
+                        generateLintSummary(MODULE_LIST)
                     }
                 }
             }
@@ -220,22 +208,32 @@ String buildLintSummaryTable(Map lintReportSummaryMap) {
 
 
 /**
- * Executes a specific Gradle Task to parse the raw Lint Results and returns a Lint Summary
+ * Executes the `generateLintReport` Gradle task once for all modules and populates
+ * LINT_REPORT_SUMMARY_MAP with per-module severity counts parsed from the aggregated JSON.
  *
- * @param module The name of the module (e.g. app, domain, sdk)
- * @return A List containing the module's Lint Summary.
- * Here's a Sample Result:
- *
- * [errorCount:20, errorMessage:None, fatalCount:10, informationCount:40, warningCount:30]
+ * @param moduleList List of module paths (e.g. ["app", "domain", "core:ui"]).
  */
-def generateLintSummary(String module) {
-    def targetFile = "${module}_processed-lint-results.json"
-    sh "./gradlew --no-daemon generateLintReport --lint-results $WORKSPACE/${module}/build/reports/lint-results.xml --target-file ${targetFile}"
-    def lintJsonFile = readFile(targetFile)
-    def lintJsonContent = new HashMap(new groovy.json.JsonSlurper().parseText(lintJsonFile))
-    print("lintSummary($module) = ${lintJsonContent}")
+def generateLintSummary(List<String> moduleList) {
+    String aggregatedJson = "lint_summary.json"
+    sh "./gradlew --no-daemon generateLintReport " +
+            "--modules \"${moduleList.join(",")}\" " +
+            "--target-file ${aggregatedJson}"
 
-    return lintJsonContent
+    String aggregatedJsonText = readFile(aggregatedJson)
+    def rawModules = new groovy.json.JsonSlurperClassic().parseText(aggregatedJsonText).modules
+    for (int i = 0; i < moduleList.size(); i++) {
+        String module = moduleList[i]
+        def raw = rawModules[module]
+        def perModule = [
+                "fatalCount"      : (raw?.fatalCount ?: 0) as int,
+                "errorCount"      : (raw?.errorCount ?: 0) as int,
+                "warningCount"    : (raw?.warningCount ?: 0) as int,
+                "informationCount": (raw?.informationCount ?: 0) as int,
+                "errorMessage"    : (raw == null ? "No lint results found" : (raw.errorMessage ?: "None")).toString()
+        ]
+        print("lintSummary($module) = ${perModule}")
+        LINT_REPORT_SUMMARY_MAP.put(module, perModule)
+    }
 }
 
 /**

@@ -1,7 +1,9 @@
 package mega.privacy.android.navigation.contract.bottomsheet
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,7 +11,9 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.scene.OverlayScene
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.android.core.ui.theme.AndroidTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 class BottomSheetScene<T : Any>(
     override val key: Any,
     override val previousEntries: List<NavEntry<T>>,
@@ -17,9 +21,12 @@ class BottomSheetScene<T : Any>(
     private val sheetEntry: NavEntry<T>,
     private val onBack: () -> Unit,
     private val skipPartiallyExpanded: Boolean,
+    private val bottomSheetProperties: ModalBottomSheetProperties,
 ) : OverlayScene<T> {
 
     override val entries = listOf(sheetEntry)
+
+    private val forceDarkTheme = sheetEntry.forceDarkTheme()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override val content = @Composable {
@@ -30,16 +37,23 @@ class BottomSheetScene<T : Any>(
             onBack()
         }
 
-        MegaModalBottomSheet(
-            sheetState = sheetState,
-            onDismissRequest = {
-                onBack()
-            },
-            modifier = Modifier.Companion,
-            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
-            windowInsets = null,
-        ) {
-            sheetEntry.Content()
+        val sheet: @Composable () -> Unit = {
+            MegaModalBottomSheet(
+                sheetState = sheetState,
+                onDismissRequest = {
+                    onBack()
+                },
+                modifier = Modifier.statusBarsPadding(),
+                bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
+                properties = bottomSheetProperties,
+            ) {
+                sheetEntry.Content()
+            }
+        }
+        if (forceDarkTheme) {
+            AndroidTheme(isDark = true, content = sheet)
+        } else {
+            sheet()
         }
     }
 

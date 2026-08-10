@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity.Companion.KEY_ACTION
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity.Companion.KEY_LINK_TO_RESET
@@ -322,6 +323,7 @@ internal class ChangePasswordViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isResetPasswordMode).isTrue()
+                assertThat(state.isParkAccountMode).isTrue()
             }
         }
 
@@ -337,6 +339,23 @@ internal class ChangePasswordViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isResetPasswordLinkValid).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that park account with a valid link does not show alert when master key is null`() =
+        runTest {
+            val fakeLink = "Link"
+            savedStateHandle[KEY_ACTION] = Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT
+            savedStateHandle[KEY_LINK_TO_RESET] = fakeLink
+            savedStateHandle[IntentConstants.EXTRA_MASTER_KEY] = null
+            initTestClass()
+            underTest.determineIfScreenIsResetPasswordMode()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isParkAccountMode).isTrue()
+                assertThat(state.isShowAlertMessage).isFalse()
             }
         }
 
@@ -483,7 +502,7 @@ internal class ChangePasswordViewModelTest {
             onUserClickChangePassword("")
             uiState.test {
                 val state = awaitItem()
-                assertEquals(state.snackBarMessage, R.string.general_text_error)
+                assertEquals(state.snackBarMessage, sharedR.string.general_text_error)
                 assertNull(state.loadingMessage)
                 assertFalse(state.isPasswordChanged)
             }

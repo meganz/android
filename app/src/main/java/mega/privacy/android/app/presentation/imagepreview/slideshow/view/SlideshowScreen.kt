@@ -41,14 +41,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.request.ImageRequest
 import kotlinx.coroutines.delay
@@ -373,7 +373,6 @@ private fun SlideshowTopBar(
 
 @Composable
 private fun SlideShowContent(
-    modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit,
     pagerState: PagerState,
@@ -386,6 +385,7 @@ private fun SlideShowContent(
     onImageZooming: (ZoomableState) -> Unit,
     onCacheImageState: (ImageNode, ZoomableState) -> Unit,
     onImageDownloadStatus: (ImageNode, Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier.fillMaxSize()) {
         HorizontalPager(
@@ -393,13 +393,13 @@ private fun SlideShowContent(
                 .fillMaxSize(),
             state = pagerState,
             key = {
-                imageNodes.getOrNull(it)?.id?.longValue ?: "${System.currentTimeMillis()}_$it"
+                imageNodes.getOrNull(it)?.id?.longValue?.toString() ?: "empty_$it"
             },
         ) { index ->
             val imageNode = imageNodes[index]
             val status by produceState(
                 initialValue = ImageResultStatus(0, false, null, null),
-                key1 = imageNode,
+                key1 = imageNode.id,
             ) {
                 downloadImage(imageNode).collectLatest { imageResult ->
                     value = ImageResultStatus(
@@ -415,7 +415,7 @@ private fun SlideShowContent(
             onImageDownloadStatus(imageNode, isDownloaded)
 
             val zoomableState = rememberZoomableState(
-                zoomSpec = ZoomSpec(maxZoomFactor = Int.MAX_VALUE.toFloat())
+                zoomSpec = ZoomSpec(maxZoomFactor = 10.0f)
             )
             val imageState = rememberZoomableImageState(zoomableState)
             onCacheImageState(imageNode, imageState.zoomableState)

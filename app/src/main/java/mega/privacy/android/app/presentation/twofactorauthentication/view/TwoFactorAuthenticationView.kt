@@ -1,32 +1,25 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.view
 
-import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.ScreenType
@@ -35,9 +28,11 @@ import mega.privacy.android.app.presentation.twofactorauthentication.view.screen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationSetupScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.InitialisationScreen
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -45,14 +40,11 @@ internal fun TwoFactorAuthenticationView(
     uiState: TwoFactorAuthenticationUIState,
     isDarkMode: Boolean,
     qrCodeMapper: QRCodeMapper,
-    onBackPressedDispatcher: OnBackPressedDispatcher,
     onFinishActivity: () -> Unit,
     openPlayStore: () -> Unit,
     isIntentAvailable: (String) -> Boolean,
     onOpenInClicked: (String) -> Unit,
-    on2FAPinChanged: (String, Int) -> Unit,
     on2FAChanged: (String) -> Unit,
-    onFirstTime2FAConsumed: () -> Unit,
     on2FAPinReset: () -> Unit,
     onExportRkClicked: () -> Unit,
     onDismissClicked: () -> Unit,
@@ -61,74 +53,59 @@ internal fun TwoFactorAuthenticationView(
     onIsWritePermissionDeniedConsumed: () -> Unit,
     onIsSeedCopiedToClipboardConsumed: () -> Unit,
 ) {
-
-    val currentScreen =
-        remember { mutableStateOf(ScreenType.InitialisationScreen) }
-
-    val scrollState = rememberScrollState()
-    val snackBarHostState = remember { SnackbarHostState() }
+    var currentScreen by rememberSaveable {
+        mutableStateOf(ScreenType.InitialisationScreen)
+    }
+    val resources = LocalResources.current
     val scaffoldState = rememberScaffoldState()
+    val snackBarHostState = scaffoldState.snackbarHostState
     val coroutineScope = rememberCoroutineScope()
-    val onBackPressedDispatcherOwner = LocalOnBackPressedDispatcherOwner.current
-    onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(enabled = true) {
-        override fun handleOnBackPressed() {
-            when (currentScreen.value) {
 
-                ScreenType.SetupScreen -> {
-                    currentScreen.value = ScreenType.InitialisationScreen
-                }
+    val onBack: () -> Unit = {
+        when (currentScreen) {
+            ScreenType.SetupScreen -> {
+                currentScreen = ScreenType.InitialisationScreen
+            }
 
-                ScreenType.AuthenticationScreen -> {
-                    on2FAPinReset()
-                    currentScreen.value = ScreenType.SetupScreen
-                }
+            ScreenType.AuthenticationScreen -> {
+                on2FAPinReset()
+                currentScreen = ScreenType.SetupScreen
+            }
 
-                else -> {
-                    onFinishActivity()
-                }
+            else -> {
+                onFinishActivity()
             }
         }
+    }
+    BackHandler(onBack = onBack)
 
-    })
-    Scaffold(
+    MegaScaffold(
         modifier = Modifier.imePadding(),
         scaffoldState = scaffoldState,
-        backgroundColor = MaterialTheme.colors.primary,
         topBar = {
-            SimpleTopAppBar(
-                titleId = R.string.settings_2fa,
-                elevation = scrollState.value > 0,
-                onBackPressed = {
-                    onBackPressedDispatcherOwner?.onBackPressedDispatcher?.onBackPressed()
-                }
+            MegaAppBar(
+                appBarType = AppBarType.BACK_NAVIGATION,
+                title = stringResource(id = R.string.settings_2fa),
+                onNavigationPressed = onBack,
             )
         },
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState) { data ->
-                Snackbar(
-                    modifier = Modifier.testTag(Constants.SNACKBAR_TEST_TAG),
-                    snackbarData = data,
-                    backgroundColor = MaterialTheme.colors.black_white,
-                )
-            }
-        }
-    )
-    { padding ->
-        val context = LocalContext.current
+    ) { padding ->
+        val contentModifier = Modifier.padding(padding)
         val onBeginSetupClicked: () -> Unit = {
             if (uiState.is2FAFetchCompleted && uiState.seed.isNullOrEmpty()) {
                 coroutineScope.launch {
-                    snackBarHostState.showAutoDurationSnackbar(context.resources.getString(R.string.qr_seed_text_error))
+                    snackBarHostState.showAutoDurationSnackbar(resources.getString(R.string.qr_seed_text_error))
                 }
             } else {
-                currentScreen.value = ScreenType.SetupScreen
+                currentScreen = ScreenType.SetupScreen
             }
         }
-        when (currentScreen.value) {
+        when (currentScreen) {
             ScreenType.InitialisationScreen -> {
                 InitialisationScreen(
                     onNextClicked = onBeginSetupClicked,
-                    modifier = Modifier.semantics { testTagsAsResourceId = true })
+                    modifier = contentModifier.semantics { testTagsAsResourceId = true },
+                )
             }
 
             ScreenType.SetupScreen -> {
@@ -137,22 +114,21 @@ internal fun TwoFactorAuthenticationView(
                     isDarkMode = isDarkMode,
                     qrCodeMapper = qrCodeMapper,
                     onNextClicked = {
-                        currentScreen.value = ScreenType.AuthenticationScreen
+                        currentScreen = ScreenType.AuthenticationScreen
                     },
                     openPlayStore = openPlayStore,
                     isIntentAvailable = isIntentAvailable,
                     onOpenInClicked = onOpenInClicked,
                     onCopySeedLongClicked = onCopySeedLongClicked,
-                    modifier = Modifier.semantics { testTagsAsResourceId = true }
+                    modifier = contentModifier.semantics { testTagsAsResourceId = true },
                 )
             }
 
             ScreenType.AuthenticationScreen -> {
                 AuthenticationScreen(
                     uiState = uiState,
-                    on2FAPinChanged = on2FAPinChanged,
                     on2FAChanged = on2FAChanged,
-                    onFirstTime2FAConsumed = onFirstTime2FAConsumed
+                    modifier = contentModifier,
                 )
             }
 
@@ -160,7 +136,8 @@ internal fun TwoFactorAuthenticationView(
                 AuthenticationCompletedScreen(
                     isMasterKeyExported = uiState.isMasterKeyExported,
                     onExportRkClicked = onExportRkClicked,
-                    onDismissClicked = onDismissClicked
+                    onDismissClicked = onDismissClicked,
+                    modifier = contentModifier,
                 )
             }
         }
@@ -169,40 +146,37 @@ internal fun TwoFactorAuthenticationView(
             event = uiState.seedCopiedToClipboardEvent,
             onConsumed = onIsSeedCopiedToClipboardConsumed
         ) {
-            snackBarHostState.showAutoDurationSnackbar(context.resources.getString(R.string.messages_copied_clipboard))
+            snackBarHostState.showAutoDurationSnackbar(resources.getString(R.string.messages_copied_clipboard))
         }
 
         EventEffect(
             event = uiState.writePermissionDeniedEvent,
             onConsumed = onIsWritePermissionDeniedConsumed
         ) {
-            snackBarHostState.showAutoDurationSnackbar(context.resources.getString(R.string.denied_write_permissions))
+            snackBarHostState.showAutoDurationSnackbar(resources.getString(R.string.denied_write_permissions))
         }
 
         EventEffect(
             event = uiState.isRkExportedSuccessfullyEvent,
             onConsumed = onIsRkExportSuccessfullyConsumed
         ) { isExported ->
-            if (isExported) {
-                Toast.makeText(
-                    context,
-                    context.resources.getString(R.string.save_MK_confirmation),
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                snackBarHostState.showAutoDurationSnackbar(context.resources.getString(R.string.general_text_error))
-            }
+            snackBarHostState.showAutoDurationSnackbar(
+                resources.getString(
+                    if (isExported) R.string.save_MK_confirmation
+                    else sharedR.string.general_text_error
+                )
+            )
         }
 
         when (uiState.authenticationState) {
             AuthenticationState.Passed -> {
-                currentScreen.value = ScreenType.AuthenticationCompletedScreen
+                currentScreen = ScreenType.AuthenticationCompletedScreen
             }
 
             AuthenticationState.Error,
-            -> {
+                -> {
                 LaunchedEffect(key1 = uiState.authenticationState) {
-                    snackBarHostState.showAutoDurationSnackbar(context.resources.getString(R.string.error_enable_2fa))
+                    snackBarHostState.showAutoDurationSnackbar(resources.getString(R.string.error_enable_2fa))
                 }
             }
 

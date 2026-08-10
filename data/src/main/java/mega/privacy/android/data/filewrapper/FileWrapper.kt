@@ -20,17 +20,23 @@ class FileWrapper(
     private val childFileExistsFunction: (name: String) -> Boolean,
     private val getChildByNameFunction: (name: String) -> String?,
     private val createChildFileFunction: (name: String, asFolder: Boolean) -> FileWrapper?,
-    private val getParentUriFunction: () -> FileWrapper?,
     private val getPathFunction: () -> String?,
     private val deleteFileFunction: () -> Boolean,
     private val deleteFolderIfEmptyFunction: () -> Boolean,
     private val setModificationTimeFunction: (newTime: Long) -> Boolean,
     private val renameFunction: (newName: String) -> FileWrapper?,
+    private val renameOverwriteFunction: (parentUriString: String, newName: String, override: Boolean) -> FileWrapper?,
+    private val moveDocumentFunction: (sourceParentUriString: String, targetParentUriString: String) -> FileWrapper?,
     private val createNestedPathFunction: (
         children: List<String>,
         createIfMissing: Boolean,
         lastAsFolder: Boolean,
     ) -> String?,
+    // Batch metadata for directory scanning — replaces N per-child getPath() + fromUri() calls.
+    // Returns null on failure (e.g. SAF query failure or unresolvable parent), which the JNI
+    // side propagates to directoryScan as SCAN_INACCESSIBLE. Empty list means "directory really
+    // has zero children" (or this wrapper is a non-folder) and is a successful result.
+    private val getChildrenWithMetadataFunction: () -> List<ChildMetadata>?,
 ) {
 
     /**
@@ -73,15 +79,6 @@ class FileWrapper(
     fun createChildFile(name: String, asFolder: Boolean): FileWrapper? = runCatching {
         createChildFileFunction(name, asFolder)
     }.onFailure { Timber.e(it) }
-        .getOrNull()
-
-    /**
-     * Get the parent file or folder.
-     * @return the [FileWrapper] of the parent folder or null if the operation failed
-     */
-    @Keep
-    fun getParentFile(): FileWrapper? = runCatching { getParentUriFunction() }
-        .onFailure { Timber.e(it) }
         .getOrNull()
 
     /**
@@ -132,6 +129,33 @@ class FileWrapper(
         .onFailure { Timber.e(it) }
         .getOrNull()
 
+    /**
+     * Rename the file or folder.
+     * @param parentUriString The uri of the parent file.
+     * @param newName the new name of the file or folder
+     * @param override True if it is required to override an existing file, false otherwise.
+     * @return the [FileWrapper] of the renamed file or folder, or null if the operation failed
+     */
+    @Keep
+    fun renameOverwrite(parentUriString: String, newName: String, override: Boolean): FileWrapper? =
+        runCatching { renameOverwriteFunction(parentUriString, newName, override) }
+            .onFailure { Timber.e(it) }
+            .getOrNull()
+
+    /**
+     * Move the file or folder from [sourceParentUriString] to [targetParentUriString] within the
+     * same SAF tree using DocumentsContract.moveDocument (API 24+). Avoids the byte-by-byte copy
+     * fallback used by the SDK's cross-parent rename path. The document keeps its original name;
+     * if a different target name is required, follow this with a same-parent rename.
+     * @return the [FileWrapper] of the moved file or folder, or null if the provider does not
+     *   support FLAG_SUPPORTS_MOVE or the operation otherwise failed.
+     */
+    @Keep
+    fun moveDocument(sourceParentUriString: String, targetParentUriString: String): FileWrapper? =
+        runCatching { moveDocumentFunction(sourceParentUriString, targetParentUriString) }
+            .onFailure { Timber.w(it) }
+            .getOrNull()
+
 
     /**
      * Get a child file by name.
@@ -151,6 +175,21 @@ class FileWrapper(
     ): String? = runCatching { createNestedPathFunction(children, createIfMissing, lastAsFolder) }
         .onFailure { Timber.e(it) }
         .getOrNull()
+
+    /**
+     * Returns a batch list of [ChildMetadata] for all direct children of this folder,
+     * populated via a single [android.content.ContentResolver.query] call.
+     *
+     * Called from C++ [directoryScan] to replace the previous N+1 IPC pattern:
+     *   1 [getChildren()] + N [getPath()] + N [getFileDescriptor()] calls.
+     *
+     * Returns null on failure (error is logged) so the C++ side can fall back to
+     * [SCAN_INACCESSIBLE].
+     */
+    @Keep
+    fun getChildrenWithMetadata(): List<ChildMetadata>? = runCatching {
+        getChildrenWithMetadataFunction()
+    }.onFailure { Timber.e(it) }.getOrNull()
 
 
     companion object {
@@ -172,7 +211,25 @@ class FileWrapper(
          */
         @JvmStatic
         @Keep
-        fun getFromUri(uriPath: String) = factory(UriPath(uriPath))
+        fun getFromUri(uriPath: String): FileWrapper? = factory(UriPath(uriPath))
+
+        /**
+         * Checks whether the SAF document at [uriPath] currently exists by issuing a
+         * fresh ContentResolver query via [FileWrapperFactory] → [DocumentFileWrapper.fromUri]
+         * with the existence probe enabled.
+         *
+         * Used by the C++ cache-validation paths to detect stale wrappers (e.g. the
+         * underlying folder was deleted externally between sync sessions). The cheap
+         * Java-reference check on the C++ side cannot detect that case.
+         *
+         * @return true if the document is currently resolvable on SAF; false otherwise.
+         */
+        @JvmStatic
+        @Keep
+        fun existsOnSaf(uriPath: String): Boolean = runCatching {
+            factory(UriPath(uriPath)) != null
+        }.onFailure { Timber.w(it, "existsOnSaf failed for $uriPath") }
+            .getOrDefault(false)
 
         /**
          * Static method to check if a string represents a file as opposed to an Uri.

@@ -1,0 +1,45 @@
+package mega.privacy.android.feature.clouddrive.presentation.search
+
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.SearchNavKey
+
+fun EntryProviderScope<NavKey>.searchScreen(
+    navigationHandler: NavigationHandler,
+    onTransfer: (TransferTriggerEvent) -> Unit,
+) {
+    entry<SearchNavKey> { key ->
+        val viewModel = hiltViewModel<SearchViewModel, SearchViewModel.Factory> { factory ->
+            factory.create(
+                SearchViewModel.Args(
+                    parentHandle = key.parentHandle,
+                    nodeSourceType = key.nodeSourceType,
+                )
+            )
+        }
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(NodeSourceType.SEARCH) }
+            )
+
+        SearchScreen(
+            navigationHandler = navigationHandler,
+            onTransfer = onTransfer,
+            viewModel = viewModel,
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel
+        )
+
+        HandleNodeOptionsActionResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            onTransfer = onTransfer,
+        )
+    }
+}
+

@@ -1,0 +1,205 @@
+package mega.privacy.android.app.presentation.login.confirmemail.updateEmail
+
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import de.palm.composestateevents.triggered
+import mega.privacy.android.app.presentation.login.confirmemail.model.ResendSignUpLinkError
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.EMAIL_CHAR_LIMIT
+import mega.privacy.android.shared.resources.R
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+
+@RunWith(AndroidJUnit4::class)
+class UpdateEmailForAccountCreationRouteTest {
+
+    @get:Rule
+    val composeRule = createComposeRule()
+
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+    @Test
+    fun `test that the email change success event is emitted`() {
+        val email = "email@email.email"
+        with(composeRule) {
+            val onChangeEmailSuccess = mock<(String) -> Unit>()
+            setScreen(
+                uiState = UpdateEmailForAccountCreationUIState(
+                    email = email,
+                    changeEmailAddressSuccessEvent = triggered
+                ),
+                onChangeEmailSuccess = onChangeEmailSuccess
+            )
+
+            verify(onChangeEmailSuccess).invoke(email)
+        }
+    }
+
+    @Test
+    fun `test that the top bar is displayed`() {
+        with(composeRule) {
+            setScreen()
+
+            onNodeWithTag(CHANGE_EMAIL_ADDRESS_SCREEN_TOP_BAR_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that the screen description is displayed`() {
+        with(composeRule) {
+            setScreen()
+
+            onNodeWithTag(CHANGE_EMAIL_ADDRESS_SCREEN_DESCRIPTION_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that the email is updated when it is inputted`() {
+        val email = "email@email.email"
+        with(composeRule) {
+            val onEmailInputChanged = mock<(String?) -> Unit>()
+            setScreen(
+                onEmailInputChanged = onEmailInputChanged
+            )
+
+            onNode(hasSetTextAction()).performTextInput(email)
+
+            verify(onEmailInputChanged).invoke(email)
+        }
+    }
+
+    @Test
+    fun `test that the email input is truncated when input exceeds the character limit`() {
+        val longEmail = "a".repeat(EMAIL_CHAR_LIMIT + 10)
+        with(composeRule) {
+            val onEmailInputChanged = mock<(String?) -> Unit>()
+            setScreen(
+                onEmailInputChanged = onEmailInputChanged
+            )
+
+            onNode(hasSetTextAction()).performTextInput(longEmail)
+
+            verify(onEmailInputChanged).invoke(longEmail.take(EMAIL_CHAR_LIMIT))
+        }
+    }
+
+    @Test
+    fun `test that the correct error message for an invalid email is displayed`() {
+        with(composeRule) {
+            setScreen(
+                uiState = UpdateEmailForAccountCreationUIState(isEmailValid = false)
+            )
+
+            val text = context.getString(R.string.login_invalid_email_error_message)
+            onNodeWithText(text).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that the correct error message for account exists is displayed`() {
+        with(composeRule) {
+            setScreen(
+                uiState = UpdateEmailForAccountCreationUIState(
+                    resendSignUpLinkError = triggered(
+                        ResendSignUpLinkError.AccountExists
+                    )
+                )
+            )
+
+            val text = context.getString(R.string.sign_up_account_existed_error_message)
+            onNodeWithText(text).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that the email is changed after clicking the update button`() {
+        with(composeRule) {
+            val onChangeEmailPressed = mock<() -> Unit>()
+            setScreen(onChangeEmailPressed = onChangeEmailPressed)
+
+            onNodeWithTag(CHANGE_EMAIL_ADDRESS_SCREEN_UPDATE_BUTTON_TAG).performClick()
+
+            verify(onChangeEmailPressed).invoke()
+        }
+    }
+
+    @Test
+    fun `test that the loading indicator is displayed when content is loading`() {
+        with(composeRule) {
+            setScreen(uiState = UpdateEmailForAccountCreationUIState(isLoading = true))
+
+            onNodeWithTag(CHANGE_EMAIL_ADDRESS_SCREEN_LOADING_INDICATOR_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that the loading indicator doesn't exist when content is not loading`() {
+        with(composeRule) {
+            setScreen(uiState = UpdateEmailForAccountCreationUIState(isLoading = false))
+
+            onNodeWithTag(CHANGE_EMAIL_ADDRESS_SCREEN_LOADING_INDICATOR_TAG).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun `test that the correct error message for too many attempts is displayed`() {
+        with(composeRule) {
+            setScreen(
+                uiState = UpdateEmailForAccountCreationUIState(
+                    resendSignUpLinkError = triggered(
+                        ResendSignUpLinkError.TooManyAttempts
+                    )
+                )
+            )
+
+            val text = context.getString(R.string.resend_signup_link_error)
+            onNodeWithText(text).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that the correct error message for an unknown error is displayed`() {
+        with(composeRule) {
+            setScreen(
+                uiState = UpdateEmailForAccountCreationUIState(
+                    resendSignUpLinkError = triggered(
+                        ResendSignUpLinkError.Unknown
+                    )
+                )
+            )
+
+            val text = context.getString(R.string.general_request_failed_message)
+            onNodeWithText(text).assertIsDisplayed()
+        }
+    }
+
+    private fun ComposeContentTestRule.setScreen(
+        uiState: UpdateEmailForAccountCreationUIState = UpdateEmailForAccountCreationUIState(),
+        onEmailInputChanged: (String?) -> Unit = {},
+        onChangeEmailPressed: () -> Unit = {},
+        onResendSignUpLinkErrorConsumed: () -> Unit = {},
+        onResetChangeEmailAddressSuccessEvent: () -> Unit = {},
+        onChangeEmailSuccess: (String) -> Unit = {},
+    ) {
+        setContent {
+            UpdateEmailForAccountCreationScreen(
+                uiState = uiState,
+                onEmailInputChanged = onEmailInputChanged,
+                onChangeEmailPressed = onChangeEmailPressed,
+                onResendSignUpLinkErrorConsumed = onResendSignUpLinkErrorConsumed,
+                onResetChangeEmailAddressSuccessEvent = onResetChangeEmailAddressSuccessEvent,
+                onChangeEmailSuccess = onChangeEmailSuccess
+            )
+        }
+    }
+}

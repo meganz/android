@@ -9,7 +9,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.platform.LocalResources
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import de.palm.composestateevents.EventEffect
@@ -17,7 +18,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncAction
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncViewModel
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetContent
@@ -26,6 +26,7 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssu
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLocalFileEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseRemoteFileEvent
@@ -62,7 +63,6 @@ fun SyncListRoute(
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
-    applyRevampStyles: Boolean = false,
 ) {
     val fragmentActivity = LocalContext.current.findFragmentActivity()
     val viewModelStoreOwner =
@@ -85,7 +85,6 @@ fun SyncListRoute(
         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
         onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         onFabExpanded = onFabExpanded,
-        applyRevampStyles = applyRevampStyles,
     )
 }
 
@@ -107,7 +106,6 @@ internal fun SyncListRoute(
     viewModel: SyncListViewModel = hiltViewModel(),
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
-    applyRevampStyles: Boolean = false,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val syncSettingsState by settingsSyncViewModel.uiState.collectAsStateWithLifecycle()
@@ -187,29 +185,31 @@ internal fun SyncListRoute(
         syncIssueNotificationViewModel = syncIssueNotificationViewModel,
         selectedChip = selectedChip,
         onFabExpanded = onFabExpanded,
-        applyRevampStyles = applyRevampStyles
     )
 
-    val context = LocalContext.current
+    val resources = LocalResources.current
     EventEffect(
         stalledIssueState.snackbarMessageContent,
-        onConsumed = {
+        onConsumed = {}
+    ) { content ->
+        try {
+            snackBarHostState.showAutoDurationSnackbar(
+                resources.getString(content)
+            )
+        } finally {
             syncStalledIssuesViewModel.handleAction(SyncListAction.SnackBarShown)
         }
-    ) {
-        snackBarHostState.showAutoDurationSnackbar(
-            context.resources.getString(
-                it
-            )
-        )
     }
 
     LaunchedEffect(key1 = syncSettingsState.snackbarMessage) {
         syncSettingsState.snackbarMessage?.let { message ->
-            snackBarHostState.showAutoDurationSnackbar(
-                message.joinToString(separator = " ") { context.getString(it) }
-            )
-            settingsSyncViewModel.handleAction(SettingsSyncAction.SnackbarShown)
+            try {
+                snackBarHostState.showAutoDurationSnackbar(
+                    message.joinToString(separator = " ") { resources.getString(it) }
+                )
+            } finally {
+                settingsSyncViewModel.handleAction(SettingsSyncAction.SnackbarShown)
+            }
         }
     }
 

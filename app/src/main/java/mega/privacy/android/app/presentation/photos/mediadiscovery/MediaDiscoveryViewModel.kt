@@ -22,19 +22,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
-import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.model.MediaListItem
-import mega.privacy.android.app.presentation.photos.model.MediaListItem.PhotoItem
-import mega.privacy.android.app.presentation.photos.model.MediaListMedia
-import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.util.createDaysCardList
 import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
@@ -42,17 +34,22 @@ import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.photos.DateCard
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.MediaListItem
+import mega.privacy.android.domain.entity.photos.MediaListItem.PhotoItem
+import mega.privacy.android.domain.entity.photos.MediaListItem.VideoItem
+import mega.privacy.android.domain.entity.photos.MediaListMedia
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
@@ -69,7 +66,6 @@ import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -82,14 +78,17 @@ import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
+import mega.privacy.android.shared.account.overquota.StorageCapacityMapper
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
 /**
- * ViewModel for MediaDiscoveryFragment
+ * ViewModel for MediaDiscovery
  */
 @HiltViewModel
 class MediaDiscoveryViewModel @Inject constructor(
@@ -119,7 +118,6 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -173,15 +171,8 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() == true
-    }
-
     private fun handleHiddenNodes() = viewModelScope.launch {
-        if (isHiddenNodesActive() && fromFolderLink != true) {
+        if (fromFolderLink != true) {
             monitorShowHiddenItems(
                 loadPhotosDone = _state.value.loadPhotosDone,
                 sourcePhotos = _state.value.sourcePhotos,
@@ -383,7 +374,7 @@ class MediaDiscoveryViewModel @Inject constructor(
             }
             val item = when (photo) {
                 is Photo.Image -> PhotoItem(photo)
-                is Photo.Video -> MediaListItem.VideoItem(
+                is Photo.Video -> VideoItem(
                     photo,
                     durationInSecondsTextMapper(photo.fileTypeInfo.duration)
                 )
@@ -532,23 +523,29 @@ class MediaDiscoveryViewModel @Inject constructor(
                 updateSelectedTimeBarState(
                     TimeBarTab.Months,
                     _state.value.monthsCardList.indexOfFirst {
-                        it.photo.modificationTime == dateCard.photo.modificationTime
-                    })
+                        it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
+                    }
+                )
             }
 
             is DateCard.MonthsCard -> {
                 updateSelectedTimeBarState(
                     TimeBarTab.Days,
                     _state.value.daysCardList.indexOfFirst {
-                        it.photo.modificationTime == dateCard.photo.modificationTime
-                    })
+                        it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
+                    }
+                )
             }
 
             is DateCard.DaysCard -> {
                 updateSelectedTimeBarState(
                     TimeBarTab.All,
-                    _state.value.mediaListItemList.indexOfFirst {
-                        it.key == dateCard.photo.id.toString()
+                    _state.value.mediaListItemList.indexOfFirst { item ->
+                        when (item) {
+                            is VideoItem -> item.video.id == dateCard.photo.id
+                            is PhotoItem -> item.photo.id == dateCard.photo.id
+                            else -> item.key == dateCard.photo.id.toString()
+                        }
                     },
                 )
             }
@@ -806,7 +803,7 @@ class MediaDiscoveryViewModel @Inject constructor(
      * Reset storage capacity to default
      */
     fun setStorageCapacityAsDefault() {
-        _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.DEFAULT) }
+        _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.Default) }
         viewModelScope.launch {
             runCatching {
                 setAlmostFullStorageBannerClosingTimestampUseCase()

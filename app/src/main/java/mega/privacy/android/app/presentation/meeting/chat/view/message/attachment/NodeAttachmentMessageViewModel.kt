@@ -10,13 +10,13 @@ import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
@@ -32,11 +32,13 @@ import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUse
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.ImportTypedNodesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
@@ -53,6 +55,7 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
+    private val getFileTypeInfoByContentUseCase: GetFileTypeInfoByContentUseCase,
     private val getCachedOriginalPathUseCase: GetCachedOriginalPathUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
@@ -119,18 +122,23 @@ class NodeAttachmentMessageViewModel @Inject constructor(
      */
     suspend fun handleFileNode(message: NodeAttachmentMessage): FileNodeContent {
         val fileNode = message.fileNode
+        val fileType = if (fileNode.type is UnMappedFileTypeInfo) {
+            getFileTypeInfoByContentUseCase(fileNode)
+        } else {
+            fileNode.type
+        }
         return when {
-            fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForChat(
+            fileType is ImageFileTypeInfo -> FileNodeContent.ImageForChat(
                 allAttachmentMessageIds = getNodeAttachmentMessageIds(message.chatId)
             )
 
-            fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
+            fileType is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
 
-            fileNode.type is PdfFileTypeInfo -> FileNodeContent.Pdf(
+            fileType is PdfFileTypeInfo -> FileNodeContent.Pdf(
                 uri = getChatNodeContentUri(message)
             )
 
-            fileNode.type is VideoFileTypeInfo || fileNode.type is AudioFileTypeInfo -> FileNodeContent.AudioOrVideo(
+            fileType is VideoFileTypeInfo || fileType is AudioFileTypeInfo -> FileNodeContent.AudioOrVideo(
                 uri = getChatNodeContentUri(message)
             )
 

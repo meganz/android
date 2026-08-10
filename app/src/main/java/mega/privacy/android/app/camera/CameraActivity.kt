@@ -2,19 +2,19 @@ package mega.privacy.android.app.camera
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.camera.preview.navigateToPhotoPreview
@@ -23,10 +23,13 @@ import mega.privacy.android.app.camera.preview.photoPreviewScreen
 import mega.privacy.android.app.camera.preview.videoPreviewScreen
 import mega.privacy.android.app.camera.setting.cameraSettingModal
 import mega.privacy.android.app.camera.setting.navigateCameraSettingModal
-import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
+import mega.privacy.android.app.usecase.orientation.compactScreen
+import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
+import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.shared.resources.R as sharedR
+import timber.log.Timber
 
 @AndroidEntryPoint
 internal class CameraActivity : AppCompatActivity() {
@@ -36,8 +39,18 @@ internal class CameraActivity : AppCompatActivity() {
         super.attachBaseContext(newBase)
     }
 
-    @OptIn(ExperimentalMaterialNavigationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Set orientation before super.onCreate() to ensure it takes effect
+        enableAdaptiveLayout { old, new ->
+            Timber.d("On size change in CameraActivity from $old to $new")
+            requestedOrientation =
+                if (new.compactScreen()) {
+                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                } else {
+                    ActivityInfo.SCREEN_ORIENTATION_FULL_USER
+                }
+        }
+
         super.onCreate(savedInstanceState)
         setContent {
             val bottomSheetNavigator = rememberBottomSheetNavigator()

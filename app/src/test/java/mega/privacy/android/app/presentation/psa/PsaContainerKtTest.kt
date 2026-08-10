@@ -25,8 +25,9 @@ class PsaContainerKtTest {
                 state = PsaState.NoPsa,
                 markAsSeen = {},
                 navigateToPsaPage = {},
-                innerModifier = { it },
                 containerModifier = Modifier,
+                onDisplay = {},
+                innerModifier = { it },
             )
         }
 
@@ -47,14 +48,15 @@ class PsaContainerKtTest {
                 ),
                 markAsSeen = {},
                 navigateToPsaPage = {},
-                innerModifier = { it },
                 containerModifier = Modifier,
+                onDisplay = {},
+                innerModifier = { it },
             )
         }
 
         composeTestRule.onNodeWithTag(WebPsaTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaViewTag).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(PsaInfoViewTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PsaInfoViewTag, useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -71,13 +73,14 @@ class PsaContainerKtTest {
                 ),
                 markAsSeen = {},
                 navigateToPsaPage = {},
-                innerModifier = { it },
                 containerModifier = Modifier,
+                onDisplay = {},
+                innerModifier = { it },
             )
         }
 
         composeTestRule.onNodeWithTag(WebPsaTag).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(PsaViewTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PsaViewTag, useUnmergedTree = true).assertIsDisplayed()
         composeTestRule.onNodeWithTag(PsaInfoViewTag).assertDoesNotExist()
     }
 
@@ -91,8 +94,9 @@ class PsaContainerKtTest {
                 ),
                 markAsSeen = {},
                 navigateToPsaPage = {},
-                innerModifier = { it },
                 containerModifier = Modifier,
+                onDisplay = {},
+                innerModifier = { it },
             )
         }
 

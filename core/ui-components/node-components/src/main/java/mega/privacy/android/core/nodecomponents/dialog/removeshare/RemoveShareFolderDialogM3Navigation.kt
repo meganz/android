@@ -1,5 +1,6 @@
 package mega.privacy.android.core.nodecomponents.dialog.removeshare
 
+import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
@@ -21,9 +22,8 @@ fun EntryProviderScope<NavKey>.removeShareFolderDialogM3(
             )
         )
     ) { key ->
-        val mapper = NodeHandlesToJsonMapper()
-        val nodes = mapper(key.nodes)
-            .map { handle -> NodeId(handle) }
+        val mapper = remember { NodeHandlesToJsonMapper() }
+        val nodes = remember(key.nodes) { mapper(key.nodes).map { handle -> NodeId(handle) } }
 
         RemoveShareFolderDialogM3(
             nodes = nodes,

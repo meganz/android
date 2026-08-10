@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Use case to resume a sync by sync id
  */
-class ResumeSyncUseCase @Inject constructor(
+internal class ResumeSyncUseCase @Inject constructor(
     private val syncRepository: SyncRepository,
 ) {
 

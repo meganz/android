@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.settings.exportrecoverykey
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -15,9 +16,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.ExportRecoveryKeyView
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.showAlert
@@ -123,7 +125,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
         showAlert(
             this,
             getString(
-                if (key.isNullOrBlank()) R.string.general_text_error
+                if (key.isNullOrBlank()) sharedR.string.general_text_error
                 else R.string.copy_MK_confirmation
             ),
             null
@@ -154,9 +156,9 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
         val key = viewModel.getRecoveryKey()
 
         val resId = when {
-            key.isNullOrBlank() -> R.string.general_text_error
+            key.isNullOrBlank() -> sharedR.string.general_text_error
             isSaveToTextFileSuccessful(key, result) -> R.string.save_MK_confirmation
-            else -> R.string.general_text_error
+            else -> sharedR.string.general_text_error
         }
 
         viewModel.showSnackBar(getString(resId))
@@ -209,5 +211,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
          * in order to save the Recovery Key
          */
         const val WRITE_STORAGE_TO_SAVE_RK = 1
+
+        fun getIntent(context: Context) = Intent(context, ExportRecoveryKeyActivity::class.java)
     }
 }

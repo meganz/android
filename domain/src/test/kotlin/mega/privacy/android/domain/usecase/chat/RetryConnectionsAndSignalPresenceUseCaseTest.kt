@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -59,6 +60,20 @@ class RetryConnectionsAndSignalPresenceUseCaseTest {
         if (expected) {
             verify(chatRepository).signalPresenceActivity()
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideChatPresenceConfig")
+    fun `test that invoke does not call signalPresenceActivity when needSignalPresence is false`(
+        config: ChatPresenceConfig?,
+        expected: Boolean,
+    ) = runTest {
+        whenever(chatRepository.getChatPresenceConfig()) doReturn config
+
+        val actual = underTest(needSignalPresence = false)
+
+        assertThat(actual).isEqualTo(expected)
+        verify(chatRepository, never()).signalPresenceActivity()
     }
 
     private fun provideChatPresenceConfig() = Stream.of(

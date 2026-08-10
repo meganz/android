@@ -28,5 +28,7 @@ internal class CompletedTransferEntityMapper @Inject constructor(
         originalPath = completedTransfer.originalPath,
         parentHandle = completedTransfer.parentHandle,
         appData = transferAppDataMapper(completedTransfer.appData),
+        uniqueId = completedTransfer.uniqueId,
+        totalBytes = completedTransfer.totalBytes,
     )
 }

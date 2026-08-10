@@ -6,17 +6,12 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.extensions.asHotFlow
-import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
 import mega.privacy.android.app.presentation.psa.mapper.PsaStateMapper
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.psa.Psa
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
-import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.psa.MonitorPsaUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -33,7 +28,6 @@ class PsaViewModelTest {
     private lateinit var underTest: PsaViewModel
 
     private val monitorPsaUseCase = mock<MonitorPsaUseCase>()
-    private val fetchPsaUseCase = mock<FetchPsaUseCase>()
     private val dismissPsaUseCase = mock<DismissPsaUseCase>()
     private val psaStateMapper = mock<PsaStateMapper>()
 
@@ -41,13 +35,12 @@ class PsaViewModelTest {
     fun setUp() {
         reset(
             monitorPsaUseCase,
-            fetchPsaUseCase,
             dismissPsaUseCase,
             psaStateMapper,
         )
 
         monitorPsaUseCase.stub {
-            on { invoke(any()) }.thenReturn(flow { awaitCancellation() })
+            on { invoke() }.thenReturn(flow { awaitCancellation() })
         }
 
         psaStateMapper.stub {
@@ -60,25 +53,14 @@ class PsaViewModelTest {
             }
         }
 
-        fetchPsaUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(null)
-        }
-    }
-
-
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-        onBlocking { invoke(AppFeatures.NewPsaState) }.thenReturn(true)
     }
 
     private fun initViewModel() {
         underTest = PsaViewModel(
             monitorPsaUseCase = monitorPsaUseCase,
-            fetchPsaUseCase = fetchPsaUseCase,
             dismissPsaUseCase = dismissPsaUseCase,
             psaStateMapper = psaStateMapper,
-            currentTimeProvider = { 0 },
-            legacyState = mock<LegacyPsaGlobalState>(),
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            setDisplayedPsaUseCase = mock(),
         )
     }
 
@@ -87,7 +69,7 @@ class PsaViewModelTest {
         val expectedCount = 5
         val monitorFlow = MutableStateFlow(createPsa(99))
         monitorPsaUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(monitorFlow)
+            on { invoke() }.thenReturn(monitorFlow)
         }
 
         initViewModel()
@@ -115,35 +97,6 @@ class PsaViewModelTest {
         verifyBlocking(dismissPsaUseCase) { invoke(1) }
     }
 
-    @Test
-    fun `test that latest psa is fetched if previous psa is dismissed`() {
-        initViewModel()
-        underTest.markAsSeen(1)
-
-        verifyBlocking(fetchPsaUseCase) { invoke(any()) }
-    }
-
-    @Test
-    fun `test that new psa is set if another is fetched after dismissing the previous psa`() =
-        runTest {
-            monitorPsaUseCase.stub {
-                onBlocking { invoke(any()) }.thenReturn(createPsa(1).asHotFlow())
-            }
-            val expectedId = 2
-            fetchPsaUseCase.stub {
-                onBlocking { invoke(any()) }.thenReturn(createPsa(expectedId))
-            }
-
-            initViewModel()
-
-            underTest.state.test {
-                awaitItem()
-                underTest.markAsSeen(1)
-                val state = awaitItem()
-                assertThat((state as PsaState.StandardPsa).id).isEqualTo(expectedId)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
 
     private fun createStandardPsaState(id: Int) =
         PsaState.StandardPsa(

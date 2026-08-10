@@ -1,0 +1,1563 @@
+package mega.privacy.android.feature.pdfviewer.presentation
+
+import android.content.Context
+import android.content.res.Resources
+import android.graphics.RectF
+import android.net.Uri
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
+import com.shockwave.pdfium.PdfTextMatch
+import de.palm.composestateevents.consumed
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
+import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
+import mega.privacy.android.core.nodecomponents.model.OfflineTypedFileNode
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.Offline
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
+import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
+import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
+import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
+import mega.privacy.android.feature.pdfviewer.search.FakePdfSearchEngine
+import mega.privacy.android.feature.pdfviewer.search.PdfSearchEngineFactory
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.mobile.analytics.event.PdfViewerSearchMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.PdfViewerSearchPerformedEvent
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.Mockito
+import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeast
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class PdfViewerViewModelTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
+    }
+
+    private val testDispatcher: TestDispatcher get() = extension.testDispatcher
+
+    private lateinit var underTest: PdfViewerViewModel
+
+    private val getLastPageViewedInPdfUseCase = mock<GetLastPageViewedInPdfUseCase>()
+    private val setOrUpdateLastPageViewedInPdfUseCase =
+        mock<SetOrUpdateLastPageViewedInPdfUseCase>()
+    private val getDataBytesFromUrlUseCase = mock<GetDataBytesFromUrlUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val saveRecentlyUsedItemIfQualifiesUseCase =
+        mock<SaveRecentlyUsedItemIfQualifiesUseCase>()
+    private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
+    private val getPublicNodeByIdUseCase = mock<GetPublicNodeByIdUseCase>()
+    private val getChatFileUseCase = mock<GetChatFileUseCase>()
+    private val getOfflineFileInformationByIdUseCase =
+        mock<GetOfflineFileInformationByIdUseCase>()
+    private val offlineTypedNodeMapper = mock<OfflineTypedNodeMapper>()
+    private val context = mock<Context>()
+
+    private val defaultArgs = PdfViewerViewModel.Args(
+        nodeHandle = 12345L,
+        contentUri = "https://example.com/test/document.pdf",
+        isLocalContent = false,
+        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        mimeType = "application/pdf",
+        title = "Test Document.pdf",
+        chatId = null,
+        messageId = null,
+        shouldStopHttpServer = false,
+    )
+
+    @BeforeEach
+    fun setUp() = runTest {
+        // Reset use case mocks to prevent test pollution
+        reset(
+            getLastPageViewedInPdfUseCase,
+            setOrUpdateLastPageViewedInPdfUseCase,
+            getDataBytesFromUrlUseCase,
+            monitorConnectivityUseCase,
+            saveRecentlyUsedItemIfQualifiesUseCase,
+            monitorOfflineNodeUpdatesUseCase,
+            monitorNodeUpdatesUseCase,
+            getFeatureFlagValueUseCase,
+            getNodeByIdUseCase,
+            getPublicNodeUseCase,
+            getPublicNodeByIdUseCase,
+            getChatFileUseCase,
+            getOfflineFileInformationByIdUseCase,
+            offlineTypedNodeMapper,
+            context,
+        )
+
+        // Mock ContentResolver so PdfSearchEngine doesn't crash when opening URIs in tests.
+        whenever(context.contentResolver).thenReturn(mock())
+        // Mock Resources to prevent NPE in PdfiumCore initialization
+        val resources = mock<Resources>()
+        val displayMetrics = android.util.DisplayMetrics()
+        whenever(resources.displayMetrics).thenReturn(displayMetrics)
+        whenever(context.resources).thenReturn(resources)
+        whenever(getLastPageViewedInPdfUseCase(12345L)).thenReturn(1)
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
+        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.CloudExplorer) }.thenReturn(false)
+    }
+
+    private fun initViewModel(
+        args: PdfViewerViewModel.Args = defaultArgs,
+        pdfSearchEngineFactory: PdfSearchEngineFactory = object : PdfSearchEngineFactory {
+            override fun create(context: Context) = FakePdfSearchEngine()
+        },
+    ): PdfViewerViewModel {
+        return PdfViewerViewModel(
+            args = args,
+            context = context,
+            pdfSearchEngineFactory = pdfSearchEngineFactory,
+            getLastPageViewedInPdfUseCase = getLastPageViewedInPdfUseCase,
+            setOrUpdateLastPageViewedInPdfUseCase = setOrUpdateLastPageViewedInPdfUseCase,
+            getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            saveRecentlyUsedItemIfQualifiesUseCase = saveRecentlyUsedItemIfQualifiesUseCase,
+            ioDispatcher = testDispatcher,
+            applicationScope = CoroutineScope(testDispatcher),
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            getPublicNodeUseCase = getPublicNodeUseCase,
+            getPublicNodeByIdUseCase = getPublicNodeByIdUseCase,
+            getChatFileUseCase = getChatFileUseCase,
+            getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
+            offlineTypedNodeMapper = offlineTypedNodeMapper,
+        )
+    }
+
+    @Test
+    fun `test that isFileExplorerEnabled is true when FileExplorer feature flag is enabled`() =
+        runTest {
+            wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.CloudExplorer) }
+                .thenReturn(true)
+            underTest = initViewModel()
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isFileExplorerEnabled).isTrue()
+            }
+            verifyBlocking(getFeatureFlagValueUseCase) {
+                invoke(AppFeatures.CloudExplorer)
+            }
+        }
+
+    @Test
+    fun `test that isFileExplorerEnabled is false when FileExplorer feature flag is disabled`() =
+        runTest {
+            wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.CloudExplorer) }
+                .thenReturn(false)
+            underTest = initViewModel()
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isFileExplorerEnabled).isFalse()
+            }
+            verifyBlocking(getFeatureFlagValueUseCase) {
+                invoke(AppFeatures.CloudExplorer)
+            }
+        }
+
+    @Test
+    fun `test that initial state has correct title from args`() = runTest {
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.title).isEqualTo("Test Document.pdf")
+        }
+    }
+
+    @Test
+    fun `test that initial state has correct nodeHandle from args`() = runTest {
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.nodeHandle).isEqualTo(12345L)
+        }
+    }
+
+    @Test
+    fun `test that toggleToolbarVisibility toggles isToolbarVisible`() = runTest {
+        underTest = initViewModel()
+
+        underTest.state.test {
+            val initialState = awaitItem()
+            assertThat(initialState.isToolbarVisible).isTrue()
+
+            underTest.toggleToolbarVisibility()
+            assertThat(awaitItem().isToolbarVisible).isFalse()
+
+            underTest.toggleToolbarVisibility()
+            assertThat(awaitItem().isToolbarVisible).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that hideToolbar sets isToolbarVisible to false`() = runTest {
+        underTest = initViewModel()
+
+        underTest.state.test {
+            // Consume initial state
+            awaitItem()
+
+            underTest.hideToolbar()
+            assertThat(awaitItem().isToolbarVisible).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that onPageChanged updates currentPage and totalPages`() = runTest {
+        underTest = initViewModel()
+
+        underTest.state.test {
+            // Consume initial state
+            awaitItem()
+
+            underTest.onPageChanged(5, 20)
+            val state = awaitItem()
+            assertThat(state.currentPage).isEqualTo(5)
+            assertThat(state.totalPages).isEqualTo(20)
+        }
+    }
+
+    @Test
+    fun `test that onPageChanged does not touch Continue Where Left Off while reading`() =
+        runTest {
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.onPageChanged(18, 20)
+            advanceUntilIdle()
+
+            verifyNoInteractions(saveRecentlyUsedItemIfQualifiesUseCase)
+        }
+
+    @Test
+    fun `test that onLoadComplete sets loading to false and updates totalPages`() = runTest {
+        underTest = initViewModel()
+
+        underTest.state.test {
+            // Consume initial state
+            awaitItem()
+
+            underTest.onLoadComplete(25)
+            val state = awaitItem()
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.totalPages).isEqualTo(25)
+            assertThat(state.error).isNull()
+        }
+    }
+
+    @Test
+    fun `test that initial state has nodeSourceType from args`() = runTest {
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.CLOUD_DRIVE)
+        }
+    }
+
+    @Test
+    fun `test that initial state has nodeSourceType FOLDER_LINK when args have FOLDER_LINK`() =
+        runTest {
+            val folderLinkArgs = defaultArgs.copy(nodeSourceType = NodeSourceType.FOLDER_LINK)
+            underTest = initViewModel(args = folderLinkArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.FOLDER_LINK)
+            }
+        }
+
+    @Test
+    fun `test that submitPassword updates currentPassword clears error and sets loading`() =
+        runTest {
+            underTest = initViewModel()
+
+            underTest.state.test {
+                // Consume initial state
+                awaitItem()
+
+                underTest.onLoadError(PdfViewerError.InvalidPassword)
+                assertThat(awaitItem().error).isEqualTo(PdfViewerError.InvalidPassword)
+
+                underTest.submitPassword("test123")
+                val state = awaitItem()
+                assertThat(state.currentPassword).isEqualTo("test123")
+                assertThat(state.error).isNull()
+                assertThat(state.isLoading).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that retryLoad sets loading to true and clears error`() = runTest {
+        underTest = initViewModel()
+
+        underTest.state.test {
+            awaitItem() // consume initial state
+
+            underTest.onLoadError(PdfViewerError.FileNotFound)
+            val errorState = awaitItem()
+            assertThat(errorState.isLoading).isFalse()
+            assertThat(errorState.error).isEqualTo(PdfViewerError.FileNotFound)
+
+            underTest.retryLoad()
+            val retriedState = awaitItem()
+            assertThat(retriedState.isLoading).isTrue()
+            assertThat(retriedState.error).isNull()
+        }
+    }
+
+    @Test
+    fun `test that clearError sets error to null`() = runTest {
+        underTest = initViewModel()
+
+        underTest.state.test {
+            awaitItem() // consume initial state
+
+            underTest.onLoadError(PdfViewerError.FileNotFound)
+            assertThat(awaitItem().error).isEqualTo(PdfViewerError.FileNotFound)
+
+            underTest.clearError()
+            assertThat(awaitItem().error).isNull()
+        }
+    }
+
+    @Test
+    fun `test that activateSearch sets isSearchActive to true`() = runTest {
+        underTest = initViewModel()
+
+        underTest.state.test {
+            // Consume initial state
+            awaitItem()
+
+            underTest.activateSearch()
+            assertThat(awaitItem().searchState.isSearchActive).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that activateSearch tracks PdfViewerSearchMenuToolbarEvent`() = runTest {
+        underTest = initViewModel()
+
+        underTest.activateSearch()
+
+        assertThat(
+            analyticsExtension.events.filterIsInstance<PdfViewerSearchMenuToolbarEvent>()
+        ).isNotEmpty()
+    }
+
+    @Test
+    fun `test that deactivateSearch clears all search state`() = runTest {
+        underTest = initViewModel()
+
+        underTest.state.test {
+            // Consume initial state
+            awaitItem()
+
+            underTest.activateSearch()
+            // Consume state after activateSearch
+            awaitItem()
+
+            underTest.onSearchQueryChanged("test")
+            // Consume state after query change
+            awaitItem()
+
+            underTest.deactivateSearch()
+            val searchState = awaitItem().searchState
+            assertThat(searchState.isSearchActive).isFalse()
+            assertThat(searchState.query).isEmpty()
+            assertThat(searchState.results).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that onSearchQueryChanged updates query in state`() = runTest {
+        underTest = initViewModel()
+
+        underTest.state.test {
+            // Consume initial state
+            awaitItem()
+
+            underTest.onSearchQueryChanged("hello")
+            assertThat(awaitItem().searchState.query).isEqualTo("hello")
+        }
+    }
+
+    @Test
+    fun `test that createSourceFromArgs returns CloudNode with RUBBISH_BIN type when nodeSourceType is RUBBISH_BIN`() =
+        runTest {
+            val rubbishBinArgs = defaultArgs.copy(
+                nodeHandle = 98765L,
+                nodeSourceType = NodeSourceType.RUBBISH_BIN,
+            )
+            underTest = initViewModel(args = rubbishBinArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+
+                assertThat(state.source).isInstanceOf(PdfViewerSource.CloudNode::class.java)
+                val source = state.source as PdfViewerSource.CloudNode
+                assertThat(source.nodeHandle).isEqualTo(98765L)
+                assertThat(source.nodeSourceType).isEqualTo(NodeSourceType.RUBBISH_BIN)
+            }
+        }
+
+    @Test
+    fun `test that createSourceFromArgs returns CloudNode with BACKUPS type when nodeSourceType is BACKUPS`() =
+        runTest {
+            val backupsArgs = defaultArgs.copy(
+                nodeHandle = 54321L,
+                nodeSourceType = NodeSourceType.BACKUPS,
+            )
+            underTest = initViewModel(args = backupsArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+
+                assertThat(state.source).isInstanceOf(PdfViewerSource.CloudNode::class.java)
+                val source = state.source as PdfViewerSource.CloudNode
+                assertThat(source.nodeHandle).isEqualTo(54321L)
+                assertThat(source.nodeSourceType).isEqualTo(NodeSourceType.BACKUPS)
+            }
+        }
+
+    @Test
+    fun `test that observeConnectivity updates isOnline to true when connected`() = runTest {
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().isOnline).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that observeConnectivity updates isOnline to false when disconnected`() = runTest {
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().isOnline).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that onLoadError resolves PasswordProtected to InvalidPassword when password was already submitted`() =
+        runTest {
+            underTest = initViewModel()
+            underTest.submitPassword("wrongPassword")
+            advanceUntilIdle()
+
+            underTest.state.test {
+                awaitItem() // consume current state
+
+                underTest.onLoadError(PdfViewerError.PasswordProtected)
+                assertThat(awaitItem().error).isEqualTo(PdfViewerError.InvalidPassword)
+            }
+        }
+
+    @Test
+    fun `test that onLoadError keeps PasswordProtected when no password was submitted yet`() =
+        runTest {
+            underTest = initViewModel()
+
+            underTest.state.test {
+                awaitItem() // consume initial state
+
+                underTest.onLoadError(PdfViewerError.PasswordProtected)
+                assertThat(awaitItem().error).isEqualTo(PdfViewerError.PasswordProtected)
+            }
+        }
+
+    @Test
+    fun `test that onLoadError sets non-password errors directly`() = runTest {
+        underTest = initViewModel()
+
+        underTest.state.test {
+            awaitItem() // consume initial state
+
+            underTest.onLoadError(PdfViewerError.FileNotFound)
+            assertThat(awaitItem().error).isEqualTo(PdfViewerError.FileNotFound)
+        }
+    }
+
+    @Test
+    fun `test that onPasswordDialogInputChanged clears InvalidPassword error to PasswordProtected`() =
+        runTest {
+            underTest = initViewModel()
+            underTest.submitPassword("wrong")
+            advanceUntilIdle()
+            underTest.onLoadError(PdfViewerError.PasswordProtected) // triggers InvalidPassword resolution
+
+            underTest.state.test {
+                awaitItem() // consume current state
+
+                underTest.onPasswordDialogInputChanged()
+                assertThat(awaitItem().error).isEqualTo(PdfViewerError.PasswordProtected)
+            }
+        }
+
+    @Test
+    fun `test that onPasswordDialogInputChanged does not change state when error is null`() =
+        runTest {
+            underTest = initViewModel()
+
+            underTest.state.test {
+                awaitItem() // consume initial state (error = null)
+
+                underTest.onPasswordDialogInputChanged()
+                expectNoEvents()
+            }
+        }
+
+    @Test
+    fun `test that onPasswordDialogInputChanged does not change state when error is PasswordProtected`() =
+        runTest {
+            underTest = initViewModel()
+
+            underTest.state.test {
+                awaitItem() // consume initial state
+
+                underTest.onLoadError(PdfViewerError.PasswordProtected)
+                awaitItem() // consume PasswordProtected error state
+
+                underTest.onPasswordDialogInputChanged()
+                expectNoEvents()
+            }
+        }
+
+    @Test
+    fun `test that retryLoad triggers loadPdfBytes for remote https URL`() = runTest {
+        whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+        underTest = initViewModel(
+            args = defaultArgs.copy(
+                contentUri = "https://example.com/test.pdf",
+                isLocalContent = false,
+            )
+        )
+        advanceUntilIdle()
+
+        underTest.onLoadComplete(1)
+        advanceUntilIdle()
+
+        underTest.retryLoad()
+        advanceUntilIdle()
+
+        // getDataBytesFromUrlUseCase should have been called at least once (initial load + retry)
+        verify(getDataBytesFromUrlUseCase, atLeast(2)).invoke(any())
+    }
+
+    @Test
+    fun `test that retryLoad does not trigger loadPdfBytes for local content`() = runTest {
+        Mockito.mockStatic(Uri::class.java).use { _ ->
+            whenever(Uri.parse(any())).thenReturn(mock<Uri>())
+            underTest = initViewModel(
+                args = defaultArgs.copy(
+                    contentUri = "file:///sdcard/test.pdf",
+                    isLocalContent = true,
+                )
+            )
+            advanceUntilIdle()
+
+            underTest.retryLoad()
+            advanceUntilIdle()
+
+            verifyNoInteractions(getDataBytesFromUrlUseCase)
+        }
+    }
+
+    @Test
+    fun `test that search pipeline updates state with results when engine returns matches`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+
+            // Wait for initialization - now that ioDispatcher is the test dispatcher, advanceUntilIdle works
+            advanceUntilIdle()
+
+            // Verify search engine is ready
+            assertThat(fakeEngine.isOpen).isTrue()
+
+            underTest.activateSearch()
+            underTest.onSearchQueryChanged("abc")
+            // Wait for debounce (300ms) + processing
+            advanceTimeBy(400)
+            runCurrent()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.searchState.results).hasSize(1)
+                assertThat(state.searchState.isSearching).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that deactivateSearch tracks PdfViewerSearchPerformedEvent with the last result count`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            underTest.onSearchQueryChanged("abc")
+            // Wait for debounce (300ms) + processing
+            advanceTimeBy(400)
+            runCurrent()
+            underTest.deactivateSearch()
+
+            val performedEvents =
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            assertThat(performedEvents).isNotEmpty()
+            assertThat(performedEvents.last().info["resultCount"]).isEqualTo(1)
+        }
+
+    @Test
+    fun `test that PdfViewerSearchPerformedEvent is not tracked while typing without deactivating`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            underTest.onSearchQueryChanged("abc")
+            advanceTimeBy(400)
+            runCurrent()
+
+            assertThat(
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            ).isEmpty()
+        }
+
+    @Test
+    fun `test that deactivateSearch does not track PdfViewerSearchPerformedEvent when no search ran`() =
+        runTest {
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            underTest.deactivateSearch()
+
+            assertThat(
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            ).isEmpty()
+        }
+
+    @Test
+    fun `test that activateSearch resets the previous result count so a new session without a search does not track PdfViewerSearchPerformedEvent`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            // First session performs a real search and reports once on close.
+            underTest.activateSearch()
+            underTest.onSearchQueryChanged("abc")
+            advanceTimeBy(400)
+            runCurrent()
+            underTest.deactivateSearch()
+
+            // Second session runs no search; the previous count must not be reported again.
+            underTest.activateSearch()
+            underTest.deactivateSearch()
+
+            assertThat(
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            ).hasSize(1)
+        }
+
+    @Test
+    fun `test that deactivateSearch reports the last performed search result count even after the query is cleared`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            underTest.onSearchQueryChanged("abc")
+            advanceTimeBy(400)
+            runCurrent()
+            // User clears the search field before closing; the last real search still counts.
+            underTest.onSearchQueryChanged("")
+            advanceTimeBy(400)
+            runCurrent()
+            underTest.deactivateSearch()
+
+            val performedEvents =
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            assertThat(performedEvents).hasSize(1)
+            assertThat(performedEvents.last().info["resultCount"]).isEqualTo(1)
+        }
+
+    @Test
+    fun `test that deactivateSearch reports 0 when the only search returned no results`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = emptyList()
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            underTest.onSearchQueryChanged("xyz")
+            advanceTimeBy(400)
+            runCurrent()
+            underTest.deactivateSearch()
+
+            val performedEvents =
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            assertThat(performedEvents).hasSize(1)
+            assertThat(performedEvents.last().info["resultCount"]).isEqualTo(0)
+        }
+
+    @Test
+    fun `test that a trailing zero-result search does not overwrite a previous non-zero count`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            // First search finds matches.
+            underTest.onSearchQueryChanged("abc")
+            advanceTimeBy(400)
+            runCurrent()
+            // User then types gibberish that matches nothing.
+            fakeEngine.searchResults = emptyList()
+            underTest.onSearchQueryChanged("abcxyz")
+            advanceTimeBy(400)
+            runCurrent()
+            underTest.deactivateSearch()
+
+            val performedEvents =
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            assertThat(performedEvents).hasSize(1)
+            assertThat(performedEvents.last().info["resultCount"]).isEqualTo(1)
+        }
+
+    @Test
+    fun `test that state has StreamingError and isLoading false when getDataBytesFromUrlUseCase returns null`() =
+        runTest {
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(null)
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.error).isInstanceOf(PdfViewerError.StreamingError::class.java)
+            }
+        }
+
+    @Test
+    fun `test that state has StreamingError and isLoading false when getDataBytesFromUrlUseCase throws`() =
+        runTest {
+            whenever(getDataBytesFromUrlUseCase(any())).thenThrow(RuntimeException("network failure"))
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.error).isInstanceOf(PdfViewerError.StreamingError::class.java)
+            }
+        }
+
+    @Test
+    fun `test that isOnline reflects last emission when connectivity changes from true to false`() =
+        runTest {
+            whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true, false))
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().isOnline).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that onLoadComplete does not save recently used item on open`() = runTest {
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.onLoadComplete(10)
+        advanceUntilIdle()
+
+        verifyNoInteractions(saveRecentlyUsedItemIfQualifiesUseCase)
+    }
+
+    @Test
+    fun `test that onCleared persists Continue Where Left Off with the read-through progress`() =
+        runTest {
+            underTest = initViewModel()
+            advanceUntilIdle()
+            underTest.onLoadComplete(20)
+            underTest.onPageChanged(5, 20)
+            advanceUntilIdle()
+
+            underTest.onCleared()
+            advanceUntilIdle()
+
+            verify(saveRecentlyUsedItemIfQualifiesUseCase).invoke(
+                nodeHandle = 12345L,
+                type = RecentlyUsedType.PDF,
+                fileName = "Test Document.pdf",
+                progress = 0.25f,
+            )
+        }
+
+    @Test
+    fun `test that onCleared does not touch Continue Where Left Off when totalPages is zero`() =
+        runTest {
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.onCleared()
+            advanceUntilIdle()
+
+            verifyNoInteractions(saveRecentlyUsedItemIfQualifiesUseCase)
+        }
+
+    @Test
+    fun `test that onCleared does not touch Continue Where Left Off when isExternalFile is true`() =
+        runTest {
+            underTest = initViewModel(args = externalFileArgs)
+            advanceUntilIdle()
+            underTest.onLoadComplete(20)
+            underTest.onPageChanged(5, 20)
+            advanceUntilIdle()
+
+            underTest.onCleared()
+            advanceUntilIdle()
+
+            verifyNoInteractions(saveRecentlyUsedItemIfQualifiesUseCase)
+        }
+
+    @Test
+    fun `test that monitorOfflineNodeAvailability does not trigger dismissEvent when nodeSourceType is not OFFLINE`() =
+        runTest {
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+
+            underTest = initViewModel(
+                args = defaultArgs.copy(nodeSourceType = NodeSourceType.CLOUD_DRIVE)
+            )
+            advanceUntilIdle()
+
+            verifyNoInteractions(monitorOfflineNodeUpdatesUseCase)
+        }
+
+    @Test
+    fun `test that monitorOfflineNodeAvailability does not trigger dismissEvent when node is still in offline list`() =
+        runTest {
+            val offlineFlow = MutableSharedFlow<List<Offline>>()
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(offlineFlow)
+
+            val offlineArgs = defaultArgs.copy(
+                nodeHandle = 12345L,
+                nodeSourceType = NodeSourceType.OFFLINE,
+                contentUri = "/offline/test.pdf",
+                isLocalContent = true,
+            )
+            underTest = initViewModel(args = offlineArgs)
+            advanceUntilIdle()
+
+            offlineFlow.emit(
+                listOf(
+                    Offline(
+                        id = 1,
+                        handle = "12345",
+                        path = "/offline",
+                        name = "test.pdf",
+                        parentId = 0,
+                        type = "0",
+                        origin = 0,
+                        handleIncoming = "",
+                    )
+                )
+            )
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.dismissEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that monitorOfflineNodeAvailability triggers dismissEvent when node is removed from offline`() =
+        runTest {
+            val offlineFlow = MutableSharedFlow<List<Offline>>()
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(offlineFlow)
+
+            val offlineArgs = defaultArgs.copy(
+                nodeHandle = 12345L,
+                nodeSourceType = NodeSourceType.OFFLINE,
+                contentUri = "/offline/test.pdf",
+                isLocalContent = true,
+            )
+            underTest = initViewModel(args = offlineArgs)
+            advanceUntilIdle()
+
+            offlineFlow.emit(
+                listOf(
+                    Offline(
+                        id = 1,
+                        handle = "12345",
+                        path = "/offline",
+                        name = "test.pdf",
+                        parentId = 0,
+                        type = "0",
+                        origin = 0,
+                        handleIncoming = "",
+                    )
+                )
+            )
+            advanceUntilIdle()
+
+            underTest.state.test {
+                awaitItem() // consume current state
+
+                offlineFlow.emit(emptyList())
+                advanceUntilIdle()
+
+                val state = awaitItem()
+                assertThat(state.dismissEvent).isNotEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that resetDismissEvent consumes dismissEvent`() = runTest {
+        val offlineFlow = MutableSharedFlow<List<Offline>>()
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(offlineFlow)
+
+        val offlineArgs = defaultArgs.copy(
+            nodeHandle = 12345L,
+            nodeSourceType = NodeSourceType.OFFLINE,
+            contentUri = "/offline/test.pdf",
+            isLocalContent = true,
+        )
+        underTest = initViewModel(args = offlineArgs)
+        advanceUntilIdle()
+
+        offlineFlow.emit(emptyList())
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val triggeredState = awaitItem()
+            assertThat(triggeredState.dismissEvent).isNotEqualTo(consumed)
+
+            underTest.resetDismissEvent()
+            val consumedState = awaitItem()
+            assertThat(consumedState.dismissEvent).isEqualTo(consumed)
+        }
+    }
+
+    private fun TestScope.triggerSearch(query: String = "abc") {
+        underTest.activateSearch()
+        underTest.onSearchQueryChanged(query)
+        advanceTimeBy(300) // passes the 300 ms debounce window
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun `test that search pipeline populates allMatchRectsByPage when results arrive`() =
+        runTest {
+            val expectedRects = listOf(RectF(0f, 0f, 100f, 20f))
+            val fakeEngine = FakePdfSearchEngine().apply {
+                searchResults = listOf(PdfTextMatch(2, 0, 1, emptyList()))
+                getPdfRectsResult = expectedRects
+            }
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                }
+            )
+            advanceUntilIdle()
+
+            underTest.onPageChanged(1, 10) // simulate document loaded
+            triggerSearch()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.searchState.allMatchRectsByPage).containsKey(2)
+                assertThat(state.searchState.allMatchRectsByPage[2]).isEqualTo(expectedRects)
+            }
+        }
+
+    @Test
+    fun `test that onPageChanged populates allMatchRectsByPage for visible pages`() =
+        runTest {
+            val expectedRects = listOf(RectF(0f, 0f, 100f, 20f))
+            val fakeEngine = FakePdfSearchEngine().apply {
+                searchResults = listOf(PdfTextMatch(5, 0, 1, emptyList()))
+                getPdfRectsResult = expectedRects
+            }
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                }
+            )
+            advanceUntilIdle()
+
+            triggerSearch()
+            // Navigate to page 6 (1-indexed) — triggers fetch for pages 4, 5, 6 (0-indexed)
+            underTest.onPageChanged(6, 20)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.searchState.allMatchRectsByPage).containsKey(5)
+            }
+        }
+
+    @Test
+    fun `test that onSearchQueryChanged clears allMatchRectsByPage`() = runTest {
+        underTest = initViewModel()
+
+        underTest.onSearchQueryChanged("xyz")
+
+        underTest.state.test {
+            assertThat(awaitItem().searchState.allMatchRectsByPage).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that deactivateSearch clears allMatchRectsByPage`() = runTest {
+        underTest = initViewModel()
+
+        underTest.deactivateSearch()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.searchState.allMatchRectsByPage).isEmpty()
+            assertThat(state.searchState.isSearchActive).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that allMatchRectsByPage retains all pages as user scrolls`() =
+        runTest {
+            val totalPages = 22
+            val fakeEngine = FakePdfSearchEngine().apply {
+                searchResults = (0 until totalPages).map { page -> PdfTextMatch(page, 0, 1, emptyList()) }
+                getPdfRectsResult = listOf(RectF(0f, 0f, 100f, 20f))
+            }
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                }
+            )
+            advanceUntilIdle()
+
+            triggerSearch()
+            for (page in 1..totalPages) {
+                underTest.onPageChanged(page, totalPages)
+            }
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().searchState.allMatchRectsByPage.size).isEqualTo(totalPages)
+            }
+        }
+
+    private val externalFileArgs = PdfViewerViewModel.Args(
+        nodeHandle = -1L,
+        contentUri = "content://authority/external.pdf",
+        isLocalContent = true,
+        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        mimeType = "application/pdf",
+        title = "external.pdf",
+        chatId = null,
+        messageId = null,
+        shouldStopHttpServer = false,
+        isExternalFile = true,
+    )
+
+    @Test
+    fun `test that init does not load last viewed page when isExternalFile is true`() = runTest {
+        underTest = initViewModel(args = externalFileArgs)
+        advanceUntilIdle()
+
+        verify(getLastPageViewedInPdfUseCase, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that currentPage is null before init coroutines run and becomes 1 after`() =
+        runTest {
+            underTest = initViewModel()
+
+            underTest.state.test {
+                // Before advancing the dispatcher: the launched coroutine in loadLastViewedPage()
+                // hasn't run yet, so currentPage is still null and the screen shows loading.
+                assertThat(awaitItem().currentPage).isNull()
+
+                advanceUntilIdle()
+
+                // After the coroutine runs, currentPage is resolved to the mocked value (1).
+                assertThat(expectMostRecentItem().currentPage).isEqualTo(1)
+            }
+        }
+
+    @Test
+    fun `test that currentPage is set to 1 immediately when isExternalFile is true`() = runTest {
+        underTest = initViewModel(args = externalFileArgs)
+
+        underTest.state.test {
+            // External files skip the DB lookup and resolve currentPage synchronously to 1.
+            assertThat(awaitItem().currentPage).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `test that currentPage defaults to 1 when getLastPageViewedInPdfUseCase fails`() = runTest {
+        whenever(getLastPageViewedInPdfUseCase(12345L)).thenThrow(RuntimeException("db error"))
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentPage).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `test that currentPage is set to last viewed page when getLastPageViewedInPdfUseCase returns saved page`() =
+        runTest {
+            whenever(getLastPageViewedInPdfUseCase(12345L)).thenReturn(7)
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.source).isNotNull()
+                assertThat(state.currentPage).isEqualTo(7)
+            }
+        }
+
+    @Test
+    fun `test that onPageChanged does not persist last page when isExternalFile is true`() =
+        runTest {
+            underTest = initViewModel(args = externalFileArgs)
+            advanceUntilIdle()
+
+            underTest.onPageChanged(2, 10)
+            advanceUntilIdle()
+
+            verify(setOrUpdateLastPageViewedInPdfUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that currentNode stays null and node lookup is skipped when isExternalFile is true`() =
+        runTest {
+            underTest = initViewModel(args = externalFileArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isNull()
+            }
+            verifyNoInteractions(getNodeByIdUseCase)
+        }
+
+    @Test
+    fun `test that currentNode stays null when node cannot be resolved`() = runTest {
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
+    }
+
+    @Test
+    fun `test that currentNode is populated when GetNodeByIdUseCase returns a node`() = runTest {
+        val node = mock<TypedFileNode>()
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(node)
+
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isEqualTo(node)
+        }
+    }
+
+    @Test
+    fun `test that currentNode falls back to offline information for OFFLINE source when cloud node is gone`() =
+        runTest {
+            val offlineArgs = defaultArgs.copy(nodeSourceType = NodeSourceType.OFFLINE)
+            val offlineInfo = mock<OfflineFileInformation>()
+            val offlineNode = mock<OfflineTypedFileNode>()
+            wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+            wheneverBlocking { getOfflineFileInformationByIdUseCase(NodeId(12345L)) }
+                .thenReturn(offlineInfo)
+            whenever(offlineTypedNodeMapper(offlineInfo)).thenReturn(offlineNode)
+
+            underTest = initViewModel(args = offlineArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isEqualTo(offlineNode)
+            }
+        }
+
+    @Test
+    fun `test that offline fallback is not used for non-OFFLINE source types`() = runTest {
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
+        verifyNoInteractions(getOfflineFileInformationByIdUseCase, offlineTypedNodeMapper)
+    }
+
+    @Test
+    fun `test that currentNode stays null when offline fallback also returns null`() = runTest {
+        val offlineArgs = defaultArgs.copy(nodeSourceType = NodeSourceType.OFFLINE)
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+        wheneverBlocking { getOfflineFileInformationByIdUseCase(NodeId(12345L)) }
+            .thenReturn(null)
+
+        underTest = initViewModel(args = offlineArgs)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
+        verifyNoInteractions(offlineTypedNodeMapper)
+    }
+
+    @Test
+    fun `test that currentNode falls back to chat file when node is not in the account`() =
+        runTest {
+            val chatArgs = defaultArgs.copy(
+                nodeSourceType = NodeSourceType.CHAT,
+                chatId = 111L,
+                messageId = 222L,
+            )
+            val chatFile = mock<ChatDefaultFile>()
+            wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+            wheneverBlocking { getChatFileUseCase(111L, 222L) }.thenReturn(chatFile)
+
+            underTest = initViewModel(args = chatArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isEqualTo(chatFile)
+            }
+        }
+
+    @Test
+    fun `test that chat fallback is not used when node resolves by handle`() = runTest {
+        val chatArgs = defaultArgs.copy(
+            nodeSourceType = NodeSourceType.CHAT,
+            chatId = 111L,
+            messageId = 222L,
+        )
+        val node = mock<TypedFileNode>()
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(node)
+
+        underTest = initViewModel(args = chatArgs)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isEqualTo(node)
+        }
+        verifyNoInteractions(getChatFileUseCase)
+    }
+
+    @Test
+    fun `test that chat fallback is not used when chat ids are missing`() = runTest {
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
+        verifyNoInteractions(getChatFileUseCase)
+    }
+
+    @Test
+    fun `test that chat fallback is not used when the source type is not chat`() = runTest {
+        val args = defaultArgs.copy(chatId = 111L, messageId = 222L)
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+
+        underTest = initViewModel(args = args)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
+        verifyNoInteractions(getChatFileUseCase)
+    }
+
+    @Test
+    fun `test that currentNode stays null when chat fallback also returns null`() = runTest {
+        val chatArgs = defaultArgs.copy(
+            nodeSourceType = NodeSourceType.CHAT,
+            chatId = 111L,
+            messageId = 222L,
+        )
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+        wheneverBlocking { getChatFileUseCase(111L, 222L) }.thenReturn(null)
+
+        underTest = initViewModel(args = chatArgs)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
+    }
+
+    @Test
+    fun `test that currentNode is wrapped in PublicLinkFile for FILE_LINK source`() = runTest {
+        val publicUrl = "https://mega.nz/file/abc"
+        val fileLinkArgs = defaultArgs.copy(
+            nodeSourceType = NodeSourceType.FILE_LINK,
+            publicLinkUrl = publicUrl,
+        )
+        val node = mock<TypedFileNode>()
+        wheneverBlocking { getPublicNodeUseCase(publicUrl) }.thenReturn(node)
+
+        underTest = initViewModel(args = fileLinkArgs)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val currentNode = awaitItem().currentNode
+            assertThat(currentNode).isInstanceOf(PublicLinkFile::class.java)
+            assertThat((currentNode as PublicLinkFile).node).isEqualTo(node)
+        }
+        verifyNoInteractions(getNodeByIdUseCase)
+    }
+
+    @Test
+    fun `test that currentNode stays null for FILE_LINK source when public link url is missing`() =
+        runTest {
+            val fileLinkArgs = defaultArgs.copy(
+                nodeSourceType = NodeSourceType.FILE_LINK,
+                publicLinkUrl = null,
+            )
+
+            underTest = initViewModel(args = fileLinkArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isNull()
+            }
+            verifyNoInteractions(getPublicNodeUseCase, getNodeByIdUseCase)
+        }
+
+    @Test
+    fun `test that currentNode is resolved via GetPublicNodeByIdUseCase for FOLDER_LINK source`() =
+        runTest {
+            val folderLinkArgs = defaultArgs.copy(nodeSourceType = NodeSourceType.FOLDER_LINK)
+            val node = mock<TypedFileNode>()
+            wheneverBlocking { getPublicNodeByIdUseCase(NodeId(12345L)) }.thenReturn(node)
+
+            underTest = initViewModel(args = folderLinkArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isEqualTo(node)
+            }
+            verifyNoInteractions(getNodeByIdUseCase)
+        }
+
+    @Test
+    fun `test that currentNode stays null for FOLDER_LINK source when node cannot be resolved`() =
+        runTest {
+            val folderLinkArgs = defaultArgs.copy(nodeSourceType = NodeSourceType.FOLDER_LINK)
+            wheneverBlocking { getPublicNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+
+            underTest = initViewModel(args = folderLinkArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isNull()
+            }
+            verifyNoInteractions(getNodeByIdUseCase)
+        }
+
+    @Test
+    fun `test that init refreshes title and currentNode when the open node is renamed`() = runTest {
+        val renamedNode = mock<TypedFileNode> {
+            on { name }.thenReturn("Renamed Document.pdf")
+        }
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(renamedNode)
+        val updatedNode = mock<Node> {
+            on { id }.thenReturn(NodeId(12345L))
+        }
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(
+            flowOf(NodeUpdate(mapOf(updatedNode to listOf(NodeChanges.Name))))
+        )
+
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.title).isEqualTo("Renamed Document.pdf")
+            assertThat(state.currentNode).isEqualTo(renamedNode)
+        }
+    }
+
+    @Test
+    fun `test that init does not refresh current node when update is for a different node`() = runTest {
+        val node = mock<TypedFileNode> {
+            on { name }.thenReturn("Test Document.pdf")
+        }
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(node)
+        val otherNode = mock<Node> {
+            on { id }.thenReturn(NodeId(99999L))
+        }
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(
+            flowOf(NodeUpdate(mapOf(otherNode to listOf(NodeChanges.Name))))
+        )
+
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().title).isEqualTo("Test Document.pdf")
+        }
+        // loadCurrentNode runs once at init only; the unrelated update is filtered out.
+        verifyBlocking(getNodeByIdUseCase) { invoke(NodeId(12345L)) }
+    }
+
+    @Test
+    fun `test that init does not monitor node updates for external files`() = runTest {
+        underTest = initViewModel(args = externalFileArgs)
+        advanceUntilIdle()
+
+        verifyNoInteractions(monitorNodeUpdatesUseCase)
+    }
+}

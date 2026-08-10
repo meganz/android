@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.changepassword.PasswordStrength
  * @param isConnectedToNetwork ui state to handle network connectivity state
  * @param isUserLoggedIn ui state to determine whether user is logged in
  * @param isResetPasswordMode ui state to determine whether screen is on change password mode or reset password mode
+ * @param isParkAccountMode ui state to determine whether reset password screen is the park-account variant
  * @param isResetPasswordLinkValid ui state to determine whether link is valid when mode is password reset
  * @param isShowAlertMessage ui state to show alert dialog
  * @param passwordStrength password level strength to show password level animation
@@ -31,6 +32,7 @@ data class ChangePasswordUIState(
     val isConnectedToNetwork: Boolean = false,
     val isUserLoggedIn: Boolean = false,
     val isResetPasswordMode: Boolean = false,
+    val isParkAccountMode: Boolean = false,
     val isResetPasswordLinkValid: Boolean = true,
     val isShowAlertMessage: Boolean = false,
     val passwordStrength: PasswordStrength = PasswordStrength.INVALID,

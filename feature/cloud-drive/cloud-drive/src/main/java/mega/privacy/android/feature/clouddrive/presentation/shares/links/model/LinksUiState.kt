@@ -3,11 +3,13 @@ package mega.privacy.android.feature.clouddrive.presentation.shares.links.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
@@ -20,11 +22,9 @@ data class LinksUiState(
     val navigateToFolderEvent: StateEventWithContent<TypedNode> = consumed(),
     val navigateBack: StateEvent = consumed,
     val openedFileNode: TypedFileNode? = null,
-    val isSelecting: Boolean = false,
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
 ) {
-
 
     /**
      * Count of visible selected items
@@ -37,6 +37,11 @@ data class LinksUiState(
     val isInSelectionMode = selectedItemsCount > 0
 
     /**
+     * True if all items are selected
+     */
+    val isAllSelected = selectedItemsCount == items.size
+
+    /**
      * True if there are no visible items and not loading
      */
     val isEmpty = items.isEmpty() && !isLoading
@@ -45,5 +50,15 @@ data class LinksUiState(
      * Returns a list of selected nodes.
      */
     val selectedNodes: List<TypedNode>
-        get() = items.mapNotNull { if (it.isSelected) it.node else null }
+        get() = items.mapNotNull { item ->
+            if (item.isSelected) {
+                when (val node = item.node) {
+                    is PublicLinkFolder -> node.node
+                    is PublicLinkFile -> node.node
+                    else -> node
+                }
+            } else {
+                null
+            }
+        }
 }

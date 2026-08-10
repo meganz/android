@@ -75,4 +75,11 @@ sealed interface TransferAppData {
      * Identify a transfer that is a download to make it available offline
      */
     data object OfflineDownload : TransferAppData
+
+    /**
+     * Identify a transfer that is a download initiated by the Storage Access Framework
+     * document provider. Unlike [PreviewDownload], these transfers participate in the standard
+     * transfer notification and totals so the user can see progress while MEGA's UI is not visible.
+     */
+    data object SafDownload : TransferAppData
 }

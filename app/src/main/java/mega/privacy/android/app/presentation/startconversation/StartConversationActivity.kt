@@ -24,12 +24,12 @@ import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.view.StartConversationView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.CreateNoteToSelfButtonPressedEvent
 import mega.privacy.mobile.analytics.event.GroupChatPressedEvent
 import mega.privacy.mobile.analytics.event.InviteContactsPressedEvent
@@ -45,10 +45,10 @@ import javax.inject.Inject
 class StartConversationActivity : ComponentActivity() {
 
     @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
-    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+    lateinit var navigator: MegaNavigator
 
     private val viewModel by viewModels<StartConversationViewModel>()
     private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
@@ -122,7 +122,6 @@ class StartConversationActivity : ComponentActivity() {
 
         MegaAppContainer(
             themeMode = themeMode,
-            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
         ) {
             StartConversationView(
                 state = uiState,
@@ -153,11 +152,10 @@ class StartConversationActivity : ComponentActivity() {
 
     private fun onNewGroup() {
         Analytics.tracker.trackEvent(GroupChatPressedEvent)
-        addContactActivityLauncher.launch(
-            Intent(this, AddContactActivity::class.java)
-                .putExtra(Constants.INTENT_EXTRA_KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-                .putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
-                .putExtra(AddContactActivity.EXTRA_IS_START_CONVERSATION, true)
+        navigator.openCreateGroupChatForResult(
+            context = this,
+            launcher = addContactActivityLauncher,
+            allowEmptyGroup = true,
         )
     }
 

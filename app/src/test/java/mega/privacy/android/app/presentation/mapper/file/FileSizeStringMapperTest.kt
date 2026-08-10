@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.mapper.file
 
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -48,29 +48,29 @@ class FileSizeStringMapperTest {
             else -> df.format(size / exabyte)
         }
 
-        whenever(context.getString(R.string.label_file_size_byte, format))
+        whenever(context.getString(SharedR.string.label_file_size_bytes, format))
             .thenReturn("$format B")
-        whenever(context.getString(R.string.label_file_size_kilo_byte, format))
+        whenever(context.getString(SharedR.string.label_file_size_kilobytes, format))
             .thenReturn("$format KB")
-        whenever(context.getString(R.string.label_file_size_mega_byte, format))
+        whenever(context.getString(SharedR.string.label_file_size_megabytes, format))
             .thenReturn("$format MB")
-        whenever(context.getString(R.string.label_file_size_giga_byte, format))
+        whenever(context.getString(SharedR.string.label_file_size_gigabytes, format))
             .thenReturn("$format GB")
-        whenever(context.getString(R.string.label_file_size_tera_byte, format))
+        whenever(context.getString(SharedR.string.label_file_size_terabytes, format))
             .thenReturn("$format TB")
-        whenever(context.getString(R.string.label_file_size_peta_byte, format))
+        whenever(context.getString(SharedR.string.label_file_size_petabytes, format))
             .thenReturn("$format PB")
-        whenever(context.getString(R.string.label_file_size_exa_byte, format))
+        whenever(context.getString(SharedR.string.label_file_size_exabytes, format))
             .thenReturn("$format EB")
 
         val expected = when {
-            size < kilobyte -> context.getString(R.string.label_file_size_byte, format)
-            size < megabyte -> context.getString(R.string.label_file_size_kilo_byte, format)
-            size < gigabyte -> context.getString(R.string.label_file_size_mega_byte, format)
-            size < terabyte -> context.getString(R.string.label_file_size_giga_byte, format)
-            size < petabyte -> context.getString(R.string.label_file_size_tera_byte, format)
-            size < exabyte -> context.getString(R.string.label_file_size_peta_byte, format)
-            else -> context.getString(R.string.label_file_size_exa_byte, format)
+            size < kilobyte -> context.getString(SharedR.string.label_file_size_bytes, format)
+            size < megabyte -> context.getString(SharedR.string.label_file_size_kilobytes, format)
+            size < gigabyte -> context.getString(SharedR.string.label_file_size_megabytes, format)
+            size < terabyte -> context.getString(SharedR.string.label_file_size_gigabytes, format)
+            size < petabyte -> context.getString(SharedR.string.label_file_size_terabytes, format)
+            size < exabyte -> context.getString(SharedR.string.label_file_size_petabytes, format)
+            else -> context.getString(SharedR.string.label_file_size_exabytes, format)
         }
 
         val actual = underTest(size)

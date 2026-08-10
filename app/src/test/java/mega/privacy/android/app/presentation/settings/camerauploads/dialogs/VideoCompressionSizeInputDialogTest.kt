@@ -43,8 +43,8 @@ internal class VideoCompressionSizeInputDialogTest {
             onNodeWithText(
                 activity.getString(
                     R.string.settings_compression_queue_subtitle,
-                    activity.getString(R.string.label_file_size_mega_byte, "100"),
-                    activity.getString(R.string.label_file_size_mega_byte, "1000"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "100"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "1000"),
                 )
             ).assertDoesNotExist()
         }
@@ -60,8 +60,8 @@ internal class VideoCompressionSizeInputDialogTest {
             onNodeWithText(
                 activity.getString(
                     R.string.settings_compression_queue_subtitle,
-                    activity.getString(R.string.label_file_size_mega_byte, "100"),
-                    activity.getString(R.string.label_file_size_mega_byte, "1000"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "100"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "1000"),
                 )
             ).assertIsDisplayed()
         }
@@ -80,8 +80,8 @@ internal class VideoCompressionSizeInputDialogTest {
             onNodeWithText(
                 activity.getString(
                     R.string.settings_compression_queue_subtitle,
-                    activity.getString(R.string.label_file_size_mega_byte, "100"),
-                    activity.getString(R.string.label_file_size_mega_byte, "1000"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "100"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "1000"),
                 )
             ).assertIsDisplayed()
         }
@@ -100,8 +100,8 @@ internal class VideoCompressionSizeInputDialogTest {
             onNodeWithText(
                 activity.getString(
                     R.string.settings_compression_queue_subtitle,
-                    activity.getString(R.string.label_file_size_mega_byte, "100"),
-                    activity.getString(R.string.label_file_size_mega_byte, "1000"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "100"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "1000"),
                 )
             ).assertIsDisplayed()
         }
@@ -135,8 +135,8 @@ internal class VideoCompressionSizeInputDialogTest {
             onNodeWithText(
                 activity.getString(
                     R.string.settings_compression_queue_subtitle,
-                    activity.getString(R.string.label_file_size_mega_byte, "100"),
-                    activity.getString(R.string.label_file_size_mega_byte, "1000"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "100"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "1000"),
                 )
             ).assertIsDisplayed()
         }
@@ -153,8 +153,8 @@ internal class VideoCompressionSizeInputDialogTest {
             onNodeWithText(
                 activity.getString(
                     R.string.settings_compression_queue_subtitle,
-                    activity.getString(R.string.label_file_size_mega_byte, "100"),
-                    activity.getString(R.string.label_file_size_mega_byte, "1000"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "100"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "1000"),
                 )
             ).assertIsDisplayed()
         }
@@ -171,8 +171,8 @@ internal class VideoCompressionSizeInputDialogTest {
             onNodeWithText(
                 activity.getString(
                     R.string.settings_compression_queue_subtitle,
-                    activity.getString(R.string.label_file_size_mega_byte, "100"),
-                    activity.getString(R.string.label_file_size_mega_byte, "1000"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "100"),
+                    activity.getString(sharedResR.string.label_file_size_megabytes, "1000"),
                 )
             ).assertIsDisplayed()
         }

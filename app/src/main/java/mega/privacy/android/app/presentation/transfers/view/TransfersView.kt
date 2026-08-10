@@ -2,6 +2,11 @@ package mega.privacy.android.app.presentation.transfers.view
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -11,33 +16,30 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.text.SpanStyle
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.prompt.ErrorPrompt
 import mega.android.core.ui.components.state.EmptyStateView
-import mega.android.core.ui.components.tabs.MegaScrollableTabRow
+import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.model.MegaSpanStyle
-import mega.android.core.ui.model.SpanIndicator
-import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.model.TabItems
-import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
-import mega.android.core.ui.theme.AppTheme
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
@@ -56,6 +58,8 @@ import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.shared.account.overquota.model.OverQuotaStatus
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ActiveTransferDragAndDropToChangePriorityEvent
 import mega.privacy.mobile.analytics.event.ActiveTransfersCancelSelectedMenuItemEvent
@@ -79,6 +83,7 @@ import mega.privacy.mobile.analytics.event.TransfersSectionScreenEvent
 internal fun TransfersView(
     onBackPress: () -> Unit,
     onNavigateToUpgradeAccount: () -> Unit,
+    navigationHandler: NavigationHandler?,
     uiState: TransfersUiState,
     onTabSelected: (Int) -> Unit,
     onPlayPauseTransfer: (Int) -> Unit,
@@ -106,14 +111,16 @@ internal fun TransfersView(
     onSelectAllCompletedTransfers: () -> Unit,
     onSelectAllFailedTransfers: () -> Unit,
     onRetryTransfer: (CompletedTransfer) -> Unit,
+    overQuotaStatus: OverQuotaStatus = OverQuotaStatus(),
     onConsumeQuotaWarning: () -> Unit,
     onCancelActiveTransfer: (InProgressTransfer) -> Unit,
     onClearCompletedTransfer: (Int) -> Unit,
     onSetActiveTransferToCancel: (InProgressTransfer) -> Unit,
     onUndoCancelActiveTransfer: (InProgressTransfer) -> Unit,
+    initialTabIndex: Int,
 ) = with(uiState) {
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val resource = LocalResources.current
     var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showFailedTransfersModal by rememberSaveable { mutableStateOf(false) }
@@ -132,6 +139,8 @@ internal fun TransfersView(
         },
     )
 
+    var selectedTab by rememberSaveable { mutableIntStateOf(initialTabIndex) }
+
     @OptIn(ExperimentalMaterial3Api::class)
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
@@ -145,7 +154,7 @@ internal fun TransfersView(
             }
 
             if (!isInSelectTransfersMode) {
-                TransfersTopBar(onBackPress, getTransferActions(uiState)) { action ->
+                TransfersTopBar(onBackPress, getTransferActions(uiState, selectedTab)) { action ->
                     when (action) {
                         TransferMenuAction.Pause -> {
                             Analytics.tracker.trackEvent(ActiveTransfersGlobalPauseMenuItemEvent)
@@ -153,8 +162,8 @@ internal fun TransfersView(
 
                             coroutineScope.launch {
                                 val result = snackbarHostState?.showAutoDurationSnackbar(
-                                    context.getString(sharedR.string.transfers_all_transfers_paused_warning),
-                                    context.getString(sharedR.string.transfers_resume_all_button)
+                                    resource.getString(sharedR.string.transfers_all_transfers_paused_warning),
+                                    resource.getString(sharedR.string.transfers_resume_all_button)
                                 )
 
                                 if (result == SnackbarResult.ActionPerformed) {
@@ -198,7 +207,7 @@ internal fun TransfersView(
                 SelectActiveTransfersTopBar(
                     onClose = onSelectTransfersClose,
                     selectedAmount = selectedTransfersAmount,
-                    actions = getTransferActions(uiState)
+                    actions = getTransferActions(uiState, selectedTab)
                 ) { action ->
                     when (action) {
                         TransferMenuAction.SelectAll -> {
@@ -271,22 +280,33 @@ internal fun TransfersView(
                 emptyStringId = sharedR.string.transfers_no_transfers_empty_text,
             )
         } else {
-            MegaScrollableTabRow(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize(),
+            MegaCollapsibleTabRow(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = paddingValues,
                 beyondViewportPageCount = 1,
                 hideTabs = isInSelectTransfersMode,
                 pagerScrollEnabled = false,
+                fixedHeader = {
+                    AnimatedVisibility(
+                        !uiState.hasInternetConnection,
+                        enter = enterPromptAnimation(),
+                        exit = exitPromptAnimation(),
+                    ) {
+                        ErrorPrompt(
+                            stringResource(sharedR.string.sync_no_network_state),
+                            forceRiceTopAppBar = true
+                        )
+                    }
+                },
                 cells = {
                     addTextTabWithScrollableContent(
                         tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_active_transfers)),
                     ) { _, modifier ->
                         ActiveTransfersView(
                             activeTransfers = activeTransfers,
-                            isTransferOverQuota = isTransferOverQuota,
-                            isStorageOverQuota = isStorageOverQuota,
-                            quotaWarning = quotaWarning,
+                            hasInternetConnection = hasInternetConnection,
+                            overQuotaStatus = overQuotaStatus,
+                            isTabSelected = selectedTab == 0,
                             areTransfersPaused = areTransfersPaused,
                             enableSwipeToDismiss = !isInSelectTransfersMode,
                             onPlayPauseClicked = { tag ->
@@ -319,6 +339,7 @@ internal fun TransfersView(
                             enableSwipeToDismiss = !isInSelectTransfersMode,
                             onCompletedTransferSelected = onCompletedTransferSelected,
                             onClearCompletedTransfer = onClearCompletedTransfer,
+                            navigationHandler = navigationHandler,
                             modifier = modifier,
                         )
                     }
@@ -346,6 +367,7 @@ internal fun TransfersView(
                     }?.let { tabSelectedEvent ->
                         Analytics.tracker.trackEvent(tabSelectedEvent)
                     }
+                    selectedTab = it
                     onTabSelected(it)
                     true
                 },
@@ -411,25 +433,19 @@ internal fun EmptyTransfersView(
 ) {
     EmptyStateView(
         modifier = modifier.fillMaxSize(),
-        illustration = iconPackR.drawable.ic_arrow_up_down_glass,
-        description = stringResource(id = emptyStringId),
-        descriptionSpanStyles = mapOf(
-            SpanIndicator('A') to SpanStyleWithAnnotation(
-                megaSpanStyle = MegaSpanStyle.TextColorStyle(
-                    SpanStyle().copy(fontWeight = AppTheme.typography.titleMedium.fontWeight),
-                    TextColor.Primary
-                ),
-                annotation = null
-            )
-        ),
+        imagePainter = painterResource(id = iconPackR.drawable.ic_arrow_up_down_glass),
+        title = stringResource(id = emptyStringId),
     )
 }
+
+private fun enterPromptAnimation() = fadeIn() + expandVertically()
+private fun exitPromptAnimation() = fadeOut() + shrinkVertically()
 
 @Composable
 internal fun TransfersTopBar(
     onBackPress: () -> Unit,
     actions: List<TransferMenuAction>,
-    onActionPressed: (MenuActionWithIcon) -> Unit,
+    onActionPressed: (MenuAction) -> Unit,
 ) {
     MegaTopAppBar(
         navigationType = AppBarNavigationType.Back(onBackPress),
@@ -444,7 +460,7 @@ internal fun SelectActiveTransfersTopBar(
     onClose: () -> Unit,
     selectedAmount: Int,
     actions: List<TransferMenuAction>,
-    onActionPressed: (MenuActionWithIcon) -> Unit,
+    onActionPressed: (MenuAction) -> Unit,
 ) {
     MegaTopAppBar(
         navigationType = AppBarNavigationType.Close(onClose),
@@ -462,6 +478,7 @@ private fun TransfersViewPreview() {
         TransfersView(
             onBackPress = {},
             onNavigateToUpgradeAccount = {},
+            navigationHandler = null,
             uiState = TransfersUiState(),
             onTabSelected = {},
             onPlayPauseTransfer = {},
@@ -494,6 +511,7 @@ private fun TransfersViewPreview() {
             onClearCompletedTransfer = {},
             onSetActiveTransferToCancel = {},
             onUndoCancelActiveTransfer = {},
+            initialTabIndex = ACTIVE_TAB_INDEX,
         )
     }
 }
@@ -501,7 +519,7 @@ private fun TransfersViewPreview() {
 /**
  * Get the actions that should be shown given the ui state
  */
-private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
+private fun getTransferActions(uiState: TransfersUiState, selectedTab: Int) = with(uiState) {
     buildList<TransferMenuAction> {
         when {
             selectedTab == ACTIVE_TAB_INDEX && activeTransfers.isNotEmpty() -> {

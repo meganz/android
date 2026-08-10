@@ -5,7 +5,6 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
-    id("kotlin-android")
 }
 
 android {
@@ -29,9 +28,9 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":shared:original-core-ui"))
     implementation(project(":shared:sync"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:string-resources"))
     implementation(project(":legacy-core-ui"))
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:icon-pack"))
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))

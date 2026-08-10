@@ -1,12 +1,15 @@
 package mega.privacy.android.app.presentation.filecontact
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,110 +17,166 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ResultCount
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
-import mega.privacy.android.navigation.destination.FileContactInfoNavKey
+import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-internal class ShareRecipientsViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = ShareRecipientsViewModel.Factory::class)
+internal class ShareRecipientsViewModel @AssistedInject constructor(
+    @Assisted private val args: Args,
     private val monitorShareRecipientsUseCase: MonitorShareRecipientsUseCase,
     private val shareFolderUseCase: ShareFolderUseCase,
     private val removeShareResultMapper: RemoveShareResultMapper,
     private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
     private val getAllowedSharingPermissionsUseCase: GetAllowedSharingPermissionsUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase,
 ) : ViewModel() {
-    private val folderInfo = savedStateHandle.toRoute<FileContactInfoNavKey>()
 
-    val state: StateFlow<FileContactListState>
-        field: MutableStateFlow<FileContactListState> = MutableStateFlow(
+    val state: StateFlow<FileContactListState> by lazy {
+        combine(
+            flow {
+                emit(getAllowedSharingPermissionsUseCase(args.folderId))
+            },
+            monitorShareRecipientsUseCase(args.folderId),
+            flow {
+                emit(false)
+                emit(getContactVerificationWarningUseCase())
+            },
+            eventsFlow,
+            addContactFlow,
+        ) { allowedPermissions: Set<AccessPermission>, recipients: List<ShareRecipient>, isContactVerificationWarningEnabled: Boolean, events: ShareEvents, addContact: AddContactState ->
+            FileContactListState.Data(
+                folderName = args.folderName,
+                folderId = args.folderId,
+                recipients = recipients.toImmutableList(),
+                shareRemovedEvent = events.removeEvent,
+                sharingInProgress = events.shareInProgress,
+                sharingCompletedEvent = events.addEvent,
+                accessPermissions = allowedPermissions.toImmutableSet(),
+                isContactVerificationWarningEnabled = isContactVerificationWarningEnabled,
+                sensitiveNodeShareWarning = addContact.warning,
+                navigateToAddContactEvent = addContact.navigateEvent,
+            )
+        }.catch { error ->
+            Timber.e(error)
+        }.asUiStateFlow(
+            viewModelScope,
             FileContactListState.Loading(
-                folderName = folderInfo.folderName,
-                folderId = folderInfo.folderId,
+                folderName = args.folderName,
+                folderId = args.folderId,
             )
         )
-
-    init {
-        viewModelScope.launch {
-            combine(
-                flow {
-                    emit(getAllowedSharingPermissionsUseCase(folderInfo.folderId))
-                },
-                monitorShareRecipientsUseCase(folderInfo.folderId),
-            ) { allowedPermissions: Set<AccessPermission>, recipients: List<ShareRecipient> ->
-                StateTransform {
-                    it.copy(
-                        recipients = recipients.toImmutableList(),
-                        accessPermissions = allowedPermissions.toImmutableSet(),
-                    )
-                }
-            }.catch { error ->
-                Timber.e(error)
-            }.collect { transformer: StateTransform ->
-                state.updateToData(transformer::invoke)
-            }
-        }
-        checkVerificationWarning()
     }
 
-    private fun checkVerificationWarning() {
-        viewModelScope.launch {
-            runCatching {
-                getContactVerificationWarningUseCase()
-            }.onSuccess { isEnabled ->
-                state.updateToData {
-                    it.copy(
-                        isContactVerificationWarningEnabled = isEnabled,
-                    )
-                }
-            }.onFailure { error ->
-                Timber.e(error)
-            }
-        }
-    }
+    private val eventsFlow = MutableStateFlow<ShareEvents>(
+        ShareEvents.Default
+    )
 
-    private fun MutableStateFlow<FileContactListState>.updateToData(function: (FileContactListState.Data) -> FileContactListState) {
-        update {
-            if (it is FileContactListState.Data) {
-                function(it)
+    private val addContactFlow = MutableStateFlow(AddContactState())
+
+    private data class AddContactState(
+        val warning: SensitiveNodeShareWarning = SensitiveNodeShareWarning.None,
+        val navigateEvent: StateEventWithContent<Long> = consumed(),
+    )
+
+    /**
+     * Called when the user chooses to add contacts to the shared folder. On the Compose picker path
+     * ([AppFeatures.ContactsComposeUI]) a hidden/sensitive-node warning is shown first when needed;
+     * the legacy picker warns itself, so no warning is surfaced here for it.
+     */
+    fun onAddContactClicked() {
+        viewModelScope.launch {
+            val isComposeContactsPicker = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val warning = if (isComposeContactsPicker) {
+                runCatching {
+                    getShareFolderSensitiveWarningUseCase(listOf(args.folderId))
+                }.getOrDefault(SensitiveNodeShareWarning.None)
             } else {
-                function(
-                    FileContactListState.Data(
-                        folderName = folderInfo.folderName,
-                        folderId = folderInfo.folderId,
-                        recipients = emptyList<ShareRecipient>().toImmutableList(),
-                        shareRemovedEvent = consumed(),
-                        sharingInProgress = false,
-                        sharingCompletedEvent = consumed(),
-                        accessPermissions = emptySet<AccessPermission>().toImmutableSet(),
-                        isContactVerificationWarningEnabled = false,
-                    )
+                SensitiveNodeShareWarning.None
+            }
+            if (warning == SensitiveNodeShareWarning.None) {
+                addContactFlow.value = AddContactState(
+                    navigateEvent = triggered(args.folderHandle),
                 )
+            } else {
+                addContactFlow.value = AddContactState(warning = warning)
             }
         }
     }
 
+    /**
+     * Called when the user confirms the hidden/sensitive-node warning; proceeds to the picker.
+     */
+    fun onShareHiddenNodeWarningConfirmed() {
+        addContactFlow.value = AddContactState(
+            navigateEvent = triggered(args.folderHandle),
+        )
+    }
+
+    /**
+     * Called when the user dismisses the hidden/sensitive-node warning; aborts adding contacts.
+     */
+    fun clearAddContactState() {
+        addContactFlow.value = AddContactState()
+    }
+
+    sealed interface ShareEvents {
+        val addEvent: StateEventWithContent<String>
+        val removeEvent: StateEventWithContent<String>
+        val shareInProgress: Boolean
+
+        data object Default : ShareEvents {
+            override val addEvent: StateEventWithContent<String> = consumed()
+            override val removeEvent: StateEventWithContent<String> = consumed()
+            override val shareInProgress: Boolean = false
+        }
+
+        data object ShareStarted : ShareEvents {
+            override val addEvent: StateEventWithContent<String> = consumed()
+            override val removeEvent: StateEventWithContent<String> = consumed()
+            override val shareInProgress: Boolean = true
+        }
+
+        class ShareTriggered(content: String) : ShareEvents {
+            override val addEvent: StateEventWithContent<String> =
+                StateEventWithContentTriggered(content)
+            override val removeEvent: StateEventWithContent<String> = consumed()
+            override val shareInProgress: Boolean = false
+        }
+
+        class RemoveTriggered(content: String) : ShareEvents {
+            override val addEvent: StateEventWithContent<String> = consumed()
+            override val removeEvent: StateEventWithContent<String> =
+                StateEventWithContentTriggered(content)
+            override val shareInProgress: Boolean = false
+        }
+    }
 
     fun removeShare(list: List<ShareRecipient>) {
         viewModelScope.launch {
             runCatching {
                 val result: MoveRequestResult.ShareMovement = shareFolderUseCase(
-                    nodeIds = listOf(folderInfo.folderId),
+                    nodeIds = listOf(args.folderId),
                     contactData = list.map { it.email },
                     accessPermission = AccessPermission.UNKNOWN,
                 )
@@ -132,35 +191,23 @@ internal class ShareRecipientsViewModel @Inject constructor(
                     errorCount = list.size,
                 )
             }.onSuccess { result ->
-                state.updateToData {
-                    it.copy(
-                        shareRemovedEvent = StateEventWithContentTriggered<String>(
-                            removeShareResultMapper(result)
-                        )
-                    )
-                }
+                eventsFlow.emit(ShareEvents.RemoveTriggered(removeShareResultMapper(result)))
             }
         }
     }
 
     fun onShareRemovedEventHandled() {
-        state.updateToData {
-            it.copy(
-                shareRemovedEvent = consumed(),
-            )
+        viewModelScope.launch {
+            eventsFlow.emit(ShareEvents.Default)
         }
     }
 
     fun shareFolder(emailList: List<String>, permission: AccessPermission) {
         viewModelScope.launch {
             runCatching {
-                state.updateToData {
-                    it.copy(
-                        sharingInProgress = true,
-                    )
-                }
+                eventsFlow.emit(ShareEvents.ShareStarted)
                 shareFolderUseCase(
-                    nodeIds = listOf(folderInfo.folderId),
+                    nodeIds = listOf(args.folderId),
                     contactData = emailList,
                     accessPermission = permission,
                 )
@@ -169,26 +216,17 @@ internal class ShareRecipientsViewModel @Inject constructor(
                 MoveRequestResult.ShareMovement(
                     count = 0,
                     errorCount = emailList.size,
-                    nodes = listOf(folderInfo.folderHandle),
+                    nodes = listOf(args.folderHandle),
                 )
             }.onSuccess { result ->
-                state.updateToData {
-                    it.copy(
-                        sharingCompletedEvent = StateEventWithContentTriggered<String>(
-                            nodeMoveRequestMessageMapper(result)
-                        ),
-                        sharingInProgress = false,
-                    )
-                }
+                eventsFlow.emit(ShareEvents.ShareTriggered(nodeMoveRequestMessageMapper(result)))
             }
         }
     }
 
     fun onSharingCompletedEventHandled() {
-        state.updateToData {
-            it.copy(
-                sharingCompletedEvent = consumed(),
-            )
+        viewModelScope.launch {
+            eventsFlow.emit(ShareEvents.Default)
         }
     }
 
@@ -196,7 +234,7 @@ internal class ShareRecipientsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 shareFolderUseCase(
-                    nodeIds = listOf(folderInfo.folderId),
+                    nodeIds = listOf(args.folderId),
                     contactData = list.map { it.email },
                     accessPermission = permission,
                 )
@@ -206,10 +244,20 @@ internal class ShareRecipientsViewModel @Inject constructor(
         }
     }
 
-}
 
-internal val FileContactInfoNavKey.folderId: NodeId
-    get() = NodeId(folderHandle)
+    @AssistedFactory
+    interface Factory {
+        fun create(args: Args): ShareRecipientsViewModel
+    }
+
+    data class Args(
+        val folderHandle: Long,
+        val folderName: String,
+    ) {
+        val folderId: NodeId get() = NodeId(folderHandle)
+    }
+
+}
 
 private fun interface StateTransform {
     operator fun invoke(

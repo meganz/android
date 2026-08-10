@@ -1,32 +1,37 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
+import mega.privacy.android.domain.entity.transfer.isSafDownload
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
-import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersFromSdkUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransferStateUseCase
 import javax.inject.Inject
 
 /**
- * To ensure that the local database accurately reflects the current state of transfers by retrieving and updating transfer status information from the SDK.
- * This process is necessary to rectify any misaligned states resulting from potential event loss, such as finish, cancel, or start of a transfer,
- * we need to fix it to avoid outdated counters in [ActiveTransferTotals]
+ * To ensure that in-memory and local database transfers accurately reflects the current state of transfers, this use-case retrieves the current transfer status information from the SDK and synchs it with the local data.
+ * This process is necessary to rectify any misaligned states resulting from potential event loss, such as finish, cancel, or start of a transfer, in case of app killed by the system or potential crashes, etc.
+ * we need to fix it to avoid outdated counters in [ActiveTransferTotals] for notifications and [mega.privacy.android.domain.entity.transfer.InProgressTransfer] for UI.
  */
 class CorrectActiveTransfersUseCase @Inject constructor(
-    private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
+    private val getInProgressTransfersFromSdkUseCase: GetInProgressTransfersFromSdkUseCase,
     private val transferRepository: TransferRepository,
     private val updatePendingTransferStateUseCase: UpdatePendingTransferStateUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
+    private val updateActiveTransfersUseCase: UpdateActiveTransfersUseCase,
+    private val setActiveTransfersAsFinishedUseCase: SetActiveTransfersAsFinishedUseCase,
 ) {
     /**
      * Invoke.
@@ -36,48 +41,71 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         if (!(isUserLoggedInUseCase() && rootNodeExistsUseCase())) {
             return
         }
+        updateActiveTransfersUseCase()
         val activeTransfers = if (transferType == null) {
-            transferRepository.getCurrentActiveTransfers()
+            transferRepository.getActiveTransfers()
         } else {
-            transferRepository.getCurrentActiveTransfersByType(transferType)
+            transferRepository.getActiveTransfersByType(transferType)
         }
-        val inProgressTransfers = getInProgressTransfersUseCase()
+        val inProgressTransfersInSdk = getInProgressTransfersFromSdkUseCase()
             .filterNot { transfer ->
                 transfer.isVoiceClip()
                         || transfer.isBackgroundTransfer()
                         || transfer.isStreamingTransfer
+                        || transfer.isSyncTransfer
+                        || transfer.isBackupTransfer
+                        || transfer.transferType == TransferType.CU_UPLOAD
+                        || transfer.isSafDownload()
             }
 
         //update transferred bytes for each transfer
-        transferRepository.updateTransferredBytes(inProgressTransfers)
+        transferRepository.updateActiveTransfersBytes(inProgressTransfersInSdk)
 
         //set not-in-progress active transfers as finished, this can happen if we missed a finish event from SDK
-        val notInProgressActiveTransfersUniqueIds = activeTransfers
+        val notInProgressActiveTransfers = activeTransfers
             .filter { activeTransfer ->
                 !activeTransfer.isFinished
-                        && activeTransfer.uniqueId !in inProgressTransfers.map { it.uniqueId }
+                        && activeTransfer.uniqueId !in inProgressTransfersInSdk.map { it.uniqueId }
             }
 
-        if (notInProgressActiveTransfersUniqueIds.isNotEmpty()) {
+        if (notInProgressActiveTransfers.isNotEmpty()) {
             //Set not in progress as finished. We are not sure if they have been cancelled or failed, we check the existence of the file to set it as cancelled as best effort approach
             transferRepository.apply {
-                val (fileExists, fileNotExists) = notInProgressActiveTransfersUniqueIds.partition {
-                    fileSystemRepository.doesUriPathExist(UriPath(it.localPath))
+                //Completed transfers are finished by definition, doesn't need to update its finished status.
+                //Check file existence with bounded parallelism: doesUriPathExist hits the file system, so doing it
+                //sequentially for many transfers (e.g. a large folder upload) can ANR (AND-20589), while unbounded
+                //parallelism would spawn one coroutine per transfer. mapAsync caps concurrency (ParallelWithLimit(10)).
+                val existenceResults = notInProgressActiveTransfers
+                    .filterIsInstance<Transfer>()
+                    .mapAsync { transfer ->
+                        transfer to fileSystemRepository.doesUriPathExist(UriPath(transfer.localPath))
+                    }
+                val fileExists = existenceResults.filter { it.second }.map { it.first }
+                val fileNotExists = existenceResults.filterNot { it.second }.map { it.first }
+                fileExists.takeIf { it.isNotEmpty() }?.let {
+                    setActiveTransfersAsFinishedUseCase(it, cancelled = false)
                 }
-                fileExists.map { it.uniqueId }.takeIf { it.isNotEmpty() }?.let {
-                    setActiveTransfersAsFinishedByUniqueId(it, cancelled = false)
-                }
-                fileNotExists.map { it.uniqueId }.takeIf { it.isNotEmpty() }?.let {
-                    setActiveTransfersAsFinishedByUniqueId(it, cancelled = true)
+                fileNotExists.takeIf { it.isNotEmpty() }?.let {
+                    setActiveTransfersAsFinishedUseCase(it, cancelled = true)
                 }
                 removeInProgressTransfers(
-                    notInProgressActiveTransfersUniqueIds.map { it.uniqueId }.toSet()
+                    notInProgressActiveTransfers.map { it.uniqueId }.toSet()
                 )
             }
         }
 
+        // If there are still in-progress-transfers that are not in the sdk, remove them as there's nothing we can do with them
+        val notInSdkInProgressTransfers =
+            transferRepository.getInProgressTransfers().filterNot { inProgressTransfer ->
+                inProgressTransfer.uniqueId in inProgressTransfersInSdk.map { it.uniqueId }
+            }
+        if (notInSdkInProgressTransfers.isNotEmpty()) {
+            transferRepository
+                .removeInProgressTransfers(notInSdkInProgressTransfers.map { it.uniqueId }.toSet())
+        }
+
         //add in-progress active transfers if they are not added, this can happen if we missed a start event from SDK
-        val inProgressNotInActiveTransfers = inProgressTransfers.filterNot { transfer ->
+        val inProgressNotInActiveTransfers = inProgressTransfersInSdk.filterNot { transfer ->
             activeTransfers.map { it.uniqueId }.contains(transfer.uniqueId)
         }
         if (inProgressNotInActiveTransfers.isNotEmpty()) {
@@ -89,7 +117,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
             }.takeUnless { it.isEmpty() }?.let { transfers ->
                 transferRepository.updateInProgressTransfers(transfers)
             }
-            transferRepository.insertOrUpdateActiveTransfers(inProgressNotInActiveTransfers)
+            transferRepository.putActiveTransfers(inProgressNotInActiveTransfers)
         }
 
         val pendingTransfersWaitingSdkScanning = if (transferType == null) {
@@ -105,7 +133,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         val notInProgressPendingTransfersWaitingSdkScanning =
             pendingTransfersWaitingSdkScanning.filter { pendingTransfer ->
                 pendingTransfer.transferUniqueId == null ||
-                        inProgressTransfers.map { it.uniqueId }
+                        inProgressTransfersInSdk.map { it.uniqueId }
                             .contains(pendingTransfer.transferUniqueId).not()
             }
         if (notInProgressPendingTransfersWaitingSdkScanning.isNotEmpty()) {

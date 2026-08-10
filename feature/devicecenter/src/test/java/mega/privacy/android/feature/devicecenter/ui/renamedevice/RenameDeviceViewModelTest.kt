@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.backup.RenameDeviceUseCase
 import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -150,6 +151,42 @@ internal class RenameDeviceViewModelTest {
         }
     }
 
+    @Test
+    fun `test that renaming the device fails when the new device name contains only a dot`() =
+        runTest {
+            val deviceId = "12345-6789"
+
+            underTest.renameDevice(
+                deviceId = deviceId,
+                newDeviceName = ".",
+                existingDeviceNames = emptyList(),
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.errorMessage).isEqualTo(
+                    sharedR.string.general_invalid_dot_name_warning
+                )
+            }
+        }
+
+    @Test
+    fun `test that renaming the device fails when the new device name contains only a double dot`() =
+        runTest {
+            val deviceId = "12345-6789"
+
+            underTest.renameDevice(
+                deviceId = deviceId,
+                newDeviceName = "..",
+                existingDeviceNames = emptyList(),
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.errorMessage).isEqualTo(
+                    sharedR.string.general_invalid_double_dot_name_warning
+                )
+            }
+        }
+
     @ParameterizedTest(name = "new device name: {0}")
     @ValueSource(
         strings = [
@@ -170,7 +207,9 @@ internal class RenameDeviceViewModelTest {
         )
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.errorMessage).isEqualTo(R.string.device_center_rename_device_dialog_error_message_invalid_characters)
+            assertThat(state.errorMessage).isEqualTo(
+                sharedR.string.general_invalid_characters_defined
+            )
         }
     }
 

@@ -35,7 +35,6 @@ import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.GiphyResponse
 import mega.privacy.android.app.services.GiphyService
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import retrofit2.Call
@@ -177,9 +176,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
                         latestIsVisible = true
 
                         if (!isEndOfList) {
-                            if (searchMenuItem?.isActionViewExpanded == true && !isTextEmpty(
-                                    currentQuery
-                                )
+                            if (searchMenuItem?.isActionViewExpanded == true && !currentQuery.isNullOrBlank()
                             ) requestSearchData(
                                 currentQuery.toString(),
                                 true
@@ -448,10 +445,10 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 currentQuery = newText
-                if (isTextEmpty(newText)) {
+                if (newText.isNullOrBlank()) {
                     requestTrendingData(false)
                 } else {
-                    requestSearchData(newText.toString(), false)
+                    requestSearchData(newText, false)
                 }
 
                 return true

@@ -4,12 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
-import mega.privacy.android.app.main.dialog.contactlink.ContactLinkViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
-import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
+import mega.privacy.android.domain.usecase.contact.ContactLinkQueryUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,19 +21,19 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ContactLinkViewModelTest {
     private lateinit var underTest: ContactLinkViewModel
-    private val getContactLinkUseCase: GetContactLinkUseCase = mock()
+    private val contactLinkQueryUseCase: ContactLinkQueryUseCase = mock()
     private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase = mock()
     private val savedStateHandle: SavedStateHandle = mock()
 
     @BeforeEach
     fun resetMocks() {
-        reset(getContactLinkUseCase, inviteContactWithHandleUseCase, savedStateHandle)
+        reset(contactLinkQueryUseCase, inviteContactWithHandleUseCase, savedStateHandle)
     }
 
     private fun initTestClass() {
         underTest =
             ContactLinkViewModel(
-                getContactLinkUseCase,
+                contactLinkQueryUseCase,
                 inviteContactWithHandleUseCase,
                 savedStateHandle
             )
@@ -44,15 +42,15 @@ internal class ContactLinkViewModelTest {
     @Test
     fun `test that contactLinkResult is updated correctly when getContactLinkUseCase return success`() =
         runTest {
-            val contactLink = mock<ContactLink>()
+            val contactLinkQueryResult = mock<ContactLinkQueryResult>()
             whenever(savedStateHandle.get<Long>(ContactLinkDialogFragment.EXTRA_USER_HANDLE))
                 .thenReturn(1L)
-            whenever(getContactLinkUseCase(1L)).thenReturn(contactLink)
+            whenever(contactLinkQueryUseCase(1L)).thenReturn(contactLinkQueryResult)
             initTestClass()
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.contactLinkResult?.isSuccess).isTrue()
-                Truth.assertThat(state.contactLinkResult?.getOrNull()).isEqualTo(contactLink)
+                Truth.assertThat(state.contactLinkQueryResult?.isSuccess).isTrue()
+                Truth.assertThat(state.contactLinkQueryResult?.getOrNull()).isEqualTo(contactLinkQueryResult)
             }
         }
 
@@ -61,12 +59,12 @@ internal class ContactLinkViewModelTest {
         runTest {
             whenever(savedStateHandle.get<Long>(ContactLinkDialogFragment.EXTRA_USER_HANDLE))
                 .thenReturn(1L)
-            whenever(getContactLinkUseCase(1L)).thenAnswer { throw RuntimeException() }
+            whenever(contactLinkQueryUseCase(1L)).thenAnswer { throw RuntimeException() }
             initTestClass()
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.contactLinkResult?.isFailure).isTrue()
-                Truth.assertThat(state.contactLinkResult?.exceptionOrNull())
+                Truth.assertThat(state.contactLinkQueryResult?.isFailure).isTrue()
+                Truth.assertThat(state.contactLinkQueryResult?.exceptionOrNull())
                     .isInstanceOf(RuntimeException::class.java)
             }
         }

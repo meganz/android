@@ -9,15 +9,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
-import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
+import mega.privacy.android.domain.usecase.contact.ContactLinkQueryUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 internal class ContactLinkViewModel @Inject constructor(
-    private val getContactLinkUseCase: GetContactLinkUseCase,
+    private val contactLinkQueryUseCase: ContactLinkQueryUseCase,
     private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -29,8 +29,8 @@ internal class ContactLinkViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val result = runCatching { getContactLinkUseCase(userHandle) }
-            _state.update { it.copy(contactLinkResult = result) }
+            val result = runCatching { contactLinkQueryUseCase(userHandle) }
+            _state.update { it.copy(contactLinkQueryResult = result) }
         }
     }
 
@@ -47,10 +47,10 @@ internal class ContactLinkViewModel @Inject constructor(
 /**
  * Contact link ui state
  *
- * @property contactLinkResult
+ * @property contactLinkQueryResult
  * @property sentInviteResult
  */
 data class ContactLinkUiState(
-    val contactLinkResult: Result<ContactLink>? = null,
+    val contactLinkQueryResult: Result<ContactLinkQueryResult>? = null,
     val sentInviteResult: Result<InviteContactRequest>? = null,
 )

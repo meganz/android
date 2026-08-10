@@ -52,7 +52,7 @@ class SettingHomeViewModelTest {
     @Test
     fun `test that an empty set of settings returns loading state`() = runTest {
         getAccountDetailsUseCase.stub {
-            onBlocking { invoke(any()) }.doSuspendableAnswer { suspendCancellableCoroutine { } }
+            on { invoke(any()) }.doSuspendableAnswer { suspendCancellableCoroutine { } }
         }
         initUnderTest()
         underTest.state.test {
@@ -69,14 +69,13 @@ class SettingHomeViewModelTest {
     @Test
     fun `test that data state is returned if user account info is returned`() = runTest {
         getAccountDetailsUseCase.stub {
-            onBlocking { invoke(any()) } doReturn UserAccount(
+            on { invoke(any()) } doReturn UserAccount(
                 userId = UserId(123L),
                 email = "email",
                 fullName = "fullname",
                 isBusinessAccount = false,
                 isMasterBusinessAccount = false,
                 accountTypeIdentifier = null,
-                accountTypeString = ""
             )
         }
         initUnderTest()

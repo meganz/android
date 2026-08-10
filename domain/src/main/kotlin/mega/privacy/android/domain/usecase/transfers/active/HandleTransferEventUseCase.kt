@@ -84,7 +84,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
             finish = true
         )?.map { it.transfer }?.let { transfers ->
             if (transfers.isNotEmpty()) {
-                transferRepository.updateTransferredBytes(transfers)
+                transferRepository.updateActiveTransfersBytes(transfers)
             }
         }
     }
@@ -95,7 +95,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
             pause = true,
             finish = true
         )?.map { transferEvent -> transferEvent.transfer }?.let {
-            transferRepository.insertOrUpdateActiveTransfers(it)
+            transferRepository.putActiveTransfers(it)
         }
     }
 

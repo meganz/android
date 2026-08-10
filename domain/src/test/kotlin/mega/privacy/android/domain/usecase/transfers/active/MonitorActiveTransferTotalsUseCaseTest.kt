@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.repository.TransferRepository
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -42,7 +41,9 @@ class MonitorActiveTransferTotalsUseCaseTest {
         transferType: TransferType,
     ) {
         val expected = mock<Flow<ActiveTransferTotals>>()
-        whenever(transferRepository.getActiveTransferTotalsByType(transferType)).thenReturn(expected)
+        whenever(transferRepository.monitorActiveTransferTotalsByType(transferType)).thenReturn(
+            expected
+        )
         Truth.assertThat(underTest.invoke(transferType)).isEqualTo(expected)
     }
 }

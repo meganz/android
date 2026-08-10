@@ -11,6 +11,7 @@ import mega.privacy.android.analytics.Analytics
  */
 class AnalyticsInitializer : Initializer<Unit> {
     override fun create(context: Context) {
+        if (!context.canResolveHiltEntryPoints()) return
         Analytics.initialise(context)
     }
 

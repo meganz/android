@@ -3,6 +3,7 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.ActionNodeCallback
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 
@@ -75,7 +76,7 @@ class RenameListener(
             if (showSnackbar) {
                 snackbarShower?.showSnackbar(
                     context.getString(
-                        if (e.errorCode == MegaError.API_OK) R.string.context_correctly_renamed
+                        if (e.errorCode == MegaError.API_OK) sharedR.string.context_correctly_renamed
                         else R.string.context_no_renamed
                     )
                 )

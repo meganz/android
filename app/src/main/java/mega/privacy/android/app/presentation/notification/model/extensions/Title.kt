@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.notification.model.extensions
 import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.toCDATAOrNull
 import mega.privacy.android.domain.entity.ContactChangeAccountDeletedAlert
 import mega.privacy.android.domain.entity.ContactChangeBlockedYouAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.PaymentReminderAlert
 import mega.privacy.android.domain.entity.PaymentSucceededAlert
 import mega.privacy.android.domain.entity.RemovedFromShareByOwnerAlert
 import mega.privacy.android.domain.entity.RemovedSharedNodesAlert
+import mega.privacy.android.domain.entity.UpdatedSharedNodesAlert
 import mega.privacy.android.domain.entity.ScheduledMeetingAlert
 import mega.privacy.android.domain.entity.TakeDownAlert
 import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
@@ -29,6 +30,9 @@ import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAl
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingAcceptedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingDeniedAlert
 import mega.privacy.android.domain.entity.UserAlert
+import mega.privacy.android.shared.resources.R as SharedR
+
+private const val SECONDS_IN_A_DAY = 86400L
 
 internal fun UserAlert.title(): (Context) -> String = when (this) {
     is IncomingPendingContactRequestAlert -> { context ->
@@ -79,16 +83,31 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
         context.getString(R.string.title_incoming_contact_request)
     }
 
-    is PaymentSucceededAlert -> { _ ->
-        title ?: ""
+    is PaymentSucceededAlert -> { context ->
+        context.getString(SharedR.string.notifications_payment_succeeded_title, planName ?: "")
     }
 
-    is PaymentFailedAlert -> { _ ->
-        title ?: ""
+    is PaymentFailedAlert -> { context ->
+        context.getString(SharedR.string.notifications_payment_failed_title, planName ?: "")
     }
 
-    is PaymentReminderAlert -> { _ ->
-        title ?: ""
+    is PaymentReminderAlert -> { context ->
+        val nowInSeconds = System.currentTimeMillis() / 1000
+        val days = ((endTimestamp - nowInSeconds) / SECONDS_IN_A_DAY).toInt()
+        if (endTimestamp < nowInSeconds) {
+            val daysAgo = -days
+            context.resources.getQuantityString(
+                SharedR.plurals.notifications_payment_reminder_expired,
+                daysAgo,
+                daysAgo,
+            )
+        } else {
+            context.resources.getQuantityString(
+                SharedR.plurals.notifications_payment_reminder_will_expire,
+                days,
+                days,
+            )
+        }
     }
 
     is TakeDownAlert -> { context ->
@@ -97,12 +116,12 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
         if (path != null && FileUtil.isFile(path)) {
             String.format(
                 context.getString(R.string.subtitle_file_takedown_notification),
-                Util.toCDATA(name)
+                name.toCDATAOrNull()
             )
         } else {
             String.format(
                 context.getString(R.string.subtitle_folder_takedown_notification),
-                Util.toCDATA(name)
+                name.toCDATAOrNull()
             )
         }
     }
@@ -111,12 +130,12 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
         if (path != null && FileUtil.isFile(path)) {
             String.format(
                 context.getString(R.string.subtitle_file_takedown_reinstated_notification),
-                Util.toCDATA(name)
+                name.toCDATAOrNull()
             )
         } else {
             String.format(
                 context.getString(R.string.subtitle_folder_takedown_reinstated_notification),
-                Util.toCDATA(name)
+                name.toCDATAOrNull()
             )
         }
     }
@@ -153,13 +172,13 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
             folderCount > 0 && fileCount > 0 -> {
                 val files =
                     context.resources.getQuantityString(
-                        R.plurals.num_files_with_parameter,
+                        SharedR.plurals.num_of_files_with_parameter,
                         fileCount,
                         fileCount
                     )
                 val folders =
                     context.resources.getQuantityString(
-                        R.plurals.num_folders_with_parameter,
+                        SharedR.plurals.num_of_folders_with_parameter,
                         folderCount,
                         folderCount
                     )
@@ -194,6 +213,15 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
     is RemovedSharedNodesAlert -> { context ->
         context.resources.getQuantityString(
             R.plurals.subtitle_notification_deleted_items,
+            itemCount,
+            contact.getNicknameStringOrEmail(context),
+            itemCount
+        )
+    }
+
+    is UpdatedSharedNodesAlert -> { context ->
+        context.resources.getQuantityString(
+            SharedR.plurals.notifications_history_updated_items_subtitle,
             itemCount,
             contact.getNicknameStringOrEmail(context),
             itemCount

@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup

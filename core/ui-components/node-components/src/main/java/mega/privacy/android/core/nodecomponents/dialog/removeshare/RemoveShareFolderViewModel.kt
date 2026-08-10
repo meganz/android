@@ -2,6 +2,7 @@ package mega.privacy.android.core.nodecomponents.dialog.removeshare
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -76,6 +77,7 @@ class RemoveShareFolderViewModel @Inject constructor(
             }.onSuccess { result ->
                 val message = removeShareResultMapper(result)
                 snackBarHandler.postSnackbarMessage(message)
+                _state.update { it.copy(shareRemovedEvent = triggered) }
             }
         }
     }

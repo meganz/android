@@ -34,7 +34,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.resources.R as sharedR
 
-
+@Deprecated("Use the revamp version")
 @Composable
 internal fun UnavailableLinkView(
     @StringRes title: Int,

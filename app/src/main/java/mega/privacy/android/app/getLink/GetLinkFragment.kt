@@ -33,7 +33,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
@@ -54,18 +53,18 @@ import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.calculateDateFromTimestamp
 import mega.privacy.android.app.utils.Util.calculateTimestamp
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -109,6 +108,10 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
+    @MegaApi
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -120,28 +123,19 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        initialize()
         super.onViewCreated(view, savedInstanceState)
+        initialize()
     }
 
     private fun initialize() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (isHiddenNodesActive() && !viewModel.isInitialized()) {
-                checkSensitiveItems()
-            } else {
-                initNode()
+        if (!viewModel.isInitialized()) {
+            checkSensitiveItems()
+        } else {
+            initNode()
 
-                setupView()
-                setupObservers()
-            }
+            setupView()
+            setupObservers()
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     private fun initNode() {
@@ -192,7 +186,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         val node = viewModel.getNode()
         binding.nodeName.text = node?.name
         binding.nodeInfo.text =
-            if (node?.isFolder == true) getMegaNodeFolderInfo(node, requireContext())
+            if (node?.isFolder == true) getMegaNodeFolderInfo(node, megaApi, requireContext())
             else getSizeString(node?.size ?: 0, requireContext())
 
         binding.learnMoreTextButton.setOnClickListener {
@@ -252,35 +246,37 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     }
 
     private fun setupObservers() {
-        viewModel.getLink().observe(viewLifecycleOwner, ::updateLink)
-        viewModel.getExpiryDate().observe(viewLifecycleOwner, ::updateExpiryDate)
+        if (isVisible) {
+            viewModel.getLink().observe(viewLifecycleOwner, ::updateLink)
+            viewModel.getExpiryDate().observe(viewLifecycleOwner, ::updateExpiryDate)
 
-        viewLifecycleOwner.collectFlow(viewModel.linkCopied) {
-            it?.let { pair ->
-                copyToClipboard(pair)
-                viewModel.resetLink()
-            }
-        }
-        viewLifecycleOwner.collectFlow(viewModel.sendLinkToChatResult) {
-            it?.let { sendLinkToChatResult ->
-                val message = when (sendLinkToChatResult) {
-                    is SendLinkResult.LinkWithKey -> getString(R.string.link_and_key_sent)
-                    is SendLinkResult.LinkWithPassword -> getString(R.string.link_and_password_sent)
-                    is SendLinkResult.NormalLink -> resources.getQuantityString(
-                        R.plurals.links_sent,
-                        1
-                    )
+            viewLifecycleOwner.collectFlow(viewModel.linkCopied) {
+                it?.let { pair ->
+                    copyToClipboard(pair)
+                    viewModel.resetLink()
                 }
-                (activity as? SnackbarShower)?.showSnackbarWithChat(
-                    message,
-                    sendLinkToChatResult.chatId
-                )
-                viewModel.onShareLinkResultHandled()
             }
-        }
-        viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
-            binding.keyText.text = uiState.key
-            updatePassword(uiState.password)
+            viewLifecycleOwner.collectFlow(viewModel.sendLinkToChatResult) {
+                it?.let { sendLinkToChatResult ->
+                    val message = when (sendLinkToChatResult) {
+                        is SendLinkResult.LinkWithKey -> getString(R.string.link_and_key_sent)
+                        is SendLinkResult.LinkWithPassword -> getString(R.string.link_and_password_sent)
+                        is SendLinkResult.NormalLink -> resources.getQuantityString(
+                            R.plurals.links_sent,
+                            1
+                        )
+                    }
+                    (activity as? SnackbarShower)?.showSnackbarWithChat(
+                        message,
+                        sendLinkToChatResult.chatId
+                    )
+                    viewModel.onShareLinkResultHandled()
+                }
+            }
+            viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
+                binding.keyText.text = uiState.key
+                updatePassword(uiState.password)
+            }
         }
     }
 
@@ -393,7 +389,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      */
     private fun updatePassword(password: String?) {
         if (binding.passwordProtectionSetText.text == password) return
-        val isPasswordSet = !isTextEmpty(password)
+        val isPasswordSet = !password.isNullOrBlank()
         val visibility = if (isPasswordSet) VISIBLE else GONE
 
         if (isPasswordSet) {
@@ -471,6 +467,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         if (!isSwitchClick) {
             binding.decryptedKeySwitch.isChecked = !binding.decryptedKeySwitch.isChecked
         }
+        viewModel.onSendDecryptedKeySeparatelyTrackEvent(isChecked = binding.decryptedKeySwitch.isChecked)
 
         if (binding.decryptedKeySwitch.isChecked
             && !viewModel.getLinkWithPassword().isNullOrEmpty()
@@ -514,6 +511,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         }
 
         if (isSwitchClick && hasExpiration) {
+            viewModel.onExpiryDateTrackEvent(isChecked = false)
             binding.expiryDateSetText.apply {
                 isVisible = false
                 text = null
@@ -529,12 +527,14 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      * Shows a warning for free users to upgrade to Pro.
      */
     private fun showUpgradeToProWarning() {
+        viewModel.onUpgradeToProAlertDisplayedTrackEvent()
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.upgrade_pro))
             .setMessage(getString(R.string.link_upgrade_pro_explanation) + "\n")
             .setCancelable(false)
             .setPositiveButton(getString(R.string.button_plans_almost_full_warning)) { _, _ ->
                 (requireActivity() as BaseActivity).apply {
+                    viewModel.onUpgradeToProPlanOptionsTrackEvent(isPositiveButton = true)
                     navigateToUpgradeAccount()
                     finish()
                 }
@@ -542,6 +542,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             .setNegativeButton(
                 getString(R.string.verify_account_not_now_button)
             ) { _, _ ->
+                viewModel.onUpgradeToProPlanOptionsTrackEvent(isPositiveButton = false)
             }
             .create()
             .show()
@@ -575,6 +576,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      */
     private fun setPasswordProtectionClick() {
         if (viewModel.isPro()) {
+            viewModel.onSetPasswordTrackEvent()
             checkIfShouldHidePassword()
             findNavController().navigate(GetLinkFragmentDirections.setPassword(false))
         } else {
@@ -656,7 +658,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                     }
                 }
             }
-            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ ->
+            .setNegativeButton(getString(sharedR.string.general_dismiss_dialog)) { _, _ ->
                 if (type == SHARE) {
                     viewModel.shareCompleteLink { intent -> startActivity(intent) }
                 } else if (type == SEND_TO_CHAT) {

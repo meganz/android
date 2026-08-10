@@ -18,7 +18,8 @@ import java.util.stream.Stream
 class ManageShareFolderBottomSheetMenuItemTest {
     private val manageShareFolderBottomSheetMenuItem = ManageShareFolderBottomSheetMenuItem(
         menuAction = ManageShareFolderMenuAction(),
-        getFeatureFlagValueUseCase = mock()
+        getFeatureFlagValueUseCase = mock(),
+        megaNavigator = mock()
     )
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - isConnected {4} - expected {5}")
@@ -46,7 +47,10 @@ class ManageShareFolderBottomSheetMenuItemTest {
             true,
             AccessPermission.OWNER,
             false,
-            mock<TypedFolderNode> { on { isTakenDown } doReturn true },
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
+            },
             false,
             false,
         ),
@@ -57,6 +61,7 @@ class ManageShareFolderBottomSheetMenuItemTest {
             mock<TypedFolderNode> {
                 on { isTakenDown } doReturn true
                 on { isShared } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
             },
             false,
             false,
@@ -68,6 +73,7 @@ class ManageShareFolderBottomSheetMenuItemTest {
             mock<TypedFolderNode> {
                 on { isTakenDown } doReturn false
                 on { isShared } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
             },
             false,
             false,
@@ -79,9 +85,35 @@ class ManageShareFolderBottomSheetMenuItemTest {
             mock<TypedFolderNode> {
                 on { isTakenDown } doReturn false
                 on { isShared } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
             },
             false,
             true,
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isShared } doReturn true
+                on { isS4Container } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
+            },
+            false,
+            false,
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isShared } doReturn true
+                on { isNodeKeyDecrypted } doReturn false
+            },
+            false,
+            false,
         ),
     )
 }

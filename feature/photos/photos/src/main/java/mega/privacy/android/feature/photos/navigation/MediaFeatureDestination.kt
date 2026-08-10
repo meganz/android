@@ -1,0 +1,66 @@
+package mega.privacy.android.feature.photos.navigation
+
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.feature.photos.presentation.albums.create.createAlbumDialog
+import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
+
+class MediaFeatureDestination : FeatureDestination {
+    override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
+        { navigationHandler, transferHandler ->
+            albumContentScreen(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent,
+                resultFlow = navigationHandler::monitorResult
+            )
+
+            createAlbumDialog(
+                onDismiss = navigationHandler::back,
+                returnResult = navigationHandler::returnResult,
+            )
+
+            videoPlaylistDetailScreen(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent,
+                resultFlow = navigationHandler::monitorResult
+            )
+
+            mediaSearchScreen(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent
+            )
+            albumCoverSelectionScreen(navigationHandler = navigationHandler)
+            albumPhotosSelectionScreen(navigationHandler = navigationHandler)
+            albumDecryptionKey(navigationHandler = navigationHandler)
+            cameraUploadsProgressRoute(
+                modifier = Modifier.fillMaxSize(),
+                onNavigateUp = navigationHandler::back,
+                onNavigateToCameraUploadsSettings = {
+                    navigationHandler.navigate(
+                        destination = LegacySettingsCameraUploadsActivityNavKey()
+                    )
+                }
+            )
+            albumGetLink(navigationHandler = navigationHandler)
+            albumGetMultipleLinks(navigationHandler = navigationHandler)
+            selectVideosForPlaylistScreen(navigationHandler = navigationHandler)
+            albumImports(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent
+            )
+            videoRecentlyWatchedScreen(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent
+            )
+            cloudDriveMediaDiscoveryScreen(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent
+            )
+            selectVideosSearchScreen(navigationHandler = navigationHandler)
+        }
+}

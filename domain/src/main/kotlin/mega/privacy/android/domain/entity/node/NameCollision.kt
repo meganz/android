@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.node
 
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
+
 /**
  * Node name collision
  *
@@ -23,6 +25,7 @@ sealed interface NameCollision {
     val parentHandle: Long
     val isFile: Boolean
     val renameName: String?
+    val pitagTrigger: PitagTrigger
 }
 
 /**

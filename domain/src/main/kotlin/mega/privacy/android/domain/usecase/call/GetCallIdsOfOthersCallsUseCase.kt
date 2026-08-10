@@ -17,10 +17,10 @@ class GetCallIdsOfOthersCallsUseCase @Inject constructor(private val callReposit
      */
     suspend operator fun invoke(currentChatId: Long): List<Long> = with(callRepository) {
         buildList {
-            addAll(getCallHandleList(ChatCallStatus.Initial))
-            addAll(getCallHandleList(ChatCallStatus.Connecting))
-            addAll(getCallHandleList(ChatCallStatus.Joining))
-            addAll(getCallHandleList(ChatCallStatus.InProgress))
+            addAll(getCallChatIdList(ChatCallStatus.Initial))
+            addAll(getCallChatIdList(ChatCallStatus.Connecting))
+            addAll(getCallChatIdList(ChatCallStatus.Joining))
+            addAll(getCallChatIdList(ChatCallStatus.InProgress))
         }.filter { it != currentChatId }
     }
 }

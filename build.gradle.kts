@@ -7,8 +7,6 @@ plugins {
     alias(plugin.plugins.mega.android.release)
     alias(plugin.plugins.jfrog.artifactory) apply false
     alias(plugin.plugins.mega.artifactory.publish.convention) apply false
-    alias(plugin.plugins.de.mannodermaus.android.junit5) apply false
-    alias(plugin.plugins.jetbrains.kotlin.android) apply false
 }
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -28,15 +26,16 @@ buildscript {
         classpath(plugin.firebase.performance)
         classpath(plugin.firebase.app.distribution)
         classpath(plugin.jacoco)
-        classpath(plugin.paparazzi)
         classpath(plugin.jfrog)
-        classpath(plugin.junit5)
         classpath(plugin.kotlin.gradle)
         classpath(lib.kotlin.serialisation)
-        classpath("androidx.benchmark:benchmark-baseline-profile-gradle-plugin:1.3.3")
+        classpath(plugin.benchmark.baseline.profile)
+        classpath(lib.okhttp3)
+        classpath(lib.okio)
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:${plugin.versions.jfrog.artifactory.get()}")
     }
 }
+
 
 allprojects {
     repositories {
@@ -75,9 +74,13 @@ allprojects {
             url =
                 uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mega-ucrop-n-edit")
         }
+        flatDir {
+            dirs("${rootProject.projectDir}/third-party-lib/pdfiumAndroid")
+        }
     }
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor(5, "minutes")
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-android-extensions-runtime")
     }
 }
 
@@ -88,18 +91,17 @@ tasks.register("clean", Delete::class) {
 
 // Define versions in a single place
 // App
-extra["appVersion"] = "15.21"
+extra["appVersion"] = "16.11"
 
 // Sdk and tools
-extra["compileSdkVersion"] = 36
-extra["minSdkVersion"] = 26
+extra["compileSdkVersion"] = 37
+extra["minSdkVersion"] = 28
 extra["targetSdkVersion"] = 36
 
-extra["buildTools"] = "36.0.0"
+extra["buildTools"] = "37.0.0"
 
 // Prebuilt MEGA SDK version
-extra["megaSdkVersion"] = "20251104.214413-rel"
-
+extra["megaSdkVersion"] = "20260731.083049-rel"
 
 //JDK and Java Version
 extra["jdk"] = "21"

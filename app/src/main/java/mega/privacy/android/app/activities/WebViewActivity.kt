@@ -23,13 +23,14 @@ import android.webkit.WebViewClient
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityWebViewBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
-import mega.privacy.android.app.utils.Constants.EMAIL_VERIFY_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.EMAIL_VERIFY_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO
@@ -162,7 +163,7 @@ class WebViewActivity : BaseActivity() {
                 }
             }
 
-            if (Util.matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
+            if (Util.matchRegexs(url, EMAIL_VERIFY_LINK_REGEX_ARRAY)) {
                 MegaApplication.setIsWebOpenDueToEmailVerification(true)
             }
 
@@ -173,7 +174,9 @@ class WebViewActivity : BaseActivity() {
             binding.webView.isEnabled = false
         }
 
-        WebView.setWebContentsDebuggingEnabled(true)
+        if (BuildConfig.DEBUG) {
+            WebView.setWebContentsDebuggingEnabled(true)
+        }
 
     }
 

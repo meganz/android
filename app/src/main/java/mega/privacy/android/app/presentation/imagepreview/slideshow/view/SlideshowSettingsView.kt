@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.imagepreview.slideshow.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
@@ -33,8 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowSettingViewModel
@@ -43,17 +42,18 @@ import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.button
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.accent_050
-import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.SlideshowSettingOrderNewestButtonEvent
 import mega.privacy.mobile.analytics.event.SlideshowSettingOrderOldestButtonEvent
 import mega.privacy.mobile.analytics.event.SlideshowSettingOrderShuffleButtonEvent
@@ -321,7 +321,7 @@ fun PreviewSlideshowSettingsView() {
     var repeat by remember { mutableStateOf(false) }
     OriginalTheme(isSystemInDarkTheme()) {
         Scaffold {
-            SlideshowSettingsView(viewModel())
+            SlideshowSettingsView(hiltViewModel())
         }
     }
 }

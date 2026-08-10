@@ -3,7 +3,6 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
-    id("kotlin-android")
 }
 
 android {
@@ -12,26 +11,50 @@ android {
         abortOnError = true
     }
     namespace = "mega.privacy.android.feature.home"
+    testOptions {
+        unitTests {
+            targetSdk = 34
+        }
+    }
 }
 
 dependencies {
+    implementation(project(":navigation"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":domain"))
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
+    implementation(project(":core:feature-flags"))
+    implementation(project(":core:formatter"))
+    implementation(project(":core:ui-components:node-components"))
+    implementation(project(":core:ui-components:shared-components"))
+    implementation(project(":feature:transfers:transfers-snowflake-components"))
+    implementation(project(":core:transfers"))
+    implementation(project(":core:analytics:analytics-tracker"))
+    implementation(project(":shared:nodes"))
+    implementation(project(":shared:transfers"))
 
     implementation(platform(androidx.compose.bom))
     implementation(androidx.hilt.navigation)
     implementation(androidx.material3.adaptive.navigation.suite)
     implementation(androidx.navigation3.runtime)
+    implementation(androidx.paging)
+    implementation(androidx.paging.compose)
+    implementation(lib.compose.state.events)
     implementation(lib.kotlin.serialisation)
     implementation(lib.mega.analytics)
     implementation(lib.mega.core.ui)
     implementation(lib.logging.timber)
 
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(project(":core-test"))
+    testImplementation(project(":core-ui-test"))
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
+    testImplementation(testlib.bundles.ui.test)
+    testImplementation(androidx.paging.testing)
     testRuntimeOnly(testlib.junit.jupiter.engine)
 }

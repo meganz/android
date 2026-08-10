@@ -45,13 +45,13 @@ internal class ClearActiveTransfersIfFinishedUseCaseTest {
         mockedActiveTransfers.forEachIndexed { index, activeTransfer ->
             whenever(activeTransfer.isFinished).thenReturn(allFinished || index != 0)
         }
-        whenever(transferRepository.getCurrentActiveTransfers()).thenReturn(
+        whenever(transferRepository.getActiveTransfers()).thenReturn(
             mockedActiveTransfers
         )
     }
 
     private fun stubEmptyActiveTransfers() = runTest {
-        whenever(transferRepository.getCurrentActiveTransfers()).thenReturn(
+        whenever(transferRepository.getActiveTransfers()).thenReturn(
             emptyList()
         )
     }

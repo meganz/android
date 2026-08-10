@@ -5,7 +5,6 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
-    id("kotlin-android")
 }
 
 android {
@@ -22,14 +21,22 @@ dependencies {
     lintChecks(project(":lint"))
     lintChecks(lib.slack.compose.lints)
 
+    implementation(project(":shared:nodes"))
+    implementation(project(":core:feature-flags"))
     implementation(project(":core:ui-components:shared-components"))
+    implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
+    implementation(project(":core:formatter"))
+    implementation(project(":core:transfers"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
     implementation(project(":feature:photos:photos-snowflake-components"))
+    implementation(project(":feature:transfers:transfers-snowflake-components"))
+    implementation(project(":shared:transfers"))
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
@@ -48,10 +55,13 @@ dependencies {
     implementation(androidx.material3.adaptive.navigation.suite)
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation3.runtime)
+    implementation(androidx.navigation3.ui)
     implementation(google.services.mlkit.document.scanner)
     implementation(lib.coil.compose)
+    implementation(lib.kotlinx.collections.immutable)
 
     // test
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     testImplementation(androidx.navigation.testing)

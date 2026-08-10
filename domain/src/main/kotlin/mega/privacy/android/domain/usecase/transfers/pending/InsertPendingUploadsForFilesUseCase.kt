@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.pending
 
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -31,6 +32,7 @@ class InsertPendingUploadsForFilesUseCase @Inject constructor(
         pathsAndNames: Map<String, String?>,
         parentFolderId: NodeId,
         isHighPriority: Boolean = false,
+        pitagTrigger: PitagTrigger,
     ) {
         val location = nodeRepository.getFullNodePathById(parentFolderId)
             ?: nodeRepository.getNodePathById(parentFolderId)
@@ -56,7 +58,8 @@ class InsertPendingUploadsForFilesUseCase @Inject constructor(
                     uriPath = UriPath(path),
                     appData = appData,
                     isHighPriority = isHighPriority,
-                    fileName = name
+                    fileName = name,
+                    pitagTrigger = pitagTrigger,
                 )
             }
         )

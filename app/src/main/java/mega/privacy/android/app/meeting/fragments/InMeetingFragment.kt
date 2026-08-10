@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
 import android.app.Dialog
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Build
@@ -48,14 +47,12 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
-import mega.privacy.android.app.main.legacycontact.AddContactActivity
-import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.pauseAudioPlayer
-import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.resumeAudioPlayerIfNotInCall
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService.Companion.pauseAudioPlayer
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveX
 import mega.privacy.android.app.meeting.AnimationTool.moveY
@@ -76,8 +73,6 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.pip.PictureInPictureCallFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
-import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
-import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
@@ -87,13 +82,6 @@ import mega.privacy.android.app.presentation.meeting.view.sheet.MoreCallOptionsB
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
-import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MAX_USER
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NAME_CHANGE
@@ -117,17 +105,21 @@ import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
+import mega.privacy.android.feature.chat.meeting.recording.CallRecordingViewModel
+import mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingUIState
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
@@ -136,6 +128,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var megaChatApi: MegaChatApiAndroid
 
     @Inject
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
@@ -2813,27 +2808,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
             val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
             dialog.show(childFragmentManager, dialog.tag)
-        } else if (ChatUtil.areAllMyContactsChatParticipants(inMeetingViewModel.state.value.currentChatId)) {
+        } else if (ChatUtil.areAllMyContactsChatParticipants(
+                inMeetingViewModel.state.value.currentChatId,
+                megaChatApi,
+                megaApi
+            )) {
             val dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
             dialog.show(childFragmentManager, dialog.tag)
         } else {
-            val inviteParticipantIntent =
-                Intent(meetingActivity, AddContactActivity::class.java).apply {
-                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-                    putExtra(INTENT_EXTRA_KEY_CHAT, true)
-                    putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
-                    putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.getChatId())
-                    putExtra(
-                        INTENT_EXTRA_KEY_MAX_USER,
-                        inMeetingViewModel.state.value.call?.callUsersLimit
-                    )
-                    putExtra(
-                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                        getString(R.string.invite_participants)
-                    )
-                }
-            meetingActivity.startActivityForResult(
-                inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS
+            megaNavigator.openAddMeetingParticipantsForResult(
+                activity = meetingActivity,
+                chatId = inMeetingViewModel.getChatId(),
+                callUsersLimit = inMeetingViewModel.state.value.call?.callUsersLimit,
+                requestCode = REQUEST_ADD_PARTICIPANTS,
             )
         }
     }
@@ -2927,7 +2914,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         inMeetingViewModel.checkAnotherCallsInProgress(chatId)
         if (args.action != MEETING_ACTION_GUEST || CallUtil.isStatusConnected(
-                context,
+                requireContext(),
                 args.chatId
             )
         ) {

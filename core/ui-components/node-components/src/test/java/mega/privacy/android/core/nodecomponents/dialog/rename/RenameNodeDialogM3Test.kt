@@ -9,7 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
 import org.junit.Test
@@ -36,6 +36,7 @@ class RenameNodeDialogM3Test {
                 resetRenameValidationPassed = { },
                 resetShowChangeNodeExtensionDialog = { },
                 onRenameConfirmed = { },
+                onNodeNameChanged = { },
                 onDismiss = mockOnDismiss,
                 onRenameNode = { }
             )
@@ -67,6 +68,7 @@ class RenameNodeDialogM3Test {
                 resetRenameValidationPassed = { },
                 resetShowChangeNodeExtensionDialog = { },
                 onRenameConfirmed = mockOnRenameConfirmed,
+                onNodeNameChanged = { },
                 onDismiss = { },
                 onRenameNode = { }
             )
@@ -102,6 +104,7 @@ class RenameNodeDialogM3Test {
                 resetRenameValidationPassed = { },
                 resetShowChangeNodeExtensionDialog = mockResetShowChangeNodeExtensionDialog,
                 onRenameConfirmed = { },
+                onNodeNameChanged = { },
                 onDismiss = mockOnDismiss,
                 onRenameNode = { }
             )
@@ -139,6 +142,7 @@ class RenameNodeDialogM3Test {
                 resetRenameValidationPassed = { },
                 resetShowChangeNodeExtensionDialog = mockResetShowChangeNodeExtensionDialog,
                 onRenameConfirmed = { },
+                onNodeNameChanged = { },
                 onDismiss = mockOnDismiss,
                 onRenameNode = mockOnRenameNode
             )
@@ -153,7 +157,7 @@ class RenameNodeDialogM3Test {
             text = InstrumentationRegistry
                 .getInstrumentation()
                 .targetContext
-                .getString(R.string.action_change_anyway)
+                .getString(NodesR.string.action_change_anyway)
         ).performClick()
         verify(mockOnRenameNode).invoke("test.jpg")
         verify(mockOnDismiss).invoke()

@@ -8,9 +8,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -18,21 +15,19 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
-import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.extensions.newError
-import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
+import mega.privacy.android.app.presentation.login.mapper.AccountBlockedTypeStringMapper
 import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
@@ -40,153 +35,117 @@ import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.login.model.RkLink
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
-import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
-import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
+import mega.privacy.android.app.presentation.twofactorauthentication.extensions.isValid2FA
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
 import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrlWithEmail
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.analytics.FirebaseAnalyticsEvent
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
+import mega.privacy.android.domain.entity.login.megaPassword
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
-import mega.privacy.android.domain.entity.login.FetchNodesUpdate
+import mega.privacy.android.domain.entity.login.GoogleSignInResult
 import mega.privacy.android.domain.entity.login.LoginStatus
-import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
+import mega.privacy.android.domain.exception.LoginRequireValidation
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.QuerySignupLinkException
-import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
-import mega.privacy.android.domain.exception.login.FetchNodesException
-import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
+import mega.privacy.android.domain.usecase.analytics.SendFirebaseAnalyticsEventUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
-import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
+import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
-import mega.privacy.android.domain.usecase.account.MonitorLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
-import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
-import mega.privacy.android.domain.usecase.account.ShouldShowUpgradeAccountUseCase
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
-import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.featureflag.ClearPersistedFeatureFlagsUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.login.ClearLastRegisteredEmailUseCase
-import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
-import mega.privacy.android.domain.usecase.login.FastLoginUseCase
-import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
-import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.DecodeGoogleIdTokenUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
-import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
 import mega.privacy.android.domain.usecase.login.LoginWith2FAUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
-import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationReminderUseCase
-import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
-import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
-import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
-import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
-import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.ResumeTransfersForNotLoggedInInstanceUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AccountRegistrationEvent
 import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationFailedEvent
 import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationSuccessEvent
 import timber.log.Timber
 import javax.inject.Inject
 
+internal const val GOOGLE_SIGN_IN_PENDING_SESSION = "google-sign-in-pending-verification"
+
 /**
- * View Model for [LoginFragment]
+ * View Model for Login and registration flows
  *
  * @property state View state as [LoginState]
  */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    @ApplicationScope private val applicationScope: CoroutineScope,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
-    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase,
-    private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase,
-    private val getSessionUseCase: GetSessionUseCase,
-    private val hasPreferencesUseCase: HasPreferencesUseCase,
-    private val hasCameraSyncEnabledUseCase: HasCameraSyncEnabledUseCase,
-    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
+    private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
     private val querySignupLinkUseCase: QuerySignupLinkUseCase,
     private val cancelTransfersUseCase: CancelTransfersUseCase,
     private val localLogoutUseCase: LocalLogoutUseCase,
     private val loginUseCase: LoginUseCase,
     private val loginWith2FAUseCase: LoginWith2FAUseCase,
-    private val fastLoginUseCase: FastLoginUseCase,
-    private val fetchNodesUseCase: FetchNodesUseCase,
-    private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase,
-    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
-    private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase,
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
-    private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
     private val getLastRegisteredEmailUseCase: GetLastRegisteredEmailUseCase,
-    private val clearLastRegisteredEmailUseCase: ClearLastRegisteredEmailUseCase,
     private val installReferrerHandler: InstallReferrerHandler,
     @LoginMutex val loginMutex: Mutex,
     private val clearUserCredentialsUseCase: ClearUserCredentialsUseCase,
     private val getHistoricalProcessExitReasonsUseCase: GetHistoricalProcessExitReasonsUseCase,
-    private val enableRequestStatusMonitorUseCase: EnableRequestStatusMonitorUseCase,
-    private val monitorRequestStatusProgressEventUseCase: MonitorRequestStatusProgressEventUseCase,
-    private val checkIfTransfersShouldBePausedUseCase: CheckIfTransfersShouldBePausedUseCase,
-    private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val resendVerificationEmailUseCase: ResendVerificationEmailUseCase,
     private val resumeCreateAccountUseCase: ResumeCreateAccountUseCase,
     private val checkRecoveryKeyUseCase: CheckRecoveryKeyUseCase,
-    monitorLoggedOutFromAnotherLocationUseCase: MonitorLoggedOutFromAnotherLocationUseCase,
-    private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
-    private val shouldShowNotificationReminderUseCase: ShouldShowNotificationReminderUseCase,
     private val savedStateHandle: SavedStateHandle,
-    private val shouldShowUpgradeAccountUseCase: ShouldShowUpgradeAccountUseCase,
     private val ephemeralCredentialManager: EphemeralCredentialManager,
     private val resumeTransfersForNotLoggedInInstanceUseCase: ResumeTransfersForNotLoggedInInstanceUseCase,
-    private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
-    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
-    private val startScreenUtil: StartScreenUtil,
     private val getMiscFlagsUseCase: GetMiscFlagsUseCase,
     private val getDomainNameUseCase: GetDomainNameUseCase,
     private val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
-    private val getUserDataUseCase: GetUserDataUseCase,
+    private val fetchNodeProvider: FetchNodeProvider,
+    private val accountBlockedTypeStringMapper: AccountBlockedTypeStringMapper,
+    private val decodeGoogleIdTokenUseCase: DecodeGoogleIdTokenUseCase,
+    private val createAccountUseCase: CreateAccountUseCase,
+    private val clearPersistedFeatureFlagsUseCase: ClearPersistedFeatureFlagsUseCase,
+    private val sendFirebaseAnalyticsEventUseCase: SendFirebaseAnalyticsEventUseCase,
 ) : ViewModel() {
+    private val is2FARequited = savedStateHandle[IS_2FA_REQUIRED] ?: false
 
-    private val _state = MutableStateFlow(LoginState())
+    private val _state = MutableStateFlow(
+        LoginState(
+            is2FARequired = is2FARequited,
+        )
+    )
     val state: StateFlow<LoginState> = _state
 
     /**
@@ -200,20 +159,10 @@ class LoginViewModel @Inject constructor(
     val isConnected: Boolean
         get() = isConnectedToInternetUseCase()
 
-    /**
-     * Monitor if the user is logged out from another location.
-     */
-    val monitorLoggedOutFromAnotherLocation = monitorLoggedOutFromAnotherLocationUseCase()
-
-    private var pendingAction: String? = null
-
-    private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
-
-    private var performFetchNodesJob: Job? = null
+    private val handledLinks = mutableSetOf<HandledLinks>()
 
     init {
         Timber.d("LoginViewModel init $this")
-        enableAndMonitorRequestStatusProgressEvent()
         viewModelScope.launch {
             runCatching {
                 getHistoricalProcessExitReasonsUseCase()
@@ -236,42 +185,28 @@ class LoginViewModel @Inject constructor(
         runCatching { monitorEphemeralCredentialsUseCase().firstOrNull() }
             .onSuccess { ephemeral ->
                 if (ephemeral != null && !ephemeral.session.isNullOrEmpty()) {
-                    setPendingFragmentToShow(LoginScreen.ConfirmEmail)
-                    _state.update { it.copy(temporalEmail = ephemeral.email) }
-                    resumeCreateAccount(ephemeral.session.orEmpty())
-                    return@launch
+                    if (ephemeral.session == GOOGLE_SIGN_IN_PENDING_SESSION) {
+                        runCatching { clearEphemeralCredentialsUseCase() }
+                            .onFailure {
+                                Timber.e(
+                                    it,
+                                    "[GSIGN] Failed to clear Google ephemeral credentials"
+                                )
+                            }
+                        setPendingFragmentToShow(LoginScreen.LoginScreen)
+                        return@launch
+                    } else {
+                        setPendingFragmentToShow(LoginScreen.ConfirmEmail)
+                        _state.update { it.copy(temporalEmail = ephemeral.email) }
+                        resumeCreateAccount(ephemeral.session.orEmpty())
+                        return@launch
+                    }
                 }
             }
 
-        val session = getSession()
-        val visibleFragment =
-            savedStateHandle.get<Int>(Constants.VISIBLE_FRAGMENT) ?: run {
-                if (session.isNullOrEmpty()) Constants.TOUR_FRAGMENT else Constants.LOGIN_FRAGMENT
-            }
-
-        setPendingFragmentToShow(LoginScreen.entries.find { it.value == visibleFragment }
-            ?: LoginScreen.LoginScreen)
-    }
-
-    private fun enableAndMonitorRequestStatusProgressEvent() {
-        viewModelScope.launch {
-            runCatching {
-                enableRequestStatusMonitorUseCase()
-                monitorRequestStatusProgressEventUseCase()
-                    .catch { throwable ->
-                        Timber.e(throwable)
-                        // Hide progress bar on error
-                        _state.update {
-                            it.copy(requestStatusProgress = null)
-                        }
-                    }.collect { progress ->
-                        _state.update {
-                            it.copy(requestStatusProgress = progress)
-                        }
-                    }
-            }.onFailure {
-                Timber.e(it)
-            }
+        val visibleFragment = savedStateHandle.get<Int>(Constants.VISIBLE_FRAGMENT)
+        LoginScreen.entries.find { it.value == visibleFragment }?.let {
+            setPendingFragmentToShow(it)
         }
     }
 
@@ -281,70 +216,36 @@ class LoginViewModel @Inject constructor(
     private fun setupInitialState() {
         viewModelScope.launch {
             merge(
-                flow { emit(getSessionUseCase()) }.map { session ->
+                monitorUserCredentialsUseCase().map { it?.session }.map { session ->
                     { state: LoginState ->
                         resumeTransfersForNotLoggedInInstance(session)
-
-                        state.copy(
-                            intentState = LoginIntentState.ReadyForInitialSetup,
-                            accountSession = state.accountSession?.copy(session = session)
-                                ?: AccountSession(session = session),
-                            is2FAEnabled = false,
-                            isAccountConfirmed = false,
-                            pressedBackWhileLogin = false,
-                            isFirstTime = session == null,
-                            isAlreadyLoggedIn = session != null,
-                            isLoginRequired = session == null,
-                        )
-                    }
-                }.catch { Timber.e(it) },
-                flow { emit(rootNodeExistsUseCase()) }.map { exists ->
-                    { state: LoginState -> state.copy(rootNodesExists = exists) }
-                }.catch { Timber.e(it) },
-                flow { emit(hasPreferencesUseCase()) }.map { hasPreferences ->
-                    { state: LoginState -> state.copy(hasPreferences = hasPreferences) }
-                }.catch { Timber.e(it) },
-                flow { emit(hasCameraSyncEnabledUseCase()) }.map { hasCameraSyncEnabled ->
-                    { state: LoginState -> state.copy(hasCUSetting = hasCameraSyncEnabled) }
-                }.catch { Timber.e(it) },
-                flow { emit(isCameraUploadsEnabledUseCase()) }.map { isCameraSyncEnabled ->
-                    { state: LoginState -> state.copy(isCUSettingEnabled = isCameraSyncEnabled) }
-                }.catch { Timber.e(it) },
-                monitorFetchNodesFinishUseCase().catch { Timber.e(it) }.map {
-                    with(pendingAction) {
-                        when (this) {
-                            ACTION_FORCE_RELOAD_ACCOUNT -> {
-                                { state: LoginState -> state.copy(isPendingToFinishActivity = true) }
-                            }
-
-                            ACTION_OPEN_APP -> {
-                                { state: LoginState -> state.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
-                            }
-
-                            else -> {
-                                { state: LoginState -> state }
-                            }
+                        if (state.intentState == null) {
+                            val is2FARequired = savedStateHandle[IS_2FA_REQUIRED] ?: false
+                            val savedEmail = savedStateHandle.get<String>(PENDING_2FA_EMAIL)
+                            val savedPassword = savedStateHandle.get<String>(PENDING_2FA_PASSWORD)
+                            state.copy(
+                                intentState = LoginIntentState.ReadyForInitialSetup,
+                                accountSession = state.accountSession?.copy(
+                                    session = session,
+                                    email = savedEmail
+                                ) ?: AccountSession(session = session, email = savedEmail),
+                                password = savedPassword,
+                                isAccountConfirmed = false,
+                                isLoginRequired = !is2FARequired && session == null,
+                            )
+                        } else {
+                            state.copy(
+                                accountSession = state.accountSession?.copy(session = session)
+                                    ?: AccountSession(session = session)
+                            )
                         }
                     }
-                },
-                flow { emit(isFirstLaunchUseCase()) }.catch { Timber.e(it) }.map { isFirstLaunch ->
-                    { state: LoginState ->
-                        state.copy(isFirstTimeLaunch = isFirstLaunch)
-                    }
-                },
+                }.catch { Timber.e(it) },
                 monitorThemeModeUseCase().catch { Timber.e(it) }.map { themeMode ->
                     { state: LoginState ->
                         state.copy(themeMode = themeMode)
                     }
                 },
-                flow {
-                    emit(shouldShowNotificationReminderUseCase())
-                }.catch { Timber.e(it) }
-                    .map { shouldShowNotificationPermission ->
-                        { state: LoginState ->
-                            state.copy(shouldShowNotificationPermission = shouldShowNotificationPermission)
-                        }
-                    },
             ).collect {
                 _state.update(it)
             }
@@ -364,6 +265,8 @@ class LoginViewModel @Inject constructor(
                 .filter { it.type in blockedTypes }
                 .collectLatest {
                     if (it.type == AccountBlockedType.VERIFICATION_EMAIL) resetLoginState() else stopLogin()
+                    val mappedText = accountBlockedTypeStringMapper(it)
+                    triggerAccountBlockedEvent(it.copy(text = mappedText))
                 }
         }
     }
@@ -397,7 +300,16 @@ class LoginViewModel @Inject constructor(
      * @param fragmentType
      */
     fun setPendingFragmentToShow(fragmentType: LoginScreen) {
-        _state.update { state -> state.copy(isPendingToShowFragment = triggered(fragmentType)) }
+        _state.update { state ->
+            // Clear any stale email/password validation errors when (re-)entering the login form,
+            // otherwise they persist after navigating back to the tour and reopening it. See AND-23619.
+            val clearErrors = fragmentType == LoginScreen.LoginScreen
+            state.copy(
+                isPendingToShowFragment = triggered(fragmentType),
+                emailError = if (clearErrors) null else state.emailError,
+                passwordError = if (clearErrors) null else state.passwordError,
+            )
+        }
     }
 
     /**
@@ -407,28 +319,9 @@ class LoginViewModel @Inject constructor(
         _state.update { state -> state.copy(isPendingToShowFragment = consumed()) }
     }
 
-    /**
-     * Sets [ACTION_FORCE_RELOAD_ACCOUNT] as pendingAction.
-     */
-    fun setForceReloadAccountAsPendingAction() {
-        pendingAction = ACTION_FORCE_RELOAD_ACCOUNT
-        _state.update { state ->
-            state.copy(
-                intentState = LoginIntentState.AlreadySet,
-                isLoginInProgress = false,
-                isLoginRequired = false,
-                is2FARequired = false,
-                isAlreadyLoggedIn = true,
-                fetchNodesUpdate = cleanFetchNodesUpdate
-            )
-        }
-    }
-
     fun resetLoginState() {
-        performFetchNodesJob?.cancel()
         _state.update {
             it.copy(
-                fetchNodesUpdate = null,
                 isLoginInProgress = false,
                 isLoginRequired = true
             )
@@ -438,50 +331,185 @@ class LoginViewModel @Inject constructor(
     /**
      * Stops logging in.
      */
-    fun stopLogin() {
+    fun stopLogin(isPerformLocalLogOut: Boolean = true) {
+        savedStateHandle[IS_2FA_REQUIRED] = false
+        savedStateHandle.remove<String>(PENDING_2FA_EMAIL)
+        savedStateHandle.remove<String>(PENDING_2FA_PASSWORD)
         _state.update {
             it.copy(
                 accountSession = null,
                 password = null,
-                fetchNodesUpdate = null,
-                isFirstTime = false,
-                isAlreadyLoggedIn = false,
-                pressedBackWhileLogin = true,
-                is2FAEnabled = false,
                 is2FARequired = false,
-                twoFAPin = listOf("", "", "", "", "", ""),
                 multiFactorAuthState = null,
                 isAccountConfirmed = false,
-                rootNodesExists = false,
                 temporalEmail = null,
-                hasPreferences = false,
-                hasCUSetting = false,
-                isCUSettingEnabled = false,
-                isLocalLogoutInProgress = true,
                 isLoginRequired = true,
                 isLoginInProgress = false,
                 loginException = null,
                 ongoingTransfersExist = null,
-                isCheckingSignupLink = false
             )
         }
-        viewModelScope.launch {
-            runCatching {
-                localLogoutUseCase(
-                    DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
-                )
-            }.onFailure {
-                Timber.w(it, "Exception in local logout.")
+        if (isPerformLocalLogOut) {
+            viewModelScope.launch {
+                runCatching {
+                    localLogoutUseCase(disableChatApi = true)
+                }.onFailure {
+                    Timber.w(it, "Exception in local logout.")
+                }
             }
-            _state.update { it.copy(isLocalLogoutInProgress = false) }
         }
     }
 
     /**
-     * Updates isAccountConfirmed value in state.
+     * Starts MEGA login with a Google ID token obtained from Credential Manager.
+     * Reuses the regular login flow; if the account doesn't exist yet, it's
+     * auto-created with the Google sub as the password and login is retried.
+     *
+     * @param idToken The raw Google ID token JWT.
      */
-    fun updateIsAccountConfirmed(isAccountConfirmed: Boolean) {
-        _state.update { it.copy(isAccountConfirmed = isAccountConfirmed) }
+    fun onGoogleSignIn(idToken: String) {
+        if (loginMutex.isLocked) return
+
+        viewModelScope.launch {
+            val result = runCatching { decodeGoogleIdTokenUseCase(idToken) }
+                .onFailure {
+                    Timber.e(it, "[GSIGN] JWT decode failed")
+                    setSnackbarMessageId(sharedR.string.google_sign_in_failed)
+                }
+                .getOrNull() ?: return@launch
+
+            _state.update {
+                it.copy(
+                    isLoginInProgress = true,
+                    is2FARequired = false,
+                    accountSession = it.accountSession?.copy(email = result.email)
+                        ?: AccountSession(email = result.email),
+                    password = result.megaPassword,
+                    ongoingTransfersExist = null,
+                )
+            }
+
+            performGoogleSignInLogin(result)
+        }
+    }
+
+    private suspend fun performGoogleSignInLogin(result: GoogleSignInResult) {
+        fetchNodeProvider.setLoginByAccount()
+        runCatching {
+            loginUseCase(
+                result.email,
+                result.megaPassword,
+                disableChatApi = true
+            ).collectLatest { status -> status.checkStatus(email = result.email) }
+        }.onFailure { exception ->
+            if (exception !is LoginException) return@onFailure
+
+            when {
+                exception is LoginMultiFactorAuthRequired -> handleGoogleSignIn2FA(result)
+
+                exception is LoginRequireValidation -> {
+                    Timber.d("[GSIGN] Account exists but not validated - navigating to ConfirmEmail")
+                    sendToConfirmEmailScreen(result.toEphemeralCredentials())
+                }
+
+                exception is LoginWrongEmailOrPassword -> autoCreateGoogleAccount(result)
+
+                else -> {
+                    _state.update {
+                        it.copy(
+                            password = null,
+                            accountSession = it.accountSession?.copy(email = null),
+                        )
+                    }
+                    exception.loginFailed()
+                }
+            }
+        }
+    }
+
+    private fun handleGoogleSignIn2FA(result: GoogleSignInResult) {
+        savedStateHandle[IS_2FA_REQUIRED] = true
+        savedStateHandle[PENDING_2FA_EMAIL] = result.email
+        savedStateHandle[PENDING_2FA_PASSWORD] = result.megaPassword
+        _state.update {
+            it.copy(
+                isLoginInProgress = false,
+                isLoginRequired = false,
+                is2FARequired = true,
+            )
+        }
+    }
+
+    private suspend fun autoCreateGoogleAccount(result: GoogleSignInResult) {
+        Timber.d("[GSIGN] Account doesn't exist - auto-creating")
+        runCatching {
+            createAccountUseCase(
+                email = result.email,
+                password = result.megaPassword,
+                firstName = result.firstName.orEmpty(),
+                lastName = result.lastName.orEmpty(),
+            )
+        }.onSuccess { credentials ->
+            sendToConfirmEmailScreen(credentials)
+        }.onFailure { ce ->
+            when (ce) {
+                is CreateAccountException.AccountAlreadyExists -> {
+                    Timber.w(ce, "[GSIGN] Email registered with different password")
+                    showGoogleSignInError(sharedR.string.google_sign_in_email_exists)
+                }
+
+                else -> {
+                    Timber.e(ce, "[GSIGN] createAccount failed")
+                    showGoogleSignInError(sharedR.string.google_sign_in_failed)
+                }
+            }
+        }
+    }
+
+    private suspend fun sendToConfirmEmailScreen(credentials: EphemeralCredentials) {
+        setTemporalCredentials(credentials)
+        runCatching {
+            clearEphemeralCredentialsUseCase()
+            saveEphemeralCredentialsUseCase(
+                credentials.copy(session = GOOGLE_SIGN_IN_PENDING_SESSION)
+            )
+        }.onFailure { Timber.e(it, "[GSIGN] Failed to persist ephemeral credentials") }
+        _state.update {
+            it.copy(
+                isLoginInProgress = false,
+                password = null,
+                accountSession = it.accountSession?.copy(email = null),
+            )
+        }
+        setIsWaitingForConfirmAccount()
+    }
+
+    private fun showGoogleSignInError(@StringRes messageId: Int) {
+        _state.update {
+            it.copy(
+                isLoginInProgress = false,
+                isLoginRequired = true,
+                password = null,
+                accountSession = it.accountSession?.copy(email = null),
+                snackbarMessage = triggered(messageId),
+            )
+        }
+    }
+
+    private fun GoogleSignInResult.toEphemeralCredentials() = EphemeralCredentials(
+        email = email,
+        password = megaPassword,
+        session = null,
+        firstName = firstName,
+        lastName = lastName,
+    )
+
+    /**
+     * Handles errors surfaced by the Credential Manager launcher (e.g. picker failed).
+     */
+    fun onGoogleSignInError(throwable: Throwable) {
+        Timber.e(throwable, "[GSIGN] Launcher reported failure (${throwable::class.simpleName})")
+        setSnackbarMessageId(sharedR.string.google_sign_in_failed)
     }
 
     /**
@@ -489,16 +517,6 @@ class LoginViewModel @Inject constructor(
      */
     fun setLoginErrorConsumed() {
         _state.update { it.copy(loginException = null) }
-    }
-
-    private fun UserCredentials.updateCredentials() {
-        val accountSession = state.value.accountSession
-        _state.update {
-            it.copy(
-                accountSession = accountSession?.copy(email = email, session = session)
-                    ?: AccountSession(email = email, session)
-            )
-        }
     }
 
     /**
@@ -514,6 +532,8 @@ class LoginViewModel @Inject constructor(
     fun checkTemporalCredentials(): Boolean {
         val ephemeralCredentials = ephemeralCredentialManager.getEphemeralCredential()
         return if (ephemeralCredentials != null && !ephemeralCredentials.email.isNullOrEmpty() && !ephemeralCredentials.password.isNullOrEmpty()) {
+            // Required for Firebase A/B testing
+            sendFirebaseAnalyticsEventUseCase(FirebaseAnalyticsEvent.CreateNewAccount)
             performLogin(ephemeralCredentials.email, ephemeralCredentials.password)
             true
         } else {
@@ -524,19 +544,18 @@ class LoginViewModel @Inject constructor(
     /**
      * Checks a signup link.
      */
-    fun checkSignupLink(link: String) {
+    fun checkSignupLink(link: String, timeStamp: Long) {
         // avoid rotating the screen calling this method again
-        if (state.value.intentState == LoginIntentState.AlreadySet
-            || state.value.isCheckingSignupLink
-        ) return
+        val handledLink = HandledLinks(link = link, timeStamp = timeStamp)
+        if (handledLinks.contains(handledLink)) return
         _state.update { state ->
             state.copy(
                 isLoginRequired = false,
                 isLoginInProgress = true,
-                isCheckingSignupLink = true
             )
         }
         viewModelScope.launch {
+            handledLinks.add(handledLink)
             val result = runCatching { querySignupLinkUseCase(link) }
             var accountConfirmed: Boolean? = null
             var newAccountSession: AccountSession? = null
@@ -552,7 +571,7 @@ class LoginViewModel @Inject constructor(
                     R.string.account_confirmed
                 }
             } else {
-                (result.exceptionOrNull() as QuerySignupLinkException).messageId
+                (result.exceptionOrNull() as? QuerySignupLinkException)?.messageId
             }
 
             _state.update { state ->
@@ -566,7 +585,6 @@ class LoginViewModel @Inject constructor(
                     accountSession = newAccountSession,
                     isAccountConfirmed = isAccountConfirmed,
                     intentState = LoginIntentState.AlreadySet,
-                    isCheckingSignupLink = false,
                     snackbarMessage = messageId?.let { triggered(it) } ?: consumed()
                 )
             }
@@ -618,21 +636,19 @@ class LoginViewModel @Inject constructor(
                     state.copy(
                         emailError = emailError,
                         passwordError = passwordError,
-                        pressedBackWhileLogin = false,
                     )
                 }
             } else {
                 viewModelScope.launch {
                     when {
                         ongoingTransfersExistUseCase() -> _state.update { state ->
-                            state.copy(ongoingTransfersExist = true, pressedBackWhileLogin = false)
+                            state.copy(ongoingTransfersExist = true)
                         }
 
                         !isConnected -> _state.update { state ->
                             state.copy(
                                 isLoginRequired = true,
                                 ongoingTransfersExist = null,
-                                pressedBackWhileLogin = false,
                                 snackbarMessage = triggered(R.string.error_server_connection_problem)
                             )
                         }
@@ -652,8 +668,6 @@ class LoginViewModel @Inject constructor(
             return
         }
 
-        LoginActivity.isBackFromLoginPage = false
-
         _state.update {
             if (typedEmail != null && typedPassword != null) {
                 it.copy(
@@ -663,14 +677,12 @@ class LoginViewModel @Inject constructor(
                         ?: AccountSession(email = typedEmail),
                     password = typedPassword,
                     ongoingTransfersExist = null,
-                    pressedBackWhileLogin = false,
                 )
             } else {
                 it.copy(
                     isLoginInProgress = true,
                     is2FARequired = false,
                     ongoingTransfersExist = null,
-                    pressedBackWhileLogin = false,
                 )
             }
         }
@@ -679,24 +691,26 @@ class LoginViewModel @Inject constructor(
             with(state.value) {
                 val email = typedEmail ?: accountSession?.email ?: return@launch
                 val password = typedPassword ?: this.password ?: return@launch
+                fetchNodeProvider.setLoginByAccount()
 
                 runCatching {
                     loginUseCase(
                         email,
                         password,
-                        DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
+                        disableChatApi = true
                     ).collectLatest { status -> status.checkStatus(email = email) }
                 }.onFailure { exception ->
                     if (exception !is LoginException) return@onFailure
 
                     if (exception is LoginMultiFactorAuthRequired) {
+                        savedStateHandle[IS_2FA_REQUIRED] = true
+                        savedStateHandle[PENDING_2FA_EMAIL] = state.value.accountSession?.email
+                        savedStateHandle[PENDING_2FA_PASSWORD] = state.value.password
                         _state.update {
                             it.copy(
                                 isLoginInProgress = false,
-                                is2FAEnabled = true,
                                 isLoginRequired = false,
                                 is2FARequired = true,
-                                isFirstTime2FA = triggered
                             )
                         }
                     } else {
@@ -721,11 +735,12 @@ class LoginViewModel @Inject constructor(
             with(state.value) {
                 runCatching {
                     val email = accountSession?.email ?: return@launch
+                    fetchNodeProvider.setLoginByAccount()
                     loginWith2FAUseCase(
                         email,
                         password ?: return@launch,
                         pin2FA,
-                        DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
+                        disableChatApi = true
                     ).collectLatest { status ->
                         status.checkStatus(email = email)
                         if (status == LoginStatus.LoginSucceed) {
@@ -753,57 +768,6 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Fast login.
-     */
-    fun fastLogin(refreshChatUrl: Boolean) {
-        _state.update {
-            it.copy(
-                isLoginInProgress = false,
-                isLoginRequired = false,
-                is2FARequired = false,
-                isAlreadyLoggedIn = true,
-                isFastLoginInProgress = true,
-                fetchNodesUpdate = cleanFetchNodesUpdate
-            )
-        }
-
-        viewModelScope.launch {
-            getAccountCredentialsUseCase()?.updateCredentials() ?: return@launch
-            var retry = 1
-            while (loginMutex.isLocked && retry <= 3) {
-                Timber.d("Wait for the isLoggingIn lock to be available")
-                delay(1000L * retry)
-                if (rootNodeExistsUseCase()) {
-                    Timber.d("Root node exists")
-                    _state.update { it.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
-                    return@launch
-                }
-                retry++
-            }
-            if (loginMutex.isLocked) {
-                Timber.w("Another login is processing")
-                pendingAction = ACTION_OPEN_APP
-                return@launch
-            }
-
-            performFastLogin(refreshChatUrl)
-        }
-    }
-
-    private fun performFastLogin(refreshChatUrl: Boolean) = viewModelScope.launch {
-        runCatching {
-            fastLoginUseCase(
-                state.value.accountSession?.session ?: return@launch,
-                refreshChatUrl,
-                DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
-            ).collectLatest { status -> status.checkStatus(isFastLogin = true) }
-        }.onFailure { exception ->
-            if (exception !is LoginException) return@onFailure
-            exception.loginFailed()
-        }
-    }
-
     private fun LoginException.loginFailed(is2FARequest: Boolean = false) =
         _state.update { loginState ->
             //If LoginBlockedAccount will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
@@ -817,60 +781,31 @@ class LoginViewModel @Inject constructor(
             loginState.copy(
                 isLoginInProgress = false,
                 isLoginRequired = true,
-                is2FAEnabled = is2FARequest,
                 is2FARequired = false,
-                fetchNodesUpdate = null,
                 loginException = this.takeUnless { this is LoginLoggedOutFromOtherLocation },
                 snackbarMessage = snackbarMessage ?: consumed()
             )
         }
 
     private suspend fun LoginStatus.checkStatus(
-        isFastLogin: Boolean = false,
         email: String? = null,
     ) = when (this) {
         LoginStatus.LoginStarted -> {
             Timber.d("Login started")
-            _state.update {
-                it.copy(loginTemporaryError = null)
-            }
         }
 
         LoginStatus.LoginSucceed -> {
-            // If fast login, state already updated.
             Timber.d("Login finished")
-            if (isFastLogin) {
-                _state.update {
-                    it.copy(
-                        loginTemporaryError = null,
-                        isFastLoginInProgress = false
-                    )
-                }
-                getUserData()
-            } else {
-                ephemeralCredentialManager.setEphemeralCredential(null)
-                _state.update {
-                    it.copy(
-                        loginTemporaryError = null,
-                        isLoginInProgress = false,
-                        isLoginRequired = false,
-                        is2FARequired = false,
-                        isAlreadyLoggedIn = true,
-                        isFastLoginInProgress = false,
-                        fetchNodesUpdate = cleanFetchNodesUpdate,
-                        multiFactorAuthState = null
-                    )
-                }
+            ephemeralCredentialManager.setEphemeralCredential(null)
+            _state.update {
+                it.copy(
+                    isLoginInProgress = false,
+                    isLoginRequired = false,
+                    is2FARequired = false,
+                    multiFactorAuthState = null
+                )
             }
-            if (!isFastLogin) {
-                shouldShowUpgradeAccount()
-            }
-            val isSingleActivityEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
-            }.getOrDefault(false)
-            if (!isSingleActivityEnabled) {
-                fetchNodes()
-            }
+            clearFeatureFlagCache()
             sendAnalyticsEventIfFirstTimeLogin(email)
         }
 
@@ -878,11 +813,8 @@ class LoginViewModel @Inject constructor(
             Timber.d("Login cannot start")
             _state.update {
                 it.copy(
-                    loginTemporaryError = null,
                     isLoginInProgress = false,
-                    isFastLoginInProgress = false,
                     isLoginRequired = true,
-                    is2FAEnabled = false,
                     is2FARequired = false
                 )
             }
@@ -890,139 +822,19 @@ class LoginViewModel @Inject constructor(
 
         is LoginStatus.LoginResumed -> {
             Timber.d("Login resumed")
-            _state.update {
-                it.copy(loginTemporaryError = null)
-            }
         }
 
         is LoginStatus.LoginWaiting -> {
             Timber.d("Login waiting")
-            // Ignore the temporary error if request status event is in progress
-            if (!state.value.isRequestStatusInProgress) {
-                _state.update {
-                    it.copy(loginTemporaryError = this.error)
-                }
-            } else {
-                Unit
-            }
         }
     }
 
-    private fun getUserData() {
+    private fun clearFeatureFlagCache() {
         viewModelScope.launch {
             runCatching {
-                getUserDataUseCase()
-            }.onFailure { exception ->
-                Timber.e(exception, "Error getting user data")
-            }
-        }
-    }
-
-    /**
-     * Should show upgrade account
-     */
-    suspend fun shouldShowUpgradeAccount() {
-        val shouldShow = runCatching {
-            shouldShowUpgradeAccountUseCase()
-        }.onFailure {
-            Timber.e("Failed to check if should show upgrade account: ${it.message}")
-        }.getOrDefault(false)
-        _state.update { it.copy(shouldShowUpgradeAccount = shouldShow) }
-        Timber.d("Should show upgrade account: ${state.value.shouldShowUpgradeAccount}")
-    }
-
-    /**
-     * Fetch nodes.
-     */
-    fun fetchNodes(isRefreshSession: Boolean = false) {
-        viewModelScope.launch {
-            if (isRefreshSession) {
-                getAccountCredentialsUseCase()?.updateCredentials() ?: return@launch
-            }
-
-            checkEnabledCookies()
-
-            if (isRefreshSession) {
-                _state.update { it.copy(fetchNodesUpdate = cleanFetchNodesUpdate) }
-            }
-
-            Timber.d("fetch nodes started")
-            performFetchNodes()
-        }
-    }
-
-    private fun checkEnabledCookies() {
-        applicationScope.launch {
-            runCatching {
-                val enabledCookies = getCookieSettingsUseCase()
-                updateCrashAndPerformanceReportersUseCase(enabledCookies)
+                clearPersistedFeatureFlagsUseCase()
             }.onFailure {
-                Timber.e("Failed to get cookie settings: $it")
-            }
-        }
-    }
-
-    private fun performFetchNodes() {
-        performFetchNodesJob = viewModelScope.launch {
-            runCatching {
-                fetchNodesUseCase().collectLatest { update ->
-                    if (update.progress?.floatValue == 1F) {
-                        Timber.d("fetch nodes finished")
-                        prefetchTimeline()
-                        _state.update {
-                            it.copy(
-                                intentState = LoginIntentState.ReadyForFinalSetup,
-                                fetchNodesUpdate = update
-                            )
-                        }
-                        startWorkers()
-                    } else {
-                        Timber.d("fetch nodes update")
-                        _state.update { it.copy(fetchNodesUpdate = update) }
-                    }
-                }
-            }.onFailure { exception ->
-                Timber.e(exception)
-                if (exception !is FetchNodesException) return@launch
-
-                _state.update { state ->
-                    val messageId =
-                        exception.takeUnless { exception is FetchNodesErrorAccess || state.pressedBackWhileLogin }
-
-                    state.copy(
-                        isLoginInProgress = false,
-                        isLoginRequired = true,
-                        is2FAEnabled = false,
-                        is2FARequired = false,
-                        snackbarMessage = messageId?.let { triggered(exception.error) }
-                            ?: consumed()
-                    )
-                }
-            }
-        }
-    }
-
-    private suspend fun prefetchTimeline() {
-        runCatching {
-            if (!getFeatureFlagValueUseCase(AppFeatures.PrefetchTimeline)) return@runCatching
-            getTimelinePhotosUseCase()
-        }.onFailure {
-            Timber.e(it)
-        }
-    }
-
-    private suspend fun startWorkers() {
-        /* In case the app crash or restarts, we need to sync some tasks */
-        val syncTasks = listOf<suspend () -> Unit>(
-            { establishCameraUploadsSyncHandlesUseCase() },
-            { checkIfTransfersShouldBePausedUseCase() }
-        )
-
-        syncTasks.forEach { task ->
-            runCatching {
-                task()
-            }.onFailure { error ->
-                Timber.e(error, "Task failed")
+                Timber.e(it)
             }
         }
     }
@@ -1047,49 +859,16 @@ class LoginViewModel @Inject constructor(
         _state.update { state -> state.copy(snackbarMessage = consumed()) }
 
     /**
-     * Stop camera upload
-     */
-    fun stopCameraUploads() =
-        viewModelScope.launch {
-            runCatching { stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable) }
-                .onFailure { Timber.e(it) }
-        }
-
-    /**
-     * Updates a pin of the 2FA code in state.
-     */
-    fun on2FAPinChanged(pin: String, index: Int) {
-        val updated2FA =
-            state.value.twoFAPin.getUpdatedTwoFactorAuthentication(pin = pin, index = index)
-
-        updateTwoFAState(updated2FA)
-        updated2FA.getTwoFactorAuthentication()?.apply {
-            performLoginWith2FA(this)
-        }
-    }
-
-    /**
      * Updates 2FA code in state.
      */
-    fun on2FAChanged(twoFA: String) = twoFA.getTwoFactorAuthentication()?.let {
-        updateTwoFAState(it)
-        performLoginWith2FA(twoFA)
-    } ?: run {
+    fun on2FAChanged(twoFA: String) {
         _state.update { state ->
             state.copy(
-                multiFactorAuthState = MultiFactorAuthState.Fixed
-                    .takeUnless { state.multiFactorAuthState == MultiFactorAuthState.Failed })
-        }
-    }
-
-    private fun updateTwoFAState(twoFA: List<String>) {
-        _state.update { state ->
-            state.copy(
-                twoFAPin = twoFA,
                 multiFactorAuthState = MultiFactorAuthState.Fixed
                     .takeUnless { state.multiFactorAuthState == MultiFactorAuthState.Failed }
             )
         }
+        if (twoFA.isValid2FA()) performLoginWith2FA(twoFA)
     }
 
     /**
@@ -1097,18 +876,6 @@ class LoginViewModel @Inject constructor(
      */
     fun setSnackbarMessageId(@StringRes messageId: Int) =
         _state.update { state -> state.copy(snackbarMessage = triggered(messageId)) }
-
-    /**
-     * Sets isFirstTime2FA as consumed.
-     */
-    fun onFirstTime2FAConsumed() =
-        _state.update { state -> state.copy(isFirstTime2FA = consumed) }
-
-    /**
-     * Get session
-     */
-    private suspend fun getSession() =
-        runCatching { getSessionUseCase() }.getOrNull()
 
     /**
      * Set temporal email
@@ -1121,20 +888,6 @@ class LoginViewModel @Inject constructor(
                 val ephemeral = monitorEphemeralCredentialsUseCase().firstOrNull() ?: return@launch
                 clearEphemeralCredentialsUseCase()
                 saveEphemeralCredentialsUseCase(ephemeral.copy(email = email))
-            }.onFailure { Timber.e(it) }
-        }
-    }
-
-    /**
-     * Save ephemeral
-     *
-     * @param ephemeral
-     */
-    fun saveEphemeral(ephemeral: EphemeralCredentials) {
-        viewModelScope.launch {
-            runCatching {
-                clearEphemeralCredentialsUseCase()
-                saveEphemeralCredentialsUseCase(ephemeral)
             }.onFailure { Timber.e(it) }
         }
     }
@@ -1170,11 +923,6 @@ class LoginViewModel @Inject constructor(
                             appInstallTime = details.appInstallTime
                         )
                     )
-                }.onFailure {
-                    Timber.e(it)
-                }
-                runCatching {
-                    clearLastRegisteredEmailUseCase()
                 }.onFailure {
                     Timber.e(it)
                 }
@@ -1282,15 +1030,6 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
-     * Set handled logged out from another location
-     */
-    fun setHandledLoggedOutFromAnotherLocation() {
-        viewModelScope.launch {
-            setLoggedOutFromAnotherLocationUseCase(false)
-        }
-    }
-
-    /**
      * On request recovery key
      *
      * @param link the recovery key link
@@ -1304,13 +1043,6 @@ class LoginViewModel @Inject constructor(
      */
     fun onRecoveryKeyConsumed() {
         _state.update { it.copy(recoveryKeyLink = null) }
-    }
-
-    /**
-     * Sets the start screen timestamp in the preferences.
-     */
-    fun setStartScreenTimeStamp() {
-        startScreenUtil.setStartScreenTimeStamp()
     }
 
     fun onForgotPassword() {
@@ -1329,7 +1061,7 @@ class LoginViewModel @Inject constructor(
 
                 recoveryUrlWithEmail(domain) + email
             }
-            _state.update { it.copy(openRecoveryUrlEvent = triggered(url)) }
+            _state.update { it.copy(openUrlEvent = triggered(url)) }
         }
     }
 
@@ -1338,12 +1070,12 @@ class LoginViewModel @Inject constructor(
             waitMiscFlagsLoaded()
             val domain = getDomainNameUseCase()
             val url = recoveryUrl(domain)
-            _state.update { it.copy(openRecoveryUrlEvent = triggered(url)) }
+            _state.update { it.copy(openUrlEvent = triggered(url)) }
         }
     }
 
-    fun onOpenRecoveryUrlEventConsumed() {
-        _state.update { it.copy(openRecoveryUrlEvent = consumed()) }
+    fun onOpenUrlEventConsumed() {
+        _state.update { it.copy(openUrlEvent = consumed()) }
     }
 
     private suspend fun waitMiscFlagsLoaded() {
@@ -1354,14 +1086,10 @@ class LoginViewModel @Inject constructor(
     }
 
     companion object {
-        /**
-         * Intent action for showing the login fetching nodes.
-         */
-        const val ACTION_FORCE_RELOAD_ACCOUNT = "FORCE_RELOAD"
-
-        /**
-         * Intent action for opening app.
-         */
-        private const val ACTION_OPEN_APP = "OPEN_APP"
+        private const val IS_2FA_REQUIRED = "is_2fa_required"
+        private const val PENDING_2FA_EMAIL = "pending_2fa_email"
+        private const val PENDING_2FA_PASSWORD = "pending_2fa_password"
     }
+
+    data class HandledLinks(val link: String, val timeStamp: Long)
 }

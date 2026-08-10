@@ -83,7 +83,7 @@ fun CameraUploadsActiveTransferItem(
                     LeadingIndicator(
                         modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
                         isDownload = isDownload,
-                        isOverQuota = isOverQuota,
+                        hasIssues = isOverQuota,
                     )
                     MegaText(
                         text = subTitle,

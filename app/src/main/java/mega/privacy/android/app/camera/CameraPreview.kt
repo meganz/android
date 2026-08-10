@@ -11,9 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.concurrent.futures.await
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -36,7 +36,7 @@ import mega.privacy.android.app.camera.state.rememberCameraState
  * @see CameraState
  * */
 @Composable
-fun CameraPreview(
+internal fun CameraPreview(
     modifier: Modifier = Modifier,
     cameraState: CameraState = rememberCameraState(),
     camSelector: CamSelector = cameraState.camSelector,
@@ -117,9 +117,8 @@ internal fun CameraPreviewContent(
                         return true
                     }
 
-                    override fun onDown(e: MotionEvent): Boolean {
-                        return true // Always return true to handle the gesture
-                    }
+                    override fun onDown(e: MotionEvent) =
+                        true // Always return true to handle the gesture
                 })
 
             setOnTouchListener { _, event ->

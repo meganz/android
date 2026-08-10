@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -49,6 +50,7 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedImageNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
@@ -97,7 +99,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.io.File
 import java.util.stream.Stream
 import kotlin.test.Ignore
 
@@ -150,6 +151,7 @@ internal class NodeRepositoryImplTest {
     val offline: Offline = mock()
     private val tag = "tag"
     private val nodeLabelIntMapper = NodeLabelIntMapper()
+    private val testCaller = "testCaller"
 
     @BeforeAll
     fun setup() {
@@ -160,6 +162,7 @@ internal class NodeRepositoryImplTest {
             megaApiFolderGateway = megaApiFolderGateway,
             megaChatApiGateway = megaChatApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
+            defaultDispatcher = UnconfinedTestDispatcher(),
             megaLocalStorageGateway = megaLocalStorageGateway,
             shareDataMapper = shareDataMapper,
             megaExceptionMapper = megaExceptionMapper,
@@ -187,6 +190,7 @@ internal class NodeRepositoryImplTest {
             nodeLabelMapper = nodeLabelMapper,
             typedNodeMapper = typedNodeMapper,
             nodePathMapper = nodePathMapper,
+            applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
         )
     }
 
@@ -218,7 +222,7 @@ internal class NodeRepositoryImplTest {
             megaLocalStorageGateway,
             megaNodeMapper,
             workManagerGateway,
-            nodePathMapper
+            nodePathMapper,
         )
     }
 
@@ -229,6 +233,15 @@ internal class NodeRepositoryImplTest {
             val expectedHandle = 1234L
             whenever(megaApiGateway.base64ToHandle(base64)).thenReturn(expectedHandle)
             assertThat(underTest.convertBase64ToHandle(base64)).isEqualTo(expectedHandle)
+        }
+
+    @Test
+    fun `test that handleToBase64 returns properly`() =
+        runTest {
+            val handle = 1234L
+            val expectedBase64 = "a base 64 value"
+            whenever(megaApiGateway.handleToBase64(handle)).thenReturn(expectedBase64)
+            assertThat(underTest.convertHandleToBase64(handle)).isEqualTo(expectedBase64)
         }
 
     @Test
@@ -274,6 +287,32 @@ internal class NodeRepositoryImplTest {
         underTest.getNodeAccessPermission(nodeId)
         verify(megaApiGateway).getAccess(node)
     }
+
+    @Test
+    fun `test that doesChildExistByName returns true when gateway getChildNode returns a node`() =
+        runTest {
+            val name = "child"
+            val parent = mock<MegaNode>()
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(parent)
+            whenever(megaApiGateway.getChildNode(parent, name)).thenReturn(mock())
+
+            val actual = underTest.doesChildExistByName(nodeId, name)
+
+            assertThat(actual).isTrue()
+        }
+
+    @Test
+    fun `test that doesChildExistByName returns false when gateway getChildNode returns null`() =
+        runTest {
+            val name = "child"
+            val parent = mock<MegaNode>()
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(parent)
+            whenever(megaApiGateway.getChildNode(parent, name)).thenReturn(null)
+
+            val actual = underTest.doesChildExistByName(nodeId, name)
+
+            assertThat(actual).isFalse()
+        }
 
     @Test
     fun `test when stopSharingNode is called then api gateway stopSharingNode is called with the proper node`() =
@@ -390,7 +429,7 @@ internal class NodeRepositoryImplTest {
     ) = runTest {
         val nodeHandle = 123456L
         megaApiGateway.stub {
-            onBlocking { getNodePathByHandle(nodeHandle) }.thenReturn(nodePath)
+            on { getNodePathByHandle(nodeHandle) }.thenReturn(nodePath)
         }
         val actualNodePath = underTest.getNodePathById(NodeId(nodeHandle))
         assertThat(actualNodePath).isEqualTo(expectedNodePath)
@@ -739,7 +778,7 @@ internal class NodeRepositoryImplTest {
             on { isNodeKeyDecrypted }.thenReturn(true)
             on { hasPreview() }.thenReturn(true)
         }
-        whenever(cacheGateway.getThumbnailCacheFolder()).thenReturn(File("thumbnail_path"))
+        whenever(cacheGateway.getThumbnailCacheFolderPath()).thenReturn("thumbnail_path")
         whenever(megaApiGateway.hasVersion(megaNode)).thenReturn(true)
         whenever(megaApiGateway.getNumVersions(megaNode)).thenReturn(2)
         whenever(megaApiGateway.getNumChildFolders(megaNode)).thenReturn(2)
@@ -758,7 +797,7 @@ internal class NodeRepositoryImplTest {
             val node = NodeId(1L)
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(null)
             assertThrows<IllegalArgumentException> {
-                underTest.exportNode(node, null)
+                underTest.exportNode(node, null, testCaller)
             }
         }
 
@@ -771,7 +810,7 @@ internal class NodeRepositoryImplTest {
             }
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(megaNode)
             assertThrows<IllegalArgumentException> {
-                underTest.exportNode(node, null)
+                underTest.exportNode(node, null, testCaller)
             }
         }
 
@@ -790,7 +829,7 @@ internal class NodeRepositoryImplTest {
                 on { publicLink }.thenReturn(expected)
             }
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(megaNode)
-            val actual = underTest.exportNode(node, expireTime)
+            val actual = underTest.exportNode(node, expireTime, testCaller)
             assertThat(actual).isEqualTo(expected)
         }
 
@@ -819,7 +858,7 @@ internal class NodeRepositoryImplTest {
                 },
             )
         }
-        assertThat(underTest.exportNode(node, expireTime)).isEqualTo(expected)
+        assertThat(underTest.exportNode(node, expireTime, testCaller)).isEqualTo(expected)
     }
 
     @Test
@@ -843,7 +882,7 @@ internal class NodeRepositoryImplTest {
                 },
             )
         }
-        assertThat(underTest.exportNode(typedNode)).isEqualTo(expected)
+        assertThat(underTest.exportNode(typedNode, testCaller)).isEqualTo(expected)
     }
 
     @Test
@@ -868,7 +907,7 @@ internal class NodeRepositoryImplTest {
                 )
             }
             assertThrows<MegaException> {
-                underTest.exportNode(node, expireTime)
+                underTest.exportNode(node, expireTime, testCaller)
             }
         }
 
@@ -1661,25 +1700,31 @@ internal class NodeRepositoryImplTest {
     }
 
     @Test
-    fun `test that getNodeNameById returns node name when node exists`() = runTest {
+    fun `test that getNodeInfoById returns node info when node exists`() = runTest {
         val nodeId = NodeId(123L)
         val expectedName = "TestNode.txt"
+        val expectedNodeInfo = mock<NodeInfo> {
+            on { name }.thenReturn(expectedName)
+            on { isNodeKeyDecrypted }.thenReturn(true)
+        }
         val megaNode = mock<MegaNode> {
             on { name }.thenReturn(expectedName)
+            on { isNodeKeyDecrypted }.thenReturn(true)
         }
         whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
 
-        val actual = underTest.getNodeNameById(nodeId)
+        val actual = underTest.getNodeInfoByIdUseCase(nodeId)
 
-        assertThat(actual).isEqualTo(expectedName)
+        assertThat(actual?.name).isEqualTo(expectedNodeInfo.name)
+        assertThat(actual?.isNodeKeyDecrypted).isEqualTo(expectedNodeInfo.isNodeKeyDecrypted)
     }
 
     @Test
-    fun `test that getNodeNameById returns null when node does not exist`() = runTest {
+    fun `test that getNodeInfoById returns null when node does not exist`() = runTest {
         val nodeId = NodeId(123L)
         whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
 
-        val actual = underTest.getNodeNameById(nodeId)
+        val actual = underTest.getNodeInfoByIdUseCase(nodeId)
 
         assertThat(actual).isNull()
     }
@@ -1754,6 +1799,47 @@ internal class NodeRepositoryImplTest {
         ) doReturn expected
 
         assertThat(underTest.getFullNodePathById(nodeId)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that checkNodeAccessibility completes successfully when API_OK is returned`() = runTest {
+        val megaNode = mock<MegaNode>()
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+        whenever(megaApiGateway.getDownloadUrl(any(), any())).thenAnswer {
+            (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
+            )
+        }
+
+        assertDoesNotThrow { underTest.checkNodeAccessibility(nodeId) }
+    }
+
+    @Test
+    fun `test that checkNodeAccessibility throws IllegalArgumentException when node is not found`() =
+        runTest {
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
+            whenever(megaApiFolderGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
+
+            assertThrows<IllegalArgumentException> { underTest.checkNodeAccessibility(nodeId) }
+        }
+
+    @Test
+    fun `test that checkNodeAccessibility throws exception when API returns non-OK error`() = runTest {
+        val megaNode = mock<MegaNode>()
+        val expectedException = MegaException(MegaError.API_EBLOCKED, "blocked")
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+        whenever(megaExceptionMapper(any(), anyOrNull(), anyOrNull())).thenReturn(expectedException)
+        whenever(megaApiGateway.getDownloadUrl(any(), any())).thenAnswer {
+            (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = mock { on { errorCode }.thenReturn(MegaError.API_EBLOCKED) },
+            )
+        }
+
+        assertThrows<MegaException> { underTest.checkNodeAccessibility(nodeId) }
     }
 
     private fun provideNodeId() = Stream.of(

@@ -12,6 +12,17 @@ LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
 LINT_REPORT_SUMMARY_MAP = [:]
 
+// Per-stage timing for build-stats collection. Keys: 'build_apk_ms', 'unit_test_ms', 'lint_ms'.
+STAGE_START_MS = [:]
+STAGE_DURATIONS_MS = [:]
+
+// Per-stage agent name. Keys: 'build_apk', 'unit_test', 'lint'.
+STAGE_NODE_NAMES = [:]
+
+// Captured at the top of the first agent-running stage so queue-wait (scheduled → agent acquired)
+// can be separated from execution time. Null until the agent is acquired.
+AGENT_ACQUIRED_TIME = null
+
 MERGE_REQUEST_FILE_CHANGES_MESSAGE = ""
 COVERAGE_SUMMARY = ""
 
@@ -20,54 +31,22 @@ UNIT_TEST_RESULT_LINK_MAP = [:]
 
 JSON_LINT_REPORT_LINK = ""
 
-NODE_LABELS = 'mac-jenkins-slave-android || mac-jenkins-slave'
+NODE_LABELS = 'mac-jenkins-slave-android'
 
 /**
  * Folder to contain build outputs, including APK, AAG and symbol files
  */
 ARCHIVE_FOLDER = "archive"
 
+CODE_REVIEW_CMD = "code_review"
+CODE_REVIEW_OUTPUT_FILE = "code_review_report.md"
+CODE_REVIEW_SUMMARY_FILE = "code_review_summary.md"
+CODE_REVIEW_ERROR_REPORT_FILE = "code_review_error_report.txt"
+
 /**
  * common.groovy file with common methods
  */
 def common
-
-/**
- * Decide whether we should skip the current build. If MR title starts with "Draft:"
- * or "WIP:", then CI pipeline skips all stages in a build. After these 2 tags have
- * been removed from MR title, newly triggered builds will resume to normal.
- *
- * @return true if current stage should be skipped. Otherwise return false.
- */
-def shouldSkipBuild() {
-    String mrTitle = env.GITLAB_OA_TITLE
-    if (mrTitle != null && !mrTitle.isEmpty()) {
-        return mrTitle.toLowerCase().startsWith("draft:") ||
-                mrTitle.toLowerCase().startsWith("wip:")
-    }
-    // If title is null, this build is probably triggered by 'jenkins rebuild' comment.
-    // In such case, build should not be skipped.
-    return false
-}
-
-/**
- * Fetch the message of the last commit from environment variable.
- *
- * @return The commit message text if GitLab plugin has sent a valid commit message, which is
- * denoted as a Code Block in Gitlab.
- *
- * Otherwise, return a Bold "N/A" normally when CI build is triggered by MR comment "jenkins rebuild".
- */
-String getLastCommitMessage() {
-    println("entering getLastCommitMessage()")
-    def lastCommitMessage = env.GITLAB_OA_LAST_COMMIT_MESSAGE
-    if (lastCommitMessage == null) {
-        return '**N/A**'
-    } else {
-        // use markdown backticks to format commit message into a code block
-        return "\n```\n$lastCommitMessage\n```\n".stripIndent().stripMargin()
-    }
-}
 
 pipeline {
     agent { label NODE_LABELS }
@@ -92,8 +71,6 @@ pipeline {
 
         // Jenkins build log will be saved in this file.
         CONSOLE_LOG_FILE = "console.txt"
-
-        BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
 
         IS_CI_BUILD = 'true'
     }
@@ -145,6 +122,17 @@ pipeline {
                         unitTestResult +
                         lintSummaryMessage
                 common.sendToMR(failureMessage)
+
+                common.recordBuildStats(
+                        common.collectBuildStats(
+                                AGENT_ACQUIRED_TIME ?: BUILD_START_TIME,
+                                STAGE_DURATIONS_MS,
+                                STAGE_NODE_NAMES,
+                                currentBuild.currentResult,
+                                shouldSkipBuild(),
+                                isCodeReviewOnly()
+                        )
+                )
             }
         }
         success {
@@ -165,7 +153,7 @@ pipeline {
                         String duration = getBuildDurationStr()
                         String buildMessage = ":white_check_mark: Build Succeeded!(Build: ${env.BUILD_NUMBER}) (Duration: ${duration})\n\n" +
                                 "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
-                                "**Build Warnings:**\n" + getBuildWarnings() + "\n\n"
+                                "\n\n**Build Warnings:**\n" + getBuildWarnings() + "\n\n"
 
                         // Create the String to be posted as a comment in Gitlab
                         String mergeRequestMessage
@@ -178,6 +166,17 @@ pipeline {
                         common.sendToMR(mergeRequestMessage)
                     }
                 }
+
+                common.recordBuildStats(
+                        common.collectBuildStats(
+                                AGENT_ACQUIRED_TIME ?: BUILD_START_TIME,
+                                STAGE_DURATIONS_MS,
+                                STAGE_NODE_NAMES,
+                                currentBuild.currentResult,
+                                shouldSkipBuild(),
+                                isCodeReviewOnly()
+                        )
+                )
             }
         }
         cleanup {
@@ -189,6 +188,7 @@ pipeline {
         stage('Load Common Script') {
             steps {
                 script {
+                    AGENT_ACQUIRED_TIME = System.currentTimeMillis()
                     BUILD_STEP = 'Preparation'
 
                     common = load('jenkinsfile/common.groovy')
@@ -197,7 +197,7 @@ pipeline {
         }
         stage('Preparation') {
             when {
-                expression { (!shouldSkipBuild()) }
+                expression { !shouldSkipBuild() }
             }
             steps {
                 script {
@@ -214,22 +214,21 @@ pipeline {
                 }
             }
         }
-        stage("Build, Test and Lint") {
+        stage("Build, Test, Lint and Code Review") {
             when {
-                expression { (!shouldSkipBuild()) }
+                expression { !shouldSkipBuild() }
             }
             parallel {
                 stage('Build APK (GMS+QA)') {
-                    agent { label NODE_LABELS }
                     when {
-                        expression { (!shouldSkipBuild()) }
+                        expression { !shouldSkipBuild() && !isCodeReviewOnly() }
                     }
                     steps {
 
                         gitlabCommitStatus(name: 'Build APK (GMS+QA)') {
                             script {
-                                common.downloadDependencyLibForSdk()
-
+                                STAGE_START_MS['build_apk_ms'] = System.currentTimeMillis()
+                                STAGE_NODE_NAMES['build_apk'] = env.NODE_NAME
                                 util.useArtifactory() {
                                     sh "./gradlew app:assembleGmsDebug --no-daemon 2>&1  | tee ${GMS_APK_BUILD_LOG}"
                                     sh "./gradlew app:assembleGmsQa --no-daemon 2>&1  | tee ${QA_APK_BUILD_LOG}"
@@ -249,7 +248,7 @@ pipeline {
                                 util.useGitLab() {
                                     String htmlOutput = "mr-file-changes.html"
                                     try {
-                                        sh "./gradlew --no-daemon checkMergeRequestFileChanges --html-output $htmlOutput"
+                                        sh "./gradlew --no-daemon checkMergeRequestFileChanges --html-output $htmlOutput --current-branch=\"${env.GIT_BRANCH}\" --target-branch=\"${env.GITLAB_OA_TARGET_BRANCH}\""
                                     } finally {
                                         MERGE_REQUEST_FILE_CHANGES_MESSAGE = getHtmlReport(htmlOutput, "")
                                     }
@@ -258,13 +257,18 @@ pipeline {
                         }
                     }
                     post {
+                        always {
+                            script {
+                                def s = STAGE_START_MS['build_apk_ms']
+                                if (s != null) {
+                                    STAGE_DURATIONS_MS['build_apk_ms'] = System.currentTimeMillis() - s
+                                }
+                            }
+                        }
                         failure {
                             script {
                                 BUILD_STEP = "Build APK (GMS+QA)"
                             }
-                        }
-                        cleanup {
-                            cleanWs(cleanWhenFailure: true)
                         }
                     }
                 } //stage('Build APK (GMS+QA)')
@@ -272,18 +276,19 @@ pipeline {
                 stage('Unit Test and Code Coverage') {
                     agent { label NODE_LABELS }
                     when {
-                        expression { (!shouldSkipBuild()) }
+                        expression { !shouldSkipBuild() && !isCodeReviewOnly() }
                     }
                     steps {
                         script {
-                            common.downloadDependencyLibForSdk()
+                            STAGE_START_MS['unit_test_ms'] = System.currentTimeMillis()
+                            STAGE_NODE_NAMES['unit_test'] = env.NODE_NAME
                         }
                         gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
-                            script { 
+                            script {
                                 util.useArtifactory() {
                                     def moduleList = common.getUnitTestModuleList()
                                     def failedModules = []
-                                    
+
                                     try {
                                         sh "./gradlew --no-daemon runAllUnitTestsWithCoverage"
                                     } finally {
@@ -291,7 +296,8 @@ pipeline {
                                         failedModules = detectFailedTestModules(moduleList)
 
                                         if (!failedModules.isEmpty()) {
-                                            for (String module in failedModules) {
+                                            for (int i = 0; i < failedModules.size(); i++) {
+                                                String module = failedModules[i]
                                                 UNIT_TEST_RESULT_LINK_MAP.put(
                                                         module,
                                                         unitTestArchiveLink("${module}/build/unittest/html", "unit_test_result_${module.replace('/', '_')}.zip")
@@ -308,6 +314,14 @@ pipeline {
                         }
                     }
                     post {
+                        always {
+                            script {
+                                def s = STAGE_START_MS['unit_test_ms']
+                                if (s != null) {
+                                    STAGE_DURATIONS_MS['unit_test_ms'] = System.currentTimeMillis() - s
+                                }
+                            }
+                        }
                         failure {
                             script {
                                 BUILD_STEP = "Unit Test and Code Coverage"
@@ -322,13 +336,13 @@ pipeline {
                 stage('Lint Check') {
                     agent { label NODE_LABELS }
                     when {
-                        expression { (!shouldSkipBuild()) }
+                        expression { !shouldSkipBuild() && !isCodeReviewOnly() }
                     }
                     steps {
                         gitlabCommitStatus(name: 'Lint Check') {
                             script {
-                                common.downloadDependencyLibForSdk()
-
+                                STAGE_START_MS['lint_ms'] = System.currentTimeMillis()
+                                STAGE_NODE_NAMES['lint'] = env.NODE_NAME
                                 util.useArtifactory() {
                                     sh "mv custom_lint.xml lint.xml"
                                     sh "./gradlew --no-daemon lint"
@@ -336,12 +350,7 @@ pipeline {
 
                                 def lintModuleList = common.getModuleList()
 
-                                def totalFatalLintErrors = 0
-                                lintModuleList.each { module ->
-                                    def lintJsonContent = generateLintSummary(module)
-                                    totalFatalLintErrors += checkFatalErrors(lintJsonContent)
-                                    LINT_REPORT_SUMMARY_MAP.put(module, lintJsonContent)
-                                }
+                                def totalFatalLintErrors = generateLintSummary(lintModuleList)
                                 archiveLintReports(lintModuleList)
 
                                 this.JSON_LINT_REPORT_LINK = common.uploadFileToArtifactory(LINT_REPORT_ARCHIVE)
@@ -353,6 +362,14 @@ pipeline {
                         }
                     }
                     post {
+                        always {
+                            script {
+                                def s = STAGE_START_MS['lint_ms']
+                                if (s != null) {
+                                    STAGE_DURATIONS_MS['lint_ms'] = System.currentTimeMillis() - s
+                                }
+                            }
+                        }
                         failure {
                             script {
                                 BUILD_STEP = "Lint Check"
@@ -363,6 +380,61 @@ pipeline {
                         }
                     }
                 }  //stage('Lint Check')
+
+                stage('Code Review') {
+                    agent { label NODE_LABELS }
+                    when {
+                        expression { shouldRunCodeReview() }
+                    }
+                    steps {
+                        gitlabCommitStatus(name: 'Code Review') {
+                            script {
+                                def skillFile = "${WORKSPACE}/.claude/skills/android-code-review/SKILL.md"
+                                def targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: 'develop'
+
+                                util.useGitLab() {
+                                    withCredentials([string(credentialsId: 'ANTHROPIC_API_KEY', variable: 'ANTHROPIC_API_KEY')]) {
+                                        try {
+                                            sh "./gradlew --no-daemon codeReview --skill '${skillFile}' --output '${CODE_REVIEW_OUTPUT_FILE}' --target-branch '${targetBranch}' --model 'claude-opus-4-6' --summary '${CODE_REVIEW_SUMMARY_FILE}' --error-report '${CODE_REVIEW_ERROR_REPORT_FILE}'"
+                                            def summary = "Code Review Report"
+                                            if (fileExists(CODE_REVIEW_SUMMARY_FILE)) {
+                                                summary = readFile(CODE_REVIEW_SUMMARY_FILE).trim()
+                                            }
+                                            common.sendFileToMRComment(CODE_REVIEW_OUTPUT_FILE, summary)
+                                        } catch (Exception e) {
+                                            String errorMessage = e.message ?: 'Unknown error'
+                                            try {
+                                                if (fileExists(CODE_REVIEW_ERROR_REPORT_FILE)) {
+                                                    errorMessage = readFile(CODE_REVIEW_ERROR_REPORT_FILE).trim()
+                                                }
+                                            } catch (ignored) {
+                                            }
+
+                                            common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+                                            String mrNumber = common.getMrNumber()
+                                            String folder = "android-build/MR-${mrNumber}"
+                                            String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
+
+                                            String failMsg = ":x: **Code Review Failed** (Build: ${env.BUILD_NUMBER})<br/>" +
+                                                    "Error: ${errorMessage}<br/>" +
+                                                    "Please check the [build log](${jenkinsLog}) for details."
+
+                                            common.sendToMR(failMsg)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts artifacts: "${CODE_REVIEW_OUTPUT_FILE},${CODE_REVIEW_SUMMARY_FILE},${CODE_REVIEW_ERROR_REPORT_FILE}", allowEmptyArchive: true
+                        }
+                        cleanup {
+                            cleanWs(cleanWhenFailure: true)
+                        }
+                    }
+                } //stage('Code Review')
             }
         }
     }
@@ -460,47 +532,40 @@ static String wrapBuildWarnings(String rawWarning) {
 }
 
 /**
- * Executes a specific Gradle Task to parse the raw Lint Results and returns a Lint Summary
+ * Executes the `generateLintReport` Gradle task once for all modules and populates
+ * LINT_REPORT_SUMMARY_MAP with per-module severity counts parsed from the aggregated JSON.
  *
- * @param module The name of the module (e.g. app, domain, sdk)
- * @return A List containing the module's Lint Summary.
- * Here's a Sample Result:
- *
- * [errorCount:20, errorMessage:None, fatalCount:10, informationCount:40, warningCount:30]
+ * @param moduleList List of module paths (e.g. ["app", "domain", "core:ui"]).
+ * @return The total number of fatal lint errors across all modules.
  */
-def generateLintSummary(String module) {
-    def reportsDir = "$WORKSPACE/${module}/build/reports"
-    
-    // Find lint XML result files, which matches "lint-*.xml"
-    def lintResultsFiles = sh(
-        script: "ls ${reportsDir}/lint-*.xml 2>/dev/null || true",
-        returnStdout: true
-    ).trim().split("\\r?\\n").findAll { it }
+def generateLintSummary(List<String> moduleList) {
+    String aggregatedJson = "lint_summary.json"
+    sh "./gradlew --no-daemon generateLintReport " +
+            "--modules \"${moduleList.join(",")}\" " +
+            "--target-file ${aggregatedJson}"
 
-    if (!lintResultsFiles) {
-        print("No lint-*.xml file found in ${reportsDir}")
-        return [
-                "fatalCount": 0,
-                "errorCount": 0,
-                "warningCount": 0,
-                "informationCount": 0,
-                "errorMessage": "No lint results found"
+    String aggregatedJsonText = readFile(aggregatedJson)
+    def rawModules = new groovy.json.JsonSlurperClassic().parseText(aggregatedJsonText).modules
+    int totalFatal = 0
+    for (int i = 0; i < moduleList.size(); i++) {
+        String module = moduleList[i]
+        def raw = rawModules[module]
+        def perModule = [
+                "fatalCount"      : (raw?.fatalCount ?: 0) as int,
+                "errorCount"      : (raw?.errorCount ?: 0) as int,
+                "warningCount"    : (raw?.warningCount ?: 0) as int,
+                "informationCount": (raw?.informationCount ?: 0) as int,
+                "errorMessage"    : (raw == null ? "No lint results found" : (raw.errorMessage ?: "None")).toString()
         ]
+        totalFatal += perModule.fatalCount
+        print("lintSummary($module) = ${perModule}")
+        LINT_REPORT_SUMMARY_MAP.put(module, perModule)
     }
 
-    // Process first lint results file
-    def lintResultsFile = lintResultsFiles[0]
-    def targetFile = "${module}_processed-lint-results.json"
-
-    // Generate JSON report from XML
-    sh "./gradlew --no-daemon generateLintReport --lint-results ${lintResultsFile} --target-file ${targetFile}"
-    
-    // Parse JSON report
-    def lintJsonFile = readFile(targetFile)
-    def lintJsonContent = new HashMap(new groovy.json.JsonSlurper().parseText(lintJsonFile))
-    
-    print("lintSummary($module) = ${lintJsonContent}")
-    return lintJsonContent
+    if (totalFatal > 0) {
+        println("Detected ${totalFatal} fatal lint error(s) across all modules.")
+    }
+    return totalFatal
 }
 
 /**
@@ -514,7 +579,8 @@ def archiveLintReports(List<String> moduleList) {
         rm -fv ${LINT_REPORT_ARCHIVE}
     """
 
-    moduleList.each { module ->
+    for (int i = 0; i < moduleList.size(); i++) {
+        String module = moduleList[i]
         sh("cp -fv ${module}/build/reports/lint*.html ${WORKSPACE}/${LINT_REPORT_FOLDER}/${module.replace('/', '_')}_lint_report.html 2>/dev/null || true")
     }
 
@@ -567,38 +633,21 @@ def unitTestArchiveLink(String reportPath, String archiveTargetName) {
 }
 
 /**
- * Checks if the specific module has any Fatal Errors and returns the count. The caller is
- * responsible for deciding when to fail the pipeline so that all artifacts can be uploaded first.
- *
- * @param lintJsonContent A List containing the module's Lint Summary.
- * Here's a Sample Result:
- *
- * [errorCount:20, errorMessage:None, fatalCount:10, informationCount:40, warningCount:30]
- */
-def checkFatalErrors(def lintJsonContent) {
-    println("Check if there are Fatal Lint errors. ${lintJsonContent}")
-    def fatalCount = lintJsonContent.fatalCount as int
-    if (fatalCount > 0) {
-        println("Detected ${fatalCount} fatal lint error(s).")
-    }
-    return fatalCount
-}
-
-/**
  * Detects which modules have failed unit tests by checking their test result files.
- * 
+ *
  * @param moduleList List of all modules that were tested
  * @return List of module names that have failed tests
  */
 def detectFailedTestModules(List<String> moduleList) {
     def failedModules = []
-    
-    for (String module in moduleList) {        
+
+    for (int i = 0; i < moduleList.size(); i++) {
+        String module = moduleList[i]
         // Check if failure can be found in XML test reports under "build/unittest/junit"
         if (fileExists("${module}/build/unittest/junit")) {
             def testResultFiles = sh(
-                script: "grep -irE \"failures=\\\"[1-9][0-9]*\\\"\" ${module}/build/unittest/junit/* 2>/dev/null || true",
-                returnStdout: true
+                    script: "grep -irE \"failures=\\\"[1-9][0-9]*\\\"\" ${module}/build/unittest/junit/* 2>/dev/null || true",
+                    returnStdout: true
             ).trim().split("\\r?\\n").findAll { it }
 
             if (testResultFiles) {
@@ -609,7 +658,7 @@ def detectFailedTestModules(List<String> moduleList) {
             println("No test result files found for module: ${module}")
         }
     }
-    
+
     println("Failed modules detected: ${failedModules}")
     return new ArrayList<>(failedModules)
 }
@@ -622,7 +671,80 @@ def detectFailedTestModules(List<String> moduleList) {
 String getBuildDurationStr() {
     long BUILD_END_TIME = System.currentTimeMillis()
     long durationMillis = BUILD_END_TIME - BUILD_START_TIME
-    int minutes = (int)(durationMillis / 1000 / 60)
-    int seconds = (int)((int)(durationMillis / 1000) % 60)
+    int minutes = (int) (durationMillis / 1000 / 60)
+    int seconds = (int) ((int) (durationMillis / 1000) % 60)
     return String.format("%dm %02ds", minutes, seconds)
+}
+
+/**
+ * Decide whether we should skip the current build. If MR title starts with "Draft:"
+ * or "WIP:", then CI pipeline skips all stages in a build. After these 2 tags have
+ * been removed from MR title, newly triggered builds will resume to normal.
+ *
+ * @return true if current stage should be skipped. Otherwise return false.
+ */
+def shouldSkipBuild() {
+    String mrTitle = env.GITLAB_OA_TITLE
+    if (mrTitle != null && !mrTitle.isEmpty()) {
+        return mrTitle.toLowerCase().startsWith("draft:") ||
+                mrTitle.toLowerCase().startsWith("wip:")
+    }
+    // If title is null, this build is probably triggered by 'jenkins rebuild' comment.
+    // In such case, build should not be skipped.
+    return false
+}
+
+/**
+ * Fetch the message of the last commit from environment variable.
+ *
+ * @return The commit message text if GitLab plugin has sent a valid commit message, which is
+ * denoted as a Code Block in Gitlab.
+ *
+ * Otherwise, return a Bold "N/A" normally when CI build is triggered by MR comment "jenkins rebuild".
+ */
+String getLastCommitMessage() {
+    println("entering getLastCommitMessage()")
+    def lastCommitMessage = env.GITLAB_OA_LAST_COMMIT_MESSAGE
+    if (lastCommitMessage == null) {
+        return '**N/A**'
+    } else {
+        // use markdown backticks to format commit message into a code block
+        return "\n```\n$lastCommitMessage\n```\n".stripIndent().stripMargin()
+    }
+}
+
+/**
+ * Decide whether the Code Review stage should run.
+ * - On MR OPEN (initial creation) if not a Draft/WIP.
+ * - On-demand via "code_review" comment (NOTE action).
+ * Note: does NOT run automatically on subsequent pushes (PUSH action) to keep CI cost low.
+ *
+ * @return true if code review should run, false otherwise.
+ */
+def shouldRunCodeReview() {
+    // 1. Determine if this is a "Newly Created MR"
+    // Condition: It is an MR context (CHANGE_ID exists) and it's the very first build for this MR job.
+    // This is the most reliable method because the first build of a Multibranch Pipeline MR job
+    // always corresponds to the MR creation event.
+    boolean isNewMr = (env.CHANGE_ID != null) && (env.BUILD_NUMBER == "1")
+
+    // 2. Determine if triggered by a "Specific MR Comment"
+    // Note: When triggered by a comment, GITLAB_OBJECT_KIND usually changes to "note".
+    boolean isCommentTrigger = isCodeReviewOnly()
+
+    // 3. Fallback logic: Use GITLAB_OA_ACTION for auxiliary validation if it exists
+    boolean isExplicitOpen = (env.GITLAB_OA_ACTION == "open")
+
+    return isNewMr || isCommentTrigger || isExplicitOpen
+}
+
+
+/**
+ * Returns true when the build was triggered solely by the "code_review" comment,
+ * meaning all other stages should be skipped.
+ */
+def isCodeReviewOnly() {
+    return env.GITLAB_OBJECT_KIND == "note" &&
+            env.GITLAB_COMMENT_TRIGGER != null &&
+            env.GITLAB_COMMENT_TRIGGER.trim() == CODE_REVIEW_CMD
 }

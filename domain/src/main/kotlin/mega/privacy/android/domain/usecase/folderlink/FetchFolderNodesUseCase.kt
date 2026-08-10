@@ -1,7 +1,8 @@
 package mega.privacy.android.domain.usecase.folderlink
 
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
-import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.repository.FolderLinkRepository
@@ -22,13 +23,18 @@ class FetchFolderNodesUseCase @Inject constructor(
      * Invoke
      *
      * @param folderSubHandle   Base 64 handle of the folder node
+     * @param order             Sort order
      * @return Folder nodes result
      */
-    suspend operator fun invoke(folderSubHandle: String?): FetchFolderNodesResult {
+    suspend operator fun invoke(
+        folderSubHandle: String?,
+        order: SortOrder? = null,
+    ): FetchFolderNodesResult {
         val folderNodesResult = FetchFolderNodesResult()
         runCatching { folderLinkRepository.fetchNodes() }
             .onSuccess { result ->
                 folderLinkRepository.updateLastPublicHandle(result.nodeHandle)
+                folderNodesResult.currentNodeId = NodeId(result.nodeHandle)
                 val rootNode = folderLinkRepository.getRootNode()
                 if (rootNode != null) {
                     if (result.flag) {
@@ -69,7 +75,7 @@ class FetchFolderNodesUseCase @Inject constructor(
                                 runCatching {
                                     getFolderLinkChildrenNodesUseCase(
                                         parentHandle,
-                                        null
+                                        order
                                     )
                                 }
                                     .onSuccess { folderNodesResult.childrenNodes = it }

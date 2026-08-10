@@ -5,7 +5,6 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
-    id("kotlin-android")
 }
 
 android {
@@ -22,10 +21,12 @@ dependencies {
 
     implementation(project(":feature:payment:payment-snowflake-components"))
     implementation(project(":core:ui-components:shared-components"))
+    implementation(project(":core:feature-flags"))
     implementation(project(":core:formatter"))
     implementation(project(":core:analytics:analytics-tracker"))
-    implementation(project(":shared:resources"))
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:string-resources"))
+    implementation(project(":shared:original-core-ui"))
+    implementation(project(":resources:icon-pack"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
     implementation(project(":domain"))

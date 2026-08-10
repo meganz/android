@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="shortcut_upload"
+        android:enabled="true"
+        android:icon="@drawable/ic_cloud_upload_medium_regular_outline"
+        android:shortcutShortLabel="@string/upload_files"
+        android:shortcutLongLabel="@string/upload_files">
+        <intent
+            android:action="mega.privacy.android.action.SHORTCUT_UPLOAD"
+            android:targetPackage="mega.privacy.android.app.qa"
+            android:targetClass="mega.privacy.android.app.appstate.MegaActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="shortcut_scan_document"
+        android:enabled="true"
+        android:icon="@drawable/ic_file_scan_medium_regular_outline"
+        android:shortcutShortLabel="@string/menu_scan_document"
+        android:shortcutLongLabel="@string/menu_scan_document">
+        <intent
+            android:action="mega.privacy.android.action.SHORTCUT_SCAN_DOCUMENT"
+            android:targetPackage="mega.privacy.android.app.qa"
+            android:targetClass="mega.privacy.android.app.appstate.MegaActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="shortcut_chat"
+        android:enabled="true"
+        android:icon="@drawable/ic_message_chat_circle_medium_regular_outline"
+        android:shortcutShortLabel="@string/section_chat"
+        android:shortcutLongLabel="@string/section_chat">
+        <intent
+            android:action="mega.privacy.android.action.SHORTCUT_CHAT"
+            android:targetPackage="mega.privacy.android.app.qa"
+            android:targetClass="mega.privacy.android.app.appstate.MegaActivity" />
+    </shortcut>
+</shortcuts>

@@ -1,15 +1,13 @@
 package mega.privacy.android.app.presentation.settings.passcode.biometric
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
-import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
 import androidx.biometric.BiometricPrompt
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.settings.passcode.mapper.BiometricAuthErrorMapper
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
+import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 /**
@@ -17,7 +15,6 @@ import javax.inject.Inject
  */
 class BiometricAuth @Inject constructor(
     private val biometricAuthErrorMapper: BiometricAuthErrorMapper,
-    private val passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
 ) {
 
     /**
@@ -73,15 +70,14 @@ class BiometricAuth @Inject constructor(
                 callback
             ).authenticate(
                 promptInfo(activity),
-                passcodeCryptObjectFactory()
             )
         }
     }
 
     private fun promptInfo(context: Context) =
         BiometricPrompt.PromptInfo.Builder()
-            .setTitle(context.getString(R.string.title_enable_fingerprint))
+            .setTitle(context.getString(sharedR.string.title_enable_biometrics))
             .setNegativeButtonText(context.getString(sharedR.string.general_dialog_cancel_button))
-            .setAllowedAuthenticators(BIOMETRIC_STRONG)
+            .setAllowedAuthenticators(BIOMETRIC_WEAK)
             .build()
 }

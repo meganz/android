@@ -4,22 +4,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.EntryProviderScope
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicDialogButton
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.login.LOGGED_OUT_DIALOG
-import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+import mega.privacy.android.shared.resources.R as SharedR
+
+internal const val LOGGED_OUT_DIALOG = "logged_out_dialog"
 
 @Serializable
-data object RemoteLogoutDialogNavKey : NavKey
+data object RemoteLogoutDialogNavKey : NoSessionNavKey.Mandatory, DialogNavKey
 
 data object RemoteLogoutDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             remoteLogoutDestination(
                 navigateBack = navigationHandler::back,
@@ -28,7 +31,7 @@ data object RemoteLogoutDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<NavKey>.remoteLogoutDestination(
+fun EntryProviderScope<in DialogNavKey>.remoteLogoutDestination(
     navigateBack: () -> Unit,
     onDialogHandled: () -> Unit,
 ) {
@@ -41,7 +44,7 @@ fun EntryProviderScope<NavKey>.remoteLogoutDestination(
             description = stringResource(id = R.string.error_server_expired_session),
             buttons = persistentListOf(
                 BasicDialogButton(
-                    text = stringResource(id = R.string.general_ok),
+                    text = stringResource(id = SharedR.string.general_ok_only),
                     onClick = {
                         onDialogHandled()
                         navigateBack()

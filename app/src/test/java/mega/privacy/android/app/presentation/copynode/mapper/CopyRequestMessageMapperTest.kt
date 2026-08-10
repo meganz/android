@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapperImpl
@@ -21,7 +21,7 @@ class CopyRequestMessageMapperTest {
     @Test
     fun `test that mapper should return a message as if there were 0 successes if the result is null`() {
         val expected =
-            mContext.resources.getQuantityString(R.plurals.general_copy_snackbar_fail, 0, 0)
+            mContext.resources.getQuantityString(SharedR.plurals.copy_node_general_snackbar_fail, 0, 0)
         val actual = underTest(null)
 
         assertThat(actual).isEqualTo(expected)
@@ -30,7 +30,7 @@ class CopyRequestMessageMapperTest {
     @Test
     fun `test that mapper should return a message as if there were 0 successes if the count is 0`() {
         val expected =
-            mContext.resources.getQuantityString(R.plurals.general_copy_snackbar_fail, 0, 0)
+            mContext.resources.getQuantityString(SharedR.plurals.copy_node_general_snackbar_fail, 0, 0)
         val actual = underTest(CopyRequestResult(count = 0, errorCount = 0))
         
         assertThat(actual).isEqualTo(expected)
@@ -40,7 +40,7 @@ class CopyRequestMessageMapperTest {
     fun `test that mapper should return correct message when there is only 1 copy request and is successful `() {
         val actual = underTest(CopyRequestResult(count = 1, errorCount = 0))
         val expected =
-            mContext.resources.getQuantityString(R.plurals.general_copy_snackbar_success, 1, 1)
+            mContext.resources.getQuantityString(SharedR.plurals.copy_node_general_snackbar_success, 1, 1)
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -51,7 +51,7 @@ class CopyRequestMessageMapperTest {
         val actual =
             underTest(CopyRequestResult(count = mockCopyCount, errorCount = 0))
         val expected = mContext.resources.getQuantityString(
-            R.plurals.general_copy_snackbar_success,
+            SharedR.plurals.copy_node_general_snackbar_success,
             mockCopyCount,
             mockCopyCount
         )
@@ -63,7 +63,7 @@ class CopyRequestMessageMapperTest {
     fun `test that when there is only 1 copy request and failed should return correct message`() {
         val actual = underTest(CopyRequestResult(count = 1, errorCount = 1))
         val expected =
-            mContext.resources.getQuantityString(R.plurals.general_copy_snackbar_fail, 1, 1)
+            mContext.resources.getQuantityString(SharedR.plurals.copy_node_general_snackbar_fail, 1, 1)
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -78,7 +78,7 @@ class CopyRequestMessageMapperTest {
             )
         )
         val expected = mContext.resources.getQuantityString(
-            R.plurals.general_copy_snackbar_fail,
+            SharedR.plurals.copy_node_general_snackbar_fail,
             mockCopyCount,
             mockCopyCount
         )
@@ -91,13 +91,13 @@ class CopyRequestMessageMapperTest {
         val actual = underTest(CopyRequestResult(count = 2, errorCount = 1))
         val expected = "${
             mContext.resources.getQuantityString(
-                R.plurals.general_copy_snackbar_concat_success,
+                SharedR.plurals.copy_node_snackbar_concat_success,
                 1,
                 1
             )
         }${
             mContext.resources.getQuantityString(
-                R.plurals.general_copy_snackbar_concat_fail,
+                SharedR.plurals.copy_node_snackbar_concat_fail,
                 1,
                 1
             )
@@ -118,13 +118,13 @@ class CopyRequestMessageMapperTest {
             )
         val expected = "${
             mContext.resources.getQuantityString(
-                R.plurals.general_copy_snackbar_concat_success,
+                SharedR.plurals.copy_node_snackbar_concat_success,
                 1,
                 1
             )
         }${
             mContext.resources.getQuantityString(
-                R.plurals.general_copy_snackbar_concat_fail,
+                SharedR.plurals.copy_node_snackbar_concat_fail,
                 mockCopyCount - 1,
                 mockCopyCount - 1
             )
@@ -140,13 +140,13 @@ class CopyRequestMessageMapperTest {
             underTest(CopyRequestResult(count = mockCopyCount, errorCount = 1))
         val expected = "${
             mContext.resources.getQuantityString(
-                R.plurals.general_copy_snackbar_concat_success,
+                SharedR.plurals.copy_node_snackbar_concat_success,
                 mockCopyCount - 1,
                 mockCopyCount - 1
             )
         }${
             mContext.resources.getQuantityString(
-                R.plurals.general_copy_snackbar_concat_fail,
+                SharedR.plurals.copy_node_snackbar_concat_fail,
                 1,
                 1
             )
@@ -167,13 +167,13 @@ class CopyRequestMessageMapperTest {
         )
         val expected = "${
             mContext.resources.getQuantityString(
-                R.plurals.general_copy_snackbar_concat_success,
+                SharedR.plurals.copy_node_snackbar_concat_success,
                 mockCopyCount - mockErrorCount,
                 mockCopyCount - mockErrorCount
             )
         }${
             mContext.resources.getQuantityString(
-                R.plurals.general_copy_snackbar_concat_fail,
+                SharedR.plurals.copy_node_snackbar_concat_fail,
                 mockErrorCount,
                 mockErrorCount
             )

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Address
@@ -33,13 +32,32 @@ import mega.privacy.android.app.presentation.account.business.AccountSuspendedDi
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.entity.contacts.ContactPermission
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Content for FileInfo screen, all except toolbar, bottom sheets, dialogs
+ * File info content
+ *
+ * @param viewState
+ * @param onTakeDownLinkClick
+ * @param onLocationClick
+ * @param availableOfflineChanged
+ * @param onVersionsClick
+ * @param onContactClick
+ * @param onContactSelected
+ * @param onContactUnselected
+ * @param onContactsClosed
+ * @param onContactMoreOptionsClick
+ * @param onShowMoreContactsClick
+ * @param onPublicLinkCopyClick
+ * @param onVerifyContactClick
+ * @param onSetDescriptionClick
+ * @param onAddTagClick
+ * @param getAddress
+ * @param modifier
  */
 @Composable
 internal fun FileInfoContent(
@@ -48,11 +66,11 @@ internal fun FileInfoContent(
     onLocationClick: () -> Unit,
     availableOfflineChanged: (checked: Boolean) -> Unit,
     onVersionsClick: () -> Unit,
-    onContactClick: (ContactPermission) -> Unit,
-    onContactSelected: (ContactPermission) -> Unit,
-    onContactUnselected: (ContactPermission) -> Unit,
+    onContactClick: (ContactPermissionUiState) -> Unit,
+    onContactSelected: (ContactPermissionUiState) -> Unit,
+    onContactUnselected: (ContactPermissionUiState) -> Unit,
     onContactsClosed: () -> Unit,
-    onContactMoreOptionsClick: (ContactPermission) -> Unit,
+    onContactMoreOptionsClick: (ContactPermissionUiState) -> Unit,
     onShowMoreContactsClick: () -> Unit,
     onPublicLinkCopyClick: () -> Unit,
     onVerifyContactClick: (String) -> Unit,
@@ -141,7 +159,7 @@ internal fun FileInfoContent(
                         isShareContactExpanded = !isShareContactExpanded
                     },
                     onContactClick = {
-                        if (viewState.outShareContactsSelected.contains(it.contactItem.email)) {
+                        if (viewState.outShareContactsSelected.contains(it.email)) {
                             onContactUnselected(it)
                         } else if (viewState.outShareContactsSelected.isEmpty()) {
                             onContactClick(it)
@@ -150,7 +168,7 @@ internal fun FileInfoContent(
                         }
                     },
                     onContactLongClick = {
-                        if (viewState.outShareContactsSelected.contains(it.contactItem.email)) {
+                        if (viewState.outShareContactsSelected.contains(it.email)) {
                             onContactUnselected(it)
                         } else {
                             onContactSelected(it)
@@ -191,12 +209,14 @@ internal fun FileInfoContent(
             }
 
             //location
-            nodeLocationInfo?.location?.let {
-                LocationInfoView(
-                    location = it,
-                    modifier = paddingHorizontal,
-                    onClick = onLocationClick,
-                )
+            if (!isNodeInBackups) {
+                nodeLocationInfo?.location?.let {
+                    LocationInfoView(
+                        location = it,
+                        modifier = paddingHorizontal,
+                        onClick = onLocationClick,
+                    )
+                }
             }
 
             //creation and modification times
@@ -227,11 +247,10 @@ internal fun FileInfoContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .testTag(TEST_TAG_DESCRIPTION)
                     .clickable {
                         if (viewState.accountDeactivatedStatus != null) {
                             showExpiredBusinessDialog = true
-                        } else {
-                            onSetDescriptionClick(descriptionText)
                         }
                     },
                 descriptionText = descriptionText,

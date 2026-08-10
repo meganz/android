@@ -1,22 +1,13 @@
 package mega.privacy.android.data.repository
 
-import android.content.Context
 import dagger.Lazy
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.FileCompressionGateway
-import mega.privacy.android.data.gateway.LogWriterGateway
 import mega.privacy.android.data.gateway.LogbackLogConfigurationGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.logging.LineNumberDebugTree
-import mega.privacy.android.data.logging.LogFlowTree
-import mega.privacy.android.domain.entity.logging.LogEntry
-import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.data.logging.LogFileTree
 import mega.privacy.android.domain.qualifier.ChatLogger
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LogFileDirectory
@@ -37,45 +28,19 @@ import javax.inject.Inject
 
 /**
  * Timber logging repository
- *
- * @property megaSdkLogger
- * @property megaChatLogger
- * @property sdkLogFlowTree
- * @property chatLogFlowTree
- * @property loggingConfig
- * @property sdkLogger
- * @property chatLogger
- * @property context
- * @property fileCompressionGateway
- * @property megaApiGateway
- * @property ioDispatcher
- * @property appScope
  */
 internal class TimberLoggingRepository @Inject constructor(
     private val megaSdkLogger: MegaLoggerInterface,
     private val megaChatLogger: MegaChatLoggerInterface,
-    @SdkLogger private val sdkLogFlowTree: LogFlowTree,
-    @ChatLogger private val chatLogFlowTree: LogFlowTree,
+    @SdkLogger private val sdkLogFileTree: Lazy<LogFileTree>,
+    @ChatLogger private val chatLogFileTree: Lazy<LogFileTree>,
     private val loggingConfig: LogbackLogConfigurationGateway,
-    @SdkLogger private val sdkLogger: LogWriterGateway,
-    @ChatLogger private val chatLogger: LogWriterGateway,
-    @ApplicationContext private val context: Context,
     private val fileCompressionGateway: FileCompressionGateway,
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationScope private val appScope: CoroutineScope,
     @LogFileDirectory private val logFileDirectory: Lazy<File>,
     @LogZipFileDirectory private val logZipFileDirectory: Lazy<File>,
 ) : LoggingRepository {
-
-    init {
-        if (!Timber.forest().contains(sdkLogFlowTree)) {
-            Timber.plant(sdkLogFlowTree)
-        }
-        if (!Timber.forest().contains(chatLogFlowTree)) {
-            Timber.plant(chatLogFlowTree)
-        }
-    }
 
     override fun enableLogAllToConsole(isDebugBuild: Boolean) {
         MegaApiAndroid.addLoggerObject(megaSdkLogger)
@@ -88,31 +53,20 @@ internal class TimberLoggingRepository @Inject constructor(
         }
     }
 
-    override fun getSdkLoggingFlow(): Flow<LogEntry> = sdkLogFlowTree
-        .logFlow
-        .onSubscription {
-            withContext(ioDispatcher) {
-                MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX)
-                loggingConfig.resetLoggingConfiguration()
+    override suspend fun initialise() {
+        withContext(ioDispatcher) {
+            // Fix race condition when multiple LoggerFactory.getLogger call
+            loggingConfig.resetLoggingConfiguration()
+            val sdkTree = sdkLogFileTree.get()
+            if (!Timber.forest().contains(sdkTree)) {
+                Timber.plant(sdkTree)
             }
-        }.onCompletion {
-            MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL)
+            val chatTree = chatLogFileTree.get()
+            if (!Timber.forest().contains(chatTree)) {
+                Timber.plant(chatTree)
+            }
         }
-
-    override fun getChatLoggingFlow(): Flow<LogEntry> =
-        chatLogFlowTree
-            .logFlow
-            .onSubscription {
-                withContext(ioDispatcher) {
-                    loggingConfig.resetLoggingConfiguration()
-                }
-            }
-
-    override suspend fun logToSdkFile(logMessage: LogEntry) =
-        withContext(ioDispatcher) { sdkLogger.writeLogEntry(logMessage) }
-
-    override suspend fun logToChatFile(logMessage: LogEntry) =
-        withContext(ioDispatcher) { chatLogger.writeLogEntry(logMessage) }
+    }
 
     override suspend fun compressLogs(): File = withContext(ioDispatcher) {
         Timber.d("LoggingRepository: compressLogs called")

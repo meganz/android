@@ -20,12 +20,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.FileProvider
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.launch
@@ -34,10 +34,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
+import mega.privacy.android.app.components.legacyfab.LegacyFabButtonAdd
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_LIST
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
-import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity.Companion.createSecondaryIntent
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
@@ -57,14 +59,19 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartUpload
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as SharedR
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
+import java.io.Serializable
 import java.util.Stack
 import javax.inject.Inject
 
@@ -76,12 +83,21 @@ class ContactFileListFragment : ContactFileBaseFragment() {
     var mLayoutManager: LinearLayoutManager? = null
     var emptyImageView: ImageView? = null
     var emptyTextView: TextView? = null
-    var fab: FloatingActionButton? = null
+    var fab: LegacyFabButtonAdd? = null
     var parentHandleStack: Stack<Long>? = Stack()
     var currNodePosition: Int = -1
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
 
     /**
      * [MegaNavigator] injection
@@ -137,9 +153,18 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 (context as ContactFileListActivity).askConfirmationMoveToRubbish(handleList)
             } else if (itemId == R.id.cab_menu_rename) {
                 val node = documents[0]
+                val snackbarShower = activity as SnackbarShower?
+                val actionNodeCallback = activity as ActionNodeCallback?
                 showRenameNodeDialog(
-                    context, node, activity as SnackbarShower?,
-                    activity as ActionNodeCallback?
+                    context = context,
+                    node = node,
+                    snackbarShower = snackbarShower,
+                    actionNodeCallback = actionNodeCallback,
+                    onRenameConfirmed = { handle, newName ->
+                        renameNode(handle, newName, snackbarShower, actionNodeCallback)
+                    },
+                    getRootNodeUseCase = getRootNodeUseCase,
+                    nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                 )
             }
             return false
@@ -299,9 +324,14 @@ class ContactFileListFragment : ContactFileBaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if (savedInstanceState != null) {
-            parentHandleStack =
-                savedInstanceState.getSerializable(PARENT_HANDLE_STACK) as Stack<Long>?
+        // After process death `getSerializable` may return an ArrayList instead of the
+        // original Stack — copy into a fresh Stack rather than casting.
+        val bundle = savedInstanceState ?: return
+        val restored = BundleCompat.getSerializable(
+            bundle, PARENT_HANDLE_STACK, Serializable::class.java,
+        ) as? Collection<*> ?: return
+        parentHandleStack = Stack<Long>().apply {
+            restored.filterIsInstance<Long>().forEach { push(it) }
         }
     }
 
@@ -323,13 +353,21 @@ class ContactFileListFragment : ContactFileBaseFragment() {
         if (userEmail != null) {
             v = inflater.inflate(R.layout.fragment_contact_file_list, container, false)
 
-            mainLayout =
-                v.findViewById<View>(R.id.contact_file_list_coordinator_layout) as CoordinatorLayout
+            mainLayout = v.findViewById(R.id.contact_file_list_coordinator_layout)
 
-            fab =
-                v.findViewById<View>(R.id.floating_button_contact_file_list) as FloatingActionButton
-            fab!!.setOnClickListener(FabButtonListener(context))
-            fab!!.hide()
+            fab = v.findViewById(R.id.floating_button_contact_file_list)
+            fab?.setOnClickListener({
+                if (!Util.isOnline(context)) {
+                    (context as? ContactFileListActivity)?.showSnackbar(
+                        Constants.SNACKBAR_TYPE, context.getString(
+                            R.string.error_server_connection_problem
+                        )
+                    )
+                    return@setOnClickListener
+                }
+                (context as? ContactFileListActivity)?.showUploadPanel()
+            })
+            fab?.hide()
 
             contact = megaApi.getContact(userEmail)
             if (contact == null) {
@@ -380,7 +418,8 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 emptyTextView!!.visibility = View.VISIBLE
                 listView!!.visibility = View.GONE
                 emptyImageView!!.setImageResource(iconPackR.drawable.ic_folder_arrow_up_glass)
-                var textToShow = String.format(context.getString(R.string.context_empty_incoming))
+                var textToShow =
+                    String.format(context.getString(SharedR.string.shares_screen_incoming_empty))
                 try {
                     textToShow = textToShow.replace(
                         "[A]", "<font color=\'"
@@ -405,7 +444,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                     _parentHandle,
                     listView as RecyclerView,
                     Constants.CONTACT_FILE_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                    ITEM_VIEW_TYPE_LIST
                 )
             } else {
                 adapter.setNodes(contactNodes)
@@ -498,7 +537,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 } else {
                     emptyImageView!!.setImageResource(iconPackR.drawable.ic_empty_folder_glass)
                     var textToShow =
-                        String.format(context.getString(R.string.context_empty_incoming))
+                        String.format(context.getString(SharedR.string.shares_screen_incoming_empty))
                     try {
                         textToShow = textToShow.replace(
                             "[A]", "<font color=\'"
@@ -714,7 +753,8 @@ class ContactFileListFragment : ContactFileBaseFragment() {
             emptyTextView!!.visibility = View.VISIBLE
 
             emptyImageView!!.setImageResource(iconPackR.drawable.ic_folder_arrow_up_glass)
-            var textToShow = String.format(context.getString(R.string.context_empty_incoming))
+            var textToShow =
+                String.format(context.getString(SharedR.string.shares_screen_incoming_empty))
             try {
                 textToShow = textToShow.replace(
                     "[A]", "<font color=\'"
@@ -907,6 +947,25 @@ class ContactFileListFragment : ContactFileBaseFragment() {
             fab!!.hide()
         } else {
             fab!!.show()
+        }
+    }
+
+    private fun renameNode(
+        nodeHandle: Long,
+        newName: String,
+        snackbarShower: SnackbarShower?,
+        actionNodeCallback: ActionNodeCallback?,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    snackbarShower?.showSnackbar(getString(SharedR.string.context_correctly_renamed))
+                    actionNodeCallback?.finishRenameActionWithSuccess(newName)
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    snackbarShower?.showSnackbar(getString(R.string.context_no_renamed))
+                }
         }
     }
 

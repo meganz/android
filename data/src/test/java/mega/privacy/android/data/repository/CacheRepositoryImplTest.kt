@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,11 +25,12 @@ import java.io.File
 class CacheRepositoryImplTest {
     private val ioDispatcher = UnconfinedTestDispatcher()
     private val cacheFolderGateway: CacheFolderGateway = mock()
-    private val underTest = CacheRepositoryImpl(cacheFolderGateway, ioDispatcher)
+    private val cacheGateway: CacheGateway = mock()
+    private val underTest = CacheRepositoryImpl(cacheFolderGateway, cacheGateway, ioDispatcher)
 
     @BeforeEach
     fun resetMocks() {
-        reset(cacheFolderGateway)
+        reset(cacheFolderGateway, cacheGateway)
     }
 
     @Test
@@ -47,6 +49,12 @@ class CacheRepositoryImplTest {
     }
 
     @Test
+    fun `test that path cache is cleared when clear cache is invoked`() = runTest {
+        underTest.clearCache()
+        verify(cacheGateway).clearPathCache()
+    }
+
+    @Test
     fun `test that cache file is same as expected and actual`() {
         val folderName = "folder"
         val fileName = "file"
@@ -60,10 +68,13 @@ class CacheRepositoryImplTest {
     @Test
     fun `test that file preview path is same as expected and actual`() = runTest {
         val fileName = "file"
+        val fileSize = 1024L
+        val lastModifiedDate = 1_700_000_000L
         val expected = File("path")
-        whenever(cacheFolderGateway.getPreviewFile(fileName)).thenReturn(expected)
-        val actual = underTest.getPreviewFile(fileName)
-        verify(cacheFolderGateway).getPreviewFile(fileName)
+        whenever(cacheFolderGateway.getPreviewFile(fileName, fileSize, lastModifiedDate))
+            .thenReturn(expected)
+        val actual = underTest.getPreviewFile(fileName, fileSize, lastModifiedDate)
+        verify(cacheFolderGateway).getPreviewFile(fileName, fileSize, lastModifiedDate)
         assertEquals(expected, actual)
     }
 

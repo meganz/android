@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
         val compileSdkVersion: Int by rootProject.extra
@@ -23,12 +23,12 @@ internal fun Project.configureKotlinAndroid(
         val buildTools: String by rootProject.extra
         buildToolsVersion = buildTools
 
-        defaultConfig {
+        defaultConfig.apply {
             val minSdkVersion: Int by rootProject.extra
             minSdk = minSdkVersion
         }
 
-        compileOptions {
+        compileOptions.apply {
             val javaVersion: JavaVersion by rootProject.extra
             sourceCompatibility = javaVersion
             targetCompatibility = javaVersion
@@ -55,9 +55,7 @@ fun Project.configureKotlin() {
             suppressWarnings = shouldSuppressWarnings
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
             freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
+            freeCompilerArgs.add("-Xannotation-default-target=param-property")
         }
     }
 }
-
-
-

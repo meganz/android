@@ -4,6 +4,14 @@
 **/build
 !**/mega/privacy/android/build/
 
+### Eclipse / Buildship (IDE metadata and JDT output; not used by Gradle CLI) ###
+.project
+.classpath
+.settings/
+build-logic/convention/bin/
+domain/bin/
+lint/bin/
+
 ### Android Studio files ###
 *.iml
 .idea/assetWizardSettings.xml
@@ -17,6 +25,9 @@
 .idea/other.xml
 .idea/AndroidProjectSystem.xml
 .idea/codeStyles/Project.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/markdown.xml
+.idea/studiobot.xml
 
 # User-specific stuff:
 .idea/workspace.xml
@@ -56,11 +67,6 @@ captures
 /.idea/caches/build_file_checksums.ser
 /.idea/caches/gradle_models.ser
 
-## Google API key files
-/app/src/debug/res/values/google_maps_api.xml
-/app/src/release/res/values/google_maps_api.xml
-/app/src/qa/res/values/google_maps_api.xml
-
 ## Transifex script project
 /transifex/
 
@@ -77,3 +83,32 @@ replay_pid*
 
 #copilot
 .idea/copilot*
+
+# ai files
+.devcontainer*
+.cursor/*
+!.cursor/commands/
+!.cursor/rules/
+.claude/*
+
+!/.claude/skills/
+!/.claude/hooks/
+!/.claude/settings.json
+.claude/settings.local.json
+/.claude/temp
+/.claude/skills/ht-*/
+/.claude/skills/release-checklist/local-constants.md
+./review.md
+review.md
+.trees
+
+/.testrail/results/*
+/.testrail/output/*
+
+*.keystore
+google-services.json
+
+firebase-debug.log
+/.mcp.json
+
+/weblate_screenshots/

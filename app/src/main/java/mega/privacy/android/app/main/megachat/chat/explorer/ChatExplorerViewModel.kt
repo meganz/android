@@ -23,7 +23,6 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus.Invalid
 import mega.privacy.android.domain.entity.contacts.UserChatStatus.Online
 import mega.privacy.android.domain.entity.contacts.UserContact
 import mega.privacy.android.domain.entity.user.UserId
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.chat.GetActiveChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetArchivedChatListItemsUseCase
@@ -34,7 +33,6 @@ import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUs
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorContactByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -63,7 +61,6 @@ class ChatExplorerViewModel @Inject constructor(
     private val getVisibleContactsWithoutChatRoomUseCase: GetVisibleContactsWithoutChatRoomUseCase,
     private val userContactMapper: UserContactMapper,
     private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     savedStateHandle: SavedStateHandle,
@@ -97,10 +94,8 @@ class ChatExplorerViewModel @Inject constructor(
     private fun initialiseNoteToSelfChat() {
         viewModelScope.launch {
             runCatching {
-                if (getFeatureFlagValueUseCase(ApiFeatures.NoteToYourselfFlag)) {
-                    getNoteToSelfChatUseCase()?.let { chatRoom ->
-                        Timber.d("Note to self chat created: ${chatRoom.chatId}")
-                    }
+                getNoteToSelfChatUseCase()?.let { chatRoom ->
+                    Timber.d("Note to self chat created: ${chatRoom.chatId}")
                 }
             }.onFailure {
                 Timber.e(it, "Note to self chat failed")

@@ -41,13 +41,19 @@ class NodeAttachmentViewModelTest {
             attachMultipleNodesUseCase = attachMultipleNodesUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             getContactHandleUseCase = getContactHandleUseCase,
-            attachContactsUseCase = attachContactsUseCase
+            attachContactsUseCase = attachContactsUseCase,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getNodesToAttachUseCase, attachMultipleNodesUseCase, get1On1ChatIdUseCase)
+        reset(
+            getNodesToAttachUseCase,
+            attachMultipleNodesUseCase,
+            get1On1ChatIdUseCase,
+            getContactHandleUseCase,
+            attachContactsUseCase,
+        )
     }
 
     @Test

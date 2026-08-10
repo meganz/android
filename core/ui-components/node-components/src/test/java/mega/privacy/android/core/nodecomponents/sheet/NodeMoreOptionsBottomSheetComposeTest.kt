@@ -15,7 +15,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.ERROR_NODE_ICON_TAG
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.HELP_ICON_TAG
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NODE_ICON_TAG

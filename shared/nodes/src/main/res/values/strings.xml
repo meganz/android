@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingQuantity,MissingTranslation">
+    <!-- New folder dialog strings -->
+    <string name="same_item_name_warning">There is already an item with the same name</string>
+
+    <!-- New text file dialog strings -->
+    <string name="context_new_file_name">File name</string>
+    <string name="same_file_name_warning">There is already a file with the same name</string>
+
+    <!--Temporary and will be moved later to strings-shared-->
+    <string name="files_send_to_chat_error">Files send to chat error</string>
+    <plurals name="files_send_to_chat_success">
+        <item quantity="one">%d file sent to chat successfully</item>
+        <item quantity="other">%d files sent to chat successfully</item>
+    </plurals>
+    <plurals name="hidden_nodes_result_message">
+        <item quantity="one">%d hidden node found</item>
+        <item quantity="other">%d hidden nodes found</item>
+    </plurals>
+    <string name="version_history_deleted_erroneously">Version history deleted erroneously</string>
+    <plurals name="versions_deleted_succesfully">
+        <item quantity="one">%d version deleted successfully</item>
+        <item quantity="other">%d versions deleted successfully</item>
+    </plurals>
+    <plurals name="versions_not_deleted">
+        <item quantity="one">%d version not deleted</item>
+        <item quantity="other">%d versions not deleted</item>
+    </plurals>
+    <string name="version_history_deleted">Version history deleted</string>
+    <string name="context_correctly_moved_to_rubbish">Context correctly moved to rubbish</string>
+    <string name="context_no_moved">Context no moved</string>
+    <string name="file_removed_offline">File removed offline</string>
+
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <plurals name="shared_items_verify_credentials_undecrypted_file">
+        <item quantity="one">[Undecrypted file]</item>
+        <item quantity="other">[Undecrypted files]</item>
+    </plurals>
+    <!-- End of node list item resources -->
+
+    <!-- Start of take down dialog strings -->
+    <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
+    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
+    <string name="dialog_taken_down_file_title">Cannot open file</string>
+    <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
+    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
+    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <!-- option to dispute taken down file or folder -->
+    <!-- End of take down dialog strings -->
+
+    <!-- Start of empty strings -->
+    <string name="context_empty_cloud_drive">[B]No files in your [/B][A]Cloud drive[/A]</string>
+    <string name="file_browser_empty_folder_new">[B]Empty[/B][A] Folder[/A]</string>
+
+    <string name="title_label" />
+    <string name="action_remove_label" />
+    <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
+    <string name="dialog_cannot_open_file_title">Cannot open file</string>
+    <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
+    <string name="dialog_cannot_open_file_text">This file type isn’t supported. To open the file, download it first.</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_download">Download</string>
+    <!-- End of empty strings -->
+
+    <!-- Storage Status Dialog M3 strings -->
+    <string name="general_dismiss">Dismiss</string>
+    <string name="action_upgrade_account">Upgrade account</string>
+    <string name="overquota_alert_text">You have exceeded your storage limit. Would you like to upgrade your account?</string>
+    <string name="overquota_alert_title">Storage quota exceeded</string>
+    <string name="pre_overquota_alert_text">This action cannot be completed as it would take you over your current storage limit. Would you like to upgrade your account?</string>
+    <string name="text_almost_full_warning">Cloud drive is almost full. Upgrade to Pro and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_almost_full_warning_pro_account">Cloud drive is almost full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_almost_full_warning_pro3_account">Cloud drive is almost full. If you need more storage please contact MEGA support to get a custom plan.</string>
+    <string name="text_storage_full_warning">Cloud drive is full. Upgrade to Pro and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_storage_full_warning_pro_account">Cloud drive is full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_storage_full_warning_pro3_account">Cloud drive is full. If you need more storage please contact MEGA support to get a custom plan.</string>
+    <string name="button_plans_almost_full_warning">See plans</string>
+    <string name="button_custom_almost_full_warning">Custom plan</string>
+    <string name="button_bonus_almost_full_warning">Get Bonus</string>
+    <!-- End of Storage Status Dialog M3 strings -->
+
+    <!-- Start of Rename dialog resources -->
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">To proceed you need to type a file extension</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
+    <string name="action_change_anyway">Change anyway</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
+    <string name="file_extension_change_warning">You might not be able to open this file if you change its extension.</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">File extension change</string>
+    <!-- End of Rename dialog resources -->
+
+    <!-- Start of Move to rubbish bin dialog resources -->
+    <!-- confirmation message before removing a file -->
+    <string name="confirmation_delete_from_mega">Delete from MEGA?</string>
+    <!-- confirmation message before removing a file -->
+    <string name="confirmation_move_to_rubbish">Move to the Rubbish bin?</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Delete</string>
+    <!-- Search button -->
+    <string name="action_search">Search</string>
+    <!-- Menu option title -->
+    <string name="context_clear_rubbish">Empty Rubbish bin</string>
+    <!-- More button in contact info page -->
+    <string name="label_more">More</string>
+
+    <!--Offline feature-->
+    <!-- to share a file using Facebook, Whatsapp, etc -->
+    <string name="context_share">Share using</string>
+    <!-- when the user tries to log in to MEGA without a network connection -->
+    <string name="error_server_connection_problem">No network connection</string>
+
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_upload">Upload</string>
+    <string name="general_allow">Allow</string>
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA needs access to your camera to capture photos and videos.</string>
+    <!-- Label of the floating action button of opening the new chat conversation -->
+    <string name="fab_label_new_chat">New chat</string>
+    <string name="error_not_enough_free_space">Not enough free space on your device</string>
+    <string name="error_temporary_unavaible">Resource temporarily not available, please try again later</string>
+
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner's account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
+</resources>

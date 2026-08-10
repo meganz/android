@@ -130,11 +130,14 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
         )
     }
 
-    internal fun saveFileLinkNode(serializedNode: String) {
-        startDownloadViewModel.onDownloadClicked(
-            serializedData = serializedNode,
-            withStartMessage = true,
-        )
+    internal fun saveFileLinkNode(publicUrl: String) {
+        viewModel.downloadPublicLinkFile(publicUrl)
+    }
+
+    protected fun observeDownloadFileLinkNode() {
+        viewModel.onDownloadFileLinkNode().observe(this) { node ->
+            startDownloadViewModel.onDownloadClicked(node = node, withStartMessage = true)
+        }
     }
 
     internal fun saveNodeFromFolderLink(nodeId: NodeId) {

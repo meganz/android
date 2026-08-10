@@ -3,28 +3,35 @@ package mega.privacy.android.app.presentation.videoplayer.view
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.BlurMegaTopAppBar
+import mega.android.core.ui.model.menu.MenuActionString
+import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
+
+internal data object VideoPlayerMoreActionsMenuAction : MenuActionString(
+    icon = IconPack.Medium.Thin.Outline.MoreVertical,
+    descriptionRes = R.string.label_more,
+    testTag = VIDEO_PLAYER_MORE_ACTIONS_BUTTON_TEST_TAG,
+)
 
 @Composable
 internal fun VideoPlayerTopBar(
     title: String,
-    menuActions: List<VideoPlayerMenuAction>,
     onBackPressed: () -> Unit,
-    onMenuActionClicked: (VideoPlayerMenuAction?) -> Unit,
+    onMoreActionsClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    trailingContent: @Composable () -> Unit = {},
 ) {
-    MegaAppBar(
+    BlurMegaTopAppBar(
         modifier = modifier.testTag(VIDEO_PLAYER_TOP_BAR_TEST_TAG),
         title = title,
-        appBarType = AppBarType.BACK_NAVIGATION,
-        onNavigationPressed = onBackPressed,
-        actions = menuActions,
+        navigationType = AppBarNavigationType.Back(onBackPressed),
+        actions = listOf(VideoPlayerMoreActionsMenuAction),
         onActionPressed = {
-            onMenuActionClicked(it as? VideoPlayerMenuAction)
-        }
+            onMoreActionsClicked()
+        },
+        trailingIcons = { trailingContent() },
     )
 }
 
@@ -32,3 +39,8 @@ internal fun VideoPlayerTopBar(
  * Test tag for video player top bar
  */
 const val VIDEO_PLAYER_TOP_BAR_TEST_TAG = "video_player_view:top_bar"
+
+/**
+ * Test tag for the more actions button in the video player top bar
+ */
+const val VIDEO_PLAYER_MORE_ACTIONS_BUTTON_TEST_TAG = "video_player_view:more_actions_button"

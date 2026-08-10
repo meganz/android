@@ -1,0 +1,1069 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 115,
+    "identityHash": "d640d710158b4e0aae43e8c7d8185220",
+    "entities": [
+      {
+        "tableName": "contacts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `handle` TEXT, `mail` TEXT, `name` TEXT, `lastname` TEXT, `nickname` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "handle",
+            "columnName": "handle",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mail",
+            "columnName": "mail",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "firstName",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lastName",
+            "columnName": "lastname",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nickName",
+            "columnName": "nickname",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "completedtransfers_2",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `transferfilename` TEXT NOT NULL, `transfertype` INTEGER NOT NULL, `transferstate` INTEGER NOT NULL, `transfersize` TEXT NOT NULL, `transferhandle` INTEGER NOT NULL, `transferpath` TEXT NOT NULL, `transferdisplaypath` TEXT, `transferoffline` INTEGER, `transfertimestamp` INTEGER NOT NULL, `transfererror` TEXT, `transfererrorcode` INTEGER, `transferoriginalpath` TEXT NOT NULL, `transferparenthandle` INTEGER NOT NULL, `transferappdata` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "transferfilename",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "transfertype",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "transferstate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "size",
+            "columnName": "transfersize",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "handle",
+            "columnName": "transferhandle",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "transferpath",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayPath",
+            "columnName": "transferdisplaypath",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isOffline",
+            "columnName": "transferoffline",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "transfertimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "error",
+            "columnName": "transfererror",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "errorCode",
+            "columnName": "transfererrorcode",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "originalPath",
+            "columnName": "transferoriginalpath",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentHandle",
+            "columnName": "transferparenthandle",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "appData",
+            "columnName": "transferappdata",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_completedtransfers_2_transferstate",
+            "unique": false,
+            "columnNames": [
+              "transferstate"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_completedtransfers_2_transferstate` ON `${TABLE_NAME}` (`transferstate`)"
+          },
+          {
+            "name": "index_completedtransfers_2_transfertimestamp",
+            "unique": false,
+            "columnNames": [
+              "transfertimestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_completedtransfers_2_transfertimestamp` ON `${TABLE_NAME}` (`transfertimestamp`)"
+          },
+          {
+            "name": "index_completedtransfers_2_transferstate_transfertimestamp",
+            "unique": false,
+            "columnNames": [
+              "transferstate",
+              "transfertimestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_completedtransfers_2_transferstate_transfertimestamp` ON `${TABLE_NAME}` (`transferstate`, `transfertimestamp`)"
+          }
+        ]
+      },
+      {
+        "tableName": "completedtransfers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `transferfilename` TEXT, `transfertype` TEXT, `transferstate` TEXT, `transfersize` TEXT, `transferhandle` TEXT, `transferpath` TEXT, `transferoffline` TEXT, `transfertimestamp` TEXT, `transfererror` TEXT, `transferoriginalpath` TEXT, `transferparenthandle` TEXT, `transferappdata` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "transferfilename",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "transfertype",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "transferstate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "size",
+            "columnName": "transfersize",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "handle",
+            "columnName": "transferhandle",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "transferpath",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isOffline",
+            "columnName": "transferoffline",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "transfertimestamp",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "error",
+            "columnName": "transfererror",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "originalPath",
+            "columnName": "transferoriginalpath",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "parentHandle",
+            "columnName": "transferparenthandle",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "appData",
+            "columnName": "transferappdata",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "active_transfers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `uniqueId` INTEGER NOT NULL DEFAULT 0, `tag` INTEGER NOT NULL, `file_name` TEXT NOT NULL DEFAULT '', `transfer_type` TEXT NOT NULL, `total_bytes` INTEGER NOT NULL, `is_finished` INTEGER NOT NULL, `is_folder_transfer` INTEGER NOT NULL DEFAULT 0, `is_paused` INTEGER NOT NULL DEFAULT 0, `is_already_downloaded` INTEGER NOT NULL DEFAULT 0, `is_cancelled` INTEGER NOT NULL DEFAULT 0, `transferappdata` TEXT NOT NULL DEFAULT '', `local_path` TEXT NOT NULL DEFAULT '')",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "uniqueId",
+            "columnName": "uniqueId",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "tag",
+            "columnName": "tag",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "file_name",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "transferType",
+            "columnName": "transfer_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalBytes",
+            "columnName": "total_bytes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFinished",
+            "columnName": "is_finished",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFolderTransfer",
+            "columnName": "is_folder_transfer",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "isPaused",
+            "columnName": "is_paused",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "isAlreadyTransferred",
+            "columnName": "is_already_downloaded",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "isCancelled",
+            "columnName": "is_cancelled",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "appData",
+            "columnName": "transferappdata",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "localPath",
+            "columnName": "local_path",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_active_transfers_transfer_type",
+            "unique": false,
+            "columnNames": [
+              "transfer_type"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_active_transfers_transfer_type` ON `${TABLE_NAME}` (`transfer_type`)"
+          },
+          {
+            "name": "index_active_transfers_uniqueId",
+            "unique": false,
+            "columnNames": [
+              "uniqueId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_active_transfers_uniqueId` ON `${TABLE_NAME}` (`uniqueId`)"
+          },
+          {
+            "name": "index_active_transfers_tag",
+            "unique": false,
+            "columnNames": [
+              "tag"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_active_transfers_tag` ON `${TABLE_NAME}` (`tag`)"
+          }
+        ]
+      },
+      {
+        "tableName": "active_transfer_groups",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`group_id` INTEGER PRIMARY KEY AUTOINCREMENT, `transfer_type` TEXT NOT NULL, `destination` TEXT NOT NULL, `start_time` INTEGER, `pending_transfer_node_id` TEXT DEFAULT NULL, `selected_names` TEXT DEFAULT NULL)",
+        "fields": [
+          {
+            "fieldPath": "groupId",
+            "columnName": "group_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "transferType",
+            "columnName": "transfer_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "destination",
+            "columnName": "destination",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startTime",
+            "columnName": "start_time",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "pendingTransferNodeId",
+            "columnName": "pending_transfer_node_id",
+            "affinity": "TEXT",
+            "defaultValue": "NULL"
+          },
+          {
+            "fieldPath": "selectedNames",
+            "columnName": "selected_names",
+            "affinity": "TEXT",
+            "defaultValue": "NULL"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "group_id"
+          ]
+        }
+      },
+      {
+        "tableName": "backups",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `backup_id` TEXT NOT NULL, `backup_type` INTEGER NOT NULL, `target_node` TEXT NOT NULL, `local_folder` TEXT NOT NULL, `backup_name` TEXT NOT NULL, `state` INTEGER NOT NULL, `sub_state` INTEGER NOT NULL, `extra_data` TEXT NOT NULL, `start_timestamp` TEXT NOT NULL, `last_sync_timestamp` TEXT NOT NULL, `target_folder_path` TEXT NOT NULL, `exclude_subFolders` TEXT NOT NULL, `delete_empty_subFolders` TEXT NOT NULL, `outdated` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "encryptedBackupId",
+            "columnName": "backup_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "backupType",
+            "columnName": "backup_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedTargetNode",
+            "columnName": "target_node",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedLocalFolder",
+            "columnName": "local_folder",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedBackupName",
+            "columnName": "backup_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subState",
+            "columnName": "sub_state",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedExtraData",
+            "columnName": "extra_data",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedStartTimestamp",
+            "columnName": "start_timestamp",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedLastFinishTimestamp",
+            "columnName": "last_sync_timestamp",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedTargetFolderPath",
+            "columnName": "target_folder_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedShouldExcludeSubFolders",
+            "columnName": "exclude_subFolders",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedShouldDeleteEmptySubFolders",
+            "columnName": "delete_empty_subFolders",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedIsOutdated",
+            "columnName": "outdated",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "offline",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `handle` TEXT, `path` TEXT, `name` TEXT, `parentId` INTEGER, `type` TEXT, `incoming` INTEGER, `incomingHandle` TEXT, `lastModifiedTime` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "encryptedHandle",
+            "columnName": "handle",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "encryptedPath",
+            "columnName": "path",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "encryptedName",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "parentId",
+            "columnName": "parentId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "encryptedType",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "incoming",
+            "columnName": "incoming",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "encryptedIncomingHandle",
+            "columnName": "incomingHandle",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lastModifiedTime",
+            "columnName": "lastModifiedTime",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "syncsolvedissues",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`entityId` INTEGER PRIMARY KEY AUTOINCREMENT, `syncId` INTEGER NOT NULL DEFAULT -1, `nodeIds` TEXT NOT NULL, `localPaths` TEXT NOT NULL, `resolutionExplanation` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "entityId",
+            "columnName": "entityId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "syncId",
+            "columnName": "syncId",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "-1"
+          },
+          {
+            "fieldPath": "nodeIds",
+            "columnName": "nodeIds",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localPaths",
+            "columnName": "localPaths",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resolutionExplanation",
+            "columnName": "resolutionExplanation",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "entityId"
+          ]
+        }
+      },
+      {
+        "tableName": "userpausedsyncs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sync_id` INTEGER NOT NULL, PRIMARY KEY(`sync_id`))",
+        "fields": [
+          {
+            "fieldPath": "syncId",
+            "columnName": "sync_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "sync_id"
+          ]
+        }
+      },
+      {
+        "tableName": "camerauploadsrecords",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`media_id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `folder_type` TEXT NOT NULL, `file_name` TEXT NOT NULL, `file_path` TEXT NOT NULL, `file_type` TEXT NOT NULL, `upload_status` TEXT NOT NULL, `original_fingerprint` TEXT NOT NULL, `generated_fingerprint` TEXT, `temp_file_path` TEXT NOT NULL, `file_size` INTEGER, PRIMARY KEY(`media_id`, `timestamp`, `folder_type`))",
+        "fields": [
+          {
+            "fieldPath": "mediaId",
+            "columnName": "media_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "folderType",
+            "columnName": "folder_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "file_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filePath",
+            "columnName": "file_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileType",
+            "columnName": "file_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uploadStatus",
+            "columnName": "upload_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "originalFingerprint",
+            "columnName": "original_fingerprint",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "generatedFingerprint",
+            "columnName": "generated_fingerprint",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "tempFilePath",
+            "columnName": "temp_file_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileSize",
+            "columnName": "file_size",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "media_id",
+            "timestamp",
+            "folder_type"
+          ]
+        }
+      },
+      {
+        "tableName": "chatroompreference",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatId` INTEGER NOT NULL, `draft_message` TEXT NOT NULL, `editing_message_id` INTEGER, PRIMARY KEY(`chatId`))",
+        "fields": [
+          {
+            "fieldPath": "chatId",
+            "columnName": "chatId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "draftMessage",
+            "columnName": "draft_message",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "editingMessageId",
+            "columnName": "editing_message_id",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chatId"
+          ]
+        }
+      },
+      {
+        "tableName": "recentlywatchedvideo",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`videoHandle` INTEGER NOT NULL, `watched_timestamp` INTEGER NOT NULL, `collection_id` INTEGER NOT NULL DEFAULT 0, `collection_title` TEXT, PRIMARY KEY(`videoHandle`))",
+        "fields": [
+          {
+            "fieldPath": "videoHandle",
+            "columnName": "videoHandle",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "watchedTimestamp",
+            "columnName": "watched_timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionId",
+            "columnName": "collection_id",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "collectionTitle",
+            "columnName": "collection_title",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "videoHandle"
+          ]
+        }
+      },
+      {
+        "tableName": "pending_transfer",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pendingTransferId` INTEGER PRIMARY KEY AUTOINCREMENT, `transferUniqueId` INTEGER, `transferType` TEXT NOT NULL, `nodeIdentifier` TEXT NOT NULL, `path` TEXT NOT NULL, `appData` TEXT, `isHighPriority` INTEGER NOT NULL, `startedFiles` INTEGER NOT NULL, `alreadyTransferred` INTEGER NOT NULL, `state` TEXT NOT NULL, `fileName` TEXT, `stage` TEXT NOT NULL, `fileCount` INTEGER NOT NULL, `folderCount` INTEGER NOT NULL, `createdFolderCount` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "pendingTransferId",
+            "columnName": "pendingTransferId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "transferUniqueId",
+            "columnName": "transferUniqueId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "transferType",
+            "columnName": "transferType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nodeIdentifier",
+            "columnName": "nodeIdentifier",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "appData",
+            "columnName": "appData",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isHighPriority",
+            "columnName": "isHighPriority",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startedFiles",
+            "columnName": "startedFiles",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alreadyTransferred",
+            "columnName": "alreadyTransferred",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "fileName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "scanningFoldersData.stage",
+            "columnName": "stage",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scanningFoldersData.fileCount",
+            "columnName": "fileCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scanningFoldersData.folderCount",
+            "columnName": "folderCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scanningFoldersData.createdFolderCount",
+            "columnName": "createdFolderCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "pendingTransferId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_pending_transfer_transferUniqueId",
+            "unique": false,
+            "columnNames": [
+              "transferUniqueId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pending_transfer_transferUniqueId` ON `${TABLE_NAME}` (`transferUniqueId`)"
+          },
+          {
+            "name": "index_pending_transfer_state",
+            "unique": false,
+            "columnNames": [
+              "state"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pending_transfer_state` ON `${TABLE_NAME}` (`state`)"
+          },
+          {
+            "name": "index_pending_transfer_transferType_state",
+            "unique": false,
+            "columnNames": [
+              "transferType",
+              "state"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pending_transfer_transferType_state` ON `${TABLE_NAME}` (`transferType`, `state`)"
+          }
+        ]
+      },
+      {
+        "tableName": "syncshownnotifications",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `notificationId` INTEGER, `notificationType` TEXT NOT NULL, `otherIdentifiers` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notificationId",
+            "columnName": "notificationId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "notificationType",
+            "columnName": "notificationType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "otherIdentifiers",
+            "columnName": "otherIdentifiers",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "last_page_viewed_in_pdf",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`nodeHandle` INTEGER NOT NULL, `lastPageViewed` INTEGER NOT NULL, PRIMARY KEY(`nodeHandle`))",
+        "fields": [
+          {
+            "fieldPath": "nodeHandle",
+            "columnName": "nodeHandle",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastPageViewed",
+            "columnName": "lastPageViewed",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "nodeHandle"
+          ]
+        }
+      },
+      {
+        "tableName": "media_playback_info",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mediaHandle` INTEGER NOT NULL, `total_duration` INTEGER NOT NULL DEFAULT 0, `current_position` INTEGER NOT NULL DEFAULT 0, `media_type` TEXT NOT NULL, PRIMARY KEY(`mediaHandle`))",
+        "fields": [
+          {
+            "fieldPath": "mediaHandle",
+            "columnName": "mediaHandle",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalDuration",
+            "columnName": "total_duration",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "currentPosition",
+            "columnName": "current_position",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "mediaType",
+            "columnName": "media_type",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "mediaHandle"
+          ]
+        }
+      },
+      {
+        "tableName": "home_widget_configuration",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`widget_identifier` TEXT NOT NULL, `widget_order` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, PRIMARY KEY(`widget_identifier`))",
+        "fields": [
+          {
+            "fieldPath": "widgetIdentifier",
+            "columnName": "widget_identifier",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "widgetOrder",
+            "columnName": "widget_order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enabled",
+            "columnName": "enabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "widget_identifier"
+          ]
+        }
+      },
+      {
+        "tableName": "recent_search",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`searchQuery` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`searchQuery`))",
+        "fields": [
+          {
+            "fieldPath": "searchQuery",
+            "columnName": "searchQuery",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "searchQuery"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd640d710158b4e0aae43e8c7d8185220')"
+    ]
+  }
+}

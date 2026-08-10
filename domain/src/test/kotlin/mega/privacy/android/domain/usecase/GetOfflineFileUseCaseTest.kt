@@ -23,8 +23,8 @@ class GetOfflineFileUseCaseTest {
     private val handle = "handle"
 
     private val fileSystemRepository = mock<FileSystemRepository> {
-        onBlocking { getOfflinePath() }.thenReturn(offlinePath)
-        onBlocking { getOfflineBackupsPath() }.thenReturn(offlineBackupsPath)
+        on { getOfflinePath() }.thenReturn(offlinePath)
+        on { getOfflineBackupsPath() }.thenReturn(offlineBackupsPath)
     }
 
     @Before

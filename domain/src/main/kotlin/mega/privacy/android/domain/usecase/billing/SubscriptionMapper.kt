@@ -19,10 +19,11 @@ class SubscriptionMapper @Inject constructor(
      */
     operator fun invoke(
         plan: SubscriptionOption,
-        localPricing: LocalPricing?
+        localPricing: LocalPricing?,
     ): Subscription {
         // Pick the first offer if available, we may need to allow user to choose offers in future
-        val offerDetail = localPricing?.offers?.firstOrNull()
+        // manage offer from SubscriptionOption.hasOffer
+        val offerDetail = localPricing?.offers?.firstOrNull()?.takeIf { plan.hasOffer }
 
         return Subscription(
             accountType = plan.accountType,
@@ -45,6 +46,9 @@ class SubscriptionMapper @Inject constructor(
             offerId = offerDetail?.offerId,
             offerPeriod = offerDetail?.offerPeriod,
             sku = plan.sku,
+            discountName = plan.discountName,
+            offerValidUntil = plan.offerValidUntil,
+            offerFlags = plan.offerFlags,
         )
     }
 }

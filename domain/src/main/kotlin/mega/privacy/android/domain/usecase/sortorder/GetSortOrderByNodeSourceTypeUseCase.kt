@@ -24,9 +24,13 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
      * @param nodeSource The source of the node.
      * @return The sort order for the specified node source.
      */
-    suspend operator fun invoke(nodeSource: NodeSourceType, isSingleActivityEnabled :Boolean): SortOrder =
+    @Suppress("UNUSED_PARAMETER")
+    suspend operator fun invoke(
+        nodeSource: NodeSourceType,
+        isSingleActivityEnabled: Boolean = true,
+    ): SortOrder =
         when (nodeSource) {
-            NodeSourceType.LINKS -> getLinksSortOrderUseCase(isSingleActivityEnabled)
+            NodeSourceType.LINKS -> getLinksSortOrderUseCase()
             NodeSourceType.INCOMING_SHARES -> getOthersSortOrder()
             NodeSourceType.CLOUD_DRIVE,
             NodeSourceType.HOME,
@@ -37,8 +41,22 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
             NodeSourceType.FAVOURITES,
             NodeSourceType.OUTGOING_SHARES,
             NodeSourceType.OTHER,
+            NodeSourceType.VIDEOS,
+            NodeSourceType.SEARCH,
+            NodeSourceType.VIDEO_PLAYLISTS,
+            NodeSourceType.RECENTS_BUCKET,
+            NodeSourceType.FOLDER_LINK,
+            NodeSourceType.FILE_LINK,
+            NodeSourceType.VIDEO_RECENTLY_WATCHED,
+            NodeSourceType.CHAT,
+            NodeSourceType.MEDIA_PLAYER_DEFAULT,
+            NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER,
+            NodeSourceType.MEDIA_PLAYER_VERSIONS,
+            NodeSourceType.CONTINUE_WHERE_LEFT_OFF,
+            NodeSourceType.MEDIA_PLAYER_ZIP_FILE,
                 -> getCloudSortOrder()
 
             NodeSourceType.OFFLINE -> getOfflineSortOrder()
+            NodeSourceType.TIMELINE -> SortOrder.ORDER_MODIFICATION_DESC
         }
 }

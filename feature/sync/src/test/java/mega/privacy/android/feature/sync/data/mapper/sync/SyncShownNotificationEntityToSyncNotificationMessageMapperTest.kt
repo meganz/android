@@ -53,7 +53,14 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
             syncNotificationType = SyncNotificationType.BATTERY_LOW,
             notificationDetails = NotificationDetails(path = "", errorCode = null)
         )
-        whenever(genericErrorToNotificationMessageMapper(SyncNotificationType.BATTERY_LOW, "", 0))
+        whenever(
+            genericErrorToNotificationMessageMapper(
+                SyncNotificationType.BATTERY_LOW,
+                "",
+                0,
+                null
+            )
+        )
             .thenReturn(notificationMessage)
 
         val result = underTest(dbEntity)
@@ -77,7 +84,8 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
             genericErrorToNotificationMessageMapper(
                 SyncNotificationType.NOT_CONNECTED_TO_WIFI,
                 "",
-                0
+                0,
+                null,
             )
         )
             .thenReturn(notificationMessage)
@@ -107,7 +115,8 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
             genericErrorToNotificationMessageMapper(
                 SyncNotificationType.ERROR,
                 notificationDetails.path.orEmpty(),
-                notificationDetails.errorCode ?: 0
+                notificationDetails.errorCode ?: 0,
+                null,
             )
         ).thenReturn(notificationMessage)
 

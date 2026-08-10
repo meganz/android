@@ -39,7 +39,7 @@ pipeline {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '1'))
-        timeout(time: 2, unit: 'HOURS')
+        timeout(time: 1, unit: 'HOURS')
         gitLabConnection('GitLabConnection')
     }
     environment {
@@ -64,8 +64,6 @@ pipeline {
         gitlabUserName = "Jenkins Pipeline"
         // default gitlabSourceBranch for this script
         gitlabSourceBranch = "develop"
-
-        BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }
     post {
         failure {
@@ -132,13 +130,9 @@ pipeline {
                     BUILD_STEP = 'Apply Google Map API Key'
 
                     withCredentials([
-                            file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG'),
                             file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE')
                     ]) {
                         println("applying production google map api config... ")
-                        sh 'mkdir -p app/src/debug/res/values'
-                        sh 'mkdir -p app/src/release/res/values'
-                        sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_DEBUG} app/src/debug/res/values/google_maps_api.xml"
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_RELEASE} app/src/release/res/values/google_maps_api.xml"
                     }
                 }
@@ -342,7 +336,7 @@ pipeline {
                             filesPattern: 'archive/*-gms-release.aab',
                             trackName: 'internal',
                             rolloutPercentage: '100',
-                            additionalVersionCodes: '233140859',
+                            additionalVersionCodes: '233140859,253240834',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOLS_FILE}",
                             recentChangeList: common.getRecentChangeList(release_notes),
                             releaseName: common.readAppVersion1()

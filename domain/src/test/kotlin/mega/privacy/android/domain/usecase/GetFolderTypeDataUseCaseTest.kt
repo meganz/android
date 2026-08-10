@@ -42,18 +42,18 @@ class GetFolderTypeDataUseCaseTest {
     @Test
     fun `test that invoke returns correct FolderTypeData when all data is available`() = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+            on { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            on { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
         }
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+            on { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
         }
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
+            on { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
         }
         nodeRepository.stub {
-            onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
-            onBlocking { getNodePathById(backupFolderId) }.thenReturn(backupFolderPath)
+            on { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            on { getNodePathById(backupFolderId) }.thenReturn(backupFolderPath)
         }
 
         val result = underTest()
@@ -72,17 +72,17 @@ class GetFolderTypeDataUseCaseTest {
     @Test
     fun `test that invoke returns correct FolderTypeData when all values are null`() = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(null)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(null)
+            on { getPrimarySyncHandle() }.thenReturn(null)
+            on { getSecondarySyncHandle() }.thenReturn(null)
         }
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(null)
+            on { getChatFilesFolderId() }.thenReturn(null)
         }
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(flowOf(Result.failure(Exception("No backup folder"))))
+            on { invoke() }.thenReturn(flowOf(Result.failure(Exception("No backup folder"))))
         }
         nodeRepository.stub {
-            onBlocking { getAllSyncedNodeIds() }.thenReturn(emptySet())
+            on { getAllSyncedNodeIds() }.thenReturn(emptySet())
         }
 
         val result = underTest()
@@ -101,17 +101,17 @@ class GetFolderTypeDataUseCaseTest {
     @Test
     fun `test that invoke handles partial data correctly`() = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(null)
+            on { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            on { getSecondarySyncHandle() }.thenReturn(null)
         }
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+            on { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
         }
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(flowOf(Result.failure(Exception("No backup folder"))))
+            on { invoke() }.thenReturn(flowOf(Result.failure(Exception("No backup folder"))))
         }
         nodeRepository.stub {
-            onBlocking { getAllSyncedNodeIds() }.thenReturn(setOf(NodeId(1111L)))
+            on { getAllSyncedNodeIds() }.thenReturn(setOf(NodeId(1111L)))
         }
 
         val result = underTest()
@@ -135,14 +135,14 @@ class GetFolderTypeDataUseCaseTest {
         val firstBackupPath = "/first/backup/path"
 
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+            on { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            on { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
         }
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+            on { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
         }
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(
+            on { invoke() }.thenReturn(
                 flowOf(
                     Result.success(firstBackupId),
                     Result.success(secondBackupId)
@@ -150,8 +150,8 @@ class GetFolderTypeDataUseCaseTest {
             )
         }
         nodeRepository.stub {
-            onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
-            onBlocking { getNodePathById(firstBackupId) }.thenReturn(firstBackupPath)
+            on { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            on { getNodePathById(firstBackupId) }.thenReturn(firstBackupPath)
         }
 
         val result = underTest()
@@ -171,14 +171,14 @@ class GetFolderTypeDataUseCaseTest {
     @Test
     fun `test that invoke handles backup folder flow with failure then success`() = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+            on { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            on { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
         }
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+            on { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
         }
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(
+            on { invoke() }.thenReturn(
                 flowOf(
                     Result.failure(Exception("Backup folder not found")),
                     Result.success(backupFolderId)
@@ -186,7 +186,7 @@ class GetFolderTypeDataUseCaseTest {
             )
         }
         nodeRepository.stub {
-            onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            on { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
         }
 
         val result = underTest()
@@ -206,17 +206,17 @@ class GetFolderTypeDataUseCaseTest {
     @Test
     fun `test that invoke handles empty backup folder flow`() = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+            on { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            on { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
         }
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+            on { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
         }
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(flowOf())
+            on { invoke() }.thenReturn(flowOf())
         }
         nodeRepository.stub {
-            onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            on { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
         }
 
         val result = underTest()
@@ -237,18 +237,18 @@ class GetFolderTypeDataUseCaseTest {
         val largeSyncedNodeSet = (1..1000).map { NodeId(it.toLong()) }.toSet()
 
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+            on { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            on { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
         }
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+            on { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
         }
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
+            on { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
         }
         nodeRepository.stub {
-            onBlocking { getAllSyncedNodeIds() }.thenReturn(largeSyncedNodeSet)
-            onBlocking { getNodePathById(backupFolderId) }.thenReturn(backupFolderPath)
+            on { getAllSyncedNodeIds() }.thenReturn(largeSyncedNodeSet)
+            on { getNodePathById(backupFolderId) }.thenReturn(backupFolderPath)
         }
 
         val result = underTest()
@@ -268,18 +268,18 @@ class GetFolderTypeDataUseCaseTest {
     @Test
     fun `test that invoke calls all repositories exactly once`() = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+            on { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            on { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
         }
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+            on { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
         }
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
+            on { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
         }
         nodeRepository.stub {
-            onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
-            onBlocking { getNodePathById(backupFolderId) }.thenReturn(backupFolderPath)
+            on { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            on { getNodePathById(backupFolderId) }.thenReturn(backupFolderPath)
         }
 
         underTest()
@@ -295,18 +295,18 @@ class GetFolderTypeDataUseCaseTest {
     @Test
     fun `test that invoke handles backup folder with empty path`() = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+            on { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            on { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
         }
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+            on { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
         }
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
+            on { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
         }
         nodeRepository.stub {
-            onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
-            onBlocking { getNodePathById(backupFolderId) }.thenReturn("")
+            on { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            on { getNodePathById(backupFolderId) }.thenReturn("")
         }
 
         val result = underTest()
@@ -325,18 +325,18 @@ class GetFolderTypeDataUseCaseTest {
     @Test
     fun `test that invoke handles backup folder with null path`() = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+            on { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            on { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
         }
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+            on { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
         }
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
+            on { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
         }
         nodeRepository.stub {
-            onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
-            onBlocking { getNodePathById(backupFolderId) }.thenReturn(null)
+            on { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            on { getNodePathById(backupFolderId) }.thenReturn(null)
         }
 
         val result = underTest()
@@ -357,18 +357,18 @@ class GetFolderTypeDataUseCaseTest {
         val customBackupPath = "/custom/backup/path"
 
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+            on { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            on { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
         }
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+            on { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
         }
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
+            on { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
         }
         nodeRepository.stub {
-            onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
-            onBlocking { getNodePathById(backupFolderId) }.thenReturn(customBackupPath)
+            on { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            on { getNodePathById(backupFolderId) }.thenReturn(customBackupPath)
         }
 
         val result = underTest()

@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.psa
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +22,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -55,7 +57,8 @@ fun PsaContainer(
         coroutineScope = coroutineScope,
         navigateToPsaPage = navigateToPsaPage,
         context = context,
-        markAsSeen = viewModel::markAsSeen
+        markAsSeen = viewModel::markAsSeen,
+        onDisplay = viewModel::setDisplayed,
     )
 }
 
@@ -70,6 +73,7 @@ fun PsaContainer(
  * @param innerModifier - Workaround for legacy screens
  * @param navigateToPsaPage
  * @param content
+ * @param onDisplay
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -78,10 +82,11 @@ internal fun PsaContentView(
     state: PsaState,
     coroutineScope: CoroutineScope,
     markAsSeen: (Int) -> Unit,
+    content: @Composable () -> Unit,
+    onDisplay: suspend (Int) -> Unit,
     containerModifier: Modifier = Modifier,
     innerModifier: (Modifier) -> Modifier = { it },
     navigateToPsaPage: (Context, String) -> Unit = ::navigateToWebView,
-    content: @Composable () -> Unit,
 ) {
     Box(modifier = Modifier.semantics {
         testTagsAsResourceId = true
@@ -101,6 +106,7 @@ internal fun PsaContentView(
             },
             containerModifier = containerModifier,
             innerModifier = innerModifier,
+            onDisplay = onDisplay,
         )
     }
 }
@@ -113,6 +119,7 @@ internal fun PsaStateView(
     navigateToPsaPage: (String) -> Unit,
     containerModifier: Modifier,
     innerModifier: (Modifier) -> Modifier,
+    onDisplay: suspend (Int) -> Unit,
 ) {
     when (state) {
         is PsaState.NoPsa -> {}
@@ -120,7 +127,8 @@ internal fun PsaStateView(
         is PsaState.WebPsa -> {
             WebPsaView(
                 psa = state,
-                markAsSeen = { markAsSeen(state.id) }
+                markAsSeen = { markAsSeen(state.id) },
+                onDisplay = suspend { onDisplay(state.id) },
             )
         }
 
@@ -137,7 +145,8 @@ internal fun PsaStateView(
                         markAsSeen(state.id)
                     },
                     onDismiss = { markAsSeen(state.id) },
-                    modifier = psaModifier
+                    modifier = psaModifier,
+                    onDisplay = suspend { onDisplay(state.id) },
                 )
             }
         }
@@ -151,6 +160,7 @@ internal fun PsaStateView(
                     imageUrl = state.imageUrl,
                     onDismiss = { markAsSeen(state.id) },
                     modifier = psaModifier,
+                    onDisplay = suspend { onDisplay(state.id) },
                 )
             }
         }
@@ -162,12 +172,17 @@ private fun NestedPsaView(
     containerModifier: Modifier,
     psaView: @Composable (Modifier) -> Unit,
 ) {
-    Box(Modifier.fillMaxSize()) {
+    BackHandler() { }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(enabled = false) {},
+    ) {
         MegaBottomSheetContainer(
             modifier = containerModifier
                 .shadow(6.dp)
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth(),
+                .fillMaxWidth()
         ) {
             psaView(
                 Modifier
@@ -192,6 +207,7 @@ private fun PsaContainerPreview(@PreviewParameter(PsaStatePreviewParameterProvid
             navigateToPsaPage = {},
             containerModifier = Modifier,
             innerModifier = { it },
+            onDisplay = {},
         )
 
     }

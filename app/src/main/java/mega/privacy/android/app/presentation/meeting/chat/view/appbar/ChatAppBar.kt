@@ -25,10 +25,10 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
-import mega.privacy.android.app.presentation.contact.view.getLastSeenString
+import mega.privacy.android.shared.contact.components.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
-import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
+import mega.privacy.android.feature.chat.meeting.call.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -69,7 +69,7 @@ internal fun ChatAppBar(
     showGroupOrContactInfoActivity: () -> Unit = {},
     onMenuActionPressed: (ChatRoomMenuAction) -> Unit = {},
     onStartCall: (Boolean) -> Unit = {},
-    openAddContactActivity: () -> Unit = {},
+    onAddParticipants: () -> Unit = {},
     showClearChatConfirmationDialog: () -> Unit = {},
     showMutePushNotificationDialog: () -> Unit = {},
     archiveChat: () -> Unit = {},
@@ -146,7 +146,7 @@ internal fun ChatAppBar(
                     when {
                         !uiState.hasAnyContact -> showNoContactToAddDialog()
                         uiState.allContactsParticipateInChat -> showAllContactsParticipateInChat()
-                        else -> openAddContactActivity()
+                        else -> onAddParticipants()
                     }
                 }
 

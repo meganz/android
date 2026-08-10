@@ -1,9 +1,16 @@
 package mega.privacy.android.core.nodecomponents.action
 
+import android.content.Context
 import android.content.Intent
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavKey
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
@@ -11,45 +18,58 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuAction
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
+import mega.privacy.android.core.nodecomponents.action.eventhandler.NodeOptionsActionEventSender
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
-import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
+import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
+import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
+import mega.privacy.android.core.nodecomponents.model.RestoreData
+import mega.privacy.android.core.nodecomponents.model.ZipFileTypedNode
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.FileNodeContent
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
+import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
+import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.entity.node.publiclink.PublicCopyCollisionResult
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -61,35 +81,52 @@ import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
+import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
+import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
 /**
  * Node actions view model
  *
  * @property checkNodesNameCollisionUseCase
+ * @property checkChatNodesNameCollisionAndCopyUseCase
  * @property moveNodesUseCase
  * @property copyNodesUseCase
  * @property setMoveLatestTargetPathUseCase
  * @property setCopyLatestTargetPathUseCase
  * @property deleteNodeVersionsUseCase
- * @property snackBarHandler
+ * @property snackbarEventQueue
  * @property moveRequestMessageMapper
  * @property versionHistoryRemoveMessageMapper
  * @property checkBackupNodeTypeUseCase
@@ -100,11 +137,14 @@ import javax.inject.Inject
  * @property nodeContentUriIntentMapper
  * @property applicationScope
  */
-@HiltViewModel
-class NodeOptionsActionViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = NodeOptionsActionViewModel.Factory::class)
+class NodeOptionsActionViewModel @AssistedInject constructor(
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
+    private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
     private val moveNodesUseCase: MoveNodesUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
+    private val restoreNodesUseCase: RestoreNodesUseCase,
+    private val restoreNodeResultMapper: RestoreNodeResultMapper,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
@@ -117,6 +157,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
+    private val getFileTypeInfoByContentUseCase: GetFileTypeInfoByContentUseCase,
     private val singleNodeActionHandlers: Set<@JvmSuppressWildcards SingleNodeAction>,
     private val multipleNodesActionHandlers: Set<@JvmSuppressWildcards MultiNodeAction>,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
@@ -126,7 +167,8 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val createShareKeyUseCase: CreateShareKeyUseCase,
-    private val snackBarHandler: SnackBarHandler,
+    private val getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
     private val nodeSelectionModeActionMapper: NodeSelectionModeActionMapper,
@@ -134,16 +176,61 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
+    private val nodeOptionsActionEventSender: NodeOptionsActionEventSender,
+    private val getNodeLocationUseCase: GetNodeLocationUseCase,
+    private val nodeDestinationMapper: NodeDestinationMapper,
+    private val navigationEventQueue: NavigationEventQueue,
+    private val removeRecentlyWatchedItemUseCase: RemoveRecentlyWatchedItemUseCase,
+    private val mapTypedNodeToPublicLinkUseCase: MapTypedNodeToPublicLinkUseCase,
+    private val copyPublicNodeUseCase: CopyPublicNodeUseCase,
+    private val checkPublicNodesNameCollisionUseCase: CheckPublicNodesNameCollisionUseCase,
+    private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    @ApplicationContext private val applicationContext: Context,
+    @Assisted private val nodeSourceType: NodeSourceType?,
 ) : ViewModel() {
 
+    /**
+     * Get the node source type for this view model
+     */
+    internal fun getNodeSourceType(): NodeSourceType? = nodeSourceType
+
     val uiState: StateFlow<NodeActionState>
-        field = MutableStateFlow(NodeActionState())
+        field: MutableStateFlow<NodeActionState> = MutableStateFlow(NodeActionState())
 
     private var rubbishBinNode: UnTypedNode? = null
     private var updateSelectionJob: Job? = null
+    private var pendingSensitiveShareFolderNodes: List<TypedFolderNode> = emptyList()
+
+    // Node handles for the share currently awaiting contact selection. The contact
+    // picker only returns the selected emails, so the target handles are retained here.
+    private var pendingShareFolderHandles: List<Long> = emptyList()
 
     init {
         getRubbishBinNode()
+        monitorIsLoggedIn()
+        loadCloudExplorerFeatureFlag()
+    }
+
+    private fun loadCloudExplorerFeatureFlag() {
+        viewModelScope.launch {
+            val enabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.onFailure { Timber.e(it) }.getOrDefault(false)
+            uiState.update { it.copy(isCloudExplorerAvailable = enabled) }
+        }
+    }
+
+    private fun monitorIsLoggedIn() {
+        viewModelScope.launch {
+            monitorUserCredentialsUseCase()
+                .catch { Timber.e(it) }
+                .collect { credentials ->
+                    uiState.update {
+                        it.copy(isLoggedIn = credentials != null)
+                    }
+                }
+        }
     }
 
     private fun getRubbishBinNode() {
@@ -169,15 +256,166 @@ class NodeOptionsActionViewModel @Inject constructor(
         targetNode: Long,
         type: NodeNameCollisionType,
     ) {
+        val chatFile = selectedChatFile()
+        if (type == NodeNameCollisionType.COPY && chatFile != null
+            && nodes.singleOrNull() == chatFile.id.longValue
+        ) {
+            copyChatNode(chatFile, targetNode)
+            return
+        }
         viewModelScope.launch {
             runCatching {
                 checkNodesNameCollisionUseCase(
                     nodes.associateWith { targetNode },
                     type
                 )
-            }.onSuccess { result ->
-                uiState.update { it.copy(nodeNameCollisionsResult = triggered(result)) }
+            }.onSuccess {
+                triggerCollisionsResult(it)
             }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /** Run a COPY collision check for [nodeIds] → [target]. No-op if empty. */
+    fun checkCopyNameCollision(nodeIds: List<NodeId>, target: NodeId) {
+        if (nodeIds.isEmpty()) return
+        checkNodesNameCollision(
+            nodeIds.map { it.longValue },
+            target.longValue,
+            NodeNameCollisionType.COPY,
+        )
+    }
+
+    /** Move counterpart of [checkCopyNameCollision]. */
+    fun checkMoveNameCollision(nodeIds: List<NodeId>, target: NodeId) {
+        if (nodeIds.isEmpty()) return
+        checkNodesNameCollision(
+            nodeIds.map { it.longValue },
+            target.longValue,
+            NodeNameCollisionType.MOVE,
+        )
+    }
+
+    fun checkPublicCopyCollision(targetHandle: Long) {
+        val publicNode = selectedPublicLinkFile() ?: return
+        viewModelScope.launch {
+            runCatching {
+                checkPublicNodesNameCollisionUseCase(
+                    listOf(publicNode),
+                    targetHandle,
+                    NodeNameCollisionType.COPY,
+                )
+            }.onSuccess { result ->
+                uiState.update {
+                    it.copy(
+                        publicCopyCollisionsResult = triggered(
+                            PublicCopyCollisionResult(
+                                result = result,
+                                targetHandle = targetHandle,
+                            )
+                        )
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Copies the single [PublicLinkFile] in `selectedNodes` into the user's account
+     * at [targetHandle] via [CopyPublicNodeUseCase]. SDK auto-renames on conflict.
+     * No-op for empty, multi-node, or non-public selections.
+     */
+    fun copyPublicLinkFile(targetHandle: Long) {
+        val publicNode = selectedPublicLinkFile() ?: return
+        val target = NodeId(targetHandle)
+        applicationScope.launch {
+            runCatching { copyPublicNodeUseCase(publicNode, target, null) }
+                .onSuccess {
+                    setCopyTargetPath(targetHandle)
+                    val message = moveRequestMessageMapper(
+                        MoveRequestResult.Copy(count = 1, errorCount = 0)
+                    )
+                    uiState.update {
+                        it.copy(infoToShowEvent = triggered(LocalizedText.Literal(message)))
+                    }
+                }
+                .onFailure {
+                    Timber.e(it)
+                    val message = moveRequestMessageMapper(
+                        MoveRequestResult.Copy(count = 0, errorCount = 1)
+                    )
+                    uiState.update {
+                        it.copy(infoToShowEvent = triggered(LocalizedText.Literal(message)))
+                    }
+                }
+        }
+    }
+
+    fun markHandlePublicCopyCollisionResult() {
+        uiState.update { it.copy(publicCopyCollisionsResult = consumed()) }
+    }
+
+    fun checkImportNameCollision(targetHandle: Long) {
+        val chatFile = selectedChatFile()
+        when {
+            selectedPublicLinkFile() != null -> checkPublicCopyCollision(targetHandle)
+            chatFile != null -> copyChatNode(chatFile, targetHandle)
+            else -> checkNodesNameCollision(
+                uiState.value.selectedNodes.map { it.id.longValue },
+                targetHandle,
+                NodeNameCollisionType.COPY,
+            )
+        }
+    }
+
+    private fun selectedPublicLinkFile(): PublicLinkFile? =
+        uiState.value.selectedNodes.singleOrNull() as? PublicLinkFile
+
+    private fun selectedChatFile(): ChatFile? =
+        uiState.value.selectedNodes.singleOrNull() as? ChatFile
+
+    /**
+     * Copy a chat attachment to the account.
+     *
+     * Attachments received from others are not in the account, so the generic pipeline
+     * ([checkNodesNameCollision] + [copyNodes]) cannot resolve them by handle.
+     * [CheckChatNodesNameCollisionAndCopyUseCase] resolves the node from the chat message,
+     * copies the non-conflicting nodes itself and reports conflicts as
+     * [mega.privacy.android.domain.entity.node.NodeNameCollision.Chat], which the collision
+     * screen resolves with a chat-aware copy.
+     */
+    private fun copyChatNode(chatFile: ChatFile, targetHandle: Long) {
+        applicationScope.launch {
+            runCatching {
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = chatFile.chatId,
+                    messageIds = listOf(chatFile.messageId),
+                    newNodeParent = NodeId(targetHandle),
+                )
+            }.onSuccess { result ->
+                if (result.collisionResult.conflictNodes.isNotEmpty()) {
+                    // The use case has already copied the non-conflicting nodes, so only
+                    // conflicts are forwarded; otherwise the collision handler would copy
+                    // them a second time.
+                    triggerCollisionsResult(
+                        result.collisionResult.copy(noConflictNodes = emptyMap())
+                    )
+                }
+                result.moveRequestResult?.let { copyResult ->
+                    setCopyTargetPath(targetHandle)
+                    uiState.update {
+                        it.copy(
+                            infoToShowEvent = triggered(
+                                LocalizedText.Literal(moveRequestMessageMapper(copyResult))
+                            )
+                        )
+                    }
+                }
+            }.onFailure {
+                manageCopyMoveError(it)
                 Timber.e(it)
             }
         }
@@ -233,6 +471,34 @@ class NodeOptionsActionViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Restore nodes (from rubbish bin or after resolving name collision).
+     * Similar to copy and move: takes a map of node handle to destination parent handle.
+     *
+     * @param nodes Map of node handle to restore destination (parent) handle
+     */
+    fun restoreNodes(nodes: Map<Long, Long>) {
+        applicationScope.launch {
+            runCatching {
+                restoreNodesUseCase(nodes)
+            }.onSuccess { result ->
+                val message = restoreNodeResultMapper(result)
+                if (result is SingleNodeRestoreResult && result.destinationHandle != null && nodes.size == 1) {
+                    onRestoreSuccess(
+                        message = message,
+                        parentHandle = result.destinationHandle ?: -1L,
+                        restoredNodeHandle = nodes.keys.first()
+                    )
+                } else {
+                    snackbarEventQueue.queueMessage(message)
+                }
+            }.onFailure {
+                manageCopyMoveError(it)
+                Timber.e(it)
+            }
+        }
+    }
+
     private fun manageCopyMoveError(error: Throwable?) = when (error) {
         is ForeignNodeException -> uiState.update { it.copy(showForeignNodeDialog = triggered) }
         is QuotaExceededMegaException -> uiState.update {
@@ -276,13 +542,17 @@ class NodeOptionsActionViewModel @Inject constructor(
     /**
      * Delete version history of selected node
      */
-    fun deleteVersionHistory(it: Long) = applicationScope.launch {
-        val result = runCatching {
-            deleteNodeVersionsUseCase(NodeId(it))
+    fun deleteVersionHistory(nodeId: Long?) = applicationScope.launch {
+        nodeId?.let { long ->
+            val result = runCatching {
+                deleteNodeVersionsUseCase(NodeId(long))
+            }
+            versionHistoryRemoveMessageMapper(result.exceptionOrNull()).let {
+                snackbarEventQueue.queueMessage(it)
+            }
         }
-        versionHistoryRemoveMessageMapper(result.exceptionOrNull()).let {
-            snackBarHandler.postSnackbarMessage(it)
-        }
+
+        dismiss()
     }
 
     /**
@@ -308,29 +578,93 @@ class NodeOptionsActionViewModel @Inject constructor(
             withContext(NonCancellable) {
                 val filteredFolderNodes = nodes.filterIsInstance<TypedFolderNode>()
 
-                filteredFolderNodes.forEach { folderNode ->
-                    runCatching { createShareKeyUseCase(folderNode) }
-                }
+                val warning = getShareFolderSensitiveWarning(filteredFolderNodes)
 
-                val hasBackUpNodes = filteredFolderNodes
-                    .any { folderNode ->
-                        runCatching {
-                            checkBackupNodeTypeUseCase(folderNode) != BackupNodeType.NonBackupNode
-                        }.getOrDefault(false)
-                    }
-
-                val nodeIds = filteredFolderNodes.map { it.id.longValue }
-
-                if (hasBackUpNodes) {
+                if (warning != SensitiveNodeShareWarning.None) {
+                    pendingSensitiveShareFolderNodes = filteredFolderNodes
+                    val nodeIds = filteredFolderNodes.map { it.id.longValue }
                     uiState.update { state ->
-                        state.copy(shareFolderDialogEvent = triggered(nodeIds))
+                        state.copy(
+                            shareHiddenNodeWarningEvent = triggered(
+                                nodeIds to (warning == SensitiveNodeShareWarning.Folders)
+                            )
+                        )
                     }
                 } else {
-                    uiState.update { state ->
-                        state.copy(shareFolderEvent = triggered(nodeIds))
-                    }
+                    proceedShareFolderAfterSensitiveCheck(filteredFolderNodes)
                 }
             }
+        }
+    }
+
+    /**
+     * Resolves the hidden/sensitive-node share warning for [folderNodes].
+     *
+     * When [AppFeatures.ContactsComposeUI] is off the legacy `AddContactActivity` runs its own
+     * hidden-node check, so this warning is skipped to avoid showing it twice.
+     */
+    private suspend fun getShareFolderSensitiveWarning(
+        folderNodes: List<TypedFolderNode>,
+    ): SensitiveNodeShareWarning {
+        val contactsComposeUIEnabled = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+        }.getOrDefault(false)
+        if (!contactsComposeUIEnabled) return SensitiveNodeShareWarning.None
+
+        return runCatching {
+            getShareFolderSensitiveWarningUseCase(folderNodes.map { it.id })
+        }.getOrDefault(SensitiveNodeShareWarning.None)
+    }
+
+    /**
+     * Continues the share once the sensitive-node warning (if any) has been resolved: creates the
+     * share keys, then routes to the backup-share dialog or straight to the contact picker.
+     */
+    private suspend fun proceedShareFolderAfterSensitiveCheck(folderNodes: List<TypedFolderNode>) {
+        folderNodes.forEach { folderNode ->
+            runCatching { createShareKeyUseCase(folderNode) }
+        }
+
+        val hasBackUpNodes = folderNodes
+            .any { folderNode ->
+                runCatching {
+                    checkBackupNodeTypeUseCase(folderNode) != BackupNodeType.NonBackupNode
+                }.getOrDefault(false)
+            }
+
+        val nodeIds = folderNodes.map { it.id.longValue }
+
+        if (hasBackUpNodes) {
+            uiState.update { state ->
+                state.copy(shareFolderDialogEvent = triggered(nodeIds))
+            }
+        } else {
+            pendingShareFolderHandles = nodeIds
+            uiState.update { state ->
+                state.copy(shareFolderEvent = triggered(nodeIds))
+            }
+        }
+    }
+
+    /**
+     * Continues the share after the user confirms the hidden/sensitive-node warning. The backup
+     * check still runs afterwards, so the backup dialog may be shown next.
+     */
+    fun onShareHiddenNodeWarningConfirmed(nodeHandles: List<Long>) {
+        val folderNodes = pendingSensitiveShareFolderNodes
+            .filter { it.id.longValue in nodeHandles }
+        pendingSensitiveShareFolderNodes = emptyList()
+        viewModelScope.launch {
+            withContext(NonCancellable) {
+                resetShareHiddenNodeWarningEvent()
+                proceedShareFolderAfterSensitiveCheck(folderNodes)
+            }
+        }
+    }
+
+    fun resetShareHiddenNodeWarningEvent() {
+        uiState.update {
+            it.copy(shareHiddenNodeWarningEvent = consumed())
         }
     }
 
@@ -340,10 +674,30 @@ class NodeOptionsActionViewModel @Inject constructor(
         }
     }
 
+    fun triggerShareFolderFromDialogResult(nodeHandles: List<Long>) {
+        pendingShareFolderHandles = nodeHandles
+        uiState.update { state ->
+            state.copy(shareFolderEvent = triggered(nodeHandles))
+        }
+    }
+
     fun resetShareFolderEvent() {
         uiState.update {
             it.copy(shareFolderEvent = consumed())
         }
+    }
+
+    /**
+     * Contacts selected in the add-contacts picker for the pending folder share.
+     *
+     * The picker returns only the selected emails; the target node handles are the
+     * ones retained when the share was triggered.
+     *
+     * @param contactsData Emails of the contacts to share the folder with.
+     */
+    fun contactSelectedForShareFolder(contactsData: List<String>) {
+        contactSelectedForShareFolder(contactsData, pendingShareFolderHandles)
+        pendingShareFolderHandles = emptyList()
     }
 
     /**
@@ -406,7 +760,8 @@ class NodeOptionsActionViewModel @Inject constructor(
                     )
                 val message = nodeSendToChatMessageMapper(attachNodeRequest)
                 message?.let {
-                    snackBarHandler.postSnackbarMessage(it)
+                    snackbarEventQueue.queueMessage(it)
+                    dismiss()
                 }
             }
         }
@@ -429,12 +784,53 @@ class NodeOptionsActionViewModel @Inject constructor(
      *                          It should be true only if the widget is not visible.
      */
     fun downloadNode(withStartMessage: Boolean) {
-        uiState.value.selectedNodes.let { nodes ->
+        val nodes = uiState.value.selectedNodes
+        val downloadNodes = if (nodeSourceType == NodeSourceType.FOLDER_LINK
+            || nodeSourceType == NodeSourceType.FILE_LINK
+        ) {
+            runCatching {
+                nodes.map { mapTypedNodeToPublicLinkUseCase(it) }
+            }.getOrDefault(nodes)
+        } else {
+            nodes
+        }
+        uiState.update {
+            it.copy(
+                downloadEvent = triggered(
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = downloadNodes,
+                        withStartMessage = withStartMessage,
+                    )
+                )
+            )
+        }
+    }
+
+    /**
+     * Download a local zip file entry by sharing it via a content URI.
+     * Triggers [mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.CopyUri]
+     * using a FileProvider URI for the local file.
+     *
+     * @param node The [ZipFileTypedNode] representing the local file inside the zip archive.
+     * @param withStartMessage Whether to show a start message. Should be true only if the widget is not visible.
+     */
+    fun downloadZipFile(node: ZipFileTypedNode, withStartMessage: Boolean) {
+        runCatching {
+            val uri = FileProvider.getUriForFile(
+                applicationContext,
+                "${applicationContext.packageName}$FILE_PROVIDER_SUFFIX",
+                node.file
+            )
+            UriPath(uri.toString())
+        }.onFailure {
+            Timber.e(it, "get file uri failed")
+        }.onSuccess { uriPath ->
             uiState.update {
                 it.copy(
                     downloadEvent = triggered(
-                        TransferTriggerEvent.StartDownloadNode(
-                            nodes = nodes,
+                        TransferTriggerEvent.CopyUri(
+                            name = node.name,
+                            uriPath = uriPath,
                             withStartMessage = withStartMessage,
                         )
                     )
@@ -472,24 +868,23 @@ class NodeOptionsActionViewModel @Inject constructor(
     }
 
     /**
-     * Download node for offline
+     * Download nodes for offline
      * Triggers TransferTriggerEvent.StartDownloadNode with parameter [mega.privacy.android.domain.entity.node.TypedNode]
      *
+     * @param nodes list of TypedNode
      * @param withStartMessage  Whether show start message or not.
      *                          It should be true only if the widget is not visible.
      */
-    fun downloadNodeForOffline(withStartMessage: Boolean) {
-        uiState.value.selectedNodes.firstOrNull().let { node ->
-            uiState.update {
-                it.copy(
-                    downloadEvent = triggered(
-                        TransferTriggerEvent.StartDownloadForOffline(
-                            node = node,
-                            withStartMessage = withStartMessage,
-                        )
+    fun downloadNodesForOffline(nodes: List<TypedNode>, withStartMessage: Boolean) {
+        uiState.update {
+            it.copy(
+                downloadEvent = triggered(
+                    TransferTriggerEvent.StartDownloadForOffline(
+                        nodes = nodes,
+                        withStartMessage = withStartMessage,
                     )
                 )
-            }
+            )
         }
     }
 
@@ -543,34 +938,44 @@ class NodeOptionsActionViewModel @Inject constructor(
      *
      * @param fileNode
      */
-    suspend fun handleFileNodeClicked(fileNode: TypedFileNode) = when {
-        fileNode.type is PdfFileTypeInfo -> FileNodeContent.Pdf(
-            uri = getNodeContentUriUseCase(fileNode)
-        )
-
-        fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForNode
-
-        fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.Companion.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
-
-        fileNode.type is VideoFileTypeInfo || fileNode.type is AudioFileTypeInfo -> {
-            FileNodeContent.AudioOrVideo(
+    suspend fun handleFileNodeClicked(fileNode: TypedFileNode): FileNodeContent {
+        val fileType = resolveFileType(fileNode)
+        return when {
+            fileType is PdfFileTypeInfo -> FileNodeContent.Pdf(
                 uri = getNodeContentUriUseCase(fileNode)
             )
-        }
 
-        fileNode.type is UrlFileTypeInfo -> {
-            val content = getNodeContentUriUseCase(fileNode)
-            val path = getPathFromNodeContentUseCase(content)
-            FileNodeContent.UrlContent(
-                uri = content,
-                path = path
+            fileType is ImageFileTypeInfo -> FileNodeContent.ImageForNode
+
+            fileType is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.Companion.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
+
+            fileType is VideoFileTypeInfo || fileType is AudioFileTypeInfo -> {
+                FileNodeContent.AudioOrVideo(
+                    uri = getNodeContentUriUseCase(fileNode)
+                )
+            }
+
+            fileType is UrlFileTypeInfo -> {
+                val content = getNodeContentUriUseCase(fileNode)
+                val path = getPathFromNodeContentUseCase(content)
+                FileNodeContent.UrlContent(
+                    uri = content,
+                    path = path
+                )
+            }
+
+            else -> FileNodeContent.Other(
+                localFile = getNodePreviewFileUseCase(fileNode)
             )
         }
-
-        else -> FileNodeContent.Other(
-            localFile = getNodePreviewFileUseCase(fileNode)
-        )
     }
+
+    private suspend fun resolveFileType(fileNode: TypedFileNode) =
+        if (fileNode.type is UnMappedFileTypeInfo) {
+            getFileTypeInfoByContentUseCase(fileNode)
+        } else {
+            fileNode.type
+        }
 
     /**
      * Apply node content uri
@@ -600,23 +1005,23 @@ class NodeOptionsActionViewModel @Inject constructor(
                             updateNodeSensitiveUseCase(nodeId = node.id, isSensitive = isHidden)
                         }
                     }
-                    uiState.update { state ->
-                        state.copy(
-                            infoToShowEvent = triggered(
-                                if (isHidden) {
-                                    LocalizedText.PluralsRes(
-                                        resId = R.plurals.hidden_nodes_result_message,
-                                        quantity = selectedNodes.size,
-                                    )
-                                } else {
-                                    LocalizedText.PluralsRes(
-                                        resId = sharedResR.plurals.unhidden_nodes_result_message,
-                                        quantity = selectedNodes.size,
-                                    )
-                                }
-                            )
+
+                    val message = if (isHidden) {
+                        LocalizedText.PluralsRes(
+                            resId = NodesR.plurals.hidden_nodes_result_message,
+                            quantity = selectedNodes.size,
+                            formatArgs = listOf(selectedNodes.size)
+                        )
+                    } else {
+                        LocalizedText.PluralsRes(
+                            resId = sharedResR.plurals.unhidden_nodes_result_message,
+                            quantity = selectedNodes.size,
+                            formatArgs = listOf(selectedNodes.size)
                         )
                     }
+
+                    snackbarEventQueue.queueMessage(message.get(applicationContext))
+                    dismiss()
                 }
             }.onFailure { Timber.e(it) }
         }
@@ -652,6 +1057,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     ) {
         val handler = singleNodeActionHandlers.find { it.canHandle(action) }
         if (handler != null) {
+            nodeOptionsActionEventSender(action, nodeSourceType)
             block(handler)
         } else {
             throw IllegalArgumentException("Action $action does not have a handler.")
@@ -671,6 +1077,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     ) {
         val handler = multipleNodesActionHandlers.find { it.canHandle(action) }
         if (handler != null) {
+            nodeOptionsActionEventSender(action, nodeSourceType)
             block(handler)
         } else {
             throw IllegalArgumentException("Action $action does not have a handler.")
@@ -687,8 +1094,20 @@ class NodeOptionsActionViewModel @Inject constructor(
         }
     }
 
-    fun postMessage(message: String) =
-        snackBarHandler.postSnackbarMessage(message)
+    fun postMessage(message: String) {
+        applicationScope.launch {
+            snackbarEventQueue.queueMessage(message)
+            dismiss()
+        }
+    }
+
+    fun triggerLoginRequiredEvent() {
+        uiState.update { it.copy(loginRequiredEvent = triggered) }
+    }
+
+    fun resetLoginRequiredEvent() {
+        uiState.update { it.copy(loginRequiredEvent = consumed) }
+    }
 
     fun updateSelectionModeAvailableActions(
         selectedNodes: Set<TypedNode>,
@@ -726,12 +1145,14 @@ class NodeOptionsActionViewModel @Inject constructor(
                 hasNodeAccessPermission = hasAccessPermission,
                 selectedNodes = selectedNodes.toList(),
                 allNodeCanBeMovedToTarget = canBeMovedToTarget,
-                noNodeInBackups = !anyNodeInBackups
+                noNodeInBackups = !anyNodeInBackups,
+                nodeSourceType = nodeSourceType
+            ).orderAction(
+                nodeSourceType, selectedNodes.size > 1
             ).map { it.action }
-                .sortedBy { it.orderInCategory }
 
             val visibleActions = if (availableActions.size > DEFAULT_MAX_VISIBLE_ITEMS) {
-                availableActions.take(DEFAULT_MAX_VISIBLE_ITEMS) + NodeSelectionAction.More
+                availableActions.take(DEFAULT_MAX_VISIBLE_ITEMS) + CommonMenuAction.More
             } else {
                 availableActions
             }
@@ -743,6 +1164,23 @@ class NodeOptionsActionViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun List<NodeSelectionModeMenuItem>.orderAction(
+        nodeSourceType: NodeSourceType, isMultipleSelected: Boolean,
+    ): List<NodeSelectionModeMenuItem> {
+        val baseList = sortedBy { it.action.orderInCategory }
+
+        // When NodeSourceType is Links and multiple nodes are selected, sort the items by orderInCategory.
+        if (nodeSourceType == NodeSourceType.LINKS && isMultipleSelected) return baseList
+
+        val topActions = filter { it.showAsActionOrder != null }
+            .sortedBy { it.showAsActionOrder }
+            .take(DEFAULT_MAX_VISIBLE_ITEMS)
+
+        val remaining = baseList.filterNot { it in topActions }
+
+        return topActions + remaining
     }
 
     private suspend fun canSelectedNodesBeMovedToRubbishBin(
@@ -767,4 +1205,135 @@ class NodeOptionsActionViewModel @Inject constructor(
                 isNodeInBackupsUseCase(handle = it.id.longValue)
             }.getOrDefault(false)
         }
+
+    private fun onRestoreSuccess(
+        message: String,
+        parentHandle: Long,
+        restoredNodeHandle: Long,
+    ) {
+        viewModelScope.launch {
+            uiState.update {
+                it.copy(
+                    restoreSuccessEvent = triggered(
+                        RestoreData(
+                            message = message,
+                            parentHandle = parentHandle,
+                            restoredNodeHandle = restoredNodeHandle
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    fun resetRestoreSuccessEvent() {
+        uiState.update {
+            it.copy(restoreSuccessEvent = consumed())
+        }
+    }
+
+    suspend fun onRemoveFromOfflineSuccess(size: Int) {
+        if (size > 1) {
+            snackbarEventQueue.queueMessage(
+                sharedResR.string.offline_remove_multiple_item_success_message,
+                size
+            )
+        } else {
+            snackbarEventQueue.queueMessage(
+                sharedResR.string.remove_from_offline_success_message
+            )
+        }
+
+        dismiss()
+    }
+
+    fun viewFileInFolder(node: TypedNode) {
+        viewModelScope.launch {
+            runCatching {
+                val nodeLocation = getNodeLocationUseCase(node)
+                nodeDestinationMapper(nodeLocation)
+            }.onSuccess { destinations ->
+                navigationEventQueue.emit(destinations)
+                uiState.update { it.copy(dismissEvent = triggered) }
+            }
+        }
+    }
+
+    fun navigateWithNavKey(navKey: NavKey) {
+        uiState.update {
+            it.copy(navigationEvent = triggered(navKey))
+        }
+    }
+
+    fun resetNavigationEvent() {
+        uiState.update {
+            it.copy(navigationEvent = consumed())
+        }
+    }
+
+    fun dismiss() {
+        uiState.update {
+            it.copy(dismissEvent = triggered)
+        }
+    }
+
+    fun resetDismiss() {
+        uiState.update {
+            it.copy(dismissEvent = consumed)
+        }
+    }
+
+    fun triggerAddVideoToPlaylistResultEvent(result: AddVideoToPlaylistResult) {
+        uiState.update {
+            it.copy(addVideoToPlaylistResultEvent = triggered(result))
+        }
+    }
+
+    fun resetAddVideoToPlaylistResultEvent() {
+        uiState.update {
+            it.copy(addVideoToPlaylistResultEvent = consumed())
+        }
+    }
+
+    fun onActionTriggered() {
+        uiState.update {
+            it.copy(actionTriggeredEvent = triggered)
+        }
+    }
+
+    fun resetActionTriggered() {
+        uiState.update {
+            it.copy(actionTriggeredEvent = consumed)
+        }
+    }
+
+    fun triggerCollisionsResult(result: NodeNameCollisionsResult) {
+        uiState.update {
+            it.copy(nodeNameCollisionsResult = triggered(result))
+        }
+    }
+
+    internal fun removeRecentlyWatchedItem(handle: Long) {
+        viewModelScope.launch {
+            runCatching {
+                removeRecentlyWatchedItemUseCase(handle)
+            }.onSuccess {
+                snackbarEventQueue.queueMessage(
+                    sharedResR.string.video_section_message_remove_recently_watched_item
+                )
+            }.onFailure {
+                Timber.e(it)
+            }
+            dismiss()
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(nodeSourceType: NodeSourceType?): NodeOptionsActionViewModel
+    }
+
+    companion object {
+        private const val FILE_PROVIDER_SUFFIX = ".providers.fileprovider"
+    }
 }

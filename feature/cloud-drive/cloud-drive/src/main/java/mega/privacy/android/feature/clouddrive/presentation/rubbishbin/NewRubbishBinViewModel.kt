@@ -19,27 +19,22 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
@@ -49,10 +44,13 @@ import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import mega.privacy.android.feature.clouddrive.R
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model.NewRubbishBinUiState
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 
@@ -66,8 +64,8 @@ import timber.log.Timber
  * @param setViewType [mega.privacy.android.domain.usecase.viewtype.SetViewType] to set view type
  * @param monitorViewType [mega.privacy.android.domain.usecase.viewtype.MonitorViewType] check view type
  * @param getRubbishBinFolderUseCase [mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase]
- * @param nodeUiItemMapper [mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper] to convert TypedNode to NodeUiItem
- * @param nodeSortConfigurationUiMapper [mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper] for sort configuration mapping
+ * @param nodeUiItemMapper [mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper] to convert TypedNode to NodeUiItem
+ * @param nodeSortConfigurationUiMapper [mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper] for sort configuration mapping
  */
 @HiltViewModel(assistedFactory = NewRubbishBinViewModel.Factory::class)
 class NewRubbishBinViewModel @AssistedInject constructor(
@@ -83,7 +81,6 @@ class NewRubbishBinViewModel @AssistedInject constructor(
     private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val cleanRubbishBinUseCase: CleanRubbishBinUseCase,
@@ -92,6 +89,7 @@ class NewRubbishBinViewModel @AssistedInject constructor(
     @Assisted private val navKey: RubbishBinNavKey,
 ) : ViewModel() {
     private val args = navKey
+    private val highlightedNodeId = navKey.highlightedNodeHandle?.let { NodeId(it) }
 
     /**
      * The RubbishBin UI State
@@ -110,43 +108,31 @@ class NewRubbishBinViewModel @AssistedInject constructor(
     private var loadNodeChunksJob: Job? = null
 
     init {
-        setRubbishBinFolderHandle()
         setupNodesLoading()
         nodeUpdates()
         monitorViewTypeChanges()
         getCloudSortOrderAndRefresh()
-        viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorAccountDetail()
-            }
-        }
-    }
-
-    private fun setRubbishBinFolderHandle() {
-        viewModelScope.launch {
-            Timber.d("Rubbish bin handle: ${args.handle}")
-            runCatching {
-                args.handle ?: getRubbishBinFolderUseCase()?.id?.longValue
-                ?: MegaApiJava.INVALID_HANDLE
-            }.onSuccess { handle ->
-                _uiState.update { it.copy(currentFolderId = NodeId(handle)) }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
+        monitorAccountDetail()
     }
 
     private fun setupNodesLoading() {
         loadNodeChunksJob = viewModelScope.launch {
-            val folderId = uiState.value.currentFolderId
-            val folderOrRootNodeId = if (folderId.longValue == -1L) {
-                getRubbishBinFolderUseCase()?.let { NodeId(it.id.longValue) } ?: folderId
+            val handle = args.handle
+            val folderOrRootNodeId = if (handle == null) {
+                getRubbishBinFolderUseCase()?.let { NodeId(it.id.longValue) } ?: NodeId(-1L)
             } else {
-                folderId
+                NodeId(handle)
             }
+            val title = if (handle == null) {
+                LocalizedText.StringRes(sharedR.string.general_section_rubbish_bin)
+            } else {
+                val currentNode = getNodeByIdUseCase(folderOrRootNodeId)
+                LocalizedText.Literal(currentNode?.name.orEmpty())
+            }
+            _uiState.update { it.copy(title = title, currentFolderId = folderOrRootNodeId) }
             getNodesByIdInChunkUseCase(folderOrRootNodeId)
-                .catch {
-                    Timber.e(it)
+                .catch { error ->
+                    Timber.e(error)
                     _uiState.update {
                         it.copy(
                             nodesLoadingState = NodesLoadingState.Failed
@@ -158,6 +144,7 @@ class NewRubbishBinViewModel @AssistedInject constructor(
                         nodeList = nodes,
                         nodeSourceType = NodeSourceType.RUBBISH_BIN,
                         existingItems = uiState.value.items,
+                        highlightedNodeId = highlightedNodeId,
                     )
                     _uiState.update { state ->
                         state.copy(
@@ -172,13 +159,6 @@ class NewRubbishBinViewModel @AssistedInject constructor(
                     }
                 }
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     /**
@@ -251,7 +231,6 @@ class NewRubbishBinViewModel @AssistedInject constructor(
                 _uiState.update {
                     it.copy(
                         accountType = accountType,
-                        isHiddenNodesEnabled = true,
                         isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
                     )
                 }
@@ -292,6 +271,7 @@ class NewRubbishBinViewModel @AssistedInject constructor(
                     nodeList = nodeList,
                     existingItems = _uiState.value.items,
                     nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                    highlightedNodeId = highlightedNodeId,
                 )
 
                 // Update title
@@ -460,9 +440,9 @@ class NewRubbishBinViewModel @AssistedInject constructor(
             cleanRubbishBinUseCase()
         }.onFailure { throwable ->
             Timber.e(throwable)
-            setMessage(LocalizedText.StringRes(R.string.rubbish_bin_no_emptied))
+            setMessage(LocalizedText.StringRes(sharedR.string.empty_rubbish_bin_error_message))
         }.onSuccess {
-            setMessage(LocalizedText.StringRes(R.string.rubbish_bin_emptied))
+            setMessage(LocalizedText.StringRes(sharedR.string.empty_rubbish_bin_success_message))
             refreshNodes()
         }
     }

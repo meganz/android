@@ -1,9 +1,11 @@
 package mega.privacy.android.data.facade
 
+import mega.privacy.android.data.constant.HttpServerConstant
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaFileServiceReclaimOptions
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSearchFilter
@@ -39,7 +41,10 @@ internal class MegaApiFolderFacade @Inject constructor(
 
     override suspend fun httpServerIsRunning(): Int = megaApiFolder.httpServerIsRunning()
 
-    override suspend fun httpServerStart(): Boolean = megaApiFolder.httpServerStart()
+    override suspend fun httpServerStart(): Boolean = megaApiFolder.httpServerStart(
+        HttpServerConstant.HTTP_SERVER_LOCAL_ONLY,
+        HttpServerConstant.FOLDER_API_HTTP_SERVER_PORT,
+    )
 
     override suspend fun httpServerSetMaxBufferSize(bufferSize: Int) =
         megaApiFolder.httpServerSetMaxBufferSize(bufferSize)
@@ -102,5 +107,9 @@ internal class MegaApiFolderFacade @Inject constructor(
 
     override suspend fun reconnect() {
         megaApiFolder.reconnect()
+    }
+
+    override fun fileServiceSetReclaimOptions(options: MegaFileServiceReclaimOptions?) {
+        megaApiFolder.fileServiceSetReclaimOptions(options)
     }
 }

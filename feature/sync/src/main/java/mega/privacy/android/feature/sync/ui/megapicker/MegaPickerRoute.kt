@@ -5,19 +5,20 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.FolderClicked
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogConfirmButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDismissButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDisplayedEvent
@@ -44,13 +45,14 @@ internal fun MegaPickerRoute(
         currentFolder = state.value.currentFolder,
         nodes = state.value.nodes,
         folderClicked = { viewModel.handleAction(FolderClicked(it)) },
+        disabledFolderClicked = { viewModel.handleAction(MegaPickerAction.DisabledFolderClicked(it)) },
         currentFolderSelected = {
             selectCurrentFolder(viewModel, syncPermissionsManager)
         },
         fileTypeIconMapper = fileTypeIconMapper,
-        errorMessageId = state.value.errorMessageId,
-        errorMessageShown = {
-            viewModel.handleAction(MegaPickerAction.ErrorMessageShown)
+        snackbarMessage = state.value.snackbarMessage,
+        snackbarMessageShown = {
+            viewModel.handleAction(MegaPickerAction.SnackbarShown)
         },
         onCreateNewFolderDialogSuccess = { newFolderName ->
             viewModel.createFolder(
@@ -59,7 +61,7 @@ internal fun MegaPickerRoute(
         },
         isLoading = state.value.isLoading,
         isSelectEnabled = state.value.isSelectEnabled,
-        isStopBackupMegaPicker = isStopBackupMegaPicker,
+        isStopBackupMegaPicker = isStopBackupMegaPicker
     )
 
     val onBack = {
@@ -71,7 +73,9 @@ internal fun MegaPickerRoute(
     }
 
     if (state.value.showAllFilesAccessDialog) {
-        Analytics.tracker.trackEvent(AndroidSyncAllFilesAccessDialogDisplayedEvent)
+        LaunchedEffect(Unit) {
+            Analytics.tracker.trackEvent(AndroidSyncAllFilesAccessDialogDisplayedEvent)
+        }
         AllFilesAccessDialog(
             onConfirm = {
                 viewModel.handleAction(MegaPickerAction.AllFilesAccessPermissionDialogShown)
@@ -92,6 +96,21 @@ internal fun MegaPickerRoute(
             },
             onDismiss = {
                 viewModel.handleAction(MegaPickerAction.DisableBatteryOptimizationsDialogShown)
+                selectCurrentFolder(viewModel, syncPermissionsManager)
+            },
+        )
+    }
+
+    // Remove folder connection dialog
+    if (state.value.showRemoveConnectionDialog) {
+        RemoveConnectionDialog(
+            deviceName = state.value.selectedDisabledFolder?.deviceName
+                ?: "",
+            onConfirm = {
+                viewModel.handleAction(MegaPickerAction.RemoveConnectionConfirmed)
+            },
+            onDismiss = {
+                viewModel.handleAction(MegaPickerAction.RemoveConnectionDialogDismissed)
             },
         )
     }
@@ -176,6 +195,40 @@ private fun AllFilesAccessDialogPreview() {
 private fun DisableBatteryOptimizationDialogPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         DisableBatteryOptimizationDialog(
+            onConfirm = {},
+            onDismiss = {},
+        )
+    }
+}
+
+/**
+ * Dialog to confirm removal of folder connection
+ */
+@Composable
+private fun RemoveConnectionDialog(
+    deviceName: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ConfirmationDialog(
+        title = stringResource(id = sharedResR.string.sync_folder_connection_dialog_title),
+        text = stringResource(
+            id = sharedResR.string.sync_folder_connection_dialog_message,
+            deviceName
+        ),
+        confirmButtonText = stringResource(id = sharedResR.string.device_center_bottom_sheet_item_remove_connection),
+        cancelButtonText = stringResource(id = android.R.string.cancel),
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
+    )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun RemoveConnectionDialogPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        RemoveConnectionDialog(
+            deviceName = "My Device",
             onConfirm = {},
             onDismiss = {},
         )

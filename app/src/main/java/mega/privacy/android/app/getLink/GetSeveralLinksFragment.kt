@@ -35,7 +35,6 @@ import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_ENABLED
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import java.util.UUID
@@ -94,7 +93,7 @@ class GetSeveralLinksFragment : Fragment() {
 
     private fun initialize() {
         viewLifecycleOwner.lifecycleScope.launch {
-            if (isHiddenNodesActive() && !viewModel.isInitialized()) {
+            if (!viewModel.isInitialized()) {
                 checkSensitiveItems()
             } else {
                 initNodes()
@@ -103,13 +102,6 @@ class GetSeveralLinksFragment : Fragment() {
                 setupObservers()
             }
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     private fun checkSensitiveItems() {

@@ -1,8 +1,9 @@
 package mega.privacy.android.app.presentation.transfers.view.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -10,8 +11,13 @@ import androidx.navigation.toRoute
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.shared.account.overquota.OverQuotaStatusViewModel
 
 internal fun NavGraphBuilder.transfersScreen(
     onBackPress: () -> Unit,
@@ -22,7 +28,8 @@ internal fun NavGraphBuilder.transfersScreen(
         TransferRoute(
             args = args,
             onBackPress = onBackPress,
-            onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
+            onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+            navigationHandler = null,
         )
     }
 }
@@ -31,16 +38,31 @@ internal fun NavGraphBuilder.transfersScreen(
 private fun TransferRoute(
     args: TransfersNavKey,
     onBackPress: () -> Unit,
+    navigationHandler: NavigationHandler?,
     onNavigateToUpgradeAccount: () -> Unit,
 ) {
-    val viewModel = hiltViewModel<TransfersViewModel, TransfersViewModel.Factory>(
-        creationCallback = { factory ->
-            factory.create(args)
-        }
-    )
+    val viewModel = hiltViewModel<TransfersViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val overQuotaStatusViewModel = hiltViewModel<OverQuotaStatusViewModel>()
+    val overQuotaUiState by overQuotaStatusViewModel.uiState.collectAsStateWithLifecycle()
+
+    val initialTabIndex = when (args.tab) {
+        TransfersNavKey.Tab.Active -> ACTIVE_TAB_INDEX
+        TransfersNavKey.Tab.Completed -> COMPLETED_TAB_INDEX
+        TransfersNavKey.Tab.Failed -> FAILED_TAB_INDEX
+        null -> if (uiState.transferInError) {
+            FAILED_TAB_INDEX
+        } else {
+            ACTIVE_TAB_INDEX
+        }
+    }
+
+    LaunchedEffect(initialTabIndex) {
+        viewModel.updateSelectedTab(initialTabIndex)
+    }
 
     TransfersView(
+        initialTabIndex = initialTabIndex,
         onBackPress = onBackPress,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
         uiState = uiState,
@@ -70,19 +92,22 @@ private fun TransferRoute(
         onSelectAllCompletedTransfers = viewModel::selectAllCompletedTransfers,
         onSelectAllFailedTransfers = viewModel::selectAllFailedTransfers,
         onRetryTransfer = viewModel::retryFailedTransfer,
-        onConsumeQuotaWarning = viewModel::onConsumeQuotaWarning,
+        overQuotaStatus = overQuotaUiState.overQuotaStatus,
+        onConsumeQuotaWarning = overQuotaStatusViewModel::dismissWarning,
         onCancelActiveTransfer = viewModel::cancelActiveTransfer,
         onClearCompletedTransfer = viewModel::clearCompletedTransfer,
         onSetActiveTransferToCancel = viewModel::setActiveTransferToCancel,
         onUndoCancelActiveTransfer = viewModel::undoCancelActiveTransfer,
+        navigationHandler = navigationHandler,
     )
 }
 
 internal fun EntryProviderScope<NavKey>.transfersScreen3(
     onBackPress: () -> Unit,
     onNavigateToUpgradeAccount: () -> Unit,
+    navigationHandler: NavigationHandler,
 ) {
     entry<TransfersNavKey> {
-        TransferRoute(it, onBackPress, onNavigateToUpgradeAccount)
+        TransferRoute(it, onBackPress, navigationHandler, onNavigateToUpgradeAccount)
     }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="scroll_handle">@color/white</color>
+    <color name="scroll_bubble_text_color">@color/grey_alpha_050</color>
+
+    <!-- Base colors referenced above, only defined here since shared:resources does not provide them -->
+    <color name="white">#FFFFFF</color>
+    <color name="grey_alpha_050">#80000000</color>
+</resources>

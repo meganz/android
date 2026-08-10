@@ -1,0 +1,219 @@
+package mega.privacy.android.feature.photos.mapper
+
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.domain.entity.NodeLabel
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.ExportedData
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
+import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.minutes
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class VideoUiEntityMapperTest {
+    private lateinit var underTest: VideoUiEntityMapper
+
+    private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
+
+    private val expectedId = NodeId(123456L)
+    private val expectedParentId = NodeId(654321L)
+    private val expectedName = "video file name"
+    private val expectedSize: Long = 100
+    private val expectedAvailableOffline = true
+    private val expectedDurationTime = 10.minutes
+    private val expectedIsFavourite = false
+    private val expectedElementID = 2L
+    private val expectedNodeLabel = NodeLabel.RED
+    private val expectedExportedData = mock<ExportedData>()
+    private val expectedType = mock<VideoFileTypeInfo>()
+    private val expectedWatchedTimestamp = 100L
+    private val expectedCollectionTitle = "collection title"
+    private val expectedDurationString = "10:00"
+
+    @BeforeAll
+    fun setUp() {
+        whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(expectedDurationString)
+        underTest = VideoUiEntityMapper(durationInSecondsTextMapper)
+    }
+
+    @Test
+    fun `test that VideoUiEntity can be mapped correctly when exportedData is not null and isOutShare is false`() =
+        runTest {
+            val testNode = initTypedVideoNode(expectedExportedData, false)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertMappedVideoUiEntity(
+                videoUiEntity = videoUiEntity,
+                expectedIsShared = true
+            )
+        }
+
+    @Test
+    fun `test that VideoUiEntity can be mapped correctly when exportedData is not null and isOutShare is true`() =
+        runTest {
+            val testNode = initTypedVideoNode(expectedExportedData, true)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertMappedVideoUiEntity(
+                videoUiEntity = videoUiEntity,
+                expectedIsShared = true
+            )
+        }
+
+    @Test
+    fun `test that VideoUiEntity can be mapped correctly when exportedData is null and isOutShared is true`() =
+        runTest {
+            val testNode = initTypedVideoNode(null, true)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertMappedVideoUiEntity(
+                videoUiEntity = videoUiEntity,
+                expectedIsShared = true
+            )
+        }
+
+    @Test
+    fun `test that VideoUiEntity can be mapped correctly when exportedData is null and isOutShared is false`() =
+        runTest {
+            val testNode = initTypedVideoNode(null, false)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertMappedVideoUiEntity(
+                videoUiEntity = videoUiEntity,
+                expectedIsShared = false
+            )
+        }
+
+    @Test
+    fun `test that VideoUiEntity can be mapped correctly when when elementId is null`() =
+        runTest {
+            val testNode = initTypedVideoNode(
+                exportData = null,
+                expectedIsOutShared = false,
+                elementIDParam = null
+            )
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertMappedVideoUiEntity(
+                videoUiEntity = videoUiEntity,
+                expectedIsShared = false,
+                elementID = testNode.id.longValue
+            )
+        }
+
+    @Test
+    fun `test that isTakenDown is mapped to true when typedVideoNode isTakenDown is true`() =
+        runTest {
+            val testNode = initTypedVideoNode(expectedExportedData, false, isTakenDown = true)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertThat(videoUiEntity.isTakenDown).isTrue()
+        }
+
+    @Test
+    fun `test that isTakenDown is mapped to false when typedVideoNode isTakenDown is false`() =
+        runTest {
+            val testNode = initTypedVideoNode(expectedExportedData, false, isTakenDown = false)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertThat(videoUiEntity.isTakenDown).isFalse()
+        }
+
+    @Test
+    fun `test that locations contains AllLocations and CloudDrive when parentId is not in syncFolderIds`() =
+        runTest {
+            val testNode = initTypedVideoNode(null, false)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertThat(videoUiEntity.locations).containsExactly(
+                LocationFilterOption.AllLocations,
+                LocationFilterOption.CloudDrive
+            )
+        }
+
+    @Test
+    fun `test that locations contains AllLocations and CameraUploads when parentId is in syncFolderIds`() =
+        runTest {
+            val testNode = initTypedVideoNode(null, false)
+            val videoUiEntity = underTest(testNode, listOf(expectedParentId.longValue))
+            assertThat(videoUiEntity.locations).containsExactly(
+                LocationFilterOption.AllLocations,
+                LocationFilterOption.CameraUploads
+            )
+        }
+
+    @Test
+    fun `test that locations contains SharedItems when exportedData is not null`() =
+        runTest {
+            val testNode = initTypedVideoNode(expectedExportedData, false)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertThat(videoUiEntity.locations).containsExactly(
+                LocationFilterOption.AllLocations,
+                LocationFilterOption.CloudDrive,
+                LocationFilterOption.SharedItems
+            )
+        }
+
+    @Test
+    fun `test that locations contains SharedItems when isOutShared is true`() =
+        runTest {
+            val testNode = initTypedVideoNode(null, true)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertThat(videoUiEntity.locations).containsExactly(
+                LocationFilterOption.AllLocations,
+                LocationFilterOption.CloudDrive,
+                LocationFilterOption.SharedItems
+            )
+        }
+
+    private fun initTypedVideoNode(
+        exportData: ExportedData?,
+        expectedIsOutShared: Boolean,
+        elementIDParam: Long? = expectedElementID,
+        isTakenDown: Boolean = false,
+    ) = mock<TypedVideoNode> {
+        on { id }.thenReturn(expectedId)
+        on { parentId }.thenReturn(expectedParentId)
+        on { name }.thenReturn(expectedName)
+        on { size }.thenReturn(expectedSize)
+        on { isFavourite }.thenReturn(expectedIsFavourite)
+        on { isAvailableOffline }.thenReturn(expectedAvailableOffline)
+        on { duration }.thenReturn(expectedDurationTime)
+        on { exportedData }.thenReturn(exportData)
+        on { elementID }.thenReturn(elementIDParam)
+        on { nodeLabel }.thenReturn(expectedNodeLabel)
+        on { type }.thenReturn(expectedType)
+        on { isOutShared }.thenReturn(expectedIsOutShared)
+        on { watchedTimestamp }.thenReturn(expectedWatchedTimestamp)
+        on { collectionTitle }.thenReturn(expectedCollectionTitle)
+        on { this.isTakenDown }.thenReturn(isTakenDown)
+    }
+
+    private fun assertMappedVideoUiEntity(
+        videoUiEntity: VideoUiEntity,
+        expectedIsShared: Boolean,
+        elementID: Long = expectedElementID
+    ) {
+        videoUiEntity.let {
+            assertAll(
+                "Grouped Assertions of ${VideoUiEntity::class.simpleName}",
+                { assertThat(it.id).isEqualTo(expectedId) },
+                { assertThat(it.parentId).isEqualTo(expectedParentId) },
+                { assertThat(it.name).isEqualTo(expectedName) },
+                { assertThat(it.size).isEqualTo(expectedSize) },
+                { assertThat(it.duration).isEqualTo(expectedDurationTime) },
+                { assertThat(it.nodeAvailableOffline).isEqualTo(expectedAvailableOffline) },
+                { assertThat(it.isFavourite).isEqualTo(expectedIsFavourite) },
+                { assertThat(it.isSharedItems).isEqualTo(expectedIsShared) },
+                { assertThat(it.elementID).isEqualTo(elementID) },
+                { assertThat(it.nodeLabel).isEqualTo(expectedNodeLabel) },
+                { assertThat(it.fileTypeInfo).isEqualTo(expectedType) },
+                { assertThat(it.watchedDate).isEqualTo(expectedWatchedTimestamp) },
+                { assertThat(it.collectionTitle).isEqualTo(expectedCollectionTitle) },
+                { assertThat(it.durationString).isEqualTo(expectedDurationString) },
+            )
+        }
+    }
+}

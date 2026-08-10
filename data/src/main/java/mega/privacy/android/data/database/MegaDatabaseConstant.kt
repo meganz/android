@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 114
+    const val DATABASE_VERSION = 123
 
     /**
      * Database Name
@@ -31,9 +31,9 @@ object MegaDatabaseConstant {
     const val TABLE_COMPLETED_TRANSFERS_LEGACY = "completedtransfers"
 
     /**
-     * Table Active Transfers
+     * Table Active Transfers, not used anymore, keep the constant for database migration purposes only
      */
-    const val TABLE_ACTIVE_TRANSFERS = "active_transfers"
+    const val TABLE_ACTIVE_TRANSFERS_LEGACY = "active_transfers"
 
     /**
      * Table Active Transfer Groups
@@ -104,4 +104,52 @@ object MegaDatabaseConstant {
      * Table for home widget configuration
      */
     const val TABLE_HOME_WIDGET_CONFIGURATION = "home_widget_configuration"
+
+    /**
+     * Table for home pinned items
+     */
+    const val TABLE_HOME_PINNED_ITEM = "home_pinned_item"
+
+    /**
+     * Table for recent searches
+     */
+    const val TABLE_RECENT_SEARCH = "recent_search"
+
+    /**
+     * Table for recently used type lookup
+     */
+    const val TABLE_RECENTLY_USED_TYPE = "recently_used_type"
+
+    /**
+     * Table for recently used items (continue where you left off)
+     */
+    const val TABLE_RECENTLY_USED = "recently_used"
+
+    /**
+     * Table for text editor scroll state
+     */
+    const val TABLE_TEXT_EDITOR_SCROLL = "text_editor_scroll"
+
+    /**
+     * SQL statements to seed the recently_used_type lookup table.
+     * Used by both the fresh-install callback and the 118→119 migration.
+     */
+    val SEED_RECENTLY_USED_TYPE_SQL = listOf(
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (1, 'PDF')",
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (2, 'Video')",
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (3, 'Audio')",
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (4, 'TextEditor')",
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (5, 'FileLink')",
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (6, 'FolderLink')",
+    )
+
+    /**
+     * Table for recently viewed link
+     */
+    const val TABLE_RECENTLY_VIEWED_LINK = "recently_viewed_link"
+
+    /**
+     * Table for per-folder UI preferences (sort order and view mode)
+     */
+    const val TABLE_FOLDER_PREFERENCE = "folder_preference"
 }

@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.data.filewrapper.ChildMetadata
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.document.DocumentMetadata
@@ -113,6 +114,56 @@ interface FileGateway {
      * Get file by path if it exists
      */
     suspend fun getFileByPath(path: String): File?
+
+    /**
+     * Read text content from the file at the given path.
+     *
+     * @param path absolute path to the file
+     * @return file content as string
+     */
+    suspend fun readTextFromPath(path: String): String
+
+    /**
+     * Read file content in chunks of lines (UTF-8). For gradual loading of large files.
+     *
+     * @param path absolute path to the file
+     * @param chunkSizeLines maximum lines per emission
+     * @return Flow of line lists; collect on a background dispatcher
+     */
+    fun readLinesFromPathInChunks(path: String, chunkSizeLines: Int): Flow<List<String>>
+
+    /**
+     * Write text content to the file at the given path.
+     *
+     * @param path absolute path to the file
+     * @param text content to write
+     */
+    suspend fun writeTextToPath(path: String, text: String)
+
+    /**
+     * Read raw bytes from the file at the given path.
+     *
+     * @param path absolute path to the file
+     * @return file content as ByteArray, or null if the file does not exist
+     */
+    suspend fun readBytesFromPath(path: String): ByteArray?
+
+    /**
+     * Read at most [length] bytes from the start of the file at the given path.
+     *
+     * @param path absolute path to the file
+     * @param length maximum number of bytes to read
+     * @return the read bytes, or null if the file does not exist
+     */
+    suspend fun readFirstBytesFromPath(path: String, length: Int): ByteArray?
+
+    /**
+     * Write raw bytes to the file at the given path.
+     *
+     * @param path absolute path to the file
+     * @param bytes content to write
+     */
+    suspend fun writeBytesToPath(path: String, bytes: ByteArray)
 
     /**
      * Get offline files root path
@@ -483,6 +534,27 @@ interface FileGateway {
     fun getFolderChildUrisSync(uri: Uri): List<Uri>
 
     /**
+     * Batch-fetch metadata for all direct children of [parentUri] using a single
+     * [android.content.ContentResolver.query] call.
+     *
+     * This is the high-performance replacement for calling [getFolderChildUrisSync] followed by
+     * N calls to [getDocumentMetadataSync] and [getExternalPathByUriSync].  For a directory
+     * with N files it reduces SAF IPC round-trips from O(N) to O(1).
+     *
+     * Note that this fun is synchronous and must only be used in contexts where there is really
+     * no other option (i.e. from the C++ JNI scan thread).
+     *
+     * @param parentUri tree/document URI of the directory to list
+     * @return list of [mega.privacy.android.data.filewrapper.ChildMetadata] for every direct child;
+     *         empty list when the directory is legitimately empty; **null** when the
+     *         directory cannot be resolved or the SAF query failed. The C++ caller relies
+     *         on this distinction — empty list means "directory has zero children" and the
+     *         sync engine deletes any cached children, while null means SCAN_INACCESSIBLE
+     *         and the sync engine retries without deleting anything.
+     */
+    fun getChildrenWithMetadataSync(parentUri: Uri): List<ChildMetadata>?
+
+    /**
      * Get file from uri
      *
      * @param uri uri of the file
@@ -545,12 +617,6 @@ interface FileGateway {
     fun createChildFileSync(parentFolder: UriPath, childName: String, asFolder: Boolean): UriPath?
 
     /**
-     * Get the parent of a file or folder
-     * @return the [UriPath] of the parent if it's accessible and permissions are granted, null otherwise
-     */
-    fun getParentSync(childUriPath: UriPath): UriPath?
-
-    /**
      * Deletes a file if it's a regular file
      * @return true if the file was deleted, false otherwise
      */
@@ -573,6 +639,31 @@ interface FileGateway {
      * @return the new [UriPath] of the renamed file, null if the file wasn't renamed
      */
     fun renameFileSync(uriPath: UriPath, newName: String): UriPath?
+
+    /**
+     * Renames a file or folder with overwrite flag
+     * @return the new [UriPath] of the renamed file, null if the file wasn't renamed
+     */
+    fun renameFileOverwriteSync(
+        uriPath: UriPath,
+        parentUriPath: UriPath,
+        newName: String,
+        overwrite: Boolean,
+    ): UriPath?
+
+    /**
+     * Moves a document from [sourceParentUriPath] to [targetParentUriPath] within the same SAF
+     * tree using [android.provider.DocumentsContract.moveDocument]. Avoids the byte-by-byte
+     * copy fallback used by cross-parent renames in the SDK's Android filesystem layer.
+     * The document keeps its original name; rename it separately at the target parent if needed.
+     * @return the new [UriPath] of the moved document, or null if the provider does not support
+     *   moves (no FLAG_SUPPORTS_MOVE) or the operation otherwise failed.
+     */
+    fun moveDocumentSync(
+        uriPath: UriPath,
+        sourceParentUriPath: UriPath,
+        targetParentUriPath: UriPath,
+    ): UriPath?
 
     /**
      * Returns device model or SD Card based on file location
@@ -641,4 +732,12 @@ interface FileGateway {
         createIfMissing: Boolean,
         lastAsFolder: Boolean
     ): UriPath?
+
+    /**
+     * Checks if there is at least one installed app able to open a file with the given [mimeType].
+     *
+     * @param mimeType the MIME type of the file to be opened
+     * @return true if a suitable app is available, false otherwise
+     */
+    fun hasSuitableAppToOpenFile(mimeType: String): Boolean
 }

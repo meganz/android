@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
 
 class InstantExecutorExtension : BeforeEachCallback, AfterEachCallback {
 
-    override fun beforeEach(context: ExtensionContext?) {
+    override fun beforeEach(context: ExtensionContext) {
         ArchTaskExecutor.getInstance()
             .setDelegate(object : TaskExecutor() {
                 override fun executeOnDiskIO(runnable: Runnable) = runnable.run()
@@ -19,7 +19,7 @@ class InstantExecutorExtension : BeforeEachCallback, AfterEachCallback {
             })
     }
 
-    override fun afterEach(context: ExtensionContext?) {
+    override fun afterEach(context: ExtensionContext) {
         ArchTaskExecutor.getInstance().setDelegate(null)
     }
 

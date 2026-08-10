@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -31,12 +32,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.features.CloudDriveFeature
-import mega.privacy.android.app.listeners.ExportListener
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
-import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
@@ -46,23 +46,21 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.MESSAGE_ID
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.utils.FileUtil.shareFile
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
-import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
-import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.constant.HttpServerConstant
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
@@ -74,10 +72,12 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -91,14 +91,23 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.DisableExportUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.shared.resources.R as sharedResR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
@@ -119,7 +128,6 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Main ViewModel to handle all logic related to the [TextEditorActivity].
@@ -160,6 +168,11 @@ class TextEditorViewModel @Inject constructor(
     // Use existing use case for smart filename generation
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
+    private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
+    private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
+    private val exportNodeUseCase: ExportNodeUseCase,
+    private val disableExportUseCase: DisableExportUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -365,8 +378,8 @@ class TextEditorViewModel @Inject constructor(
 
         when (adapterType) {
             FROM_CHAT -> {
-                val msgId = intent.getLongExtra(MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
-                val chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
+                val msgId = intent.getLongExtra(LEGACY_MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
+                val chatId = intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, MEGACHAT_INVALID_HANDLE)
 
                 if (msgId != MEGACHAT_INVALID_HANDLE && chatId != MEGACHAT_INVALID_HANDLE) {
                     textEditorData.value?.chatRoom = megaChatApi.getChatRoom(chatId)
@@ -464,17 +477,21 @@ class TextEditorViewModel @Inject constructor(
             if (getAdapterType() == OFFLINE_ADAPTER || getAdapterType() == ZIP_ADAPTER) getFileUri().toString()
             else getLocalFile(getNode())
 
-        if (isTextEmpty(localFileUri)) {
+        if (localFileUri.isNullOrBlank()) {
             val api = textEditorData.value?.api ?: return
 
             if (api.httpServerIsRunning() == 0) {
-                api.httpServerStart()
+                api.httpServerStart(
+                    HttpServerConstant.HTTP_SERVER_LOCAL_ONLY,
+                    if (api === megaApiFolder) HttpServerConstant.FOLDER_API_HTTP_SERVER_PORT
+                    else HttpServerConstant.API_HTTP_SERVER_PORT,
+                )
                 textEditorData.value?.needStopHttpServer = true
             }
 
             val uri = api.httpServerGetLocalLink(getNode())
 
-            if (!isTextEmpty(uri)) {
+            if (!uri.isNullOrBlank()) {
                 streamingFileURL = URL(uri)
             }
         }
@@ -658,7 +675,8 @@ class TextEditorViewModel @Inject constructor(
                     size = 0L, // Not relevant for our use case
                     lastModified = System.currentTimeMillis(),
                     parentHandle = parentHandle,
-                    path = UriPath("") // Not relevant for our use case
+                    path = UriPath(""), // Not relevant for our use case
+                    pitagTrigger = PitagTrigger.NotApplicable,
                 )
 
                 val uniqueFileName = getNodeNameCollisionRenameNameUseCase(nameCollision)
@@ -743,7 +761,8 @@ class TextEditorViewModel @Inject constructor(
                             uri = UriPath(it.toUri().toString()),
                         )
                     }),
-                    parentNodeId = NodeId(parentHandle)
+                    parentNodeId = NodeId(parentHandle),
+                    pitagTrigger = PitagTrigger.NotApplicable,
                 )
             }.onSuccess { fileCollisions ->
                 fileCollisions.firstOrNull()?.let {
@@ -837,7 +856,8 @@ class TextEditorViewModel @Inject constructor(
                             uri = UriPath(tempFile.toUri().toString()),
                         )
                     ),
-                    parentNodeId = NodeId(parentHandle)
+                    parentNodeId = NodeId(parentHandle),
+                    pitagTrigger = PitagTrigger.NotApplicable,
                 )
             }.onSuccess { fileCollisions ->
                 fileCollisions.firstOrNull()?.let {
@@ -1116,18 +1136,21 @@ class TextEditorViewModel @Inject constructor(
      * @param context Current context.
      */
     fun manageLink(context: Context) {
-        if (showTakenDownNodeActionNotAvailableDialog(getNode(), context)) {
+        val node = getNode() ?: return
+        if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
             return
         }
 
-        if (getNode()?.isExported == true) {
+        if (node.isExported) {
             showConfirmRemoveLinkDialog(context) {
-                megaApi.disableExport(
-                    getNode(),
-                    ExportListener(context) { runDelay(500L) { updateNode() } })
+                viewModelScope.launch {
+                    disableExportUseCase(NodeId(node.handle))
+                    delay(500L)
+                    updateNode()
+                }
             }
         } else {
-            showGetLinkActivity(context as Activity, getNode()!!.handle)
+            showGetLinkActivity(context as Activity, node.handle)
         }
     }
 
@@ -1146,7 +1169,35 @@ class TextEditorViewModel @Inject constructor(
             )
 
             FILE_LINK_ADAPTER -> shareLink(context, urlFileLink, getNode()?.name)
-            else -> shareNode(context, getNode()!!) { updateNode() }
+            else -> shareCurrentNode(context)
+        }
+    }
+
+    private fun shareCurrentNode(context: Context) {
+        val node = getNode() ?: return
+        val localPath = getLocalFile(node)
+        if (!localPath.isNullOrBlank() && !node.isFolder) {
+            shareFile(context, File(localPath), node.name)
+            return
+        }
+        if (node.isExported) {
+            val intent = Intent(Intent.ACTION_SEND)
+                .putExtra(Intent.EXTRA_SUBJECT, node.name)
+            startShareIntent(context, intent, node.publicLink, node.name)
+            return
+        }
+        viewModelScope.launch {
+            runCatching {
+                exportNodeUseCase(
+                    nodeToExport = NodeId(node.handle),
+                    callerName = "TextEditorViewModel:share",
+                )
+            }.onSuccess { link ->
+                val intent = Intent(Intent.ACTION_SEND)
+                    .putExtra(Intent.EXTRA_SUBJECT, node.name)
+                startShareIntent(context, intent, link, node.name)
+                updateNode()
+            }.onFailure { Timber.e(it) }
         }
     }
 
@@ -1261,5 +1312,74 @@ class TextEditorViewModel @Inject constructor(
         }
 
         return result
+    }
+
+    /**
+     * Decides whether the current node should be moved to the rubbish bin or
+     * removed permanently and emits a corresponding confirmation event for the
+     * activity to display the appropriate dialog.
+     *
+     * @param handle handle of the node to move or remove.
+     */
+    fun checkMoveOrRemoveNode(handle: Long) {
+        viewModelScope.launch {
+            val isInRubbish = runCatching { isNodeInRubbishBinUseCase(NodeId(handle)) }
+                .onFailure { Timber.e(it) }
+                .getOrDefault(false)
+            val result = if (isInRubbish) {
+                MoveOrRemoveNodeResult.ConfirmRemoveFromMega(handle)
+            } else {
+                MoveOrRemoveNodeResult.ConfirmMoveToRubbish(handle)
+            }
+            _uiState.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Moves the node identified by [handle] to the rubbish bin and emits a
+     * success, failure or foreign-quota event for the activity to react to.
+     */
+    fun moveNodeToRubbishBin(handle: Long) {
+        viewModelScope.launch {
+            val result = runCatching { moveNodeToRubbishBinUseCase(NodeId(handle)) }
+                .fold(
+                    onSuccess = { MoveOrRemoveNodeResult.MovedToRubbish },
+                    onFailure = { throwable ->
+                        Timber.e(throwable)
+                        if (throwable is ForeignNodeException) {
+                            MoveOrRemoveNodeResult.ForeignNodeOverQuota
+                        } else {
+                            MoveOrRemoveNodeResult.MoveFailed
+                        }
+                    }
+                )
+            _uiState.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Permanently removes the node identified by [handle] from MEGA and emits a
+     * success or failure event for the activity to react to.
+     */
+    fun removeNodeFromMega(handle: Long) {
+        viewModelScope.launch {
+            val result = runCatching { deleteNodeByHandleUseCase(NodeId(handle)) }
+                .fold(
+                    onSuccess = { MoveOrRemoveNodeResult.Removed },
+                    onFailure = { throwable ->
+                        Timber.e(throwable)
+                        MoveOrRemoveNodeResult.RemoveFailed
+                    }
+                )
+            _uiState.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Consumes the [TextEditorViewState.moveOrRemoveNodeEvent] after the
+     * activity has handled it.
+     */
+    fun onConsumeMoveOrRemoveNodeEvent() {
+        _uiState.update { it.copy(moveOrRemoveNodeEvent = consumed()) }
     }
 }

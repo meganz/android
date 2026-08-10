@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
-import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,11 +14,17 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
@@ -38,6 +43,8 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
@@ -46,9 +53,14 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
+import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.app.components.largebundle.largeBundleHolder
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentFactory
+import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.extensions.getStorageState
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.FETCHER_PARAMS
@@ -57,34 +69,48 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_IS_FOREIGN
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_MENU_OPTIONS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
+import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowActivity
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
 import mega.privacy.android.app.presentation.offline.action.HandleOfflineNodeActions
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
-import mega.privacy.android.app.presentation.psa.PsaContainer
-import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.transition.opaqueFadeBackwardTransition
+import mega.privacy.android.navigation.contract.transition.opaqueFadeForwardTransition
+import mega.privacy.android.navigation.destination.VideoEditorScreenNavKey
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ImagePreviewGetLinkMenuItemEvent
@@ -94,7 +120,7 @@ import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
 import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -107,10 +133,25 @@ class ImagePreviewActivity : BaseActivity() {
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+    lateinit var navigationResultManager: NavigationResultManager
+
+    @Inject
+    lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
 
     @Inject
     lateinit var nodeLabelBottomSheetDialogFragmentFactory: NodeLabelBottomSheetDialogFragmentFactory
+
+    @Inject
+    lateinit var exportNodeUseCase: ExportNodeUseCase
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
 
     private val selectMoveFolderLauncher: ActivityResultLauncher<LongArray> =
         registerForActivityResult(
@@ -163,77 +204,123 @@ class ImagePreviewActivity : BaseActivity() {
         Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            val snackbarHostState: SnackbarHostState = remember {
-                SnackbarHostState()
-            }
-            val systemUiController = rememberSystemUiController()
-            val isDarkMode = themeMode.isDarkMode()
-            LaunchedEffect(systemUiController, isDarkMode) {
-                systemUiController.setSystemBarsColor(
-                    color = Color.Transparent,
-                    darkIcons = !isDarkMode
-                )
-            }
             val uiState by viewModel.state.collectAsStateWithLifecycle()
-            OriginalTheme(isDark = isDarkMode) {
-                PasscodeContainer(
-                    passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                    content = {
-                        PsaContainer {
-                            ImagePreviewScreen(
-                                snackbarHostState = snackbarHostState,
-                                onClickBack = ::finish,
-                                onClickEdit = {
-                                    Analytics.tracker.trackEvent(PhotoEditorMenuItemEvent)
-                                    viewModel.launchPhotoEditor(it)
-                                },
-                                onClickVideoPlay = ::playVideo,
-                                onClickSlideshow = ::playSlideshow,
-                                onClickInfo = ::checkInfo,
-                                onClickFavourite = ::favouriteNode,
-                                onClickLabel = ::handleLabel,
-                                onClickOpenWith = ::handleOpenWith,
-                                onClickSaveToDevice = ::saveNodeToDevice,
-                                onClickImport = ::importNode,
-                                onSwitchAvailableOffline = ::setAvailableOffline,
-                                onClickGetLink = ::getNodeLink,
-                                onClickSendTo = {
-                                    nodeAttachmentViewModel.startAttachNodes(listOf(it.id))
-                                },
-                                onClickShare = ::shareNode,
-                                onClickRename = ::renameNode,
-                                onClickHide = ::hideNode,
-                                onClickHideHelp = ::showHiddenNodesOnboarding,
-                                onClickUnhide = ::unhideNode,
-                                onClickMove = ::moveNode,
-                                onClickCopy = ::copyNode,
-                                onClickRestore = ::restoreNode,
-                                onClickRemove = ::removeNode,
-                                onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
-                                onClickAddToAlbum = ::addToAlbum,
-                            )
-
-                            NodeAttachmentView(
-                                viewModel = nodeAttachmentViewModel,
-                                snackbarHostState = snackbarHostState,
-                            )
-                            HandleOfflineNodeActions(
-                                viewModel = offlineNodeActionsViewModel,
-                                snackBarHostState = snackbarHostState,
-                                coroutineScope = rememberCoroutineScope(),
-                            )
-                        }
-                    }
-                )
-            }
-            EventEffect(
-                event = uiState.openPhotoEditorEvent,
-                onConsumed = { viewModel.onOpenPhotoEditorEventConsumed() },
-            ) { (imageNode, imagePath) ->
-                openPhotoEditor(imagePath.toUri(), imageNode.name)
+            val isFromLinkWithoutLogin = uiState.isFromLink && !uiState.isLoggedIn
+            val isSessionRequired = !isFromLinkWithoutLogin && !uiState.isFromOffline
+            // Host a nav3 scaffold so the viewer can navigate to other destinations (e.g. the video editor)
+            LegacyActivityScaffold(
+                container = { content ->
+                    SharedAppContainer(
+                        themeMode = themeMode,
+                        isSessionRequired = isSessionRequired,
+                        useLegacyStatusBarColor = false,
+                        finishOnSessionRefresh = false,
+                        content = content,
+                    )
+                },
+                initialKey = ImagePreviewNavKey,
+                navigationResultManager = navigationResultManager,
+                featureDestinations = featureDestinations,
+                onEmptyBackStack = ::finish,
+                // The Activity window is translucent (to support flick-to-dismiss), so the default
+                // crossfade would briefly reveal the Activity behind it. These keep the screen
+                // underneath opaque and only fade the top-most entry.
+                transitionSpec = { opaqueFadeForwardTransition },
+                popTransitionSpec = { opaqueFadeBackwardTransition },
+            ) { navigationHandler, _ ->
+                entry<ImagePreviewNavKey> {
+                    ImagePreviewContent(
+                        onEditVideo = { imageNode ->
+                            navigationHandler.navigate(VideoEditorScreenNavKey(imageNode.id.longValue))
+                        },
+                    )
+                }
             }
         }
         setupFlow()
+    }
+
+    @Composable
+    private fun ImagePreviewContent(onEditVideo: (ImageNode) -> Unit) {
+        val themeMode by monitorThemeModeUseCase()
+            .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        val isDarkMode = themeMode.isDarkMode()
+        val snackbarHostState = remember { SnackbarHostState() }
+        val systemUiController = rememberSystemUiController()
+        LaunchedEffect(systemUiController, isDarkMode) {
+            systemUiController.setSystemBarsColor(
+                color = Color.Transparent,
+                darkIcons = !isDarkMode,
+            )
+        }
+        val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+        OriginalTheme(isDark = isDarkMode) {
+            ImagePreviewScreen(
+                viewModel = viewModel,
+                snackbarHostState = snackbarHostState,
+                onClickBack = ::finish,
+                onClickEdit = { imageNode ->
+                    if (imageNode.type is VideoFileTypeInfo) {
+                        // TODO add analytics event
+                        onEditVideo(imageNode)
+                    } else {
+                        Analytics.tracker.trackEvent(PhotoEditorMenuItemEvent)
+                        viewModel.launchPhotoEditor(imageNode)
+                    }
+                },
+                onClickVideoPlay = ::playVideo,
+                onClickSlideshow = ::playSlideshow,
+                onClickInfo = ::checkInfo,
+                onClickFavourite = ::favouriteNode,
+                onClickLabel = ::handleLabel,
+                onClickOpenWith = ::handleOpenWith,
+                onClickSaveToDevice = ::saveNodeToDevice,
+                onClickImport = ::importNode,
+                onSwitchAvailableOffline = ::setAvailableOffline,
+                onClickGetLink = ::getNodeLink,
+                onClickSendTo = {
+                    nodeAttachmentViewModel.startAttachNodes(listOf(it.id))
+                },
+                onClickShare = ::shareNode,
+                onClickRename = ::renameNode,
+                onClickHide = ::hideNode,
+                onClickHideHelp = ::showHiddenNodesOnboarding,
+                onClickUnhide = ::unhideNode,
+                onClickMove = ::moveNode,
+                onClickCopy = ::copyNode,
+                onClickRestore = ::restoreNode,
+                onClickRemove = ::removeNode,
+                onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
+                onClickAddToAlbum = ::addToAlbum,
+            )
+
+            NodeAttachmentView(
+                viewModel = nodeAttachmentViewModel,
+                snackbarHostState = snackbarHostState,
+            )
+            HandleOfflineNodeActions(
+                viewModel = offlineNodeActionsViewModel,
+                snackBarHostState = snackbarHostState,
+                coroutineScope = rememberCoroutineScope(),
+            )
+
+            // Render snackbar from Nav3 components, e.g. LegacyActivityScaffold > StartTransferComponent
+            LocalSnackBarHostState.current?.let { hostState ->
+                Box(
+                    modifier = Modifier.fillMaxSize().systemBarsPadding(),
+                    contentAlignment = Alignment.BottomCenter,
+                ) {
+                    MegaSnackbar(hostState)
+                }
+            }
+        }
+        EventEffect(
+            event = uiState.openPhotoEditorEvent,
+            onConsumed = { viewModel.onOpenPhotoEditorEventConsumed() },
+        ) { (imageNode, imagePath) ->
+            openPhotoEditor(imagePath.toUri(), imageNode.name)
+        }
     }
 
     override fun shouldSetStatusBarTextColor() = false
@@ -243,9 +330,6 @@ class ImagePreviewActivity : BaseActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Draw behind display cutouts.
             window.attributes.layoutInDisplayCutoutMode = LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
-
-            // No scrim behind transparent navigation bar.
-            window.setFlags(FLAG_LAYOUT_NO_LIMITS, FLAG_LAYOUT_NO_LIMITS)
 
             // System bars use fade by default to hide/show. Make them slide instead.
             val insetsController = WindowCompat.getInsetsController(window, window.decorView)
@@ -345,13 +429,19 @@ class ImagePreviewActivity : BaseActivity() {
     private fun handleOpenWith(imageNode: ImageNode) {
         if (viewModel.isInOfflineMode()) {
             offlineNodeActionsViewModel.handleOpenWithIntentById(imageNode.id)
-        } else {
+            return
+        }
+        lifecycleScope.launch {
+            val node = viewModel.resolveMegaNode(imageNode) ?: run {
+                Timber.w("handleOpenWith: cannot resolve MegaNode for ${imageNode.id}")
+                return@launch
+            }
             onNodeTapped(
-                this,
-                MegaNode.unserialize(imageNode.serializedData),
-                { this.saveNodeByOpenWith() },
-                this,
-                this,
+                this@ImagePreviewActivity,
+                node,
+                { saveNodeByOpenWith() },
+                this@ImagePreviewActivity,
+                this@ImagePreviewActivity,
                 true
             )
         }
@@ -383,19 +473,115 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun shareNode(imageNode: ImageNode) {
-        if (viewModel.isInOfflineMode()) {
-            offlineNodeActionsViewModel.handleShareOfflineNodeById(
-                nodeId = imageNode.id,
-                isOnline = false
-            )
-        } else {
-            MegaNodeUtil.shareNode(this, MegaNode.unserialize(imageNode.serializedData))
+        when {
+            viewModel.isInOfflineMode() -> {
+                offlineNodeActionsViewModel.handleShareOfflineNodeById(
+                    nodeId = imageNode.id,
+                    isOnline = false
+                )
+            }
+
+            viewModel.isFileLink() -> {
+                intent.getStringExtra(FETCHER_PARAMS)?.let { paramsKey ->
+                    lifecycleScope.launch {
+                        largeBundleHolder.get(paramsKey)
+                            ?.getString(PublicFileImageNodeFetcher.URL)
+                            ?.let { link ->
+                                MegaNodeUtil.shareLink(
+                                    this@ImagePreviewActivity,
+                                    link,
+                                    imageNode.name,
+                                )
+                            }
+                    }
+                }
+            }
+
+            else -> lifecycleScope.launch {
+                val node = viewModel.resolveMegaNode(imageNode) ?: run {
+                    Timber.w("shareNode: cannot resolve MegaNode for ${imageNode.id}")
+                    return@launch
+                }
+                shareCurrentNode(node)
+            }
+        }
+    }
+
+    private fun shareCurrentNode(node: nz.mega.sdk.MegaNode) {
+        val localPath = FileUtil.getLocalFile(node)
+        if (!localPath.isNullOrBlank() && !node.isFolder) {
+            FileUtil.shareFile(this, File(localPath), node.name)
+            return
+        }
+        if (node.isExported) {
+            val intent = Intent(Intent.ACTION_SEND)
+                .putExtra(Intent.EXTRA_SUBJECT, node.name)
+            MegaNodeUtil.startShareIntent(this, intent, node.publicLink, node.name)
+            return
+        }
+        lifecycleScope.launch {
+            runCatching {
+                exportNodeUseCase(
+                    nodeToExport = NodeId(node.handle),
+                    callerName = "ImagePreviewActivity:share",
+                )
+            }.onSuccess { link ->
+                val intent = Intent(Intent.ACTION_SEND)
+                    .putExtra(Intent.EXTRA_SUBJECT, node.name)
+                MegaNodeUtil.startShareIntent(
+                    this@ImagePreviewActivity,
+                    intent,
+                    link,
+                    node.name,
+                )
+            }.onFailure { Timber.e(it) }
         }
     }
 
     private fun renameNode(imageNode: ImageNode) {
-        val node = MegaNode.unserialize(imageNode.serializedData)
-        MegaNodeDialogUtil.showRenameNodeDialog(this, node, this, null)
+        lifecycleScope.launch {
+            val node = viewModel.resolveMegaNode(imageNode) ?: run {
+                Timber.w("renameNode: cannot resolve MegaNode for ${imageNode.id}")
+                return@launch
+            }
+            val snackbarShower = object : SnackbarShower {
+                override fun showSnackbar(type: Int, content: String?, chatId: Long) {
+                    content?.let { viewModel.setResultMessage(it) }
+                }
+
+                override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
+                    viewModel.setResultMessage(content)
+                }
+            }
+            MegaNodeDialogUtil.showRenameNodeDialog(
+                context = this@ImagePreviewActivity,
+                node = node,
+                snackbarShower = snackbarShower,
+                actionNodeCallback = null,
+                onRenameConfirmed = { handle, newName ->
+                    performRename(handle, newName, snackbarShower)
+                },
+                getRootNodeUseCase = getRootNodeUseCase,
+                nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
+            )
+        }
+    }
+
+    private fun performRename(
+        nodeHandle: Long,
+        newName: String,
+        snackbarShower: SnackbarShower,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    snackbarShower.showSnackbar(getString(sharedR.string.context_correctly_renamed))
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    snackbarShower.showSnackbar(getString(R.string.context_no_renamed))
+                }
+        }
     }
 
     private fun hideNode(
@@ -492,7 +678,7 @@ class ImagePreviewActivity : BaseActivity() {
                     val error = UCrop.getError(data)
                     showSnackbar(
                         SNACKBAR_TYPE,
-                        error?.message ?: getString(R.string.general_text_error),
+                        error?.message ?: getString(sharedR.string.general_text_error),
                         INVALID_HANDLE
                     )
                 }
@@ -574,6 +760,9 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
+        if (isFinishing) {
+            intent.getStringExtra(FETCHER_PARAMS)?.let { largeBundleHolder.release(it) }
+        }
         viewModel.clearImageResultCache()
         super.onDestroy()
     }
@@ -589,15 +778,90 @@ class ImagePreviewActivity : BaseActivity() {
             params: Map<String, Any> = mapOf(),
             isForeign: Boolean = false,
             enableAddToAlbum: Boolean = false,
+            publicLinkUrl: String? = null,
         ): Intent {
+            val paramsKey = context.largeBundleHolder.put(
+                bundleOf(*params.toList().toTypedArray())
+            )
             return Intent(context, ImagePreviewActivity::class.java).apply {
                 putExtra(IMAGE_NODE_FETCHER_SOURCE, imageSource)
                 putExtra(IMAGE_PREVIEW_MENU_OPTIONS, menuOptionsSource)
                 putExtra(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE, anchorImageNodeId?.longValue)
-                putExtra(FETCHER_PARAMS, bundleOf(*params.toList().toTypedArray()))
+                putExtra(FETCHER_PARAMS, paramsKey)
                 putExtra(IMAGE_PREVIEW_IS_FOREIGN, isForeign)
                 putExtra(IMAGE_PREVIEW_ADD_TO_ALBUM, enableAddToAlbum)
+                putExtra(ImagePreviewViewModel.IMAGE_PREVIEW_PUBLIC_LINK_URL, publicLinkUrl)
             }
+        }
+
+        fun createIntent(
+            context: Context,
+            fileNodeId: Long,
+            parentNodeId: Long,
+            nodeSourceType: Int?,
+        ): Intent? {
+            val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
+                NodeSourceTypeInt.FILE_BROWSER_ADAPTER -> Triple(
+                    ImagePreviewFetcherSource.CLOUD_DRIVE,
+                    ImagePreviewMenuSource.CLOUD_DRIVE,
+                    CloudDriveImageNodeFetcher.PARENT_ID
+                )
+
+                NodeSourceTypeInt.RUBBISH_BIN_ADAPTER -> Triple(
+                    ImagePreviewFetcherSource.RUBBISH_BIN,
+                    ImagePreviewMenuSource.RUBBISH_BIN,
+                    RubbishBinImageNodeFetcher.PARENT_ID
+                )
+
+                NodeSourceTypeInt.INCOMING_SHARES_ADAPTER,
+                NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
+                    -> Triple(
+                    ImagePreviewFetcherSource.SHARED_ITEMS,
+                    ImagePreviewMenuSource.SHARED_ITEMS,
+                    SharedItemsImageNodeFetcher.PARENT_ID
+                )
+
+                NodeSourceTypeInt.LINKS_ADAPTER -> Triple(
+                    ImagePreviewFetcherSource.SHARED_ITEMS,
+                    ImagePreviewMenuSource.LINKS,
+                    SharedItemsImageNodeFetcher.PARENT_ID
+                )
+
+                NodeSourceTypeInt.BACKUPS_ADAPTER -> Triple(
+                    ImagePreviewFetcherSource.CLOUD_DRIVE,
+                    ImagePreviewMenuSource.CLOUD_DRIVE,
+                    CloudDriveImageNodeFetcher.PARENT_ID
+                )
+
+                NodeSourceTypeInt.FAVOURITES_ADAPTER -> Triple(
+                    ImagePreviewFetcherSource.FAVOURITE,
+                    ImagePreviewMenuSource.FAVOURITE,
+                    FavouriteImageNodeFetcher.NODE_ID
+                )
+
+                else -> {
+                    Timber.e("Unknown node source type: $nodeSourceType")
+                    return null
+                }
+            }
+
+            val params = if (nodeSourceType == NodeSourceTypeInt.FAVOURITES_ADAPTER) {
+                mapOf(paramKey to fileNodeId)
+            } else {
+                mapOf(paramKey to parentNodeId)
+            }
+
+            return createIntent(
+                context = context,
+                imageSource = imageSource,
+                menuOptionsSource = menuOptionsSource,
+                anchorImageNodeId = NodeId(fileNodeId),
+                params = params,
+                enableAddToAlbum = nodeSourceType in listOf(
+                    NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                    NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
+                )
+            )
         }
 
         fun createSecondaryIntent(

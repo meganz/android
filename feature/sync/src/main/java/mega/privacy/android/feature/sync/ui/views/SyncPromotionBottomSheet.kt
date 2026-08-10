@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.views
 
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -13,13 +12,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -50,7 +47,7 @@ import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetSyncFoldersBu
  *
  * @param onSyncFoldersClicked Callback called when "Sync folders" button is tapped
  * @param onBackUpFoldersClicked Callback called when "Back up folders" button is tapped
- * @param onLearnMoreClicked Callback called when "Learn more" button is tapped
+ * @param onLearnMoreClicked Callback called when "Learn more" button is tapped, receives the URL to launch
  * @param modifier [Modifier]
  * @param hideSheet Callback called to hide the bottom sheet
  */
@@ -58,11 +55,10 @@ import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetSyncFoldersBu
 fun SyncPromotionBottomSheet(
     onSyncFoldersClicked: () -> Unit,
     onBackUpFoldersClicked: () -> Unit,
-    onLearnMoreClicked: () -> Unit,
+    onLearnMoreClicked: (url: String) -> Unit,
     modifier: Modifier = Modifier,
     hideSheet: () -> Unit = {},
 ) {
-    val context = LocalContext.current
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     Column(
         modifier
@@ -110,10 +106,7 @@ fun SyncPromotionBottomSheet(
             color = TextColor.Secondary,
             onAnnotationClick = {
                 Analytics.tracker.trackEvent(SyncPromotionBottomSheetLearnMoreButtonPressedEvent)
-                onLearnMoreClicked()
-                context.startActivity(Intent(Intent.ACTION_VIEW).apply {
-                    data = LEARN_MORE_URI.toUri()
-                })
+                onLearnMoreClicked(LEARN_MORE_URI)
                 hideSheet()
             },
             modifier = Modifier
@@ -154,7 +147,7 @@ private fun SyncPromotionBottomSheetPreview() {
         SyncPromotionBottomSheet(
             onSyncFoldersClicked = {},
             onBackUpFoldersClicked = {},
-            onLearnMoreClicked = {},
+            onLearnMoreClicked = { _ -> },
         )
     }
 }

@@ -27,6 +27,9 @@ private const val SUBFOLDER_MEDIA_DISCOVERY = "SUBFOLDER_MEDIA_DISCOVERY"
 private const val SHOW_OFFLINE_WARNING_VIEW = "SHOW_OFFLINE_WARNING_VIEW"
 private const val PHOTOS_RECENT_QUERIES = "PHOTOS_RECENT_QUERIES"
 private const val VIEW_TYPE = "VIEW_TYPE"
+private const val TIMELINE_GRID_SIZE = "TIMELINE_GRID_SIZE"
+private const val SORTING_PREFERENCE = "SORTING_PREFERENCE"
+private const val VIEW_MODE_PREFERENCE = "VIEW_MODE_PREFERENCE"
 private const val ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP =
     "ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP"
 private const val ADS_CLOSING_TIMESTAMP = "ADS_CLOSING_TIMESTAMP"
@@ -34,6 +37,8 @@ private const val GEO_TAGGING = "GEO_TAGGING"
 private const val NOTIFICATION_SHOWN_TIMESTAMP = "NOTIFICATION_SHOWN_TIMESTAMP"
 private const val SERIALISED_START_SCREEN_PREFERENCE_DESTINATION =
     "SERIALISED_START_SCREEN_PREFERENCE_DESTINATION"
+private const val LAST_VERSION_NEW_FEATURE_SHOWN = "LAST_VERSION_NEW_FEATURE_SHOWN"
+
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = USER_INTERFACE_PREFERENCES,
     corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
@@ -58,6 +63,9 @@ internal class UIPreferencesDatastore @Inject constructor(
     private val mediaDiscoveryViewKey = intPreferencesKey(MEDIA_DISCOVERY_VIEW)
     private val subFolderMediaDiscoveryKey = booleanPreferencesKey(SUBFOLDER_MEDIA_DISCOVERY)
     private val viewTypeKey = intPreferencesKey(VIEW_TYPE)
+    private val timelineGridSizeKey = intPreferencesKey(TIMELINE_GRID_SIZE)
+    private val sortingPreferenceKey = intPreferencesKey(SORTING_PREFERENCE)
+    private val viewModePreferenceKey = intPreferencesKey(VIEW_MODE_PREFERENCE)
     private val offlineWarningViewKey = booleanPreferencesKey(SHOW_OFFLINE_WARNING_VIEW)
     private val almostFullStorageBannerClosingTimestampKey =
         longPreferencesKey(ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP)
@@ -80,6 +88,33 @@ internal class UIPreferencesDatastore @Inject constructor(
     override suspend fun setViewType(value: Int) {
         context.uiPreferenceDataStore.edit {
             it[viewTypeKey] = value
+        }
+    }
+
+    override fun monitorTimelineGridSize(): Flow<Int?> =
+        context.uiPreferenceDataStore.monitor(timelineGridSizeKey)
+
+    override suspend fun setTimelineGridSize(value: Int) {
+        context.uiPreferenceDataStore.edit {
+            it[timelineGridSizeKey] = value
+        }
+    }
+
+    override fun monitorSortingPreference(): Flow<Int?> =
+        context.uiPreferenceDataStore.monitor(sortingPreferenceKey)
+
+    override suspend fun setSortingPreference(value: Int) {
+        context.uiPreferenceDataStore.edit {
+            it[sortingPreferenceKey] = value
+        }
+    }
+
+    override fun monitorViewModePreference(): Flow<Int?> =
+        context.uiPreferenceDataStore.monitor(viewModePreferenceKey)
+
+    override suspend fun setViewModePreference(value: Int) {
+        context.uiPreferenceDataStore.edit {
+            it[viewModePreferenceKey] = value
         }
     }
 
@@ -183,4 +218,15 @@ internal class UIPreferencesDatastore @Inject constructor(
         context.uiPreferenceDataStore.monitor(
             stringPreferencesKey(SERIALISED_START_SCREEN_PREFERENCE_DESTINATION)
         )
+
+    override fun monitorLastVersionNewFeatureShownPreference() =
+        context.uiPreferenceDataStore.monitor(
+            stringPreferencesKey(LAST_VERSION_NEW_FEATURE_SHOWN)
+        )
+
+    override suspend fun setLastVersionNewFeatureShownPreference(value: String) {
+        context.uiPreferenceDataStore.edit {
+            it[stringPreferencesKey(LAST_VERSION_NEW_FEATURE_SHOWN)] = value
+        }
+    }
 }

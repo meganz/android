@@ -1,16 +1,14 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -20,8 +18,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
@@ -41,15 +43,17 @@ internal fun FileVersionsView(
         .height(48.dp),
     verticalAlignment = Alignment.CenterVertically,
 ) {
-    Image(
+    Box(
         modifier = Modifier
             .sizeIn(minWidth = textStartPadding)
-            .padding(start = 16.dp),
-        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ClockRotate),
-        alignment = Alignment.CenterStart,
-        contentDescription = "versions icon"
-    )
-    Text(
+            .padding(start = 16.dp)
+    ) {
+        MegaIcon(
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ClockRotate),
+            contentDescription = "versions icon"
+        )
+    }
+    MegaText(
         modifier = Modifier
             .clickable(onClick = onClick)
             .padding(8.dp)
@@ -60,7 +64,8 @@ internal fun FileVersionsView(
             count = versions,
             versions
         ),
-        style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.secondary),
+        style = AppTheme.typography.bodyMedium,
+        textColor = TextColor.Secondary
     )
 }
 
@@ -71,7 +76,8 @@ internal fun FileVersionsView(
 @Composable
 private fun FileVersionsPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        FileVersionsView(versions = 5,
+        FileVersionsView(
+            versions = 5,
             onClick = {})
     }
 }

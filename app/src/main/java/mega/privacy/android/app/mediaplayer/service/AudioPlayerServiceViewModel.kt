@@ -15,12 +15,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -68,19 +70,15 @@ import mega.privacy.android.app.utils.FileUtil.getUriForFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.MegaNodeUtil.isInRootLinksLevel
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.BACKUPS_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
+import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_NEAR_COMPLETION_THRESHOLD_MS
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -89,6 +87,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
@@ -104,6 +103,8 @@ import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
@@ -127,6 +128,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SaveAudioPlay
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodeAccessibilityUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -134,6 +136,14 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
@@ -141,6 +151,7 @@ import timber.log.Timber
 import java.io.File
 import java.net.URI
 import java.util.Collections
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -154,6 +165,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val playlistItemMapper: PlaylistItemMapper,
     private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
@@ -192,10 +204,13 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
     private val saveAudioPlaybackInfoUseCase: SaveAudioPlaybackInfoUseCase,
+    private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
+    private val removeRecentlyUsedItemUseCase: RemoveRecentlyUsedItemUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
+    private val checkNodeAccessibilityUseCase: CheckNodeAccessibilityUseCase,
     monitorAudioBackgroundPlayEnabledUseCase: MonitorAudioBackgroundPlayEnabledUseCase,
     monitorAudioShuffleEnabledUseCase: MonitorAudioShuffleEnabledUseCase,
     monitorAudioRepeatModeUseCase: MonitorAudioRepeatModeUseCase,
@@ -207,11 +222,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
         true
     )
 
-    private var shuffleEnabled = monitorAudioShuffleEnabledUseCase().stateIn(
-        sharingScope,
-        SharingStarted.Eagerly,
-        false
-    )
+    private var shuffleEnabled = MutableStateFlow(false)
 
     private var audioRepeatToggleMode = monitorAudioRepeatModeUseCase().stateIn(
         sharingScope,
@@ -223,7 +234,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private val playerSource = MutableLiveData<MediaPlaySources>()
 
-    private val mediaItemToRemove = MutableStateFlow<Pair<Int, Long>>(Pair(-1, -1))
+    private val mediaItemToRemove = MutableStateFlow(NO_MEDIA_ITEM)
+
 
     private val nodeNameUpdate = MutableLiveData<String>()
 
@@ -242,12 +254,13 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private var mediaPlayback = MutableLiveData<Boolean>()
 
-    private val playlistItems = mutableListOf<PlaylistItem>()
+    private val playlistItems = CopyOnWriteArrayList<PlaylistItem>()
 
     private val itemsSelectedMap = mutableMapOf<Long, PlaylistItem>()
 
     private var playlistSearchQuery: String? = null
 
+    @Volatile
     private var shuffleOrder: ShuffleOrder = ExposedShuffleOrder(0, this)
 
     private var playingHandle = INVALID_HANDLE
@@ -258,8 +271,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private var needStopStreamingServer = false
 
-    private var playSourceChanged: MutableList<MediaItem> = mutableListOf()
-    private var playlistItemsChanged: MutableList<PlaylistItem> = mutableListOf()
+    private var playSourceChanged: MutableList<MediaItem> = CopyOnWriteArrayList()
+    private var playlistItemsChanged: MutableList<PlaylistItem> = CopyOnWriteArrayList()
     private var playingPosition = 0
 
     private var cancelToken: MegaCancelToken? = null
@@ -274,12 +287,17 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     init {
         setupTransferListener()
-        cancellableJobs[JOB_KEY_MONITOR_SHUFFLE]?.cancel()
         cancellableJobs[JOB_KEY_MONITOR_SHUFFLE] = sharingScope.launch {
             monitorAudioShuffleEnabledUseCase().collect {
                 recreateAndUpdatePlaylistItems(
                     originalItems = if (it) playlistItemsFlow.value.first else playlistItems
                 )
+            }
+        }
+
+        sharingScope.launch {
+            monitorAudioShuffleEnabledUseCase().firstOrNull()?.let { isEnable ->
+                shuffleEnabled.update { isEnable }
             }
         }
 
@@ -353,6 +371,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
         )
 
         playerRetry = 0
+        // Reset mediaItemToRemove when building the play sources.
+        resetMediaItemToRemove()
 
         // if we are already playing this music, then the metadata is already
         // in LiveData (_metadata of AudioPlayerService), we don't need (and shouldn't)
@@ -438,7 +458,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                         val order = getSortOrderFromIntent(intent)
 
                         if (isInRootLinksLevel(type, parentHandle)) {
-                            playlistTitle.postValue(context.getString(R.string.tab_links_shares))
+                            playlistTitle.postValue(context.getString(sharedR.string.shares_screen_links_shares_tab_title))
                             buildPlaySourcesByTypedAudioNodes(
                                 type = type,
                                 typedAudioNodes = getAudioNodesFromPublicLinksUseCase(order),
@@ -448,7 +468,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                         }
 
                         if (type == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                            playlistTitle.postValue(context.getString(R.string.tab_incoming_shares))
+                            playlistTitle.postValue(context.getString(sharedR.string.shares_screen_incoming_shares_tab_title))
                             buildPlaySourcesByTypedAudioNodes(
                                 type = type,
                                 typedAudioNodes = getAudioNodesFromInSharesUseCase(order),
@@ -458,7 +478,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                         }
 
                         if (type == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                            playlistTitle.postValue(context.getString(R.string.tab_outgoing_shares))
+                            playlistTitle.postValue(context.getString(sharedR.string.shares_screen_outgoing_shares_tab_title))
                             buildPlaySourcesByTypedAudioNodes(
                                 type = type,
                                 typedAudioNodes = getAudioNodesFromOutSharesUseCase(
@@ -658,10 +678,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
         runCatching {
             getOfflineNodesByParentIdUseCase(parentId)
         }.onSuccess { list ->
-            playlistItems.clear()
-
             val mediaItems = mutableListOf<MediaItem>()
             var firstPlayIndex = 0
+            val newItems = mutableListOf<PlaylistItem>()
 
             list.filter {
                 it.fileTypeInfo is AudioFileTypeInfo && it.fileTypeInfo?.isSupported == true
@@ -692,9 +711,11 @@ class AudioPlayerServiceViewModel @Inject constructor(
                     size = item.totalSize,
                     duration = (item.fileTypeInfo as? AudioFileTypeInfo)?.duration ?: 0.seconds,
                     fileExtension = item.fileTypeInfo?.extension
-                ).let { playlistItems.add(it) }
+                ).let { newItems.add(it) }
             }
 
+            playlistItems.clear()
+            playlistItems.addAll(newItems)
             updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
         }.onFailure {
             Timber.e(it)
@@ -713,67 +734,70 @@ class AudioPlayerServiceViewModel @Inject constructor(
         typedAudioNodes: List<TypedAudioNode>,
         firstPlayHandle: Long,
     ) {
-        playlistItems.clear()
-
         val mediaItems = ArrayList<MediaItem>()
         var firstPlayIndex = 0
+        val newItems = mutableListOf<PlaylistItem>()
 
         val nodesWithoutThumbnail = ArrayList<Pair<Long, File>>()
 
-        filterNonSensitiveNodes(typedAudioNodes).mapIndexed { currentIndex, typedAudioNode ->
-            getLocalFilePathUseCase(typedAudioNode).let { localPath ->
-                if (localPath != null && isLocalFile(typedAudioNode, localPath)) {
-                    mediaItemFromFile(File(localPath), typedAudioNode.id.longValue.toString())
-                } else {
-                    val url =
-                        if (type == FOLDER_LINK_ADAPTER) {
-                            if (isMegaApiFolder(type)) {
-                                getLocalFolderLinkFromMegaApiFolderUseCase(typedAudioNode.id.longValue)
-                            } else {
-                                getLocalFolderLinkFromMegaApiUseCase(typedAudioNode.id.longValue)
-                            }
-                        } else {
-                            getLocalLinkFromMegaApiUseCase(typedAudioNode.id.longValue)
-                        }
-                    if (url == null) {
-                        null
+        filterNonSensitiveNodes(typedAudioNodes).filterTakeDownNodes()
+            .mapIndexed { currentIndex, typedAudioNode ->
+                getLocalFilePathUseCase(typedAudioNode).let { localPath ->
+                    if (localPath != null && isLocalFile(typedAudioNode, localPath)) {
+                        mediaItemFromFile(File(localPath), typedAudioNode.id.longValue.toString())
                     } else {
-                        MediaItem.Builder()
-                            .setUri(url.toUri())
-                            .setMediaId(typedAudioNode.id.longValue.toString())
-                            .build()
+                        val url =
+                            if (type == FOLDER_LINK_ADAPTER) {
+                                if (isMegaApiFolder(type)) {
+                                    getLocalFolderLinkFromMegaApiFolderUseCase(typedAudioNode.id.longValue)
+                                } else {
+                                    getLocalFolderLinkFromMegaApiUseCase(typedAudioNode.id.longValue)
+                                }
+                            } else {
+                                getLocalLinkFromMegaApiUseCase(typedAudioNode.id.longValue)
+                            }
+                        if (url == null) {
+                            null
+                        } else {
+                            MediaItem.Builder()
+                                .setUri(url.toUri())
+                                .setMediaId(typedAudioNode.id.longValue.toString())
+                                .build()
+                        }
+                    }?.let {
+                        mediaItems.add(it)
                     }
-                }?.let {
-                    mediaItems.add(it)
+                }
+
+                if (typedAudioNode.id.longValue == firstPlayHandle) {
+                    firstPlayIndex = currentIndex
+                }
+                val thumbnail = typedAudioNode.thumbnailPath?.let { path ->
+                    File(path)
+                }
+
+                val duration = typedAudioNode.duration
+
+                playlistItemMapper(
+                    typedAudioNode.id.longValue,
+                    typedAudioNode.name,
+                    thumbnail,
+                    currentIndex,
+                    TYPE_NEXT,
+                    typedAudioNode.size,
+                    duration,
+                    typedAudioNode.type.extension
+                ).let { playlistItem ->
+                    newItems.add(playlistItem)
+                }
+
+                if (thumbnail != null && !thumbnail.exists()) {
+                    nodesWithoutThumbnail.add(Pair(typedAudioNode.id.longValue, thumbnail))
                 }
             }
 
-            if (typedAudioNode.id.longValue == firstPlayHandle) {
-                firstPlayIndex = currentIndex
-            }
-            val thumbnail = typedAudioNode.thumbnailPath?.let { path ->
-                File(path)
-            }
-
-            val duration = typedAudioNode.duration
-
-            playlistItemMapper(
-                typedAudioNode.id.longValue,
-                typedAudioNode.name,
-                thumbnail,
-                currentIndex,
-                TYPE_NEXT,
-                typedAudioNode.size,
-                duration,
-                typedAudioNode.type.extension
-            ).let { playlistItem ->
-                playlistItems.add(playlistItem)
-            }
-
-            if (thumbnail != null && !thumbnail.exists()) {
-                nodesWithoutThumbnail.add(Pair(typedAudioNode.id.longValue, thumbnail))
-            }
-        }
+        playlistItems.clear()
+        playlistItems.addAll(newItems)
 
         if (nodesWithoutThumbnail.isNotEmpty() && isConnectedToInternetUseCase()) {
             cancellableJobs[JOB_KEY_UPDATE_THUMBNAIL]?.cancel()
@@ -818,6 +842,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }
     }
 
+    private fun List<TypedAudioNode>.filterTakeDownNodes(): List<TypedAudioNode> =
+        filter { !it.isTakenDown }
+
     /**
      * Build play sources by node handles
      *
@@ -847,10 +874,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
         files: List<File>,
         firstPlayHandle: Long,
     ) {
-        playlistItems.clear()
-
         val mediaItems = ArrayList<MediaItem>()
         var firstPlayIndex = 0
+        val newItems = mutableListOf<PlaylistItem>()
 
         files.filter {
             it.isFile && filterByNodeName(it.name)
@@ -872,9 +898,11 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 MimeTypeList.typeForName(file.name).extension
             )
                 .let { playlistItem ->
-                    playlistItems.add(playlistItem)
+                    newItems.add(playlistItem)
                 }
         }
+        playlistItems.clear()
+        playlistItems.addAll(newItems)
         updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
     }
 
@@ -932,7 +960,20 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun onPlayerError() {
         playerRetry++
-        retry.value = playerRetry <= MAX_RETRY
+        if (playerRetry == 1) {
+            sharingScope.launch {
+                runCatching { checkNodeAccessibilityUseCase(NodeId(playingHandle)) }
+                    .onFailure { exception ->
+                        if (exception is BlockedMegaException) {
+                            withContext(mainDispatcher) { error.value = exception }
+                            return@launch
+                        }
+                    }
+                withContext(mainDispatcher) { retry.value = true }
+            }
+        } else {
+            retry.value = playerRetry <= MAX_RETRY
+        }
     }
 
     /**
@@ -1087,27 +1128,28 @@ class AudioPlayerServiceViewModel @Inject constructor(
             playingPosition = items.indexOfFirst { (nodeHandle) ->
                 nodeHandle == playingHandle
             }.takeIf { index ->
-                index in originalItems.indices
+                index in items.indices
             } ?: 0
 
             val recreatedItems = mutableListOf<PlaylistItem>()
             // Adjust whether need to build play sources again to avoid playlist is reordered everytime playlist items updated
-            if (isBuildPlaySources && shuffleEnabled.value && shuffleOrder.length == originalItems.size) {
+            val currentShuffleOrder = shuffleOrder
+            if (isBuildPlaySources && shuffleEnabled.value && currentShuffleOrder.length == items.size) {
                 recreatedItems.add(items[playingPosition])
 
                 var newPlayingIndex = 0
 
-                var index = shuffleOrder.getPreviousIndex(playingPosition)
+                var index = currentShuffleOrder.getPreviousIndex(playingPosition)
                 while (index != C.INDEX_UNSET) {
                     recreatedItems.add(0, items[index])
-                    index = shuffleOrder.getPreviousIndex(index)
+                    index = currentShuffleOrder.getPreviousIndex(index)
                     newPlayingIndex++
                 }
 
-                index = shuffleOrder.getNextIndex(playingPosition)
+                index = currentShuffleOrder.getNextIndex(playingPosition)
                 while (index != C.INDEX_UNSET) {
                     recreatedItems.add(items[index])
-                    index = shuffleOrder.getNextIndex(index)
+                    index = currentShuffleOrder.getNextIndex(index)
                 }
 
                 playingPosition = newPlayingIndex
@@ -1192,7 +1234,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
         mediaItemTransitionState.update { handle }
         cancellableJobs[JOB_KEY_AUDIO_PLAYBACK_INFO]?.cancel()
         cancellableJobs[JOB_KEY_AUDIO_PLAYBACK_INFO] = sharingScope.launch {
-            saveAudioPlaybackInfoUseCase()
+            runCatching {
+                saveAudioPlaybackInfoUseCase()
+            }.onFailure { Timber.e(it, "Failed to save audio playback info") }
         }
     }
 
@@ -1213,6 +1257,10 @@ class AudioPlayerServiceViewModel @Inject constructor(
     override fun playerSourceUpdate() = playerSource.asFlow()
 
     override fun mediaItemToRemoveUpdate() = mediaItemToRemove
+
+    override fun resetMediaItemToRemove() {
+        mediaItemToRemove.update { NO_MEDIA_ITEM }
+    }
 
     override fun nodeNameUpdate() = nodeNameUpdate.asFlow()
 
@@ -1299,7 +1347,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     override fun updateItemName(handle: Long, newName: String) =
         playlistItemsFlow.update {
             it.copy(
-                it.first.map { item ->
+                first = it.first.map { item ->
                     if (item.nodeHandle == handle) {
                         nodeNameUpdate.postValue(newName)
                         item.updateNodeName(newName)
@@ -1319,9 +1367,16 @@ class AudioPlayerServiceViewModel @Inject constructor(
     override fun getShuffleOrder() = shuffleOrder
 
     override fun setShuffleEnabled(enabled: Boolean) {
+        shuffleEnabled.update { enabled }
+        recreateAndUpdatePlaylistItems(
+            originalItems = if (enabled) playlistItemsFlow.value.first else playlistItems
+        )
+    }
+
+    override fun saveShuffleEnabled() {
         cancellableJobs[JOB_KEY_SET_SHUFFLE]?.cancel()
         cancellableJobs[JOB_KEY_SET_SHUFFLE] = sharingScope.launch {
-            setAudioShuffleEnabledUseCase(enabled)
+            setAudioShuffleEnabledUseCase(shuffleEnabled.value)
         }
     }
 
@@ -1349,6 +1404,32 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }
         cancellableJobs.values.map {
             it.cancel()
+        }
+    }
+
+    override fun saveRecentlyUsedItemIfQualifies(
+        handle: Long,
+        duration: Long,
+        position: Long,
+    ) {
+        // Duration not yet known: cannot evaluate, leave the CWLO index untouched.
+        if (handle == INVALID_HANDLE || duration <= 0L) return
+        val qualifies = position > CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
+                && duration - position >= CWLO_NEAR_COMPLETION_THRESHOLD_MS
+        applicationScope.launch {
+            runCatching {
+                if (qualifies) {
+                    val fileName = playlistItemsFlow.value.first
+                        .firstOrNull { it.nodeHandle == handle }?.nodeName.orEmpty()
+                    saveRecentlyUsedItemUseCase(
+                        nodeHandle = handle,
+                        type = RecentlyUsedType.Audio,
+                        fileName = fileName,
+                    )
+                } else {
+                    removeRecentlyUsedItemUseCase(handle)
+                }
+            }.onFailure { Timber.e(it, "Failed to update CWLO item on leave") }
         }
     }
 
@@ -1455,8 +1536,13 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun monitorMediaItemTransitionState(): Flow<Long?> = mediaItemTransitionState
 
+    override fun resetError() {
+        error.value = null
+    }
+
     companion object {
         private const val MAX_RETRY = 6
+        private val NO_MEDIA_ITEM = -1 to -1L
 
         private const val JOB_KEY_MONITOR_SHUFFLE = "JOB_KEY_MONITOR_SHUFFLE"
         private const val JOB_KEY_BUILD_PLAYER_SOURCES = "KEY_JOB_BUILD_PLAYER_SOURCES"

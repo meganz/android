@@ -21,7 +21,7 @@ class DefaultMonitorUserUpdatesTest {
     private val currentUserId = UserId(1L)
 
     private val accountRepository = mock<AccountRepository> {
-        onBlocking { getLoggedInUserId() }.thenReturn(currentUserId)
+        on { getLoggedInUserId() }.thenReturn(currentUserId)
     }
 
     @Before

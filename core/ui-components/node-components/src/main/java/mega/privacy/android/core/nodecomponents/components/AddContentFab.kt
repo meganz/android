@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import mega.android.core.ui.components.fab.MegaFab
 import mega.privacy.android.icon.pack.IconPack
@@ -21,13 +22,15 @@ import mega.privacy.android.icon.pack.IconPack
 fun AddContentFab(
     visible: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var readyToShow by remember { mutableStateOf(true) }
 
     if (visible && readyToShow) {
         MegaFab(
             onClick = onClick,
-            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus)
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
+            modifier = modifier
         )
     }
 

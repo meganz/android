@@ -34,7 +34,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
@@ -54,26 +53,25 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -82,6 +80,8 @@ import com.google.accompanist.permissions.isGranted
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
+import mega.android.core.ui.components.fab.MegaFab
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -106,22 +106,19 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Constants.PHONE_NUMBER_REGEX
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.LinkButton
-import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
-import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
-import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
@@ -144,6 +141,7 @@ internal fun InviteContactRoute(
     viewModel: InviteContactViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val localKeyboardController = LocalSoftwareKeyboardController.current
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -172,11 +170,11 @@ internal fun InviteContactRoute(
         uiState.emailValidationMessage?.let {
             if (it is Singular) {
                 val message = if (it.argument != null) {
-                    context.resources.getString(
+                    resources.getString(
                         it.id,
                         it.argument
                     )
-                } else context.getString(it.id)
+                } else resources.getString(it.id)
                 snackBarHostState.showAutoDurationSnackbar(message)
             }
         }
@@ -197,7 +195,7 @@ internal fun InviteContactRoute(
                     val message = status.messages.fold("") { acc, messageType ->
                         acc + when (messageType) {
                             is Plural -> {
-                                context.resources.getQuantityString(
+                                resources.getQuantityString(
                                     messageType.id,
                                     messageType.quantity,
                                     messageType.quantity
@@ -206,15 +204,15 @@ internal fun InviteContactRoute(
 
                             is Singular -> {
                                 if (messageType.argument != null) {
-                                    context.resources.getString(
+                                    resources.getString(
                                         messageType.id,
                                         messageType.argument
                                     )
-                                } else context.resources.getString(messageType.id)
+                                } else resources.getString(messageType.id)
                             }
                         }
                     }
-                    val action = status.actionId?.let { context.resources.getString(it) }
+                    val action = status.actionId?.let { resources.getString(it) }
 
                     snackBarHostState.showAutoDurationSnackbar(message, action).let { result ->
                         if (result == SnackbarResult.ActionPerformed && action != null) {
@@ -290,17 +288,19 @@ internal fun InviteContactRoute(
                             localKeyboardController?.hide()
                         }
 
-                        else -> Toast.makeText(
-                            context,
-                            R.string.invalid_input,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        else -> {
+                            Toast.makeText(
+                                context,
+                                R.string.invalid_input,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 } else {
                     localKeyboardController?.hide()
                 }
             },
-            onContactChipClick = viewModel::onContactChipClick
+            onContactChipClick = viewModel::onContactChipClick,
         )
 
         if (uiState.showOpenCameraConfirmation) {
@@ -428,20 +428,18 @@ internal fun InviteContactScreen(
             )
         },
         floatingActionButton = {
-            MegaFloatingActionButton(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(56.dp)
-                    .testTag(INVITE_CONTACT_FAB_TAG),
-                enabled = isInviteButtonEnabled,
-                onClick = {
-                    isInviteButtonEnabled = false
-                    onInviteContactClick()
-                }
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_send_horizontal_medium_thin_outline),
-                    contentDescription = null,
+            val modifier = Modifier
+                .padding(16.dp)
+                .size(56.dp)
+                .testTag(INVITE_CONTACT_FAB_TAG)
+            if (isInviteButtonEnabled) {
+                MegaFab(
+                    modifier = modifier,
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.SendHorizontal),
+                    onClick = {
+                        isInviteButtonEnabled = false
+                        onInviteContactClick()
+                    }
                 )
             }
         }
@@ -501,10 +499,7 @@ internal fun InviteContactScreen(
 
                 uiState.areContactsInitialized -> {
                     if (uiState.filteredContacts.isEmpty()) {
-                        EmptyContactResultBody(
-                            modifier = Modifier.fillMaxWidth(),
-                            isDarkMode = isDarkMode
-                        )
+                        EmptyContactResultBody()
                     } else {
                         ContactListBody(
                             modifier = Modifier.fillMaxSize(),
@@ -629,28 +624,12 @@ private fun ContactListLoadingBody(
 }
 
 @Composable
-private fun EmptyContactResultBody(
-    isDarkMode: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        EmptyContactsImage(isDarkMode)
-
-        val emptySpan = MegaSpanStyle(spanStyle = SpanStyle())
-        MegaSpannedText(
-            modifier = Modifier.testTag(NO_CONTACTS_TEXT_TAG),
-            value = stringResource(id = R.string.context_empty_contacts),
-            baseStyle = MaterialTheme.typography.subtitle2,
-            styles = mapOf(
-                SpanIndicator('A') to emptySpan,
-                SpanIndicator('B') to emptySpan,
-            ),
-            color = TextColor.Disabled
-        )
-    }
+private fun EmptyContactResultBody() {
+    EmptyStateView(
+        modifier = Modifier.testTag(NO_CONTACTS_EMPTY_VIEW_TAG),
+        imagePainter = painterResource(id = iconPackR.drawable.ic_user_glass),
+        title = stringResource(id = R.string.context_empty_contacts),
+    )
 }
 
 @Composable
@@ -969,7 +948,7 @@ internal const val EMPTY_CONTACTS_IMAGE_TAG = "empty_contacts_image:image_empty_
 internal const val CONTACT_LIST_LOADING_TEXT_TAG = "default_contact_list_loading_body:text_loading"
 internal const val CIRCULAR_LOADING_INDICATOR_TAG =
     "default_contact_list_loading_body:circular_loading_indicator"
-internal const val NO_CONTACTS_TEXT_TAG = "empty_contact_result_body:text_no_contacts"
+internal const val NO_CONTACTS_EMPTY_VIEW_TAG = "empty_contact_result_body"
 internal const val PHONE_CONTACTS_HEADER_TEXT_TAG = "phone_contacts_header:text_phone_contacts"
 internal const val HIGHLIGHTED_CONTACT_AVATAR_TAG = "contact_avatar:image_highlighted_avatar"
 internal const val CONTACT_AVATAR_WITH_URI_TAG = "contact_avatar:image_with_uri"

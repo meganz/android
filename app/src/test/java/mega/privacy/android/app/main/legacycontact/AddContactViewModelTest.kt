@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
 import mega.privacy.android.app.main.legacycontact.AddContactViewModel.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDER
 import mega.privacy.android.app.main.legacycontact.AddContactViewModel.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDERS
@@ -46,9 +45,6 @@ class AddContactViewModelTest {
     fun setUp() {
         whenever(monitorAccountDetailUseCase()).thenReturn(flow { mock() })
         runBlocking {
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
-                true
-            )
             whenever(getContactVerificationWarningUseCase()).thenReturn(false)
         }
         initUnderTest()
@@ -76,20 +72,6 @@ class AddContactViewModelTest {
             getFeatureFlagValueUseCase
         )
     }
-
-    @Test
-    fun `test that sensitiveItemsCount updated the value is HIDDEN_NODE_NONE_SENSITIVE when getFeatureFlagValueUseCase is false`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
-                false
-            )
-            initUnderTest()
-            underTest.checkSensitiveItems(listOf(10000L))
-
-            underTest.sensitiveItemsCountFlow.test {
-                assertThat(awaitItem()).isEqualTo(HIDDEN_NODE_NONE_SENSITIVE)
-            }
-        }
 
     @Test
     fun `test that sensitiveItemsCount updated the value is HIDDEN_NODE_NONE_SENSITIVE when node is not FolderNode`() =

@@ -23,5 +23,11 @@ class MonitorStorageStateUseCase @Inject constructor(
     operator fun invoke() = notificationsRepository.monitorEvent()
         .filterIsInstance<StorageStateEvent>().map {
             it.storageState
-        }.onStart { emit(getCurrentStorageStateUseCase()) }
+        }.onStart {
+            emit(
+                runCatching { getCurrentStorageStateUseCase() }.getOrDefault(
+                    StorageState.Unknown
+                )
+            )
+        }
 }

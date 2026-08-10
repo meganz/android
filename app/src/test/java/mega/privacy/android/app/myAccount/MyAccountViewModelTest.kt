@@ -14,7 +14,9 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
+import mega.privacy.android.domain.entity.account.AccountStorageDetail
+import mega.privacy.android.domain.entity.account.AccountTransferDetail
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
@@ -93,6 +95,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 import kotlin.random.Random
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Test class for [MyAccountViewModel]
@@ -100,11 +103,10 @@ import kotlin.random.Random
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class MyAccountViewModelTest {
-
     private lateinit var underTest: MyAccountViewModel
 
     private val context: Context = mock()
-    private val myAccountInfo: MyAccountInfo = mock()
+    private val fileSizeStringMapper: FileSizeStringMapper = mock()
     private val megaApi: MegaApiAndroid = mock()
     private val setAvatarUseCase: SetAvatarUseCase = mock()
     private val isMultiFactorAuthEnabledUseCase: IsMultiFactorAuthEnabledUseCase = mock()
@@ -187,7 +189,7 @@ internal class MyAccountViewModelTest {
         ).thenReturn(Unit)
         whenever(getPaymentMethodUseCase(anyBoolean())).thenReturn(PaymentMethodFlags(0L))
         whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
-        whenever(myAccountInfo.usedFormatted).thenReturn("")
+        whenever(fileSizeStringMapper(any<Long>())).thenReturn("")
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
         storageStateFlow.value = StorageState.Unknown
     }
@@ -195,8 +197,8 @@ internal class MyAccountViewModelTest {
     private fun initializeViewModel() {
         underTest = MyAccountViewModel(
             context = context,
-            myAccountInfo = myAccountInfo,
             megaApi = megaApi,
+            fileSizeStringMapper = fileSizeStringMapper,
             setAvatarUseCase = setAvatarUseCase,
             isMultiFactorAuthEnabledUseCase = isMultiFactorAuthEnabledUseCase,
             checkVersionsUseCase = checkVersionsUseCase,
@@ -233,7 +235,7 @@ internal class MyAccountViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorStorageStateUseCase = monitorStorageStateUseCase,
             getUsedTransferStatusUseCase = getUsedTransferStatusUseCase,
-            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase
+            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
         )
     }
 
@@ -401,7 +403,7 @@ internal class MyAccountViewModelTest {
                     errorCode = 30,
                     errorString = "An unexpected issue occurred",
                 ),
-                errorMessageRes = R.string.invalid_link,
+                errorMessageRes = sharedR.string.general_invalid_link,
             )
         }
 
@@ -602,27 +604,27 @@ internal class MyAccountViewModelTest {
         Arguments.of(
             AccountType.PRO_FLEXI,
             accountDetailsWithValidSubscription(AccountType.PRO_FLEXI),
-            false
+            true
         ),
         Arguments.of(
             AccountType.BUSINESS,
             accountDetailsWithValidSubscription(AccountType.BUSINESS),
-            false
+            true
         ),
         Arguments.of(
             AccountType.STARTER,
             accountDetailsWithValidSubscription(AccountType.STARTER),
-            false
+            true
         ),
         Arguments.of(
             AccountType.BASIC,
             accountDetailsWithValidSubscription(AccountType.BASIC),
-            false
+            true
         ),
         Arguments.of(
             AccountType.ESSENTIAL,
             accountDetailsWithValidSubscription(AccountType.ESSENTIAL),
-            false
+            true
         ),
         Arguments.of(
             AccountType.PRO_I,
@@ -637,7 +639,7 @@ internal class MyAccountViewModelTest {
         Arguments.of(
             AccountType.PRO_III,
             accountDetailsOneOffPlan(AccountType.PRO_III),
-            true
+            false
         ),
         Arguments.of(
             AccountType.PRO_LITE,
@@ -661,7 +663,6 @@ internal class MyAccountViewModelTest {
             isBusinessAccount = false,
             isMasterBusinessAccount = false,
             accountTypeIdentifier = accountType,
-            accountTypeString = "accountTypeString",
         )
 
         whenever(getAccountDetailsUseCase(anyBoolean())).thenReturn(userAccount)
@@ -768,10 +769,19 @@ internal class MyAccountViewModelTest {
         usedTransferPercentage: Int,
         usedTransferStatus: UsedTransferStatus,
     ) = runTest {
-        whenever(myAccountInfo.usedTransferPercentage).thenReturn(usedTransferPercentage)
         whenever(getUsedTransferStatusUseCase(usedTransferPercentage)).thenReturn(usedTransferStatus)
 
-        initializeViewModel()
+        accountDetailFlow.emit(
+            AccountDetail(
+                transferDetail = AccountTransferDetail(
+                    totalTransfer = 100L,
+                    usedTransfer = usedTransferPercentage.toLong(),
+                    usedTransferPercentage = usedTransferPercentage,
+                ),
+            )
+        )
+        advanceUntilIdle()
+
         assertThat(underTest.getUsedTransferPercentage()).isEqualTo(usedTransferPercentage)
         assertThat(underTest.getUsedTransferStatus()).isEqualTo(usedTransferStatus)
     }
@@ -830,13 +840,15 @@ internal class MyAccountViewModelTest {
         isFreeTrial = false,
     )
 
-    private fun expectedAccountSubscriptionDetail(accountType: AccountType) =
-        AccountSubscriptionDetail(
+    private fun expectedAccountSubscriptionDetail(
+        accountType: AccountType,
+        paymentMethodType: PaymentMethodType = PaymentMethodType.GOOGLE_WALLET,
+    ) = AccountSubscriptionDetail(
             subscriptionId = expectedSubscriptionId,
             subscriptionStatus = SubscriptionStatus.VALID,
             subscriptionCycle = AccountSubscriptionCycle.MONTHLY,
             subscriptionLevel = accountType,
-            paymentMethodType = PaymentMethodType.STRIPE2,
+            paymentMethodType = paymentMethodType,
             renewalTime = expectedSubscriptionRenewTime,
             featuresList = listOf("vpn", "pwm"),
             isFreeTrial = false,
@@ -898,7 +910,9 @@ internal class MyAccountViewModelTest {
             accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
             proExpirationTime = expectedProExpirationTime,
             accountPlanDetail = expectedAccountPlanDetailOneOff,
-            accountSubscriptionDetailList = listOf(expectedAccountSubscriptionDetail(accountType))
+            accountSubscriptionDetailList = listOf(
+                expectedAccountSubscriptionDetail(accountType, PaymentMethodType.STRIPE2)
+            )
         )
     )
 
@@ -907,8 +921,8 @@ internal class MyAccountViewModelTest {
         Dispatchers.resetMain()
         reset(
             context,
-            myAccountInfo,
             megaApi,
+            fileSizeStringMapper,
             setAvatarUseCase,
             isMultiFactorAuthEnabledUseCase,
             checkVersionsUseCase,

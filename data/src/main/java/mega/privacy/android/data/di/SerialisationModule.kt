@@ -28,6 +28,7 @@ internal abstract class SerialisationModule {
         @Provides
         fun provideJson(): Json {
             return Json {
+                ignoreUnknownKeys = true
                 serializersModule =
                     typedMessageSerialisationModule +
                             messageInfoSerialisationModule +

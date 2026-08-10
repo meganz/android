@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.mediaplayer.videoplayer
 
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.repository.MediaPlayerRepository
-import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
 /**
@@ -17,5 +17,7 @@ class GetVideoNodesByHandlesUseCase @Inject constructor(
      * @return video nodes
      */
     suspend operator fun invoke(handles: List<Long>) =
-        mediaPlayerRepository.getVideoNodesByHandles(handles)
+        mediaPlayerRepository.getVideoNodesByHandles(handles).filter { node ->
+            node.type is VideoFileTypeInfo
+        }
 }

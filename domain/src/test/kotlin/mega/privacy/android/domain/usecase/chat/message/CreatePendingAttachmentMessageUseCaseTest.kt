@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -63,6 +64,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val transferUniqueId = 344L
         val fileTypeInfo = mock<UnknownFileTypeInfo>()
         val fileSize = 89475L
+        val pitagTrigger = PitagTrigger.CameraCapture
 
         whenever(getFileSizeFromUriPathUseCase(uriPath)) doReturn FileResult(fileSize)
         whenever(getMyUserHandleUseCase()).thenReturn(userHandle)
@@ -76,6 +78,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             state = state.value,
             uriPath = uriPath,
             name = fileName,
+            pitagTrigger = pitagTrigger,
         )
         val expected = PendingFileAttachmentMessage(
             chatId = chatId,
@@ -94,6 +97,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             state = state,
             fileName = fileName,
             fileSize = fileSize,
+            pitagTrigger = pitagTrigger,
         )
         val actual = underTest(pendingMessage)
         assertThat(actual).isEqualTo(expected)
@@ -113,6 +117,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val transferUniqueId = 344L
         val fileTypeInfo = mock<UnknownFileTypeInfo>()
         val uriPath = UriPath(fileUri)
+        val pitagTrigger = PitagTrigger.Picker
         whenever(getMyUserHandleUseCase()).thenReturn(userHandle)
         whenever(fileSystemRepository.getFileNameFromUri(fileUri)) doReturn fileName
         whenever(fileSystemRepository.getFileTypeInfo(uriPath, fileName))
@@ -126,6 +131,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             uriPath = uriPath,
             type = PendingMessage.TYPE_VOICE_CLIP,
             name = fileName,
+            pitagTrigger = pitagTrigger,
         )
         val expected = PendingVoiceClipMessage(
             chatId = chatId,

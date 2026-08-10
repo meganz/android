@@ -9,9 +9,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.dialogs.BasicInputDialog
@@ -72,7 +74,9 @@ internal fun RenameDeviceDialog(
             onRenameCancelled.invoke()
         },
         onInputChange = {
-            renameDeviceViewModel.clearErrorMessage()
+            if (uiState.errorMessage != null) {
+                renameDeviceViewModel.clearErrorMessage()
+            }
         }
     )
 }
@@ -94,7 +98,12 @@ private fun RenameDeviceDialogBody(
     onInputChange: () -> Unit,
 ) {
     // Saves the input across configuration changes
-    var initialInput by rememberSaveable { mutableStateOf(oldDeviceName) }
+    var initialInput by rememberSaveable(
+        inputs = arrayOf(oldDeviceName),
+        stateSaver = TextFieldValue.Saver
+    ) {
+        mutableStateOf(TextFieldValue(oldDeviceName, TextRange(oldDeviceName.length)))
+    }
 
     BasicInputDialog(
         modifier = Modifier.testTag(RENAME_DEVICE_DIALOG_TAG),
@@ -103,15 +112,15 @@ private fun RenameDeviceDialogBody(
             initialInput = it
             onInputChange()
         },
-        positiveButtonText = stringResource(id = R.string.device_center_rename_device_dialog_positive_button),
+        positiveButtonText = stringResource(id = sharedR.string.context_rename),
         onPositiveButtonClicked = {
-            onRenameConfirmed(initialInput)
+            onRenameConfirmed(initialInput.text)
         },
         description = stringResource(id = R.string.device_center_rename_device_dialog_title),
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         inputValue = initialInput,
         errorText = uiState.errorMessage?.let { nonNullErrorMessage ->
-            if (nonNullErrorMessage == R.string.device_center_rename_device_dialog_error_message_invalid_characters) {
+            if (nonNullErrorMessage == sharedR.string.general_invalid_characters_defined) {
                 stringResource(nonNullErrorMessage).replace(
                     oldValue = "%1\$s",
                     newValue = "\" * / : < > ? \\ |"
@@ -153,6 +162,6 @@ private class RenameDeviceDialogBodyPreviewProvider : PreviewParameterProvider<R
             RenameDeviceState(errorMessage = R.string.device_center_rename_device_dialog_error_message_empty_device_name),
             RenameDeviceState(errorMessage = R.string.device_center_rename_device_dialog_error_message_maximum_character_length_exceeded),
             RenameDeviceState(errorMessage = R.string.device_center_rename_device_dialog_error_message_name_already_exists),
-            RenameDeviceState(errorMessage = R.string.device_center_rename_device_dialog_error_message_invalid_characters),
+            RenameDeviceState(errorMessage = sharedR.string.general_invalid_characters_defined),
         )
 }

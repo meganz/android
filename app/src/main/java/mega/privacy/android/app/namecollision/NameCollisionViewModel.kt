@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -100,6 +101,9 @@ class NameCollisionViewModel @Inject constructor(
     var pendingFolderCollisions = 0
     private var allCollisionsProcessed = false
     var isCopyToOrigin = false
+    var pitagTrigger = PitagTrigger.NotApplicable
+    private var uploadedFilesCount = 0
+    private var isLoadingOrLoaded = false
 
     init {
         viewModelScope.launch {
@@ -144,7 +148,7 @@ class NameCollisionViewModel @Inject constructor(
                 }
             }
         }.onFailure {
-            Timber.w("Fingerprint is null", it)
+            Timber.w(it, "Fingerprint is null")
         }
     }
 
@@ -154,13 +158,20 @@ class NameCollisionViewModel @Inject constructor(
      * @param collision [NameCollision] to resolve.
      */
     fun setSingleData(collision: NameCollision) {
+        if (isLoadingOrLoaded) return
+        isLoadingOrLoaded = true
+        pitagTrigger = collision.pitagTrigger
+        uploadedFilesCount = 0
         viewModelScope.launch {
             runCatching {
                 if (collision is NodeNameCollision.Default) {
                     checkCopyToOrigin(collision)
                 }
                 updateCurrentCollision(collision, true)
-            }.onFailure { Timber.e("Exception setting single data $it") }
+            }.onFailure {
+                isLoadingOrLoaded = false
+                Timber.e("Exception setting single data $it")
+            }
         }
     }
 
@@ -196,6 +207,10 @@ class NameCollisionViewModel @Inject constructor(
      * @param collisions    ArrayList of [NameCollision] to resolve.
      */
     fun setData(collisions: List<NameCollision>) {
+        if (isLoadingOrLoaded) return
+        isLoadingOrLoaded = true
+        pitagTrigger = collisions.first().pitagTrigger
+        uploadedFilesCount = 0
         viewModelScope.launch {
             runCatching {
                 require(collisions.isNotEmpty()) { "Collisions list is empty" }
@@ -215,7 +230,8 @@ class NameCollisionViewModel @Inject constructor(
                     getPendingCollisions(reorderedCollisions)
                 }
             }.onFailure {
-                Timber.e("Exception setting data", it)
+                Timber.e(it, "Exception setting data")
+                isLoadingOrLoaded = false
                 currentCollision.value = null
             }
         }
@@ -321,7 +337,10 @@ class NameCollisionViewModel @Inject constructor(
                 }
             }
 
-            else -> currentCollision.value = null
+            else -> {
+                pendingCollisions.clear()
+                currentCollision.value = null
+            }
         }
     }
 
@@ -497,7 +516,7 @@ class NameCollisionViewModel @Inject constructor(
      */
     private fun getAllPendingCollisions(): MutableList<NodeNameCollisionResult> {
         val allPendingCollisions = mutableListOf<NodeNameCollisionResult>().apply {
-            add(currentCollision.value!!)
+            currentCollision.value?.let { add(it) }
             addAll(pendingCollisions)
         }
 
@@ -516,6 +535,11 @@ class NameCollisionViewModel @Inject constructor(
         val choice =
             if (rename) NameCollisionChoice.RENAME
             else NameCollisionChoice.REPLACE_UPDATE_MERGE
+
+        // Count uploaded files when user chooses to upload
+        if (currentCollision.value?.nameCollision?.isFile == true) {
+            uploadedFilesCount++
+        }
 
         if (isFolderUploadContext) {
             continueWithNext(choice)
@@ -549,6 +573,10 @@ class NameCollisionViewModel @Inject constructor(
         list: MutableList<NodeNameCollisionResult>,
         rename: Boolean,
     ) {
+        // Count uploaded files when user chooses to upload
+        val fileCount = list.count { it.nameCollision.isFile }
+        uploadedFilesCount += fileCount
+
         if (isFolderUploadContext) {
             list.forEach { item ->
                 resolvedCollisions.add(item.apply {
@@ -750,6 +778,7 @@ class NameCollisionViewModel @Inject constructor(
                         pathsAndNames = pathsAndNames,
                         destinationId = destinationId,
                         collisionChoice = choice,
+                        pitagTrigger = pitagTrigger,
                     )
                 )
             )
@@ -772,6 +801,14 @@ class NameCollisionViewModel @Inject constructor(
      * Checks if all the pending collisions have been processed.
      */
     fun shouldFinish() = pendingCollisions.isEmpty()
+
+    /**
+     * Gets the count of files that were uploaded (choice != CANCEL and isFile == true).
+     * This counts files when user chooses to upload them (RENAME or REPLACE_UPDATE_MERGE).
+     *
+     * @return The number of files that were uploaded.
+     */
+    fun getUploadedFilesCount(): Int = uploadedFilesCount
 
     /**
      * Gets the current collision.

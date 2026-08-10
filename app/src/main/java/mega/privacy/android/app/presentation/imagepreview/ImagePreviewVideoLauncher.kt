@@ -8,10 +8,10 @@ import mega.privacy.android.app.utils.Constants.VIEWER_FROM_ZIP_BROWSER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
-import mega.privacy.android.domain.usecase.GetFileUrlByImageNodeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
+import mega.privacy.android.domain.usecase.node.GetAlbumLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -26,9 +26,9 @@ import javax.inject.Inject
 class ImagePreviewVideoLauncher @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getFingerprintUseCase: GetFingerprintUseCase,
-    private val getFileUrlByImageNodeUseCase: GetFileUrlByImageNodeUseCase,
     private val addImageTypeUseCase: AddImageTypeUseCase,
     private val getFolderLinkNodeContentUriUseCase: GetFolderLinkNodeContentUriUseCase,
+    private val getAlbumLinkNodeContentUriUseCase: GetAlbumLinkNodeContentUriUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
     private val megaNavigator: MegaNavigator,
@@ -41,13 +41,15 @@ class ImagePreviewVideoLauncher @Inject constructor(
         adapterType: Int = Constants.FROM_IMAGE_VIEWER,
         albumTitle: String? = null,
         albumId: Long? = null,
+        publicLinkUrl: String? = null,
     ) {
         runCatching {
-            val viewType = if (source == ImagePreviewFetcherSource.ZIP) { //handle zip file
-                VIEWER_FROM_ZIP_BROWSER
-            } else {
-                adapterType
+            val viewType = when (source) {
+                ImagePreviewFetcherSource.ZIP -> VIEWER_FROM_ZIP_BROWSER
+                ImagePreviewFetcherSource.ALBUM_SHARING -> Constants.FROM_ALBUM_SHARING
+                else -> adapterType
             }
+            val isMediaQueueAvailable = source != ImagePreviewFetcherSource.ALBUM_SHARING
             isLocalFile(imageNode, source)?.let { localPath ->
                 val file = File(localPath)
                 val fileTypeInfo = getFileTypeInfoUseCase(file)
@@ -58,25 +60,32 @@ class ImagePreviewVideoLauncher @Inject constructor(
                     viewType = viewType,
                     handle = imageNode.id.longValue,
                     parentId = imageNode.parentId.longValue,
+                    isMediaQueueAvailable = isMediaQueueAvailable,
                     collectionTitle = albumTitle,
                     collectionId = albumId
                 )
             } ?: run {
                 val typedFileNode = addImageTypeUseCase(imageNode)
-                if (source == ImagePreviewFetcherSource.CHAT) {
-                    getNodeContentUriUseCase(imageNode as ChatImageFile)
-                } else {
-                    getFolderLinkNodeContentUriUseCase(typedFileNode)
-                }.let { contentUri ->
-                    megaNavigator.openMediaPlayerActivityByFileNode(
-                        context = context,
-                        contentUri = contentUri,
-                        fileNode = typedFileNode,
-                        viewType = viewType,
-                        collectionTitle = albumTitle,
-                        collectionId = albumId
-                    )
+                val contentUri = when (source) {
+                    ImagePreviewFetcherSource.CHAT ->
+                        getNodeContentUriUseCase(imageNode as ChatImageFile)
+
+                    ImagePreviewFetcherSource.ALBUM_SHARING ->
+                        getAlbumLinkNodeContentUriUseCase(imageNode.id)
+
+                    else -> getFolderLinkNodeContentUriUseCase(typedFileNode)
                 }
+                megaNavigator.openMediaPlayerActivityByFileNode(
+                    context = context,
+                    contentUri = contentUri,
+                    fileNode = typedFileNode,
+                    viewType = viewType,
+                    isMediaQueueAvailable = isMediaQueueAvailable,
+                    collectionTitle = albumTitle,
+                    collectionId = albumId,
+                    serializedData = typedFileNode.serializedData,
+                    publicLinkUrl = publicLinkUrl,
+                )
             }
         }.onFailure { Timber.e(it) }
     }
@@ -92,17 +101,27 @@ class ImagePreviewVideoLauncher @Inject constructor(
         imageNode: ImageNode,
         source: ImagePreviewFetcherSource,
     ): String? {
-        return if (source == ImagePreviewFetcherSource.ZIP) {//handle zip file
-            imageNode.fullSizePath
-        } else if (source == ImagePreviewFetcherSource.CHAT) {
-            MegaNode.unserialize(imageNode.serializedData)?.let { node ->
-                checkNodePath(node)
+        return when (source) {
+            ImagePreviewFetcherSource.ZIP -> {
+                imageNode.fullSizePath
             }
-        } else {
-            getNodeByHandle(imageNode.id.longValue)?.let { node ->
-                checkNodePath(node)
+
+            ImagePreviewFetcherSource.CHAT -> {
+                MegaNode.unserialize(imageNode.serializedData)?.let { node ->
+                    checkNodePath(node)
+                }
             }
-            imageNode.fullSizePath
+
+            ImagePreviewFetcherSource.ALBUM_SHARING -> {
+                null
+            }
+
+            else -> {
+                getNodeByHandle(imageNode.id.longValue)?.let { node ->
+                    checkNodePath(node)
+                }
+                imageNode.fullSizePath
+            }
         }
     }
 

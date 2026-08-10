@@ -60,4 +60,15 @@ interface AudioPlayerServiceViewModelGateway : PlayerServiceViewModelGateway {
      */
     @OptIn(UnstableApi::class)
     fun newShuffleOrder(): ShuffleOrder
+
+    /**
+     * Decide whether the given item belongs in the Continue Where Left Off index when the user
+     * leaves the player (or playback ends). The item is added only once [position] is past 15
+     * seconds and is still more than 3 seconds from [duration]; otherwise it is removed so that
+     * briefly opened, finished, or near-completion items are not surfaced back as resumable.
+     *
+     * Caveat: in repeat mode ExoPlayer may loop directly without firing STATE_ENDED, or fire
+     * it after position has wrapped to 0. In that case the ticker path is the source of truth.
+     */
+    fun saveRecentlyUsedItemIfQualifies(handle: Long, duration: Long, position: Long)
 }

@@ -77,10 +77,10 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_gr
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.grey_900
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ScheduledMeetingJoinGuestButtonEvent
 import mega.privacy.mobile.analytics.event.WaitingRoomLeaveButtonEvent
 import kotlin.random.Random
-
 
 /**
  * Waiting room View
@@ -417,7 +417,7 @@ private fun GuestNameInputText(
 ) {
     Row(modifier = modifier) {
         GenericTextField(
-            placeholder = stringResource(R.string.first_name_text),
+            placeholder = stringResource(sharedR.string.general_first_name),
             text = firstName,
             imeAction = ImeAction.Next,
             onTextChange = { onFirstNameChange(it.take(15)) },
@@ -426,7 +426,7 @@ private fun GuestNameInputText(
                 .testTag("waiting_room:text_first_name"),
         )
         GenericTextField(
-            placeholder = stringResource(R.string.lastname_text),
+            placeholder = stringResource(sharedR.string.general_last_name),
             text = lastName,
             onTextChange = { onLastNameChange(it.take(15)) },
             modifier = Modifier

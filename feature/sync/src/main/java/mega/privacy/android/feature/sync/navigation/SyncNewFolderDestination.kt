@@ -6,7 +6,7 @@ import android.provider.DocumentsContract
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toFile
 import androidx.documentfile.provider.DocumentFile
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -18,9 +18,9 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import timber.log.Timber
 
 /**
@@ -30,7 +30,6 @@ import timber.log.Timber
 @Serializable
 data class SyncNewFolder(
     val syncType: SyncType = SyncType.TYPE_TWOWAY,
-    val isFromManagerActivity: Boolean = false,
     val remoteFolderHandle: Long? = null,
     val remoteFolderName: String? = null,
 ) : Parcelable
@@ -40,7 +39,7 @@ internal fun NavGraphBuilder.syncNewFolderDestination(
     navController: NavController,
     shouldNavigateToSyncList: Boolean,
     openUpgradeAccountPage: () -> Unit,
-    popToSyncListView: () -> Unit,
+    popToSyncListView: (syncType: SyncType) -> Unit,
     megaDomainName: String,
 ) {
     composable<SyncNewFolder>(
@@ -55,7 +54,6 @@ internal fun NavGraphBuilder.syncNewFolderDestination(
 
         val context = LocalContext.current
         val syncType = routeArg.syncType
-        val isFromManagerActivity = routeArg.isFromManagerActivity
         val remoteFolderHandle = routeArg.remoteFolderHandle
         val remoteFolderName = routeArg.remoteFolderName
 
@@ -84,7 +82,7 @@ internal fun NavGraphBuilder.syncNewFolderDestination(
                         )
                     }
                 }.onFailure {
-                    Timber.Forest.e(it)
+                    Timber.e(it)
                 }
             },
         )
@@ -97,7 +95,7 @@ internal fun NavGraphBuilder.syncNewFolderDestination(
             },
             openNextScreen = {
                 if (shouldNavigateToSyncList) {
-                    popToSyncListView()
+                    popToSyncListView(syncType)
                 } else {
                     if (!navController.popBackStack()) {
                         context.findFragmentActivity()?.finish()
@@ -108,8 +106,8 @@ internal fun NavGraphBuilder.syncNewFolderDestination(
                 openUpgradeAccountPage()
             },
             onBackClicked = {
-                if (shouldNavigateToSyncList && isFromManagerActivity.not()) {
-                    popToSyncListView()
+                if (shouldNavigateToSyncList) {
+                    popToSyncListView(syncType)
                 } else {
                     if (!navController.popBackStack()) {
                         context.findFragmentActivity()?.finish()

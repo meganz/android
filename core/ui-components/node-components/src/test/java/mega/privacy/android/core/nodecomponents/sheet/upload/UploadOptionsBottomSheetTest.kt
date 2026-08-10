@@ -13,7 +13,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.analytics.test.AnalyticsTestRule
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -35,6 +35,7 @@ class UploadOptionsBottomSheetTest {
     private val onCaptureClicked = mock<() -> Unit>()
     private val onNewFolderClicked = mock<() -> Unit>()
     private val onNewTextFileClicked = mock<() -> Unit>()
+    private val onOpenLinkClicked = mock<() -> Unit>()
     private val onDismissSheet = mock<() -> Unit>()
 
     @Test
@@ -49,6 +50,7 @@ class UploadOptionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_CAPTURE_ACTION).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_NEW_FOLDER_ACTION).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_NEW_TEXT_FILE_ACTION).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_OPEN_LINK_ACTION).assertIsDisplayed()
         }
     }
 
@@ -57,12 +59,12 @@ class UploadOptionsBottomSheetTest {
         initComposeTestRule()
 
         with(composeTestRule) {
-            onNodeWithText(R.string.upload_files).assertIsDisplayed()
-            onNodeWithText(R.string.upload_folder).assertIsDisplayed()
-            onNodeWithText(R.string.menu_scan_document).assertIsDisplayed()
-            onNodeWithText(R.string.menu_take_picture).assertIsDisplayed()
-            onNodeWithText(R.string.menu_new_folder).assertIsDisplayed()
-            onNodeWithText(R.string.action_create_txt).assertIsDisplayed()
+            onNodeWithText(sharedR.string.upload_bottom_sheet_action_upload_files).assertIsDisplayed()
+            onNodeWithText(sharedR.string.upload_bottom_sheet_action_upload_folder).assertIsDisplayed()
+            onNodeWithText(sharedR.string.upload_bottom_sheet_action_menu_scan_document).assertIsDisplayed()
+            onNodeWithText(sharedR.string.upload_bottom_sheet_action_menu_take_picture).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_new_folder).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_new_text_file).assertIsDisplayed()
         }
     }
 
@@ -132,6 +134,17 @@ class UploadOptionsBottomSheetTest {
         verify(onDismissSheet).invoke()
     }
 
+    @Test
+    fun `test that clicking on open link option invokes onOpenLinkClicked and onDismissSheet`() {
+        initComposeTestRule()
+
+        composeTestRule.onNodeWithTag(TEST_TAG_OPEN_LINK_ACTION)
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        verify(onOpenLinkClicked).invoke()
+        verify(onDismissSheet).invoke()
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     private fun initComposeTestRule() {
         composeTestRule.setContent {
@@ -142,6 +155,7 @@ class UploadOptionsBottomSheetTest {
                 onCaptureClicked = onCaptureClicked,
                 onNewFolderClicked = onNewFolderClicked,
                 onNewTextFileClicked = onNewTextFileClicked,
+                onOpenLinkClicked = onOpenLinkClicked,
                 onDismissSheet = onDismissSheet,
             )
         }

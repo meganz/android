@@ -6,7 +6,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUiEntity
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -17,6 +17,7 @@ import javax.inject.Inject
 /**
  * The mapper class to convert the RecentActionBucket to RecentActionBucketUiEntity
  */
+@Deprecated("Use revamp version")
 class RecentActionBucketUiEntityMapper @Inject constructor(
     @ApplicationContext private val context: Context,
     private val fileTypeIconMapper: FileTypeIconMapper,
@@ -69,8 +70,10 @@ class RecentActionBucketUiEntityMapper @Inject constructor(
                 fileTypeIconMapper(node.type.extension),
             shareIcon = when (item.parentFolderSharesType) {
                 RecentActionsSharesType.NONE -> null
-                RecentActionsSharesType.INCOMING_SHARES -> IconPackR.drawable.ic_folder_incoming_medium_solid
-                RecentActionsSharesType.OUTGOING_SHARES, RecentActionsSharesType.PENDING_OUTGOING_SHARES -> IconPackR.drawable.ic_folder_outgoing_medium_solid
+                RecentActionsSharesType.INCOMING_SHARES,
+                RecentActionsSharesType.OUTGOING_SHARES,
+                RecentActionsSharesType.PENDING_OUTGOING_SHARES,
+                    -> IconPackR.drawable.ic_folder_users_medium_solid
             },
             actionIcon = if (item.isUpdate) R.drawable.ic_versions_small else R.drawable.ic_recents_up,
             showMenuButton = isSingleNode,

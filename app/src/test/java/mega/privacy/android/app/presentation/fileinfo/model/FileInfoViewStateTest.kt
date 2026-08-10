@@ -3,10 +3,10 @@ package mega.privacy.android.app.presentation.fileinfo.model
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState.Companion.MAX_NUMBER_OF_CONTACTS_IN_LIST
 import mega.privacy.android.domain.entity.FolderTreeInfo
-import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -18,7 +18,7 @@ class FileInfoViewStateTest {
 
     @Test
     fun `test outSharesCoerceMax is returning all outShares if maximum is not surpassed`() {
-        val outShares = List<ContactPermission>(MAX_NUMBER_OF_CONTACTS_IN_LIST) { mock() }
+        val outShares = List<ContactPermissionUiState>(MAX_NUMBER_OF_CONTACTS_IN_LIST) { mock() }
         underTest = FileInfoViewState(outShares = outShares)
         assertThat(underTest.outSharesCoerceMax.size)
             .isEqualTo(MAX_NUMBER_OF_CONTACTS_IN_LIST)
@@ -26,7 +26,7 @@ class FileInfoViewStateTest {
 
     @Test
     fun `test outSharesCoerceMax is returning no more than maximum out shares`() {
-        val outShares = List<ContactPermission>(MAX_NUMBER_OF_CONTACTS_IN_LIST + 1) { mock() }
+        val outShares = List<ContactPermissionUiState>(MAX_NUMBER_OF_CONTACTS_IN_LIST + 1) { mock() }
         underTest = FileInfoViewState(outShares = outShares)
         assertThat(underTest.outSharesCoerceMax.size)
             .isEqualTo(MAX_NUMBER_OF_CONTACTS_IN_LIST)
@@ -66,7 +66,8 @@ class FileInfoViewStateTest {
     @Test
     fun `test that when folder tree info is updated then size is updated to totalCurrentSizeInBytes plus sizeOfPreviousVersionsInBytes`() {
         underTest = FileInfoViewState()
-        val result = underTest.copyWithFolderTreeInfo(mockFolderTreeInfo())
+        val folderNode = mockFolder()
+        val result = underTest.copyWithFolderTreeInfo(folderNode, mockFolderTreeInfo())
         assertThat(result.sizeInBytes).isEqualTo(CURRENT_SIZE + PREVIOUS_SIZE)
     }
 
@@ -76,10 +77,24 @@ class FileInfoViewStateTest {
         empty: Boolean,
     ) {
         underTest = FileInfoViewState()
-        val result = underTest.copyWithFolderTreeInfo(mockFolderTreeInfo(empty))
+        val folderNode = mock<TypedFolderNode> {
+            on { name }.thenReturn("Node")
+            on { isNodeKeyDecrypted }.thenReturn(true)
+        }
+        val result = underTest.copyWithFolderTreeInfo(folderNode, mockFolderTreeInfo(empty))
         assertThat(result.isAvailableOfflineAvailable).isEqualTo(!empty)
     }
 
+    @Test
+    fun `test that when folder tree info is updated and node key is not decrypted then isAvailableOfflineAvailable is false`() {
+        underTest = FileInfoViewState()
+        val folderNode = mock<TypedFolderNode> {
+            on { name }.thenReturn("Node")
+            on { isNodeKeyDecrypted }.thenReturn(false)
+        }
+        val result = underTest.copyWithFolderTreeInfo(folderNode, mockFolderTreeInfo(empty = false))
+        assertThat(result.isAvailableOfflineAvailable).isFalse()
+    }
 
     @Test
     fun `test that isDecrypted defaults to true`() {

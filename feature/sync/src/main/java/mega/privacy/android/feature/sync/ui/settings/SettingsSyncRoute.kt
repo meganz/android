@@ -14,11 +14,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.feature.sync.ui.model.SyncConnectionType
 import mega.privacy.android.feature.sync.ui.model.SyncFrequency
@@ -168,13 +168,16 @@ internal fun SettingSyncScreen(
             },
         )
     }
-    val context = LocalContext.current
+    val resources = LocalResources.current
     LaunchedEffect(key1 = uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { message ->
-            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                message.joinToString(separator = " ") { context.getString(it) }
-            )
-            snackbarShown()
+            try {
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                    message.joinToString(separator = " ") { resources.getString(it) }
+                )
+            } finally {
+                snackbarShown()
+            }
         }
     }
 }

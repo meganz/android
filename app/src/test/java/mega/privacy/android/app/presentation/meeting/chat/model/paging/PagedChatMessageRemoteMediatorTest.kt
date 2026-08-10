@@ -7,7 +7,6 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatMessage
@@ -33,7 +32,6 @@ class PagedChatMessageRemoteMediatorTest {
     private lateinit var underTest: PagedChatMessageRemoteMediator
 
     private val chatId = 123L
-    private val messageFlow: MutableStateFlow<ChatMessage?> = MutableStateFlow(null)
     private val fetchMessages = mock<FetchMessagePageUseCase>()
     private val saveChatMessagesUseCase = mock<SaveChatMessagesUseCase>()
     private val clearChatMessagesUseCase = mock<ClearChatMessagesUseCase>()
@@ -53,14 +51,12 @@ class PagedChatMessageRemoteMediatorTest {
                 chatId = chatId,
                 fetchMessages = fetchMessages,
                 saveMessages = saveChatMessagesUseCase,
-                coroutineScope = mock(),
                 clearChatMessagesUseCase = clearChatMessagesUseCase,
             )
     }
 
     @AfterEach
     internal fun tearDown() {
-        messageFlow.value = null
         Mockito.reset(
             fetchMessages,
             saveChatMessagesUseCase,
@@ -73,11 +69,8 @@ class PagedChatMessageRemoteMediatorTest {
         runTest {
 
             fetchMessages.stub {
-                onBlocking {
-                    invoke(
-                        any(),
-                        any()
-                    )
+                on {
+                    invoke(any())
                 }.thenReturn(
                     FetchMessagePageResponse(
                         chatId = 1L,
@@ -105,11 +98,8 @@ class PagedChatMessageRemoteMediatorTest {
             on { this.chatId }.thenReturn(chatId)
         }
         fetchMessages.stub {
-            onBlocking {
-                invoke(
-                    any(),
-                    any()
-                )
+            on {
+                invoke(any())
             }.thenReturn(response)
         }
 
@@ -122,11 +112,8 @@ class PagedChatMessageRemoteMediatorTest {
     internal fun `test that error response is returned if an error is thrown`() = runTest {
         val exception = Exception("This is the issue")
         fetchMessages.stub {
-            onBlocking {
-                invoke(
-                    any(),
-                    any()
-                )
+            on {
+                invoke(any())
             }.thenAnswer { throw exception }
         }
 
@@ -155,11 +142,8 @@ class PagedChatMessageRemoteMediatorTest {
 
             }
             fetchMessages.stub {
-                onBlocking {
-                    invoke(
-                        any(),
-                        any()
-                    )
+                on {
+                    invoke(any())
                 }.thenReturn(response)
             }
 
@@ -171,7 +155,7 @@ class PagedChatMessageRemoteMediatorTest {
     internal fun `test that timeout cancel exception returns when fetch message throw exception`() =
         runTest {
             val exception = mock<TimeoutCancellationException>()
-            whenever(fetchMessages(any(), any())).thenAnswer { throw exception }
+            whenever(fetchMessages(any())).thenAnswer { throw exception }
 
             val result = underTest.load(LoadType.APPEND, state)
 

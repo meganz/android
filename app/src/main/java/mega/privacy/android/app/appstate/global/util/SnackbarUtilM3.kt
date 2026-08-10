@@ -16,15 +16,20 @@ suspend fun SnackbarHostState.show(attributes: SnackbarAttributes) {
     val result = showSnackbar(
         message = attributes.message.orEmpty(),
         actionLabel = attributes.action,
-        duration = when (attributes.duration) {
-            SnackbarDuration.Short -> SnackbarDurationM3.Short
-            SnackbarDuration.Long -> SnackbarDurationM3.Long
-            SnackbarDuration.Indefinite -> SnackbarDurationM3.Indefinite
-        },
+        duration = attributes.duration.toM3Duration(),
         withDismissAction = attributes.withDismissAction,
     )
 
     if (result == SnackbarResult.ActionPerformed) {
         attributes.actionClick?.invoke()
     }
+}
+
+/**
+ * Maps [SnackbarAttributes] duration to Material 3 SnackbarDuration
+ */
+fun SnackbarDuration.toM3Duration(): SnackbarDurationM3 = when (this) {
+    SnackbarDuration.Short -> SnackbarDurationM3.Short
+    SnackbarDuration.Long -> SnackbarDurationM3.Long
+    SnackbarDuration.Indefinite -> SnackbarDurationM3.Indefinite
 }

@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.data.mapper
 import mega.privacy.android.data.mapper.backup.SyncErrorMapper
 import mega.privacy.android.data.mapper.sync.SyncTypeMapper
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import nz.mega.sdk.MegaSync
@@ -22,9 +23,9 @@ internal class FolderPairMapper @Inject constructor(
         model: MegaSync,
         megaFolderName: String,
         syncStats: MegaSyncStats?,
-        isStorageOverQuota: Boolean,
-    ): FolderPair =
-        FolderPair(
+    ): FolderPair {
+        val syncError = syncErrorMapper(model.error)
+        return FolderPair(
             id = model.backupId,
             syncType = syncTypeMapper(MegaSync.SyncType.swigToEnum(model.type)),
             pairName = model.name,
@@ -33,8 +34,9 @@ internal class FolderPairMapper @Inject constructor(
             syncStatus = mapSyncStatus(
                 syncStats = syncStats,
                 runningState = model.runState,
-                isStorageOverQuota = isStorageOverQuota,
+                isStorageOverQuota = syncError == SyncError.STORAGE_OVERQUOTA,
             ),
-            syncError = syncErrorMapper(model.error)
+            syncError = syncError
         )
+    }
 }

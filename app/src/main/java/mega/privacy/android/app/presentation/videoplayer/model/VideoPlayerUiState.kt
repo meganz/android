@@ -7,9 +7,11 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
@@ -22,13 +24,15 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property currentPlayingIndex the current playing index
  * @property metadata the metadata
  * @property playQueueTitle the play queue title
- * @property isRetry whether it is retry
+ * @property isRetry whether it is retry (legacy video player)
+ * @property retryEvent event triggered when playback should be retried (new video player)
+ * @property retryFailedEvent event triggered when all retries are exhausted or playback build fails (new video player)
  * @property repeatToggleMode the repeat toggle mode
  * @property currentPlayingVideoSize the current playing video size
  * @property mediaPlaybackState the playback state
  * @property snackBarMessage the snack bar message
  * @property isFullscreen whether it is full screen
- * @property isVideoOptionPopupShown whether the video option popup is shown
+ * @property isMoreOptionShown whether the video more option is shown
  * @property menuActions the list of video player menu actions
  * @property accountType the account type
  * @property isBusinessAccountExpired whether the business account is expired
@@ -45,17 +49,41 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property query search query
  * @property searchedItems searched video player items
  * @property isLocked whether the video player is locked
- * @property isSpeedPopupShown speed playback popup whether is shown, true is shown, otherwise is false
+ * @property isSpeedOptionsShown whether the playback speed options bottom sheet is shown
  * @property currentSpeedPlayback current SpeedPlaybackItem
  * @property showPlaybackDialog whether the playback dialog is shown
  * @property playbackPosition the playback position
  * @property currentPlayingItemName the current playing item name
- * @property showSubtitleDialog whether the subtitle dialog is shown
+ * @property showSubTitlesOptions whether the subtitle options are shown
  * @property subtitleSelectedStatus the subtitle selected status
  * @property matchedSubtitleInfo the matched subtitle info
  * @property addedSubtitleInfo the added subtitle info
  * @property navigateToSelectSubtitleScreen whether to navigate to select subtitle screen
  * @property blockedError the blocked error event
+ * @property isClosedAfterHidingNode whether to close the video player after hiding node.
+ * @property nodeSourceType the source type of the current playing node
+ * @property fileLinkUrl the public file link URL; non-null only when [nodeSourceType] is
+ *   [mega.privacy.android.domain.entity.node.NodeSourceType.FILE_LINK]. Used to fetch the node
+ *   via GetPublicNodeUseCase when the video player displays bottom-sheet options.
+ * @property localFilePath the absolute path to a local file; non-null only when [nodeSourceType] is
+ *   [mega.privacy.android.domain.entity.node.NodeSourceType.MEDIA_PLAYER_ZIP_FILE]. Used to build
+ *   a synthetic ZipFileTypedNode when displaying bottom-sheet options.
+ * @property isConnected whether the device is connected to the internet
+ * @property playerErrorType the type of player error, null if no error
+ * @property moveOrRemoveNodeEvent one-shot event emitted while moving or removing the
+ *   current playing node, used to drive confirmation dialogs and snack bars from the activity.
+ * @property isPipEnabled whether the Picture in Picture feature is enabled via feature flag
+ * @property isInPipMode whether the video player is currently displayed in PIP mode
+ * @property isFromLink whether the video was opened from a public link (file link, folder link, or album sharing)
+ * @property isLoggedIn whether the user is currently logged in; used together with [isFromLink] to determine if session validation is required
+ * @property isFromOffline whether the video was opened from offline storage; when true the player reads a local file and needs no SDK session
+ * @property isVideoNotRendered whether the video cannot be rendered (audio may still play)
+ * @property isAlbumSharingLink whether the video was opened from an album sharing link specifically (as opposed to a folder link)
+ * @property isPlayQueueVisible whether the play queue is shown as an in-place overlay (Compose route, which has no separate queue destination)
+ * @property invalidLaunchSourceEvent one-shot event emitted when no valid launch payload was
+ *   available at creation (e.g. after process death); drives the route to navigate back.
+ * @property chatId the chat room ID
+ * @property msgId the message ID within the chat
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -65,12 +93,14 @@ data class VideoPlayerUiState(
     val metadata: Metadata = Metadata(null, null, null, ""),
     val playQueueTitle: String? = null,
     val isRetry: Boolean? = null,
+    val retryEvent: StateEvent = consumed,
+    val retryFailedEvent: StateEvent = consumed,
     val repeatToggleMode: RepeatToggleMode = RepeatToggleMode.REPEAT_NONE,
     val currentPlayingVideoSize: VideoSize? = null,
     val mediaPlaybackState: MediaPlaybackState = MediaPlaybackState.Playing,
     val snackBarMessage: String? = null,
     val isFullscreen: Boolean = false,
-    val isVideoOptionPopupShown: Boolean = false,
+    val isMoreOptionShown: Boolean = false,
     val menuActions: List<VideoPlayerMenuAction> = emptyList(),
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
@@ -87,16 +117,34 @@ data class VideoPlayerUiState(
     val query: String? = null,
     val searchedItems: List<VideoPlayerItem> = emptyList(),
     val isLocked: Boolean = false,
-    val isSpeedPopupShown: Boolean = false,
+    val isSpeedOptionsShown: Boolean = false,
     val currentSpeedPlayback: SpeedPlaybackItem = VideoSpeedPlaybackItem.PlaybackSpeed_1X,
     val showPlaybackDialog: Boolean = false,
     val playbackPosition: Long? = null,
     val currentPlayingItemName: String? = null,
-    val showSubtitleDialog: Boolean = false,
+    val showSubTitlesOptions: Boolean = false,
     val subtitleSelectedStatus: SubtitleSelectedStatus = SubtitleSelectedStatus.Off,
     val matchedSubtitleInfo: SubtitleFileInfo? = null,
     val addedSubtitleInfo: SubtitleFileInfo? = null,
     val navigateToSelectSubtitleScreen: Boolean = false,
     val blockedError: StateEvent = consumed,
-    val isClosedAfterHidingNode: Boolean = false
+    val isClosedAfterHidingNode: Boolean = false,
+    val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    val fileLinkUrl: String? = null,
+    val localFilePath: String? = null,
+    val isConnected: Boolean = true,
+    val playerErrorType: PlayerErrorType? = null,
+    val moveOrRemoveNodeEvent: StateEventWithContent<MoveOrRemoveNodeResult> = consumed(),
+    val isPipEnabled: Boolean = false,
+    val isInPipMode: Boolean = false,
+    val isFromLink: Boolean = false,
+    val isLoggedIn: Boolean = false,
+    val isFromOffline: Boolean = false,
+    val isAlbumSharingLink: Boolean = false,
+    val serializedData: String? = null,
+    val isVideoNotRendered: Boolean = false,
+    val isPlayQueueVisible: Boolean = false,
+    val invalidLaunchSourceEvent: StateEvent = consumed,
+    val chatId: Long? = null,
+    val msgId: Long? = null,
 )

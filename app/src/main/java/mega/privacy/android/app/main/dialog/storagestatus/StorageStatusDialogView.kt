@@ -27,8 +27,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Util
@@ -65,7 +65,7 @@ internal fun StorageStatusDialogView(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     usePlatformDefaultWidth: Boolean = true,
-    viewModel: StorageStatusViewModel = viewModel(),
+    viewModel: StorageStatusViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
@@ -174,7 +174,7 @@ internal fun StorageStatusDialogView(
                     ) {
                         TextMegaButton(
                             modifier = Modifier.testTag(HORIZONTAL_DISMISS_TAG),
-                            textId = R.string.general_dismiss,
+                            textId = sharedR.string.general_dismiss_dialog,
                             onClick = dismissClickListener,
                         )
 
@@ -207,7 +207,7 @@ internal fun StorageStatusDialogView(
 
                         TextMegaButton(
                             modifier = Modifier.testTag(VERTICAL_DISMISS_TAG),
-                            textId = R.string.general_dismiss,
+                            textId = sharedR.string.general_dismiss_dialog,
                             onClick = dismissClickListener,
                         )
                     }

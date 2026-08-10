@@ -28,6 +28,7 @@ class RetryPendingMessageUseCase @Inject constructor(
                     startChatUploadsWithWorkerUseCase(
                         uriPath = it,
                         chatFilesFolderId = getOrCreateMyChatsFilesFolderIdUseCase(),
+                        pitagTrigger = message.pitagTrigger,
                         message.msgId
                     ).collect()
                 }

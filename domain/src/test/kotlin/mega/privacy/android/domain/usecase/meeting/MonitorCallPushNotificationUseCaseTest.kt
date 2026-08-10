@@ -417,37 +417,6 @@ class MonitorCallPushNotificationUseCaseTest {
         }
 
     @Test
-    fun `test that monitorChatCallUpdates emits Remove action when call composition changes and user is added`() =
-        runTest(defaultDispatcher) {
-            val myUserHandle = 999L
-            val call = ChatCall(
-                chatId = chatId,
-                callId = callId,
-                peerIdParticipants = listOf(myUserHandle),
-                status = ChatCallStatus.UserNoPresent, // Changed to UserNoPresent as per new implementation
-                changes = listOf(ChatCallChanges.CallComposition),
-                callCompositionChange = CallCompositionChanges.Added,
-                peerIdCallCompositionChange = myUserHandle // Added this field as per new implementation
-            )
-
-            whenever(callRepository.monitorChatCallUpdates()).thenReturn(flowOf(call))
-            whenever(getMyUserHandleUseCase()).thenReturn(myUserHandle)
-
-            underTest().test {
-                val item = awaitItem()
-                assertThat(item).isNotEmpty()
-                assertThat(item[chatId]).isEqualTo(CallPushMessageNotificationActionType.Remove)
-                cancelAndIgnoreRemainingEvents()
-            }
-
-            // Verify that setFakeIncomingCallUseCase is called with Remove
-            verify(setFakeIncomingCallStateUseCase).invoke(
-                chatId = chatId,
-                type = FakeIncomingCallState.Remove
-            )
-        }
-
-    @Test
     fun `test that monitorChatCallUpdates calls setFakeIncomingCallUseCase when call status changes to Joining`() =
         runTest(defaultDispatcher) {
             val call = ChatCall(
@@ -731,7 +700,7 @@ class MonitorCallPushNotificationUseCaseTest {
             underTest().test {
                 val item = awaitItem()
                 assertThat(item).isNotEmpty()
-                assertThat(item[chatId]).isEqualTo(CallPushMessageNotificationActionType.Remove)
+                assertThat(item[chatId]).isEqualTo(CallPushMessageNotificationActionType.Update)
                 cancelAndIgnoreRemainingEvents()
             }
         }

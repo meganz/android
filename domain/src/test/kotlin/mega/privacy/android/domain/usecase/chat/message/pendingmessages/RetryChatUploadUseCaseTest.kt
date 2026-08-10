@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
@@ -35,8 +36,11 @@ class RetryChatUploadUseCaseTest {
     private val id = NodeId(1)
     private val uriPath = UriPath("foo")
     private val chatUploadAppData = listOf(TransferAppData.ChatUpload(pendingMessageId))
+
+    private val pitagTrigger = PitagTrigger.Picker
     private val pendingMessage = mock<PendingMessage> {
         on { this.uriPath } doReturn uriPath
+        on { this.pitagTrigger } doReturn pitagTrigger
     }
 
     @BeforeAll
@@ -78,11 +82,12 @@ class RetryChatUploadUseCaseTest {
         runTest {
             whenever(getPendingMessageUseCase(pendingMessageId)).thenReturn(pendingMessage)
             whenever(getOrCreateMyChatsFilesFolderIdUseCase()).thenReturn(id)
-            whenever(startChatUploadsWithWorkerUseCase(uriPath, id, pendingMessageId))
+            whenever(startChatUploadsWithWorkerUseCase(uriPath, id, pitagTrigger, pendingMessageId))
                 .thenReturn(emptyFlow())
 
             underTest(chatUploadAppData)
 
-            verify(startChatUploadsWithWorkerUseCase).invoke(uriPath, id, pendingMessageId)
+            verify(startChatUploadsWithWorkerUseCase)
+                .invoke(uriPath, id, pitagTrigger, pendingMessageId)
         }
 }

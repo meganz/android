@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
@@ -41,7 +42,7 @@ internal fun RequireChargingDuringVideoCompressionTile(
             subtitle = stringResource(
                 R.string.settings_camera_upload_charging_helper_label,
                 stringResource(
-                    R.string.label_file_size_mega_byte,
+                    SharedR.string.label_file_size_megabytes,
                     maximumNonChargingVideoCompressionSize.toString(),
                 )
             ),

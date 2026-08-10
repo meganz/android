@@ -651,7 +651,7 @@ class WaitingRoomViewModel @Inject constructor(
     private fun chatLogout() {
         viewModelScope.launch {
             runCatching {
-                chatLogoutUseCase()
+                chatLogoutUseCase(disableChatApi = false)
             }.onSuccess {
                 _state.update {
                     it.copy(

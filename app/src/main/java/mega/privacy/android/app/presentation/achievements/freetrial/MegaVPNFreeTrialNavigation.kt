@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.achievements.freetrial.view.MegaVPNFreeTrialScreen
 import mega.privacy.android.app.utils.Constants.MEGA_VPN_PACKAGE_NAME
@@ -16,7 +17,8 @@ data class MegaVPNFreeTrial(
     val storageAmount: Long,
     val awardStorageAmount: Long,
     val durationInDays: Int,
-)
+    val awardDaysLeft: Int?,
+) : NavKey
 
 /**
  * Route for [MegaVPNFreeTrial]
@@ -30,6 +32,7 @@ fun NavGraphBuilder.megaVPNFreeTrialScreen() {
             storageAmount = megaVPNFreeTrial.storageAmount,
             awardStorageAmount = megaVPNFreeTrial.awardStorageAmount,
             durationInDays = megaVPNFreeTrial.durationInDays,
+            awardDaysLeft = megaVPNFreeTrial.awardDaysLeft,
             onInstallButtonClicked = {
                 openInSpecificApp(context, MEGA_VPN_PACKAGE_NAME)
             }
@@ -45,6 +48,7 @@ fun NavController.navigateToMegaVPNFreeTrial(
     storageAmount: Long,
     awardStorageAmount: Long,
     durationInDays: Int,
+    awardDaysLeft: Int?,
     navOptions: NavOptions? = null,
 ) {
     this.navigate(
@@ -52,7 +56,8 @@ fun NavController.navigateToMegaVPNFreeTrial(
             isReceivedAward,
             storageAmount,
             awardStorageAmount,
-            durationInDays
+            durationInDays,
+            awardDaysLeft
         ),
         navOptions = navOptions
     )

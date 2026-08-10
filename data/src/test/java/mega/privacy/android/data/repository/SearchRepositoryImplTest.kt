@@ -3,8 +3,12 @@ package mega.privacy.android.data.repository
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.database.dao.RecentSearchDao
+import mega.privacy.android.data.database.entity.RecentSearchEntity
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -26,11 +30,11 @@ import nz.mega.sdk.MegaShare
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -49,6 +53,7 @@ class SearchRepositoryImplTest {
     private val megaCancelToken: MegaCancelToken = mock()
     private val megsSearchFilterMapper: MegaSearchFilterMapper = mock()
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
+    private val recentSearchDao: RecentSearchDao = mock()
     private val typedNode: TypedFileNode = mock {
         on { id } doReturn nodeId
     }
@@ -69,7 +74,8 @@ class SearchRepositoryImplTest {
             megaSearchFilterMapper = megsSearchFilterMapper,
             megaLocalRoomGateway = megaLocalRoomGateway,
             getCloudSortOrder = getCloudSortOrder,
-            getOthersSortOrder = getOthersSortOrder
+            getOthersSortOrder = getOthersSortOrder,
+            recentSearchDao = recentSearchDao
         )
     }
 
@@ -163,15 +169,14 @@ class SearchRepositoryImplTest {
         assertThat(actual.first().id).isEqualTo(nodeId)
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that getPublicLinks returns list of untyped nodes`(isSingleActivityEnabled: Boolean) =
+    @Test
+    fun `test that getPublicLinks returns list of untyped nodes`() =
         runTest {
-            whenever(getLinksSortOrderUseCase(isSingleActivityEnabled)).thenReturn(SortOrder.ORDER_NONE)
+            whenever(getLinksSortOrderUseCase(true)).thenReturn(SortOrder.ORDER_NONE)
             whenever(megaApiGateway.getPublicLinks(sortOrderIntMapper(SortOrder.ORDER_NONE)))
                 .thenReturn(listOf(megaNode))
             whenever(nodeMapper(megaNode)).thenReturn(typedNode)
-            val actual = underTest.getPublicLinks(isSingleActivityEnabled)
+            val actual = underTest.getPublicLinks()
             assertThat(actual.first().id).isEqualTo(nodeId)
         }
 
@@ -218,6 +223,35 @@ class SearchRepositoryImplTest {
         whenever(megaApiGateway.getInvalidHandle()).thenReturn(-1L)
         val actual = underTest.getInvalidHandle()
         assertThat(actual).isEqualTo(NodeId(-1L))
+    }
+
+    @Test
+    fun `test that saveRecentSearch calls dao with correct entity when query is not empty`() =
+        runTest {
+            val query = "test query"
+            underTest.saveRecentSearch(query)
+            verify(recentSearchDao).insertRecentSearchWithPrefixCleanup(
+                argThat { entity ->
+                    entity.searchQuery == query && entity.timestamp > 0
+                }
+            )
+        }
+
+    @Test
+    fun `test that saveRecentSearch does not call dao when query is empty`() = runTest {
+        underTest.saveRecentSearch("")
+        verify(recentSearchDao, never()).insertRecentSearchWithPrefixCleanup(any())
+    }
+
+    @Test
+    fun `test that monitorRecentSearches returns mapped flow of search queries`() = runTest {
+        val entities = listOf(
+            RecentSearchEntity("query1", 1000L),
+            RecentSearchEntity("query2", 2000L)
+        )
+        whenever(recentSearchDao.monitorRecentSearches()).thenReturn(flowOf(entities))
+        val result = underTest.monitorRecentSearches().first()
+        assertThat(result).containsExactly("query1", "query2").inOrder()
     }
 
     companion object {

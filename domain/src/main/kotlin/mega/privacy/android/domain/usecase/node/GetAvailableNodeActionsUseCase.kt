@@ -27,48 +27,52 @@ class GetAvailableNodeActionsUseCase @Inject constructor(
         typedNode: TypedNode,
     ) = if (isNodeInRubbishBinUseCase(typedNode.id)) {
         listOf(NodeAction.Delete)
-    } else mutableListOf<NodeAction>().apply {
-        if (!typedNode.isTakenDown && typedNode is FileNode) {
-            add(NodeAction.SendToChat)
-        }
-        val accessPermission = getNodeAccessPermission(typedNode.id)
-        if (accessPermission != AccessPermission.OWNER) {
-            val incomingShareFirstLevel =
-                typedNode.parentId.longValue == -1L || getNodeByIdUseCase(typedNode.parentId)?.parentId?.longValue == -1L
-            if (!typedNode.isTakenDown) {
-                add(NodeAction.Download)
-                add(NodeAction.Copy)
-                if (incomingShareFirstLevel) {
-                    add(NodeAction.Leave)
-                }
+    } else if (!typedNode.isNodeKeyDecrypted) {
+        emptyList()
+    } else {
+        mutableListOf<NodeAction>().apply {
+            if (!typedNode.isTakenDown && typedNode is FileNode) {
+                add(NodeAction.SendToChat)
             }
-            if (!isNodeInBackupsUseCase(typedNode.id.longValue) && accessPermission == AccessPermission.FULL) {
-                add(NodeAction.Rename)
-                if (incomingShareFirstLevel) {
-                    add(NodeAction.MoveToRubbishBin)
+            val accessPermission = getNodeAccessPermission(typedNode.id)
+            if (accessPermission != AccessPermission.OWNER) {
+                val incomingShareFirstLevel =
+                    typedNode.parentId.longValue == -1L || getNodeByIdUseCase(typedNode.parentId)?.parentId?.longValue == -1L
+                if (!typedNode.isTakenDown) {
+                    add(NodeAction.Download)
+                    add(NodeAction.Copy)
+                    if (incomingShareFirstLevel) {
+                        add(NodeAction.Leave)
+                    }
                 }
-            }
-        } else {
-            if (!typedNode.isTakenDown) {
-                add(NodeAction.Download)
-                add(NodeAction.Copy)
-                if (typedNode !is FileNode) {
-                    add(NodeAction.ShareFolder)
-                }
-
-                if (typedNode.exportedData != null) {
-                    add(NodeAction.ManageLink)
-                    add(NodeAction.RemoveLink)
-                } else {
-                    add(NodeAction.GetLink)
+                if (!isNodeInBackupsUseCase(typedNode.id.longValue) && accessPermission == AccessPermission.FULL) {
+                    add(NodeAction.Rename)
+                    if (incomingShareFirstLevel) {
+                        add(NodeAction.MoveToRubbishBin)
+                    }
                 }
             } else {
-                add(NodeAction.DisputeTakedown)
-            }
-            if (!isNodeInBackupsUseCase(typedNode.id.longValue)) {
-                add(NodeAction.MoveToRubbishBin)
-                add(NodeAction.Rename)
-                add(NodeAction.Move)
+                if (!typedNode.isTakenDown) {
+                    add(NodeAction.Download)
+                    add(NodeAction.Copy)
+                    if (typedNode !is FileNode) {
+                        add(NodeAction.ShareFolder)
+                    }
+
+                    if (typedNode.exportedData != null) {
+                        add(NodeAction.ManageLink)
+                        add(NodeAction.RemoveLink)
+                    } else {
+                        add(NodeAction.GetLink)
+                    }
+                } else {
+                    add(NodeAction.DisputeTakedown)
+                }
+                if (!isNodeInBackupsUseCase(typedNode.id.longValue)) {
+                    add(NodeAction.MoveToRubbishBin)
+                    add(NodeAction.Rename)
+                    add(NodeAction.Move)
+                }
             }
         }
     }

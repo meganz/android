@@ -1,9 +1,12 @@
 package mega.privacy.android.app.presentation.fileexplorer.model
 
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 
 /**
  * The File Explorer UI State
@@ -16,6 +19,11 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * decides to back out of the process
  * @property shouldFinishScreen true if the File Explorer should be finished
  * @property isAskingForCollisionsResolution true if the app is asking for name collisions resolution, false otherwise.
+ * @property nonCollidedFilesUploadedCount number of non-collided files that were uploaded (tracked when upload completes while collision resolution is in progress)
+ * @property nodeUpdatedEvent event triggered when nodes have been updated
+ * @property cloudDriveFolderPath navigation stack for the cloud drive explorer (root handle at
+ * index 0, current folder at the end). Used to resolve the parent folder on back press.
+ * @property cloudRootHandle the cloud drive root node handle, or -1 if not yet initialised.
  */
 data class FileExplorerUiState(
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
@@ -25,7 +33,22 @@ data class FileExplorerUiState(
     val isScanUploadingAborted: Boolean = false,
     val shouldFinishScreen: Boolean = false,
     val isAskingForCollisionsResolution: Boolean = false,
+    val nonCollidedFilesUploadedCount: Int = 0,
+    val nodeUpdatedEvent: StateEvent = consumed,
+    val noFilesToUploadEvent: StateEvent = consumed,
+    val navigateToCloud: StateEventWithContent<NavigateToCloudEvent> = consumed(),
+    val isFeatureFlagEnabled: Boolean? = null,
+    val disabledTargetId: NodeId? = null,
+    val cloudDriveFolderPath: List<Long> = emptyList(),
+    val cloudRootHandle: Long = -1,
 ) {
+
+    data class NavigateToCloudEvent(
+        val nodeId: NodeId?,
+        val folderDestinations: List<CloudDriveNavKey>?,
+        val message: String?,
+    )
+
     /**
      * Documents associated by its uri value
      */

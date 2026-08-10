@@ -14,8 +14,6 @@
     <string name="general_select">Seç</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Klasör seç</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Oluştur</string>
     <!-- button -->
     <string name="general_add">Ekle</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -61,10 +59,6 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Yükle</string>
     <!-- Menu item -->
-    <string name="action_create_folder">Yeni klasör oluştur</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Yeni metin dosyası</string>
-    <!-- Menu item -->
     <string name="action_settings">Ayarlar</string>
     <!-- Search button -->
     <string name="action_search">Ara</string>
@@ -93,7 +87,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Abonelik iptal edildi</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Aboneliğinizi iptal edemedik. Yardım için lütfen support&#64;mega.io ile iletişime geçin.</string>
+    <string name="cancel_subscription_error">Aboneliğinizi iptal edemedik. Yardım için lütfen https://mega.nz/support sayfasından iletişime geçin.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Diğer tüm oturumları kapat</string>
     <!-- Message after kill all opened sessions -->
@@ -152,10 +146,6 @@
     <string name="login_before_share">MEGA ile paylaşmak için giriş yapın</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Onay bağlantınız artık geçerli değil. Hesabınız zaten etkinleştirilmiş veya kaydınızı iptal etmiş olabilirsiniz.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Adı</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Soyadı</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">[B]Şifremi kaybedersem verilerimi de kaybedebileceğimi[/B] anlıyorum. [A]MEGA’nın uçtan uca şifrelemesi[/A] hakkında daha fazlasını öğrenin.</string>
     <!-- warning dialog -->
@@ -184,7 +174,7 @@
     <!-- Label to reference a recents section -->
     <string name="section_recents">Son etkinlikler</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
-    <string name="section_secondary_media_uploads">Medya Yüklemeleri</string>
+    <string name="section_secondary_media_uploads">Medya yüklemeleri</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Çevrim dışı</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -276,8 +266,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Bu bağlantı artık herkese açık olmayacak.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Yeniden adlandır</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Aç</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Dosya hazırlanıyor</string>
@@ -297,8 +285,6 @@
     <string name="context_move_to_trash">Çöp kutusuna taşı</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">MEGA’dan kaldır</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Klasör adı</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Klasör oluşturuluyor</string>
     <!-- Menu option title -->
@@ -387,8 +373,6 @@
     <string name="subscription_type_monthly">Aylık</string>
     <!--  -->
     <string name="subscription_type_yearly">Yıllık</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Yeni klasör</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Kişi ekle</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -734,7 +718,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Geçersiz e-posta adresi veya şifre. Lütfen tekrar deneyin.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Hesabınız Hizmet Şartları ihlalleri nedeniyle askıya alındı. Lütfen support&#64;mega.io ile iletişime geçin.</string>
+    <string name="error_account_suspended">Hesabınız Hizmet Şartları ihlalleri nedeniyle askıya alındı. Destek için lütfen https://mega.nz/support sayfasından ile iletişime geçin</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Giriş yapmak için çok fazla başarısız deneme oldu, lütfen bir saat bekleyin.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -819,7 +803,7 @@
     <!-- Message when select the option Do not disturb but the notifications are already muted -->
     <string name="notifications_are_already_muted">Sohbet bildirimleri zaten sessize alınmış</string>
     <!-- Message when a chat has been unmuted successfully. -->
-    <string name="success_unmuting_a_chat">Sohbet bildirimleri etkinleştirildi.</string>
+    <string name="success_unmuting_a_chat">Sohbet bildirimleri etkinleştirildi</string>
     <!-- String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15 -->
     <plurals name="chat_notifications_muted_until_specific_time">
         <item quantity="one">Saat %1$s olana kadar sessiz</item>
@@ -990,7 +974,7 @@
     <!-- Title of the settings section to configure the autoaway of chat presence -->
     <string name="settings_autoaway_title">Otomatik uzakta</string>
     <!-- Subtitle of the settings section to configure the autoaway of chat presence -->
-    <string name="settings_autoaway_subtitle">Hareketsizlikten sonra beni Uzakta göster</string>
+    <string name="settings_autoaway_subtitle">Şu kadar hareketsizlikten sonra beni Uzakta göster:</string>
     <!-- Value in the settings section of the autoaway chat presence -->
     <string name="settings_autoaway_value">%1$d dakika</string>
     <!-- Title of the settings section to configure the status persistence of chat presence -->
@@ -1004,12 +988,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">dakika</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Çevrim içi</item>
-        <item>Uzakta</item>
-        <item>Meşgul</item>
-        <item>Çevrim dışı</item>
-    </string-array>
+    <string name="settings_chat_status_online">Çevrim içi</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Uzakta</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Meşgul</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Çevrim dışı</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Etkinleştir</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1027,15 +1012,15 @@
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
     <string name="transfer_paused">Duraklatıldı</string>
     <!-- Possible state of a transfer -->
-    <string name="transfer_queued">Kuyrukta</string>
+    <string name="transfer_queued">Sıraya alındı</string>
     <!-- Possible state of a transfer. When the transfer is finishing -->
     <string name="transfer_completing">Tamamlanıyor</string>
     <!-- Possible state of a transfer. When the transfer is retrying -->
-    <string name="transfer_retrying">Tekrar deneniyor</string>
+    <string name="transfer_retrying">Yeniden deneniyor</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
-    <string name="upload_service_notification">%2$d dosyadan %1$d tanesi yükleniyor</string>
+    <string name="upload_service_notification">Dosyalar yükleniyor: %1$d / %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
-    <string name="upload_service_notification_paused">%2$d dosyadan %1$d tanesi yükleniyor (duraklatıldı)</string>
+    <string name="upload_service_notification_paused">Dosyalar yükleniyor: %1$d / %2$d (duraklatıldı)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d dosya yüklendi</item>
@@ -1065,8 +1050,8 @@
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
-        <item quantity="one">%2$d dosyadan %1$d tanesi indirildi</item>
-        <item quantity="other">%2$d dosyadan %1$d tanesi indirildi</item>
+        <item quantity="one">%2$d dosyadan %1$d adet indirildi</item>
+        <item quantity="other">%2$d dosyadan %1$d adedi indirildi</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
     <plurals name="download_service_failed">
@@ -1074,9 +1059,9 @@
         <item quantity="other">%1$d dosya indirilemedi</item>
     </plurals>
     <!-- Text of the notification shown when the download service is running -->
-    <string name="download_service_notification">%2$d dosyadan %1$d tanesi indiriliyor</string>
+    <string name="download_service_notification">Dosyalar indiriliyor: %1$d / %2$d</string>
     <!-- Text of the notification shown when the download service is paused -->
-    <string name="download_service_notification_paused">%2$d dosyadan %1$d tanesi indiriliyor (duraklatıldı)</string>
+    <string name="download_service_notification_paused">Dosyalar indiriliyor: %1$d / %2$d (duraklatıldı)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Yetersiz aktarım kotası</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -1229,7 +1214,7 @@
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Yalnızca HTTPS kullan</string>
     <!-- subtitle of the advanced setting to choose the use of https -->
-    <string name="setting_subtitle_use_https_only">Bu seçeneği yalnızca aktarımlarınız başlamazsa etkinleştirin. Normal koşullarda HTTP yeterlidir, çünkü tüm aktarımlar zaten şifrelenmiştir.</string>
+    <string name="setting_subtitle_use_https_only">Bu seçeneği yalnızca aktarımlarınız başlamazsa etkinleştirin. Normal şartlarda tüm aktarımlar zaten şifrelendiği için HTTP yeterlidir.</string>
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Nasıl işliyor?</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
@@ -1253,8 +1238,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Yardım</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Geri bildirim gönder</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Android geri bildirimi</string>
     <!-- mail body -->
@@ -1263,8 +1246,6 @@
     <string name="settings_feedback_body_device_model">Cihaz modeli</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Android sürümü</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">Yeni metin dosyası</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Dosya adı</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1283,8 +1264,6 @@
     <string name="general_incorrect_names">Lütfen devam etmeden önce dosya adlarınızı düzeltin</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Geçersiz karakterler</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">Şu karakterlere izin verilmez: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Dosya adı boş olamaz.</item>
@@ -1302,12 +1281,6 @@
     <string name="invalid_connection_state">Sohbete yeniden bağlanılıyor</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Bir hata oluştu ve aramaya bağlanılamıyor.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">MEGA Mobil Uygulamasını beğendiniz mi?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Evet, uygulamayı derecelendir</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Hayır, geri bildirim gönder</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Kişi izni verilmedi</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1365,7 +1338,7 @@
     <!-- positive button on dialog to view a contact -->
     <string name="contact_view">Görüntüle</string>
     <!-- Item menu option to reproduce audio or video in external reproductors -->
-    <string name="external_play">Şununla aç</string>
+    <string name="external_play">Birlikte aç</string>
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Şununla paylaş</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
@@ -1389,7 +1362,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Depolama kotası aşıldı</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Geçersiz bağlantı, lütfen yeni bir geçerli bağlantı isteyin</string>
+    <string name="invalid_link">Geçersiz bağlantı. Lütfen tekrar deneyin veya yeni bir bağlantı isteyin.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Geçersiz bağlantı şifresi</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1474,12 +1447,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Video kalitesi</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Düşük</item>
-        <item>Orta</item>
-        <item>Yüksek</item>
-        <item>Orijinal</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Düşük</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Orta</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Yüksek</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Orijinal</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Cevapsız arama</string>
     <!-- Refers to a location of file -->
@@ -1743,8 +1717,8 @@
     <string name="settings_file_management_file_versions_title">Dosya sürümleri</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
-        <item quantity="one">%1$d dosya sürümü, toplam %2$s</item>
-        <item quantity="other">%1$d dosya sürümü, toplam %2$s</item>
+        <item quantity="one">%1$d dosya sürümü, toplamda %2$s yer kaplıyor</item>
+        <item quantity="other">%1$d dosya sürümü, toplamda %2$s yer kaplıyor</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Dosya yönetimi</string>
@@ -1904,7 +1878,7 @@
     <!-- General label for files -->
     <string name="general_files">Dosya</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Cihaza kaydet</string>
+    <string name="general_save_to_device">İndir</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">MEGA’ya yükle</string>
     <!-- Label choose destination -->
@@ -2037,7 +2011,7 @@
         <item quantity="other">%d katılımcı</item>
     </plurals>
     <!--  -->
-    <string name="custom_subtitle_of_group_chat">%1$s ve %2$d tane daha</string>
+    <string name="custom_subtitle_of_group_chat">%1$s ve %2$d adet daha</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Bu sohbet için bir bağlantı oluşturmadan önce bir açıklama ayarlamanız gerekir:</string>
     <!-- Message shown when a call starts. -->
@@ -2250,7 +2224,7 @@
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[B]Son etkinliklerin içerisinde [/B][A]dosya bulunamadı[/A]</string>
     <!-- Title of a recents bucket -->
-    <string name="title_bucket">%1$s ve %2$d tane daha</string>
+    <string name="title_bucket">%1$s ve %2$d adet daha</string>
     <!-- Title of a media recents bucket that only contains some images -->
     <plurals name="title_media_bucket_only_images">
         <item quantity="one">%d fotoğraf</item>
@@ -2980,7 +2954,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
     <string name="delete_account_text_other_platform_last_step">Bu, hesabınızı silmek için son adımdır. Hem hesabınız hem de aboneliğiniz silinecek ve saklanan tüm verilerinizi kalıcı olarak kaybedeceksiniz. Lütfen aşağıya şifrenizi girin.</string>
     <!-- Title of timeline tab in photos section -->
-    <string name="tab_title_timeline">Zaman akışı</string>
+    <string name="tab_title_timeline">Zaman çizelgesi</string>
     <!-- Title of album tab in photos section. -->
     <string name="tab_title_album">Albümler</string>
     <!-- Title of favourite album. -->
@@ -3068,7 +3042,7 @@
     <!-- Warning informing transfers were cancelled. -->
     <string name="transfers_cancelled">Aktarımlar iptal edildi.</string>
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
-    <string name="title_duplicated_items">Yinelenen öğeler</string>
+    <string name="title_duplicated_items">Aynı adlı öğeler</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
     <string name="file_already_exists_in_location">Hedefte [B]%1$s[/B] adlı bir dosya zaten mevcut.</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
@@ -3164,7 +3138,7 @@
     <!-- Accessibility Label for the submit button on the report issue screen-->
     <string name="settings_help_report_issue_submit_menu_action">Gönder</string>
     <!-- Error message when submit issue failed-->
-    <string name="settings_help_report_issue_error">Bir şeyler ters gitti. Lütfen daha sonra tekrar deneyin. Sorunu hala gönderemiyorsanız yardım için %s ile iletişime geçin.</string>
+    <string name="settings_help_report_issue_error">Bir şeyler ters gitti. Lütfen daha sonra tekrar deneyin. Sorunu hâlâ gönderemiyorsanız yardım için %s ile iletişime geçin.</string>
     <!-- Success message when submit issue succeeded-->
     <string name="settings_help_report_issue_success">Raporunuzu aldık. Sorunu inceleyip size geri döneceğiz.</string>
     <!-- Message shown during log file upload-->
@@ -3266,7 +3240,7 @@
     <!-- Button to skip asking permissions. -->
     <string name="permissions_not_now_button">Şimdi değil</string>
     <!-- Title of the screen asking for enabling notifications permission. -->
-    <string name="permissions_notifications_title">Bildirimde kalın</string>
+    <string name="permissions_notifications_title">Bildirim alın</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA size arama, sohbet ve dosya aktarım bildirimleri gönderecektir.</string>
     <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
@@ -3382,8 +3356,8 @@
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="one">Albüm silinecek ancak içeriği Zaman akışınızda kalacaktır.</item>
-        <item quantity="other">Albümler silinecek ancak içerikleri Zaman akışınızda kalacaktır.</item>
+        <item quantity="one">Albüm silinecek ancak içeriği Zaman çizelgenizde kalacaktır.</item>
+        <item quantity="other">Albümler silinecek ancak içerikleri Zaman çizelgenizde kalacaktır.</item>
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Daha az gör</string>
@@ -3932,12 +3906,18 @@
         <item quantity="one">%1$d öğe kopyalanamadı</item>
         <item quantity="other">%1$d öğe kopyalanamadı</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">%1$d öğe kopyalandı,&#160;</item>
         <item quantity="other">%1$d öğe kopyalandı,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">%1$d öğe kopyalanamadı</item>
         <item quantity="other">%1$d öğe kopyalanamadı</item>
@@ -4174,8 +4154,8 @@
     <string name="cloud_drive_subtitle_link_access_password">Bağlantıyı yalnızca şifreye sahip kişiler açabilir</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <plurals name="general_name_collision_file_apply_for_all">
-        <item quantity="one">Yinelenen öğeye uygula</item>
-        <item quantity="other">Tüm %1$d yinelenen öğeye uygula</item>
+        <item quantity="one">Aynı adlı öğeye uygula</item>
+        <item quantity="other">%1$d aynı adlı öğeye uygula</item>
     </plurals>
     <!-- Title of the meeting info screen -->
     <string name="meetings_info_title">Bilgi</string>
@@ -4546,16 +4526,6 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s sunuyor</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Bu kişi ekran paylaşıyor</string>
-    <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">Bu arama kaydediliyor</string>
-    <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">Aramada kalarak kayıt altına alınmasına izin vermiş olursunuz. Kayıt yalnızca kaydeden kişinin cihazında saklanır.</string>
-    <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">Tamam</string>
-    <!-- Label for the negative or cancel button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_negative_button">Aramadan ayrıl</string>
-    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Daha fazlasını öğren[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">%1$s kayda başladı</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
@@ -4641,7 +4611,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Şarjınız %%%1$d’nin altında olduğu için yükleme duraklatıldı</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Kamera yüklemeleri çalışmayı durdurdu. Çözmek için kamera yüklemelerini yeniden etkinleştirmeyi deneyin. Sorun devam ederse support&#64;mega.io ile iletişime geçin.</string>
+    <string name="photos_camera_uploads_general_issue">Kamera yüklemeleri çalışmayı durdurdu. Çözmek için kamera yüklemelerini yeniden etkinleştirmeyi deneyin. Sorun devam ederse destek ile https://mega.nz/support sayfasından ile iletişime geçin</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Kamera yüklemeleri devam ediyor, %1$d dosya beklemede</item>
@@ -4708,7 +4678,7 @@
     <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Katılınamıyor</string>
     <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
-    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Bu arama yalnızca 100 katılımcıyı destekleyebilir. Yöneticiden bu kısıtlamayı kaldırmasını isteyin.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Bu arama yalnızca 100 katılımcıyı destekleyebilir. Düzenleyiciden bu kısıtlamayı kaldırmasını isteyin.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Tamam</string>
     <!-- The snackbar message of hidden nodes operation -->

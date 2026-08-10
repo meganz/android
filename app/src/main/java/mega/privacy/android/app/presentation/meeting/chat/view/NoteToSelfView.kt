@@ -9,20 +9,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
-import mega.privacy.android.shared.original.core.ui.controls.chip.TagChipStyle
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
+import mega.privacy.android.shared.resources.R as sharedR
 
 
 /**
@@ -35,7 +33,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1me
 internal fun NoteToSelfView(
     onNoteToSelfClicked: (() -> Unit)? = null,
     isHint: Boolean = false,
-    isNew: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -78,16 +75,6 @@ internal fun NoteToSelfView(
                         textColor = TextColor.Primary,
                         style = MaterialTheme.typography.subtitle1medium,
                     )
-
-                    if (isNew) {
-                        MegaChip(
-                            selected = true,
-                            text = stringResource(sharedR.string.notifications_notification_item_new_tag),
-                            style = TagChipStyle,
-                            modifier = Modifier
-                                .testTag(NOTE_TO_SELF_ITEM_NEW_LABEL)
-                        )
-                    }
                 }
             }
         }
@@ -101,7 +88,6 @@ private fun PreviewNoteToSelfView() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         NoteToSelfView(
             isHint = true,
-            isNew = true,
             onNoteToSelfClicked = {}
         )
     }
@@ -113,12 +99,10 @@ private fun PreviewNoteToSelfAvatarView() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         NoteToSelfView(
             isHint = false,
-            isNew = true,
             onNoteToSelfClicked = {}
         )
     }
 }
 
 internal const val NOTE_TO_SELF_ITEM_TITLE_TEXT = "note_to_self_item:title_text"
-internal const val NOTE_TO_SELF_ITEM_NEW_LABEL = "note_to_self_item:new_label"
 

@@ -1,13 +1,15 @@
 package mega.privacy.android.app.getLink
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
@@ -16,12 +18,13 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.Constants.HANDLE
 import mega.privacy.android.app.utils.Constants.HANDLE_LIST
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 
 /**
  * Activity which allows create and manage a link of a node
- * @see[GetLinkFragment], [CopyrightFragment], [DecryptionKeyFragment], [LinkPasswordFragment].
+ * @see[GetLinkFragment], [DecryptionKeyFragment], [LinkPasswordFragment].
  *
  * Or the creation of multiple links @see[GetSeveralLinksFragment].
  */
@@ -63,7 +66,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         setContentView(binding.root)
         consumeInsetsWithToolbar(customToolbar = binding.toolbarGetLink)
 
-        if (intent == null || shouldRefreshSessionDueToSDK()) {
+        if (intent == null || shouldRefreshSessionDueToSDK(true)) {
             return
         }
 
@@ -140,11 +143,13 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                         if (!isShowing) show()
                     }
                 }
+
                 R.id.copyright -> supportActionBar?.hide()
                 R.id.decryption_key -> {
                     supportActionBar?.title =
                         getString(R.string.option_decryption_key)
                 }
+
                 R.id.password -> {
                     supportActionBar?.title = getString(
                         if (viewModelNode.getPasswordText()
@@ -153,6 +158,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                         else R.string.reset_password_label
                     )
                 }
+
                 R.id.main_get_several_links -> {
                     viewModelNode.setElevation(true)
                     supportActionBar?.apply {
@@ -167,8 +173,10 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
-        if (viewModelNode.shouldShowCopyright()) {
-            navController.navigate(R.id.show_copyright)
+        lifecycleScope.launch {
+            if (viewModelNode.shouldShowCopyright()) {
+                navController.navigate(R.id.show_copyright)
+            }
         }
     }
 

@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.settings.reportissue
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,12 +23,14 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueUiState
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubmitIssueRequest
 import mega.privacy.android.domain.exception.TooManyRequestsMegaException
 import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.SubmitIssueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.SharedStringResourceProvider
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,6 +48,8 @@ import javax.inject.Inject
 class ReportIssueViewModel @Inject constructor(
     private val submitIssueUseCase: SubmitIssueUseCase,
     private val getSupportEmailUseCase: GetSupportEmailUseCase,
+    private val accountTypeNameMapper: SharedStringResourceProvider<AccountType?>,
+    @ApplicationContext private val context: Context,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -131,7 +137,12 @@ class ReportIssueViewModel @Inject constructor(
             if (submitReportJob?.isActive != true) {
                 submitReportJob = viewModelScope.launch {
                     try {
-                        submitIssueUseCase(SubmitIssueRequest(description.value, includeLogs.value))
+                        submitIssueUseCase(
+                            request = SubmitIssueRequest(description.value, includeLogs.value),
+                            accountTypeMapper = { accountType ->
+                                context.getString(accountTypeNameMapper(accountType))
+                            },
+                        )
                             .cancellable()
                             .onCompletion { error ->
                                 onSubmitCompleted(error)
@@ -202,6 +213,6 @@ class ReportIssueViewModel @Inject constructor(
     companion object {
         internal const val DESCRIPTION_KEY = "DESCRIPTION"
         internal const val INCLUDE_LOGS_KEY = "INCLUDE_LOGS"
-        private const val MINIMUM_CHARACTERS = 10
+        private const val MINIMUM_CHARACTERS = 30
     }
 }

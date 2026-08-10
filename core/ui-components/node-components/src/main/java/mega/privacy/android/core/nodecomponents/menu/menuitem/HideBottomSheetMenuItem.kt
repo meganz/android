@@ -15,15 +15,15 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.HideOnboardingInfoMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
@@ -36,7 +36,7 @@ import javax.inject.Inject
  */
 class HideBottomSheetMenuItem @Inject constructor(
     override val menuAction: HideMenuAction,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val hideOnboardingInfoMenuAction: HideOnboardingInfoMenuAction,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -65,11 +65,10 @@ class HideBottomSheetMenuItem @Inject constructor(
                     MegaIcon(
                         painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.HelpCircle),
                         contentDescription = null,
-                        modifier = Modifier.Companion
+                        modifier = Modifier
                             .size(24.dp)
                             .clickable {
-                                handler.actionHandler(menuAction, selectedNode)
-                                handler.onDismiss()
+                                handler.actionHandler(hideOnboardingInfoMenuAction, selectedNode)
                             },
                         tint = IconColor.Secondary
                     )
@@ -84,11 +83,9 @@ class HideBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType,
     ): Boolean {
-        val isHiddenNodesEnabled = isHiddenNodesActive()
-        if (!isHiddenNodesEnabled) return false
-
-        if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown || isInBackups)
+        if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown || isInBackups || !node.isNodeKeyDecrypted)
             return false
 
         if (!isHidingActionAllowedUseCase(node.id))
@@ -100,13 +97,6 @@ class HideBottomSheetMenuItem @Inject constructor(
             return true
 
         return !node.isMarkedSensitive && !node.isSensitiveInherited
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     override

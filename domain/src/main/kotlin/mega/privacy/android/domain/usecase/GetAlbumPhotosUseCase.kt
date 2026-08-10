@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
@@ -44,6 +45,7 @@ class GetAlbumPhotosUseCase @Inject constructor(
                 )
             }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun monitorAlbumPhotosUpdate(albumId: AlbumId): Flow<List<Photo>> =
         albumRepository.monitorAlbumElementIds(albumId)
             .filter(List<AlbumPhotoId>::isNotEmpty)

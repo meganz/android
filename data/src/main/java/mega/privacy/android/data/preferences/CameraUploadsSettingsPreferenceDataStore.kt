@@ -70,9 +70,12 @@ internal class CameraUploadsSettingsPreferenceDataStore(
     private val chargingRequiredToUploadContent =
         stringPreferencesKey("chargingRequiredToUploadContent")
 
+    override val monitorCameraUploadsEnabled: Flow<Boolean?> =
+        getPreferenceFlow().monitor(cameraUploadsEnabledKey)
+            .map { decryptData(it)?.toBooleanStrictOrNull() }
+
     override suspend fun isCameraUploadsEnabled(): Boolean? {
-        return getPreferenceFlow().monitor(cameraUploadsEnabledKey)
-            .map { decryptData(it)?.toBooleanStrictOrNull() }.firstOrNull()
+        return monitorCameraUploadsEnabled.firstOrNull()
     }
 
     override suspend fun isMediaUploadsEnabled(): Boolean? {

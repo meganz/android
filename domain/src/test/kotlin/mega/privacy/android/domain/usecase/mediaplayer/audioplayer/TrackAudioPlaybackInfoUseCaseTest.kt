@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.usecase.GetTickerUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -28,6 +29,7 @@ class TrackAudioPlaybackInfoUseCaseTest {
     private lateinit var underTest: TrackAudioPlaybackInfoUseCase
 
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
+    private val removeRecentlyUsedItemUseCase = mock<RemoveRecentlyUsedItemUseCase>()
 
     private val mediaHandle: Long = 1234567
 
@@ -38,6 +40,7 @@ class TrackAudioPlaybackInfoUseCaseTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = TrackAudioPlaybackInfoUseCase(
             mediaPlayerRepository = mediaPlayerRepository,
+            removeRecentlyUsedItemUseCase = removeRecentlyUsedItemUseCase,
             getTickerUseCase = getTicker
         )
     }
@@ -48,13 +51,13 @@ class TrackAudioPlaybackInfoUseCaseTest {
     }
 
     @Test
-    fun `test that invoke with current position of the audio is less than 15 minutes`() =
+    fun `test that invoke with current position of the audio is less than 15 seconds`() =
         runTest {
             whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit))
             val currentPlaybackInfo = MediaPlaybackInfo(
                 mediaHandle = mediaHandle,
                 totalDuration = TimeUnit.MINUTES.toMillis(20),
-                currentPosition = TimeUnit.MINUTES.toMillis(15),
+                currentPosition = TimeUnit.SECONDS.toMillis(15),
                 mediaType = MediaType.Audio
             )
 
@@ -68,13 +71,13 @@ class TrackAudioPlaybackInfoUseCaseTest {
         }
 
     @Test
-    fun `test that update playback info when the audio position is more than 15 minutes`() =
+    fun `test that update playback info when the audio position is more than 15 seconds`() =
         runTest {
             whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit, Unit))
             val currentPlaybackInfo = MediaPlaybackInfo(
                 mediaHandle = mediaHandle,
                 totalDuration = TimeUnit.MINUTES.toMillis(20),
-                currentPosition = TimeUnit.MINUTES.toMillis(15),
+                currentPosition = TimeUnit.SECONDS.toMillis(15),
                 mediaType = MediaType.Audio
             )
 
@@ -101,7 +104,7 @@ class TrackAudioPlaybackInfoUseCaseTest {
         val currentPlaybackInfo = MediaPlaybackInfo(
             mediaHandle = mediaHandle,
             totalDuration = TimeUnit.MINUTES.toMillis(20),
-            currentPosition = TimeUnit.MINUTES.toMillis(15),
+            currentPosition = TimeUnit.SECONDS.toMillis(15),
             mediaType = MediaType.Audio
         )
 
@@ -125,7 +128,9 @@ class TrackAudioPlaybackInfoUseCaseTest {
 
         verify(getCurrentPlaybackInfo, times(2)).invoke()
         verify(mediaPlayerRepository).deleteMediaPlaybackInfo(nextTrackId)
+        verify(removeRecentlyUsedItemUseCase).invoke(nextTrackId)
         verify(mediaPlayerRepository, never()).deleteMediaPlaybackInfo(mediaHandle)
+        verify(removeRecentlyUsedItemUseCase, never()).invoke(mediaHandle)
         verify(mediaPlayerRepository, never()).updateAudioPlaybackInfo(any())
     }
 }

@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_OFFLINE
@@ -400,7 +399,11 @@ class SqliteDatabaseHandler @Inject constructor(
             Timber.e("Error: Chat settings are null")
             return
         }
-        db.execSQL("DELETE FROM $TABLE_CHAT_SETTINGS")
+        try {
+            db.execSQL("DELETE FROM $TABLE_CHAT_SETTINGS")
+        } catch (_: SQLiteException) {
+            legacyDatabaseMigration.onCreate(writableDatabase)
+        }
         val values = ContentValues().apply {
             put(KEY_CHAT_NOTIFICATIONS_ENABLED, "")
             put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(chatSettings.notificationsSound))
@@ -410,82 +413,6 @@ class SqliteDatabaseHandler @Inject constructor(
 
         db.insert(TABLE_CHAT_SETTINGS, SQLiteDatabase.CONFLICT_NONE, values)
     }
-    /**
-     * Gets the chat video quality value.
-     *
-     * @return The chat video quality.
-     */
-    /**
-     * Sets the chat video quality value.
-     * There are four possible values for this setting: VIDEO_QUALITY_ORIGINAL, VIDEO_QUALITY_HIGH,
-     * VIDEO_QUALITY_MEDIUM or VIDEO_QUALITY_LOW.
-     *
-     * @param chatVideoQuality The new chat video quality.
-     */
-    override var chatVideoQuality: Int
-        get() {
-            Timber.d("getChatVideoQuality")
-            return getIntValue(
-                TABLE_CHAT_SETTINGS,
-                KEY_CHAT_VIDEO_QUALITY,
-                VideoQuality.MEDIUM.value
-            )
-        }
-        set(chatVideoQuality) {
-            Timber.d("setChatVideoQuality")
-            setIntValue(TABLE_CHAT_SETTINGS, KEY_CHAT_VIDEO_QUALITY, chatVideoQuality)
-        }
-
-    override fun setNotificationSoundChat(sound: String?) {
-        val selectQuery = "SELECT * FROM $TABLE_CHAT_SETTINGS"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_CHAT_SETTINGS SET $KEY_CHAT_SOUND_NOTIFICATIONS= '${
-                            encrypt(sound)
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(sound))
-                    writableDatabase.insert(
-                        TABLE_CHAT_SETTINGS,
-                        SQLiteDatabase.CONFLICT_NONE,
-                        values
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun setVibrationEnabledChat(enabled: String?) {
-        val selectQuery = "SELECT * FROM $TABLE_CHAT_SETTINGS"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_CHAT_SETTINGS SET $KEY_CHAT_VIBRATION_ENABLED= '${
-                            encrypt(enabled)
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(enabled))
-                    writableDatabase.insert(
-                        TABLE_CHAT_SETTINGS,
-                        SQLiteDatabase.CONFLICT_NONE,
-                        values
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
     /**
      * Saves attributes in DB.
      *
@@ -869,31 +796,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun setLastCloudFolder(folderHandle: String) {
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_PREFERENCES SET $KEY_LAST_CLOUD_FOLDER_HANDLE= '${
-                            encrypt(folderHandle)
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                    Timber.d(
-                        "KEY_LAST_CLOUD_FOLDER_HANDLE UPLOAD FOLDER: %s",
-                        UPDATE_PREFERENCES_TABLE
-                    )
-                } else {
-                    values.put(KEY_LAST_CLOUD_FOLDER_HANDLE, encrypt(folderHandle))
-                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
     override fun setAccountDetailsTimeStamp() {
         setAccountDetailsTimeStamp(System.currentTimeMillis() / 1000)
     }
@@ -1024,8 +926,8 @@ class SqliteDatabaseHandler @Inject constructor(
     private fun getLongValue(tableName: String, columnName: String, defaultValue: Long): Long {
         try {
             val value = getStringValue(tableName, columnName, defaultValue.toString())
-            if (!TextUtil.isTextEmpty(value)) {
-                return value!!.toLong()
+            if (!value.isNullOrBlank()) {
+                return value.toLong()
             }
         } catch (e: Exception) {
             Timber.w(e, "EXCEPTION - Return default value: %s", defaultValue)
@@ -1041,7 +943,7 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param value      Value to set.
      */
     private fun setStringValue(tableName: String, columnName: String, value: String?) {
-        if (TextUtil.isTextEmpty(value)) {
+        if (value.isNullOrBlank()) {
             Timber.w("Set %s with empty value!", columnName)
         }
         val selectQuery = "SELECT * FROM $tableName"
@@ -1082,13 +984,12 @@ class SqliteDatabaseHandler @Inject constructor(
             readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     value = decrypt(cursor.getString(0))
-                    Timber.d("%s value: %s", columnName, value)
+                    Timber.d("Read value for %s", columnName)
                 } else {
                     Timber.w("No value found, setting default")
                     val values = ContentValues()
                     values.put(columnName, encrypt(defaultValue))
                     writableDatabase.insert(tableName, SQLiteDatabase.CONFLICT_NONE, values)
-                    Timber.d("Default value: %s", defaultValue)
                 }
             }
         } catch (e: Exception) {
@@ -1180,42 +1081,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun setUseHttpsOnly(useHttpsOnly: Boolean) {
-        val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_ATTRIBUTES_TABLE =
-                        "UPDATE $TABLE_ATTRIBUTES SET $KEY_USE_HTTPS_ONLY='${encrypt(useHttpsOnly.toString())}' WHERE $KEY_ID ='1'"
-                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
-                    Timber.d("UPDATE_ATTRIBUTES_TABLE : %s", UPDATE_ATTRIBUTES_TABLE)
-                } else {
-                    values.put(KEY_USE_HTTPS_ONLY, encrypt(useHttpsOnly.toString()))
-                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override val useHttpsOnly: String?
-        get() {
-            val selectQuery =
-                "SELECT $KEY_USE_HTTPS_ONLY FROM $TABLE_ATTRIBUTES WHERE $KEY_ID = '1'"
-            try {
-                readableDatabase.query(selectQuery).use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        return decrypt(cursor.getString(0))
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return "false"
-        }
-
     override fun setShowCopyright(showCopyright: Boolean) {
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
@@ -1250,25 +1115,6 @@ class SqliteDatabaseHandler @Inject constructor(
             }
             return true
         }
-
-    override fun setShowNotifOff(showNotifOff: Boolean) {
-        val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_ATTRIBUTES_TABLE =
-                        "UPDATE $TABLE_ATTRIBUTES SET $KEY_SHOW_NOTIF_OFF='${encrypt(showNotifOff.toString())}' WHERE $KEY_ID ='1'"
-                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
-                } else {
-                    values.put(KEY_SHOW_NOTIF_OFF, encrypt(showNotifOff.toString()))
-                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
 
     override fun setLastPublicHandle(handle: Long) {
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
@@ -1389,22 +1235,6 @@ class SqliteDatabaseHandler @Inject constructor(
             )
         }
 
-    override val showNotifOff: String?
-        get() {
-            val selectQuery =
-                "SELECT $KEY_SHOW_NOTIF_OFF FROM $TABLE_ATTRIBUTES WHERE $KEY_ID = '1'"
-            try {
-                readableDatabase.query(selectQuery).use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        return decrypt(cursor.getString(0))
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return "true"
-        }
-
     override fun setInvalidateSdkCache(invalidateSdkCache: Boolean) {
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
@@ -1487,26 +1317,6 @@ class SqliteDatabaseHandler @Inject constructor(
         legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
-    override fun clearChatSettings() {
-        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_CHAT_SETTINGS")
-        legacyDatabaseMigration.onCreate(writableDatabase)
-    }
-
-    override val autoPlayEnabled: String?
-        get() {
-            val selectQuery =
-                "SELECT $KEY_AUTO_PLAY FROM $TABLE_PREFERENCES WHERE $KEY_ID = '1'"
-            try {
-                readableDatabase.query(selectQuery).use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        return decrypt(cursor.getString(0))
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return "false"
-        }
     override var sdCardUri: String?
         get() = getStringValue(TABLE_PREFERENCES, KEY_SD_CARD_URI, "")
         set(sdCardUri) {

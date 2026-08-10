@@ -31,20 +31,11 @@ interface DatabaseHandler {
     var chatSettings: ChatSettings?
 
     /**
-     * Sets the chat video quality value.
-     * There are four possible values for this setting: VIDEO_QUALITY_ORIGINAL, VIDEO_QUALITY_HIGH,
-     * VIDEO_QUALITY_MEDIUM or VIDEO_QUALITY_LOW.
-     *
-     * @param chatVideoQuality The new chat video quality.
-     */
-    var chatVideoQuality: Int
-    /**
      * Sets the flag to indicate if should ask the user about set the current path as default download location.
      *
      * @param askSetDownloadLocation true if should ask, false otherwise.
      */
     var askSetDownloadLocation: Boolean
-    val useHttpsOnly: String?
 
     /**
      * Flag to determine whether user should be shown a copyright page
@@ -71,8 +62,6 @@ interface DatabaseHandler {
      * @param transferQueueStatus True if the queue is paused, false otherwise.
      */
     var transferQueueStatus: Boolean
-    val showNotifOff: String?
-    val autoPlayEnabled: String?
     var sdCardUri: String?
 
     /**
@@ -82,8 +71,6 @@ interface DatabaseHandler {
      */
     var attributes: MegaAttributes?
 
-    fun setNotificationSoundChat(sound: String?)
-    fun setVibrationEnabledChat(enabled: String?)
     fun setNonContactFirstName(name: String?, handle: String?): Int
     fun setNonContactLastName(lastName: String?, handle: String?): Int
     fun setNonContactEmail(email: String?, handle: String?): Int
@@ -94,7 +81,6 @@ interface DatabaseHandler {
     fun setPreferredSortCloud(order: String?)
     fun setPreferredSortCameraUpload(order: String?)
     fun setPreferredSortOthers(order: String?)
-    fun setLastCloudFolder(folderHandle: String)
     fun setAccountDetailsTimeStamp()
     fun resetAccountDetailsTimeStamp()
     fun setExtendedAccountDetailsTimestamp()
@@ -102,9 +88,7 @@ interface DatabaseHandler {
     fun setStorageAskAlways(storageAskAlways: Boolean)
     fun setStorageDownloadLocation(storageDownloadLocation: String?)
     fun setAttrAskSizeDownload(askSizeDownload: String?)
-    fun setUseHttpsOnly(useHttpsOnly: Boolean)
     fun setShowCopyright(showCopyright: Boolean)
-    fun setShowNotifOff(showNotifOff: Boolean)
     fun setLastPublicHandle(handle: Long)
     fun setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp: Long)
     fun setLastPublicHandleTimeStamp()
@@ -118,7 +102,6 @@ interface DatabaseHandler {
     fun clearContacts()
     fun clearNonContacts()
     fun clearChatItems()
-    fun clearChatSettings()
 
     fun setAutoPlayEnabled(enabled: String)
     fun findNonContactByHandle(handle: String): NonContactInfo?

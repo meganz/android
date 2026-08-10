@@ -10,7 +10,7 @@ class GetCacheSizeUseCase @Inject constructor(
     private val cacheRepository: CacheRepository
 ) {
     /**
-     * Invoke
+     * Get the cache size in bytes as reported by the system App info screen.
      */
     suspend operator fun invoke() = cacheRepository.getCacheSize().coerceAtLeast(0L)
 }

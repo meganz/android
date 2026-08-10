@@ -64,6 +64,12 @@ fun NewTwoFactorAuthentication(
         request.requestFocus()
         softKeyboard?.show()
     }
+    LaunchedEffect(state.multiFactorAuthState) {
+        if (state.multiFactorAuthState == MultiFactorAuthState.Failed) {
+            request.requestFocus()
+            softKeyboard?.show()
+        }
+    }
     val orientation = LocalConfiguration.current.orientation
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
     val isPhoneLandscape =
@@ -100,6 +106,7 @@ fun NewTwoFactorAuthentication(
                         it != MultiFactorAuthState.Checking
                                 && it != MultiFactorAuthState.Fixed
                     }?.let { it == MultiFactorAuthState.Passed },
+                    cursorIndex = if (state.multiFactorAuthState == MultiFactorAuthState.Failed) 0 else -1,
                     errorText = stringResource(sharedR.string.multi_factor_auth_login_verification_input_error_text),
                     onValueChange = {
                         code = it

@@ -2,12 +2,21 @@ package mega.privacy.android.core.nodecomponents.action
 
 import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
+import androidx.navigation3.runtime.NavKey
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.menu.MenuAction
+import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AddToActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AddToAlbumActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AddToPlaylistActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.AvailableOfflineActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.CopyActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.DeletePermanentActionClickHandler
@@ -31,16 +40,22 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveOfflin
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RenameNodeActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RestoreActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SaveToMegaActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SendToChatActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareFolderActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SyncActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.UnhideActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VerifyActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ViewInFolderActionClickHandler
 import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
 import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogNavKey
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
-import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
+import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToAlbumMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToPlaylistMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DeletePermanentlyMenuAction
@@ -62,51 +77,68 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAc
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RenameMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RestoreMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.SaveToMegaMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareFolderMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.SyncMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ViewInFolderMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeActionState
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeFavoriteUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.chat.GetNodeToAttachUseCase
+import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
-import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.FileContactInfoNavKey
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.FileInfoNavKey
+import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
+import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.ShareLinkNavKey
+import mega.privacy.android.shared.nodes.dialog.removelink.RemoveNodeLinkDialogNavKey
+import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
+import org.junit.After
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.anyList
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -115,9 +147,8 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExtendWith(CoroutineMainDispatcherExtension::class)
+@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeActionClickHandlerTest {
     private val testScope = TestScope(UnconfinedTestDispatcher())
     private val mockContext = mock<Context>()
@@ -126,8 +157,6 @@ class NodeActionClickHandlerTest {
     private val mockViewModel = mock<NodeOptionsActionViewModel>()
     private val mockNodeHandlesToJsonMapper = mock<NodeHandlesToJsonMapper>()
     private val mockCheckNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
-    private val mockRestoreNodesUseCase = mock<RestoreNodesUseCase>()
-    private val mockRestoreNodeResultMapper = mock<RestoreNodeResultMapper>()
     private val mockIsHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
     private val mockRemoveOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
     private val mockGetNodeToAttachUseCase = mock<GetNodeToAttachUseCase>()
@@ -140,26 +169,36 @@ class NodeActionClickHandlerTest {
     private val mockGetLocalFilePathUseCase = mock<GetLocalFilePathUseCase>()
     private val mockExportNodeUseCase = mock<ExportNodeUseCase>()
     private val mockGetNodeShareDataUseCase = mock<GetNodeShareDataUseCase>()
+    private val mockGetOfflineNodeInformationByNodeIdUseCase =
+        mock<GetOfflineNodeInformationByNodeIdUseCase>()
+    private val mockGetOfflineFileUseCase = mock<GetOfflineFileUseCase>()
+    private val mockNodeShareContentUrisIntentMapper = mock<NodeShareContentUrisIntentMapper>()
+    private val mockMonitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val mockUpdateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val mockUpdateNodeFavoriteUseCase = mock<UpdateNodeFavoriteUseCase>()
 
     private val mockFileNode = mock<TypedFileNode> {
         on { id } doReturn NodeId(123L)
+        on { parentId } doReturn NodeId(789L)
         on { name } doReturn "filename"
     }
 
     private val mockFolderNode = mock<TypedFolderNode> {
         on { id } doReturn NodeId(456L)
+        on { parentId } doReturn NodeId(999L)
+        on { name } doReturn "foldername"
     }
 
     private val mockVersionsLauncher = mock<ActivityResultLauncher<Long>>()
     private val mockMoveLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockCopyLauncher = mock<ActivityResultLauncher<LongArray>>()
-    private val mockShareFolderLauncher = mock<ActivityResultLauncher<LongArray>>()
+    private val mockPublicCopyLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockRestoreLauncher = mock<ActivityResultLauncher<ArrayList<NameCollision>>>()
     private val mockSendToChatLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockHiddenNodesOnboardingLauncher = mock<ActivityResultLauncher<Boolean>>()
     private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase>()
+    private val mockAddToAlbumLauncher = mock<ActivityResultLauncher<Pair<Array<Long>, Int>>>()
+    private val mockVideoToPlaylistLauncher = mock<ActivityResultLauncher<Long>>()
 
     private val mockSingleNodeActionProvider = SingleNodeActionProvider(
         viewModel = mockViewModel,
@@ -170,11 +209,31 @@ class NodeActionClickHandlerTest {
         navigationHandler = mockNavigationHandler,
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
-        shareFolderLauncher = mockShareFolderLauncher,
+        publicCopyLauncher = mockPublicCopyLauncher,
         restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
         hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
-        versionsLauncher = mockVersionsLauncher
+        versionsLauncher = mockVersionsLauncher,
+        addToAlbumLauncher = mockAddToAlbumLauncher,
+        videoToPlaylistLauncher = mockVideoToPlaylistLauncher
+    )
+
+    private val mockSingleNodeActionProviderNoHandler = SingleNodeActionProvider(
+        viewModel = mockViewModel,
+        context = mockContext,
+        coroutineScope = testScope,
+        postMessage = { },
+        megaNavigator = mockMegaNavigator,
+        navigationHandler = null,
+        moveLauncher = mockMoveLauncher,
+        copyLauncher = mockCopyLauncher,
+        publicCopyLauncher = mockPublicCopyLauncher,
+        restoreLauncher = mockRestoreLauncher,
+        sendToChatLauncher = mockSendToChatLauncher,
+        hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
+        versionsLauncher = mockVersionsLauncher,
+        addToAlbumLauncher = mockAddToAlbumLauncher,
+        videoToPlaylistLauncher = mockVideoToPlaylistLauncher
     )
 
     private val mockMultipleNodesActionProvider = MultipleNodesActionProvider(
@@ -186,33 +245,54 @@ class NodeActionClickHandlerTest {
         navigationHandler = mockNavigationHandler,
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
-        shareFolderLauncher = mockShareFolderLauncher,
+        publicCopyLauncher = mockPublicCopyLauncher,
         restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
-        hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher
+        hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
+        addToAlbumLauncher = mockAddToAlbumLauncher
     )
 
-    @BeforeEach
+    private val mockMultipleNodesActionProviderNoHandler = MultipleNodesActionProvider(
+        viewModel = mockViewModel,
+        context = mockContext,
+        coroutineScope = testScope,
+        postMessage = { },
+        megaNavigator = mockMegaNavigator,
+        navigationHandler = null,
+        moveLauncher = mockMoveLauncher,
+        copyLauncher = mockCopyLauncher,
+        publicCopyLauncher = mockPublicCopyLauncher,
+        restoreLauncher = mockRestoreLauncher,
+        sendToChatLauncher = mockSendToChatLauncher,
+        hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
+        addToAlbumLauncher = mockAddToAlbumLauncher
+    )
+
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule()
+
+    @Before
     fun setUp() {
         // Reset mocks
+        whenever(mockViewModel.uiState).thenReturn(MutableStateFlow(NodeActionState()))
         whenever(mockNodeHandlesToJsonMapper(any<List<Long>>())).thenReturn("test-json")
         whenever(mockNodeHandlesToJsonMapper(any<String>())).thenReturn(listOf())
         mockCheckNodesNameCollisionUseCase.stub {
-            onBlocking { invoke(any(), any()) } doReturn NodeNameCollisionsResult(
+            on { invoke(any(), any()) } doReturn NodeNameCollisionsResult(
                 noConflictNodes = emptyMap(),
                 conflictNodes = emptyMap(),
                 type = NodeNameCollisionType.RESTORE
             )
         }
         mockIsHiddenNodesOnboardedUseCase.stub {
-            onBlocking { invoke() } doReturn false
+            on { invoke() } doReturn false
         }
         mockViewModel.stub {
-            onBlocking { isOnboarding() } doReturn false
+            on { isOnboarding() } doReturn false
         }
     }
 
-    @AfterEach
+    @After
     fun resetMocks() {
         reset(
             mockContext,
@@ -221,8 +301,6 @@ class NodeActionClickHandlerTest {
             mockViewModel,
             mockNodeHandlesToJsonMapper,
             mockCheckNodesNameCollisionUseCase,
-            mockRestoreNodesUseCase,
-            mockRestoreNodeResultMapper,
             mockIsHiddenNodesOnboardedUseCase,
             mockRemoveOfflineNodeUseCase,
             mockGetNodeToAttachUseCase,
@@ -239,11 +317,12 @@ class NodeActionClickHandlerTest {
             mockVersionsLauncher,
             mockMoveLauncher,
             mockCopyLauncher,
-            mockShareFolderLauncher,
+            mockPublicCopyLauncher,
             mockRestoreLauncher,
             mockSendToChatLauncher,
             mockHiddenNodesOnboardingLauncher,
-            mockGetNodeShareDataUseCase
+            mockGetNodeShareDataUseCase,
+            mockAddToAlbumLauncher
         )
     }
 
@@ -334,6 +413,207 @@ class NodeActionClickHandlerTest {
         verify(mockCopyLauncher).launch(longArrayOf(123L, 456L))
     }
 
+    @Test
+    fun `test CopyAction single node navigates to CopyNavKey when cloud explorer enabled`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = CopyActionClickHandler()
+        val menuAction = mock<CopyMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockNavigationHandler).navigate(CopyNavKey(nodeIds = listOf(NodeId(123L))))
+    }
+
+    @Test
+    fun `test CopyAction multiple nodes navigates to CopyNavKey when cloud explorer enabled`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = CopyActionClickHandler()
+        val menuAction = mock<CopyMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockNavigationHandler).navigate(
+            CopyNavKey(
+                nodeIds = listOf(
+                    NodeId(123L),
+                    NodeId(456L)
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `test CopyAction uses copyLauncher when cloud explorer enabled but navigationHandler is null`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = CopyActionClickHandler()
+        val menuAction = mock<CopyMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProviderNoHandler)
+
+        verify(mockCopyLauncher).launch(longArrayOf(123L))
+    }
+
+    @Test
+    fun `test MoveAction single node navigates to MoveNavKey with the node parent when cloud explorer enabled`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = MoveActionClickHandler()
+        val menuAction = mock<MoveMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockNavigationHandler).navigate(
+            MoveNavKey(nodeIds = listOf(NodeId(123L)), disabledTargetId = NodeId(789L))
+        )
+    }
+
+    @Test
+    fun `test MoveAction multiple nodes navigates to MoveNavKey with the first node parent when cloud explorer enabled`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = MoveActionClickHandler()
+        val menuAction = mock<MoveMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockNavigationHandler).navigate(
+            MoveNavKey(
+                nodeIds = listOf(NodeId(123L), NodeId(456L)),
+                disabledTargetId = NodeId(789L),
+            )
+        )
+    }
+
+    @Test
+    fun `test MoveAction uses moveLauncher when cloud explorer enabled but navigationHandler is null`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = MoveActionClickHandler()
+        val menuAction = mock<MoveMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProviderNoHandler)
+
+        verify(mockMoveLauncher).launch(longArrayOf(123L))
+    }
+
+    // SaveToMegaAction Tests
+    @Test
+    fun `test SaveToMegaAction canHandle returns true for SaveToMegaMenuAction`() {
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+
+        assertThat(action.canHandle(menuAction)).isTrue()
+    }
+
+    @Test
+    fun `test SaveToMegaAction launches copyLauncher when logged in`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isLoggedIn = true))
+        )
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockCopyLauncher).launch(longArrayOf(123L))
+        verify(mockViewModel, never()).triggerLoginRequiredEvent()
+    }
+
+    @Test
+    fun `test SaveToMegaAction triggers login required when not logged in`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isLoggedIn = false))
+        )
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockViewModel).triggerLoginRequiredEvent()
+        verify(mockCopyLauncher, never()).launch(any())
+        verify(mockPublicCopyLauncher, never()).launch(any())
+    }
+
+    @Test
+    fun `test SaveToMegaAction routes a PublicLinkFile through publicCopyLauncher`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isLoggedIn = true))
+        )
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+        val publicNode = mock<PublicLinkFile> {
+            on { id } doReturn NodeId(789L)
+        }
+
+        action.handle(menuAction, publicNode, mockSingleNodeActionProvider)
+
+        verify(mockPublicCopyLauncher).launch(longArrayOf(789L))
+        verify(mockCopyLauncher, never()).launch(any())
+    }
+
+    @Test
+    fun `test SaveToMegaAction multi-node always uses copyLauncher even with PublicLinkFile in the list`() {
+        // Multi-select is not exposed for public-link sources (their menus are
+        // single-item only), but defensively confirm that the multi-node path
+        // never routes to publicCopyLauncher even if a PublicLinkFile somehow
+        // ends up in the list.
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isLoggedIn = true))
+        )
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+        val publicNode = mock<PublicLinkFile> {
+            on { id } doReturn NodeId(789L)
+        }
+        val nodes = listOf(publicNode, mockFileNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockCopyLauncher).launch(longArrayOf(789L, 123L))
+        verify(mockPublicCopyLauncher, never()).launch(any())
+    }
+
+    @Test
+    fun `test CopyAction does not branch on PublicLinkFile and uses copyLauncher`() {
+        // Copy is exposed only for owned-node source types (no FILE_LINK menu entry)
+        // so the handler intentionally does not differentiate. PublicLinkFile is
+        // routed through the regular copyLauncher just like an owned file would
+        // be — the public-link copy path lives on SaveToMegaActionClickHandler
+        // / publicCopyLauncher instead.
+        val action = CopyActionClickHandler()
+        val menuAction = mock<CopyMenuAction>()
+        val publicNode = mock<PublicLinkFile> {
+            on { id } doReturn NodeId(789L)
+        }
+
+        action.handle(menuAction, publicNode, mockSingleNodeActionProvider)
+
+        verify(mockCopyLauncher).launch(longArrayOf(789L))
+        verify(mockPublicCopyLauncher, never()).launch(any())
+    }
+
+    @Test
+    fun `test CopyAction routes an owned node through copyLauncher`() {
+        val action = CopyActionClickHandler()
+        val menuAction = mock<CopyMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockCopyLauncher).launch(longArrayOf(123L))
+        verify(mockPublicCopyLauncher, never()).launch(any())
+    }
+
     // ShareFolderAction Tests
     @Test
     fun `test ShareFolderAction canHandle returns true for ShareFolderMenuAction`() {
@@ -369,8 +649,6 @@ class NodeActionClickHandlerTest {
     fun `test RestoreAction canHandle returns true for RestoreMenuAction`() = runTest {
         val action = RestoreActionClickHandler(
             mockCheckNodesNameCollisionUseCase,
-            mockRestoreNodesUseCase,
-            mockRestoreNodeResultMapper,
             isNodeDeletedFromBackupsUseCase
         )
         val menuAction = mock<RestoreMenuAction>()
@@ -382,8 +660,6 @@ class NodeActionClickHandlerTest {
     fun `test RestoreAction single node handle calls checkNodesNameCollisionUseCase`() = runTest {
         val action = RestoreActionClickHandler(
             mockCheckNodesNameCollisionUseCase,
-            mockRestoreNodesUseCase,
-            mockRestoreNodeResultMapper,
             isNodeDeletedFromBackupsUseCase
         )
         val menuAction = mock<RestoreMenuAction>()
@@ -401,8 +677,6 @@ class NodeActionClickHandlerTest {
         runTest {
             val action = RestoreActionClickHandler(
                 mockCheckNodesNameCollisionUseCase,
-                mockRestoreNodesUseCase,
-                mockRestoreNodeResultMapper,
                 isNodeDeletedFromBackupsUseCase
             )
             val menuAction = mock<RestoreMenuAction>()
@@ -569,7 +843,7 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test AvailableOfflineAction single node handle calls downloadNodeForOffline when node is not available offline`() =
+    fun `test AvailableOfflineAction single node handle calls downloadNodesForOffline when node is not available offline`() =
         runTest {
             val action = AvailableOfflineActionClickHandler()
             val menuAction = mock<AvailableOfflineMenuAction>()
@@ -580,18 +854,24 @@ class NodeActionClickHandlerTest {
 
             action.handle(menuAction, nodeNotOffline, mockSingleNodeActionProvider)
 
-            verify(mockViewModel).downloadNodeForOffline(withStartMessage = false)
+            verify(mockViewModel).downloadNodesForOffline(
+                nodes = listOf(nodeNotOffline),
+                withStartMessage = false,
+            )
         }
 
     @Test
-    fun `test AvailableOfflineAction multiple nodes handle calls downloadNodeForOffline`() {
+    fun `test AvailableOfflineAction multiple nodes handle calls downloadNodesForOffline`() {
         val action = AvailableOfflineActionClickHandler()
         val menuAction = mock<AvailableOfflineMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
-        verify(mockViewModel).downloadNodeForOffline(withStartMessage = false)
+        verify(mockViewModel).downloadNodesForOffline(
+            nodes = nodes,
+            withStartMessage = false,
+        )
     }
 
     @Test
@@ -700,7 +980,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockSingleNodeActionProvider.viewModel).navigateWithNavKey(
                 MoveToRubbishOrDeleteDialogArgs(
                     isInRubbish = false,
                     nodeHandles = listOf(123L)
@@ -718,7 +998,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
                 MoveToRubbishOrDeleteDialogArgs(
                     isInRubbish = false,
                     nodeHandles = listOf(123L, 456L)
@@ -736,29 +1016,48 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test ManageLinkAction single node handle calls openGetLinkActivity with single handle`() {
+    fun `test that ManageLinkAction single node handle navigates via ShareLinkNavKey when navigationHandler is not null`() {
         val action = ManageLinkActionClickHandler()
         val menuAction = mock<ManageLinkMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).openGetLinkActivity(
-            context = mockContext,
-            handle = 123L
-        )
+        verify(mockNavigationHandler).navigate(ShareLinkNavKey(handles = listOf(123L)))
     }
 
     @Test
-    fun `test ManageLinkAction multiple nodes handle calls openGetLinkActivity with handles array`() {
+    fun `test that ManageLinkAction single node handle calls megaNavigator when navigationHandler is null`() {
+        val action = ManageLinkActionClickHandler()
+        val menuAction = mock<ManageLinkMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProviderNoHandler)
+
+        verify(mockMegaNavigator).openGetLinkActivity(context = mockContext, 123L)
+    }
+
+    @Test
+    fun `test that ManageLinkAction multiple nodes handle navigates via ShareLinkNavKey when navigationHandler is not null`() {
         val action = ManageLinkActionClickHandler()
         val menuAction = mock<ManageLinkMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
+        verify(mockNavigationHandler).navigate(ShareLinkNavKey(handles = listOf(123L, 456L)))
+    }
+
+    @Test
+    fun `test that ManageLinkAction multiple nodes handle calls openGetLinkActivity when navigationHandler is null`() {
+        val action = ManageLinkActionClickHandler()
+        val menuAction = mock<ManageLinkMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProviderNoHandler)
+
         verify(mockMegaNavigator).openGetLinkActivity(
             context = mockContext,
-            handles = longArrayOf(123L, 456L)
+            123L,
+            456L
         )
     }
 
@@ -780,7 +1079,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
                 MoveToRubbishOrDeleteDialogArgs(
                     isInRubbish = true,
                     nodeHandles = listOf(123L)
@@ -798,7 +1097,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
                 MoveToRubbishOrDeleteDialogArgs(
                     isInRubbish = true,
                     nodeHandles = listOf(123L, 456L)
@@ -823,14 +1122,51 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).navigate(any())
+        verify(mockSingleNodeActionProvider.viewModel).navigateWithNavKey(
+            ChangeLabelBottomSheet(123L)
+        )
+    }
+
+    @Test
+    fun `test LabelAction multiple nodes handle navigates with ChangeLabelBottomSheetMultiple`() {
+        val action = LabelActionClickHandler()
+        val menuAction = mock<LabelMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
+            ChangeLabelBottomSheetMultiple(listOf(123L, 456L))
+        )
+    }
+
+    @Test
+    fun `test LabelAction single node in multi handle navigates with ChangeLabelBottomSheet`() {
+        val action = LabelActionClickHandler()
+        val menuAction = mock<LabelMenuAction>()
+
+        action.handle(menuAction, listOf(mockFileNode), mockMultipleNodesActionProvider)
+
+        verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
+            ChangeLabelBottomSheet(123L)
+        )
+    }
+
+    @Test
+    fun `test LabelAction empty nodes handle does not navigate`() {
+        val action = LabelActionClickHandler()
+        val menuAction = mock<LabelMenuAction>()
+
+        action.handle(menuAction, emptyList(), mockMultipleNodesActionProvider)
+
+        verify(mockMultipleNodesActionProvider.viewModel, never()).navigateWithNavKey(any())
     }
 
     // ManageShareFolderAction Tests
     @Test
     fun `test ManageShareFolderAction canHandle returns true for ManageShareFolderMenuAction`() {
         val action =
-            ManageShareFolderActionClickHandler(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
+            ManageShareFolderActionClickHandler(mockMegaNavigator)
         val menuAction = mock<ManageShareFolderMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -839,15 +1175,12 @@ class NodeActionClickHandlerTest {
     @Test
     fun `test ManageShareFolderAction single node handle calls megaNavigator`() = runTest {
         val action =
-            ManageShareFolderActionClickHandler(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
+            ManageShareFolderActionClickHandler(mockMegaNavigator)
         val menuAction = mock<ManageShareFolderMenuAction>()
-
-        whenever(mockGetFeatureFlagValueUseCase(any())).thenReturn(true)
-
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).navigate(any<FileContactInfoNavKey>())
+        verify(mockMegaNavigator).openFileContactListActivity(any(), any(), any())
     }
 
     // InfoAction Tests
@@ -860,32 +1193,57 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test InfoAction single node handle calls megaNavigator`() {
+    fun `test that InfoAction handle navigates via FileInfoNavKey when navigationHandler is not null`() {
         val action = InfoActionClickHandler(mockMegaNavigator)
         val menuAction = mock<InfoMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).openFileInfoActivity(any(), any())
+        verify(mockNavigationHandler).navigate(FileInfoNavKey(nodeHandle = 123L))
+    }
+
+    @Test
+    fun `test that InfoAction handle calls megaNavigator when navigationHandler is null`() {
+        val action = InfoActionClickHandler(mockMegaNavigator)
+        val menuAction = mock<InfoMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProviderNoHandler)
+
+        verify(mockMegaNavigator).openFileInfoActivity(mockContext, 123L)
     }
 
     // EditAction Tests
     @Test
     fun `test EditAction canHandle returns true for EditMenuAction`() {
-        val action = EditActionClickHandler(mockMegaNavigator)
+        val action = EditActionClickHandler()
         val menuAction = mock<EditMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
     }
 
     @Test
-    fun `test EditAction single node handle calls megaNavigator`() {
-        val action = EditActionClickHandler(mockMegaNavigator)
+    fun `test that EditAction handle navigates to text editor in Edit mode`() {
+        val action = EditActionClickHandler()
         val menuAction = mock<EditMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).openTextEditorActivity(any(), any(), any(), any(), anyOrNull())
+        verify(mockNavigationHandler).navigate(
+            LegacyTextEditorNavKey(
+                nodeHandle = mockFileNode.id.longValue,
+                mode = TextEditorMode.Edit.value,
+            )
+        )
+    }
+
+    @Test
+    fun `test that EditAction handle dismisses bottom sheet`() {
+        val action = EditActionClickHandler()
+        val menuAction = mock<EditMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockViewModel).dismiss()
     }
 
     // DisputeTakeDownAction Tests
@@ -904,7 +1262,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).launchUrl(any(), any())
+        verify(mockMegaNavigator).launchUrl(any(), any(), anyBoolean())
     }
 
     // VerifyAction Tests
@@ -957,7 +1315,7 @@ class NodeActionClickHandlerTest {
 
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-            verify(mockNavigationHandler).navigate(any())
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(any<NavKey>())
         }
 
     @Test
@@ -994,7 +1352,7 @@ class NodeActionClickHandlerTest {
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
         verify(mockGetNodeShareDataUseCase).invoke(mockFileNode)
-        verify(mockNavigationHandler, never()).navigate(any())
+        verify(mockNavigationHandler, never()).navigate(any<NavKey>(), anyOrNull())
         verify(mockMegaNavigator, never()).openAuthenticityCredentialsActivity(any(), any(), any())
     }
 
@@ -1004,7 +1362,10 @@ class NodeActionClickHandlerTest {
         val action = ShareActionClickHandler(
             mockGetLocalFilePathUseCase,
             mockExportNodeUseCase,
-            mockGetFileUriUseCase
+            mockGetOfflineNodeInformationByNodeIdUseCase,
+            mockGetOfflineFileUseCase,
+            mockNodeShareContentUrisIntentMapper,
+            mockMonitorConnectivityUseCase
         )
         val menuAction = mock<ShareMenuAction>()
 
@@ -1016,7 +1377,10 @@ class NodeActionClickHandlerTest {
         val action = ShareActionClickHandler(
             mockGetLocalFilePathUseCase,
             mockExportNodeUseCase,
-            mockGetFileUriUseCase
+            mockGetOfflineNodeInformationByNodeIdUseCase,
+            mockGetOfflineFileUseCase,
+            mockNodeShareContentUrisIntentMapper,
+            mockMonitorConnectivityUseCase
         )
         val menuAction = mock<ShareMenuAction>()
 
@@ -1026,6 +1390,130 @@ class NodeActionClickHandlerTest {
 
         verify(mockGetLocalFilePathUseCase).invoke(mockFileNode)
     }
+
+    @Test
+    fun `test ShareAction single node handle collects connectivity before NonCancellable for offline source`() =
+        runTest {
+            val action = ShareActionClickHandler(
+                mockGetLocalFilePathUseCase,
+                mockExportNodeUseCase,
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
+            )
+            val menuAction = mock<ShareMenuAction>()
+
+            whenever(mockViewModel.getNodeSourceType()).thenReturn(NodeSourceType.OFFLINE)
+            whenever(mockMonitorConnectivityUseCase()).thenReturn(flowOf(true))
+            whenever(mockGetOfflineNodeInformationByNodeIdUseCase(any())).thenReturn(null)
+
+            action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockMonitorConnectivityUseCase).invoke()
+            verify(mockViewModel).dismiss()
+        }
+
+    @Test
+    fun `test ShareAction single node handle does not collect connectivity for non-offline source`() =
+        runTest {
+            val action = ShareActionClickHandler(
+                mockGetLocalFilePathUseCase,
+                mockExportNodeUseCase,
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
+            )
+            val menuAction = mock<ShareMenuAction>()
+
+            whenever(mockViewModel.getNodeSourceType()).thenReturn(NodeSourceType.CLOUD_DRIVE)
+            whenever(mockGetLocalFilePathUseCase(any())).thenReturn("/test/path")
+
+            action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockMonitorConnectivityUseCase, never()).invoke()
+        }
+
+    @Test
+    fun `test ShareAction single node handle calls dismiss even when share throws exception`() =
+        runTest {
+            val action = ShareActionClickHandler(
+                mockGetLocalFilePathUseCase,
+                mockExportNodeUseCase,
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
+            )
+            val menuAction = mock<ShareMenuAction>()
+
+            whenever(mockViewModel.getNodeSourceType()).thenReturn(NodeSourceType.CLOUD_DRIVE)
+            whenever(mockGetLocalFilePathUseCase(any())).thenThrow(RuntimeException("File error"))
+
+            action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockViewModel).dismiss()
+        }
+
+    @Test
+    fun `test ShareAction single node handle falls through to link sharing when local file does not exist`() =
+        runTest {
+            val action = ShareActionClickHandler(
+                mockGetLocalFilePathUseCase,
+                mockExportNodeUseCase,
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
+            )
+            val menuAction = mock<ShareMenuAction>()
+
+            whenever(mockViewModel.getNodeSourceType()).thenReturn(NodeSourceType.CLOUD_DRIVE)
+            whenever(mockGetLocalFilePathUseCase(any())).thenReturn("/nonexistent/path.pdf")
+            whenever(
+                mockExportNodeUseCase(
+                    any(),
+                    anyOrNull(),
+                    any()
+                )
+            ).thenReturn("https://link.example.com")
+
+            action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+            testScope.advanceUntilIdle()
+
+            // Should fall through to export link since file doesn't exist
+            verify(mockExportNodeUseCase).invoke(any(), anyOrNull(), any())
+            verify(mockViewModel).dismiss()
+        }
+
+    @Test
+    fun `test ShareAction multi node handle collects connectivity before NonCancellable for offline source`() =
+        runTest {
+            val action = ShareActionClickHandler(
+                mockGetLocalFilePathUseCase,
+                mockExportNodeUseCase,
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
+            )
+            val menuAction = mock<ShareMenuAction>()
+            val nodes = listOf(mockFileNode)
+
+            whenever(mockViewModel.getNodeSourceType()).thenReturn(NodeSourceType.OFFLINE)
+            whenever(mockMonitorConnectivityUseCase()).thenReturn(flowOf(true))
+            whenever(mockGetOfflineNodeInformationByNodeIdUseCase(any())).thenReturn(null)
+
+            action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockMonitorConnectivityUseCase).invoke()
+            verify(mockViewModel).dismiss()
+        }
 
     // RemoveShareAction Tests
     @Test
@@ -1049,20 +1537,22 @@ class NodeActionClickHandlerTest {
     // RemoveLinkAction Tests
     @Test
     fun `test RemoveLinkAction canHandle returns true for RemoveLinkMenuAction`() {
-        val action = RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper)
+        val action = RemoveLinkActionClickHandler()
         val menuAction = mock<RemoveLinkMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
     }
 
     @Test
-    fun `test RemoveLinkAction single node handle calls nodeHandlesToJsonMapper`() {
-        val action = RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper)
+    fun `test that RemoveLinkAction single node handle navigates via RemoveNodeLinkDialogNavKey`() {
+        val action = RemoveLinkActionClickHandler()
         val menuAction = mock<RemoveLinkMenuAction>()
 
-        whenever(mockNodeHandlesToJsonMapper(anyList())).thenReturn("test")
-
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockSingleNodeActionProvider.viewModel).navigateWithNavKey(
+            RemoveNodeLinkDialogNavKey(handles = listOf(123L))
+        )
     }
 
     // GetLinkAction Tests
@@ -1075,13 +1565,23 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test GetLinkAction single node handle calls megaNavigator`() {
+    fun `test that GetLinkAction single node handle navigates via ShareLinkNavKey when navigationHandler is not null`() {
         val action = GetLinkActionClickHandler(mockMegaNavigator)
         val menuAction = mock<GetLinkMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).openGetLinkActivity(any(), anyLong())
+        verify(mockNavigationHandler).navigate(ShareLinkNavKey(handles = listOf(123L)))
+    }
+
+    @Test
+    fun `test that GetLinkAction single node handle calls megaNavigator when navigationHandler is null`() {
+        val action = GetLinkActionClickHandler(mockMegaNavigator)
+        val menuAction = mock<GetLinkMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProviderNoHandler)
+
+        verify(mockMegaNavigator).openGetLinkActivity(any<Context>(), anyLong())
     }
 
     // UnhideAction Tests
@@ -1123,6 +1623,34 @@ class NodeActionClickHandlerTest {
             verify(mockUpdateNodeFavoriteUseCase).invoke(any(), any())
         }
 
+    @Test
+    fun `test RemoveFavouriteAction multiple nodes handle calls updateNodeFavoriteUseCase for each node and dismisses`() =
+        runTest {
+            val action = RemoveFavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
+            val menuAction = mock<RemoveFavouriteMenuAction>()
+            val nodes = listOf(mockFileNode, mockFolderNode)
+
+            action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockUpdateNodeFavoriteUseCase).invoke(NodeId(123L), false)
+            verify(mockUpdateNodeFavoriteUseCase).invoke(NodeId(456L), false)
+            verify(mockViewModel).dismiss()
+        }
+
+    @Test
+    fun `test RemoveFavouriteAction multiple nodes empty list dismisses without calling use case`() =
+        runTest {
+            val action = RemoveFavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
+            val menuAction = mock<RemoveFavouriteMenuAction>()
+
+            action.handle(menuAction, emptyList(), mockMultipleNodesActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockUpdateNodeFavoriteUseCase, never()).invoke(any(), any())
+            verify(mockViewModel).dismiss()
+        }
+
     // FavouriteAction Tests
     @Test
     fun `test FavouriteAction canHandle returns true for FavouriteMenuAction`() {
@@ -1141,6 +1669,34 @@ class NodeActionClickHandlerTest {
 
         verify(mockUpdateNodeFavoriteUseCase).invoke(any(), any())
     }
+
+    @Test
+    fun `test FavouriteAction multiple nodes handle calls updateNodeFavoriteUseCase for each node and dismisses`() =
+        runTest {
+            val action = FavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
+            val menuAction = mock<FavouriteMenuAction>()
+            val nodes = listOf(mockFileNode, mockFolderNode)
+
+            action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockUpdateNodeFavoriteUseCase).invoke(NodeId(123L), true)
+            verify(mockUpdateNodeFavoriteUseCase).invoke(NodeId(456L), true)
+            verify(mockViewModel).dismiss()
+        }
+
+    @Test
+    fun `test FavouriteAction multiple nodes empty list dismisses without calling use case`() =
+        runTest {
+            val action = FavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
+            val menuAction = mock<FavouriteMenuAction>()
+
+            action.handle(menuAction, emptyList(), mockMultipleNodesActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockUpdateNodeFavoriteUseCase, never()).invoke(any(), any())
+            verify(mockViewModel).dismiss()
+        }
 
     // LeaveShareAction Tests
     @Test
@@ -1168,7 +1724,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
                 LeaveShareDialogNavKey(handles = "test-json")
             )
         }
@@ -1183,7 +1739,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
                 LeaveShareDialogNavKey(handles = "test-json")
             )
         }
@@ -1199,7 +1755,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L))
-            verify(mockNavigationHandler, never()).navigate(any<LeaveShareDialogNavKey>())
+            verify(mockNavigationHandler, never()).navigate(any<LeaveShareDialogNavKey>(), anyOrNull())
         }
 
     @Test
@@ -1214,7 +1770,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
-            verify(mockNavigationHandler, never()).navigate(any<LeaveShareDialogNavKey>())
+            verify(mockNavigationHandler, never()).navigate(any<LeaveShareDialogNavKey>(), anyOrNull())
         }
 
     // UnhideAction Tests (already exists, but adding for completeness)
@@ -1243,28 +1799,39 @@ class NodeActionClickHandlerTest {
 
     // GetLinkAction Tests (already exists, but adding multiple nodes test)
     @Test
-    fun `test GetLinkAction multiple nodes handle calls megaNavigator with handles array`() {
+    fun `test that GetLinkAction multiple nodes handle navigates via ShareLinkNavKey when navigationHandler is not null`() {
         val action = GetLinkActionClickHandler(mockMegaNavigator)
         val menuAction = mock<GetLinkMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
-        verify(mockMegaNavigator).openGetLinkActivity(any<Context>(), any<LongArray>())
+        verify(mockNavigationHandler).navigate(ShareLinkNavKey(handles = listOf(123L, 456L)))
+    }
+
+    @Test
+    fun `test that GetLinkAction multiple nodes handle calls megaNavigator when navigationHandler is null`() {
+        val action = GetLinkActionClickHandler(mockMegaNavigator)
+        val menuAction = mock<GetLinkMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProviderNoHandler)
+
+        verify(mockMegaNavigator).openGetLinkActivity(any<Context>(), anyLong(), anyLong())
     }
 
     // RemoveLinkAction Tests (already exists, but adding multiple nodes test)
     @Test
-    fun `test RemoveLinkAction multiple nodes handle calls nodeHandlesToJsonMapper`() {
-        val action = RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper)
+    fun `test that RemoveLinkAction multiple nodes handle navigates via RemoveNodeLinkDialogNavKey`() {
+        val action = RemoveLinkActionClickHandler()
         val menuAction = mock<RemoveLinkMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
-        whenever(mockNodeHandlesToJsonMapper(anyList())).thenReturn("test")
-
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
-        verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
+        verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
+            RemoveNodeLinkDialogNavKey(handles = listOf(123L, 456L))
+        )
     }
 
     // SendToChatAction Tests (already exists, but adding multiple nodes test for completeness)
@@ -1314,7 +1881,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
-        verify(mockMegaNavigator).launchUrl(any<Context>(), any<String>())
+        verify(mockMegaNavigator).launchUrl(any<Context>(), any<String>(), anyBoolean())
     }
 
     // ShareAction Tests (already exists, but adding multiple nodes test)
@@ -1324,7 +1891,10 @@ class NodeActionClickHandlerTest {
             val action = ShareActionClickHandler(
                 mockGetLocalFilePathUseCase,
                 mockExportNodeUseCase,
-                mockGetFileUriUseCase
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
             )
             val menuAction = mock<ShareMenuAction>()
             val nodes = listOf(mockFileNode, mockFolderNode)
@@ -1347,8 +1917,6 @@ class NodeActionClickHandlerTest {
         assertThat(
             RestoreActionClickHandler(
                 mockCheckNodesNameCollisionUseCase,
-                mockRestoreNodesUseCase,
-                mockRestoreNodeResultMapper,
                 isNodeDeletedFromBackupsUseCase
             ).canHandle(wrongAction)
         ).isFalse()
@@ -1380,12 +1948,11 @@ class NodeActionClickHandlerTest {
         assertThat(LabelActionClickHandler().canHandle(wrongAction)).isFalse()
         assertThat(
             ManageShareFolderActionClickHandler(
-                mockGetFeatureFlagValueUseCase,
                 mockMegaNavigator
             ).canHandle(wrongAction)
         ).isFalse()
         assertThat(InfoActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
-        assertThat(EditActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
+        assertThat(EditActionClickHandler().canHandle(wrongAction)).isFalse()
         assertThat(DisputeTakeDownActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
         assertThat(
             VerifyActionClickHandler(mockGetNodeShareDataUseCase, mockMegaNavigator).canHandle(
@@ -1396,11 +1963,14 @@ class NodeActionClickHandlerTest {
             ShareActionClickHandler(
                 mockGetLocalFilePathUseCase,
                 mockExportNodeUseCase,
-                mockGetFileUriUseCase
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
             ).canHandle(wrongAction)
         ).isFalse()
         assertThat(RemoveShareActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
-        assertThat(RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
+        assertThat(RemoveLinkActionClickHandler().canHandle(wrongAction)).isFalse()
         assertThat(GetLinkActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
         assertThat(UnhideActionClickHandler(mockIsHiddenNodesOnboardedUseCase).canHandle(wrongAction)).isFalse()
         assertThat(
@@ -1410,5 +1980,126 @@ class NodeActionClickHandlerTest {
         ).isFalse()
         assertThat(FavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase).canHandle(wrongAction)).isFalse()
         assertThat(LeaveShareActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
+        assertThat(SyncActionClickHandler().canHandle(wrongAction)).isFalse()
+    }
+
+    @Test
+    fun `test SyncAction canHandle returns true for SyncMenuAction`() {
+        val action = SyncActionClickHandler()
+        val menuAction = mock<SyncMenuAction>()
+
+        assertThat(action.canHandle(menuAction)).isTrue()
+    }
+
+    @Test
+    fun `test SyncAction canHandle returns false for other actions`() {
+        val action = SyncActionClickHandler()
+        val otherAction = mock<CopyMenuAction>()
+
+        assertThat(action.canHandle(otherAction)).isFalse()
+    }
+
+    @Test
+    fun `test SyncAction single node handle calls navigate with correct parameters for folder`() {
+        val action = SyncActionClickHandler()
+        val menuAction = mock<SyncMenuAction>()
+
+        action.handle(menuAction, mockFolderNode, mockSingleNodeActionProvider)
+
+        verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
+            SyncNewFolderNavKey(
+                remoteFolderHandle = mockFolderNode.id.longValue,
+                remoteFolderName = mockFolderNode.name,
+            )
+        )
+    }
+
+    @Test
+    fun `test AddToMenuAction single node calls launch function invoked`() {
+        val action = AddToActionClickHandler()
+        val menuAction = mock<AddToMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+        verify(mockSingleNodeActionProvider.addToAlbumLauncher).launch(
+            argThat { pair: Pair<Array<Long>, Int> ->
+                pair.first.contentEquals(arrayOf(123L)) && pair.second == 1
+            }
+        )
+    }
+
+    @Test
+    fun `test AddToMenuAction multiple node calls launch function invoked`() {
+        val action = AddToActionClickHandler()
+        val menuAction = mock<AddToMenuAction>()
+
+        action.handle(menuAction, listOf(mockFileNode), mockMultipleNodesActionProvider)
+        verify(mockSingleNodeActionProvider.addToAlbumLauncher).launch(
+            argThat { pair: Pair<Array<Long>, Int> ->
+                pair.first.contentEquals(arrayOf(123L)) && pair.second == 1
+            }
+        )
+        verify(mockMultipleNodesActionProvider.viewModel).dismiss()
+    }
+
+    @Test
+    fun `test AddToAlbumMenuAction single node calls launch function invoked`() {
+        val action = AddToAlbumActionClickHandler()
+        val menuAction = mock<AddToAlbumMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+        verify(mockSingleNodeActionProvider.addToAlbumLauncher).launch(
+            argThat { pair: Pair<Array<Long>, Int> ->
+                pair.first.contentEquals(arrayOf(123L)) && pair.second == 0
+            }
+        )
+    }
+
+    @Test
+    fun `test AddToAlbumMenuAction multiple node calls launch function invoked`() {
+        val action = AddToAlbumActionClickHandler()
+        val menuAction = mock<AddToAlbumMenuAction>()
+
+        action.handle(menuAction, listOf(mockFileNode), mockMultipleNodesActionProvider)
+        verify(mockSingleNodeActionProvider.addToAlbumLauncher).launch(
+            argThat { pair: Pair<Array<Long>, Int> ->
+                pair.first.contentEquals(arrayOf(123L)) && pair.second == 0
+            }
+        )
+        verify(mockMultipleNodesActionProvider.viewModel).dismiss()
+    }
+
+    @Test
+    fun `test AddToPlaylistMenuAction single node calls launch function invoked`() {
+        val action = AddToPlaylistActionClickHandler()
+        val menuAction = mock<AddToPlaylistMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+        verify(mockSingleNodeActionProvider.videoToPlaylistLauncher).launch(123L)
+    }
+
+    @Test
+    fun `test that ViewInFolder canHandle returns true when action is ViewInFolderMenuAction`() {
+        val action = ViewInFolderActionClickHandler()
+        val menuAction = mock<ViewInFolderMenuAction>()
+
+        assertThat(action.canHandle(menuAction)).isTrue()
+    }
+
+    @Test
+    fun `test that ViewInFolder canHandle returns false when action is other`() {
+        val action = ViewInFolderActionClickHandler()
+        val menuAction = mock<SyncMenuAction>()
+
+        assertThat(action.canHandle(menuAction)).isFalse()
+    }
+
+    @Test
+    fun `test that ViewInFolder calls view model method on handle`() {
+        val action = ViewInFolderActionClickHandler()
+        val menuAction = mock<ViewInFolderMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockSingleNodeActionProvider.viewModel).viewFileInFolder(mockFileNode)
     }
 }

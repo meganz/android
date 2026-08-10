@@ -30,6 +30,7 @@ plugins {
     alias(convention.plugins.mega.android.application.firebase)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.firebase.appdistribution")
@@ -61,14 +62,14 @@ android {
         buildConfigField("long", "NOCTURN_TIMEOUT", "${getNocturnTimeout(project)}")
         buildConfigField("int", "KARMA_PLUGIN_PORT", "${getKarmaPluginPort(project)}")
         resValue("string", "app_version", "\"${versionName}${versionNameSuffix}\"")
-        val offlineDocumentProviderAuthority = "$applicationId.offline.documents"
-        manifestPlaceholders["offlineDocumentProviderAuthority"] = offlineDocumentProviderAuthority
+
+        val cloudDriveDocumentProviderAuthority = "$applicationId.cloud.documents"
+        manifestPlaceholders["cloudDriveDocumentProviderAuthority"] = cloudDriveDocumentProviderAuthority
         buildConfigField(
             "String",
-            "OFFLINE_DOCUMENT_PROVIDER_AUTHORITY",
-            "\"${offlineDocumentProviderAuthority}\""
+            "CLOUD_DRIVE_DOCUMENT_PROVIDER_AUTHORITY",
+            "\"${cloudDriveDocumentProviderAuthority}\""
         )
-
         val megaSdkVersion: String by rootProject.extra
         resValue("string", "sdk_version", "\"${getSdkGitHash(megaSdkVersion, project)}\"")
         resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion, project)}\"")
@@ -76,13 +77,31 @@ android {
         testInstrumentationRunner = "mega.privacy.android.app.HiltTestRunner"
     }
 
+    val debugKeyStoreFile = file("debug.keystore")
+    signingConfigs {
+        create("debug_sign") {
+            storeFile = debugKeyStoreFile
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+    project.downloadGoogleServicesJsonIfNeeded()
+
     buildTypes {
         debug {
+            project.downloadDebugKeyStoreIfNeeded(debugKeyStoreFile)
+
+            if (debugKeyStoreFile.exists()) {
+                println("Shared debug keystore found!")
+                signingConfig = signingConfigs["debug_sign"]
+            } else {
+                println("Shared debug keystore not found, use default keystore from Android SDK!")
+            }
             isDebuggable = true
             extra["enableCrashlytics"] = false
             extra["alwaysUpdateBuildId"] = false
             buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/Dev\"")
-            buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
         }
         release {
             firebaseAppDistribution {
@@ -105,7 +124,6 @@ android {
             // signingConfig = signingConfigs.getByName("debug")
 
             buildConfigField("String", "ENVIRONMENT", "\"\"")
-            buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-2135147798858967/9835644604\"")
 
         }
 
@@ -123,15 +141,14 @@ android {
             }
             applicationIdSuffix = ".qa"
             buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/QA\"")
-            buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
-            val offlineDocumentProviderAuthority =
-                "${defaultConfig.applicationId}$applicationIdSuffix.offline.documents"
-            manifestPlaceholders["offlineDocumentProviderAuthority"] =
-                offlineDocumentProviderAuthority
+            val cloudDriveDocumentProviderAuthority =
+                "${defaultConfig.applicationId}$applicationIdSuffix.cloud.documents"
+            manifestPlaceholders["cloudDriveDocumentProviderAuthority"] =
+                cloudDriveDocumentProviderAuthority
             buildConfigField(
                 "String",
-                "OFFLINE_DOCUMENT_PROVIDER_AUTHORITY",
-                "\"${offlineDocumentProviderAuthority}\""
+                "CLOUD_DRIVE_DOCUMENT_PROVIDER_AUTHORITY",
+                "\"${cloudDriveDocumentProviderAuthority}\""
             )
             firebaseAppDistribution {
                 releaseNotes = readReleaseNotes()
@@ -168,6 +185,7 @@ android {
     packaging {
         resources.excludes.add("/META-INF/{AL2.0,LGPL2.1}")
     }
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
 project.extensions.configure<ApplicationExtension> {
@@ -184,8 +202,20 @@ project.extensions.configure<ApplicationExtension> {
 
 applyTestLiteForTasks()
 
+configurations.matching { it.name.contains("AndroidTest", ignoreCase = true) }.configureEach {
+    resolutionStrategy {
+        force("androidx.test:core:1.6.1")
+        force("androidx.test.services:storage:1.4.2")
+    }
+}
+
 dependencies {
     // Modules
+    implementation(project(":shared:ads"))
+    implementation(project(":shared:nodes"))
+    implementation(project(":shared:search"))
+    implementation(project(":shared:account"))
+    implementation(project(":shared:contact"))
     implementation(project(":core:formatter"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":domain"))
@@ -193,16 +223,25 @@ dependencies {
     implementation(project(":legacy-core-ui"))
     implementation(project(":data"))
     implementation(project(":navigation"))
-    implementation("androidx.profileinstaller:profileinstaller:1.3.1")
+    implementation(lib.profileinstaller)
     implementation(project(":shared:sync"))
-    implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3:2.10.0-alpha04")
+    implementation(androidx.lifecycle.viewmodel.navigation3)
     "baselineProfile"(project(":baselineprofile"))
     implementation(project(":core:analytics:analytics-tracker"))
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:icon-pack"))
     implementation(project(":feature:sync"))
+    implementation(project(":feature:text-editor:text-editor"))
+    implementation(project(":feature:pdfviewer"))
+    implementation(project(":feature:file-info"))
+    implementation(project(":feature:sign-in-external"))
     implementation(project(":feature:devicecenter"))
-    implementation(project(":shared:resources"))
+    implementation(project(":feature:cloudexplorer"))
+    implementation(project(":resources:string-resources"))
     implementation(project(":feature:chat"))
+    implementation(project(":feature:contact:contact"))
+    implementation(project(":feature:media-player:media-player"))
+    implementation(project(":feature:media-player:media-player-snowflake-components"))
+    implementation(project(":feature:transfers:transfers"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))
     implementation(project(":feature:payment:payment-snowflake-components"))
     implementation(project(":feature:payment:payment"))
@@ -211,12 +250,21 @@ dependencies {
     implementation(project(":feature:photos:photos-snowflake-components"))
     implementation(project(":feature:notifications:notifications-snowflakes"))
     implementation(project(":core:ui-components:shared-components"))
+    implementation(project(":core:ui-components:achievement-snowflake-components"))
     implementation(project(":core:navigation-snowflake-components"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":core:feature-flags"))
-    "qaImplementation"(project(":feature:cloud-drive:cloud-drive"))
+    implementation(project(":feature:cloud-drive:cloud-drive"))
+    implementation(project(":feature:document-scanner:document-scanner"))
+    implementation(project(":feature:video-editor:video-editor"))
+    implementation(project(":feature:share-link"))
     preBuiltSdkDependency(rootProject.extra)
+    implementation(project(":core:passcode:passcode"))
     implementation(project(":core:transfers"))
+    implementation(project(":feature:myaccount"))
+    implementation(project(":feature:settings"))
+    implementation(project(":third-party-lib:twemoji"))
 
     //Test Modules
     testImplementation(project(":core-test"))
@@ -243,13 +291,13 @@ dependencies {
     implementation(androidx.constraintlayout)
     implementation(androidx.constraintlayout.compose)
     implementation(androidx.datastore.preferences)
+    implementation(androidx.security.crypto)
     implementation(androidx.emoji2)
     implementation(androidx.emojiPicker)
     implementation(androidx.exifinterface)
     implementation(androidx.fragment)
     implementation(androidx.fragment.compose)
     implementation(androidx.legacy.support)
-    implementation(androidx.multidex)
     implementation(androidx.palette)
     implementation(androidx.preferences)
     implementation(androidx.recyclerview)
@@ -283,20 +331,18 @@ dependencies {
     implementation(google.gson)
     implementation(google.material)
     implementation(google.media3.exoplayer)
+    implementation(google.media3.session)
     implementation(google.media3.ui)
     implementation(google.flexbox)
     implementation(google.zxing)
-    implementation(google.accompanist.pager)
-    implementation(google.accompanist.flowlayout)
     implementation(google.accompanist.placeholder)
     implementation(google.accompanist.permissions)
-    implementation(google.accompanist.navigationmaterial)
-    implementation(google.accompanist.navigationanimation)
+    implementation(androidx.compose.material.navigation)
     implementation(google.accompanist.systemui)
 
     // Google GMS
     implementation(lib.billing.client.ktx)
-    implementation(google.services.ads)
+    implementation(google.ads.mobile.sdk)
     implementation(google.services.location)
     implementation(google.services.maps)
     implementation(google.services.mlkit.document.scanner)
@@ -357,7 +403,7 @@ dependencies {
     debugImplementation(lib.xray)
 
     if (!shouldUsePrebuiltSdk()) {
-        implementation(files("../sdk/src/main/jni/megachat/webrtc/libwebrtc.jar"))
+        implementation(files("../sdk/libs/libwebrtc.jar"))
     }
 
     // Testing dependencies
@@ -396,6 +442,12 @@ dependencies {
     }
     androidTestImplementation(testlib.espresso.intents)
     androidTestImplementation(testlib.compose.junit)
+    androidTestImplementation(project(":data-test"))
+    androidTestImplementation(lib.logging.timber)
+    androidTestImplementation(androidx.work.test)
+    androidTestImplementation(androidx.hilt.work)
+    androidTestImplementation(testlib.uiautomator)
+    androidTestImplementation(project(":core:analytics:analytics-tracker"))
 
     kspAndroidTest(google.hilt.android.compiler)
     debugImplementation(androidx.fragment.test)
@@ -404,12 +456,16 @@ dependencies {
 
     // Live Data testing
     testImplementation(testlib.jraska.livedata.test)
-    testImplementation(testlib.coil.test)
     testImplementation(testlib.coil3.test)
 
     //QA
     "qaImplementation"(google.firebase.app.distribution)
     "qaImplementation"(testlib.compose.manifest)
+
+    // screenshot tests
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
 
     lintChecks(project(":lint"))
 }
@@ -453,6 +509,68 @@ tasks.register("printAppVersionNameChannel") {
     doLast {
         println(readVersionNameChannel())
     }
+}
+
+/**
+ * Downloads google-services.json from Artifactory if it does not exist locally.
+ */
+fun Project.downloadGoogleServicesJsonIfNeeded() {
+    val googleServicesFile = file("src/gms/google-services.json")
+    val artifactoryHost = System.getenv("ARTIFACTORY_BASE_URL")
+    if (!googleServicesFile.exists() && !artifactoryHost.isNullOrBlank()) {
+        println("Downloading google-services.json")
+        val proxyArgs = detectCurlProxyArgs()
+        ProcessBuilder(
+            listOf(
+                "curl",
+                "--fail",
+                "--location",
+            ) + proxyArgs + listOf(
+                "$artifactoryHost:443/artifactory/android-mega/cicd/firebase/google-services.json",
+                "-o",
+                googleServicesFile.absolutePath
+            )
+        ).inheritIO().start().waitFor()
+    }
+}
+
+/**
+ * Downloads the debug keystore from Artifactory if it does not exist locally.
+ */
+fun Project.downloadDebugKeyStoreIfNeeded(debugKeyStoreFile: File) {
+    val artifactoryHost = System.getenv("ARTIFACTORY_BASE_URL")
+    if (!debugKeyStoreFile.exists() && !artifactoryHost.isNullOrBlank()) {
+        println("Downloading debug keystore")
+        val proxyArgs = detectCurlProxyArgs()
+        ProcessBuilder(
+            listOf(
+                "curl",
+                "--fail",
+                "--location",
+            ) + proxyArgs + listOf(
+                "$artifactoryHost:443/artifactory/android-mega/cicd/debug-keystore/debug.keystore",
+                "-o",
+                debugKeyStoreFile.absolutePath
+            )
+        ).inheritIO().start().waitFor()
+    }
+}
+
+/**
+ * Detect system proxy settings and return the appropriate curl arguments for SOCKS5 proxy.
+ */
+fun Project.detectCurlProxyArgs(): List<String> {
+    val socksHost = System.getProperty("socksProxyHost")
+    val socksPort = System.getProperty("socksProxyPort")
+
+    if (!socksHost.isNullOrBlank() && !socksPort.isNullOrBlank()) {
+        val args = listOf("--socks5-hostname", "$socksHost:$socksPort")
+        println("Detected SOCKS proxy: $socksHost:$socksPort -> curl args: $args")
+        return args
+    }
+
+    println("No proxy detected, curl will connect directly")
+    return emptyList()
 }
 
 /**

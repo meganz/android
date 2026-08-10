@@ -14,29 +14,28 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
-import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.LocationPreference
 import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
 import mega.privacy.android.app.presentation.photos.model.RememberPreferences
-import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
-import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
-import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
+import mega.privacy.android.domain.entity.photos.DateCard
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -60,6 +59,9 @@ import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUs
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
+import mega.privacy.android.feature.photos.model.CameraUploadsStatus
+import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -88,22 +90,22 @@ internal class TimelineViewModelTest {
     private lateinit var underTest: TimelineViewModel
 
     private val isCameraUploadsEnabledUseCase =
-        mock<IsCameraUploadsEnabledUseCase> { onBlocking { invoke() }.thenReturn(true) }
+        mock<IsCameraUploadsEnabledUseCase> { on { invoke() }.thenReturn(true) }
 
     private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
 
     private val filterCameraUploadPhotos =
-        mock<FilterCameraUploadPhotos> { onBlocking { invoke(any()) }.thenAnswer { it.arguments[0] } }
+        mock<FilterCameraUploadPhotos> { on { invoke(any()) }.thenAnswer { it.arguments[0] } }
 
     private val filterCloudDrivePhotos =
-        mock<FilterCloudDrivePhotos> { onBlocking { invoke(any()) }.thenAnswer { it.arguments[0] } }
+        mock<FilterCloudDrivePhotos> { on { invoke(any()) }.thenAnswer { it.arguments[0] } }
 
     private val setInitialCUPreferences = mock<SetInitialCUPreferences>()
 
     private val enableCameraUploadsInPhotosUseCase = mock<EnableCameraUploadsInPhotosUseCase>()
 
     private val getNodeListByIds = mock<GetNodeListByIds> {
-        onBlocking { invoke(any()) }.thenReturn(
+        on { invoke(any()) }.thenReturn(
             emptyList()
         )
     }
@@ -149,13 +151,29 @@ internal class TimelineViewModelTest {
 
     private val loadNextPageOfPhotosUseCase = mock<LoadNextPageOfPhotosUseCase>()
 
+    private val accountLevelDetail = mock<AccountLevelDetail> {
+        on { accountType }.thenReturn(AccountType.PRO_III)
+    }
+    private val accountDetail = mock<AccountDetail> {
+        on { levelDetail }.thenReturn(accountLevelDetail)
+    }
+
     @BeforeEach
     fun setUp() {
         getTimelinePhotosUseCase.stub {
             on { invoke() }.thenReturn(emptyFlow())
         }
         monitorCameraUploadsStatusInfoUseCase.stub {
-            onBlocking { invoke() }.thenReturn(cameraUploadsStatusInfoFlow)
+            on { invoke() }.thenReturn(cameraUploadsStatusInfoFlow)
+        }
+        monitorShowHiddenItemsUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(false))
+        }
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+        isHiddenNodesOnboardedUseCase.stub {
+            on { invoke() }.thenReturn(false)
         }
         reset(
             enableCameraUploadsInPhotosUseCase
@@ -204,16 +222,14 @@ internal class TimelineViewModelTest {
     private fun initViewModelWithDefaultFlags() {
         // Set up default feature flags (legacy behavior)
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
         initViewModel()
     }
 
     private fun setupUIDrivenPhotoMonitoring(enabled: Boolean) {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
     }
@@ -222,8 +238,7 @@ internal class TimelineViewModelTest {
         val mockPhoto =
             mock<Photo.Image> { on { modificationTime }.thenReturn(LocalDateTime.now()) }
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(mockPhoto)))
     }
@@ -273,6 +288,8 @@ internal class TimelineViewModelTest {
                 .isTrue()
             assertWithMessage("enableSortOption value is incorrect").that(initialState.enableSortOption)
                 .isTrue()
+            assertWithMessage("enableFilterOption value is incorrect").that(initialState.enableFilterOption)
+                .isTrue()
             assertWithMessage("enableCameraUploadButtonShowing value is incorrect").that(
                 initialState.enableCameraUploadButtonShowing
             ).isTrue()
@@ -309,8 +326,7 @@ internal class TimelineViewModelTest {
 
         // Set up default feature flags
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
 
         initViewModel()
@@ -328,7 +344,7 @@ internal class TimelineViewModelTest {
                     )
                 )
             val hasPhoto =
-                Correspondence.transforming<DateCard, Photo>({ it?.photo }, "contains photo")
+                Correspondence.transforming<DateCard?, Photo?>({ it?.photo }, "contains photo")
 
             assertWithMessage("Day card photos do not match").that(initialisedState.daysCardPhotos)
                 .comparingElementsUsing(hasPhoto)
@@ -776,8 +792,7 @@ internal class TimelineViewModelTest {
 
         // Set up default feature flags
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
 
         initViewModel()
@@ -799,7 +814,7 @@ internal class TimelineViewModelTest {
                     )
                 )
             val hasPhoto =
-                Correspondence.transforming<DateCard, Photo>({ it?.photo }, "contains photo")
+                Correspondence.transforming<DateCard?, Photo?>({ it?.photo }, "contains photo")
 
             assertWithMessage("Day card photos do not match").that(state.daysCardPhotos)
                 .comparingElementsUsing(hasPhoto)
@@ -824,8 +839,7 @@ internal class TimelineViewModelTest {
         isEnabled: Boolean,
     ) = runTest {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
         whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsTransferScreen))
             .thenReturn(isEnabled)
@@ -845,8 +859,7 @@ internal class TimelineViewModelTest {
         isEnabled: Boolean,
     ) = runTest {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
         whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWarningBanner))
             .thenReturn(isEnabled)
@@ -1013,8 +1026,7 @@ internal class TimelineViewModelTest {
     fun `test that feature flag exception defaults to enabled behavior`() = runTest {
         // Given: Feature flag throws exception (simulating network/API error)
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenThrow(RuntimeException("Network error"))
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenThrow(RuntimeException("Network error"))
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
         initViewModel()
@@ -1038,8 +1050,7 @@ internal class TimelineViewModelTest {
     fun `test that feature flag null result defaults to enabled behavior`() = runTest {
         // Given: Feature flag returns null (simulating missing config)
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(null)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(null)
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
         initViewModel()

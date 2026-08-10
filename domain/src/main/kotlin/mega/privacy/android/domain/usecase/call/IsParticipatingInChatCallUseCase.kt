@@ -16,9 +16,9 @@ class IsParticipatingInChatCallUseCase @Inject constructor(private val callRepos
      *         false if user is not participating in any calls
      */
     suspend operator fun invoke(): Boolean = with(callRepository) {
-        return getCallHandleList(ChatCallStatus.Initial).isNotEmpty()
-                || getCallHandleList(ChatCallStatus.Connecting).isNotEmpty()
-                || getCallHandleList(ChatCallStatus.Joining).isNotEmpty()
-                || getCallHandleList(ChatCallStatus.InProgress).isNotEmpty()
+        return getCallChatIdList(ChatCallStatus.Initial).isNotEmpty()
+                || getCallChatIdList(ChatCallStatus.Connecting).isNotEmpty()
+                || getCallChatIdList(ChatCallStatus.Joining).isNotEmpty()
+                || getCallChatIdList(ChatCallStatus.InProgress).isNotEmpty()
     }
 }

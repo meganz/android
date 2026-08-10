@@ -8,7 +8,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
-import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.camerauploads.SendCameraUploadsBackupHeartBeatUseCase
@@ -23,7 +22,6 @@ import timber.log.Timber
 class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val applicationWrapper: ApplicationWrapper,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val sendCameraUploadsBackupHeartBeatUseCase: SendCameraUploadsBackupHeartBeatUseCase,
     private val sendMediaUploadsBackupHeartBeatUseCase: SendMediaUploadsBackupHeartBeatUseCase,
@@ -31,7 +29,6 @@ class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        if (isStopped) return Result.failure()
         Timber.d("SyncHeartbeatCameraUploadWorker: doWork()")
         return try {
             // arbitrary retry value
@@ -44,7 +41,6 @@ class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
             if (!loginMutex.isLocked) {
                 backgroundFastLoginUseCase()
                 Timber.d("backgroundFastLogin successful")
-                applicationWrapper.setHeartBeatAlive(true)
                 runCatching {
                     sendCameraUploadsBackupHeartBeatUseCase(
                         heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
@@ -63,7 +59,7 @@ class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
             Result.success()
         } catch (throwable: Throwable) {
             Timber.e(throwable, "SyncHeartbeatCameraUploadWorker: doWork() fail")
-            Result.failure()
+            Result.retry()
         }
     }
 }

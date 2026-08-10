@@ -7,6 +7,7 @@ import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.ChatInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.navigation.destination.ChatNavKey
 import timber.log.Timber
 
 fun showGroupOrContactInfoActivity(context: Context, uiState: ChatUiState) {
@@ -14,7 +15,7 @@ fun showGroupOrContactInfoActivity(context: Context, uiState: ChatUiState) {
         when {
             isNoteToSelf -> {
                 Intent(context, ChatInfoActivity::class.java).apply {
-                    putExtra(Constants.CHAT_ID, chatId)
+                    putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
                 }.also {
                     context.startActivity(it)
                 }
@@ -23,7 +24,7 @@ fun showGroupOrContactInfoActivity(context: Context, uiState: ChatUiState) {
             schedIsPending && isActive -> {
                 Timber.d("show scheduled meeting info")
                 Intent(context, ChatInfoActivity::class.java).apply {
-                    putExtra(Constants.CHAT_ID, scheduledMeeting?.chatId)
+                    putExtra(ChatNavKey.LEGACY_CHAT_ID, scheduledMeeting?.chatId)
                     putExtra(Constants.SCHEDULED_MEETING_ID, scheduledMeeting?.schedId)
                 }.also {
                     context.startActivity(it)

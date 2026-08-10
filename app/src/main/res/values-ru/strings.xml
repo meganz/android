@@ -14,8 +14,6 @@
     <string name="general_select">Выбрать</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Выбрать папку</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Создать</string>
     <!-- button -->
     <string name="general_add">Добавить</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -60,10 +58,6 @@
     <string name="action_logout">Выйти</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Загрузить</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">Новая папка</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Новый текстовый файл</string>
     <!-- Menu item -->
     <string name="action_settings">Настройки</string>
     <!-- Search button -->
@@ -156,10 +150,6 @@
     <string name="login_before_share">Для использования MEGA войдите в систему</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Cсылка для подтверждения больше не действительна. Возможно, ваш аккаунт уже активирован или вы отменили регистрацию.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Имя</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Фамилия</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Я понимаю, что, [B]потеряв пароль, я могу потерять свои данные[/B]. Подробнее о [A]сквозном шифровании MEGA[/A].</string>
     <!-- warning dialog -->
@@ -282,8 +272,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Эта ссылка больше не будет доступна публично.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Переименовать</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Открыть</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Подготовка файла</string>
@@ -303,8 +291,6 @@
     <string name="context_move_to_trash">Переместить в Корзину</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Удалить из MEGA</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Имя папки</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Создание папки</string>
     <!-- Menu option title -->
@@ -393,8 +379,6 @@
     <string name="subscription_type_monthly">Ежемесячно</string>
     <!--  -->
     <string name="subscription_type_yearly">Ежегодно</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Новая папка</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Добавить контакт</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -1034,12 +1018,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">минуты</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>В сети</item>
-        <item>Отсутствует</item>
-        <item>Занят</item>
-        <item>Локальные</item>
-    </string-array>
+    <string name="settings_chat_status_online">В сети</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Отсутствует</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Занят</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Локальные</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Включить</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1301,8 +1286,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Помощь</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Отправить отзыв</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Обратная связь по Android</string>
     <!-- mail body -->
@@ -1311,8 +1294,6 @@
     <string name="settings_feedback_body_device_model">Модель устройства</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Версия Android</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">Новый текстовый файл</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Название файла</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1331,8 +1312,6 @@
     <string name="general_incorrect_names">Пожалуйста, исправьте названия файлов, прежде чем продолжить</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Недопустимые символы</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">Следующие символы не допускаются: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Название файла не может быть пустым.</item>
@@ -1352,12 +1331,6 @@
     <string name="invalid_connection_state">Переподключение к чату</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Произошла ошибка, звонок не может быть соединён.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Вам нравится мобильное приложение MEGA?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Да, оценить</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Нет, написать отзыв</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">У контакта нет разрешений</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1439,7 +1412,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Превышен лимит хранения данных</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Недействительная ссылка, пожалуйста, запросите новую действующую ссылку</string>
+    <string name="invalid_link">Недействительная ссылка. Пожалуйста, попробуйте ещё раз или запросите новую.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Неверный пароль ссылки</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1530,12 +1503,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Качество видео</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Низкое</item>
-        <item>Среднее</item>
-        <item>Высокое</item>
-        <item>Исходное</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Низкое</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Среднее</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Высокое</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Исходное</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Пропущенный звонок</string>
     <!-- Refers to a location of file -->
@@ -1978,7 +1952,7 @@
     <!-- General label for files -->
     <string name="general_files">Файлы</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Сохранить на устройстве</string>
+    <string name="general_save_to_device">Скачать</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Загрузить в MEGA</string>
     <!-- Label choose destination -->
@@ -2298,7 +2272,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Игнорировать</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s заглушил этот вызов</string>
+    <string name="muted_contact_micro">%s отключил звук</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">Приглушён</string>
     <!-- Subtitle of the call screen when the call is on hold -->
@@ -4260,14 +4234,20 @@
         <item quantity="many">%1$d элементов не удалось скопировать</item>
         <item quantity="other">%1$d элемента не удалось скопировать</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Скопирован %1$d элемент,&#160;</item>
         <item quantity="few">Скопированы %1$d элемента,&#160;</item>
         <item quantity="many">Скопировано %1$d элементов,&#160;</item>
         <item quantity="other">Скопировано %1$d элемента,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">%1$d не удалось скопировать</item>
         <item quantity="few">%1$d не удалось скопировать</item>
@@ -4954,16 +4934,6 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s выступает</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Этот пользователь демонстрирует экран</string>
-    <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">Этот звонок записывается</string>
-    <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">Продолжая звонок, вы даёте разрешение на запись. Запись сохраняется только на устройстве того, кто её ведёт.</string>
-    <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">Понятно</string>
-    <!-- Label for the negative or cancel button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_negative_button">Покинуть звонок</string>
-    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Подробнее[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">Пользователь %1$s начал запись</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->

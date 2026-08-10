@@ -17,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.usecase.camerauploads.SendCameraUploadsBackupHeartBeatUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendMediaUploadsBackupHeartBeatUseCase
@@ -27,6 +26,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 import java.util.UUID
@@ -46,8 +46,6 @@ internal class SyncHeartbeatCameraUploadWorkerTest {
     private lateinit var executor: Executor
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var workDatabase: WorkDatabase
-
-    private val applicationWrapper = mock<ApplicationWrapper>()
     private val backgroundFastLoginUseCase = mock<BackgroundFastLoginUseCase>()
     private val sendCameraUploadsBackupHeartBeatUseCase =
         mock<SendCameraUploadsBackupHeartBeatUseCase>()
@@ -82,7 +80,6 @@ internal class SyncHeartbeatCameraUploadWorkerTest {
                     { _, _ -> }, workExecutor,
                 )
             ),
-            applicationWrapper = applicationWrapper,
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             sendCameraUploadsBackupHeartBeatUseCase = sendCameraUploadsBackupHeartBeatUseCase,
             sendMediaUploadsBackupHeartBeatUseCase = sendMediaUploadsBackupHeartBeatUseCase,
@@ -97,13 +94,11 @@ internal class SyncHeartbeatCameraUploadWorkerTest {
 
         val inOrder = inOrder(
             backgroundFastLoginUseCase,
-            applicationWrapper,
             sendCameraUploadsBackupHeartBeatUseCase,
             sendMediaUploadsBackupHeartBeatUseCase,
         )
 
         inOrder.verify(backgroundFastLoginUseCase).invoke()
-        inOrder.verify(applicationWrapper).setHeartBeatAlive(true)
         inOrder.verify(sendCameraUploadsBackupHeartBeatUseCase).invoke(
             heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
             lastNodeHandle = -1L
@@ -117,11 +112,49 @@ internal class SyncHeartbeatCameraUploadWorkerTest {
     }
 
     @Test
-    fun `test that a failure is returned when an exception is found`() = runTest {
+    fun `test that a retry is returned when an exception is found`() = runTest {
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(backgroundFastLoginUseCase()).thenThrow(RuntimeException())
 
         val result = underTest.doWork()
-        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+    }
+
+    @Test
+    fun `test that work is skipped when login mutex stays locked`() = runTest {
+        whenever(loginMutex.isLocked).thenReturn(true)
+
+        val result = underTest.doWork()
+
+        verifyNoInteractions(
+            backgroundFastLoginUseCase,
+            sendCameraUploadsBackupHeartBeatUseCase,
+            sendMediaUploadsBackupHeartBeatUseCase,
+        )
+        assertThat(result).isEqualTo(ListenableWorker.Result.success())
+    }
+
+    @Test
+    fun `test that work waits for login mutex to unlock then sends heartbeats`() = runTest {
+        whenever(loginMutex.isLocked).thenReturn(true, false)
+
+        val result = underTest.doWork()
+
+        val inOrder = inOrder(
+            backgroundFastLoginUseCase,
+            sendCameraUploadsBackupHeartBeatUseCase,
+            sendMediaUploadsBackupHeartBeatUseCase,
+        )
+
+        inOrder.verify(backgroundFastLoginUseCase).invoke()
+        inOrder.verify(sendCameraUploadsBackupHeartBeatUseCase).invoke(
+            heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
+            lastNodeHandle = -1L
+        )
+        inOrder.verify(sendMediaUploadsBackupHeartBeatUseCase).invoke(
+            heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
+            lastNodeHandle = -1L
+        )
+        assertThat(result).isEqualTo(ListenableWorker.Result.success())
     }
 }

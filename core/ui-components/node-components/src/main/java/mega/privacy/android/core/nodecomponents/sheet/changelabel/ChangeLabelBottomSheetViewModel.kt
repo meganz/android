@@ -7,11 +7,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import mega.privacy.android.core.nodecomponents.mapper.NodeLabelResourceMapper
 import mega.privacy.android.core.nodecomponents.model.label.ChangeLabelState
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeLabelUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLabelListUseCase
@@ -48,11 +50,23 @@ class ChangeLabelBottomSheetViewModel @Inject constructor(
      */
     suspend fun loadLabelInfo(nodeId: NodeId) {
         getTypedNode(nodeId)?.let {
-            getLabelList(it)
+            getLabelList(it, null)
         }
     }
 
-    private fun getLabelList(node: TypedNode) {
+    /**
+     * get label info for multiple nodes.
+     * Uses the first node's label for the current selection display.
+     * @param nodeIds [List] of [NodeId]
+     */
+    suspend fun loadLabelInfo(nodeIds: List<NodeId>) {
+        if (nodeIds.isEmpty()) return
+        getTypedNode(nodeIds.first())?.let { firstNode ->
+            getLabelList(firstNode, nodeIds)
+        }
+    }
+
+    private fun getLabelList(node: TypedNode, nodeIds: List<NodeId>?) {
         runCatching {
             getNodeLabelListUseCase()
         }.onFailure {
@@ -67,7 +81,8 @@ class ChangeLabelBottomSheetViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     labelList = labels,
-                    nodeId = node.id
+                    nodeId = if (nodeIds == null) node.id else null,
+                    nodeIds = nodeIds
                 )
             }
         }
@@ -83,12 +98,27 @@ class ChangeLabelBottomSheetViewModel @Inject constructor(
      * When label change clicked
      */
     fun onLabelSelected(labelColor: NodeLabel?) {
-        state.value.nodeId?.let {
+        val nodeIds = state.value.nodeIds
+        if (nodeIds != null) {
             viewModelScope.launch {
-                runCatching {
-                    changeLabelUseCase(nodeId = it, label = labelColor)
-                }.onFailure {
-                    Timber.e("Error changing label $it")
+                supervisorScope {
+                    nodeIds.mapAsync { nodeId ->
+                        runCatching {
+                            changeLabelUseCase(nodeId = nodeId, label = labelColor)
+                        }.onFailure {
+                            Timber.e("Error changing label $it")
+                        }
+                    }
+                }
+            }
+        } else {
+            state.value.nodeId?.let {
+                viewModelScope.launch {
+                    runCatching {
+                        changeLabelUseCase(nodeId = it, label = labelColor)
+                    }.onFailure {
+                        Timber.e("Error changing label $it")
+                    }
                 }
             }
         }

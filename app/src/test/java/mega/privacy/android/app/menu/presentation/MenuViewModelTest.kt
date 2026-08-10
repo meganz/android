@@ -4,7 +4,7 @@ import android.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -24,27 +24,40 @@ import mega.privacy.android.app.menu.navigation.AchievementsItem
 import mega.privacy.android.app.menu.navigation.CurrentPlanItem
 import mega.privacy.android.app.menu.navigation.RubbishBinItem
 import mega.privacy.android.app.menu.navigation.StorageItem
+import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.AccountStorageDetail
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
+import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.android.shared.resources.R as SharedR
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -53,6 +66,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -71,7 +85,8 @@ class MenuViewModelTest {
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
     private val getMyAvatarColorUseCase = mock<GetMyAvatarColorUseCase>()
     private val getMyAvatarFileUseCase = mock<GetMyAvatarFileUseCase>()
-    private val accountNameMapper = mock<AccountNameMapper>()
+    private val accountTypeNameMapper = mock<AccountTypeNameMapper>()
+    private val accountTypeIconMapper = AccountTypeIconMapper()
     private val getStringFromStringResMapper = mock<GetStringFromStringResMapper>()
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
     private val getUserFullNameUseCase = mock<GetUserFullNameUseCase>()
@@ -80,13 +95,17 @@ class MenuViewModelTest {
     private val isAchievementsEnabledUseCase = mock<IsAchievementsEnabledUseCase>()
     private val checkPasswordReminderUseCase = mock<CheckPasswordReminderUseCase>()
     private val monitorNotSeenUserAlertsCountUseCase = mock<MonitorNotSeenUserAlertsCountUseCase>()
-    private val ioDispatcher = UnconfinedTestDispatcher()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
+    private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
+    private val getSpecificAccountDetailUseCase = mock<GetSpecificAccountDetailUseCase>()
+    private val avatarContentMapper = mock<AvatarContentMapper>()
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     private object TestDestination : NavKey
 
     @BeforeAll
     fun initialisation() {
-        Dispatchers.setMain(ioDispatcher)
+        Dispatchers.setMain(testDispatcher)
     }
 
     @AfterAll
@@ -102,7 +121,7 @@ class MenuViewModelTest {
             monitorMyAvatarFile,
             getMyAvatarColorUseCase,
             getMyAvatarFileUseCase,
-            accountNameMapper,
+            accountTypeNameMapper,
             getStringFromStringResMapper,
             fileSizeStringMapper,
             getUserFullNameUseCase,
@@ -111,6 +130,10 @@ class MenuViewModelTest {
             isAchievementsEnabledUseCase,
             checkPasswordReminderUseCase,
             monitorNotSeenUserAlertsCountUseCase,
+            monitorNodeUpdatesUseCase,
+            getRubbishNodeUseCase,
+            getSpecificAccountDetailUseCase,
+            avatarContentMapper,
         )
     }
 
@@ -119,6 +142,7 @@ class MenuViewModelTest {
         monitorConnectivityUseCase.stub {
             on { invoke() }.thenReturn(flowOf(false))
         }
+        whenever(isAchievementsEnabledUseCase()).doReturn(false)
         initUnderTest()
 
         val initialState = underTest.uiState.value
@@ -126,7 +150,7 @@ class MenuViewModelTest {
         assertThat(initialState.privacySuiteItems).isEmpty()
         assertThat(initialState.email).isNull()
         assertThat(initialState.name).isNull()
-        assertThat(initialState.avatar).isNull()
+        assertThat(initialState.avatarContent).isNull()
         assertThat(initialState.isConnectedToNetwork).isFalse()
     }
 
@@ -136,6 +160,7 @@ class MenuViewModelTest {
             monitorConnectivityUseCase.stub {
                 on { invoke() }.thenReturn(flowOf(true))
             }
+            stubDefaultDependencies()
 
             val accountItem = NavDrawerItem.Account(
                 destination = TestDestination,
@@ -161,11 +186,14 @@ class MenuViewModelTest {
 
             initUnderTest(menuItems = menuItems)
 
-            val state = underTest.uiState.value
-            assertThat(state.myAccountItems).hasSize(1)
-            assertThat(state.privacySuiteItems).hasSize(1)
-            assertThat(state.myAccountItems[1]?.title).isEqualTo(R.string.ok)
-            assertThat(state.privacySuiteItems[2]?.title).isEqualTo(R.string.cancel)
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.myAccountItems).hasSize(1)
+                assertThat(state.privacySuiteItems).hasSize(1)
+                assertThat(state.myAccountItems[1]?.title).isEqualTo(R.string.ok)
+                assertThat(state.privacySuiteItems[2]?.title).isEqualTo(R.string.cancel)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @ParameterizedTest(name = "isConnected: {0}")
@@ -187,54 +215,226 @@ class MenuViewModelTest {
         }
 
     @Test
-    fun `test that avatar color is fetched and updates state`() = runTest {
-        stubDefaultDependencies()
-        val expectedColor = -16711936 // Green color value
-        getMyAvatarColorUseCase.stub {
-            onBlocking { invoke() }.thenReturn(expectedColor)
+    fun `test that refresh methods are called with forceRefresh false when connectivity is false`() =
+        runTest {
+            stubDefaultDependencies()
+            monitorConnectivityUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(false))
+            }
+
+            whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+            whenever(getUserFullNameUseCase(forceRefresh = false)).thenReturn("Test User")
+            whenever(getCurrentUserEmail(true)).thenReturn("test@example.com")
+            whenever(getCurrentUserEmail(false)).thenReturn("test@example.com")
+
+            initUnderTest()
+
+            // Wait for connectivity flow to process
+            underTest.uiState.test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            // Verify refresh methods are called with forceRefresh = true on init
+            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getCurrentUserEmail).invoke(true)
+            // Verify refresh methods are also called with forceRefresh = false when connectivity is false
+            verify(getUserFullNameUseCase).invoke(forceRefresh = false)
+            verify(getCurrentUserEmail).invoke(false)
         }
+
+    @Test
+    fun `test that refresh methods are not called when connectivity is true`() = runTest {
+        stubDefaultDependencies()
+        monitorConnectivityUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(true))
+        }
+
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+        whenever(getCurrentUserEmail(true)).thenReturn("test@example.com")
 
         initUnderTest()
 
+        // Wait for connectivity flow to process
         underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.avatarColor).isEqualTo(Color(expectedColor))
+            awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
+
+        // Verify refresh methods are called with forceRefresh = true only on init
+        verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+        verify(getCurrentUserEmail).invoke(true)
+        // Verify they are NOT called with forceRefresh = false when connectivity is true
+        verify(getUserFullNameUseCase, times(0)).invoke(forceRefresh = false)
+        verify(getCurrentUserEmail, times(0)).invoke(false)
     }
 
     @Test
-    fun `test that avatar color fetch failure is handled gracefully`() = runTest {
-        stubDefaultDependencies()
-        getMyAvatarColorUseCase.stub {
-            onBlocking { invoke() }.thenThrow(RuntimeException("Color fetch failed"))
+    fun `test that refresh methods are called when connectivity changes from true to false`() =
+        runTest {
+            stubDefaultDependencies()
+            val connectivityFlow = MutableStateFlow(true)
+
+            monitorConnectivityUseCase.stub {
+                on { invoke() }.thenReturn(connectivityFlow)
+            }
+
+            whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+            whenever(getUserFullNameUseCase(forceRefresh = false)).thenReturn("Test User")
+            whenever(getCurrentUserEmail(true)).thenReturn("test@example.com")
+            whenever(getCurrentUserEmail(false)).thenReturn("test@example.com")
+
+            initUnderTest()
+
+            // Wait for initial state
+            underTest.uiState.test {
+                awaitItem()
+            }
+
+            // Verify initial calls with forceRefresh = true
+            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getCurrentUserEmail).invoke(true)
+            // Verify no calls with forceRefresh = false yet
+            verify(getUserFullNameUseCase, times(0)).invoke(forceRefresh = false)
+            verify(getCurrentUserEmail, times(0)).invoke(false)
+
+            // Change connectivity to false
+            connectivityFlow.emit(false)
+
+            // Wait for state update
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isConnectedToNetwork).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            // Verify refresh methods are now called with forceRefresh = false when connectivity becomes false
+            verify(getUserFullNameUseCase).invoke(forceRefresh = false)
+            verify(getCurrentUserEmail).invoke(false)
         }
 
-        initUnderTest()
+    @Test
+    fun `test that refresh methods are not called when connectivity changes from false to true`() =
+        runTest {
+            stubDefaultDependencies()
+            val connectivityFlow = MutableStateFlow(false)
 
-        // Should not crash and state should remain with default values
-        val state = underTest.uiState.value
-        assertThat(state.avatarColor).isEqualTo(Color.Unspecified)
-    }
+            monitorConnectivityUseCase.stub {
+                on { invoke() }.thenReturn(connectivityFlow)
+            }
+
+            whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+            whenever(getUserFullNameUseCase(forceRefresh = false)).thenReturn("Test User")
+            whenever(getCurrentUserEmail(true)).thenReturn("test@example.com")
+            whenever(getCurrentUserEmail(false)).thenReturn("test@example.com")
+
+            initUnderTest()
+
+            // Wait for initial state (connectivity is false, so refresh methods are called)
+            underTest.uiState.test {
+                awaitItem()
+            }
+
+            // Verify initial calls: once with forceRefresh = true and once with forceRefresh = false
+            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getUserFullNameUseCase).invoke(forceRefresh = false)
+            verify(getCurrentUserEmail).invoke(true)
+            verify(getCurrentUserEmail).invoke(false)
+
+            // Change connectivity to true
+            connectivityFlow.emit(true)
+
+            // Wait for state update
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isConnectedToNetwork).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            // Verify refresh methods are NOT called again when connectivity becomes true
+            // Total calls should still be 1 for each forceRefresh value
+            verify(getUserFullNameUseCase, times(1)).invoke(forceRefresh = true)
+            verify(getUserFullNameUseCase, times(1)).invoke(forceRefresh = false)
+            verify(getCurrentUserEmail, times(1)).invoke(true)
+            verify(getCurrentUserEmail, times(1)).invoke(false)
+        }
 
     @Test
-    fun `test that avatar file is monitored and updates state`() = runTest {
+    fun `test that avatar content is mapped and updates state when name and file are available`() =
+        runTest {
+            stubDefaultDependencies()
+            val avatarFile = File("/path/to/avatar.jpg")
+            val expectedContent = PhotoAvatarContent(
+                path = avatarFile.absolutePath,
+                size = 1234L,
+                showBorder = false,
+            )
+
+            whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+            monitorMyAvatarFile.stub {
+                on { invoke() }.thenReturn(flowOf(avatarFile))
+            }
+            whenever(getMyAvatarFileUseCase(false)).thenReturn(avatarFile)
+            whenever(getMyAvatarFileUseCase(true)).thenReturn(avatarFile)
+            whenever(getMyAvatarColorUseCase()).thenReturn(-16711936)
+            whenever(avatarContentMapper(any(), any(), any(), any(), any())).thenReturn(expectedContent)
+
+            initUnderTest()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.avatarContent).isEqualTo(expectedContent)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that avatar content mapper is invoked with correct parameters`() = runTest {
         stubDefaultDependencies()
         val avatarFile = File("/path/to/avatar.jpg")
+        val expectedContent = TextAvatarContent(
+            avatarText = "J",
+            backgroundColor = 0,
+            showBorder = false,
+            textSize = 18.sp,
+        )
 
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("John Doe")
         monitorMyAvatarFile.stub {
             on { invoke() }.thenReturn(flowOf(avatarFile))
         }
+        whenever(getMyAvatarFileUseCase(false)).thenReturn(avatarFile)
+        whenever(getMyAvatarFileUseCase(true)).thenReturn(avatarFile)
+        whenever(getMyAvatarColorUseCase()).thenReturn(0)
+        whenever(avatarContentMapper(any(), any(), any(), any(), any())).thenReturn(expectedContent)
 
-        getMyAvatarFileUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(avatarFile)
+        initUnderTest()
+
+        underTest.uiState.test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
         }
+
+        verify(avatarContentMapper).invoke(
+            "John Doe",
+            avatarFile,
+            false,
+            18.sp,
+            0,
+        )
+    }
+
+    @Test
+    fun `test that avatar content is not updated when name is null or empty`() = runTest {
+        stubDefaultDependencies()
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn(null)
 
         initUnderTest()
 
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.avatar).isEqualTo(avatarFile)
+            assertThat(state.avatarContent).isNull()
+            verify(avatarContentMapper, times(0)).invoke(any(), any(), any(), any(), any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -264,9 +464,30 @@ class MenuViewModelTest {
 
         // Should not crash despite error in avatar file monitoring
         val state = underTest.uiState.value
-        assertThat(state.avatar).isNull()
+        assertThat(state.avatarContent).isNull()
     }
 
+    @Test
+    fun `test that avatarContentMapper throwing in transform does not crash`() = runTest {
+        stubDefaultDependencies()
+        val avatarFile = File("/path/to/avatar.jpg")
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+        whenever(getMyAvatarFileUseCase(false)).thenReturn(avatarFile)
+        whenever(getMyAvatarFileUseCase(true)).thenReturn(avatarFile)
+        monitorMyAvatarFile.stub {
+            on { invoke() }.thenReturn(flowOf(avatarFile))
+        }
+        whenever(getMyAvatarColorUseCase()).thenReturn(0)
+        whenever(avatarContentMapper(any(), any(), any(), any(), any())).thenThrow(
+            RuntimeException("Mapper error")
+        )
+
+        initUnderTest()
+
+        val state = underTest.uiState.value
+        assertThat(state).isNotNull()
+        assertThat(state.avatarContent).isNull()
+    }
     @Test
     fun `test that account details are processed correctly and update subtitle flows`() = runTest {
         stubDefaultDependencies()
@@ -293,7 +514,7 @@ class MenuViewModelTest {
             on { invoke(2000000L) }.thenReturn(mockRubbishString)
         }
 
-        accountNameMapper.stub {
+        accountTypeNameMapper.stub {
             on { invoke(AccountType.PRO_I) }.thenReturn(mockAccountTypeName)
         }
 
@@ -338,6 +559,108 @@ class MenuViewModelTest {
 
 
     @Test
+    fun `test that storageSubtitle shows used storage only when account type is BUSINESS`() =
+        runTest {
+            stubDefaultDependencies()
+
+            val accountDetail = createAccountDetail(
+                usedStorage = 10737418240L,
+                totalStorage = Long.MAX_VALUE,
+                usedRubbish = 0L,
+                accountType = AccountType.BUSINESS
+            )
+
+            monitorAccountDetailUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(accountDetail))
+            }
+
+            val mockUsedStorageString = "10 GB"
+            val mockAccountTypeName = R.string.ok
+
+            fileSizeStringMapper.stub {
+                on { invoke(10737418240L) }.thenReturn(mockUsedStorageString)
+            }
+
+            accountTypeNameMapper.stub {
+                on { invoke(AccountType.BUSINESS) }.thenReturn(mockAccountTypeName)
+            }
+
+            getStringFromStringResMapper.stub {
+                on { invoke(mockAccountTypeName) }.thenReturn("Business")
+                on {
+                    invoke(
+                        SharedR.string.navigation_drawer_used_space_only,
+                        mockUsedStorageString
+                    )
+                }.thenReturn("[A]10 GB[/A] used")
+            }
+
+            val menuItems = mapOf(20 to StorageItem)
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+
+                state.myAccountItems[20]?.subTitle?.test {
+                    assertThat(awaitItem()).isEqualTo("10 GB used")
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that storageSubtitle shows used storage only when account type is PRO_FLEXI`() =
+        runTest {
+            stubDefaultDependencies()
+
+            val accountDetail = createAccountDetail(
+                usedStorage = 5368709120L,
+                totalStorage = Long.MAX_VALUE,
+                usedRubbish = 0L,
+                accountType = AccountType.PRO_FLEXI
+            )
+
+            monitorAccountDetailUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(accountDetail))
+            }
+
+            val mockUsedStorageString = "5 GB"
+            val mockAccountTypeName = R.string.ok
+
+            fileSizeStringMapper.stub {
+                on { invoke(5368709120L) }.thenReturn(mockUsedStorageString)
+            }
+
+            accountTypeNameMapper.stub {
+                on { invoke(AccountType.PRO_FLEXI) }.thenReturn(mockAccountTypeName)
+            }
+
+            getStringFromStringResMapper.stub {
+                on { invoke(mockAccountTypeName) }.thenReturn("Pro Flexi")
+                on {
+                    invoke(
+                        SharedR.string.navigation_drawer_used_space_only,
+                        mockUsedStorageString
+                    )
+                }.thenReturn("[A]5 GB[/A] used")
+            }
+
+            val menuItems = mapOf(20 to StorageItem)
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+
+                state.myAccountItems[20]?.subTitle?.test {
+                    assertThat(awaitItem()).isEqualTo("5 GB used")
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that account details with null level detail default to FREE account type`() =
         runTest {
             stubDefaultDependencies()
@@ -364,7 +687,7 @@ class MenuViewModelTest {
                 on { invoke(50L) }.thenReturn(mockRubbishString)
             }
 
-            accountNameMapper.stub {
+            accountTypeNameMapper.stub {
                 on { invoke(AccountType.FREE) }.thenReturn(mockAccountTypeName)
             }
 
@@ -386,7 +709,7 @@ class MenuViewModelTest {
                 verify(fileSizeStringMapper).invoke(100L)
                 verify(fileSizeStringMapper).invoke(200L)
                 verify(fileSizeStringMapper).invoke(50L)
-                verify(accountNameMapper).invoke(AccountType.FREE)
+                verify(accountTypeNameMapper).invoke(AccountType.FREE)
                 verify(getStringFromStringResMapper).invoke(mockAccountTypeName)
 
                 assertThat(state.myAccountItems).hasSize(3)
@@ -423,7 +746,7 @@ class MenuViewModelTest {
             on { invoke(1000000000L) }.thenReturn(mock1GBString)
         }
 
-        accountNameMapper.stub {
+        accountTypeNameMapper.stub {
             on { invoke(AccountType.FREE) }.thenReturn(mockAccountTypeName)
         }
 
@@ -447,7 +770,7 @@ class MenuViewModelTest {
             val rubbishBinItem = state.myAccountItems[90]
 
             verify(fileSizeStringMapper, times(2)).invoke(0L)
-            verify(accountNameMapper).invoke(AccountType.FREE)
+            verify(accountTypeNameMapper).invoke(AccountType.FREE)
             verify(getStringFromStringResMapper).invoke(mockAccountTypeName)
 
             assertThat(state.myAccountItems).hasSize(3)
@@ -499,7 +822,6 @@ class MenuViewModelTest {
             usedIncoming = 0L,
             totalStorage = totalStorage,
             usedStorage = usedStorage,
-            subscriptionMethodId = 0
         ),
         levelDetail: AccountLevelDetail? = AccountLevelDetail(
             accountType = accountType,
@@ -508,7 +830,8 @@ class MenuViewModelTest {
             accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
             proExpirationTime = 0L,
             accountPlanDetail = null,
-            accountSubscriptionDetailList = emptyList()
+            accountSubscriptionDetailList = emptyList(),
+            subscriptionMethodId = 0,
         ),
     ): AccountDetail {
         return AccountDetail(
@@ -533,9 +856,10 @@ class MenuViewModelTest {
         }
 
         whenever(getMyAvatarFileUseCase(false)).thenReturn(null)
+        whenever(getMyAvatarFileUseCase(true)).thenReturn(null)
 
         monitorAccountDetailUseCase.stub {
-            on { invoke() }.thenReturn(flow { awaitCancellation() })
+            on { invoke() }.thenReturn(flow { emit(AccountDetail()) })
         }
 
         whenever(getMyAvatarColorUseCase()).thenReturn(0)
@@ -548,6 +872,21 @@ class MenuViewModelTest {
         }
 
         whenever(isAchievementsEnabledUseCase()).thenReturn(true)
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flow { awaitCancellation() })
+        }
+
+        whenever(getRubbishNodeUseCase()).thenReturn(null)
+
+        fileSizeStringMapper.stub {
+            on { invoke(any()) }.thenReturn("")
+        }
+
+        getStringFromStringResMapper.stub {
+            on { invoke(any()) }.thenReturn("")
+            on { invoke(any(), any()) }.thenReturn("")
+        }
     }
 
     private fun initUnderTest(
@@ -560,7 +899,8 @@ class MenuViewModelTest {
             monitorMyAvatarFile = monitorMyAvatarFile,
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,
-            accountNameMapper = accountNameMapper,
+            accountTypeNameMapper = accountTypeNameMapper,
+            accountTypeIconMapper = accountTypeIconMapper,
             getStringFromStringResMapper = getStringFromStringResMapper,
             fileSizeStringMapper = fileSizeStringMapper,
             getUserFullNameUseCase = getUserFullNameUseCase,
@@ -568,8 +908,12 @@ class MenuViewModelTest {
             monitorUserUpdates = monitorUserUpdates,
             isAchievementsEnabledUseCase = isAchievementsEnabledUseCase,
             checkPasswordReminderUseCase = checkPasswordReminderUseCase,
-            ioDispatcher = ioDispatcher,
             monitorNotSeenUserAlertsCountUseCase = monitorNotSeenUserAlertsCountUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            getRubbishNodeUseCase = getRubbishNodeUseCase,
+            getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
+            avatarContentMapper = avatarContentMapper,
+            ioDispatcher = testDispatcher,
         )
     }
 
@@ -578,14 +922,14 @@ class MenuViewModelTest {
         stubDefaultDependencies()
         val expectedName = "John Doe"
 
-        whenever(getUserFullNameUseCase(forceRefresh = false)).thenReturn(expectedName)
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn(expectedName)
 
         initUnderTest()
 
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.name).isEqualTo(expectedName)
-            verify(getUserFullNameUseCase).invoke(forceRefresh = false)
+            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -625,7 +969,7 @@ class MenuViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.name).isEqualTo(updatedName)
-            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getUserFullNameUseCase, times(2)).invoke(forceRefresh = true)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -648,7 +992,7 @@ class MenuViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.name).isEqualTo(updatedName)
-            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getUserFullNameUseCase, times(2)).invoke(forceRefresh = true)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -688,7 +1032,7 @@ class MenuViewModelTest {
         verify(
             getUserFullNameUseCase,
             times(1)
-        ).invoke(forceRefresh = false) // Only initial call
+        ).invoke(forceRefresh = true) // Only initial call
         verify(getCurrentUserEmail, times(1)).invoke() // Only initial call
     }
 
@@ -705,7 +1049,7 @@ class MenuViewModelTest {
         // Should not crash despite error in user updates monitoring
         val state = underTest.uiState.value
         assertThat(state).isNotNull()
-        verify(getUserFullNameUseCase, times(0)).invoke(true)
+        verify(getUserFullNameUseCase, times(1)).invoke(true) // Only initial call
     }
 
     @Test
@@ -814,10 +1158,10 @@ class MenuViewModelTest {
         }
 
     @Test
-    fun `test that achievements item is not included when IsAchievementsEnabled returns null`() =
+    fun `test that achievements item is not included when IsAchievementsEnabled returns false`() =
         runTest {
             stubDefaultDependencies()
-            whenever(isAchievementsEnabledUseCase()).thenReturn(null)
+            whenever(isAchievementsEnabledUseCase()).thenReturn(false)
 
             val menuItems = mapOf(
                 10 to CurrentPlanItem,
@@ -1027,4 +1371,521 @@ class MenuViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that rubbish bin node id is fetched when monitoring node updates`() = runTest {
+        stubDefaultDependencies()
+        val rubbishBinNodeId = NodeId(100L)
+        val rubbishBinNode = mock<FolderNode> {
+            on { id } doReturn rubbishBinNodeId
+        }
+
+        whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flow { awaitCancellation() })
+        }
+
+        initUnderTest()
+
+        verify(getRubbishNodeUseCase).invoke()
+    }
+
+    @Test
+    fun `test that node updates monitoring handles null rubbish bin node gracefully`() = runTest {
+        stubDefaultDependencies()
+        whenever(getRubbishNodeUseCase()).thenReturn(null)
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flow { awaitCancellation() })
+        }
+
+        initUnderTest()
+
+        // Should not crash when rubbish bin node is null
+        val state = underTest.uiState.value
+        assertThat(state).isNotNull()
+        verify(getRubbishNodeUseCase).invoke()
+        // Should not start monitoring when rubbish bin node is null
+        verify(monitorNodeUpdatesUseCase, times(0)).invoke()
+    }
+
+    @Test
+    fun `test that node updates monitoring handles rubbish bin node fetch exceptions gracefully`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getRubbishNodeUseCase()).thenThrow(RuntimeException("Rubbish bin node error"))
+
+            initUnderTest()
+
+            // Should not crash despite error
+            val state = underTest.uiState.value
+            assertThat(state).isNotNull()
+            verify(getRubbishNodeUseCase).invoke()
+            // Should not start monitoring when rubbish bin node fetch fails
+            verify(monitorNodeUpdatesUseCase, times(0)).invoke()
+        }
+
+    @Test
+    fun `test that node updates are monitored when rubbish bin node is available`() = runTest {
+        stubDefaultDependencies()
+        val rubbishBinNodeId = NodeId(100L)
+        val rubbishBinNode = mock<FolderNode> {
+            on { id } doReturn rubbishBinNodeId
+        }
+
+        whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+        val testNode = mock<FolderNode> {
+            on { id } doReturn NodeId(1L)
+            on { parentId } doReturn NodeId(0L)
+        }
+        val nodeUpdate = NodeUpdate(mapOf(testNode to listOf(NodeChanges.Attributes)))
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(nodeUpdate))
+        }
+
+        initUnderTest()
+
+        verify(getRubbishNodeUseCase).invoke()
+        verify(monitorNodeUpdatesUseCase).invoke()
+    }
+
+    @Test
+    fun `test that account storage details are refreshed on init`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(
+            usedStorage = 2000000L,
+            totalStorage = 4000000L,
+            usedRubbish = 1000000L,
+        )
+
+        whenever(getSpecificAccountDetailUseCase(storage = true, transfer = false, pro = false))
+            .thenReturn(accountDetail)
+
+        initUnderTest()
+
+        verify(getSpecificAccountDetailUseCase).invoke(
+            storage = true,
+            transfer = false,
+            pro = false
+        )
+    }
+
+    @Test
+    fun `test that account storage details are refreshed when rubbish bin node is updated`() =
+        runTest {
+            stubDefaultDependencies()
+            val rubbishBinNodeId = NodeId(100L)
+            val rubbishBinNode = mock<FolderNode> {
+                on { id } doReturn rubbishBinNodeId
+            }
+
+            whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+
+            val accountDetail = createAccountDetail(
+                usedStorage = 2000000L,
+                totalStorage = 4000000L,
+                usedRubbish = 1000000L,
+            )
+
+            whenever(getSpecificAccountDetailUseCase(storage = true, transfer = false, pro = false))
+                .thenReturn(accountDetail)
+
+            val updatedRubbishBinNode = mock<FolderNode> {
+                on { id } doReturn rubbishBinNodeId
+                on { parentId } doReturn NodeId(0L)
+            }
+            val nodeUpdate = NodeUpdate(
+                mapOf(updatedRubbishBinNode to listOf(NodeChanges.Attributes))
+            )
+
+            monitorNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(nodeUpdate))
+            }
+
+            initUnderTest()
+
+            //Called on init and after node update
+            verify(getSpecificAccountDetailUseCase, times(2)).invoke(
+                storage = true,
+                transfer = false,
+                pro = false
+            )
+
+        }
+
+    @Test
+    fun `test that account storage details are refreshed when child of rubbish bin is updated`() =
+        runTest {
+            stubDefaultDependencies()
+            val rubbishBinNodeId = NodeId(100L)
+            val rubbishBinNode = mock<FolderNode> {
+                on { id } doReturn rubbishBinNodeId
+            }
+
+            whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+            val childNode = mock<FolderNode> {
+                on { id } doReturn NodeId(101L)
+                on { parentId } doReturn rubbishBinNodeId
+            }
+            val nodeUpdate = NodeUpdate(
+                mapOf(childNode to listOf(NodeChanges.Remove))
+            )
+
+            monitorNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(nodeUpdate))
+            }
+
+            val accountDetail = createAccountDetail(
+                usedStorage = 2000000L,
+                totalStorage = 4000000L,
+                usedRubbish = 500000L,
+            )
+
+            whenever(getSpecificAccountDetailUseCase(storage = true, transfer = false, pro = false))
+                .thenReturn(accountDetail)
+
+            initUnderTest()
+
+            //Called on init and after node update
+            verify(getSpecificAccountDetailUseCase, times(2)).invoke(
+                storage = true,
+                transfer = false,
+                pro = false
+            )
+        }
+
+    @Test
+    fun `test that account storage details are not refreshed for unrelated node updates`() =
+        runTest {
+            stubDefaultDependencies()
+            val rubbishBinNodeId = NodeId(100L)
+            val rubbishBinNode = mock<FolderNode> {
+                on { id } doReturn rubbishBinNodeId
+            }
+
+            whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+            val unrelatedNode = mock<FolderNode> {
+                on { id } doReturn NodeId(200L)
+                on { parentId } doReturn NodeId(0L)
+            }
+            val nodeUpdate = NodeUpdate(
+                mapOf(unrelatedNode to listOf(NodeChanges.Attributes))
+            )
+
+            monitorNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(nodeUpdate))
+            }
+
+            initUnderTest()
+
+            //Called only on init and not after node update
+            verify(getSpecificAccountDetailUseCase, times(1)).invoke(
+                storage = true,
+                transfer = false,
+                pro = false
+            )
+        }
+
+    @Test
+    fun `test that account storage refresh handles exceptions gracefully`() = runTest {
+        stubDefaultDependencies()
+        val rubbishBinNodeId = NodeId(100L)
+        val rubbishBinNode = mock<FolderNode> {
+            on { id } doReturn rubbishBinNodeId
+        }
+
+        whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+        val updatedRubbishBinNode = mock<FolderNode> {
+            on { id } doReturn rubbishBinNodeId
+            on { parentId } doReturn NodeId(0L)
+        }
+        val nodeUpdate = NodeUpdate(
+            mapOf(updatedRubbishBinNode to listOf(NodeChanges.Attributes))
+        )
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(nodeUpdate))
+        }
+
+        whenever(getSpecificAccountDetailUseCase(storage = true, transfer = false, pro = false))
+            .thenThrow(RuntimeException("Account detail error"))
+
+        initUnderTest()
+
+        // Should not crash despite error (both on init and after node update)
+        val state = underTest.uiState.value
+        assertThat(state).isNotNull()
+        // Called on init and after node update, both should handle exceptions gracefully
+        verify(getSpecificAccountDetailUseCase, times(2)).invoke(
+            storage = true,
+            transfer = false,
+            pro = false
+        )
+    }
+
+    @Test
+    fun `test that node update monitoring handles exceptions gracefully`() = runTest {
+        stubDefaultDependencies()
+        val rubbishBinNodeId = NodeId(100L)
+        val rubbishBinNode = mock<FolderNode> {
+            on { id } doReturn rubbishBinNodeId
+        }
+
+        whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flow { throw RuntimeException("Node update error") })
+        }
+
+        initUnderTest()
+
+        // Should not crash despite error in node update monitoring
+        val state = underTest.uiState.value
+        assertThat(state).isNotNull()
+        verify(getRubbishNodeUseCase).invoke()
+        verify(monitorNodeUpdatesUseCase).invoke()
+    }
+
+    @Test
+    fun `test that current plan item icon is set to ShieldLite for PRO_LITE account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.PRO_LITE)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.ShieldLite)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield01 for PRO_I account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.PRO_I)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield01)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield02 for PRO_II account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.PRO_II)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield02)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield03 for PRO_III account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.PRO_III)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield03)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield for FREE account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.FREE)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield for PRO_FLEXI account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.PRO_FLEXI)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield for BUSINESS account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.BUSINESS)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield when account type is null`() =
+        runTest {
+            stubDefaultDependencies()
+
+            val accountDetail = createAccountDetail(levelDetail = null)
+
+            monitorAccountDetailUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(accountDetail))
+            }
+
+            val menuItems = mapOf(10 to CurrentPlanItem)
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                val currentPlanItem = state.myAccountItems[10]
+                assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that current plan item icon updates when account type changes from FREE to PRO_I`() =
+        runTest {
+            stubDefaultDependencies()
+
+            val accountDetailFlow =
+                MutableStateFlow(createAccountDetail(accountType = AccountType.FREE))
+
+            monitorAccountDetailUseCase.stub {
+                on { invoke() }.thenReturn(accountDetailFlow)
+            }
+
+            val menuItems = mapOf(10 to CurrentPlanItem)
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.myAccountItems[10]?.icon).isEqualTo(CurrentPlanItem.icon)
+
+                // Update account type to PRO_I
+                accountDetailFlow.emit(createAccountDetail(accountType = AccountType.PRO_I))
+
+                val updatedState = awaitItem()
+                assertThat(updatedState.myAccountItems[10]?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield01)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that current plan item icon updates when account type changes from PRO_II to PRO_III`() =
+        runTest {
+            stubDefaultDependencies()
+
+            val accountDetailFlow =
+                MutableStateFlow(createAccountDetail(accountType = AccountType.PRO_II))
+
+            monitorAccountDetailUseCase.stub {
+                on { invoke() }.thenReturn(accountDetailFlow)
+            }
+
+            val menuItems = mapOf(10 to CurrentPlanItem)
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.myAccountItems[10]?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield02)
+
+                // Update account type to PRO_III
+                accountDetailFlow.emit(createAccountDetail(accountType = AccountType.PRO_III))
+
+                val updatedState = awaitItem()
+                assertThat(updatedState.myAccountItems[10]?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield03)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 } 

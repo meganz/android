@@ -3,11 +3,15 @@ package mega.privacy.android.data.preferences.migration
 import androidx.datastore.core.DataMigration
 import androidx.datastore.preferences.core.Preferences
 import dagger.Lazy
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.preferences.CameraUploadsSettingsPreferenceDataStore
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.qualifier.DatabaseDispatcher
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -16,6 +20,7 @@ import javax.inject.Inject
 internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constructor(
     private val databaseHandler: Lazy<DatabaseHandler>,
     private val cameraUploadsSettingsPreferenceDataStoreFactory: CameraUploadsSettingsPreferenceDataStoreFactory,
+    @DatabaseDispatcher private val databaseDispatcher: CoroutineDispatcher,
 ) : DataMigration<Preferences> {
     override suspend fun cleanUp() {
         // No-op
@@ -27,7 +32,9 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
     override suspend fun migrate(currentData: Preferences): Preferences {
         val newPreferences = currentData.toMutablePreferences()
         val store = cameraUploadsSettingsPreferenceDataStoreFactory(newPreferences)
-        val oldPreferences = databaseHandler.get().preferences
+        val oldPreferences = withContext(databaseDispatcher) {
+            databaseHandler.get().preferences
+        }
         if (oldPreferences == null) {
             setDefaults(store)
         } else {
@@ -43,6 +50,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
      * @param store The latest Preferences
      */
     private suspend fun setDefaults(store: CameraUploadsSettingsPreferenceDataStore) {
+        Timber.d("Old MegaPreferences not found, setting default values to CameraUploadsSettingsPreferenceDataStore")
         store.setValues(
             isCameraUploadsEnabled = null,
             isMediaUploadsEnabled = null,
@@ -52,7 +60,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             mediaUploadsLocalPath = null,
             areLocationTagsEnabled = false,
             uploadVideoQuality = VideoQuality.ORIGINAL.value,
-            areUploadFileNamesKept = false,
+            areUploadFileNamesKept = true,
             isChargingRequiredForVideoCompression = true,
             videoCompressionSizeLimit = GetVideoCompressionSizeLimitUseCase.DEFAULT_SIZE,
             fileUploadOption = 1003,
@@ -72,8 +80,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
         oldPreferences: MegaPreferences,
     ) {
         store.setValues(
-            isCameraUploadsEnabled = oldPreferences.camSyncEnabled?.toBooleanStrictOrNull()
-                ?: false,
+            isCameraUploadsEnabled = oldPreferences.camSyncEnabled?.toBooleanStrictOrNull(),
             isMediaUploadsEnabled = oldPreferences.secondaryMediaFolderEnabled?.toBooleanStrictOrNull()
                 ?: false,
             cameraUploadsHandle = oldPreferences.camSyncHandle?.toLongOrNull(),
@@ -84,7 +91,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
                 ?: false,
             uploadVideoQuality = oldPreferences.uploadVideoQuality?.toIntOrNull()
                 ?: VideoQuality.ORIGINAL.value,
-            areUploadFileNamesKept = oldPreferences.keepFileNames?.toBooleanStrictOrNull() ?: false,
+            areUploadFileNamesKept = oldPreferences.keepFileNames?.toBooleanStrictOrNull(),
             isChargingRequiredForVideoCompression = oldPreferences.conversionOnCharging?.toBooleanStrictOrNull()
                 ?: true,
             videoCompressionSizeLimit = oldPreferences.chargingOnSize?.toIntOrNull()
@@ -106,7 +113,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
         mediaUploadsLocalPath: String?,
         areLocationTagsEnabled: Boolean,
         uploadVideoQuality: Int,
-        areUploadFileNamesKept: Boolean,
+        areUploadFileNamesKept: Boolean?,
         isChargingRequiredForVideoCompression: Boolean,
         videoCompressionSizeLimit: Int,
         fileUploadOption: Int,
@@ -122,7 +129,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             setMediaUploadsLocalPath(mediaUploadsLocalPath)
             setLocationTagsEnabled(areLocationTagsEnabled)
             setUploadVideoQuality(uploadVideoQuality)
-            setUploadFileNamesKept(areUploadFileNamesKept)
+            areUploadFileNamesKept?.let { setUploadFileNamesKept(it) }
             setChargingRequiredForVideoCompression(isChargingRequiredForVideoCompression)
             setVideoCompressionSizeLimit(videoCompressionSizeLimit)
             setFileUploadOption(fileUploadOption)

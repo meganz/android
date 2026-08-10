@@ -9,6 +9,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.achievements.freetrial.view.MegaPassFreeTrialScreen
 import mega.privacy.android.app.utils.Constants.MEGA_PASS_PACKAGE_NAME
@@ -19,7 +20,8 @@ data class MegaPassFreeTrial(
     val storageAmount: Long,
     val awardStorageAmount: Long,
     val durationInDays: Int,
-)
+    val awardDaysLeft: Int?,
+) : NavKey
 
 /**
  * Route for [MegaPassFreeTrial]
@@ -33,6 +35,7 @@ fun NavGraphBuilder.megaPassFreeTrialScreen() {
             storageAmount = megaPassFreeTrial.storageAmount,
             awardStorageAmount = megaPassFreeTrial.awardStorageAmount,
             durationInDays = megaPassFreeTrial.durationInDays,
+            awardDaysLeft = megaPassFreeTrial.awardDaysLeft,
             onInstallButtonClicked = {
                 openInSpecificApp(context, MEGA_PASS_PACKAGE_NAME)
             }
@@ -48,6 +51,7 @@ fun NavController.navigateToMegaPassFreeTrial(
     storageAmount: Long,
     awardStorageAmount: Long,
     durationInDays: Int,
+    awardDaysLeft: Int?,
     navOptions: NavOptions? = null,
 ) {
     this.navigate(
@@ -55,7 +59,8 @@ fun NavController.navigateToMegaPassFreeTrial(
             isReceivedAward,
             storageAmount,
             awardStorageAmount,
-            durationInDays
+            durationInDays,
+            awardDaysLeft
         ),
         navOptions = navOptions
     )

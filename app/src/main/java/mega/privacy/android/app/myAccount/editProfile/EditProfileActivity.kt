@@ -7,6 +7,7 @@ import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -38,7 +39,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
-import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
@@ -50,7 +51,6 @@ import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.CHECKING_2FA
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.logout.LogoutViewModel
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
@@ -68,13 +68,13 @@ import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_PORT
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
 import mega.privacy.android.app.utils.Util.checkTakePicture
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -97,6 +97,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         private const val EMAIL_SIZE = 12F
         private const val PADDING_LEFT_STATE = 8F
         private const val MAX_NAME_LENGTH = 40
+        private const val MAX_EMAIL_LENGTH = 190
 
         private const val CHANGE_NAME_SHOWN = "CHANGE_NAME_SHOWN"
         private const val FIRST_NAME_TYPED = "FIRST_NAME_TYPED"
@@ -426,7 +427,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             }
 
             else -> {
-                firstMessageId = R.string.general_text_error
+                firstMessageId = sharedR.string.general_text_error
                 secondMessageId = R.string.general_error_word
             }
         }
@@ -553,8 +554,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     }
 
     private fun setupPhoneNumber(
-        alreadyRegistered: Boolean = viewModel.isAlreadyRegisteredPhoneNumber(),
-        canVerify: Boolean = canVoluntaryVerifyPhoneNumber(),
+        alreadyRegistered: Boolean,
+        canVerify: Boolean,
     ) {
 
         binding.addPhoneNumber.text = getString(
@@ -740,6 +741,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 quitEditTextError(dialogBinding.emailLayout, dialogBinding.emailErrorIcon)
 
                 dialogBinding.emailField.apply {
+                    // Set InputFilter to enforce maxLength from XML
+                    setFilters(arrayOf(InputFilter.LengthFilter(MAX_EMAIL_LENGTH)))
+
                     setText(email ?: viewModel.getEmail())
                     requestFocus()
                     setSelection(0, text.toString().length)

@@ -2,8 +2,8 @@ package mega.privacy.android.app.di.notification
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.Module
 import dagger.Provides

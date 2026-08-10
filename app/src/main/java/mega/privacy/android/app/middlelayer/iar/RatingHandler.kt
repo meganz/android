@@ -65,7 +65,7 @@ abstract class RatingHandler(val context: Context) {
     fun showRatingBaseOnContacts() {
         if (!meetBaseCondition()) return
 
-        val app = MegaApplication.getInstance()
+        val app = context.applicationContext as? MegaApplication ?: return
         val condition = run {
             val contact = app.megaApi.contacts
             if (contact.isNullOrEmpty()) {
@@ -98,7 +98,7 @@ abstract class RatingHandler(val context: Context) {
     fun showRatingBaseOnSharing() {
         if (!meetBaseCondition()) return
 
-        val app = MegaApplication.getInstance()
+        val app = context.applicationContext as? MegaApplication ?: return
         val condition = run {
             val totalNum = app.megaApi.publicLinks.size + app.megaApi.outShares.size
             totalNum >= SHARED_NUM_LIMIT
@@ -119,7 +119,8 @@ abstract class RatingHandler(val context: Context) {
             return false
         }
 
-        val app = MegaApplication.getInstance()
+        // Conditions are unmet when not running inside MegaApplication (e.g. Hilt tests)
+        val app = context.applicationContext as? MegaApplication ?: return false
         val megaApi = app.megaApi
 
         // Exclude ODQ & OBQ accounts

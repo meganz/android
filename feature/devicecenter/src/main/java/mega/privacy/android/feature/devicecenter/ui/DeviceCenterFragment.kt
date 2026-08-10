@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -112,8 +112,7 @@ class DeviceCenterFragment : Fragment() {
                             if (viewModel.shouldNavigateToSyncs(device)) {
                                 Analytics.tracker.trackEvent(AndroidSyncNavigationItemEvent)
                                 megaNavigator.openSyncs(
-                                    context = this@DeviceCenterFragment.activity
-                                        ?: return@DeviceCenterScreen,
+                                    context = activity ?: return@DeviceCenterScreen,
                                 )
                             } else {
                                 viewModel.showDeviceFolders(device)
@@ -133,11 +132,18 @@ class DeviceCenterFragment : Fragment() {
                             )
                             showBlankOverlay = true
                             megaNavigator.openNodeInBackups(
-                                activity = this@DeviceCenterFragment.activity
-                                    ?: return@DeviceCenterScreen,
+                                activity = activity ?: return@DeviceCenterScreen,
                                 backupsHandle = backupFolderUINode.rootHandle,
                                 errorMessage = backupFolderUINode.status.localizedErrorMessage,
                             )
+                        },
+                        onFolderMenuClicked = {
+                            Analytics.tracker.trackEvent(
+                                DeviceCenterItemClickedEvent(
+                                    DeviceCenterItemClicked.ItemType.Connection
+                                )
+                            )
+                            viewModel.setMenuClickedFolder(it)
                         },
                         onNonBackupFolderClicked = { nonBackupDeviceFolderUINode ->
                             Analytics.tracker.trackEvent(
@@ -147,8 +153,7 @@ class DeviceCenterFragment : Fragment() {
                             )
                             showBlankOverlay = true
                             megaNavigator.openNodeInCloudDrive(
-                                activity = this@DeviceCenterFragment.activity
-                                    ?: return@DeviceCenterScreen,
+                                activity = activity ?: return@DeviceCenterScreen,
                                 nodeHandle = nonBackupDeviceFolderUINode.rootHandle,
                                 errorMessage = nonBackupDeviceFolderUINode.status.localizedErrorMessage,
                             )
@@ -156,21 +161,23 @@ class DeviceCenterFragment : Fragment() {
                         onInfoOptionClicked = viewModel::onInfoClicked,
                         onAddNewSyncOptionClicked = {
                             megaNavigator.openNewSync(
-                                context = this@DeviceCenterFragment.activity
-                                    ?: return@DeviceCenterScreen,
+                                context = activity ?: return@DeviceCenterScreen,
                                 syncType = SyncType.TYPE_TWOWAY,
                             )
                         },
                         onAddBackupOptionClicked = {
                             megaNavigator.openNewSync(
-                                context = this@DeviceCenterFragment.activity
-                                    ?: return@DeviceCenterScreen,
+                                context = activity ?: return@DeviceCenterScreen,
                                 syncType = SyncType.TYPE_BACKUP,
                             )
                         },
                         onCameraUploadsClicked = {
-                            megaNavigator.openSettingsCameraUploads(requireActivity())
+                            megaNavigator.openSettingsCameraUploads(
+                                activity ?: return@DeviceCenterScreen
+                            )
                         },
+                        onRemoveConnectionClicked = viewModel::removeFolderConnection,
+                        onRemoveFolderConnectionSuccessSnackbarShown = viewModel::resetRemoveFolderConnectionSuccess,
                         onRenameDeviceOptionClicked = viewModel::setDeviceToRename,
                         onRenameDeviceCancelled = viewModel::resetDeviceToRename,
                         onRenameDeviceSuccessful = {
@@ -198,7 +205,9 @@ class DeviceCenterFragment : Fragment() {
                                 }
 
                                 is DeviceMenuAction.CameraUploads -> {
-                                    megaNavigator.openSettingsCameraUploads(requireContext())
+                                    megaNavigator.openSettingsCameraUploads(
+                                        activity ?: return@DeviceCenterScreen
+                                    )
                                 }
                             }
                         },

@@ -21,7 +21,7 @@
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/category_document"
-        app:name="@string/favourites_category_title" />
+        app:name="@string/system_album_favourites_title" />
 
     <mega.privacy.android.app.components.CategoryButton
         android:id="@+id/category_document"

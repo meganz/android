@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.folderlink
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -22,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
@@ -36,20 +36,16 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
+import mega.privacy.android.shared.ads.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ColorUtils
@@ -58,17 +54,21 @@ import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -79,6 +79,7 @@ import javax.inject.Inject
  * FolderLinkActivity with compose view
  */
 @AndroidEntryPoint
+@Deprecated("Use revamp")
 class FolderLinkComposeActivity : PasscodeActivity(),
     DecryptAlertDialog.DecryptDialogListener {
 
@@ -162,16 +163,22 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
 
-        viewModel.state.map { it.shouldShowAdsForLink }
-            .distinctUntilChanged()
-            .combine(googleAdsManager.isAdsFeatureEnabled) { shouldShowAdsForLink, isAdsFeatureEnabled ->
-                if (shouldShowAdsForLink && isAdsFeatureEnabled) {
+        collectFlow(
+            viewModel.state.map { it.shouldShowAdsForLink }
+                .distinctUntilChanged()
+                .combine(googleAdsManager.isAdsFeatureEnabled) { shouldShowAdsForLink, isAdsFeatureEnabled ->
+                    shouldShowAdsForLink to isAdsFeatureEnabled
+                }
+        ) { (shouldShowAdsForLink, isAdsFeatureEnabled) ->
+            if (shouldShowAdsForLink && isAdsFeatureEnabled) {
+                lifecycleScope.launch {
                     googleAdsManager.checkLatestConsentInformation(
-                        activity = this,
+                        activity = this@FolderLinkComposeActivity,
                         onConsentInformationUpdated = { googleAdsManager.fetchAdRequest() }
                     )
                 }
-            }.launchIn(lifecycleScope)
+            }
+        }
 
         setContent {
             StartFolderLinkView()
@@ -241,13 +248,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
             )
 
             EventEffect(
-                event = uiState.showLoginEvent,
-                onConsumed = viewModel::onShowLoginEventConsumed
-            ) {
-                showLoginScreen()
-            }
-
-            EventEffect(
                 event = uiState.finishActivityEvent,
                 onConsumed = viewModel::onFinishActivityEventConsumed
             ) {
@@ -315,12 +315,11 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     private fun onEnterMediaDiscoveryClick() {
         viewModel.clearAllSelection()
         val mediaHandle = viewModel.state.value.parentNode?.id?.longValue ?: -1
-        MediaDiscoveryActivity.startMDActivity(
+        megaNavigator.openMediaDiscoveryActivity(
             context = this@FolderLinkComposeActivity,
-            mediaHandle = mediaHandle,
+            folderId = NodeId(mediaHandle),
             folderName = viewModel.state.value.title,
-            isOpenByMDIcon = true,
-            isFromFolderLink = true
+            isFromFolderLink = true,
         )
     }
 
@@ -346,6 +345,10 @@ class FolderLinkComposeActivity : PasscodeActivity(),
             viewModel.openFolder(nodeUIItem)
         } else if (nodeUIItem.node is FileNode) {
             val fileNode = nodeUIItem.node
+            if (fileNode.isNodeKeyDecrypted.not()) {
+                viewModel.showSnackbar(sharedR.string.preview_not_available_undecrypted_files)
+                return
+            }
             val nameType = MimeTypeList.typeForName(fileNode.name)
             when {
                 nameType.isImage -> {
@@ -397,9 +400,15 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 }
 
                 nameType.isOpenableTextFile(fileNode.size) -> {
-                    val intent =
-                        Intent(this@FolderLinkComposeActivity, TextEditorActivity::class.java)
-                    viewModel.updateTextEditorIntent(intent, fileNode)
+                    megaNavigator.openTextEditor(
+                        context = this@FolderLinkComposeActivity,
+                        params = OpenTextEditorParams.CloudNode(
+                            nodeId = fileNode.id,
+                            nodeSourceType = FOLDER_LINK_ADAPTER,
+                            mode = TextEditorMode.View,
+                            fileName = fileNode.name,
+                        ),
+                    )
                 }
 
                 else -> {
@@ -435,18 +444,10 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     }
 
     private fun onShareClicked() {
+        if (viewModel.state.value.parentNode?.isNodeKeyDecrypted == false) {
+            return
+        }
         MegaNodeUtil.shareLink(this, viewModel.state.value.url, viewModel.state.value.title)
-    }
-
-    private fun showLoginScreen() {
-        Timber.d("Refresh session - sdk or karere")
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-        intent.data = Uri.parse(viewModel.state.value.url)
-        intent.action = Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(intent)
-        finish()
     }
 
     private fun showAskForDecryptionKeyDialog() {
@@ -454,7 +455,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         val builder = DecryptAlertDialog.Builder()
         val decryptAlertDialog = builder
             .setTitle(getString(R.string.alert_decryption_key))
-            .setPosText(R.string.general_decryp)
+            .setPosText(sharedR.string.general_decrypt)
             .setNegText(sharedR.string.general_dialog_cancel_button)
             .setMessage(getString(R.string.message_decryption_key))
             .setErrorMessage(R.string.invalid_decryption_key)
@@ -505,7 +506,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     }
 
     private fun getEmptyViewString(): String {
-        var textToShow = getString(R.string.file_browser_empty_folder_new)
+        var textToShow = getString(sharedR.string.annotated_empty_folder)
         try {
             textToShow = textToShow.replace(
                 "[A]",
@@ -537,5 +538,12 @@ class FolderLinkComposeActivity : PasscodeActivity(),
 
     companion object {
         private const val TAG_DECRYPT = "decrypt"
+
+        fun getIntent(context: Context, link: Uri?): Intent =
+            Intent(context, FolderLinkComposeActivity::class.java).also { intent ->
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                intent.action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
+                intent.data = link
+            }
     }
 }

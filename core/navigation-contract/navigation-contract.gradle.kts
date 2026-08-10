@@ -1,6 +1,8 @@
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
+    alias(convention.plugins.mega.android.hilt)
+    alias(plugin.plugins.kotlin.serialisation)
     id("kotlin-parcelize")
 }
 
@@ -10,11 +12,14 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":resources:string-resources"))
+    implementation(project(":resources:icon-pack"))
 
     // AndroidX
     implementation(androidx.navigation.compose)
     implementation(androidx.navigation3.runtime)
     implementation(androidx.navigation3.ui)
+    implementation(androidx.hilt.navigation)
     implementation(androidx.material3)
 
     // Core components
@@ -25,4 +30,16 @@ dependencies {
     implementation(lib.logging.timber)
 
     implementation(lib.javax.inject)
+
+    implementation(google.hilt.android)
+
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
+    testRuntimeOnly(testlib.junit.jupiter.engine)
+    testImplementation(testlib.bundles.unit.test)
+    testImplementation(testlib.truth)
+    testImplementation(testlib.truth.ext)
+    testImplementation(testlib.compose.junit)
+    debugImplementation(testlib.compose.manifest)
+    testImplementation(testlib.roboelectric)
 }

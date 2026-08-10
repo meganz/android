@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.core.net.toUri
+import mega.privacy.android.app.extensions.launchUrl
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.meeting.view.WaitingRoomView
-import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
@@ -121,12 +122,7 @@ class WaitingRoomActivity : AppCompatActivity() {
     }
 
     private fun launchInfoScreen() {
-        val intent = Intent(Intent.ACTION_VIEW, INFO_SCREEN_URL.toUri())
-        if (intent.resolveActivity(packageManager) != null) {
-            startActivity(intent)
-        } else {
-            Timber.w("Internet Browser not available")
-        }
+        launchUrl(INFO_SCREEN_URL)
     }
 
     private fun launchCallScreen(

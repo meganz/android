@@ -5,10 +5,14 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
+import mega.privacy.android.domain.entity.node.FileNode
 import nz.mega.sdk.MegaRecentActionBucket
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class RecentActionBucketMapperTest {
     private lateinit var underTest: RecentActionBucketMapper
@@ -16,6 +20,7 @@ class RecentActionBucketMapperTest {
     private val nodeMapper = mock<NodeMapper>()
 
     private val recentActionBucket = mock<MegaRecentActionBucket> {
+        on { id }.thenReturn("identifier")
         on { timestamp }.thenReturn(12L)
         on { userEmail }.thenReturn("something@email.com")
         on { parentHandle }.thenReturn(1L)
@@ -30,11 +35,15 @@ class RecentActionBucketMapperTest {
 
     @Test
     fun `test that mapper returns correct value`() = runTest {
+        whenever(
+            nodeMapper(any(), any(), any(), anyOrNull(), anyOrNull())
+        ).thenReturn(mock<FileNode>())
         val actual = underTest.invoke(
-            recentActionBucket,
-            listOf(mock(), mock())
+            megaRecentActionBucket = recentActionBucket,
+            megaNodes = listOf(mock(), mock())
         )
         assertThat(actual).isInstanceOf(RecentActionBucketUnTyped::class.java)
+        assertThat(actual.id).isEqualTo(recentActionBucket.id)
         assertThat(actual.timestamp).isEqualTo(recentActionBucket.timestamp)
         assertThat(actual.userEmail).isEqualTo(recentActionBucket.userEmail)
         assertThat(actual.parentNodeId.longValue).isEqualTo(recentActionBucket.parentHandle)

@@ -11,9 +11,13 @@ import mega.privacy.android.domain.entity.RequestStatusProgressEvent
 import mega.privacy.android.domain.repository.NotificationsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 class MonitorRequestStatusProgressEventUseCaseTest {
 
@@ -40,10 +44,14 @@ class MonitorRequestStatusProgressEventUseCaseTest {
         assertThat(result[0]?.floatValue).isEqualTo(0.5f)
     }
 
-    @Test
-    fun `test that progress is set to null when number is -1L`() = runTest {
+    @ParameterizedTest
+    @MethodSource("progressTestArguments")
+    fun `test that progress is handled correctly for various values`(
+        progressValue: Long,
+        expectedProgress: Float?
+    ) = runTest {
         val event = mock<RequestStatusProgressEvent> {
-            on { progress } doReturn -1L
+            on { progress } doReturn progressValue
         }
         val eventsFlow: Flow<Event> = flowOf(event)
         whenever(notificationsRepository.monitorEvent()) doReturn (eventsFlow)
@@ -51,6 +59,20 @@ class MonitorRequestStatusProgressEventUseCaseTest {
         val result = underTest().toList()
 
         assertThat(result.size).isEqualTo(1)
-        assertThat(result[0]).isNull()
+        if (expectedProgress == null) {
+            assertThat(result[0]).isNull()
+        } else {
+            assertThat(result[0]?.floatValue).isEqualTo(expectedProgress)
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun progressTestArguments(): Stream<Arguments> = Stream.of(
+            Arguments.of(-1L, null),
+            Arguments.of(0L, 0.0f),
+            Arguments.of(100L, 0.1f),
+            Arguments.of(995L, null)
+        )
     }
 }

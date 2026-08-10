@@ -1,6 +1,7 @@
 package mega.privacy.android.data.facade
 
 import android.provider.MediaStore
+import androidx.concurrent.futures.await
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -15,10 +16,13 @@ import androidx.work.WorkQuery
 import androidx.work.WorkRequest.Companion.MIN_BACKOFF_MILLIS
 import androidx.work.await
 import dagger.Lazy
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.WorkerClassGateway
 import mega.privacy.android.data.worker.ChatUploadsWorker
@@ -74,6 +78,7 @@ class WorkManagerGatewayImpl @Inject constructor(
         val workRequest =
             OneTimeWorkRequest.Builder(workerClassGateway.deleteOldestCompletedTransferWorkerClass)
                 .addTag(DeleteOldestCompletedTransfersWorker.DELETE_OLDEST_TRANSFERS_WORKER_TAG)
+                .setInitialDelay(1.minutes.toJavaDuration()) // let's wait to don't affect performance on app start-up
                 .build()
 
         workManager.get()
@@ -238,15 +243,20 @@ class WorkManagerGatewayImpl @Inject constructor(
      * Cancel all camera upload sync heartbeat workers.
      * Cancel new media worker.
      */
-    override suspend fun cancelCameraUploadsAndHeartbeatWorkRequest() {
-        listOf(
+    override suspend fun cancelCameraUploadsAndHeartbeatWorkRequest() = coroutineScope {
+        val cancellationJobs = listOf(
             CAMERA_UPLOAD_TAG,
             SINGLE_CAMERA_UPLOAD_TAG,
             HEART_BEAT_TAG,
             NewMediaWorker.NEW_MEDIA_WORKER_TAG,
-        ).forEach {
-            workManager.get().cancelAllWorkByTag(it).await()
+        ).map { tag ->
+            launch {
+                runCatching { workManager.get().cancelAllWorkByTag(tag).await() }.onFailure {
+                    Timber.e(it, "cancelCameraUploadsAndHeartbeatWorkRequest() $tag FAILED")
+                }
+            }
         }
+        cancellationJobs.joinAll()
         Timber.d("cancelCameraUploadAndHeartbeatWorkRequest() SUCCESS")
     }
 
@@ -275,24 +285,26 @@ class WorkManagerGatewayImpl @Inject constructor(
      *
      * @param tag
      */
-    private fun isWorkerRunning(tag: String): Boolean {
-        return workManager.get().getWorkInfosByTag(tag).get()
-            ?.map { workInfo -> workInfo.state == WorkInfo.State.RUNNING }
-            ?.contains(true)
-            ?: false
-    }
+    private suspend fun isWorkerRunning(tag: String): Boolean =
+        workManager.get().getWorkInfosByTag(tag).await()
+            .map { workInfo ->
+                Timber.d("isWorkerRunning() ${workInfo.tags}")
+                workInfo.state == WorkInfo.State.RUNNING
+            }
+            .contains(true)
 
     /**
      * Check if a worker is currently enqueued or running given his tag
      *
      * @param tag
      */
-    private fun isWorkerEnqueuedOrRunning(tag: String): Boolean {
-        return workManager.get().getWorkInfosByTag(tag).get()
-            ?.map { workInfo -> workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING }
-            ?.contains(true)
-            ?: false
-    }
+    private suspend fun isWorkerEnqueuedOrRunning(tag: String): Boolean =
+        workManager.get().getWorkInfosByTag(tag).await()
+            .map { workInfo ->
+                Timber.d("isWorkerEnqueuedOrRunning() ${workInfo.tags}")
+                workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING
+            }
+            .contains(true)
 
     override fun monitorCameraUploadsStatusInfo(): Flow<List<WorkInfo>> {
         val uploadFlow = workManager.get().getWorkInfosByTagFlow(CAMERA_UPLOAD_TAG)

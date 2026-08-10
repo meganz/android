@@ -2,40 +2,48 @@ package mega.privacy.android.core.nodecomponents.components.offline
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
-import mega.privacy.android.core.nodecomponents.R
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeContentUri
-import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
+import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.resources.R as sharedR
 import java.io.File
 import java.util.UUID
 
 /**
  * Composable function to handle offline node action clicks
+ *
+ * @param onNavigate Callback to navigate to a NavKey destination.
+ * Used for PDF navigation with either [PdfViewerNavKey] or [LegacyPdfViewerNavKey].
  */
 @Composable
 fun HandleOfflineNodeAction3(
     uiState: OfflineNodeActionsUiState,
     applyShareContentUris: (List<File>, String) -> Intent,
+    applyNodeContentUri: (Intent, File, String, Boolean) -> Unit,
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
     consumeShareFilesEvent: () -> Unit = {},
     consumeShareNodeLinksEvent: () -> Unit = {},
     consumeOpenFileEvent: () -> Unit = {},
+    onNavigate: (NavKey) -> Unit = {},
 ) {
     val context = LocalContext.current
     val megaNavigator = rememberMegaNavigator()
@@ -72,17 +80,20 @@ fun HandleOfflineNodeAction3(
             openFile(
                 context = context,
                 content = it,
+                applyNodeContentUri = applyNodeContentUri,
                 snackBarHostState = snackBarHostState,
                 coroutineScope = coroutineScope,
                 sortOrder = sortOrder,
                 megaNavigator = megaNavigator,
+                isPdfViewerComposeEnabled = uiState.isPdfViewerComposeEnabled,
+                onNavigate = onNavigate,
             )
         }
     }
 }
 
 private fun startShareFilesIntent(context: Context, intent: Intent) {
-    val chooserTitle = context.getString(R.string.context_share)
+    val chooserTitle = context.getString(NodesR.string.context_share)
     context.startActivity(Intent.createChooser(intent, chooserTitle))
 }
 
@@ -100,7 +111,7 @@ private fun startShareLinksIntent(context: Context, title: String?, links: Strin
     context.startActivity(
         Intent.createChooser(
             shareIntent,
-            context.getString(R.string.context_share)
+            context.getString(NodesR.string.context_share)
         )
     )
 }
@@ -111,10 +122,13 @@ private fun startShareLinksIntent(context: Context, title: String?, links: Strin
 private suspend fun openFile(
     context: Context,
     content: OfflineNodeActionUiEntity,
+    applyNodeContentUri: (Intent, File, String, Boolean) -> Unit,
     snackBarHostState: SnackbarHostState?,
     coroutineScope: CoroutineScope,
     sortOrder: SortOrder,
     megaNavigator: MegaNavigator,
+    isPdfViewerComposeEnabled: Boolean,
+    onNavigate: (NavKey) -> Unit,
 ) {
     when (content) {
         is OfflineNodeActionUiEntity.Image -> {
@@ -132,7 +146,7 @@ private suspend fun openFile(
                         context = context,
                         localFile = content.file,
                         fileTypeInfo = content.fileTypeInfo,
-                        viewType = 2004, // Constants.OFFLINE_ADAPTER
+                        viewType = NodeSourceTypeInt.OFFLINE_ADAPTER,
                         handle = content.nodeId.longValue,
                         offlineParentId = content.parentId,
                         sortOrder = sortOrder,
@@ -146,20 +160,36 @@ private suspend fun openFile(
         }
 
         is OfflineNodeActionUiEntity.Pdf -> {
-            megaNavigator.openPdfActivity(
-                context = context,
-                content = NodeContentUri.LocalContentUri(content.file),
-                type = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
-                nodeId = content.nodeId
-            )
+            if (isPdfViewerComposeEnabled) {
+                val navKey = PdfViewerNavKey(
+                    nodeHandle = content.nodeId.longValue,
+                    contentUri = content.file.absolutePath,
+                    isLocalContent = true,
+                    shouldStopHttpServer = false,
+                    nodeSourceType = NodeSourceType.OFFLINE,
+                    mimeType = content.mimeType,
+                    title = content.file.name,
+                )
+                onNavigate(navKey)
+            } else {
+                val navKey = LegacyPdfViewerNavKey(
+                    nodeHandle = content.nodeId.longValue,
+                    nodeContentUri = NodeContentUri.LocalContentUri(content.file),
+                    nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                    mimeType = content.mimeType,
+                )
+                onNavigate(navKey)
+            }
         }
 
         is OfflineNodeActionUiEntity.Text -> {
-            megaNavigator.openTextEditorActivity(
+            megaNavigator.openTextEditor(
                 context = context,
-                currentNodeId = content.nodeId,
-                nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
-                mode = TextEditorMode.Edit
+                params = OpenTextEditorParams.LocalFile(
+                    localPath = content.file.absolutePath,
+                    fileName = content.file.name,
+                    nodeSourceType = NodeSourceTypeInt.OFFLINE_ADAPTER,
+                ),
             )
         }
 
@@ -196,8 +226,7 @@ private suspend fun openFile(
 
         is OfflineNodeActionUiEntity.Other -> {
             val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(Uri.fromFile(content.file), content.mimeType)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                applyNodeContentUri(this, content.file, content.mimeType, false)
             }
             safeLaunchActivity(
                 context = context,

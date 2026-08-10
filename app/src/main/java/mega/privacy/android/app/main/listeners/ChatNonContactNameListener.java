@@ -1,8 +1,5 @@
 package mega.privacy.android.app.main.listeners;
 
-
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-
 import android.app.Activity;
 import android.content.Context;
 
@@ -96,6 +93,10 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         } else {
             Timber.e("ERROR: requesting: %s", request.getRequestString());
         }
+    }
+
+    private boolean isTextEmpty(String text){
+        return text == null || text.trim().isEmpty();
     }
 
     @Override

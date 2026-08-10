@@ -13,9 +13,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.contact.ContactGateway
@@ -41,7 +41,7 @@ import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -102,8 +102,8 @@ class DefaultContactsRepositoryTest {
         ChatConnectionStateMapper(chatConnectionStatusMapper = ChatConnectionStatusMapper())
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
     private val contactWrapper: ContactWrapper = mock()
-    private val databaseHandler: DatabaseHandler = mock()
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
+    private val localStorageGateway: MegaLocalStorageGateway = mock()
     private val context: Context = mock()
     private val contactGateway: ContactGateway = mock()
 
@@ -161,10 +161,10 @@ class DefaultContactsRepositoryTest {
             credentialsPreferencesGateway = { credentialsPreferencesGateway },
             contactRequestActionMapper = contactRequestActionMapper,
             contactWrapper = contactWrapper,
-            databaseHandler = { databaseHandler },
             chatConnectionStateMapper = chatConnectionStateMapper,
             context = context,
             megaLocalRoomGateway = megaLocalRoomGateway,
+            localStorageGateway = localStorageGateway,
             userChatStatusMapper = userChatStatusMapper,
             userMapper = userMapper,
             sharingScope = CoroutineScope(UnconfinedTestDispatcher()),
@@ -285,7 +285,7 @@ class DefaultContactsRepositoryTest {
 
             val result = underTest.getUserFirstName(userHandle, false)
             verifyNoInteractions(contactWrapper)
-            verifyNoInteractions(databaseHandler)
+            verifyNoInteractions(localStorageGateway)
 
             assertThat(result).isEqualTo(testName)
         }
@@ -877,7 +877,7 @@ class DefaultContactsRepositoryTest {
     fun `test that clear contact database when call clearContactDatabase`() =
         runTest {
             underTest.clearContactDatabase()
-            verify(databaseHandler).clearContacts()
+            verify(localStorageGateway).clearContacts()
         }
 
     @Test
@@ -1146,7 +1146,9 @@ class DefaultContactsRepositoryTest {
     @Test
     fun `test that api gateway is called when get incoming contact requests is triggered`() =
         runTest {
-            val contactRequest = mock<MegaContactRequest>()
+            val contactRequest = mock<MegaContactRequest> {
+                on { sourceEmail }.thenReturn("sourceEmail")
+            }
             whenever(megaApiGateway.getIncomingContactRequests()).thenReturn(
                 arrayListOf(contactRequest)
             )
@@ -1174,29 +1176,32 @@ class DefaultContactsRepositoryTest {
             val myNodeHandle = 2L
             val myName = "Name"
             val myText = "Text"
+            val myfile = "_9j_4AAQSkZJRgABAQAAAQABAAD_2wBDAAgG"
             val request = mock<MegaRequest> {
                 on { email }.thenReturn(myEmail)
                 on { parentHandle }.thenReturn(myParentHandle)
                 on { nodeHandle }.thenReturn(myNodeHandle)
                 on { name }.thenReturn(myName)
                 on { text }.thenReturn(myText)
+                on { file }.thenReturn(myfile)
             }
             val user = mock<MegaUser> {
                 on { email }.thenReturn(myEmail)
                 on { visibility }.thenReturn(MegaUser.VISIBILITY_VISIBLE)
             }
-            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+            whenever(megaApiGateway.contactLinkQuery(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
                     .onRequestFinish(mock(), request, success)
             }
             whenever(megaApiGateway.getContacts()).thenReturn(listOf(user))
-            assertThat(underTest.getContactLink(1L)).isEqualTo(
-                ContactLink(
+            assertThat(underTest.contactLinkQuery(1L)).isEqualTo(
+                ContactLinkQueryResult(
                     isContact = true,
                     email = request.email,
                     contactHandle = request.parentHandle,
                     contactLinkHandle = request.nodeHandle,
-                    fullName = "${request.name} ${request.text}"
+                    fullName = "${request.name} ${request.text}",
+                    avatarFileInBase64 = request.file
                 )
             )
         }
@@ -1220,13 +1225,13 @@ class DefaultContactsRepositoryTest {
                 on { email }.thenReturn(myEmail)
                 on { visibility }.thenReturn(MegaUser.VISIBILITY_INACTIVE)
             }
-            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+            whenever(megaApiGateway.contactLinkQuery(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
                     .onRequestFinish(mock(), request, success)
             }
             whenever(megaApiGateway.getContacts()).thenReturn(listOf(user))
-            assertThat(underTest.getContactLink(1L)).isEqualTo(
-                ContactLink(
+            assertThat(underTest.contactLinkQuery(1L)).isEqualTo(
+                ContactLinkQueryResult(
                     isContact = false,
                     email = request.email,
                     contactHandle = request.parentHandle,
@@ -1251,13 +1256,13 @@ class DefaultContactsRepositoryTest {
                 on { name }.thenReturn(myName)
                 on { text }.thenReturn(myText)
             }
-            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+            whenever(megaApiGateway.contactLinkQuery(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
                     .onRequestFinish(mock(), request, success)
             }
             whenever(megaApiGateway.getContacts()).thenReturn(emptyList())
-            assertThat(underTest.getContactLink(1L)).isEqualTo(
-                ContactLink(
+            assertThat(underTest.contactLinkQuery(1L)).isEqualTo(
+                ContactLinkQueryResult(
                     isContact = false,
                     email = request.email,
                     contactHandle = request.parentHandle,
@@ -1272,23 +1277,23 @@ class DefaultContactsRepositoryTest {
         runTest {
             val request = mock<MegaRequest>()
             val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EEXIST) }
-            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+            whenever(megaApiGateway.contactLinkQuery(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
                     .onRequestFinish(mock(), request, error)
             }
-            assertThat(underTest.getContactLink(1L))
-                .isEqualTo(ContactLink(isContact = false))
+            assertThat(underTest.contactLinkQuery(1L))
+                .isEqualTo(ContactLinkQueryResult(isContact = false))
         }
 
     @Test(expected = MegaException::class)
     fun `test that getContactLink throws MegaException when calling api gateway returns failed`() =
         runTest {
             val request = mock<MegaRequest>()
-            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+            whenever(megaApiGateway.contactLinkQuery(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
                     .onRequestFinish(mock(), request, error)
             }
-            underTest.getContactLink(1L)
+            underTest.contactLinkQuery(1L)
         }
 
     @Test

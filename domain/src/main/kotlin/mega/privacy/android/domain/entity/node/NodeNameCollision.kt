@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.node
 
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
+
 /**
  * Node name collision
  *
@@ -27,8 +29,10 @@ sealed interface NodeNameCollision : NameCollision {
         override val isFile: Boolean,
         override val serializedData: String? = null,
         override val renameName: String? = null,
-        val type: NodeNameCollisionType = NodeNameCollisionType.COPY
-    ) : NodeNameCollision
+        val type: NodeNameCollisionType = NodeNameCollisionType.COPY,
+    ) : NodeNameCollision {
+        override val pitagTrigger = PitagTrigger.NotApplicable
+    }
 
     /**
      * Chat node name collision while importing
@@ -50,5 +54,7 @@ sealed interface NodeNameCollision : NameCollision {
         override val renameName: String? = null,
         val chatId: Long,
         val messageId: Long,
-    ) : NodeNameCollision
+    ) : NodeNameCollision {
+        override val pitagTrigger = PitagTrigger.NotApplicable
+    }
 }

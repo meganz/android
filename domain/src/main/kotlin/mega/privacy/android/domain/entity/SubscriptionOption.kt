@@ -12,6 +12,10 @@ import mega.privacy.android.domain.entity.account.CurrencyPoint
  * @property transfer        Amount of transfer quota of the subscription plan
  * @property amount          Price amount of the subscription plan
  * @property currency        Currency of the subscription plan
+ * @property hasOffer        Flag to indicate if the subscription option has a mobile offer
+ * @property discountName    Localised campaign name for an active discount, or null/empty when none
+ * @property offerValidUntil Mobile offer expiry timestamp in seconds (utqa "mo.e"), or null when the offer has no expiry
+ * @property offerFlags      Mobile offer flags bitmask from the SDK, or null when the offer carries no flags
  */
 data class SubscriptionOption(
     val sku: String,
@@ -22,4 +26,8 @@ data class SubscriptionOption(
     val transfer: Int,
     val amount: CurrencyPoint.SystemCurrencyPoint,
     val currency: Currency,
+    val hasOffer: Boolean,
+    val discountName: String? = null,
+    val offerValidUntil: Long? = null,
+    val offerFlags: Long? = null,
 )

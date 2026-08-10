@@ -58,7 +58,7 @@ abstract class StartAllPendingTransfersUseCase(
                                     transferEvent.transfer.isBackgroundTransfer().not()
                                 ) {
                                     //to be sure that the active transfer is added before deleting the pending transfer. Transfer Workers use collectChunked to monitor transfer events
-                                    transferRepository.insertOrUpdateActiveTransfer(
+                                    transferRepository.putActiveTransfer(
                                         transferEvent.transfer
                                     )
                                 }

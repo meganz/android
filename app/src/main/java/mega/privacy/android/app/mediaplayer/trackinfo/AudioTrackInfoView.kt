@@ -62,7 +62,7 @@ import java.io.File
 fun AudioTrackInfoView(
     uiState: TrackInfoState,
     metadata: Metadata,
-    onLocationClicked: (location: LocationInfo?) -> Unit,
+    onLocationClicked: () -> Unit,
     onCheckedChange: (isChecked: Boolean) -> Unit,
 ) {
     Column(
@@ -84,6 +84,7 @@ fun AudioTrackInfoView(
             isEnabled = uiState.availableOffline,
             sizeValue = uiState.size,
             locationValue = uiState.location,
+            showLocation = !uiState.isNodeInBackups,
             onLocationClicked = onLocationClicked,
             addedValue = formatLongDateTime(uiState.added),
             lastModifiedValue = formatLongDateTime(uiState.lastModified)
@@ -195,9 +196,10 @@ fun AudioNodeInfoView(
     onCheckedChange: (isChecked: Boolean) -> Unit,
     sizeValue: String?,
     locationValue: LocationInfo?,
-    onLocationClicked: (location: LocationInfo?) -> Unit,
+    onLocationClicked: () -> Unit,
     addedValue: String?,
     lastModifiedValue: String?,
+    showLocation: Boolean = true,
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -211,7 +213,8 @@ fun AudioNodeInfoView(
                     value = isEnabled ?: false,
                     role = Role.Switch,
                     onValueChange = { onCheckedChange(it) }
-                ).testTag(OFFLINE_OPTION_TEST_TAG),
+                )
+                .testTag(OFFLINE_OPTION_TEST_TAG),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -251,25 +254,25 @@ fun AudioNodeInfoView(
                 .testTag(AUDIO_SIZE_TEST_TAG)
         )
 
-        Text(
-            text = stringResource(id = R.string.file_properties_info_location),
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorResource(R.color.grey_087_white),
-            modifier = Modifier.padding(top = 14.dp, start = 72.dp)
-        )
+        if (showLocation) {
+            Text(
+                text = stringResource(id = R.string.file_properties_info_location),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.grey_087_white),
+                modifier = Modifier.padding(top = 14.dp, start = 72.dp)
+            )
 
-        Text(
-            text = (locationValue?.location ?: ""),
-            fontSize = 14.sp,
-            color = colorResource(R.color.accent_900),
-            modifier = Modifier
-                .padding(top = 4.dp, start = 72.dp)
-                .clickable {
-                    onLocationClicked(locationValue)
-                }
-                .testTag(AUDIO_LOCATION_TEST_TAG)
-        )
+            Text(
+                text = (locationValue?.location ?: ""),
+                fontSize = 14.sp,
+                color = colorResource(R.color.grey_070_white_070),
+                modifier = Modifier
+                    .padding(top = 4.dp, start = 72.dp)
+                    .clickable { onLocationClicked() }
+                    .testTag(AUDIO_LOCATION_TEST_TAG)
+            )
+        }
 
         Text(
             text = stringResource(id = R.string.file_properties_info_added),

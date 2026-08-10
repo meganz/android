@@ -11,11 +11,12 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TEST_USER_ACCOUNT
-import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
@@ -41,6 +43,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
+import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -51,6 +54,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.stream.Stream
@@ -73,28 +77,29 @@ class MyAccountHomeViewModelTest {
     private val connectivityFlow = MutableStateFlow(false)
     private val userUpdatesFlow = MutableStateFlow<UserChanges>(UserChanges.Firstname)
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase = mock()
+    private val getExtendedAccountDetail: GetExtendedAccountDetail = mock()
     private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
-        onBlocking { invoke() }.thenReturn(accountDetailFlow)
+        on { invoke() }.thenReturn(accountDetailFlow)
     }
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock {
-        onBlocking { invoke() }.thenReturn(myAvatarFileFlow)
+        on { invoke() }.thenReturn(myAvatarFileFlow)
     }
     private val monitorVerificationStatusUseCase: MonitorVerificationStatusUseCase = mock {
-        onBlocking { invoke() }.thenReturn(verifiedPhoneNumberFlow)
+        on { invoke() }.thenReturn(verifiedPhoneNumberFlow)
     }
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
-        onBlocking { invoke() }.thenReturn(connectivityFlow)
+        on { invoke() }.thenReturn(connectivityFlow)
     }
     private val monitorUserUpdates: MonitorUserUpdates = mock {
-        onBlocking { invoke() }.thenReturn(userUpdatesFlow)
+        on { invoke() }.thenReturn(userUpdatesFlow)
     }
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase = mock {
-        onBlocking { invoke() }.thenReturn(emptyList())
+        on { invoke() }.thenReturn(emptyList())
     }
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock {
-        onBlocking { invoke() }.thenReturn(1)
+        on { invoke() }.thenReturn(1)
     }
     private val getInSharesUseCase: GetInSharesUseCase = mock()
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
@@ -110,15 +115,16 @@ class MyAccountHomeViewModelTest {
 
     private fun initViewModel(accountDetailsValue: UserAccount = TEST_USER_ACCOUNT) {
         getAccountDetailsUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(accountDetailsValue)
+            on { invoke(any()) }.thenReturn(accountDetailsValue)
         }
 
         getUserFullNameUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT.fullName)
+            on { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT.fullName)
         }
 
         underTest = MyAccountHomeViewModel(
             getAccountDetailsUseCase,
+            getExtendedAccountDetail,
             monitorAccountDetailUseCase,
             monitorMyAvatarFile,
             monitorVerificationStatusUseCase,
@@ -132,7 +138,8 @@ class MyAccountHomeViewModelTest {
             getUserFullNameUseCase,
             getMyAvatarFileUseCase,
             getUsedTransferStatusUseCase,
-            accountNameMapper = AccountNameMapper(),
+            accountTypeNameMapper = AccountTypeNameMapper(),
+            accountTypeIconMapper = AccountTypeIconMapper(),
             avatarContentMapper,
             isAchievementsEnabledUseCase
         )
@@ -247,7 +254,7 @@ class MyAccountHomeViewModelTest {
                     (expected.levelDetail?.proExpirationTime ?: 0) > 0
                 )
                 assertThat(state.lastSession).isEqualTo(
-                    (expected.sessionDetail?.mostRecentSessionTimeStamp) ?: 0
+                    expected.sessionDetail?.mostRecentSessionTimeStamp
                 )
                 assertThat(state.usedStorage).isEqualTo(
                     expected.storageDetail?.usedStorage ?: 0,
@@ -276,6 +283,19 @@ class MyAccountHomeViewModelTest {
             }
         }
 
+    @Test
+    fun `test that refreshAccountInfo calls getExtendedAccountDetail with sessions and purchases enabled`() =
+        runTest {
+            advanceUntilIdle()
+
+            verify(getExtendedAccountDetail).invoke(
+                forceRefresh = true,
+                sessions = true,
+                purchases = true,
+                transactions = false,
+            )
+        }
+
     @ParameterizedTest(name = " with usedTransfer as {0} and totalTransfer as {1} and UsedTransferStatus is {2}")
     @MethodSource("provideTransferDetails")
     fun `test that account details state should be updated when monitorAccountDetail emits data related to transfers`(
@@ -284,15 +304,18 @@ class MyAccountHomeViewModelTest {
         usedTransferStatus: UsedTransferStatus,
     ) =
         runTest {
-            val accountDetail =
-                AccountDetail(transferDetail = AccountTransferDetail(totalTransfer, usedTransfer))
-            whenever(accountDetail.transferDetail?.usedTransferPercentage?.let {
-                getUsedTransferStatusUseCase(
-                    it
+            val usedTransferPercentage = if (totalTransfer > 0) {
+                ((usedTransfer.toDouble() / totalTransfer.toDouble()) * 100).toInt()
+            } else 0
+            val accountDetail = AccountDetail(
+                transferDetail = AccountTransferDetail(
+                    totalTransfer = totalTransfer,
+                    usedTransfer = usedTransfer,
+                    usedTransferPercentage = usedTransferPercentage,
                 )
-            }).thenReturn(
-                usedTransferStatus
             )
+            whenever(getUsedTransferStatusUseCase(usedTransferPercentage))
+                .thenReturn(usedTransferStatus)
             accountDetailFlow.emit(accountDetail)
 
             advanceUntilIdle()
@@ -314,7 +337,6 @@ class MyAccountHomeViewModelTest {
                 isBusinessAccount = true,
                 isMasterBusinessAccount = true,
                 accountTypeIdentifier = AccountType.BUSINESS,
-                accountTypeString = "business"
             )
             initViewModel(accountDetailsValue = expected)
             whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
@@ -339,7 +361,6 @@ class MyAccountHomeViewModelTest {
                 isBusinessAccount = true,
                 isMasterBusinessAccount = false,
                 accountTypeIdentifier = AccountType.PRO_FLEXI,
-                accountTypeString = "proflexi"
             )
             initViewModel(accountDetailsValue = expected)
             whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
@@ -438,5 +459,109 @@ class MyAccountHomeViewModelTest {
         @JvmField
         @RegisterExtension
         val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to ShieldLite for PRO_LITE account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.PRO_LITE)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.ShieldLite)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to Shield01 for PRO_I account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.PRO_I)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield01)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to Shield02 for PRO_II account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.PRO_II)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield02)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to Shield03 for PRO_III account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.PRO_III)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield03)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to default Shield for FREE account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.FREE)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to default Shield for BUSINESS account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.BUSINESS)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to default Shield for PRO_FLEXI account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.PRO_FLEXI)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to default Shield when accountType is null`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = null)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+        }
     }
 }

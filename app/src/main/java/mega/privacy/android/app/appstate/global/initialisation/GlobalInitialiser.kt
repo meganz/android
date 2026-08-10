@@ -1,61 +1,92 @@
-package mega.privacy.android.app.appstate.initialisation
+package mega.privacy.android.app.appstate.global.initialisation
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
-import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.navigation.contract.initialisation.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Auth initialiser handles initialisation tasks during user auth.
- * It's an abstraction that simplifies the logic in the [mega.privacy.android.app.appstate.global.GlobalStateViewModel].
  *
  * @property coroutineScope
+ * @property syncAppCreateInitialisers ordered list of app-create initialisers
+ * @property asyncAppCreateInitialisers set of app-create initialisers
  * @property appStartInitialisers
- * @property preLoginInitialisers
  * @property postLoginInitialisers
  */
+@Singleton
 class GlobalInitialiser @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
+    private val syncAppCreateInitialisers: List<@JvmSuppressWildcards SynchronousAppCreateInitialiser>,
+    private val asyncAppCreateInitialisers: Set<@JvmSuppressWildcards AsyncAppCreateInitialiser>,
     private val appStartInitialisers: Set<@JvmSuppressWildcards AppStartInitialiser>,
-    private val preLoginInitialisers: Set<@JvmSuppressWildcards PreLoginInitialiser>,
-    private val postLoginInitialisers: Set<@JvmSuppressWildcards PostLoginInitialiser>,
+    private val postLoginInitialisers: dagger.Lazy<Set<@JvmSuppressWildcards PostLoginInitialiser>>,
 ) {
+    private var onAppCreateCalled = false
+    private var onAppStartJob: Job? = null
+    private var onPostLoginJob: Job? = null
+
+    /**
+     * Runs the app-create initialisers once per process, from `Application.onCreate`.
+     *
+     * Critical initialisers run synchronously in list order and complete before this method
+     * returns; their failures propagate to the caller. Non-critical initialisers are launched
+     * fire-and-forget into the application scope with failures logged.
+     *
+     * @param filter restricts which initialisers run, allowing tests to boot selectively
+     */
+    fun onAppCreate(filter: (AppCreateInitialiser) -> Boolean = { true }) {
+        if (onAppCreateCalled) return
+        onAppCreateCalled = true
+        syncAppCreateInitialisers.filter(filter).forEach {
+            it()
+        }
+        asyncAppCreateInitialisers.filter(filter).forEach { initialiser ->
+            coroutineScope.launch {
+                try {
+                    initialiser()
+                } catch (e: Exception) {
+                    Timber.e(e, "Error during app create initialisation: ${initialiser.name}")
+                }
+            }
+        }
+    }
 
     fun onAppStart() {
-        appStartInitialisers.forEach {
-            coroutineScope.launch {
-                try {
-                    it()
-                } catch (e: Exception) {
-                    Timber.e(e, "Error during auth viewmodel initialisation")
+        if (onAppStartJob?.isActive != true) {
+            onAppStartJob = coroutineScope.launch {
+                appStartInitialisers.forEach {
+                    launch {
+                        try {
+                            it()
+                        } catch (e: Exception) {
+                            Timber.e(e, "Error during auth viewmodel initialisation")
+                        }
+                    }
                 }
             }
         }
     }
 
-    fun onPreLogin(session: String?) {
-        preLoginInitialisers.forEach { initialiser ->
-            coroutineScope.launch {
-                try {
-                    initialiser(session)
-                } catch (e: Exception) {
-                    Timber.e(e, "Error during pre-login initialisation")
-                }
-            }
-        }
-    }
-
-    fun onPostLogin(session: String) {
-        postLoginInitialisers.forEach { initialiser ->
-            coroutineScope.launch {
-                try {
-                    initialiser(session)
-                } catch (e: Exception) {
-                    Timber.e(e, "Error during post-login initialisation")
+    fun onPostLogin(session: String, isFastLogin: Boolean) {
+        Timber.d("Starting post-login initialisation")
+        onPostLoginJob?.cancel()
+        onPostLoginJob = coroutineScope.launch {
+            postLoginInitialisers.get().forEach { initialiser ->
+                launch {
+                    try {
+                        initialiser(session, isFastLogin)
+                    } catch (e: Exception) {
+                        Timber.e(e, "Error during post-login initialisation")
+                    }
                 }
             }
         }

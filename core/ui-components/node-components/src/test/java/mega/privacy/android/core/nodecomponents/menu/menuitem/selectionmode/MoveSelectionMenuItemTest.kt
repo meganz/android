@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.jupiter.api.Test
@@ -41,7 +42,8 @@ class MoveSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isTrue()
@@ -56,7 +58,8 @@ class MoveSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode, mockFolderNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isTrue()
@@ -71,26 +74,29 @@ class MoveSelectionMenuItemTest {
             selectedNodes = listOf(mockIncomingShareNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
     }
 
     @Test
-    fun `test shouldDisplay returns false when mixed incoming and non-incoming share nodes`() = runTest {
-        val moveMenuItem = MoveSelectionMenuItem(mock<MoveMenuAction>())
+    fun `test shouldDisplay returns false when mixed incoming and non-incoming share nodes`() =
+        runTest {
+            val moveMenuItem = MoveSelectionMenuItem(mock<MoveMenuAction>())
 
-        val result = moveMenuItem.shouldDisplay(
-            hasNodeAccessPermission = true,
-            selectedNodes = listOf(mockFileNode, mockIncomingShareNode),
-            canBeMovedToTarget = true,
-            noNodeInBackups = true,
-            noNodeTakenDown = true
-        )
+            val result = moveMenuItem.shouldDisplay(
+                hasNodeAccessPermission = true,
+                selectedNodes = listOf(mockFileNode, mockIncomingShareNode),
+                canBeMovedToTarget = true,
+                noNodeInBackups = true,
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
 
-        assertThat(result).isFalse()
-    }
+            assertThat(result).isFalse()
+        }
 
     @Test
     fun `test shouldDisplay returns false when node is in backups`() = runTest {
@@ -101,34 +107,47 @@ class MoveSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = false,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
     }
 
     @Test
-    fun `test shouldDisplay ignores other parameters like access permission and canBeMovedToTarget`() = runTest {
+    fun `test shouldDisplay returns false when no permission`() = runTest {
         val moveMenuItem = MoveSelectionMenuItem(mock<MoveMenuAction>())
-
-        // Test that it ignores hasNodeAccessPermission and canBeMovedToTarget
-        val result1 = moveMenuItem.shouldDisplay(
+        val result = moveMenuItem.shouldDisplay(
             hasNodeAccessPermission = false,
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = false,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
-        val result2 = moveMenuItem.shouldDisplay(
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `test shouldDisplay returns false when any node is S4 container`() = runTest {
+        val s4ContainerNode = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(456L)
+            on { isTakenDown } doReturn false
+            on { isIncomingShare } doReturn false
+            on { isS4Container } doReturn true
+        }
+        val moveMenuItem = MoveSelectionMenuItem(mock<MoveMenuAction>())
+
+        val result = moveMenuItem.shouldDisplay(
             hasNodeAccessPermission = true,
-            selectedNodes = listOf(mockFileNode),
+            selectedNodes = listOf(s4ContainerNode),
             canBeMovedToTarget = true,
-            noNodeInBackups = false,
-            noNodeTakenDown = true
+            noNodeInBackups = true,
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
-        assertThat(result1).isTrue() // Should be true because no incoming shares and not in backups
-        assertThat(result2).isFalse() // Should be false because in backups
+        assertThat(result).isFalse()
     }
 }

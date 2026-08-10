@@ -1,0 +1,142 @@
+package mega.privacy.android.domain.entity.cloudexplorer
+
+/**
+ * Represents the different modes in which the cloud explorer can operate.
+ *
+ * Each mode defines the behavior and available navigation tabs of the explorer screen
+ * based on the user's intent (e.g., uploading files, moving nodes, selecting a folder).
+ *
+ * @property isFolderPicker Whether the explorer acts as a folder picker (selecting a destination folder)
+ *   rather than a file picker (selecting individual files).
+ * @property isIncomingAvailable Whether the Incoming Shares tab is available in this mode.
+ * @property isChatAvailable Whether the Chat tab is available in this mode.
+ * @property isVideoPicker Whether only video files can be selected. Non-video files are shown disabled.
+ * @property requiresFullAccessShares Whether incoming shares need full access permission to be
+ *   selectable or navigable (e.g. syncing a shared folder requires full access), instead of the
+ *   default write permission.
+ * @property allowsFolderSelection Whether folders are checkbox-selectable alongside files in a
+ *   multi-select (file-picker) mode. Only meaningful when [isFolderPicker] is false; lets a mode
+ *   select a mix of folders and files in one pass (e.g. pinning items to Home).
+ */
+enum class ExplorerMode(
+    val isFolderPicker: Boolean,
+    val isIncomingAvailable: Boolean,
+    val isChatAvailable: Boolean,
+    val isVideoPicker: Boolean,
+    val requiresFullAccessShares: Boolean = false,
+    val allowsFolderSelection: Boolean = false,
+) {
+    /** Upload files shared from an external app to a MEGA folder. */
+    ShareFilesToMega(
+        isFolderPicker = true,
+        isIncomingAvailable = true,
+        isChatAvailable = true,
+        isVideoPicker = false,
+    ),
+
+    /** Upload text shared from an external app to a MEGA folder. */
+    ShareTextToMega(
+        isFolderPicker = true,
+        isIncomingAvailable = true,
+        isChatAvailable = true,
+        isVideoPicker = false,
+    ),
+
+    /** Upload a URL shared from an external app to a MEGA folder. */
+    ShareURLToMega(
+        isFolderPicker = true,
+        isIncomingAvailable = true,
+        isChatAvailable = true,
+        isVideoPicker = false,
+    ),
+
+    /** Save a scanned document to a MEGA folder. */
+    SaveScannedDocument(
+        isFolderPicker = true,
+        isIncomingAvailable = true,
+        isChatAvailable = true,
+        isVideoPicker = false,
+    ),
+
+    /** Select files to send to a chat conversation. */
+    ShareFilesToChat(
+        isFolderPicker = false,
+        isIncomingAvailable = true,
+        isChatAvailable = false,
+        isVideoPicker = false,
+    ),
+
+    /** Select a destination folder to move nodes into. */
+    Move(
+        isFolderPicker = true,
+        isIncomingAvailable = true,
+        isChatAvailable = false,
+        isVideoPicker = false,
+    ),
+
+    /** Select a destination folder to copy nodes into. */
+    Copy(
+        isFolderPicker = true,
+        isIncomingAvailable = true,
+        isChatAvailable = false,
+        isVideoPicker = false,
+    ),
+
+    /** Select a folder for Camera Uploads. */
+    SelectCUFolder(
+        isFolderPicker = true,
+        isIncomingAvailable = true,
+        isChatAvailable = false,
+        isVideoPicker = false,
+    ),
+
+    /** Select a destination folder to import nodes from a public link. */
+    Import(
+        isFolderPicker = true,
+        isIncomingAvailable = true,
+        isChatAvailable = false,
+        isVideoPicker = false,
+    ),
+
+    /** Select a destination folder to import an album. */
+    AlbumImport(
+        isFolderPicker = true,
+        isIncomingAvailable = false,
+        isChatAvailable = false,
+        isVideoPicker = false,
+    ),
+
+    /** Select videos to add to a playlist. */
+    AddVideosToPlaylist(
+        isFolderPicker = false,
+        isIncomingAvailable = false,
+        isChatAvailable = false,
+        isVideoPicker = true,
+    ),
+
+    /** Select the MEGA folder to be synced when creating a new sync. */
+    SelectSyncFolder(
+        isFolderPicker = true,
+        isIncomingAvailable = true,
+        isChatAvailable = false,
+        isVideoPicker = false,
+        requiresFullAccessShares = true,
+    ),
+
+    /** Select the destination to move a backup folder to when stopping a backup. */
+    SelectStopBackupDestination(
+        isFolderPicker = true,
+        isIncomingAvailable = false,
+        isChatAvailable = false,
+        isVideoPicker = false,
+    ),
+
+    /** Select a mix of folders and files to pin to the Home screen. */
+    PinToHome(
+        isFolderPicker = false,
+        isIncomingAvailable = true,
+        isChatAvailable = false,
+        isVideoPicker = false,
+        allowsFolderSelection = true,
+    ),
+}

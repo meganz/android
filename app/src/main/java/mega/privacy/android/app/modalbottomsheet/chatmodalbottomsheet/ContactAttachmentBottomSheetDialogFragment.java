@@ -4,20 +4,21 @@ import static mega.privacy.android.app.utils.AvatarUtil.setImageAvatar;
 import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
 import static mega.privacy.android.app.utils.ChatUtil.getUserStatus;
 import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
-import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.EMAIL;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT;
-import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Constants.NAME;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.navigation.destination.ChatNavKey.LEGACY_CHAT_ID;
+import static mega.privacy.android.navigation.destination.ChatNavKey.LEGACY_MESSAGE_ID;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,27 +32,30 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ContactUtil;
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private AndroidMegaChatMessage message;
     private long chatId;
     private long messageId;
     private String email;
-    private ChatController chatC;
     private int position;
 
     public EmojiTextView titleNameContactChatPanel;
@@ -59,14 +63,17 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
     public EmojiTextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
 
+    @Inject
+    ChatController chatController;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
         itemsLayout = contentView.findViewById(R.id.items_layout);
 
         if (savedInstanceState != null) {
-            chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
-            messageId = savedInstanceState.getLong(MESSAGE_ID, INVALID_HANDLE);
+            chatId = savedInstanceState.getLong(LEGACY_CHAT_ID, INVALID_HANDLE);
+            messageId = savedInstanceState.getLong(LEGACY_MESSAGE_ID, INVALID_HANDLE);
             email = savedInstanceState.getString(EMAIL);
 
             MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
@@ -85,7 +92,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         }
 
         Timber.d("Chat ID: %d, Message ID: %d", chatId, messageId);
-        chatC = new ChatController(requireActivity());
 
         return contentView;
     }
@@ -138,7 +144,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             optionInfo.setVisibility(View.VISIBLE);
 
             long userHandle = message.getMessage().getUserHandle(0);
-            setContactStatus(getUserStatus(userHandle), stateIcon, StatusIconLocation.DRAWER);
+            setContactStatus(getUserStatus(userHandle, megaApi, megaChatApi), stateIcon, StatusIconLocation.DRAWER);
 
             if (userHandle != megaChatApi.getMyUserHandle()) {
 
@@ -226,8 +232,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
                 long userHandle = message.getMessage().getUserHandle(position);
                 String name = message.getMessage().getUserName(position);
-                if (isTextEmpty(name)) {
-                    name = chatC.getParticipantFullName(userHandle);
+                if (name == null || name.trim().isEmpty()) {
+                    name = chatController.getParticipantFullName(userHandle);
                     if (name.trim().isEmpty()) {
                         name = email;
                     }
@@ -291,11 +297,15 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             }
 
             if (contactHandle != MEGACHAT_INVALID_HANDLE) {
-                ContactUtil.openContactInfoActivity(requireActivity(), contactEmail);
+                Intent intent = new Intent(requireActivity(), ContactInfoActivity.class);
+                intent.putExtra(NAME, contactEmail);
+                startActivity(
+                        intent
+                );
             }
         } else if (id == R.id.option_view) {
             Timber.d("View option");
-            ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
+            megaNavigator.openContactAttachmentActivity(requireActivity(), chatId, messageId);
         } else if (id == R.id.option_invite) {
             if (!isOnline(requireContext())) {
                 return;
@@ -328,8 +338,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(CHAT_ID, chatId);
-        outState.putLong(MESSAGE_ID, messageId);
+        outState.putLong(LEGACY_CHAT_ID, chatId);
+        outState.putLong(LEGACY_MESSAGE_ID, messageId);
         outState.putString(EMAIL, email);
     }
 }

@@ -23,7 +23,7 @@ internal fun JoinAnswerCallDialog(
 ) = if (numberOfCallsInOtherChats > 1) {
     ConfirmationDialog(
         title = stringResource(id = if (isGroup) R.string.title_join_call else R.string.title_join_one_to_one_call),
-        text = stringResource(id = R.string.text_join_call),
+        text = stringResource(id = sharedR.string.can_only_join_one_call_error_message),
         confirmButtonText = stringResource(id = if (isGroup) R.string.end_and_join_call_incoming else R.string.end_and_answer_call_incoming),
         cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = onEndAndAnswer,

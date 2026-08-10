@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -8,22 +9,32 @@ import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Cache Gateway implementation
  *
  * @property context
  * @property ioDispatcher
+ * @property deviceGateway
  */
 internal class CacheGatewayImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val deviceGateway: DeviceGateway,
 ) : CacheGateway {
 
-    companion object {
-        private const val VOICE_CLIP_FOLDER = "voiceClipsMEGA"
-    }
+    /**
+     * Cache folder paths to avoid multiple IO operations
+     */
+    private val pathCache = ConcurrentHashMap<String, String>()
+
+    private val pathCacheRefreshedAtNanos =
+        AtomicLong(deviceGateway.nanoTime - REVALIDATE_INTERVAL.inWholeNanoseconds)
 
     override suspend fun getOrCreateCacheFolder(folderName: String): File? =
         withContext(ioDispatcher) {
@@ -52,6 +63,7 @@ internal class CacheGatewayImpl @Inject constructor(
 
     override suspend fun clearCacheDirectory() {
         try {
+            clearPathCache()
             val dir = context.cacheDir
             dir.list()?.forEach {
                 deleteDir(File(dir, it))
@@ -61,14 +73,32 @@ internal class CacheGatewayImpl @Inject constructor(
         }
     }
 
-    override suspend fun getThumbnailCacheFolder(): File? =
-        getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)
+    override suspend fun getThumbnailCacheFolderPath(): String? =
+        getCachedFolderPath(CacheFolderConstant.THUMBNAIL_FOLDER)
 
-    override suspend fun getPreviewCacheFolder(): File? =
-        getOrCreateCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)
+    override suspend fun getPreviewCacheFolderPath(): String? =
+        getCachedFolderPath(CacheFolderConstant.PREVIEW_FOLDER)
 
-    override suspend fun getFullSizeCacheFolder(): File? =
-        getOrCreateCacheFolder(CacheFolderConstant.TEMPORARY_FOLDER)
+    override suspend fun getFullSizeCacheFolderPath(): String? =
+        getCachedFolderPath(CacheFolderConstant.TEMPORARY_FOLDER)
+
+    private suspend fun getCachedFolderPath(folderName: String): String? {
+        val refreshedAtNanos = pathCacheRefreshedAtNanos.get()
+        val nowNanos = deviceGateway.nanoTime
+        // CAS so that concurrent lookups trigger at most one refresh per interval
+        if ((nowNanos - refreshedAtNanos).nanoseconds >= REVALIDATE_INTERVAL &&
+            pathCacheRefreshedAtNanos.compareAndSet(refreshedAtNanos, nowNanos)
+        ) {
+            pathCache.clear()
+        }
+        return pathCache[folderName]
+            ?: getOrCreateCacheFolder(folderName)?.path?.also { pathCache[folderName] = it }
+    }
+
+    override suspend fun clearPathCache() {
+        pathCache.clear()
+        pathCacheRefreshedAtNanos.set(deviceGateway.nanoTime)
+    }
 
     override suspend fun getCameraUploadsCacheFolder(): File? =
         getOrCreateCacheFolder(CacheFolderConstant.CAMERA_UPLOADS_CACHE_FOLDER)
@@ -78,6 +108,7 @@ internal class CacheGatewayImpl @Inject constructor(
 
     override suspend fun clearAppData(excludeFileNames: Set<String>) {
         try {
+            clearPathCache()
             val dir = context.filesDir
             dir.list()?.asSequence()
                 ?.filter { !excludeFileNames.contains(it) }
@@ -117,5 +148,18 @@ internal class CacheGatewayImpl @Inject constructor(
         } else {
             false
         }
+    }
+
+    companion object {
+        private const val VOICE_CLIP_FOLDER = "voiceClipsMEGA"
+
+        /**
+         * How long cached paths are trusted before being dropped and resolved from disk again.
+         * The system or the user can delete the cache directory at any time without notifying
+         * the app, so a cached path may go stale; a bounded refresh keeps the worst case to
+         * one interval.
+         */
+        @VisibleForTesting
+        internal val REVALIDATE_INTERVAL = 10.seconds
     }
 }

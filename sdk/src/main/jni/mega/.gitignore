@@ -1,4 +1,5 @@
 3rdparty
+3rdparty_sdk/
 
 # Compiled Object files
 *.slo

@@ -28,7 +28,7 @@ class FavouriteMapperTest {
         val expectedName = "TestFolder"
         val expectedLabel = MegaNode.NODE_LBL_RED
         val expectedInfo = "Test folder info"
-        val expectedIcon = IconPackR.drawable.ic_folder_incoming_medium_solid
+        val expectedIcon = IconPackR.drawable.ic_folder_users_medium_solid
         val expectedIsFavourite = false
         val expectedIsTakenDown = false
         val expectedShowLabel = true

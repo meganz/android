@@ -1,8 +1,8 @@
 package mega.privacy.android.data.repository.monitoring
 
 import com.google.firebase.perf.FirebasePerformance
-import com.google.firebase.perf.ktx.trace
 import com.google.firebase.perf.metrics.Trace
+import com.google.firebase.perf.trace
 import mega.privacy.android.domain.repository.monitoring.PerformanceReporterRepository
 import java.util.Hashtable
 import javax.inject.Inject

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.UploadOptionUiItemMapper
@@ -28,9 +29,12 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedRea
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
+import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
@@ -45,6 +49,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathU
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.camerauploads.HasLocalFolderConflictWithSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
@@ -75,16 +80,22 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFo
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.CameraUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsKeepFileNamesAsInDeviceDisabledEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsKeepFileNamesAsInDeviceEnabledEvent
 import mega.privacy.mobile.analytics.event.MediaUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.MediaUploadsEnabledEvent
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -214,6 +225,11 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val videoQualityUiItemMapper: VideoQualityUiItemMapper,
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
+    private val hasLocalFolderConflictWithSyncUseCase: HasLocalFolderConflictWithSyncUseCase,
+    private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val folderConflictMessageFormatter: FolderConflictMessageFormatter,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsCameraUploadsUiState())
@@ -224,10 +240,23 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
+        checkFeatureFlags()
         initializeSettings()
         monitorCameraUploadsFolderDestination()
         monitorCameraUploadsSettingsActions()
         monitorCameraUploadsStatusInfo()
+    }
+
+    private fun checkFeatureFlags() {
+        viewModelScope.launch {
+            val isCloudExplorerAvailable = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+
+            _uiState.update { state ->
+                state.copy(isCloudExplorerAvailable = isCloudExplorerAvailable)
+            }
+        }
     }
 
     /**
@@ -524,6 +553,9 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setupCameraUploadsSettingUseCase(isEnabled = true)
                 setCameraUploadsEnabled(true)
+                _uiState.update {
+                    it.copy(shouldKeepUploadFileNames = areUploadFileNamesKeptUseCase())
+                }
                 broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsEnabled)
             }.onSuccess {
                 Analytics.tracker.trackEvent(CameraUploadsEnabledEvent)
@@ -663,6 +695,12 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 setUploadFileNamesKeptUseCase(newState)
                 stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
                 _uiState.update { it.copy(shouldKeepUploadFileNames = newState) }
+            }.onSuccess {
+                Analytics.tracker.trackEvent(
+                    if (newState) CameraUploadsKeepFileNamesAsInDeviceEnabledEvent
+                    else CameraUploadsKeepFileNamesAsInDeviceDisabledEvent
+                )
+                showSnackbar(R.string.message_keep_device_name)
             }.onFailure { exception ->
                 Timber.e(exception, "An error occurred when changing the Keep File Names state")
                 showGenericErrorSnackbar()
@@ -822,6 +860,20 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             )
             runCatching {
                 primaryFolderPath?.let { primaryFolderPath ->
+                    // Validate against sync/backup folders FIRST
+                    if (hasLocalFolderConflictWithSyncUseCase(primaryFolderPath)) {
+                        val folderName = File(primaryFolderPath).name.takeIf { it.isNotBlank() }
+                        if (folderName != null)
+                            showSnackbar(
+                                folderConflictMessageFormatter.formatDeviceFolderCameraUploadsConflict(
+                                    folderName
+                                )
+                            )
+                        else
+                            showSnackbar(SharedR.string.sync_label_a_sync_or_backup)
+                        return@launch
+                    }
+
                     if (isFolderPathExistingUseCase(primaryFolderPath)) {
                         if (isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase(primaryFolderPath)) {
                             setPrimaryFolderPathUseCase(primaryFolderPath)
@@ -862,6 +914,26 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     fun onPrimaryFolderNodeSelected(newPrimaryFolderNodeId: NodeId) {
         viewModelScope.launch {
             runCatching {
+                val folderUsage = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                    nodeId = newPrimaryFolderNodeId,
+                    isSyncFolderSelection = false,
+                    shouldExcludeCurrentDevice = false,
+                    useCache = false,
+                )
+                if (folderUsage != FolderUsageResult.NotUsed) {
+                    val folderName = getNodeByIdUseCase(newPrimaryFolderNodeId)?.name
+                    val conflictMessage = folderConflictMessageFormatter.formatFromFolderUsage(
+                        folderDisplayName = folderName ?: "",
+                        folderTypeLabelRes = SharedR.string.sync_label_cloud_folder,
+                        result = folderUsage,
+                    )
+                    if (conflictMessage != null)
+                        showSnackbar(conflictMessage)
+                    else
+                        showSnackbar(SharedR.string.sync_label_a_sync_or_backup)
+                    return@launch
+                }
+
                 if (isNewFolderNodeValidUseCase(newPrimaryFolderNodeId.longValue)) {
                     setupPrimaryFolderUseCase(newPrimaryFolderNodeId.longValue)
                     stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
@@ -897,6 +969,20 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             )
             runCatching {
                 secondaryFolderPath?.let { secondaryFolderPath ->
+                    // Validate against sync/backup folders FIRST
+                    if (hasLocalFolderConflictWithSyncUseCase(secondaryFolderPath)) {
+                        val folderName = File(secondaryFolderPath).name.takeIf { it.isNotBlank() }
+                        if (folderName != null)
+                            showSnackbar(
+                                folderConflictMessageFormatter.formatDeviceFolderMediaUploadsConflict(
+                                    folderName
+                                )
+                            )
+                        else
+                            showSnackbar(SharedR.string.sync_label_a_sync_or_backup)
+                        return@launch
+                    }
+
                     if (isFolderPathExistingUseCase(secondaryFolderPath)) {
                         if (isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase(secondaryFolderPath)) {
                             setSecondaryFolderLocalPathUseCase(secondaryFolderPath)
@@ -936,6 +1022,27 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     fun onSecondaryFolderNodeSelected(newSecondaryFolderNodeId: NodeId) {
         viewModelScope.launch {
             runCatching {
+                // Validate against sync/backup remote folders FIRST
+                val folderUsage = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                    nodeId = newSecondaryFolderNodeId,
+                    isSyncFolderSelection = false,
+                    shouldExcludeCurrentDevice = false,
+                    useCache = false,
+                )
+                if (folderUsage != FolderUsageResult.NotUsed) {
+                    val folderName = getNodeByIdUseCase(newSecondaryFolderNodeId)?.name
+                    val conflictMessage = folderConflictMessageFormatter.formatFromFolderUsage(
+                        folderDisplayName = folderName ?: "",
+                        folderTypeLabelRes = SharedR.string.sync_label_cloud_folder,
+                        result = folderUsage,
+                    )
+                    if (conflictMessage != null)
+                        showSnackbar(conflictMessage)
+                    else
+                        showSnackbar(SharedR.string.sync_label_a_sync_or_backup)
+                    return@launch
+                }
+
                 if (isNewFolderNodeValidUseCase(newSecondaryFolderNodeId.longValue)) {
                     setupSecondaryFolderUseCase(newSecondaryFolderNodeId.longValue)
                     stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
@@ -981,6 +1088,16 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
      * @param messageRes The String Resource to be displayed in the Snackbar
      */
     private fun showSnackbar(@StringRes messageRes: Int) {
-        _uiState.update { it.copy(snackbarMessage = triggered(messageRes)) }
+        _uiState.update { it.copy(snackbarMessage = triggered(LocalizedText.StringRes(messageRes))) }
     }
+
+    /**
+     * Updates the UI State to display a Snackbar with a specific message
+     *
+     * @param message The String to be displayed in the Snackbar
+     */
+    private fun showSnackbar(message: String) {
+        _uiState.update { it.copy(snackbarMessage = triggered(LocalizedText.Literal(message))) }
+    }
+
 }

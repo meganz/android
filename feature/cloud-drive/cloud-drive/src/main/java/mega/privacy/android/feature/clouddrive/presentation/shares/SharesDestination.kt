@@ -1,7 +1,10 @@
 package mega.privacy.android.feature.clouddrive.presentation.shares
 
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.SharesNavKey
@@ -11,9 +14,21 @@ fun EntryProviderScope<NavKey>.shares(
     transferHandler: TransferHandler,
 ) {
     entry<SharesNavKey> {
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(null) }
+            )
+
+        HandleNodeOptionsActionResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            onTransfer = transferHandler::setTransferEvent,
+        )
+
         SharesScreen(
             navigationHandler = navigationHandler,
             onTransfer = transferHandler::setTransferEvent,
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
         )
     }
 }

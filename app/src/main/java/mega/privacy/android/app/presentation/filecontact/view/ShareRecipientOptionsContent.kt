@@ -61,7 +61,7 @@ fun ColumnScope.ShareRecipientsOptionsContent(
         modifier = Modifier
             .height(56.dp)
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(vertical = 8.dp)
     )
 }
 

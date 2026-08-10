@@ -5,9 +5,9 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
-import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountInactivity
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
@@ -15,7 +15,9 @@ import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.User
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
@@ -33,12 +35,6 @@ interface AccountRepository {
      * @return the user account for the current user
      */
     suspend fun getUserAccount(): UserAccount
-
-    /**
-     * Storage capacity used is blank
-     *
-     */
-    fun storageCapacityUsedIsBlank(): Boolean
 
     /**
      * Request account
@@ -73,6 +69,45 @@ interface AccountRepository {
      *
      */
     suspend fun requestDeleteAccountLink()
+
+    /**
+     * Request a delete (cancel) account link, gated by a valid Multi-Factor Authentication PIN.
+     *
+     * @param pin The 6-digit 2FA PIN.
+     * @throws WrongMultiFactorAuthPinException if the PIN is invalid or expired.
+     * @throws MegaException for any other failure.
+     */
+    suspend fun requestDeleteAccountLinkWith2FA(pin: String)
+
+    /**
+     * Request a change-email confirmation link, gated by a valid Multi-Factor Authentication PIN.
+     *
+     * @param newEmail The new email address requested by the user.
+     * @param pin The 6-digit 2FA PIN.
+     * @throws WrongMultiFactorAuthPinException if the PIN is invalid or expired.
+     * @throws MegaException for any other failure.
+     */
+    suspend fun requestChangeEmailWith2FA(newEmail: String, pin: String)
+
+    /**
+     * Disable Multi-Factor Authentication for the current account.
+     *
+     * @param pin The 6-digit 2FA PIN.
+     * @throws WrongMultiFactorAuthPinException if the PIN is invalid or expired.
+     * @throws MegaException for any other failure.
+     */
+    suspend fun disableMultiFactorAuth(pin: String)
+
+    /**
+     * Change the account password, gated by a valid Multi-Factor Authentication PIN.
+     *
+     * @param newPassword The new password.
+     * @param pin The 6-digit 2FA PIN.
+     * @return true if the change succeeded.
+     * @throws WrongMultiFactorAuthPinException if the PIN is invalid or expired.
+     * @throws MegaException for any other failure.
+     */
+    suspend fun changePasswordWith2FA(newPassword: String, pin: String): Boolean
 
     /**
      * Monitor user updates
@@ -209,6 +244,27 @@ interface AccountRepository {
      * @return email address or null
      */
     suspend fun getAccountEmail(forceRefresh: Boolean = true): String?
+
+    /**
+     * Get the number of nodes (files and folders) in the account.
+     *
+     * @return the number of nodes.
+     */
+    suspend fun getNumberOfNodes(): Long
+
+    /**
+     * Get the storage over quota deletion deadline (Unix timestamp in seconds).
+     *
+     * @return the deadline timestamp in seconds, or a negative value if there is no deadline.
+     */
+    suspend fun getOverDiskQuotaDeadline(): Long
+
+    /**
+     * Get the list of storage over quota warning timestamps (Unix timestamps in seconds).
+     *
+     * @return the list of warning timestamps in seconds.
+     */
+    suspend fun getOverDiskQuotaWarningTimestamps(): List<Long>
 
     /**
      * Monitor account detail
@@ -352,22 +408,22 @@ interface AccountRepository {
     /**
      * Set last target path of copy
      */
-    suspend fun setLatestTargetPathCopyPreference(path: Long)
+    suspend fun setLatestTargetCopyPreference(path: Long)
 
     /**
      * Get last target path of copy
      */
-    suspend fun getLatestTargetPathCopyPreference(): Long?
+    suspend fun getLatestTargetCopyPreference(): Long?
 
     /**
      * Set last target path of move
      */
-    suspend fun setLatestTargetPathMovePreference(path: Long)
+    suspend fun setLatestTargetMovePreference(path: Long)
 
     /**
      * Get last target path of move
      */
-    suspend fun getLatestTargetPathMovePreference(): Long?
+    suspend fun getLatestTargetMovePreference(): Long?
 
     /**
      *  Notify the user has successfully skipped the password check
@@ -723,19 +779,23 @@ interface AccountRepository {
 
 
     /**
-     * Monitor misc loaded
+     * Monitor misc state
      */
-    fun monitorMiscLoaded(): Flow<Boolean>
+    fun monitorMiscState(): Flow<MiscLoadedState>
 
     /**
-     * Broadcast misc loaded
+     * Get current misc state
+     *
+     * @return The current misc state
      */
-    suspend fun broadcastMiscLoaded()
+    fun getCurrentMiscState(): MiscLoadedState
 
     /**
-     * Broadcast misc un loaded
+     * Broadcast misc state
+     *
+     * @param state The misc state to broadcast
      */
-    suspend fun broadcastMiscUnLoaded()
+    suspend fun broadcastMiscState(state: MiscLoadedState)
 
     /**
      *  Resend the verification email for Weak Account Protection
@@ -778,4 +838,37 @@ interface AccountRepository {
      * @return Flow of Boolean
      */
     fun monitorIsUnverifiedBusinessAccount(): Flow<Boolean>
+
+    /**
+     * Acknowledge the last purge notification so it is not shown again on any device.
+     *
+     * @param ts the Unix timestamp (seconds) of the purge to acknowledge, taken from the
+     *           last purge event.
+     */
+    suspend fun setLastPurgeAcknowledged(ts: Long)
+
+    /**
+     * Monitor the account inactivity status, derived from the last purge event
+     * (EVENT_LAST_PURGE) for the inactive reason.
+     *
+     * @return a [Flow] emitting [AccountInactivity] when an inactive-reason purge event is
+     *         received, or null otherwise.
+     */
+    fun monitorAccountInactivity(): Flow<AccountInactivity?>
+
+    /**
+     * Monitor the purge timestamp whose inactivity banner has been suppressed (dismissed) for the
+     * current session. In-memory, app-scoped state; resets on app restart.
+     *
+     * @return a [Flow] of the suppressed purge timestamp (seconds), or null if none.
+     */
+    fun monitorSuppressedPurgeTimestamp(): Flow<Long?>
+
+    /**
+     * Suppress the inactivity banner for the given purge timestamp for the current session, so it
+     * is not shown again until the next app launch.
+     *
+     * @param ts the purge timestamp (seconds) to suppress.
+     */
+    fun setSuppressedPurgeTimestamp(ts: Long)
 }

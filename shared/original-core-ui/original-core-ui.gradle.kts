@@ -2,16 +2,11 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
-    id("kotlin-android")
 }
 
 android {
     buildFeatures {
         buildConfig = true
-    }
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     lint {
@@ -25,8 +20,9 @@ android {
 dependencies {
     lintChecks(project(":lint"))
 
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":core:passcode:passcode"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
     testImplementation(project(":core-ui-test"))
 
     implementation(androidx.constraintlayout.compose)
@@ -36,7 +32,7 @@ dependencies {
     implementation(google.material)
     implementation(google.accompanist.systemui)
     implementation(google.accompanist.permissions)
-    implementation(google.accompanist.navigationmaterial)
+    implementation(androidx.compose.material.navigation)
     implementation(androidx.splashscreen)
     implementation(androidx.compose.activity)
     implementation(androidx.lifecycle.runtime)

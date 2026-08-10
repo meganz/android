@@ -30,15 +30,14 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
-import mega.privacy.android.core.nodecomponents.extension.getIcon
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.contacts.ContactPermission
+import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges.Description
@@ -53,6 +52,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges.Tags
 import mega.privacy.android.domain.entity.node.NodeChanges.Timestamp
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -87,9 +87,11 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -98,6 +100,11 @@ import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
+import mega.privacy.android.shared.contact.mapper.ContactPermissionUiStateMapper
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
+import mega.privacy.android.shared.nodes.extension.getIcon
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -106,7 +113,54 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 
 /**
- * View Model class for [FileInfoActivity]
+ * File info view model
+ *
+ * @property tempMegaNodeRepository
+ * @property fileUtilWrapper
+ * @property monitorStorageStateEventUseCase
+ * @property isConnectedToInternetUseCase
+ * @property isNodeInBackupsUseCase
+ * @property isNodeInRubbishBinUseCase
+ * @property checkNodesNameCollisionWithActionUseCase
+ * @property moveNodeToRubbishBinUseCase
+ * @property deleteNodeByHandleUseCase
+ * @property deleteNodeVersionsUseCase
+ * @property getPreviewUseCase
+ * @property getNodeByIdUseCase
+ * @property getFolderTreeInfo
+ * @property getContactItemFromInShareFolder
+ * @property monitorNodeUpdatesById
+ * @property monitorChildrenUpdates
+ * @property monitorContactUpdates
+ * @property monitorChatOnlineStatusUseCase
+ * @property getNodeVersionsByHandleUseCase
+ * @property getNodeOutSharesUseCase
+ * @property getNodeLocationInfo
+ * @property setNodeDescriptionUseCase
+ * @property isAvailableOfflineUseCase
+ * @property removeOfflineNodeUseCase
+ * @property getNodeAccessPermission
+ * @property setOutgoingPermissions
+ * @property stopSharingNode
+ * @property getPrimarySyncHandleUseCase
+ * @property isCameraUploadsEnabledUseCase
+ * @property getSecondarySyncHandleUseCase
+ * @property isMediaUploadsEnabledUseCase
+ * @property getAvailableNodeActionsUseCase
+ * @property nodeActionMapper
+ * @property clipboardGateway
+ * @property monitorOfflineFileAvailabilityUseCase
+ * @property getContactVerificationWarningUseCase
+ * @property fileTypeIconMapper
+ * @property getImageNodeByNodeId
+ * @property isBusinessAccountActiveUseCase
+ * @property isMasterBusinessAccountUseCase
+ * @property monitorAccountDetailUseCase
+ * @property getNodeLocationByIdUseCase
+ * @property nodeDestinationMapper
+ * @property iODispatcher
+ * @property contactItemStatusMapper
+ * @property contactPermissionUiStateMapper
  */
 @HiltViewModel
 class FileInfoViewModel @Inject constructor(
@@ -137,7 +191,6 @@ class FileInfoViewModel @Inject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val setOutgoingPermissions: SetOutgoingPermissions,
     private val stopSharingNode: StopSharingNode,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
@@ -152,7 +205,13 @@ class FileInfoViewModel @Inject constructor(
     private val isBusinessAccountActiveUseCase: IsBusinessAccountActiveUseCase,
     private val isMasterBusinessAccountUseCase: IsMasterBusinessAccountUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getNodeLocationByIdUseCase: GetNodeLocationByIdUseCase,
+    private val nodeDestinationMapper: NodeDestinationMapper,
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
+    private val contactItemStatusMapper: ContactItemStatusMapper,
+    private val contactPermissionUiStateMapper: ContactPermissionUiStateMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -184,8 +243,6 @@ class FileInfoViewModel @Inject constructor(
     val nodeId get() = typedNode.id
 
     init {
-        checkMapLocationFeatureFlag()
-        checkTagsFeatureFlag()
         monitorBusinessAccountExpiry()
         viewModelScope.launch {
             val isRemindersForContactVerificationEnabled =
@@ -198,6 +255,8 @@ class FileInfoViewModel @Inject constructor(
      * Safer method to get the current node id. Use it instead of [nodeId] property
      */
     fun getCurrentNodeId() = if (this::typedNode.isInitialized) typedNode.id else null
+
+    fun getCurrentNodeParentId() = if (this::typedNode.isInitialized) typedNode.parentId else null
 
     private fun monitorBusinessAccountExpiry() {
         viewModelScope.launch {
@@ -226,22 +285,6 @@ class FileInfoViewModel @Inject constructor(
                         Timber.e("Monitor business account expiry failed $it")
                     }
                 }
-        }
-    }
-
-    private fun checkTagsFeatureFlag() = viewModelScope.launch {
-        runCatching { getFeatureFlagValueUseCase(AppFeatures.NodeWithTags) }.onSuccess { flag ->
-            _uiState.update { it.copy(tagsEnabled = flag) }
-        }.onFailure {
-            Timber.e("Get tag feature flag failed $it")
-        }
-    }
-
-    private fun checkMapLocationFeatureFlag() = viewModelScope.launch {
-        runCatching { getFeatureFlagValueUseCase(AppFeatures.MapLocation) }.onSuccess { flag ->
-            _uiState.update { it.copy(mapLocationEnabled = flag) }
-        }.onFailure {
-            Timber.e("Get gis feature flag failed $it")
         }
     }
 
@@ -488,7 +531,7 @@ class FileInfoViewModel @Inject constructor(
     /**
      * A contact is selected to show Sharing info
      */
-    fun contactToShowOptions(contactPermission: ContactPermission?) {
+    fun contactToShowOptions(contactPermission: ContactPermissionUiState?) {
         updateState {
             it.copy(
                 contactToShowOptions = contactPermission,
@@ -527,7 +570,7 @@ class FileInfoViewModel @Inject constructor(
     fun selectAllVisibleContacts() =
         updateState { viewState ->
             viewState.copy(
-                outShareContactsSelected = _uiState.value.outSharesCoerceMax.map { it.contactItem.email },
+                outShareContactsSelected = _uiState.value.outSharesCoerceMax.map { it.email },
                 contactToShowOptions = null,
             )
         }
@@ -549,7 +592,7 @@ class FileInfoViewModel @Inject constructor(
      */
     fun setSharePermissionForUsers(accessPermission: AccessPermission, emails: List<String>) {
         extraActionFinished()
-        val alreadySet = _uiState.value.outShares.map { it.contactItem.email }.containsAll(emails)
+        val alreadySet = _uiState.value.outShares.map { it.email }.containsAll(emails)
         changeSharePermissionForUsers(
             accessPermission,
             if (alreadySet) FileInfoJobInProgressState.ChangeSharePermission.Change else FileInfoJobInProgressState.ChangeSharePermission.Set,
@@ -604,8 +647,8 @@ class FileInfoViewModel @Inject constructor(
         val actualEmails = emails ?: _uiState.value.outShareContactsSelected
         val actualPermissions = actualEmails.map { email ->
             _uiState.value.outShares.firstOrNull {
-                it.contactItem.email == email
-            }?.accessPermission ?: AccessPermission.UNKNOWN
+                it.email == email
+            }?.permission ?: AccessPermission.UNKNOWN
         }
         //if all current permissions are the same, we set it as selected one
         val selected = actualPermissions.firstOrNull()
@@ -794,16 +837,22 @@ class FileInfoViewModel @Inject constructor(
     private fun monitorOnlineState() =
         viewModelScope.launch {
             monitorChatOnlineStatusUseCase().filter { onlineStatus ->
-                _uiState.value.outShares.any { it.contactItem.handle == onlineStatus.userHandle }
-            }.collect { onlineStatus ->
+                _uiState.value.outShares.any { it.contactItemUiState.handle == onlineStatus.userHandle }
+            }.collect { onlineStatus: OnlineStatus ->
                 updateState { uiState ->
                     uiState.outShares.indexOfFirst {
-                        it.contactItem.handle == onlineStatus.userHandle
+                        it.contactItemUiState.handle == onlineStatus.userHandle
                     }.takeIf { it >= 0 }?.let { contactUpdatedIndex ->
                         // lets update the online status of the corresponding user in outShares
                         val outShares = uiState.outShares.toMutableList().apply {
                             this[contactUpdatedIndex] = this[contactUpdatedIndex].let {
-                                it.copy(contactItem = it.contactItem.copy(status = onlineStatus.status))
+                                it.copy(
+                                    contactItemUiState = it.contactItemUiState.copy(
+                                        status = contactItemStatusMapper(
+                                            onlineStatus.status
+                                        )
+                                    )
+                                )
                             }
                         }
                         uiState.copy(outShares = outShares)
@@ -855,6 +904,7 @@ class FileInfoViewModel @Inject constructor(
         updateOwner()
         updateOutShares()
         updateLocation()
+        updateNodeLocation()
         updateMapLocationInfo()
     }
 
@@ -903,11 +953,11 @@ class FileInfoViewModel @Inject constructor(
                 runCatching {
                     getFolderTreeInfo(folder).let { folderTreeInfo ->
                         _uiState.update {
-                            it.copyWithFolderTreeInfo(folderTreeInfo)
+                            it.copyWithFolderTreeInfo(folder, folderTreeInfo)
                         }
                     }
                 }.onFailure {
-                    Timber.w("Exception getting folder tree info.", it)
+                    Timber.w(it, "Exception getting folder tree info.")
                 }
             }
         }
@@ -933,6 +983,19 @@ class FileInfoViewModel @Inject constructor(
     private fun updateLocation() {
         updateState {
             it.copy(nodeLocationInfo = getNodeLocationInfo(typedNode))
+        }
+    }
+
+    private fun updateNodeLocation() {
+        viewModelScope.launch {
+            runCatching {
+                getNodeLocationByIdUseCase(typedNode.id)
+            }.onSuccess { nodeLocation ->
+                val nodeDestination = nodeLocation?.let { nodeDestinationMapper(nodeLocation) }
+                _uiState.update { state -> state.copy(nodeDestination = nodeDestination) }
+            }.onFailure {
+                Timber.e("Failed to get node location: $it")
+            }
         }
     }
 
@@ -983,7 +1046,8 @@ class FileInfoViewModel @Inject constructor(
 
     private fun updateOutShares() = updateState {
         it.copy(
-            outShares = getNodeOutSharesUseCase(typedNode.id),
+            outShares = getNodeOutSharesUseCase(typedNode.id)
+                .map { contactPermissionUiStateMapper(it) },
         )
     }
 
@@ -1133,5 +1197,49 @@ class FileInfoViewModel @Inject constructor(
      */
     fun clearLeaveFolderNodeIds() {
         _uiState.update { it.copy(leaveFolderNodeIds = null) }
+    }
+
+    /**
+     * Called when the user chooses to share the folder with contacts. On the Compose picker path
+     * ([AppFeatures.ContactsComposeUI]) a hidden/sensitive-node warning is shown first when needed;
+     * the legacy picker warns itself, so no warning is surfaced here for it.
+     */
+    fun shareFolderWithContactsClicked() {
+        viewModelScope.launch {
+            val isComposeContactsPicker = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val warning = if (isComposeContactsPicker) {
+                getShareFolderSensitiveWarningUseCase(listOf(nodeId))
+            } else {
+                SensitiveNodeShareWarning.None
+            }
+            if (warning == SensitiveNodeShareWarning.None) {
+                _uiState.update {
+                    it.copy(oneOffViewEvent = triggered(FileInfoOneOffViewEvent.LaunchShareContactPicker))
+                }
+            } else {
+                _uiState.update { it.copy(shareHiddenNodeWarning = warning) }
+            }
+        }
+    }
+
+    /**
+     * Called when the user confirms the hidden/sensitive-node warning; proceeds to the picker.
+     */
+    fun shareHiddenNodeWarningConfirmed() {
+        _uiState.update {
+            it.copy(
+                shareHiddenNodeWarning = SensitiveNodeShareWarning.None,
+                oneOffViewEvent = triggered(FileInfoOneOffViewEvent.LaunchShareContactPicker),
+            )
+        }
+    }
+
+    /**
+     * Called when the user dismisses the hidden/sensitive-node warning; aborts the share.
+     */
+    fun shareHiddenNodeWarningDismissed() {
+        _uiState.update { it.copy(shareHiddenNodeWarning = SensitiveNodeShareWarning.None) }
     }
 }

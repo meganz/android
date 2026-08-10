@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.transfers.model.completed
 import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -15,6 +17,7 @@ import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -22,6 +25,8 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadDocumentFileUseCase
@@ -33,6 +38,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mockito.mockStatic
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -54,6 +60,9 @@ class CompletedTransferActionsViewModelTest {
     private val deleteCompletedTransferUseCase = mock<DeleteCompletedTransferUseCase>()
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
+    private val getOfflineNodeInformationByNodeIdUseCase =
+        mock<GetOfflineNodeInformationByNodeIdUseCase>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
 
     @TempDir
     lateinit var temporaryFolder: File
@@ -76,6 +85,50 @@ class CompletedTransferActionsViewModelTest {
         appData = emptyList(),
     )
 
+    private val completedOffline = CompletedTransfer(
+        id = 0,
+        fileName = "fileName.txt",
+        type = TransferType.DOWNLOAD,
+        state = TransferState.STATE_COMPLETED,
+        size = "3.57 MB",
+        handle = 27169983390750L,
+        path = "content://com.android.externalstorage.documents/tree/primary%Download//2023-03-24 00.13.20_1.pdf",
+        displayPath = "storage/emulated/0/Download",
+        isOffline = true,
+        timestamp = 1684228012974L,
+        error = "No error",
+        errorCode = 0,
+        originalPath = "content://com.android.externalstorage.documents/tree/primary%Download//2023-03-24 00.13.20_1.pdf",
+        parentHandle = 11622336899311L,
+        appData = emptyList(),
+    )
+
+    private val completedUpload = CompletedTransfer(
+        id = 0,
+        fileName = "fileName.txt",
+        type = TransferType.GENERAL_UPLOAD,
+        state = TransferState.STATE_COMPLETED,
+        size = "3.57 MB",
+        handle = 27169983390750L,
+        path = "content://com.android.externalstorage.documents/tree/primary%Download//2023-03-24 00.13.20_1.pdf",
+        displayPath = "storage/emulated/0/Download",
+        isOffline = false,
+        timestamp = 1684228012974L,
+        error = "No error",
+        errorCode = 0,
+        originalPath = "content://com.android.externalstorage.documents/tree/primary%Download//2023-03-24 00.13.20_1.pdf",
+        parentHandle = 11622336899311L,
+        appData = emptyList(),
+    )
+
+    private fun mockCompletedTransferUriPath(completedTransfer: CompletedTransfer) {
+        val uri = mock<Uri> {
+            on { this.scheme } doReturn "content"
+            on { this.toString() } doReturn completedTransfer.path
+        }
+        whenever(Uri.parse(completedTransfer.path)) doReturn uri
+    }
+
     @BeforeAll
     fun initTest() {
         initializeTest()
@@ -89,7 +142,9 @@ class CompletedTransferActionsViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             deleteCompletedTransferUseCase = deleteCompletedTransferUseCase,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
-            fileTypeInfoMapper = fileTypeInfoMapper
+            fileTypeInfoMapper = fileTypeInfoMapper,
+            getOfflineNodeInformationByNodeIdUseCase = getOfflineNodeInformationByNodeIdUseCase,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
         )
     }
 
@@ -102,7 +157,9 @@ class CompletedTransferActionsViewModelTest {
             monitorConnectivityUseCase,
             deleteCompletedTransferUseCase,
             getNodeByHandleUseCase,
-            fileTypeInfoMapper
+            fileTypeInfoMapper,
+            getOfflineNodeInformationByNodeIdUseCase,
+            isNodeInRubbishBinUseCase,
         )
 
         wheneverBlocking { monitorConnectivityUseCase() } doReturn flowOf(true)
@@ -293,11 +350,14 @@ class CompletedTransferActionsViewModelTest {
         }
         val expected = triggered(ShareLinkEvent(untypedNode))
 
+        whenever(isNodeInRubbishBinUseCase(NodeId(completedDownload.handle))) doReturn false
         whenever(getNodeByHandleUseCase(completedDownload.handle)) doReturn untypedNode
 
         initializeTest()
 
-        underTest.shareLink(completedDownload.handle)
+        underTest.checkCompletedTransferActions(completedDownload)
+        advanceUntilIdle()
+        underTest.shareLink()
 
         underTest.uiState.test {
             assertThat(awaitItem().shareLinkEvent).isEqualTo(expected)
@@ -312,10 +372,66 @@ class CompletedTransferActionsViewModelTest {
 
         initializeTest()
 
-        underTest.shareLink(completedDownload.handle)
+        underTest.checkCompletedTransferActions(completedDownload)
+        advanceUntilIdle()
+        underTest.shareLink()
 
         underTest.uiState.test {
             assertThat(awaitItem().shareLinkEvent).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that canShareLink is false when node is in rubbish bin`() = runTest {
+        whenever(getNodeAccessPermission(NodeId(completedDownload.handle))) doReturn AccessPermission.OWNER
+        whenever(isNodeInRubbishBinUseCase(NodeId(completedDownload.handle))) doReturn true
+
+        initializeTest()
+
+        underTest.checkCompletedTransferActions(completedDownload)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.amINodeOwner).isTrue()
+            assertThat(state.node).isNull()
+            assertThat(state.canShareLink).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that canViewInFolder is false for upload when node does not exist`() = runTest {
+        whenever(getNodeByHandleUseCase(completedUpload.handle)) doReturn null
+
+        initializeTest()
+
+        underTest.checkCompletedTransferActions(completedUpload)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.node).isNull()
+            assertThat(state.canViewInFolder).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that canViewInFolder is true for download when node does not exist`() = runTest {
+        val regularDownload = completedDownload.copy(
+            originalPath = "/storage/emulated/0/Download/fileName.txt",
+            path = "/storage/emulated/0/Download/fileName.txt",
+        )
+        whenever(getNodeByHandleUseCase(regularDownload.handle)) doReturn null
+
+        initializeTest()
+
+        underTest.checkCompletedTransferActions(regularDownload)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.node).isNull()
+            assertThat(state.canViewInFolder).isTrue()
         }
     }
 
@@ -326,6 +442,79 @@ class CompletedTransferActionsViewModelTest {
         underTest.clearTransfer(completedDownload)
 
         verify(deleteCompletedTransferUseCase).invoke(completedDownload, false)
+    }
+
+    @Test
+    fun `test that onViewInFolder emits new download event when is invoked with a download completed transfer`() =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                mockCompletedTransferUriPath(completedOffline)
+
+                underTest.onViewInFolder(completedDownload)
+
+                assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
+                    ViewInFolderEvent.Download::class.java
+                )
+            }
+        }
+
+    @Test
+    fun `test that onViewInFolder emits new download to offline event when is invoked with a download to offline completed transfer`() =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                mockCompletedTransferUriPath(completedOffline)
+                val offlineInfo = mock<OfflineFileInformation> {
+                    on { this.id } doReturn 425
+                    on { this.name } doReturn "parent"
+                }
+                val expected = ViewInFolderEvent.DownloadToOffline(
+                    fileName = completedOffline.fileName,
+                    parentNodeOfflineId = offlineInfo.id,
+                    title = offlineInfo.name,
+                    path = completedOffline.path
+                )
+                whenever(getOfflineNodeInformationByNodeIdUseCase(NodeId(completedOffline.parentHandle))) doReturn offlineInfo
+                underTest.onViewInFolder(completedOffline)
+
+                assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content)
+                    .isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that onViewInFolder emits new upload event when is invoked with an upload completed transfer`() =
+        runTest {
+            underTest.onViewInFolder(completedUpload)
+
+            assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
+                ViewInFolderEvent.Upload::class.java
+            )
+        }
+
+    @Test
+    fun `test that onViewInFolder emits not found event when is invoked with a completed transfer that does not exist anymore`() =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                mockCompletedTransferUriPath(completedOffline)
+                whenever(getOfflineNodeInformationByNodeIdUseCase(any())) doReturn null
+
+                underTest.onViewInFolder(completedOffline)
+
+                assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content)
+                    .isEqualTo(ViewInFolderEvent.NotFound)
+            }
+        }
+
+    @Test
+    fun `test that onConsumeViewInFolder consumes the event correctly`() = runTest {
+        mockStatic(Uri::class.java).use {
+            mockCompletedTransferUriPath(completedOffline)
+
+            underTest.onViewInFolder(completedDownload)
+            underTest.onConsumeViewInFolder()
+
+            assertThat(underTest.uiState.value.viewInFolderEvent).isEqualTo(consumed())
+        }
     }
 
     companion object {

@@ -15,8 +15,11 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.mapper.FileContentTypeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
+import mega.privacy.android.data.mapper.getFileTypeInfoForExtension
+import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -51,6 +54,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheGateway: CacheGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val fileContentTypeMapper: FileContentTypeMapper,
     private val fileGateway: FileGateway,
     private val deviceGateway: DeviceGateway,
     private val fileAttributeGateway: FileAttributeGateway,
@@ -130,6 +134,34 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun doesFileExist(path: String) = withContext(ioDispatcher) {
         File(path).exists()
+    }
+
+    override suspend fun readTextFromPath(path: String): String = withContext(ioDispatcher) {
+        fileGateway.readTextFromPath(path)
+    }
+
+    override fun readLinesFromPathInChunks(path: String, chunkSizeLines: Int): Flow<List<String>> =
+        fileGateway.readLinesFromPathInChunks(path, chunkSizeLines).flowOn(ioDispatcher)
+
+    override suspend fun writeTextToPath(path: String, text: String) = withContext(ioDispatcher) {
+        fileGateway.writeTextToPath(path, text)
+    }
+
+    override suspend fun saveLargeBundle(key: String, bytes: ByteArray) =
+        withContext(ioDispatcher) {
+            val file = cacheGateway.getCacheFile(LARGE_BUNDLE_CACHE_FOLDER, key) ?: return@withContext
+            fileGateway.writeBytesToPath(file.absolutePath, bytes)
+        }
+
+    override suspend fun readLargeBundle(key: String): ByteArray? = withContext(ioDispatcher) {
+        val file = cacheGateway.getCacheFile(LARGE_BUNDLE_CACHE_FOLDER, key) ?: return@withContext null
+        fileGateway.readBytesFromPath(file.absolutePath)
+    }
+
+    override suspend fun deleteLargeBundle(key: String) = withContext(ioDispatcher) {
+        val file = cacheGateway.getCacheFile(LARGE_BUNDLE_CACHE_FOLDER, key) ?: return@withContext
+        fileGateway.deleteFile(file)
+        Unit
     }
 
     override suspend fun getParent(path: String): String = withContext(ioDispatcher) {
@@ -242,6 +274,19 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override fun getFileTypeInfoByName(name: String, duration: Int): FileTypeInfo =
         fileTypeInfoMapper(name, duration)
+
+    override fun getFileTypeInfoFromContent(header: ByteArray, duration: Int): FileTypeInfo? =
+        fileContentTypeMapper(header)?.let { mimeType ->
+            getFileTypeInfoForExtension(mimeType = mimeType, extension = "", duration = duration)
+        }
+
+    override suspend fun readFirstBytesFromPath(path: String, length: Int): ByteArray? =
+        withContext(ioDispatcher) {
+            fileGateway.readFirstBytesFromPath(path, length)
+        }
+
+    override fun isNodeOpenableTextFile(node: FileNode) =
+        MimeTypeList.typeForName(node.name).isOpenableTextFile(node.size)
 
     override suspend fun createNewImageUri(fileName: String): String? = withContext(ioDispatcher) {
         fileGateway.createNewImageUri(fileName)?.toString()
@@ -420,9 +465,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun canReadUri(stringUri: String) =
         fileGateway.canReadUri(stringUri)
 
-    override suspend fun getOfflineFilesRootFolder(): File =
-        File(fileGateway.getOfflineFilesRootPath())
-
     override suspend fun getFileStorageTypeName(path: String?) = withContext(ioDispatcher) {
         fileGateway.getFileStorageTypeName(path)
     }
@@ -503,6 +545,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             }
         }
 
+    override suspend fun hasSuitableAppToOpenFile(mimeType: String): Boolean =
+        withContext(ioDispatcher) {
+            fileGateway.hasSuitableAppToOpenFile(mimeType)
+        }
+
     private fun generateNewName(fileName: String, counter: Int): String {
         val fileNameWithoutExtension = fileName.substringBeforeLast(".")
         val extension = fileName.substringAfterLast('.', missingDelimiterValue = "")
@@ -514,4 +561,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         return "$fileNameWithoutExtension ($counter)$fullExtension"
     }
 
+    private companion object {
+        const val LARGE_BUNDLE_CACHE_FOLDER = "large_bundle"
+    }
 }

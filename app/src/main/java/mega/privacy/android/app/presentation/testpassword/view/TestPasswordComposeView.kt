@@ -87,6 +87,8 @@ import androidx.print.PrintHelper
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.model.TestPasswordAttribute
 import mega.privacy.android.app.presentation.testpassword.model.PasswordState
@@ -191,7 +193,7 @@ internal fun TestPasswordComposeView(
         file?.let {
             printRecoveryKey(context, it, onPrintRecoveryKeyCompleted)
         } ?: run {
-            errorAlertMessage = context.getString(R.string.general_text_error)
+            errorAlertMessage = context.getString(sharedResR.string.general_text_error)
         }
     }
 
@@ -418,9 +420,8 @@ private fun PasswordReminderModeLayout(
     @StringRes val descriptionText: Int =
         if (uiState.isLogoutMode) R.string.remember_pwd_dialog_text_logout else R.string.remember_pwd_dialog_text
     @StringRes val dismissButtonText: Int =
-        if (uiState.isLogoutMode) R.string.proceed_to_logout else R.string.general_dismiss
-    val dismissButtonColor =
-        if (uiState.isLogoutMode) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.secondary
+        if (uiState.isLogoutMode) R.string.proceed_to_logout else sharedResR.string.general_dismiss_dialog
+    val dismissButtonColor = if (uiState.isLogoutMode) TextColor.Brand else TextColor.Accent
 
     ConstraintLayout(
         modifier = modifier
@@ -568,11 +569,13 @@ private fun PasswordReminderModeLayout(
             ),
             enabled = uiState.isLoading.not()
         ) {
-            Text(
+            MegaText(
                 text = stringResource(id = dismissButtonText),
-                style = MaterialTheme.typography.button.copy(letterSpacing = 0.25.sp),
-                color = dismissButtonColor,
-                fontWeight = FontWeight.Medium
+                textColor = dismissButtonColor,
+                style = MaterialTheme.typography.button.copy(
+                    letterSpacing = 0.25.sp,
+                    fontWeight = FontWeight.Medium
+                ),
             )
         }
     }
@@ -608,7 +611,7 @@ private fun TestPasswordModeLayout(
                     .padding(top = 24.dp)
                     .testTag(PASSWORD_TEXT_FIELD_TAG)
             },
-            label = stringResource(id = R.string.hint_set_password_protection_dialog),
+            label = stringResource(id = sharedResR.string.password_dialog_hint),
             passwordState = uiState.isCurrentPassword,
             isShowPassword = isShowPasswordChar,
             onValueChange = { value, _ ->
@@ -660,7 +663,7 @@ private fun TestPasswordModeLayout(
                 modifier = Modifier
                     .testTag(DISMISS_BUTTON_TAG)
                     .padding(top = 12.dp),
-                text = stringResource(id = R.string.general_dismiss),
+                text = stringResource(id = sharedResR.string.general_dismiss_dialog),
                 onClick = {
                     onBackPressedDispatcher?.onBackPressed()
                 },

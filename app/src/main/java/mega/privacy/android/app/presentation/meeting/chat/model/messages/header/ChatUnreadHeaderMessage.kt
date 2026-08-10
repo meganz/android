@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.meeting.chat.model.messages.header
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.pluralStringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel

@@ -1,20 +1,26 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose
 
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.navigation.BottomSheetNavigator
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.navigation.destination.AddChatParticipantsNavKey
+import mega.privacy.android.navigation.destination.AddContactsNavKey
+import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
 
 internal const val ConversationRoute = "conversation"
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.chatScreen(
     navController: NavHostController,
     bottomSheetNavigator: BottomSheetNavigator,
@@ -41,6 +47,10 @@ internal fun NavGraphBuilder.chatScreen(
     navigateToConversation: (Long) -> Unit,
     onBackPress: () -> Unit,
     enablePasscodeCheck: () -> Unit,
+    navigateToWebSite: (String) -> Unit,
+    onNavigate: (NavKey) -> Unit = {},
+    monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
+    clearResult: (String) -> Unit = {},
 ) {
     composable(
         route = ConversationRoute
@@ -48,6 +58,36 @@ internal fun NavGraphBuilder.chatScreen(
 
         val viewModel = backStackEntry.sharedViewModel<ChatViewModel>(navController)
         val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+        val shareFilesToChatResult by monitorResult(ShareFilesToChatNavKey.RESULT)
+            .collectAsStateWithLifecycle(null)
+        LaunchedEffect(shareFilesToChatResult) {
+            @Suppress("UNCHECKED_CAST")
+            val nodeIds = (shareFilesToChatResult as? List<NodeId>)
+                ?.takeIf { it.isNotEmpty() } ?: return@LaunchedEffect
+            viewModel.onAttachNodes(nodeIds)
+            clearResult(ShareFilesToChatNavKey.RESULT)
+        }
+
+        val addContactsResult by monitorResult(AddContactsNavKey.KEY)
+            .collectAsStateWithLifecycle(null)
+        LaunchedEffect(addContactsResult) {
+            @Suppress("UNCHECKED_CAST")
+            val emails = (addContactsResult as? List<String>)
+                ?.takeIf { it.isNotEmpty() } ?: return@LaunchedEffect
+            viewModel.onAttachContacts(emails)
+            clearResult(AddContactsNavKey.KEY)
+        }
+
+        val addParticipantsResult by monitorResult(AddChatParticipantsNavKey.KEY)
+            .collectAsStateWithLifecycle(null)
+        LaunchedEffect(addParticipantsResult) {
+            @Suppress("UNCHECKED_CAST")
+            val emails = (addParticipantsResult as? List<String>)
+                ?.takeIf { it.isNotEmpty() } ?: return@LaunchedEffect
+            viewModel.inviteContactsToChat(uiState.chatId, emails)
+            clearResult(AddChatParticipantsNavKey.KEY)
+        }
 
         ChatView(
             bottomSheetNavigator = bottomSheetNavigator,
@@ -82,8 +122,10 @@ internal fun NavGraphBuilder.chatScreen(
             navigateToReactionInfo = navigateToReactionInfo,
             navigateToNotSentModal = navigateToNotSentModal,
             navigateToConversation = navigateToConversation,
+            navigateToWebSite = navigateToWebSite,
+            onNavigate = onNavigate,
             navHostController = navController,
-            inviteContactsToChat = viewModel::inviteContactsToChat,
+            onNavigateToAddParticipants = { onNavigate(AddChatParticipantsNavKey(uiState.chatId)) },
             onInfoToShowConsumed = viewModel::onInfoToShowEventConsumed,
             enablePasscodeCheck = enablePasscodeCheck,
             archiveChat = viewModel::archiveChat,
@@ -102,6 +144,7 @@ internal fun NavGraphBuilder.chatScreen(
             onForwardMessages = viewModel::onForwardMessages,
             consumeDownloadEvent = viewModel::consumeDownloadEvent,
             onActionToManageEventConsumed = viewModel::onActionToManageEventConsumed,
+            onOpenPdfEventConsumed = viewModel::onOpenPdfEventConsumed,
             onVoiceClipRecordEvent = viewModel::onVoiceClipRecordEvent,
             onConsumeShouldUpgradeToProPlan = viewModel::onConsumeShouldUpgradeToProPlan,
         )

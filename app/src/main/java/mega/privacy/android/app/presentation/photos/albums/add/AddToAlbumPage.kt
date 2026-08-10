@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.add
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -39,23 +38,24 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import mega.android.core.ui.components.button.PrimaryFilledButton
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.app.presentation.photos.timeline.view.AlbumListSkeletonView
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
+import mega.privacy.android.feature.photos.presentation.timeline.component.AlbumListSkeletonView
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body3
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun AddToAlbumPage(
-    modifier: Modifier = Modifier,
     accountType: AccountType?,
     isBusinessAccountExpired: Boolean,
     isLoading: Boolean,
@@ -70,13 +70,14 @@ internal fun AddToAlbumPage(
     onCancelAlbumCreation: () -> Unit,
     onClearAlbumNameErrorMessage: () -> Unit,
     onCreateAlbum: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val defaultAlbumName = stringResource(R.string.photos_album_creation_dialog_input_placeholder)
 
     if (isCreatingAlbum) {
         CreateNewAlbumDialog(
             titleResID = R.string.photos_album_creation_dialog_title,
-            positiveButtonTextResID = R.string.general_create,
+            positiveButtonTextResID = sharedR.string.general_create_label,
             onDismissRequest = {
                 onCancelAlbumCreation()
                 onClearAlbumNameErrorMessage()
@@ -97,16 +98,12 @@ internal fun AddToAlbumPage(
             .fillMaxSize()
             .background(MaterialTheme.colors.surface),
         content = {
-            TextMegaButton(
-                text = stringResource(id = R.string.photos_album_creation_dialog_input_placeholder),
-                onClick = { onSetupNewAlbum(defaultAlbumName) },
-                contentPadding = PaddingValues(horizontal = 16.dp)
-            )
-
             if (isLoading) {
                 AlbumListSkeletonView()
             } else if (albums.isEmpty()) {
-                EmptyState()
+                EmptyState(
+                    onCreateAlbum = { onSetupNewAlbum(defaultAlbumName) },
+                )
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
@@ -141,24 +138,18 @@ internal fun AddToAlbumPage(
 
 @Composable
 private fun EmptyState(
+    onCreateAlbum: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
+    EmptyStateView(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        content = {
-            Image(
-                painter = painterResource(id = iconPackR.drawable.ic_playlist_glass_red),
-                contentDescription = null,
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            MegaText(
-                text = "No Albums",
-                textColor = TextColor.Primary,
-                style = MaterialTheme.typography.body1,
+        imagePainter = painterResource(id = iconPackR.drawable.ic_playlist_glass_red),
+        title = stringResource(sharedR.string.album_content_empty_album_title),
+        primaryAction = {
+            PrimaryFilledButton(
+                modifier = Modifier,
+                text = stringResource(id = sharedR.string.home_do_more_with_mega_create_album),
+                onClick = onCreateAlbum,
             )
         },
     )
@@ -166,7 +157,6 @@ private fun EmptyState(
 
 @Composable
 private fun AlbumCard(
-    modifier: Modifier = Modifier,
     accountType: AccountType?,
     isBusinessAccountExpired: Boolean,
     album: UserAlbum,
@@ -174,6 +164,7 @@ private fun AlbumCard(
     isSelected: Boolean,
     onDownloadPhoto: PhotoDownload,
     onClick: (UserAlbum) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val isLight = MaterialTheme.colors.isLight

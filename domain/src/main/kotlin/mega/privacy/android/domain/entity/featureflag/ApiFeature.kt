@@ -17,6 +17,12 @@ interface ApiFeature : Feature {
     val checkRemote: Boolean
 
     /**
+     * If true, the remote value is fetched once based on the account
+     * state at app startup, cached for the entire lifetime of the app process
+     */
+    val singleCheckPerRun: Boolean
+
+    /**
      * map value to boolean
      */
     fun mapValue(input: GroupFlagTypes): Boolean = when (input) {

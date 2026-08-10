@@ -16,4 +16,11 @@ interface ShareRepository {
      * @return public links
      */
     suspend fun getPublicLinks(sortOrder: SortOrder): List<UnTypedNode>
+
+    /**
+     * Checks if the account has public links
+     *
+     * @return true if the account has public links, false otherwise
+     */
+    suspend fun doesHaveLinks(): Boolean
 }

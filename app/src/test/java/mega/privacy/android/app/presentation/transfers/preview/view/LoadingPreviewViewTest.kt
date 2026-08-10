@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.transfers.preview.model.LoadingPreviewState
@@ -67,7 +66,6 @@ class LoadingPreviewViewTest {
         }
     }
 
-    @OptIn(ExperimentalMaterialNavigationApi::class)
     private fun initComposeTestRule(uiState: LoadingPreviewState) {
         composeTestRule.setContent {
             CompositionLocalProvider(

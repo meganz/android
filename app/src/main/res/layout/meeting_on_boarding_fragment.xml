@@ -51,7 +51,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <mega.privacy.android.app.components.twemoji.EmojiEditText
+        <mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
             android:id="@+id/type_meeting_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -115,7 +115,7 @@
         android:layout_marginEnd="8dp"
         android:background="@android:color/transparent"
         android:gravity="center"
-        android:hint="@string/first_name_text"
+        android:hint="@string/general_first_name"
         android:maxLength="50"
         android:paddingVertical="16dp"
         android:singleLine="true"
@@ -133,7 +133,7 @@
         android:layout_marginStart="8dp"
         android:background="@android:color/transparent"
         android:gravity="center"
-        android:hint="@string/lastname_text"
+        android:hint="@string/general_last_name"
         android:maxLength="50"
         android:paddingVertical="16dp"
         android:singleLine="true"

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.meeting.activity
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -8,27 +7,42 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityGuestLeaveMeetingBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
-import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.app.presentation.meeting.LeftMeetingViewModel
 import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import timber.log.Timber
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LeftMeetingActivity : BaseActivity() {
     private lateinit var binding: ActivityGuestLeaveMeetingBinding
     private val viewModel by viewModels<LeftMeetingViewModel>()
 
+    @Inject
+    lateinit var navigationEventQueue: NavigationEventQueue
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
+
+        enableAdaptiveLayout { old, new ->
+            Timber.d("On size change in LeftMeetingActivity from $old to $new")
+        }
+
         super.onCreate(savedInstanceState)
 
         binding = ActivityGuestLeaveMeetingBinding.inflate(layoutInflater)
@@ -84,9 +98,9 @@ class LeftMeetingActivity : BaseActivity() {
      *
      */
     private fun createAccount() {
-        val createAccountIntent = Intent(this, LoginActivity::class.java)
-        createAccountIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.CREATE_ACCOUNT_FRAGMENT)
-        startActivity(createAccountIntent)
-        finish()
+        lifecycleScope.launch {
+            navigationEventQueue.emit(CreateAccountNavKey())
+            finish()
+        }
     }
 }

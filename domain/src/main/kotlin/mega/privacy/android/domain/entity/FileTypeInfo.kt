@@ -11,7 +11,7 @@ import kotlin.time.Duration
 /**
  * File type info
  */
-@Polymorphic
+@Serializable
 sealed interface FileTypeInfo {
     /**
      * type of file
@@ -42,13 +42,13 @@ sealed interface PlayableFileTypeInfo {
 /**
  * Image file type info
  */
-@Polymorphic
+@Serializable
 sealed interface ImageFileTypeInfo : FileTypeInfo
 
 /**
  * Text editor file type info
  */
-@Polymorphic
+@Serializable
 sealed interface TextEditorFileTypeInfo : FileTypeInfo
 
 /**

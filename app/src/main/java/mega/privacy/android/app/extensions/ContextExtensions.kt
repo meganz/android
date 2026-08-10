@@ -11,8 +11,6 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.utils.Util
 import timber.log.Timber
 
 /**
@@ -28,15 +26,7 @@ fun Context.navigateToAppSettings() {
     try {
         startActivity(intent)
     } catch (e: Exception) {
-        if (this is ManagerActivity) {
-            // in case few devices cannot handle 'ACTION_APPLICATION_DETAILS_SETTINGS' action.
-            Util.showSnackbar(
-                this,
-                getString(R.string.on_permanently_denied)
-            )
-        } else {
-            Timber.e(e, "Exception opening device settings")
-        }
+        Timber.e(e, "Exception opening device settings")
     }
 }
 
@@ -60,8 +50,12 @@ fun Context.isTablet() =
  *
  * The method first attempts to launch the URL using Chrome Custom Tabs. If that fails,
  * it falls back to launching in WebViewActivity, and finally the default browser.
+ *
+ * @param url The URL to launch
+ * @param appendNoPlansParam When true (default), appends noplans=1 to mega.io/help.mega.io/mega.co.nz
+ * URLs to suppress checkout redirects. Pass false for links where checkout should be shown.
  */
-fun Context?.launchUrl(url: String?) {
+fun Context?.launchUrl(url: String?, appendNoPlansParam: Boolean = true) {
     if (url.isNullOrEmpty()) {
         Timber.w("URL is null or empty")
         return
@@ -75,6 +69,7 @@ fun Context?.launchUrl(url: String?) {
         Timber.e(it, "Failed to parse URL")
         return
     }
+    val uriToLaunch = if (appendNoPlansParam) appendNoPlansParam(uri) else uri
 
     fun Intent.applyNewTaskFlag() = apply {
         if (this@launchUrl is Application) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -90,7 +85,7 @@ fun Context?.launchUrl(url: String?) {
             "mega.app",
             "www.mega.app",
         )
-        if (deeplinkHosts.contains(uri.host) || uri.scheme == "mega") {
+        if (deeplinkHosts.contains(uriToLaunch.host) || uriToLaunch.scheme == "mega") {
             throw IllegalArgumentException("URL is a deeplink")
         }
         CustomTabsIntent.Builder()
@@ -109,19 +104,19 @@ fun Context?.launchUrl(url: String?) {
                     Uri.parse("android-app://$packageName")
                 )
                 it.intent.applyNewTaskFlag()
-            }.launchUrl(this, uri)
+            }.launchUrl(this, uriToLaunch)
     }.recoverCatching { e ->
         Timber.e(e, "Falling back to WebViewActivity")
         startActivity(
             Intent(this, WebViewActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 applyNewTaskFlag()
-                data = uri
+                data = uriToLaunch
             }
         )
     }.recoverCatching { e ->
         Timber.e(e, "Falling back to default browser")
-        startActivity(Intent(Intent.ACTION_VIEW, uri).applyNewTaskFlag())
+        startActivity(Intent(Intent.ACTION_VIEW, uriToLaunch).applyNewTaskFlag())
     }.onFailure {
         Timber.e(it, "Failed to launch URL")
     }

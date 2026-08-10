@@ -1,5 +1,6 @@
 package mega.privacy.android.data.gateway
 
+import mega.privacy.android.data.constant.HttpServerConstant
 import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
@@ -15,7 +16,10 @@ class DefaultStreamingGateway @Inject constructor(
 
     override suspend fun getPort() = megaApi.httpServerIsRunning()
 
-    override suspend fun startServer() = megaApi.httpServerStart()
+    override suspend fun startServer() = megaApi.httpServerStart(
+        HttpServerConstant.HTTP_SERVER_LOCAL_ONLY,
+        HttpServerConstant.API_HTTP_SERVER_PORT,
+    )
 
     override suspend fun setMaxBufferSize(bufferSize: Int) {
         megaApi.httpServerSetMaxBufferSize(bufferSize)

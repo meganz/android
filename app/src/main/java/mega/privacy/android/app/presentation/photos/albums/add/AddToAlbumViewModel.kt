@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.core.sharedcomponents.extension.truncateMiddle
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -32,7 +33,6 @@ import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.AddPhotosToAlbum
@@ -41,6 +41,8 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
@@ -52,6 +54,7 @@ import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 @HiltViewModel
@@ -114,15 +117,11 @@ internal class AddToAlbumViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) {
-                isHiddenNodesVisible = monitorShowHiddenItemsUseCase().firstOrNull() ?: false
+            isHiddenNodesVisible = monitorShowHiddenItemsUseCase().firstOrNull() ?: false
 
-                monitorAccountDetailUseCase()
-                    .onEach(::handleAccountDetail)
-                    .launchIn(viewModelScope)
-            } else {
-                isHiddenNodesVisible = true
-            }
+            monitorAccountDetailUseCase()
+                .onEach(::handleAccountDetail)
+                .launchIn(viewModelScope)
 
             getPhotos()
                 .onEach { handlePhotos() }
@@ -260,16 +259,20 @@ internal class AddToAlbumViewModel @Inject constructor(
         if (createAlbumJob?.isActive == true) return
 
         createAlbumJob = viewModelScope.launch {
-            val errorMessageRes =
-                if (getProscribedAlbumNamesUseCase().any { it.equals(albumName, true) }) {
-                    R.string.photos_create_album_error_message_systems_album
-                } else if (albumName in state.value.existingAlbumNames) {
-                    R.string.photos_create_album_error_message_duplicate
-                } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(albumName)) {
-                    R.string.invalid_characters_defined
-                } else {
-                    null
-                }
+            val errorMessageRes = when {
+                albumName.isEmpty() -> sharedR.string.general_invalid_string
+                albumName.isInvalidDotName() -> sharedR.string.general_invalid_dot_name_warning
+                albumName.isInvalidDoubleDotName() -> sharedR.string.general_invalid_double_dot_name_warning
+                "[\\\\*/:<>?\"|]".toRegex()
+                    .containsMatchIn(albumName) -> sharedR.string.general_invalid_characters_defined
+
+                getProscribedAlbumNamesUseCase().any { it.equals(albumName, true) }
+                    -> sharedR.string.album_invalid_name_error_message
+
+                albumName in state.value.existingAlbumNames -> sharedR.string.album_name_exists_error_message
+
+                else -> null
+            }
 
             state.update {
                 it.copy(albumNameErrorMessageRes = errorMessageRes)
@@ -318,7 +321,7 @@ internal class AddToAlbumViewModel @Inject constructor(
         }.onSuccess {
             state.update {
                 it.copy(
-                    mediaHolderName = album.title,
+                    mediaHolderName = album.title.truncateMiddle(),
                     completionType = completionType,
                     numAddedItems = numAddedItems,
                     additionType = 0,
@@ -397,16 +400,16 @@ internal class AddToAlbumViewModel @Inject constructor(
         if (createPlaylistJob?.isActive == true) return
 
         createPlaylistJob = viewModelScope.launch {
-            val errorMessageRes =
-                if (playlistName.isBlank()) {
-                    R.string.invalid_string
-                } else if (playlistName in state.value.existingPlaylistNames) {
-                    -888
-                } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(playlistName)) {
-                    R.string.invalid_characters_defined
-                } else {
-                    null
-                }
+            val errorMessageRes = when {
+                playlistName.isBlank() -> sharedR.string.general_invalid_string
+                playlistName.isInvalidDotName() -> sharedR.string.general_invalid_dot_name_warning
+                playlistName.isInvalidDoubleDotName() -> sharedR.string.general_invalid_double_dot_name_warning
+                "[\\\\*/:<>?\"|]".toRegex()
+                    .containsMatchIn(playlistName) -> sharedR.string.general_invalid_characters_defined
+
+                playlistName in state.value.existingPlaylistNames -> sharedR.string.video_section_playlists_error_message_playlist_name_exists
+                else -> null
+            }
 
             state.update {
                 it.copy(playlistNameErrorMessageRes = errorMessageRes)
@@ -451,7 +454,7 @@ internal class AddToAlbumViewModel @Inject constructor(
 
         state.update {
             it.copy(
-                mediaHolderName = playlist.title,
+                mediaHolderName = playlist.title.truncateMiddle(),
                 completionType = completionType,
                 numAddedItems = numAddedItems,
                 additionType = 1,

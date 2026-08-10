@@ -10,15 +10,15 @@ import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.myaccount.view.MyAccountQuotaProgressBar
-import mega.privacy.android.app.presentation.myaccount.view.QuotaLevel
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
+import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 
@@ -211,6 +211,8 @@ object MyAccountViewUtil {
     /**
      * Updates the views related to payments for all type of accounts.
      *
+     * @param renewTime
+     * @param expirationTime
      * @param renewable True if the subscriptions is renewable, false otherwise.
      * @param fragment  Value from `ActiveFragment` enum indicating what is the active fragment.
      */
@@ -227,9 +229,9 @@ object MyAccountViewUtil {
             text = context.getString(
                 if (renewable) R.string.account_info_renews_on else R.string.account_info_expires_on,
                 TimeUtils.formatDate(
-                    if (renewable) renewTime else expirationTime,
-                    TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                    context
+                    timestamp = if (renewable) renewTime else expirationTime,
+                    format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+                    context = context,
                 )
             )
 

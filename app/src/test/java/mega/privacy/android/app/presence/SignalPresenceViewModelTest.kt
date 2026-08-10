@@ -2,21 +2,25 @@ package mega.privacy.android.app.presence
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -25,37 +29,106 @@ class SignalPresenceViewModelTest {
 
     private val retryConnectionsAndSignalPresenceUseCase =
         mock<RetryConnectionsAndSignalPresenceUseCase>()
+    private val monitorChatSignalPresenceUseCase =
+        mock<MonitorChatSignalPresenceUseCase>()
+    private var monitorChatSignalPresenceFlow = MutableSharedFlow<Unit>()
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
+        // New instance per test so previous ViewModel's subscription cannot receive emissions from this test.
+        monitorChatSignalPresenceFlow = MutableSharedFlow()
+        whenever(monitorChatSignalPresenceUseCase()).thenReturn(monitorChatSignalPresenceFlow)
         underTest = SignalPresenceViewModel(
-            retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase
+            retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase,
+            monitorChatSignalPresenceUseCase = monitorChatSignalPresenceUseCase
         )
     }
 
     @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
-        reset(retryConnectionsAndSignalPresenceUseCase)
+        reset(retryConnectionsAndSignalPresenceUseCase, monitorChatSignalPresenceUseCase)
     }
 
     @Test
     fun `test that signal is sent when signal presence is called the first time`() = runTest {
-        underTest.signalPresence()
+        underTest.retryConnections(signalPresence = true)
         advanceUntilIdle()
-        verify(retryConnectionsAndSignalPresenceUseCase).invoke()
+        verify(retryConnectionsAndSignalPresenceUseCase).invoke(true)
     }
 
     @Test
     fun `test that subsequent calls are debounced by 500ms`() = runTest {
-        underTest.signalPresence()
+        underTest.retryConnections(signalPresence = true)
         advanceUntilIdle()
-        verify(retryConnectionsAndSignalPresenceUseCase).invoke()
-        underTest.signalPresence()
-        underTest.signalPresence()
-        underTest.signalPresence()
+        verify(retryConnectionsAndSignalPresenceUseCase).invoke(true)
+        underTest.retryConnections(signalPresence = true)
+        underTest.retryConnections(signalPresence = true)
+        underTest.retryConnections(signalPresence = true)
         advanceTimeBy(501L)
-        verify(retryConnectionsAndSignalPresenceUseCase, times(2)).invoke()
+        verify(retryConnectionsAndSignalPresenceUseCase, times(2)).invoke(true)
     }
+
+    @Test
+    fun `test that signal is sent when monitorChatSignalPresence emits and delaySignalPresence is true`() =
+        runTest {
+            whenever(retryConnectionsAndSignalPresenceUseCase(true)) doReturn true
+            underTest.retryConnections(signalPresence = true)
+            advanceUntilIdle()
+            verify(retryConnectionsAndSignalPresenceUseCase).invoke(true)
+
+            // Emit from monitorChatSignalPresenceUseCase
+            monitorChatSignalPresenceFlow.emit(Unit)
+            advanceUntilIdle()
+
+            // Should be called again because delaySignalPresence was true
+            verify(retryConnectionsAndSignalPresenceUseCase, times(2)).invoke(true)
+        }
+
+    @Test
+    fun `test that signal is not sent when monitorChatSignalPresence emits and delaySignalPresence is false`() =
+        runTest {
+            whenever(retryConnectionsAndSignalPresenceUseCase(true)) doReturn false
+            underTest.retryConnections(signalPresence = true)
+            advanceUntilIdle()
+            verify(retryConnectionsAndSignalPresenceUseCase).invoke(true)
+
+            // Emit from monitorChatSignalPresenceUseCase
+            monitorChatSignalPresenceFlow.emit(Unit)
+            advanceUntilIdle()
+
+            // Should not be called again because delaySignalPresence was false
+            verify(retryConnectionsAndSignalPresenceUseCase, times(1)).invoke(true)
+        }
+
+    @Test
+    fun `test that signalPresence calls use case with signalPresence true`() =
+        runTest {
+            underTest.signalPresence()
+            advanceUntilIdle()
+            verify(retryConnectionsAndSignalPresenceUseCase).invoke(true)
+        }
+
+    @Test
+    fun `test that retryConnections calls use case with needSignalPresence false`() =
+        runTest {
+            underTest.retryConnections(signalPresence = false)
+            advanceUntilIdle()
+            verify(retryConnectionsAndSignalPresenceUseCase).invoke(false)
+        }
+
+    @Test
+    fun `test that signalPresence passes needSignalPresence false to use case when monitorChatSignalPresence emits`() =
+        runTest {
+            whenever(retryConnectionsAndSignalPresenceUseCase(false)) doReturn true
+            underTest.retryConnections(signalPresence = false)
+            advanceUntilIdle()
+            verify(retryConnectionsAndSignalPresenceUseCase).invoke(false)
+
+            monitorChatSignalPresenceFlow.emit(Unit)
+            advanceUntilIdle()
+
+            verify(retryConnectionsAndSignalPresenceUseCase, times(2)).invoke(false)
+        }
 }

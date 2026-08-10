@@ -21,6 +21,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -53,6 +54,8 @@ internal class MoveCollidedNodeUseCaseTest {
                 underTest(
                     nodeNameCollision = mock<NodeNameCollision.Default> {
                         on { renameName } doReturn "new name"
+                        on { nodeHandle } doReturn 1L
+                        on { collisionHandle } doReturn 3L
                     },
                     rename = true
                 )
@@ -70,6 +73,8 @@ internal class MoveCollidedNodeUseCaseTest {
                 underTest(
                     nodeNameCollision = mock<NodeNameCollision.Default> {
                         on { renameName } doReturn "new name"
+                        on { nodeHandle } doReturn 1L
+                        on { collisionHandle } doReturn 3L
                     },
                     rename = true
                 )
@@ -87,6 +92,8 @@ internal class MoveCollidedNodeUseCaseTest {
                 underTest(
                     nodeNameCollision = mock<NodeNameCollision.Default> {
                         on { renameName } doReturn "new name"
+                        on { nodeHandle } doReturn 1L
+                        on { collisionHandle } doReturn 3L
                     },
                     rename = true
                 )
@@ -143,6 +150,23 @@ internal class MoveCollidedNodeUseCaseTest {
             verify(moveNodeToRubbishBinUseCase).invoke(NodeId(3L))
         }
 
+    @Test
+    fun `test that node is not moved to rubbish bin when the collision node is the node itself`() =
+        runTest {
+            val nodeNameCollision = mock<NodeNameCollision.Default> {
+                on { nodeHandle } doReturn 1L
+                on { collisionHandle } doReturn 1L
+                on { parentHandle } doReturn 2L
+                on { isFile } doReturn true
+            }
+            val result = underTest(
+                nodeNameCollision,
+                rename = false
+            )
+            assertThat(result.count).isEqualTo(1)
+            assertThat(result.errorCount).isEqualTo(0)
+            verifyNoInteractions(moveNodeToRubbishBinUseCase, moveNodeUseCase)
+        }
 
     @Test
     fun `test that return MoveRequestResult correctly when node move failed`() =

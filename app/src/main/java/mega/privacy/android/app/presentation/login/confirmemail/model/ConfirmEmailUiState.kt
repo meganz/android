@@ -18,6 +18,8 @@ import mega.privacy.android.domain.entity.ThemeMode
  * @property isAccountConfirmed True if the account has been confirmed, false otherwise.
  * @property themeMode The current theme mode.
  * @property resendSignUpLinkError [ResendSignUpLinkError].
+ * @property resendCountdownSeconds Remaining seconds before the user can resend the confirmation
+ * email again. Reflects the API's 1-minute cooldown between resend attempts.
  */
 data class ConfirmEmailUiState(
     val isLoading: Boolean = false,
@@ -30,4 +32,15 @@ data class ConfirmEmailUiState(
     val isAccountConfirmed: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.System,
     val resendSignUpLinkError: StateEventWithContent<ResendSignUpLinkError> = consumed(),
-)
+    val resendCountdownSeconds: Int = RESEND_EMAIL_COUNTDOWN_SECONDS,
+) {
+    /**
+     * Whether the user is allowed to resend the confirmation email, i.e. the cooldown elapsed.
+     */
+    val canResend: Boolean get() = resendCountdownSeconds <= 0
+}
+
+/**
+ * Duration in seconds of the resend cooldown enforced by the API between resend attempts.
+ */
+const val RESEND_EMAIL_COUNTDOWN_SECONDS = 60

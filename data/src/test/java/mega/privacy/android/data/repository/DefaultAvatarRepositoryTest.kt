@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import androidx.core.graphics.toColorInt
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
@@ -18,6 +19,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.AvatarWrapper
@@ -35,6 +37,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.util.Base64
 import kotlin.contracts.ExperimentalContracts
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -61,6 +64,7 @@ internal class DefaultAvatarRepositoryTest {
     private val sharedFlow = MutableSharedFlow<GlobalUpdate>()
     private val avatarWrapper = mock<AvatarWrapper>()
     private val bitmapFactoryWrapper = mock<BitmapFactoryWrapper>()
+    private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
 
     @Before
     fun setUp() {
@@ -73,6 +77,7 @@ internal class DefaultAvatarRepositoryTest {
             cacheGateway = cacheGateway,
             sharingScope = TestScope(),
             ioDispatcher = UnconfinedTestDispatcher(),
+            credentialsPreferencesGateway = { credentialsPreferencesGateway },
         )
     }
 
@@ -316,6 +321,49 @@ internal class DefaultAvatarRepositoryTest {
         underTest.monitorUserAvatarUpdates().test {
             assertThat(awaitItem()).isEqualTo(2L)
             awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that getAvatarSecondaryColor returns color int when getUserAvatarSecondaryColor returns hex string`() =
+        runTest {
+            val userHandle = 456L
+            val hexColor = "#FF6A19"
+            whenever(megaApiGateway.getUserAvatarSecondaryColor(userHandle)).thenReturn(hexColor)
+            val result = underTest.getAvatarSecondaryColor(userHandle)
+            assertThat(result).isEqualTo(hexColor.toColorInt())
+        }
+
+    @Test
+    fun `test that getAvatarSecondaryColor returns fallback color when getUserAvatarSecondaryColor returns null`() =
+        runTest {
+            val userHandle = 789L
+            val fallbackColor = -12345
+            whenever(megaApiGateway.getUserAvatarSecondaryColor(userHandle)).thenReturn(null)
+            whenever(avatarWrapper.getSpecificAvatarColor(any())).thenReturn(fallbackColor)
+            val result = underTest.getAvatarSecondaryColor(userHandle)
+            assertThat(result).isEqualTo(fallbackColor)
+        }
+
+    @Test
+    fun `test that getAvatarFromBase64String returns correctly`() = runTest {
+        val strings = arrayOf(
+            "data:image/jpeg;base64,_9j_4AAQSkZJRgABAQAAAQABAAD_2wBDAAgG",
+            "_9j_4AAQSkZJRgABAQAAAQABAAD-2wBDAAgG",
+            "_9j_4AAQSkZJRgABAQAAAQABAAD+2wBDAAgG",
+        )
+        val userHandle = 12345L
+        val expected = "/9j/4AAQSkZJRgABAQAAAQABAAD+2wBDAAgG"
+        val imageBytes = Base64.getDecoder().decode(expected)
+        val avatarFile = File.createTempFile(userHandle.toString(), FileConstant.JPG_EXTENSION)
+        avatarFile.writeBytes(imageBytes)
+
+        whenever(cacheGateway.buildAvatarFile(userHandle.toString() + FileConstant.JPG_EXTENSION))
+            .thenReturn(avatarFile)
+
+        strings.forEach { base64String ->
+            assertThat(underTest.getAvatarFromBase64String(userHandle, base64String))
+                .isEqualTo(avatarFile)
         }
     }
 }

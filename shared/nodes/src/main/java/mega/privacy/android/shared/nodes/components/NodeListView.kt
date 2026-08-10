@@ -1,0 +1,160 @@
+package mega.privacy.android.shared.nodes.components
+
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.nodes.components.previewdata.FolderNodePreviewDataProvider
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.text
+import mega.privacy.android.shared.nodes.selection.SelectableTypedNode
+
+/**
+ * Composable for showing a list of [NodeUiItem] in a lazy column with optional header for sort and view type
+ *
+ * @param nodeUiItemList list of [NodeUiItem] to show
+ * @param onMenuClick callback to handle menu click
+ * @param onItemClicked callback to handle item click
+ * @param onLongClick callback to handle long click
+ * @param onEnterMediaDiscoveryClick callback to handle media discovery click
+ * @param sortConfiguration the sort order of the list
+ * @param onSortOrderClick callback to handle sort order click
+ * @param onChangeViewTypeClick callback to handle change view type click
+ * @param showSortOrder whether to show change sort order button
+ * @param showLinkIcon whether to show public share link icon
+ * @param listState the state of the list
+ * @param showMediaDiscoveryButton whether to show media discovery button
+ * @param modifier
+ * @param showChangeViewType whether to show change view type button
+ * @param listContentPadding the content padding of the list/lazyColumn
+ */
+@Composable
+internal fun <T : TypedNode> NodeListView(
+    nodeUiItemList: List<SelectableTypedNode<T>>,
+    onMenuClick: (T) -> Unit,
+    onItemClicked: (T) -> Unit,
+    onLongClick: (T) -> Unit,
+    onEnterMediaDiscoveryClick: () -> Unit,
+    sortConfiguration: NodeSortConfiguration,
+    onSortOrderClick: () -> Unit,
+    onChangeViewTypeClick: () -> Unit,
+    showSortOrder: Boolean,
+    listState: LazyListState,
+    showMediaDiscoveryButton: Boolean,
+    modifier: Modifier = Modifier,
+    isNextPageLoading: Boolean = false,
+    highlightText: String = "",
+    showLinkIcon: Boolean = true,
+    showChangeViewType: Boolean = true,
+    listContentPadding: PaddingValues = PaddingValues(0.dp),
+    inSelectionMode: Boolean = false,
+    bannerHeader: (@Composable () -> Unit)? = null,
+) {
+    FastScrollLazyColumn(
+        state = listState,
+        totalItems = nodeUiItemList.size,
+        modifier = modifier.semantics { testTagsAsResourceId = true },
+        contentPadding = listContentPadding
+    ) {
+        if (showSortOrder || showChangeViewType) {
+            if (bannerHeader != null) {
+                item(key = "bannerHeader") {
+                    bannerHeader()
+                }
+            }
+            item(key = "header") {
+                NodeHeaderItem(
+                    modifier = Modifier
+                        .padding(horizontal = DSTokens.spacings.s3)
+                        .padding(bottom = DSTokens.spacings.s3),
+                    onSortOrderClick = onSortOrderClick,
+                    onChangeViewTypeClick = onChangeViewTypeClick,
+                    onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                    sortConfiguration = sortConfiguration,
+                    isListView = true,
+                    showSortOrder = showSortOrder,
+                    showChangeViewType = showChangeViewType,
+                    showMediaDiscoveryButton = showMediaDiscoveryButton,
+                )
+            }
+        }
+
+        items(
+            count = nodeUiItemList.size,
+            key = {
+                nodeUiItemList[it].id.longValue
+            }
+        ) {
+            val nodeUiItem = nodeUiItemList[it]
+            NodeListViewItem(
+                title = nodeUiItem.title.text,
+                subtitle = nodeUiItem.subtitle.text(),
+                icon = nodeUiItem.iconRes,
+                modifier = Modifier,
+                description = nodeUiItem.formattedDescription?.text,
+                tags = nodeUiItem.tags,
+                thumbnailData = nodeUiItem.thumbnailData,
+                accessPermissionIcon = nodeUiItem.accessPermissionIcon,
+                highlightText = highlightText,
+                showOffline = nodeUiItem.isAvailableOffline,
+                showVersion = nodeUiItem.hasVersion,
+                isSelected = nodeUiItem.isSelected,
+                isInSelectionMode = inSelectionMode,
+                showIsVerified = nodeUiItem.showIsVerified,
+                isTakenDown = nodeUiItem.isTakenDown,
+                label = nodeUiItem.nodeLabel,
+                showLink = nodeUiItem.showLink,
+                showFavourite = nodeUiItem.showFavourite,
+                isSensitive = nodeUiItem.isSensitive,
+                showBlurEffect = nodeUiItem.showBlurEffect,
+                isHighlighted = nodeUiItem.isHighlighted,
+                onMoreClicked = { onMenuClick(nodeUiItem.node) },
+                onItemClicked = { onItemClicked(nodeUiItem.node) },
+                onLongClicked = { onLongClick(nodeUiItem.node) },
+            )
+        }
+
+        if (isNextPageLoading) {
+            items(count = 5, key = { "loading_$it" }) {
+                NodeListViewItemSkeleton()
+            }
+        }
+    }
+}
+
+
+@CombinedThemePreviews
+@Composable
+private fun NodeListViewPreview(
+    @PreviewParameter(FolderNodePreviewDataProvider::class) items: List<SelectableTypedNode<TypedFolderNode>>,
+) {
+    AndroidThemeForPreviews {
+        NodeListView(
+            nodeUiItemList = items,
+            onMenuClick = {},
+            onItemClicked = {},
+            onLongClick = {},
+            onEnterMediaDiscoveryClick = {},
+            sortConfiguration = NodeSortConfiguration.default,
+            onSortOrderClick = {},
+            onChangeViewTypeClick = {},
+            showSortOrder = true,
+            listState = LazyListState(),
+            showMediaDiscoveryButton = false,
+            modifier = Modifier,
+            showChangeViewType = true
+        )
+    }
+}

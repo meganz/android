@@ -172,6 +172,11 @@ internal class SyncFoldersViewModel @Inject constructor(
             }.distinctUntilChanged().collect {
                 if (it != null) {
                     Timber.d("Selected mega folder: $it")
+                    // Hide stop-backup dialog before closing the mega picker so returning from the
+                    // picker does not briefly flash the confirmation dialog.
+                    _uiState.update { state ->
+                        state.copy(showConfirmRemoveSyncFolderDialog = false)
+                    }
                     handleAction(
                         SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(
                             StopBackupOption.MOVE,
@@ -204,7 +209,9 @@ internal class SyncFoldersViewModel @Inject constructor(
         monitorSyncsUseCase()
             .map(syncUiItemMapper::invoke)
             .distinctUntilChanged(),
-        monitorStalledIssuesUseCase().distinctUntilChanged()
+        monitorStalledIssuesUseCase()
+            .onStart { emit(emptyList()) }
+            .distinctUntilChanged()
     ) { syncs, stalledIssues ->
         val syncUiItems = syncs.map { sync ->
             val folderInfo = getCompleteFolderInfoUseCase(sync.megaStorageNodeId)
@@ -425,10 +432,20 @@ internal class SyncFoldersViewModel @Inject constructor(
                 dismissConfirmRemoveSyncFolderDialog()
             }
 
+            is SyncFoldersAction.OnStopBackupMoveDestinationSelectionStarted -> {
+                // Hide the dialog without clearing syncUiItemToRemove, which is still needed to
+                // complete the move once a destination is selected. See AND-22622.
+                _uiState.update { it.copy(showConfirmRemoveSyncFolderDialog = false) }
+            }
+
             is SyncFoldersAction.PauseRunClicked -> {
                 viewModelScope.launch {
                     runCatching {
-                        if (action.syncUiItem.status != SyncStatus.PAUSED) {
+                        if (action.syncUiItem.status in arrayOf(
+                                SyncStatus.SYNCING,
+                                SyncStatus.SYNCED,
+                            )
+                        ) {
                             pauseSyncUseCase(action.syncUiItem.id)
                             setUserPausedSyncsUseCase(action.syncUiItem.id, true)
                         } else {

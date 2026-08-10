@@ -2,17 +2,22 @@ package mega.privacy.android.app.presentation.apiserver
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.apiserver.ApiServerViewModel
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.apiserver.ApiServer
 import mega.privacy.android.domain.usecase.apiserver.GetCurrentApiServerUseCase
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
@@ -23,7 +28,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
-@ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ApiServerViewModelTest {
@@ -32,10 +36,18 @@ class ApiServerViewModelTest {
 
     private val getCurrentApiServerUseCase = mock<GetCurrentApiServerUseCase>()
     private val updateApiServerUseCase = mock<UpdateApiServerUseCase>()
+    private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
+    private val applicationScope: CoroutineScope = CoroutineScope(testDispatcher)
 
     @BeforeAll
     fun setup() {
+        Dispatchers.setMain(testDispatcher)
         initTestClass()
+    }
+
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @BeforeEach
@@ -49,20 +61,8 @@ class ApiServerViewModelTest {
         apiServer: ApiServer,
     ) = runTest {
         whenever(getCurrentApiServerUseCase()).thenReturn(apiServer)
-        initTestClass()
         underTest.state.test {
             Truth.assertThat(awaitItem().currentApiServer).isEqualTo(apiServer)
-        }
-    }
-
-    @ParameterizedTest(name = " with {0}")
-    @EnumSource(ApiServer::class)
-    fun `test that new api server is updated`(newApiServer: ApiServer) = runTest {
-        with(underTest) {
-            updateNewApiServer(newApiServer)
-            state.test {
-                Truth.assertThat(awaitItem().newApiServer).isEqualTo(newApiServer)
-            }
         }
     }
 
@@ -74,10 +74,15 @@ class ApiServerViewModelTest {
     ) = runTest {
         whenever(getCurrentApiServerUseCase()).thenReturn(currentApiServer)
         whenever(updateApiServerUseCase(currentApiServer, newApiServer)).thenReturn(Unit)
-        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().currentApiServer).isEqualTo(currentApiServer)
+        }
         with(underTest) {
             updateNewApiServer(newApiServer)
             confirmUpdateApiServer()
+        }
+        underTest.state.test {
+            assertThat(awaitItem().newApiServer).isEqualTo(newApiServer)
         }
         verify(updateApiServerUseCase).invoke(currentApiServer, newApiServer)
     }
@@ -105,6 +110,7 @@ class ApiServerViewModelTest {
         underTest = ApiServerViewModel(
             getCurrentApiServerUseCase = getCurrentApiServerUseCase,
             updateApiServerUseCase = updateApiServerUseCase,
+            applicationScope = applicationScope,
         )
     }
 }

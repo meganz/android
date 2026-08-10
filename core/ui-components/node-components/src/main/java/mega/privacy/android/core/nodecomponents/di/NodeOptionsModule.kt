@@ -2,18 +2,32 @@ package mega.privacy.android.core.nodecomponents.di
 
 import dagger.Binds
 import dagger.Module
-import dagger.multibindings.IntoSet
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 import mega.privacy.android.core.nodecomponents.menu.provider.BackupsMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.ChatMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.CloudDriveMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.FavouritesMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.FileLinkMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.FolderLinkMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.IncomingSharesMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.LinksMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.NodeMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.OfflineMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.OutgoingSharesMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.RecentsBucketMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.RubbishBinMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.TimelineMenuOptionProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerDefaultMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerImageViewerMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerVersionsMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerZipFileMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlaylistOptionProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.VideoRecentlyWatchedOptionProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.VideosMenuOptionProvider
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistryImpl
-import mega.privacy.android.core.nodecomponents.menu.provider.OutgoingSharesMenuOptionsProvider
-import mega.privacy.android.core.nodecomponents.menu.provider.RubbishBinMenuOptionsProvider
 
 /**
  * Hilt module that binds all NodeOptionsProvider implementations and the registry.
@@ -33,6 +47,18 @@ abstract class NodeOptionsModule {
     @IntoSet
     abstract fun bindCloudDriveOptionsProvider(
         cloudDriveOptionsProvider: CloudDriveMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindFavouritesOptionsProvider(
+        optionsProvider: FavouritesMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindRecentsBucketOptionsProvider(
+        optionsProvider: RecentsBucketMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 
     @Binds
@@ -63,5 +89,77 @@ abstract class NodeOptionsModule {
     @IntoSet
     abstract fun bindBackupsOptionsProvider(
         backupsOptionsProvider: BackupsMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindVideosOptionsProvider(
+        videosMenuOptionProvider: VideosMenuOptionProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindTimelineOptionsProvider(
+        timelineOptionsProvider: TimelineMenuOptionProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindVideoPlaylistOptionsProvider(
+        videoPlaylistOptionProvider: VideoPlaylistOptionProvider
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindVideoRecentlyWatchedOptionsProvider(
+        videoRecentlyWatchedOptionProvider: VideoRecentlyWatchedOptionProvider
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindFolderLinkOptionsProvider(
+        provider: FolderLinkMenuOptionsProvider
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindFileLinkOptionsProvider(
+        provider: FileLinkMenuOptionsProvider
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindOfflineOptionsProvider(
+        provider: OfflineMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindChatOptionsProvider(
+        provider: ChatMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindVideoPlayerDefaultOptionsProvider(
+        provider: MediaPlayerDefaultMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindVideoPlayerVersionsOptionsProvider(
+        provider: MediaPlayerVersionsMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindVideoPlayerImageViewerOptionsProvider(
+        provider: MediaPlayerImageViewerMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindVideoPlayerZipFileOptionsProvider(
+        provider: MediaPlayerZipFileMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 }

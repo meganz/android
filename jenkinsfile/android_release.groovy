@@ -41,7 +41,7 @@ pipeline {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '1'))
-        timeout(time: 2, unit: 'HOURS')
+        timeout(time: 1, unit: 'HOURS')
         gitLabConnection('GitLabConnection')
     }
     environment {
@@ -58,8 +58,6 @@ pipeline {
 
         // CD pipeline uses this environment variable to assign version code
         APK_VERSION_CODE_FOR_CD = "${new Date().format('yyDDDHHmm', TimeZone.getTimeZone("GMT"))}"
-
-        BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }
     post {
         failure {
@@ -190,16 +188,21 @@ pipeline {
                 }
             }
         }
-        stage('Clone transifex') {
+        stage('Clone weblate') {
             when {
                 expression { triggeredByDeliverAppStore() || triggeredByDeleteOldString() || triggeredByPostRelease() }
             }
             steps {
                 script {
-                    BUILD_STEP = 'Clone transifex'
-                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
+                    BUILD_STEP = 'Clone weblate'
+
+                    withCredentials([
+                            gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default'),
+                            file(credentialsId: 'ANDROID_WEBLATE_TRANSLATE_JSON_FILE', variable: 'ANDROID_WEBLATE_TRANSLATE_JSON_FILE'),
+                    ]) {
                         sh """
                             git clone https://code.developers.mega.co.nz/mobile/android/transifex.git
+                            cp -fv ${ANDROID_WEBLATE_TRANSLATE_JSON_FILE} transifex/weblate/translate.json
                         """
                     }
                 }
@@ -252,14 +255,10 @@ pipeline {
                 }
 
                 withCredentials([
-                        file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG'),
                         file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE')
                 ]) {
                     script {
                         println("applying production google map api config... ")
-                        sh 'mkdir -p app/src/debug/res/values'
-                        sh 'mkdir -p app/src/release/res/values'
-                        sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_DEBUG} app/src/debug/res/values/google_maps_api.xml"
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_RELEASE} app/src/release/res/values/google_maps_api.xml"
                     }
                 }
@@ -409,32 +408,6 @@ pipeline {
             }
         }
 
-        stage('Delete old strings') {
-            when {
-                expression { triggeredByDeleteOldString() }
-            }
-            steps {
-                script {
-                    withCredentials([
-                            string(credentialsId: 'ANDROID_TRANSIFEX_BOT_TOKEN', variable: 'TRANSIFEX_BOT_TOKEN'),
-                            string(credentialsId: 'ANDROID_TRANSIFEX_BOT_URL', variable: 'TRANSIFEX_BOT_URL'),
-                            string(credentialsId: 'ANDROID_TRANSIFEX_TOKEN', variable: 'ANDROID_TRANSIFEX_TOKEN'),
-                            gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')
-                    ]) {
-                        withEnv([
-                                "TRANSIFEX_BOT_TOKEN=${TRANSIFEX_BOT_TOKEN}",
-                                "TRANSIFEX_BOT_URL=${TRANSIFEX_BOT_URL}",
-                                "TRANSIFEX_TOKEN=${ANDROID_TRANSIFEX_TOKEN}"
-                        ]) {
-                            sh 'echo $TRANSIFEX_BOT_TOKEN'
-                            sh 'echo $TRANSIFEX_BOT_URL'
-                            sh './gradlew --no-daemon deleteOldStrings'
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Deploy to Google Play Alpha') {
             when {
                 expression { triggeredByDeliverAppStore() }
@@ -445,7 +418,6 @@ pipeline {
                 }
                 script {
                     withCredentials([
-                            string(credentialsId: 'ANDROID_TRANSIFIX_AUTHORIZATION_TOKEN', variable: 'TRANSIFEX_TOKEN'),
                             gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')
                     ]) {
                         sh './gradlew --no-daemon readReleaseNotes'
@@ -461,7 +433,7 @@ pipeline {
                             filesPattern: 'archive/*-gms-release.aab',
                             trackName: 'alpha',
                             rolloutPercentage: rolloutPercentage,
-                            additionalVersionCodes: '233140859',
+                            additionalVersionCodes: '233140859,253240834',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOLS_FILE}",
                             recentChangeList: common.getRecentChangeList(RELEASE_NOTES_CONTENT),
                             releaseName: common.readAppVersion1()
@@ -547,7 +519,6 @@ pipeline {
                     def appGitHash = content[1]
 
                     withCredentials([
-                            string(credentialsId: 'ANDROID_TRANSIFIX_AUTHORIZATION_TOKEN', variable: 'TRANSIFEX_TOKEN'),
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
                             string(credentialsId: 'GITLAB_API_BASE_URL', variable: 'GITLAB_API_BASE_URL'),
                             string(credentialsId: 'GITLAB_PERSONAL_ACCESS_TOKEN_TEXT', variable: 'GITLAB_PERSONAL_ACCESS_TOKEN_TEXT'),

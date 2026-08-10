@@ -18,13 +18,15 @@ class RetryConnectionsAndSignalPresenceUseCase @Inject constructor(
     /**
      * Invocation method.
      *
-     * @return True if successfully signal the presence to the SDK, false otherwise
+     * @param needSignalPresence Whether to signal presence activity when presenceConfig is available.
+     *                           Pass false to skip signaling (e.g. in MeetingActivity).
+     * @return True if presenceConfig is available and not pending, false otherwise
      */
-    suspend operator fun invoke(): Boolean {
+    suspend operator fun invoke(needSignalPresence: Boolean = true): Boolean {
         retryPendingConnectionsUseCase(disconnect = false)
         val chatPresenceConfig = chatRepository.getChatPresenceConfig()
         return if (chatPresenceConfig != null && !chatPresenceConfig.isPending) {
-            chatRepository.signalPresenceActivity()
+            if (needSignalPresence) chatRepository.signalPresenceActivity()
             true
         } else false
     }

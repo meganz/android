@@ -32,7 +32,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property askForDecryptionKeyDialogEvent  Event to show AskForDecryptionDialog
  * @property collisionsEvent            Event with list of nodes with existing names
  * @property copyResultEvent            Event to show on successful copy text or error
- * @property showLoginEvent             Event to show login screen
  * @property finishActivityEvent        Event to finish the activity
  * @property openFile                   State to handle file opening
  * @property openFileNodeEvent          State to handle open a file node
@@ -65,7 +64,6 @@ data class FolderLinkState(
     @StringRes val snackBarMessage: Int = -1,
     val moreOptionNode: NodeUIItem<TypedNode>? = null,
     val storageStatusDialogState: StorageStatusDialogState? = null,
-    val showLoginEvent: StateEvent = consumed,
     val finishActivityEvent: StateEvent = consumed,
     val askForDecryptionKeyDialogEvent: StateEvent = consumed,
     val selectImportLocation: StateEvent = consumed,

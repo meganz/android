@@ -14,18 +14,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.presentation.transfers.transferoverquota.TransferOverQuotaViewModel
 import mega.privacy.android.app.presentation.transfers.transferoverquota.model.TransferOverQuotaViewState
-import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
-import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
@@ -47,10 +46,14 @@ internal fun TransferOverQuotaDialog(
             context.megaNavigator.openUpgradeAccount(context)
         },
         navigateToLogin = {
-            Intent(context, LoginActivity::class.java).apply {
-                putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            }.also { intent -> context.startActivity(intent) }
+            context.startActivity(
+                MegaActivity.getIntentWithExtraDestinations(
+                    context,
+                    listOf(LoginNavKey())
+                ).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                }
+            )
         },
         onDismiss = viewModel::bandwidthOverQuotaDelayConsumed,
         modifier = modifier
@@ -123,7 +126,7 @@ internal fun TransferOverQuotaDialogContent(
                 else -> sharedR.string.login_text
             }
         ),
-        cancelButtonText = stringResource(R.string.general_dismiss),
+        cancelButtonText = stringResource(sharedR.string.general_dismiss_dialog),
         onConfirm = {
             if (isLoggedIn) {
                 Analytics.tracker.trackEvent(TransferOverQuotaUpgradeAccountButtonEvent)

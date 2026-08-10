@@ -1,0 +1,667 @@
+package mega.privacy.mobile.home.presentation.continuewhereleftoff
+
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
+import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.triggered
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffResult
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.node.GetCurrentVersionNodeUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.ClearRecentlyUsedItemsUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffSortPreferenceUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SetContinueWhereLeftOffSortUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+
+@ExtendWith(CoroutineMainDispatcherExtension::class)
+class ContinueWhereLeftOffListViewModelTest {
+
+    private lateinit var underTest: ContinueWhereLeftOffListViewModel
+
+    private val monitorContinueWhereLeftOffItemsUseCase =
+        mock<MonitorContinueWhereLeftOffItemsUseCase>()
+    private val monitorContinueWhereLeftOffSortPreferenceUseCase =
+        mock<MonitorContinueWhereLeftOffSortPreferenceUseCase>()
+    private val setContinueWhereLeftOffSortUseCase =
+        mock<SetContinueWhereLeftOffSortUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val getCurrentVersionNodeUseCase = mock<GetCurrentVersionNodeUseCase>()
+    private val clearRecentlyUsedItemsUseCase = mock<ClearRecentlyUsedItemsUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+
+    private val sampleItems = listOf(
+        ContinueWhereLeftOffItem(
+            nodeHandle = 1L,
+            type = RecentlyUsedType.PDF,
+            title = "Charlie.pdf",
+            lastAccessedTimestamp = 2000L,
+        ),
+        ContinueWhereLeftOffItem(
+            nodeHandle = 2L,
+            type = RecentlyUsedType.Audio,
+            title = "Alpha.mp3",
+            lastAccessedTimestamp = 1000L,
+        ),
+        ContinueWhereLeftOffItem(
+            nodeHandle = 3L,
+            type = RecentlyUsedType.Video,
+            title = "Bravo.mp4",
+            lastAccessedTimestamp = 3000L,
+        ),
+    )
+
+    @BeforeEach
+    fun setUp() {
+        stubDefaultSortPreference()
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        underTest = ContinueWhereLeftOffListViewModel(
+            monitorContinueWhereLeftOffItemsUseCase = monitorContinueWhereLeftOffItemsUseCase,
+            monitorContinueWhereLeftOffSortPreferenceUseCase = monitorContinueWhereLeftOffSortPreferenceUseCase,
+            setContinueWhereLeftOffSortUseCase = setContinueWhereLeftOffSortUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            getCurrentVersionNodeUseCase = getCurrentVersionNodeUseCase,
+            clearRecentlyUsedItemsUseCase = clearRecentlyUsedItemsUseCase,
+            nameResolver = ContinueWhereLeftOffNameResolver(
+                getNodeByIdUseCase,
+                DurationInSecondsTextMapper(),
+                mock(),
+                mock { on { it.invoke() } doReturn true },
+            ),
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+        )
+    }
+
+    @AfterEach
+    fun tearDown() {
+        reset(
+            monitorContinueWhereLeftOffItemsUseCase,
+            monitorContinueWhereLeftOffSortPreferenceUseCase,
+            setContinueWhereLeftOffSortUseCase,
+            getNodeByIdUseCase,
+            getCurrentVersionNodeUseCase,
+            clearRecentlyUsedItemsUseCase,
+            monitorConnectivityUseCase,
+        )
+    }
+
+    @Test
+    fun `test that isLoading is initially true`() = runTest {
+        stubFakeFlow() // no emission yet → combine doesn't fire → initial value
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isLoading).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isLoading stays true until the hidden nodes state is resolved`() = runTest {
+        val items = listOf(
+            ContinueWhereLeftOffItem(
+                nodeHandle = 1L,
+                type = RecentlyUsedType.PDF,
+                title = "test.pdf",
+                lastAccessedTimestamp = 1000L,
+            )
+        )
+        val fakeFlow = stubFakeFlow()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isLoading).isTrue()
+            // Unresolved emission (hidden state not yet known) must keep loading, even though
+            // items are already available.
+            fakeFlow.emit(result(items, isHiddenResolved = false))
+            assertThat(awaitItem().isLoading).isTrue()
+            fakeFlow.emit(result(items, isHiddenResolved = true))
+            assertThat(awaitItem().isLoading).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that initial items is empty list`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().items).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that default sort is Name ascending`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.sortConfiguration.sortOption).isEqualTo(NodeSortOption.Name)
+            assertThat(state.sortConfiguration.sortDirection).isEqualTo(SortDirection.Ascending)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that sort configuration reflects timestamp descending preference`() = runTest {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Timestamp,
+            SortDirection.Descending,
+        )
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.sortConfiguration.sortOption).isEqualTo(NodeSortOption.LastAccessed)
+            assertThat(state.sortConfiguration.sortDirection).isEqualTo(SortDirection.Descending)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that items keep use case order when sorting by timestamp`() = runTest {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Timestamp,
+            SortDirection.Descending,
+        )
+        stubItems(sampleItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.items.map { it.nodeHandle })
+                .containsExactly(1L, 2L, 3L).inOrder()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that items are sorted by title ascending when sorting by name`() = runTest {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Ascending,
+        )
+        stubItems(sampleItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            // Alpha.mp3 (2L), Bravo.mp4 (3L), Charlie.pdf (1L)
+            assertThat(state.items.map { it.nodeHandle })
+                .containsExactly(2L, 3L, 1L).inOrder()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that items are sorted by title descending when sorting by name`() = runTest {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Descending,
+        )
+        stubItems(sampleItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            // Charlie.pdf (1L), Bravo.mp4 (3L), Alpha.mp3 (2L)
+            assertThat(state.items.map { it.nodeHandle })
+                .containsExactly(1L, 3L, 2L).inOrder()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that name sort is case insensitive`() = runTest {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Ascending,
+        )
+        stubItems(
+            listOf(
+                ContinueWhereLeftOffItem(
+                    nodeHandle = 1L,
+                    type = RecentlyUsedType.PDF,
+                    title = "banana.pdf",
+                    lastAccessedTimestamp = 1000L,
+                ),
+                ContinueWhereLeftOffItem(
+                    nodeHandle = 2L,
+                    type = RecentlyUsedType.Audio,
+                    title = "Apple.mp3",
+                    lastAccessedTimestamp = 2000L,
+                ),
+            )
+        )
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            // Apple.mp3 (2L) before banana.pdf (1L) — case-insensitive
+            assertThat(state.items.map { it.nodeHandle })
+                .containsExactly(2L, 1L).inOrder()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that name sort uses node name resolved from blank title`() = runTest {
+        val items = listOf(
+            ContinueWhereLeftOffItem(
+                nodeHandle = 1L,
+                type = RecentlyUsedType.PDF,
+                title = "Zebra.pdf",
+                lastAccessedTimestamp = 1000L,
+            ),
+            ContinueWhereLeftOffItem(
+                nodeHandle = 2L,
+                type = RecentlyUsedType.Audio,
+                title = "",
+                lastAccessedTimestamp = 2000L,
+            ),
+        )
+        val typedNode = mock<TypedFileNode> {
+            on { name }.thenReturn("Apple.mp3")
+        }
+        whenever(getNodeByIdUseCase(NodeId(2L))).thenReturn(typedNode)
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Ascending,
+        )
+        stubItems(items)
+
+        underTest.uiState.test {
+            // UnconfinedTestDispatcher resolves the blank name synchronously, so the
+            // re-emitted list is sorted by the resolved node name (Apple.mp3 before Zebra.pdf).
+            val state = expectMostRecentItem()
+            assertThat(state.items.map { it.title })
+                .containsExactly("Apple.mp3", "Zebra.pdf").inOrder()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that items use case is called with list limit`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            awaitItem()
+            verify(monitorContinueWhereLeftOffItemsUseCase).invoke(
+                limit = eq(50),
+                sortField = isNull(),
+                sortDirection = isNull(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that updateSortConfiguration persists LastAccessed descending via use case`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            awaitItem() // initial
+            underTest.updateSortConfiguration(
+                NodeSortConfiguration(NodeSortOption.LastAccessed, SortDirection.Descending)
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(setContinueWhereLeftOffSortUseCase).invoke(
+            ContinueWhereLeftOffSortField.Timestamp,
+            SortDirection.Descending,
+        )
+    }
+
+    @Test
+    fun `test that updateSortConfiguration persists Name descending via use case`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            awaitItem() // initial
+            underTest.updateSortConfiguration(
+                NodeSortConfiguration(NodeSortOption.Name, SortDirection.Descending)
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(setContinueWhereLeftOffSortUseCase).invoke(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Descending,
+        )
+    }
+
+    @Test
+    fun `test that updateSortConfiguration dismisses sort sheet`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            awaitItem() // initial
+            underTest.showSortSheet()
+            assertThat(awaitItem().showSortSheet).isTrue()
+            underTest.updateSortConfiguration(
+                NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
+            )
+            assertThat(awaitItem().showSortSheet).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that clearAll calls ClearRecentlyUsedItemsUseCase`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            awaitItem() // triggers lazy init
+            underTest.clearAll()
+            verify(clearRecentlyUsedItemsUseCase).invoke()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that clearAll triggers clearHistoryCompletedEvent when clearing succeeds`() =
+        runTest {
+            stubEmptyItems()
+
+            underTest.uiState.test {
+                awaitItem() // initial
+                underTest.clearAll()
+                assertThat(awaitItem().clearHistoryCompletedEvent).isEqualTo(triggered)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that clearAll does not dismiss the options sheet`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            awaitItem() // initial
+            underTest.showOptionsSheet()
+            assertThat(awaitItem().showOptionsSheet).isTrue()
+            underTest.clearAll()
+            // The screen dismisses the sheet before showing the confirmation dialog,
+            // so clearAll() must not touch showOptionsSheet.
+            assertThat(awaitItem().clearHistoryCompletedEvent).isEqualTo(triggered)
+            assertThat(underTest.uiState.value.showOptionsSheet).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that default view type is LIST`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.LIST)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onChangeViewTypeClicked toggles from LIST to GRID`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.LIST)
+            underTest.onChangeViewTypeClicked()
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.GRID)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onChangeViewTypeClicked toggles from GRID back to LIST`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.LIST)
+            underTest.onChangeViewTypeClicked()
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.GRID)
+            underTest.onChangeViewTypeClicked()
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.LIST)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that blank title is resolved from node when available`() = runTest {
+        val items = listOf(
+            ContinueWhereLeftOffItem(
+                nodeHandle = 10L,
+                type = RecentlyUsedType.PDF,
+                title = "",
+                lastAccessedTimestamp = 1000L,
+            )
+        )
+        val typedNode = mock<TypedFileNode> {
+            on { name }.thenReturn("actual_name.pdf")
+        }
+        whenever(getNodeByIdUseCase(NodeId(10L))).thenReturn(typedNode)
+        stubItems(items)
+
+        underTest.uiState.test {
+            // UnconfinedTestDispatcher resolves synchronously
+            val state = awaitItem()
+            assertThat(state.items).hasSize(1)
+            assertThat(state.items[0].title).isEqualTo("actual_name.pdf")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that non-blank title is not resolved from node`() = runTest {
+        val items = listOf(
+            ContinueWhereLeftOffItem(
+                nodeHandle = 20L,
+                type = RecentlyUsedType.Video,
+                title = "stored_name.mp4",
+                lastAccessedTimestamp = 2000L,
+            )
+        )
+        stubItems(items)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.items).hasSize(1)
+            assertThat(state.items[0].title).isEqualTo("stored_name.mp4")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that resolved name is cached and not fetched again`() = runTest {
+        val fakeFlow = stubFakeFlow()
+        val items = listOf(
+            ContinueWhereLeftOffItem(
+                nodeHandle = 30L,
+                type = RecentlyUsedType.PDF,
+                title = "",
+                lastAccessedTimestamp = 1000L,
+            )
+        )
+        val typedNode = mock<TypedFileNode> {
+            on { name }.thenReturn("resolved.pdf")
+        }
+        whenever(getNodeByIdUseCase(NodeId(30L))).thenReturn(typedNode)
+
+        underTest.uiState.test {
+            awaitItem() // initial
+            fakeFlow.emit(result(items))
+            awaitItem() // blank name (first transformLatest emit)
+            assertThat(awaitItem().items[0].title).isEqualTo("resolved.pdf")
+            fakeFlow.emit(result(listOf(items[0].copy(lastAccessedTimestamp = 2000L))))
+            // cached name applied immediately in first transformLatest emit
+            assertThat(awaitItem().items[0].title).isEqualTo("resolved.pdf")
+            verify(getNodeByIdUseCase, times(1)).invoke(NodeId(30L))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onItemClicked triggers openNodeEvent when node is resolved`() = runTest {
+        stubEmptyItems()
+        val nodeHandle = 123L
+        val expectedNode = mock<TypedFileNode>()
+        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(expectedNode)
+
+        underTest.uiState.test {
+            awaitItem() // initial
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.Video)
+            val state = awaitItem()
+            assertThat(state.openNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((state.openNodeEvent as StateEventWithContentTriggered).content)
+                .isEqualTo(expectedNode)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onItemClicked resolves current version when item is a text editor`() = runTest {
+        stubEmptyItems()
+        val nodeHandle = 123L
+        val currentVersion = mock<TypedFileNode>()
+        whenever(getCurrentVersionNodeUseCase(NodeId(nodeHandle))).thenReturn(currentVersion)
+
+        underTest.uiState.test {
+            awaitItem() // initial
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.TextEditor)
+            val state = awaitItem()
+            assertThat(state.openNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((state.openNodeEvent as StateEventWithContentTriggered).content)
+                .isEqualTo(currentVersion)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(getCurrentVersionNodeUseCase).invoke(NodeId(nodeHandle))
+    }
+
+    @Test
+    fun `test that onItemClicked does not trigger event when use case throws`() = runTest {
+        stubEmptyItems()
+        val nodeHandle = 456L
+        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenThrow(RuntimeException("Not found"))
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.Video)
+            assertThat(state.openNodeEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onOpenNodeEventConsumed resets the event`() = runTest {
+        stubEmptyItems()
+        val nodeHandle = 123L
+        val expectedNode = mock<TypedFileNode>()
+        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(expectedNode)
+
+        underTest.uiState.test {
+            awaitItem() // initial
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.Video)
+            awaitItem() // triggered
+            underTest.onOpenNodeEventConsumed()
+            val state = awaitItem()
+            assertThat(state.openNodeEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isConnected is true when online`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
+            assertThat(state.isConnected).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isConnected is false when offline`() = runTest {
+        stubEmptyItems()
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))
+
+        underTest.uiState.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
+            assertThat(state.isConnected).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun stubDefaultSortPreference() {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Ascending,
+        )
+    }
+
+    private fun stubSortPreference(
+        sortField: ContinueWhereLeftOffSortField,
+        sortDirection: SortDirection,
+    ) {
+        whenever(monitorContinueWhereLeftOffSortPreferenceUseCase())
+            .thenReturn(flowOf(sortField to sortDirection))
+    }
+
+    private fun stubEmptyItems() {
+        whenever(
+            monitorContinueWhereLeftOffItemsUseCase(any(), anyOrNull(), anyOrNull())
+        ) doReturn flow {
+            emit(result(emptyList()))
+            awaitCancellation()
+        }
+    }
+
+    private fun stubItems(items: List<ContinueWhereLeftOffItem>) {
+        whenever(
+            monitorContinueWhereLeftOffItemsUseCase(any(), anyOrNull(), anyOrNull())
+        ) doReturn flow {
+            emit(result(items))
+            awaitCancellation()
+        }
+    }
+
+    private fun stubFakeFlow(): MutableSharedFlow<ContinueWhereLeftOffResult> {
+        val fakeFlow = MutableSharedFlow<ContinueWhereLeftOffResult>()
+        whenever(
+            monitorContinueWhereLeftOffItemsUseCase(any(), anyOrNull(), anyOrNull())
+        ) doReturn fakeFlow
+        return fakeFlow
+    }
+
+    private fun result(
+        items: List<ContinueWhereLeftOffItem>,
+        isHiddenResolved: Boolean = true,
+    ) = ContinueWhereLeftOffResult(items = items, isHiddenResolved = isHiddenResolved)
+}

@@ -1,46 +1,48 @@
 package mega.privacy.android.app.nav
 
+import android.app.Activity
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.net.Uri
-import android.os.Bundle
+import android.os.Parcelable
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.core.net.toUri
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.activities.OfflineFileInfoActivity
-import mega.privacy.android.app.constants.IntentConstants
+import kotlinx.coroutines.withContext
+import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.getLink.GetLinkActivity
-import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
-import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
+import mega.privacy.android.app.mediaplayer.Nav3AudioPlayerRouteLauncher
+import mega.privacy.android.app.presentation.contact.AddContactToShareComposeActivity
+import mega.privacy.android.app.presentation.contact.AddContactsComposeActivity
+import mega.privacy.android.app.presentation.contact.AddParticipantsComposeActivity
+import mega.privacy.android.app.presentation.contact.CreateGroupChatComposeActivity
+import mega.privacy.android.app.presentation.contact.NewChatComposeActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
-import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
-import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
-import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
-import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
+import mega.privacy.android.app.presentation.meeting.chat.ChatActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
-import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
-import mega.privacy.android.app.presentation.search.SearchActivity
-import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
+import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
@@ -48,32 +50,31 @@ import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_DEVICE_CENTER
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_SYNC_MEGA_FOLDER
+import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH
+import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
+import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
+import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_APP
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MAX_USER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
-import mega.privacy.android.app.utils.Constants.NODE_HANDLES
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
+import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -83,20 +84,50 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
-import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity
+import mega.privacy.android.feature.payment.presentation.cancelaccountplan.CancelAccountPlanActivity
+import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountActivity
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.AchievementNavKey
+import mega.privacy.android.navigation.destination.AuthenticityCredentialsNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.ContactAttachmentNavKey
+import mega.privacy.android.navigation.destination.ContactInfoNavKey
+import mega.privacy.android.navigation.destination.DeviceCenterNavKey
+import mega.privacy.android.navigation.destination.FileContactInfoNavKey
+import mega.privacy.android.navigation.destination.FileInfoNavKey
+import mega.privacy.android.navigation.destination.GetLinkNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.navigation.destination.InviteContactNavKey
+import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
+import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
+import mega.privacy.android.navigation.destination.MyAccountNavKey
+import mega.privacy.android.navigation.destination.OfflineInfoNavKey
+import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
+import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
+import mega.privacy.android.navigation.destination.SyncListNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.settings.SettingsNavigator
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -113,11 +144,80 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val settingsNavigator: SettingsNavigatorImpl,
     private val getDomainNameUseCase: GetDomainNameUseCase,
+    private val mediaPlayerIntentMapper: MediaPlayerIntentMapper,
+    private val nav3VideoPlayerRouteLauncher: Nav3VideoPlayerRouteLauncher,
+    private val nav3AudioPlayerRouteLauncher: Nav3AudioPlayerRouteLauncher,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val navigationQueue: NavigationEventQueue,
+    private val activityLifecycleHandler: ActivityLifecycleHandler,
+    private val snackbarEventQueue: SnackbarEventQueue,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : MegaNavigator,
     AppNavigatorImpl, SettingsNavigator by settingsNavigator {
 
+    private fun navigateForSingleActivity(
+        context: Context,
+        singleActivityDestination: NavKey?,
+        singleActivityMessage: String? = null,
+    ) = navigateForSingleActivity(
+        context = context,
+        singleActivityDestinations = listOfNotNull(singleActivityDestination),
+        singleActivityMessage = singleActivityMessage,
+    )
+
+    private fun navigateForSingleActivity(
+        context: Context,
+        singleActivityDestinations: List<NavKey>,
+        singleActivityMessage: String? = null,
+    ) {
+        applicationScope.launch {
+            withContext(mainDispatcher) {
+                launchMegaActivityIfNeeded(context)
+                singleActivityDestinations.takeIf { it.isNotEmpty() }?.let {
+                    navigationQueue.emit(it)
+                }
+                singleActivityMessage?.let {
+                    snackbarEventQueue.queueMessage(singleActivityMessage)
+                }
+            }
+        }
+    }
+
+    /**
+     * Only use navKey if current activity is MegaActivity
+     * Otherwise, use legacy navigation
+     */
+    private fun navigateIfInSingleActivity(
+        singleActivityDestination: NavKey?,
+        legacyNavigation: suspend () -> Unit,
+    ) {
+        applicationScope.launch {
+            val isMegaActivity =
+                activityLifecycleHandler.getCurrentActivity() is MegaActivity
+            if (isMegaActivity) {
+                singleActivityDestination?.let { navigationQueue.emit(it) }
+            } else {
+                legacyNavigation()
+            }
+        }
+    }
+
+    override fun launchMegaActivityIfNeeded(context: Context) {
+        val isMegaActivity =
+            activityLifecycleHandler.getCurrentActivity() is MegaActivity
+        if (!isMegaActivity) {
+            context.startActivity(
+                Intent(context, MegaActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or FLAG_ACTIVITY_CLEAR_TOP)
+                }
+            )
+        }
+    }
+
     override fun openSettingsCameraUploads(context: Context) {
-        context.startActivity(Intent(context, SettingsCameraUploadsActivity::class.java))
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = SettingsCameraUploadsNavKey
+        )
     }
 
     override fun openChat(
@@ -130,23 +230,58 @@ internal class MegaNavigatorImpl @Inject constructor(
         isOverQuota: Int?,
         flags: Int,
     ) {
-        val intent = getChatActivityIntent(
-            context = context,
-            action = action,
-            link = link,
-            text = text,
-            chatId = chatId,
-            messageId = messageId,
-            isOverQuota = isOverQuota,
-            flags = flags
-        )
-        context.startActivity(intent)
+        navigateIfInSingleActivity(
+            singleActivityDestination = ChatNavKey(
+                chatId = chatId,
+                action = action,
+                link = link,
+                snackbarText = text,
+                messageId = messageId,
+                isOverQuota = isOverQuota,
+            )
+        ) {
+            val intent = getChatActivityIntent(
+                context = context,
+                action = action,
+                link = link,
+                text = text,
+                chatId = chatId,
+                messageId = messageId,
+                isOverQuota = isOverQuota,
+                flags = flags
+            )
+            context.startActivity(intent)
+        }
     }
 
     override fun openUpgradeAccount(context: Context, source: UpgradeAccountSource) {
-        ChooseAccountActivity.navigateToUpgradeAccount(
+        navigateIfInSingleActivity(
+            singleActivityDestination = UpgradeAccountNavKey(source = source)
+        ) {
+            UpgradeAccountActivity.navigateToUpgradeAccount(
+                context = context, source = source
+            )
+        }
+    }
+
+    override fun openQuotaWarningUpsell(
+        context: Context,
+        type: QuotaWarningType,
+        trigger: QuotaWarningTrigger,
+    ) {
+        navigateForSingleActivity(
             context = context,
-            source = source
+            singleActivityDestination = QuotaWarningUpgradeNavKey(
+                type = type,
+                trigger = trigger,
+            ),
+        )
+    }
+
+    override fun navigateToCancelAccountPlan(context: Context, usedStorage: String) {
+        CancelAccountPlanActivity.navigateToCancelAccountPlan(
+            context = context,
+            usedStorage = usedStorage,
         )
     }
 
@@ -160,14 +295,17 @@ internal class MegaNavigatorImpl @Inject constructor(
         isOverQuota: Int?,
         flags: Int,
     ): Intent {
-        val intent = Intent(context, ChatHostActivity::class.java).apply {
+        val intent = Intent(context, ChatActivity::class.java).apply {
             this.action = action
             putExtra(EXTRA_ACTION, action)
             text?.let { putExtra(Constants.SHOW_SNACKBAR, text) }
-            putExtra(Constants.CHAT_ID, chatId)
-            messageId?.let { putExtra("ID_MSG", messageId) }
-            isOverQuota?.let { putExtra("IS_OVERQUOTA", isOverQuota) }
-            if (flags > 0) setFlags(flags)
+            putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
+            messageId?.let { putExtra(Constants.ID_MSG, messageId) }
+            isOverQuota?.let { putExtra(Constants.IS_OVER_QUOTA, isOverQuota) }
+            // Use setFlags for consistency with ChatHostDestination
+            if (flags > 0) {
+                setFlags(flags)
+            }
         }
         link?.let {
             intent.putExtra(EXTRA_LINK, it)
@@ -180,13 +318,13 @@ internal class MegaNavigatorImpl @Inject constructor(
         chatId: Long,
         email: String?,
     ) {
-        applicationScope.launch {
-            val intent = Intent(context, ManageChatHistoryActivity::class.java).apply {
-                putExtra(Constants.CHAT_ID, chatId)
-                email?.let { putExtra(Constants.EMAIL, it) }
-            }
-            context.startActivity(intent)
-        }
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = ManageChatHistoryNavKey(
+                chatId = chatId,
+                email = email,
+            )
+        )
     }
 
     override fun openZipBrowserActivity(
@@ -208,7 +346,9 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openInviteContactActivity(context: Context, isFromAchievement: Boolean) {
-        applicationScope.launch {
+        navigateIfInSingleActivity(
+            singleActivityDestination = InviteContactNavKey(isFromAchievement = isFromAchievement)
+        ) {
             val intent = Intent(context, InviteContactActivity::class.java).apply {
                 putExtra(InviteContactViewModel.KEY_FROM, isFromAchievement)
             }
@@ -217,10 +357,12 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openTransfers(context: Context) {
-        context.startActivity(TransfersActivity.getIntent(context))
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = TransfersNavKey()
+        )
     }
 
-    override suspend fun openMediaPlayerActivityByFileNode(
+    override fun openMediaPlayerActivityByFileNode(
         context: Context,
         contentUri: NodeContentUri,
         fileNode: TypedFileNode,
@@ -233,101 +375,81 @@ internal class MegaNavigatorImpl @Inject constructor(
         collectionTitle: String?,
         collectionId: Long?,
         enableAddToAlbum: Boolean?,
+        serializedData: String?,
+        publicLinkUrl: String?,
     ) {
-        manageMediaIntent(
-            context = context,
-            contentUri = contentUri,
-            fileTypeInfo = fileNode.type,
-            sortOrder = sortOrder,
-            viewType = viewType ?: NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
-            name = fileNode.name,
-            handle = fileNode.id.longValue,
-            parentHandle = fileNode.parentId.longValue,
-            isFolderLink = isFolderLink,
-            isMediaQueueAvailable = isMediaQueueAvailable,
-            searchedItems = searchedItems,
-            mediaQueueTitle = mediaQueueTitle,
-            collectionTitle = collectionTitle,
-            collectionId = collectionId,
-            enableAddToAlbum = enableAddToAlbum ?: run {
-                viewType in listOf(
-                    NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
-                    NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
-                )
-            },
-        )
+        val scope = (context as? LifecycleOwner)?.lifecycleScope ?: applicationScope
+        scope.launch {
+            val intent = mediaPlayerIntentMapper(
+                context = context,
+                contentUri = contentUri,
+                fileTypeInfo = fileNode.type,
+                sortOrder = sortOrder,
+                viewType = viewType ?: NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                name = fileNode.name,
+                handle = fileNode.id.longValue,
+                parentHandle = fileNode.parentId.longValue,
+                isFolderLink = isFolderLink,
+                isMediaQueueAvailable = isMediaQueueAvailable,
+                searchedItems = searchedItems,
+                mediaQueueTitle = mediaQueueTitle,
+                collectionTitle = collectionTitle,
+                collectionId = collectionId,
+                enableAddToAlbum = enableAddToAlbum ?: run {
+                    viewType in listOf(
+                        NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                        NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
+                    )
+                },
+                serializedData = serializedData,
+                publicLinkUrl = publicLinkUrl,
+            )
+            withContext(mainDispatcher) {
+                runCatching {
+                    launchMediaPlayer(context, intent)
+                }.onFailure { e ->
+                    Timber.e(e, "Exception when opening media player activity")
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.intent_not_available),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
     }
 
-    private suspend fun manageMediaIntent(
-        context: Context,
-        contentUri: NodeContentUri,
-        fileTypeInfo: FileTypeInfo,
-        sortOrder: SortOrder,
-        name: String,
-        handle: Long,
-        parentHandle: Long,
-        isFolderLink: Boolean,
-        isMediaQueueAvailable: Boolean,
-        viewType: Int? = null,
-        path: String? = null,
-        offlineParentId: Int? = null,
-        offlineParent: String? = null,
-        searchedItems: List<Long>? = null,
-        mediaQueueTitle: String? = null,
-        nodeHandles: List<Long>? = null,
-        collectionTitle: String? = null,
-        collectionId: Long? = null,
-        enableAddToAlbum: Boolean = false,
-    ) {
-        val intent = getIntent(context, fileTypeInfo).apply {
-            putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
-            putExtra(INTENT_EXTRA_KEY_PLACEHOLDER, 0)
-            putExtra(INTENT_EXTRA_KEY_FILE_NAME, name)
-            putExtra(INTENT_EXTRA_KEY_HANDLE, handle)
-            putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, isFolderLink)
-            viewType?.let {
-                putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
-            }
-            if (isMediaQueueAvailable) {
-                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentHandle)
-            }
-            putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, isMediaQueueAvailable)
-            path?.let {
-                putExtra(INTENT_EXTRA_KEY_PATH, path)
-            }
-            offlineParentId?.let {
-                putExtra(INTENT_EXTRA_KEY_PARENT_ID, it)
-            }
-            offlineParent?.let {
-                putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, offlineParent)
-            }
-            searchedItems?.let {
-                putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, it.toLongArray())
-            }
-            mediaQueueTitle?.let {
-                putExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE, it)
-            }
-            nodeHandles?.let {
-                putExtra(NODE_HANDLES, it.toLongArray())
-            }
-            collectionTitle?.let {
-                putExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE, it)
-            }
-            collectionId?.let {
-                putExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID, it)
-            }
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            putExtra(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, enableAddToAlbum)
+    private suspend fun isVideoRevampEnabled(): Boolean =
+        runCatching { getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerRevamp) }
+            .getOrDefault(false)
+
+    /**
+     * Launch the media player for [intent]. Route launchers decide whether to use the
+     * single-activity Compose destination for video or audio; otherwise the activity is started
+     * as before.
+     */
+    private suspend fun launchMediaPlayer(context: Context, intent: Intent) {
+        val videoRouteKey = nav3VideoPlayerRouteLauncher.routeOrNull(intent)
+        if (videoRouteKey != null) {
+            navigateForSingleActivity(context, videoRouteKey)
+            return
         }
-        val mimeType =
-            if (fileTypeInfo.extension == "opus") "audio/*" else fileTypeInfo.mimeType
-        nodeContentUriIntentMapper(intent, contentUri, mimeType, fileTypeInfo.isSupported)
+        val audioRouteKey = nav3AudioPlayerRouteLauncher.routeOrNull(intent)
+        if (audioRouteKey != null) {
+            navigateForSingleActivity(context, audioRouteKey)
+            return
+        }
         context.startActivity(intent)
     }
 
-    private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo) = when {
+    private fun getIntent(
+        context: Context,
+        fileTypeInfo: FileTypeInfo,
+        useRevamp: Boolean = false,
+    ) = when {
         fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
-            Intent(context, VideoPlayerComposeActivity::class.java)
+            if (useRevamp) Intent(context, VideoPlayerActivity::class.java)
+            else Intent(context, LegacyVideoPlayerActivity::class.java)
 
         fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
             Intent(context, AudioPlayerActivity::class.java)
@@ -349,10 +471,12 @@ internal class MegaNavigatorImpl @Inject constructor(
         searchedItems: List<Long>?,
         collectionTitle: String?,
         collectionId: Long?,
+        publicLinkUrl: String?,
+        localFilePath: String?,
     ) {
         val contentUri = NodeContentUri.LocalContentUri(localFile)
         val info = fileTypeInfo ?: getFileTypeInfoUseCase(localFile)
-        manageMediaIntent(
+        val intent = mediaPlayerIntentMapper(
             context = context,
             contentUri = contentUri,
             fileTypeInfo = info,
@@ -368,9 +492,11 @@ internal class MegaNavigatorImpl @Inject constructor(
             offlineParent = localFile.parent,
             searchedItems = searchedItems,
             collectionTitle = collectionTitle,
-            collectionId = collectionId
+            collectionId = collectionId,
+            publicLinkUrl = publicLinkUrl,
+            localFilePath = localFilePath,
         )
-
+        launchMediaPlayer(context, intent)
     }
 
     override suspend fun openMediaPlayerActivityFromChat(
@@ -379,7 +505,8 @@ internal class MegaNavigatorImpl @Inject constructor(
         message: NodeAttachmentMessage,
         fileNode: FileNode,
     ) {
-        val intent = getIntent(context, fileNode.type).apply {
+        val useRevamp = isVideoRevampEnabled()
+        val intent = getIntent(context, fileNode.type, useRevamp).apply {
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
             putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
             putExtra(INTENT_EXTRA_KEY_MSG_ID, message.msgId)
@@ -391,7 +518,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         val mimeType =
             if (fileNode.type.extension == "opus") "audio/*" else fileNode.type.mimeType
         nodeContentUriIntentMapper(intent, contentUri, mimeType, fileNode.type.isSupported)
-        context.startActivity(intent)
+        launchMediaPlayer(context, intent)
     }
 
     override suspend fun openMediaPlayerActivityFromChat(
@@ -402,8 +529,9 @@ internal class MegaNavigatorImpl @Inject constructor(
         chatId: Long,
         name: String,
     ) {
+        val useRevamp = isVideoRevampEnabled()
         val fileType = getFileTypeInfoByNameUseCase(name)
-        val intent = getIntent(context, fileType).apply {
+        val intent = getIntent(context, fileType, useRevamp).apply {
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
             putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
             putExtra(INTENT_EXTRA_KEY_MSG_ID, messageId)
@@ -415,7 +543,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         val mimeType =
             if (fileType.extension == "opus") "audio/*" else fileType.mimeType
         nodeContentUriIntentMapper(intent, contentUri, mimeType, fileType.isSupported)
-        context.startActivity(intent)
+        launchMediaPlayer(context, intent)
     }
 
     override suspend fun openMediaPlayerActivity(
@@ -435,7 +563,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         enableAddToAlbum: Boolean,
     ) {
         val info = fileTypeInfo ?: getFileTypeInfoByNameUseCase(name)
-        manageMediaIntent(
+        val intent = mediaPlayerIntentMapper(
             context = context,
             contentUri = contentUri,
             fileTypeInfo = info,
@@ -451,17 +579,19 @@ internal class MegaNavigatorImpl @Inject constructor(
             nodeHandles = nodeHandles,
             enableAddToAlbum = enableAddToAlbum,
         )
+        launchMediaPlayer(context, intent)
     }
 
     override fun openSyncs(context: Context) {
-        context.startActivity(Intent(context, SyncHostActivity::class.java))
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = SyncListNavKey
+        )
     }
 
 
     override fun openNewSync(
         context: Context,
         syncType: SyncType,
-        isFromManagerActivity: Boolean,
         isFromCloudDrive: Boolean,
         remoteFolderHandle: Long?,
         remoteFolderName: String?,
@@ -471,7 +601,6 @@ internal class MegaNavigatorImpl @Inject constructor(
                 SyncHostActivity.EXTRA_NEW_FOLDER_DETAIL,
                 SyncNewFolder(
                     syncType = syncType,
-                    isFromManagerActivity = isFromManagerActivity,
                     remoteFolderHandle = remoteFolderHandle,
                     remoteFolderName = remoteFolderName,
                 )
@@ -506,20 +635,49 @@ internal class MegaNavigatorImpl @Inject constructor(
         )
     }
 
+    override fun openAddContactToShare(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        nodeHandles: List<Long>,
+    ) {
+        applicationScope.launch {
+            val isContactsComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactsComposeUIEnabled) {
+                AddContactToShareComposeActivity.getIntent(
+                    context = context,
+                    nodeHandles = nodeHandles,
+                )
+            } else {
+                Intent(context, AddContactActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_BOTH)
+                    if (nodeHandles.size == 1) {
+                        putExtra(AddContactActivity.EXTRA_NODE_HANDLE, nodeHandles.first())
+                        putExtra(AddContactActivity.EXTRA_MULTISELECT, 0)
+                    } else if (nodeHandles.size > 1) {
+                        putExtra(AddContactActivity.EXTRA_NODE_HANDLE, nodeHandles.toLongArray())
+                        putExtra(AddContactActivity.EXTRA_MULTISELECT, 1)
+                    }
+                }
+            }
+            withContext(mainDispatcher) {
+                launcher.launch(intent)
+            }
+        }
+    }
+
     override fun openSyncMegaFolder(context: Context, handle: Long) {
-        context.startActivity(
-            Intent(context, ManagerActivity::class.java)
-                .setAction(ACTION_OPEN_SYNC_MEGA_FOLDER)
-                .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                .setData("https://${getDomainNameUseCase()}/opensync#${handle}".toUri())
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = CloudDriveNavKey(nodeHandle = handle),
         )
     }
 
     override fun openDeviceCenter(context: Context) {
-        context.startActivity(
-            Intent(context, ManagerActivity::class.java)
-                .setAction(ACTION_OPEN_DEVICE_CENTER)
-                .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = DeviceCenterNavKey,
         )
     }
 
@@ -540,16 +698,12 @@ internal class MegaNavigatorImpl @Inject constructor(
         type: Int?,
         currentFileNode: TypedFileNode,
     ) {
-        val pdfIntent = Intent(context, PdfViewerActivity::class.java)
+        val pdfIntent = PdfViewerActivity.createIntent(
+            context = context,
+            nodeHandle = currentFileNode.id.longValue,
+            nodeSourceType = type,
+        )
         val mimeType = currentFileNode.type.mimeType
-        pdfIntent.apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
-            putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, type)
-            putExtra(Constants.INTENT_EXTRA_KEY_APP, true)
-        }
         nodeContentUriIntentMapper(
             intent = pdfIntent,
             content = content,
@@ -569,10 +723,10 @@ internal class MegaNavigatorImpl @Inject constructor(
         pdfIntent.apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeId.longValue)
-            putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, type)
-            putExtra(Constants.INTENT_EXTRA_KEY_APP, true)
+            putExtra(INTENT_EXTRA_KEY_HANDLE, nodeId.longValue)
+            putExtra(INTENT_EXTRA_KEY_INSIDE, true)
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, type)
+            putExtra(INTENT_EXTRA_KEY_APP, true)
         }
         nodeContentUriIntentMapper(
             intent = pdfIntent,
@@ -582,65 +736,38 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(pdfIntent)
     }
 
+    override fun openPdfViewerFromChat(
+        context: Context,
+        content: NodeContentUri,
+        nodeHandle: Long,
+        chatId: Long,
+        messageId: Long,
+        mimeType: String,
+    ) {
+        val pdfIntent = Intent(context, PdfViewerActivity::class.java).apply {
+            putExtra(INTENT_EXTRA_KEY_INSIDE, true)
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
+            putExtra(INTENT_EXTRA_KEY_MSG_ID, messageId)
+            putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
+            putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+        }
+        nodeContentUriIntentMapper(pdfIntent, content, mimeType)
+        context.startActivity(pdfIntent)
+    }
+
     override fun openImageViewerActivity(
         context: Context,
         currentFileNode: TypedFileNode,
         nodeSourceType: Int?,
     ) {
-        val currentFileNodeParentId = currentFileNode.parentId.longValue
-
-        val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
-            NodeSourceTypeInt.FILE_BROWSER_ADAPTER -> Triple(
-                ImagePreviewFetcherSource.CLOUD_DRIVE,
-                ImagePreviewMenuSource.CLOUD_DRIVE,
-                CloudDriveImageNodeFetcher.PARENT_ID
-            )
-
-            NodeSourceTypeInt.RUBBISH_BIN_ADAPTER -> Triple(
-                ImagePreviewFetcherSource.RUBBISH_BIN,
-                ImagePreviewMenuSource.RUBBISH_BIN,
-                RubbishBinImageNodeFetcher.PARENT_ID
-            )
-
-            NodeSourceTypeInt.INCOMING_SHARES_ADAPTER,
-            NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
-                -> Triple(
-                ImagePreviewFetcherSource.SHARED_ITEMS,
-                ImagePreviewMenuSource.SHARED_ITEMS,
-                SharedItemsImageNodeFetcher.PARENT_ID
-            )
-
-            NodeSourceTypeInt.LINKS_ADAPTER -> Triple(
-                ImagePreviewFetcherSource.SHARED_ITEMS,
-                ImagePreviewMenuSource.LINKS,
-                SharedItemsImageNodeFetcher.PARENT_ID
-            )
-
-            NodeSourceTypeInt.BACKUPS_ADAPTER -> Triple(
-                ImagePreviewFetcherSource.CLOUD_DRIVE,
-                ImagePreviewMenuSource.CLOUD_DRIVE,
-                CloudDriveImageNodeFetcher.PARENT_ID
-            )
-
-            else -> {
-                Timber.e("Unknown node source type: $nodeSourceType")
-                return
-            }
+        ImagePreviewActivity.createIntent(
+            context,
+            currentFileNode.id.longValue,
+            currentFileNode.parentId.longValue,
+            nodeSourceType
+        )?.let { intent ->
+            context.startActivity(intent)
         }
-
-        val intent = ImagePreviewActivity.createIntent(
-            context = context,
-            imageSource = imageSource,
-            menuOptionsSource = menuOptionsSource,
-            anchorImageNodeId = currentFileNode.id,
-            params = mapOf(paramKey to currentFileNodeParentId),
-            enableAddToAlbum = nodeSourceType in listOf(
-                NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
-                NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
-            )
-        )
-
-        context.startActivity(intent)
     }
 
     override fun openImageViewerForOfflineNode(
@@ -659,42 +786,83 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(intent)
     }
 
-    override fun openTextEditorActivity(
+    override fun openTextEditor(
         context: Context,
-        currentNodeId: NodeId,
-        nodeSourceType: Int?,
-        mode: TextEditorMode,
-        fileName: String?,
+        params: OpenTextEditorParams,
     ) {
-        val textFileIntent = Intent(context, TextEditorActivity::class.java)
-        textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentNodeId.longValue)
-            .putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileName)
-            .putExtra(TextEditorViewModel.MODE, mode.value)
-            .putExtra(
-                Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                nodeSourceType ?: NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+        when (params) {
+            is OpenTextEditorParams.CloudNode -> navigateForSingleActivity(
+                context = context,
+                singleActivityDestinations = listOf(
+                    LegacyTextEditorNavKey(
+                        nodeHandle = params.nodeId.longValue,
+                        mode = params.mode.value,
+                        nodeSourceType = params.nodeSourceType,
+                        fileName = params.fileName,
+                        fromHome = params.fromHome,
+                    )
+                ),
             )
-        context.startActivity(textFileIntent)
+
+            is OpenTextEditorParams.LocalFile -> navigateForSingleActivity(
+                context = context,
+                singleActivityDestination = LegacyTextEditorNavKey(
+                    localPath = params.localPath,
+                    fileName = params.fileName,
+                    nodeSourceType = params.nodeSourceType,
+                ),
+            )
+
+            is OpenTextEditorParams.Chat -> navigateIfInSingleActivity(
+                singleActivityDestination = LegacyTextEditorNavKey(
+                    chatId = params.chatId,
+                    messageId = params.messageId,
+                ),
+                legacyNavigation = {
+                    withContext(mainDispatcher) {
+                        context.startActivity(
+                            Intent(context, TextEditorActivity::class.java).apply {
+                                putExtra(
+                                    Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                                    Constants.FROM_CHAT
+                                )
+                                putExtra(ChatNavKey.LEGACY_MESSAGE_ID, params.messageId)
+                                putExtra(ChatNavKey.LEGACY_CHAT_ID, params.chatId)
+                            }
+                        )
+                    }
+                },
+            )
+
+            is OpenTextEditorParams.FileLink -> {
+                val intent = Intent(context, TextEditorActivity::class.java).apply {
+                    putExtra(EXTRA_SERIALIZE_STRING, params.serializedNode)
+                    putExtra(URL_FILE_LINK, params.urlFileLink)
+                    putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FILE_LINK_ADAPTER)
+                    putExtra(TextEditorViewModel.MODE, params.mode.value)
+                }
+                context.startActivity(intent)
+            }
+        }
     }
 
-    override fun openGetLinkActivity(context: Context, handle: Long) {
-        context.startActivity(
-            Intent(context, GetLinkActivity::class.java)
-                .putExtra(Constants.HANDLE, handle)
-        )
-    }
+    override fun openGetLinkActivity(context: Context, vararg handles: Long) {
+        if (handles.isEmpty()) {
+            Timber.e("openGetLinkActivity: No handles provided, aborting operation.")
+            return
+        }
 
-    override fun openGetLinkActivity(context: Context, handles: LongArray) {
-        context.startActivity(
-            Intent(context, GetLinkActivity::class.java)
-                .putExtra(Constants.HANDLE_LIST, handles)
+        val handlesList = handles.toList()
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = GetLinkNavKey(handles = handlesList)
         )
     }
 
     override fun openFileInfoActivity(context: Context, handle: Long) {
-        context.startActivity(
-            Intent(context, FileInfoActivity::class.java)
-                .putExtra(Constants.HANDLE, handle)
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = FileInfoNavKey(nodeHandle = handle)
         )
     }
 
@@ -702,9 +870,8 @@ internal class MegaNavigatorImpl @Inject constructor(
         context: Context,
         handle: String,
     ) {
-        context.startActivity(
-            Intent(context, OfflineFileInfoActivity::class.java)
-                .putExtra(Constants.HANDLE, handle)
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = OfflineInfoNavKey(handle = handle)
         )
     }
 
@@ -713,24 +880,11 @@ internal class MegaNavigatorImpl @Inject constructor(
         handle: Long,
         nodeName: String,
     ) {
-        context.startActivity(
-            FileContactListComposeActivity.newIntent(
-                context = context,
-                nodeHandle = handle,
-                nodeName = nodeName
-            )
-        )
-    }
-
-    @Deprecated("Use the new openFileContactListActivity with nodeName parameter")
-    override fun openFileContactListActivity(
-        context: Context,
-        handle: Long,
-    ) {
-        context.startActivity(
-            FileContactListActivity.launchIntent(
-                context = context,
-                handle = handle
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = FileContactInfoNavKey(
+                folderHandle = handle,
+                folderName = nodeName
             )
         )
     }
@@ -740,105 +894,62 @@ internal class MegaNavigatorImpl @Inject constructor(
         email: String,
         isIncomingShares: Boolean,
     ) {
-        context.startActivity(
-            AuthenticityCredentialsActivity.getIntent(
-                context = context,
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = AuthenticityCredentialsNavKey(
                 email = email,
                 isIncomingShares = isIncomingShares
             )
         )
     }
 
-    override fun launchUrl(context: Context?, url: String?) {
-        context?.launchUrl(url)
-    }
-
-    override fun openSaveScannedDocumentsActivity(
-        context: Context,
-        originatedFromChat: Boolean,
-        cloudDriveParentHandle: Long,
-        scanPdfUri: Uri,
-        scanSoloImageUri: Uri?,
-    ) {
-        val intent = SaveScannedDocumentsActivity.getIntent(
-            context = context,
-            fromChat = originatedFromChat,
-            parentHandle = cloudDriveParentHandle,
-            pdfUri = scanPdfUri,
-            imageUris = scanSoloImageUri?.let { listOf(it) } ?: emptyList(),
-        )
-        context.startActivity(intent)
-    }
-
-    override fun openSearchActivity(
-        context: Context,
-        nodeSourceType: NodeSourceType,
-        parentHandle: Long,
-        isFirstNavigationLevel: Boolean,
-    ) {
-        context.startActivity(
-            SearchActivity.getIntent(
-                context = context,
-                nodeSourceType = nodeSourceType,
-                parentHandle = parentHandle,
-                isFirstNavigationLevel = isFirstNavigationLevel
-            )
-        )
+    override fun launchUrl(context: Context?, url: String?, appendNoPlansParam: Boolean) {
+        context?.launchUrl(url, appendNoPlansParam)
     }
 
     override fun openTakedownPolicyLink(context: Context) {
         launchUrl(
             context = context,
-            url = "https://${getDomainNameUseCase()}/takedown"
+            url = TAKEDOWN_URL,
         )
     }
 
     override fun openDisputeTakedownLink(context: Context) {
         launchUrl(
             context = context,
-            url = "https://${getDomainNameUseCase()}/dispute"
+            url = DISPUTE_URL,
         )
     }
 
     override fun openAchievements(context: Context) {
-        context.startActivity(
-            Intent(context, MyAccountActivity::class.java)
-                .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = AchievementNavKey
         )
     }
 
     override fun openAskForCustomizedPlan(
         context: Context,
-        myEmail: String?,
+        email: String?,
         accountType: AccountType,
     ) {
         AlertsAndWarnings.askForCustomizedPlan(
             context = context,
-            myEmail = myEmail,
+            myEmail = email,
             accountType = accountType
         )
     }
 
     override fun openMyAccountActivity(context: Context, flags: Int?) {
-        val intent = Intent(context, MyAccountActivity::class.java)
-        flags?.let {
-            intent.flags = flags
-        }
-        context.startActivity(intent)
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = MyAccountNavKey()
+        )
     }
 
-    override fun openManagerActivity(
+    override suspend fun <T> getPendingIntentWithDestination(
         context: Context,
-        data: Uri?,
-        action: String?,
-        bundle: Bundle?,
-    ) {
-        val intent = Intent(context, ManagerActivity::class.java)
-        intent.action = action
-        intent.data = data
-        bundle?.let { intent.putExtras(it) }
-        context.startActivity(intent)
-    }
+        singleActivityDestination: () -> T,
+    ): PendingIntent where T : NavKey, T : Parcelable =
+        MegaActivity.getPendingIntentWithExtraDestination(context, singleActivityDestination())
 
     override fun openMediaDiscoveryActivity(
         context: Context,
@@ -850,8 +961,263 @@ internal class MegaNavigatorImpl @Inject constructor(
             context = context,
             mediaHandle = folderId.longValue,
             folderName = folderName,
-            isOpenByMDIcon = true,
-            isFromFolderLink = false
+            isFromFolderLink = isFromFolderLink
         )
+    }
+
+    override suspend fun sendMessageConsideringSingleActivity(context: Context, message: String) {
+        launchMegaActivityIfNeeded(context)
+        snackbarEventQueue.queueMessage(message)
+    }
+
+    override fun openContactInfoActivity(context: Context, email: String) {
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = ContactInfoNavKey(email = email)
+        )
+    }
+
+    override fun openContactInfoActivity(context: Context, chatId: Long) {
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = ContactInfoNavKey(chatId = chatId)
+        )
+    }
+
+
+    override fun openContactAttachmentActivity(context: Context, chatId: Long, msgId: Long) {
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = ContactAttachmentNavKey(
+                chatId = chatId,
+                messageId = msgId
+            )
+        )
+    }
+
+    @Suppress("deprecation")
+    override fun openAddMeetingParticipantsForResult(
+        activity: Activity,
+        chatId: Long,
+        callUsersLimit: Int?,
+        requestCode: Int,
+    ) {
+        applicationScope.launch {
+            val isContactsComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactsComposeUIEnabled) {
+                AddParticipantsComposeActivity.getMeetingIntent(
+                    context = activity,
+                    chatId = chatId,
+                )
+            } else {
+                Intent(activity, AddContactActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                    putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                    putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
+                    putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
+                    putExtra(INTENT_EXTRA_KEY_MAX_USER, callUsersLimit)
+                    putExtra(
+                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                        activity.getString(R.string.invite_participants)
+                    )
+                }
+            }
+            withContext(mainDispatcher) {
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    activity.startActivityForResult(intent, requestCode)
+                }
+            }
+        }
+    }
+
+    @Suppress("deprecation")
+    override fun openAddChatParticipantsForResult(
+        activity: Activity,
+        chatId: Long,
+        requestCode: Int,
+    ) {
+        applicationScope.launch {
+            val isContactsComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactsComposeUIEnabled) {
+                AddParticipantsComposeActivity.getChatIntent(
+                    context = activity,
+                    chatId = chatId,
+                )
+            } else {
+                Intent(activity, AddContactActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                    putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                    putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
+                    putExtra(
+                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                        activity.getString(R.string.add_participants_menu_item)
+                    )
+                }
+            }
+            withContext(mainDispatcher) {
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    activity.startActivityForResult(intent, requestCode)
+                }
+            }
+        }
+    }
+
+    override fun openAddChatParticipantsForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        chatId: Long,
+    ) {
+        applicationScope.launch {
+            val isContactsComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactsComposeUIEnabled) {
+                AddParticipantsComposeActivity.getChatIntent(
+                    context = context,
+                    chatId = chatId,
+                )
+            } else {
+                Intent(context, AddContactActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                    putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                    putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
+                    putExtra(
+                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                        context.getString(R.string.add_participants_menu_item)
+                    )
+                }
+            }
+            withContext(mainDispatcher) {
+                launcher.launch(intent)
+            }
+        }
+    }
+
+    override fun openAddContactsForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        preselectedHandles: List<Long>,
+        preselectedEmails: List<String>,
+    ) {
+        applicationScope.launch {
+            val isContactsComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactsComposeUIEnabled) {
+                AddContactsComposeActivity.getIntent(
+                    context = context,
+                    preselectedHandles = preselectedHandles,
+                )
+            } else {
+                Intent(context, AddContactActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                    putStringArrayListExtra(
+                        Constants.INTENT_EXTRA_KEY_CONTACTS_SELECTED,
+                        ArrayList(preselectedEmails),
+                    )
+                    putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                    putExtra(
+                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                        context.getString(R.string.add_participants_menu_item),
+                    )
+                }
+            }
+            withContext(mainDispatcher) {
+                launcher.launch(intent)
+            }
+        }
+    }
+
+    @Suppress("deprecation")
+    override fun openCreateGroupChatForResult(
+        activity: Activity,
+        requestCode: Int,
+        allowEmptyGroup: Boolean,
+    ) {
+        applicationScope.launch {
+            val intent = createGroupChatIntent(activity, allowEmptyGroup)
+            withContext(mainDispatcher) {
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    activity.startActivityForResult(intent, requestCode)
+                }
+            }
+        }
+    }
+
+    override fun openCreateGroupChatForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        allowEmptyGroup: Boolean,
+    ) {
+        applicationScope.launch {
+            val intent = createGroupChatIntent(context, allowEmptyGroup)
+            withContext(mainDispatcher) {
+                launcher.launch(intent)
+            }
+        }
+    }
+
+    private suspend fun createGroupChatIntent(
+        context: Context,
+        allowEmptyGroup: Boolean,
+    ): Intent {
+        val isContactsComposeUIEnabled = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+        }.getOrDefault(false)
+        return if (isContactsComposeUIEnabled) {
+            CreateGroupChatComposeActivity.getIntent(context, allowEmptyGroup = allowEmptyGroup)
+        } else {
+            Intent(context, AddContactActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
+                if (allowEmptyGroup) {
+                    putExtra(AddContactActivity.EXTRA_IS_START_CONVERSATION, true)
+                }
+            }
+        }
+    }
+
+    override fun openNewChatForResult(
+        activity: Activity,
+        requestCode: Int,
+    ) {
+        applicationScope.launch {
+            val intent = newChatIntent(activity)
+            withContext(mainDispatcher) {
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    activity.startActivityForResult(intent, requestCode)
+                }
+            }
+        }
+    }
+
+    override fun openNewChatForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+    ) {
+        applicationScope.launch {
+            val intent = newChatIntent(context)
+            withContext(mainDispatcher) {
+                launcher.launch(intent)
+            }
+        }
+    }
+
+    private suspend fun newChatIntent(context: Context): Intent {
+        val isContactsComposeUIEnabled = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+        }.getOrDefault(false)
+        return if (isContactsComposeUIEnabled) {
+            NewChatComposeActivity.getIntent(context)
+        } else {
+            Intent(context, AddContactActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+            }
+        }
+    }
+
+    override fun openHomeScreen(context: Context) {
+        navigateForSingleActivity(context, HomeScreensNavKey())
     }
 }

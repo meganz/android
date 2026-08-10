@@ -2,6 +2,7 @@ package mega.privacy.android.navigation
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContract
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.navigation.camera.CameraArg
@@ -41,14 +42,6 @@ interface MegaActivityResultContract {
     val selectFolderToCopyActivityResultContract: ActivityResultContract<LongArray, Pair<LongArray, Long>?>
 
     /**
-     * Contract for sharing folders with contacts.
-     *
-     * @return [ActivityResultContract] with input type [LongArray] (folder handles to share)
-     *         and output type [Pair<List<String>, List<Long>>?] (contact IDs and shared folder handles)
-     */
-    val shareFolderActivityResultContract: ActivityResultContract<LongArray, Pair<List<String>, List<Long>>?>
-
-    /**
      * Contract for sending files/folders to chat conversations.
      *
      * @return [ActivityResultContract] with input type [LongArray] (node handles to send)
@@ -62,6 +55,7 @@ interface MegaActivityResultContract {
      * @return [ActivityResultContract] with input type [Boolean] (onboarding state)
      *         and output type [Boolean] (onboarding completion status)
      */
+    @Deprecated("Migrate to Nav 3 to access this activity")
     val hiddenNodeOnboardingActivityResultContract: ActivityResultContract<Boolean, Boolean>
 
     /**
@@ -81,4 +75,14 @@ interface MegaActivityResultContract {
      * Contract for opening a multiple documents and persisting their URIs.
      */
     val openMultipleDocumentsPersistable: ActivityResultContract<Array<String>, List<@JvmSuppressWildcards Uri>>
+
+    /**
+     * Contract for add to in file operations.
+     */
+    val addToAlbumResultContract: ActivityResultContract<Pair<Array<Long>, Int>, String?>
+
+    /**
+     * Contract for adding a video to a playlist.
+     */
+    val videoToPlaylistActivityContract: ActivityResultContract<Long, AddVideoToPlaylistResult?>
 }

@@ -55,10 +55,11 @@ class SortFavouritesUseCase @Inject constructor(
     ): Int {
         val otherFile = other as? FileNode ?: return compareFileToFolder(order)
         return when (order) {
-            FavouriteSortOrder.Label -> label.compareTo(otherFile.label)
+            is FavouriteSortOrder.Label -> label.compareTo(otherFile.label)
             is FavouriteSortOrder.ModifiedDate -> modificationTime.compareTo(otherFile.modificationTime)
             is FavouriteSortOrder.Name -> name.compareTo(otherFile.name)
             is FavouriteSortOrder.Size -> size.compareTo(otherFile.size)
+            is FavouriteSortOrder.AddedDate -> creationTime.compareTo(otherFile.creationTime)
         }
     }
 

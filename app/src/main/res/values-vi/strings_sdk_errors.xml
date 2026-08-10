@@ -13,13 +13,13 @@
     <!-- Label to show that a SDK operation has failed permanently. -->
     <string name="api_efailed">Thất bại hoàn toàn</string>
     <!-- Error shown when terms of service are breached during download. -->
-    <string name="api_etoomany_ec_download">Phát hiện vi phạm Điều Khoản Dịch Vụ</string>
+    <string name="api_etoomany_ec_download">Phát hiện vi phạm Điều&#160;Khoản Dịch&#160;Vụ</string>
     <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
     <string name="api_etoomay">Quá nhiều kết nối/truyền tải cùng lúc</string>
     <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
     <string name="api_erange">Nằm ngoài phạm vi</string>
     <!-- State to indicate something has expired (achivements of business status account for instance) -->
-    <string name="api_eexpired">Hết hạn</string>
+    <string name="api_eexpired">Hết</string>
     <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
     <string name="api_enoent">Không tìm thấy</string>
     <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
@@ -33,7 +33,7 @@
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
     <string name="api_ekey">Lỗi giải mã</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
-    <string name="api_esid">Bad session ID</string>
+    <string name="api_esid">Số ID phiên sai</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Bị chặn</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
@@ -53,7 +53,7 @@
     <!-- Label shown when current account does not have enough quota to complete the operation -->
     <string name="api_egoingoverquota">Không đủ băng thông</string>
     <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
-    <string name="api_emfarequired">Cần sử dụng xác&#160;thực 2&#160;yếu&#160;tố.</string>
+    <string name="api_emfarequired">Cần sử dụng xác thực 2 yếu tố.</string>
     <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
     <string name="api_emasteronly">Truy cập bị từ chối cho tất cả thành viên dưới hạng admin</string>
     <!-- A dialog title shown to users when their business account is expired. -->
@@ -69,7 +69,7 @@
     <!-- Label to show that an error of Balance occurs during a SDK operation. -->
     <string name="payment_ebalance">Số dư tài khoản bị lỗi</string>
     <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-    <string name="payment_egeneric_api_error_unknown">Lỗi không xác&#160;định được</string>
+    <string name="payment_egeneric_api_error_unknown">Lỗi không xác định được</string>
     <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
     <string name="api_error_http">Lỗi HTTP</string>
     <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->

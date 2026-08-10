@@ -169,7 +169,6 @@ class MessageListViewModel @Inject constructor(
 
     private val remoteMediator = remoteMediatorFactory.create(
         chatId = chatId,
-        coroutineScope = viewModelScope,
     )
 
     private val pagedFlow = unreadCount

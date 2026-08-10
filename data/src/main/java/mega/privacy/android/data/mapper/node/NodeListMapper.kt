@@ -12,6 +12,6 @@ internal class NodeListMapper @Inject constructor(
 ) {
 
     suspend operator fun invoke(megaNodeList: MegaNodeList) = with(megaNodeList) {
-        (0 until size()).map { nodeMapper(get(it)) }
+        (0 until size()).mapNotNull { nodeMapper(get(it)) }
     }
 }

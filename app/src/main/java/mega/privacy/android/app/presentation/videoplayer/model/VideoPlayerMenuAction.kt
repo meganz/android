@@ -1,11 +1,11 @@
 package mega.privacy.android.app.presentation.videoplayer.model
 
-import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.IconPack
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionPlural
 import mega.android.core.ui.model.menu.MenuActionString
 import mega.android.core.ui.model.menu.MenuActionWithoutIcon
+import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -82,7 +82,7 @@ sealed interface VideoPlayerMenuAction : MenuAction {
      * Video player rename action
      */
     object VideoPlayerRenameAction : MenuActionWithoutIcon(
-        descriptionRes = R.string.context_rename,
+        descriptionRes = sharedR.string.context_rename,
         testTag = TEST_TAG_VIDEO_PLAYER_RENAME_ACTION
     ), VideoPlayerMenuAction {
         override val orderInCategory = 130

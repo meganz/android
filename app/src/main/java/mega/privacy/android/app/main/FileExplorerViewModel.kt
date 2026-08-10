@@ -21,14 +21,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
-import mega.privacy.android.app.presentation.upload.UploadDestinationActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.parcelableArrayList
-import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -36,23 +35,30 @@ import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetFolderTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
+import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetUseCase
+import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
+import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -64,10 +70,9 @@ import javax.inject.Inject
 class FileExplorerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val getCopyLatestTargetPathUseCase: GetCopyLatestTargetPathUseCase,
-    private val getMoveLatestTargetPathUseCase: GetMoveLatestTargetPathUseCase,
+    private val getCopyLatestTargetUseCase: GetCopyLatestTargetUseCase,
+    private val getMoveLatestTargetUseCase: GetMoveLatestTargetUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val attachNodeUseCase: AttachNodeUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
@@ -76,6 +81,11 @@ class FileExplorerViewModel @Inject constructor(
     private val getDocumentsFromSharedUrisUseCase: GetDocumentsFromSharedUrisUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val getFolderTypeByHandleUseCase: GetFolderTypeByHandleUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val getNodeLocationUseCase: GetNodeLocationUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getAncestorsIdsUseCase: GetAncestorsIdsUseCase,
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileExplorerUiState())
@@ -127,8 +137,8 @@ class FileExplorerViewModel @Inject constructor(
 
     val showHiddenItems: Boolean get() = _showHiddenItems
 
-
     init {
+        monitorNodeUpdates()
         viewModelScope.launch {
             combine(
                 savedStateHandle.getStateFlow(
@@ -151,20 +161,125 @@ class FileExplorerViewModel @Inject constructor(
     }
 
     /**
-     * Sets up the Cloud Drive Explorer content
+     * Returns true if the root handle has been initialised (i.e. is not [INVALID_HANDLE]).
      */
-    fun initCloudDriveExplorerContent() = viewModelScope.launch {
-        if (isHiddenNodesActive()) {
-            _accountDetail = monitorAccountDetailUseCase().firstOrNull()
-            _showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull() ?: true
+    fun isCloudRootInitialized(): Boolean = _uiState.value.cloudRootHandle != INVALID_HANDLE
+
+    /**
+     * Returns true if [handle] is the cloud drive root.
+     * Also returns false when the root has not yet been initialised.
+     */
+    fun isAtCloudRoot(handle: Long): Boolean {
+        val rootHandle = _uiState.value.cloudRootHandle
+        return rootHandle != INVALID_HANDLE && handle == rootHandle
+    }
+
+    /**
+     * Returns the raw cloud drive root handle.
+     * Prefer [isAtCloudRoot] / [isCloudRootInitialized] for comparisons.
+     * Use this only when the handle value itself is required (e.g. SDK calls, setParentHandle).
+     */
+    fun getCloudRootHandle(): Long = _uiState.value.cloudRootHandle
+
+    /**
+     * Returns the cloud drive root handle, fetching it from the repository if not yet cached.
+     * This should be the preferred way to obtain the root handle in suspend contexts, as it
+     * encapsulates SDK access inside the ViewModel and keeps the Fragment free of SDK calls.
+     */
+    suspend fun getOrInitCloudRootHandle(): Long {
+        val cached = _uiState.value.cloudRootHandle
+        if (cached != INVALID_HANDLE) return cached
+        val handle = withContext(ioDispatcher) {
+            getRootNodeIdUseCase()?.longValue ?: INVALID_HANDLE
+        }
+        _uiState.update { it.copy(cloudRootHandle = handle) }
+        return handle
+    }
+
+    /**
+     * Builds the cloud explorer path (root → current folder) and sets it.
+     *
+     * This is intentionally a `suspend` function so that [CloudDriveExplorerFragment] can
+     * `await` path construction before rendering child nodes — ensuring back navigation is
+     * always consistent with what the user sees on screen.
+     *
+     * NOTE: Intentionally a suspend function rather than fire-and-forget via viewModelScope.launch,
+     * so the caller can wait for the path to be ready before updating the UI. Without this,
+     * pressing back before the path is built would navigate to the wrong folder.
+     */
+    suspend fun rebuildCloudDriveFolderPath(folderHandle: Long) {
+        val rootHandle = _uiState.value.cloudRootHandle
+        val path = withContext(ioDispatcher) {
+            val node = getNodeByIdUseCase(NodeId(folderHandle))
+            if (node == null) {
+                Timber.w("rebuildCloudDriveFolderPath: node not found for handle $folderHandle, falling back to root")
+                return@withContext listOf(rootHandle)
+            }
+            val allAncestors = getAncestorsIdsUseCase(node)
+            val rootIndex = allAncestors.indexOfFirst { it.longValue == rootHandle }
+            // Defensive: truncate from parent up to and including the cloud root.
+            val ancestors =
+                if (rootIndex >= 0) allAncestors.subList(0, rootIndex + 1) else allAncestors
+            ancestors.reversed().map { it.longValue } + folderHandle
+        }
+        _uiState.update { it.copy(cloudDriveFolderPath = path) }
+    }
+
+    /**
+     * Sets the cloud drive folder path directly. Used for trivial cases (e.g. root-only path
+     * on search reset) where no ancestor traversal is needed.
+     */
+    fun setCloudDriveFolderPath(handles: List<Long>) {
+        _uiState.update { it.copy(cloudDriveFolderPath = handles) }
+    }
+
+    /**
+     * Records navigation into a child folder (current folder must already be the last path segment).
+     */
+    fun pushCloudDriveFolder(childHandle: Long) {
+        _uiState.update { it.copy(cloudDriveFolderPath = it.cloudDriveFolderPath + childHandle) }
+    }
+
+    /**
+     * Pops the current folder and returns the parent folder handle, or null if already at root.
+     */
+    fun popCloudDriveFolderForBack(): Long? {
+        val path = _uiState.value.cloudDriveFolderPath
+        if (path.size <= 1) return null
+        val newPath = path.dropLast(1)
+        _uiState.update { it.copy(cloudDriveFolderPath = newPath) }
+        return newPath.last()
+    }
+
+    fun initCloudExplorerState(moveHandles: LongArray?) {
+        viewModelScope.launch {
+            val isFeatureFlagEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+            val disabledTargetId = moveHandles?.firstOrNull()?.takeIf { isFeatureFlagEnabled }?.let {
+                runCatching { getNodeByIdUseCase(NodeId(it))?.parentId }
+                    .getOrNull()
+            }
+
+            _uiState.update { state ->
+                state.copy(
+                    isFeatureFlagEnabled = isFeatureFlagEnabled,
+                    disabledTargetId = disabledTargetId,
+                )
+            }
         }
     }
 
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
+    fun consumeFeatureFlag() {
+        _uiState.update { it.copy(isFeatureFlagEnabled = null) }
+    }
+
+    /**
+     * Sets up the Cloud Drive Explorer content
+     */
+    fun initCloudDriveExplorerContent() = viewModelScope.launch {
+        _accountDetail = monitorAccountDetailUseCase().firstOrNull()
+        _showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull() ?: true
     }
 
     /**
@@ -182,6 +297,15 @@ class FileExplorerViewModel @Inject constructor(
         textInfoContent?.let {
             _textInfo.postValue(it.copy(subject = fileNames.values.firstOrNull() ?: ""))
         }
+    }
+
+    /**
+     * Reset the cached share data so a new incoming intent (e.g. a second share while
+     * the activity is alive) is reprocessed from scratch.
+     */
+    fun resetForNewIntent() {
+        dataAlreadyRequested = false
+        _uiState.update { it.copy(documents = emptyList()) }
     }
 
     /**
@@ -228,10 +352,7 @@ class FileExplorerViewModel @Inject constructor(
             context = context,
         )
 
-        val nameMap =
-            intent.serializable<HashMap<String, String>>(UploadDestinationActivity.EXTRA_NAME_MAP)
-                ?: mapOf(subject to subject)
-        setFileNames(nameMap)
+        setFileNames(mapOf(subject to subject))
         _textInfo.postValue(ShareTextInfo(isUrl, subject, fileContent, messageContent))
     }
 
@@ -253,8 +374,20 @@ class FileExplorerViewModel @Inject constructor(
         context: Context,
     ) {
         viewModelScope.launch {
-            setDocuments(getDocuments(intent, context))
+            val documents = getDocuments(intent, context)
+            if (documents != null && documents.isEmpty()) {
+                _uiState.update { it.copy(noFilesToUploadEvent = triggered) }
+            } else {
+                setDocuments(documents)
+            }
         }
+    }
+
+    /**
+     * Consumes the [FileExplorerUiState.noFilesToUploadEvent].
+     */
+    fun onConsumeNoFilesToUploadEvent() {
+        _uiState.update { it.copy(noFilesToUploadEvent = consumed) }
     }
 
     private fun grantUriPermission(context: Context, uris: List<Uri>) {
@@ -409,7 +542,7 @@ class FileExplorerViewModel @Inject constructor(
      */
     fun getCopyTargetPath() {
         viewModelScope.launch {
-            latestCopyTargetPath = runCatching { getCopyLatestTargetPathUseCase() }.getOrNull()
+            latestCopyTargetPath = runCatching { getCopyLatestTargetUseCase() }.getOrNull()
             latestCopyTargetPath?.let {
                 val accessPermission =
                     runCatching { getNodeAccessPermission(NodeId(it)) }.getOrNull()
@@ -428,7 +561,7 @@ class FileExplorerViewModel @Inject constructor(
      */
     fun getMoveTargetPath() {
         viewModelScope.launch {
-            latestMoveTargetPath = runCatching { getMoveLatestTargetPathUseCase() }.getOrNull()
+            latestMoveTargetPath = runCatching { getMoveLatestTargetUseCase() }.getOrNull()
             latestMoveTargetPath?.let {
                 val accessPermission =
                     runCatching { getNodeAccessPermission(NodeId(it)) }.getOrNull()
@@ -464,22 +597,27 @@ class FileExplorerViewModel @Inject constructor(
         chatIds: List<Long>,
         documents: List<DocumentEntity>,
         nodeIds: List<NodeId>,
+        pitagTrigger: PitagTrigger,
         toDoAfter: () -> Unit,
     ) {
         viewModelScope.launch {
             chatIds.forEach {
                 attachNodes(it, nodeIds)
             }
-            attachFiles(chatIds, documents)
+            attachFiles(chatIds, documents, pitagTrigger)
             toDoAfter()
         }
     }
 
-    private suspend fun attachFiles(chatIds: List<Long>, documents: List<DocumentEntity>) {
+    private suspend fun attachFiles(
+        chatIds: List<Long>,
+        documents: List<DocumentEntity>,
+        pitagTrigger: PitagTrigger,
+    ) {
         val filePathsWithNames = documents.associate { it.uri to it.name }
         runCatching {
             sendChatAttachmentsUseCase(
-                filePathsWithNames, chatIds = chatIds.toLongArray()
+                filePathsWithNames, chatIds = chatIds.toLongArray(), pitagTrigger = pitagTrigger,
             )
         }.onFailure {
             Timber.e(it, "Error attaching files")
@@ -502,14 +640,17 @@ class FileExplorerViewModel @Inject constructor(
      *
      * @param file The file to upload.
      * @param destination The destination where the file will be uploaded.
+     * @param pitagTrigger [PitagTrigger]
      */
     fun uploadFile(
         file: File,
         destination: Long,
+        pitagTrigger: PitagTrigger,
     ) {
         uploadFiles(
             mapOf(file.absolutePath to uiState.value.documentsByUriPathValue[file.name]?.name),
-            NodeId(destination)
+            NodeId(destination),
+            pitagTrigger,
         )
     }
 
@@ -528,18 +669,24 @@ class FileExplorerViewModel @Inject constructor(
      *
      * @param destination The destination where the files will be uploaded.
      * @param collidedPaths The list of paths that have name collisions and should be excluded from the upload.
+     * @param pitagTrigger [PitagTrigger]
      */
-    fun uploadFiles(destination: Long, collidedPaths: List<String>) {
+    fun uploadFiles(
+        destination: Long,
+        collidedPaths: List<String>,
+        pitagTrigger: PitagTrigger,
+    ) {
         val namesByUriPathValues = uiState.value.documents.filterNot { document ->
             collidedPaths.any { it == document.uri.value }
         }.associate { it.uri.value to it.name }
 
-        uploadFiles(namesByUriPathValues, NodeId(destination))
+        uploadFiles(namesByUriPathValues, NodeId(destination), pitagTrigger)
     }
 
     private fun uploadFiles(
         pathsAndNames: Map<String, String?>,
         destinationId: NodeId,
+        pitagTrigger: PitagTrigger,
     ) {
         _uiState.update { state ->
             state.copy(
@@ -548,6 +695,7 @@ class FileExplorerViewModel @Inject constructor(
                         pathsAndNames = pathsAndNames,
                         destinationId = destinationId,
                         waitNotificationPermissionResponseToStart = true,
+                        pitagTrigger = pitagTrigger,
                     )
                 )
             )
@@ -572,6 +720,28 @@ class FileExplorerViewModel @Inject constructor(
      * Returns true if the app is asking for name collisions resolution, false otherwise.
      */
     fun isAskingForCollisionsResolution() = uiState.value.isAskingForCollisionsResolution
+
+    /**
+     * Sets the count of non-collided files that were uploaded.
+     * This is used when non-collided files finish uploading while collision resolution is in progress.
+     *
+     * @param count The number of non-collided files that were uploaded.
+     */
+    fun setNonCollidedFilesUploadedCount(count: Int) {
+        _uiState.update { it.copy(nonCollidedFilesUploadedCount = count) }
+    }
+
+    /**
+     * Gets and clears the count of non-collided files that were uploaded.
+     * This should be called after collision resolution is complete to check if any non-collided files were uploaded.
+     *
+     * @return The number of non-collided files that were uploaded.
+     */
+    fun getAndClearNonCollidedFilesUploadedCount(): Int {
+        val count = uiState.value.nonCollidedFilesUploadedCount
+        _uiState.update { it.copy(nonCollidedFilesUploadedCount = 0) }
+        return count
+    }
 
     /**
      * Handles Back Navigation logic by checking if the there are scans to be uploaded or not
@@ -607,4 +777,82 @@ class FileExplorerViewModel @Inject constructor(
     internal suspend fun getFolderType(handle: Long) = runCatching {
         getFolderTypeByHandleUseCase(handle)
     }.getOrNull()
+
+    /**
+     * Monitor node updates from the SDK
+     */
+    private fun monitorNodeUpdates() {
+        viewModelScope.launch {
+            monitorNodeUpdatesUseCase().collect { nodeUpdate ->
+                _uiState.update { it.copy(nodeUpdatedEvent = triggered) }
+            }
+        }
+    }
+
+    /**
+     * Consume node update event
+     * Should be called after the UI has handled the node update
+     */
+    fun consumeNodeUpdate() {
+        _uiState.update { it.copy(nodeUpdatedEvent = consumed) }
+    }
+
+    fun getFolderDestinations(
+        handle: Long,
+        message: String?,
+    ) {
+        viewModelScope.launch {
+            val nodeId = NodeId(handle).takeIf { handle != INVALID_HANDLE }
+            val ancestorIds = runCatching {
+                val node = nodeId?.let { getNodeByIdUseCase(nodeId) }
+                node?.let {
+                    getNodeLocationUseCase(it).ancestorIds
+                }?.plus(
+                    if (node.parentId.longValue == INVALID_HANDLE) null else NodeId(handle) //add the destination itself if it's not root
+                )
+            }.getOrNull()
+            val folderDestinations = ancestorIds?.filterNotNull()?.map { folderId ->
+                CloudDriveNavKey(nodeHandle = folderId.longValue)
+            }
+            _uiState.update {
+                it.copy(
+                    navigateToCloud = triggered(
+                        FileExplorerUiState.NavigateToCloudEvent(
+                            nodeId = nodeId,
+                            folderDestinations = folderDestinations,
+                            message = message
+                        )
+                    )
+                )
+            }
+
+        }
+    }
+
+    fun consumeFolderDestinations() {
+        _uiState.update { it.copy(navigateToCloud = consumed()) }
+    }
+
+    /**
+     * Determine whether to stay in app or finish after share
+     * Checks if app moved to background during share process
+     *
+     * @param handle Parent handle of the folder to open (if staying in app)
+     * @param message Message to show in snackbar
+     * @param shouldLeaveApp
+     */
+    fun finishShareAndBack(handle: Long, message: String?, shouldLeaveApp: Boolean) {
+        viewModelScope.launch {
+            val needStayInApp = !shouldLeaveApp
+
+            if (needStayInApp) {
+                // If app moved to the background during share, stay in App and navigate to cloud drive
+                getFolderDestinations(handle, message)
+            } else {
+                // If app didn't move to background during share, finish and back to previous App
+                _uiState.update { it.copy(shouldFinishScreen = true) }
+            }
+        }
+    }
+
 }

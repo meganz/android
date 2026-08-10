@@ -168,14 +168,24 @@ fun <T> Flow<T>.onFirst(
 }
 
 /**
- * Returns a new flow where values not validated by [validator] will be skip if a new value is emitted before the delay
+ * Returns a new flow where values not validated by [validator] will be skip if a new value is emitted before the delay.
+ *
+ * @param timeout The delay to wait before emitting values that don't pass the validator
+ * @param validator Function that determines if a value should be emitted immediately (true) or wait for timeout (false)
+ * @param emitFirstValueImmediately If true, the first value is always emitted immediately, even if it doesn't pass the validator. Default is false.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-fun <T> Flow<T>.skipUnstable(timeout: Duration, validator: (T) -> Boolean): Flow<T> {
+fun <T> Flow<T>.skipUnstable(
+    timeout: Duration,
+    emitFirstValueImmediately: Boolean = false,
+    validator: (T) -> Boolean,
+): Flow<T> {
+    var isFirstValue = emitFirstValueImmediately
     return this.mapLatest { value ->
-        if (validator(value).not()) {
+        if ((isFirstValue || validator(value)).not()) {
             delay(timeout)
         }
+        isFirstValue = false
         value
     }
 }

@@ -3,8 +3,10 @@ package mega.privacy.android.core.nodecomponents.dialog.removeshare
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -36,9 +38,7 @@ fun RemoveShareFolderDialogM3(
             viewModel.removeShare(nodes)
             onDismiss()
         },
-        // onDismiss is empty here to avoid multiple calls. We don't need this since action must be
-        // taken in order to dismiss the dialog
-        onDismiss = {}
+        onDismiss = onDismiss
     )
 }
 
@@ -59,12 +59,12 @@ private fun RemoveShareFolderDialogBodyM3(
         stringResource(id = sharedResR.string.general_dialog_cancel_button)
 
     BasicDialog(
+        modifier = Modifier.testTag(REMOVE_SHARE_FOLDER_DIALOG_TAG),
         description = text,
         positiveButtonText = confirmButtonText,
         negativeButtonText = cancelButtonText,
         onPositiveButtonClicked = {
             onConfirm()
-            onDismiss()
         },
         onNegativeButtonClicked = onDismiss,
         onDismiss = onDismiss
@@ -85,3 +85,5 @@ private fun RemoveShareFolderBodyPreview() {
         )
     }
 }
+
+internal const val REMOVE_SHARE_FOLDER_DIALOG_TAG = "remove_share_folder:dialog"

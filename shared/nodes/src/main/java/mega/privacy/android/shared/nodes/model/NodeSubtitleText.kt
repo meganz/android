@@ -1,0 +1,134 @@
+package mega.privacy.android.shared.nodes.model
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
+import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.core.formatter.formatModifiedDate
+import mega.privacy.android.shared.resources.R as SharedR
+
+/**
+ * Represents different types of node subtitles that can be resolved to localized strings
+ * in Composable functions using Compose's context.
+ */
+sealed class NodeSubtitleText {
+    /**
+     * For file nodes: displays file size and modification time
+     * @param fileSizeValue Pre-calculated file size value (raw number)
+     * @param modificationTime File modification time in milliseconds
+     * @param showPublicLinkCreationTime Whether to show public link creation time instead of modification time
+     * @param publicLinkCreationTime Public link creation time in milliseconds (optional)
+     */
+    data class FileSubtitle(
+        val fileSizeValue: Long,
+        val modificationTime: Long,
+        val showPublicLinkCreationTime: Boolean,
+        val publicLinkCreationTime: Long? = null,
+    ) : NodeSubtitleText()
+
+    /**
+     * For folder nodes with proper pluralization
+     * @param childFolderCount Number of child folders
+     * @param childFileCount Number of child files
+     */
+    data class FolderSubtitle(
+        val childFolderCount: Int,
+        val childFileCount: Int,
+    ) : NodeSubtitleText()
+
+    /**
+     * For shared items
+     * @param shareCount Number of shares
+     * @param user User email/name (optional)
+     * @param userFullName User full name (optional)
+     * @param isVerified Whether the user is verified
+     */
+    data class SharedSubtitle(
+        val shareCount: Int,
+        val user: String? = null,
+        val userFullName: String? = null,
+        val isVerified: Boolean = false,
+    ) : NodeSubtitleText()
+
+    /**
+     * Empty string
+     */
+    object Empty : NodeSubtitleText()
+}
+
+/**
+ * Composable function that resolves NodeSubtitleText to a localized string
+ * @return Localized string representation of the node subtitle
+ */
+@Composable
+fun NodeSubtitleText.text(): String {
+    return when (this) {
+        is NodeSubtitleText.FileSubtitle -> {
+            val locale = Locale.current.platformLocale
+            val time = publicLinkCreationTime.takeIf {
+                showPublicLinkCreationTime
+            } ?: modificationTime
+            val context = LocalContext.current
+            val fileSizeText = formatFileSize(fileSizeValue, context)
+            if (time != 0L) {
+                val formattedDate = formatModifiedDate(locale, time)
+                stringResource(
+                    SharedR.string.file_info_subtitle_format,
+                    fileSizeText,
+                    formattedDate
+                )
+            } else {
+                fileSizeText
+            }
+        }
+
+        is NodeSubtitleText.FolderSubtitle -> {
+            when {
+                childFolderCount == 0 && childFileCount == 0 ->
+                    stringResource(SharedR.string.empty_file_browser_folder)
+
+                childFolderCount == 0 && childFileCount > 0 ->
+                    pluralStringResource(
+                        SharedR.plurals.num_of_files_with_parameter,
+                        childFileCount,
+                        childFileCount
+                    )
+
+                childFileCount == 0 && childFolderCount > 0 ->
+                    pluralStringResource(
+                        SharedR.plurals.num_of_folders_with_parameter,
+                        childFolderCount,
+                        childFolderCount
+                    )
+
+                else -> {
+                    pluralStringResource(
+                        SharedR.plurals.num_of_folders_num_of_files,
+                        childFolderCount,
+                        childFolderCount
+                    ) + pluralStringResource(
+                        SharedR.plurals.num_of_files_with_parameter,
+                        childFileCount,
+                        childFileCount
+                    )
+                }
+            }
+        }
+
+        is NodeSubtitleText.SharedSubtitle -> {
+            when (shareCount) {
+                0 -> if (!isVerified) user else ""
+                1 -> if (isVerified) userFullName else ""
+                else -> pluralStringResource(
+                    SharedR.plurals.general_num_shared_with_count,
+                    shareCount,
+                    shareCount
+                )
+            } ?: ""
+        }
+
+        is NodeSubtitleText.Empty -> ""
+    }
+}

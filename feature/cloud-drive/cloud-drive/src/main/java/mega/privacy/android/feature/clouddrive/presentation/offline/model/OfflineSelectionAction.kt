@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -37,13 +36,13 @@ sealed interface OfflineSelectionAction {
     data object Delete : MenuActionWithIcon {
         @Composable
         override fun getIconPainter(): Painter =
-            rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash)
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.X)
 
         override val testTag: String = "offline_selection_action:delete"
 
         @Composable
         override fun getDescription(): String =
-            stringResource(R.string.offline_screen_selection_menu_remove_from_offline)
+            stringResource(sharedR.string.offline_screen_remove_from_offline_selection_menu)
     }
 
     data object SelectAll : MenuActionWithIcon {
@@ -58,7 +57,6 @@ sealed interface OfflineSelectionAction {
     }
 
     companion object {
-        val topBarItems = listOf(SelectAll)
         val bottomBarItems = listOf(Download, Share, Delete)
     }
 }

@@ -17,6 +17,7 @@ data class SyncNotificationMessage(
     @StringRes val text: Int,
     val syncNotificationType: SyncNotificationType,
     val notificationDetails: NotificationDetails,
+    val formattedText: String? = null,
 )
 
 /**
@@ -28,4 +29,5 @@ data class SyncNotificationMessage(
 data class NotificationDetails(
     val path: String?,
     val errorCode: Int?,
+    val formattedConflictBody: String? = null,
 )

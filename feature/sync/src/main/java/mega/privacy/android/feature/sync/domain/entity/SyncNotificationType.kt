@@ -34,4 +34,10 @@ enum class SyncNotificationType {
      * Change sync root notification
      */
     CHANGE_SYNC_ROOT,
+
+    /**
+     * Notification for cross-device folder conflict
+     * When a sync's remote folder is already being used by another sync/backup on a different device
+     */
+    CROSS_DEVICE_CONFLICT,
 }

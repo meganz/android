@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -59,7 +59,7 @@ internal class UserInfoViewModelTest {
     private val applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
     private val avatarContentMapper: AvatarContentMapper = mock()
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock {
-        onBlocking { invoke() }.thenReturn(1)
+        on { invoke() }.thenReturn(1)
     }
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock()

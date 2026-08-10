@@ -8,6 +8,8 @@ import androidx.media3.exoplayer.source.ShuffleOrder;
 import java.util.Arrays;
 import java.util.Random;
 
+import timber.log.Timber;
+
 /**
  * This class is barely a copy of {@link ShuffleOrder.DefaultShuffleOrder}, only expose
  * the shuffled index.
@@ -75,6 +77,10 @@ public class ExposedShuffleOrder implements ShuffleOrder {
 
     @Override
     public int getNextIndex(int index) {
+        if (index < 0 || index >= indexInShuffled.length) {
+            Timber.w("getNextIndex: index %d out of bounds (length=%d)", index, indexInShuffled.length);
+            return C.INDEX_UNSET;
+        }
         int shuffledIndex = indexInShuffled[index];
         return ++shuffledIndex < shuffled.length ? shuffled[shuffledIndex] : C.INDEX_UNSET;
     }

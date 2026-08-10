@@ -33,11 +33,13 @@ import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesBy
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.CompressPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.DeleteActiveTransferGroupUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.ClearPendingMessagesCompressionProgressUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.PrepareAllPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartUploadingAllPendingMessagesUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.ClearCompletedTransfersCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 
@@ -68,8 +70,9 @@ class ChatUploadsWorker @AssistedInject constructor(
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
+    deleteActiveTransferGroupUseCase: DeleteActiveTransferGroupUseCase,
     @LoginMutex loginMutex: Mutex,
-    @DisplayPathFromUriCache displayPathFromUriCache: HashMap<String, String>,
+    clearCompletedTransfersCacheUseCase: ClearCompletedTransfersCacheUseCase,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -86,7 +89,8 @@ class ChatUploadsWorker @AssistedInject constructor(
     foregroundSetter = foregroundSetter,
     notificationSamplePeriod = notificationSamplePeriod,
     loginMutex = loginMutex,
-    displayPathFromUriCache = displayPathFromUriCache,
+    clearCompletedTransfersCacheUseCase = clearCompletedTransfersCacheUseCase,
+    deleteActiveTransferGroupUseCase = deleteActiveTransferGroupUseCase,
 ) {
     override val updateNotificationId = NOTIFICATION_CHAT_UPLOAD
 

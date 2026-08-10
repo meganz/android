@@ -155,40 +155,29 @@ class AddContactViewModel @Inject constructor(
     }
 
     fun checkSensitiveItems(handles: List<Long>) = viewModelScope.launch {
-        if (isHiddenNodesActive()) {
-            var sensitiveType = HIDDEN_NODE_NONE_SENSITIVE
+        var sensitiveType = HIDDEN_NODE_NONE_SENSITIVE
 
-            for (handle in handles) {
-                val nodeId = NodeId(handle)
-                val node = getNodeByIdUseCase(nodeId) ?: continue
+        for (handle in handles) {
+            val nodeId = NodeId(handle)
+            val node = getNodeByIdUseCase(nodeId) ?: continue
 
-                if (node !is FolderNode || node.isOutShare()) continue
+            if (node !is FolderNode || node.isOutShare()) continue
 
-                if (node.isMarkedSensitive ||
-                    node.isSensitiveInherited ||
-                    hasSensitiveDescendantUseCase(node.id)
-                ) {
-                    sensitiveType =
-                        if (handles.size == 1) {
-                            HIDDEN_NODE_WARNING_TYPE_FOLDER
-                        } else {
-                            HIDDEN_NODE_WARNING_TYPE_FOLDERS
-                        }
-                    break
-                }
+            if (node.isMarkedSensitive ||
+                node.isSensitiveInherited ||
+                hasSensitiveDescendantUseCase(node.id)
+            ) {
+                sensitiveType =
+                    if (handles.size == 1) {
+                        HIDDEN_NODE_WARNING_TYPE_FOLDER
+                    } else {
+                        HIDDEN_NODE_WARNING_TYPE_FOLDERS
+                    }
+                break
             }
-
-            _sensitiveItemsCount.value = sensitiveType
-        } else {
-            _sensitiveItemsCount.value = HIDDEN_NODE_NONE_SENSITIVE
         }
-    }
 
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() == true
+        _sensitiveItemsCount.value = sensitiveType
     }
 
     fun clearSensitiveItemsCheck() {

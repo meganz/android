@@ -14,9 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -24,18 +24,18 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.list.MegaReorderableLazyColumn
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollForLazyColumn
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.presentation.extensions.transfers.getProgressPercentString
-import mega.privacy.android.app.presentation.extensions.transfers.getProgressSizeString
-import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
 import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
 import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
-import mega.privacy.android.app.presentation.transfers.model.QuotaWarning
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
+import mega.privacy.android.core.transfers.extension.getProgressPercentString
+import mega.privacy.android.core.transfers.extension.getProgressSizeString
+import mega.privacy.android.core.transfers.extension.getSpeedString
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.feature.transfers.components.ActiveTransferItem
-import mega.privacy.android.feature.transfers.components.OverQuotaBanner
+import mega.privacy.android.shared.account.overquota.model.OverQuotaStatus
+import mega.privacy.android.shared.account.overquota.view.OverQuotaBanner
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPauseButtonButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPlayButtonButtonPressedEvent
@@ -46,9 +46,8 @@ import mega.privacy.mobile.analytics.event.ActiveTransfersUndoSwipeToCancelSnack
 internal fun ActiveTransfersView(
     activeTransfers: List<InProgressTransfer>,
     selectedActiveTransfersIds: List<Long>?,
-    isTransferOverQuota: Boolean,
-    isStorageOverQuota: Boolean,
-    quotaWarning: QuotaWarning?,
+    hasInternetConnection: Boolean,
+    overQuotaStatus: OverQuotaStatus,
     areTransfersPaused: Boolean,
     enableSwipeToDismiss: Boolean,
     onPlayPauseClicked: (tag: Int) -> Unit,
@@ -60,6 +59,7 @@ internal fun ActiveTransfersView(
     onCancelActiveTransfer: (InProgressTransfer) -> Unit,
     onSetActiveTransferToCancel: (InProgressTransfer) -> Unit,
     onUndoCancelActiveTransfer: (InProgressTransfer) -> Unit,
+    isTabSelected: Boolean,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
@@ -70,7 +70,7 @@ internal fun ActiveTransfersView(
     val snackBarHostState = LocalSnackBarHostState.current?.let {
         SnackbarHostStateWrapper(it)
     }
-    val context = LocalContext.current
+    val resources = LocalResources.current
 
     if (activeTransfers.isEmpty()) {
         EmptyTransfersView(
@@ -79,15 +79,14 @@ internal fun ActiveTransfersView(
         )
     } else {
         Column {
-            quotaWarning?.let {
-                OverQuotaBanner(
-                    modifier = Modifier.testTag(OVER_QUOTA_BANNER_TAG),
-                    isTransferOverQuota = it is QuotaWarning.Transfer || it is QuotaWarning.StorageAndTransfer,
-                    isStorageOverQuota = it is QuotaWarning.Storage || it is QuotaWarning.StorageAndTransfer,
-                    onUpgradeClick = onUpgradeClick,
-                    onCancelButtonClick = onConsumeQuotaWarning,
-                )
-            }
+            OverQuotaBanner(
+                overQuotaStatus = overQuotaStatus,
+                modifier = Modifier.testTag(OVER_QUOTA_BANNER_TAG),
+                isBlockingAware = true,
+                forceRiceTopAppBar = isTabSelected,
+                onUpgradeClicked = onUpgradeClick,
+                onDismissed = onConsumeQuotaWarning,
+            )
             FastScrollForLazyColumn(
                 totalItems = activeTransfers.size,
                 modifier = modifier.fillMaxSize(),
@@ -112,8 +111,8 @@ internal fun ActiveTransfersView(
                 ) { item ->
                     ActiveTransferItem(
                         activeTransfer = item,
-                        isTransferOverQuota = isTransferOverQuota,
-                        isStorageOverQuota = isStorageOverQuota,
+                        overQuotaStatus = overQuotaStatus,
+                        hasInternetConnection = hasInternetConnection,
                         areTransfersPaused = areTransfersPaused,
                         enableSwipeToDismiss = enableSwipeToDismiss,
                         isSelected = selectedActiveTransfersIds?.contains(item.uniqueId),
@@ -126,8 +125,8 @@ internal fun ActiveTransfersView(
                             coroutineScope.launch {
                                 localSnackbarHostState?.currentSnackbarData?.dismiss()
                                 val result = snackBarHostState.showAutoDurationSnackbar(
-                                    context.getString(sharedR.string.transfers_transfer_cancelled),
-                                    context.getString(sharedR.string.general_undo),
+                                    resources.getString(sharedR.string.transfers_transfer_cancelled),
+                                    resources.getString(sharedR.string.general_undo),
                                 )
                                 when (result) {
                                     SnackbarResult.ActionPerformed -> {
@@ -158,9 +157,9 @@ internal fun ActiveTransfersView(
 @Composable
 internal fun ActiveTransferItem(
     activeTransfer: InProgressTransfer,
-    isTransferOverQuota: Boolean,
-    isStorageOverQuota: Boolean,
+    overQuotaStatus: OverQuotaStatus,
     areTransfersPaused: Boolean,
+    hasInternetConnection: Boolean,
     isSelected: Boolean?,
     isDraggable: Boolean,
     isBeingDragged: Boolean,
@@ -188,11 +187,11 @@ internal fun ActiveTransferItem(
         progress = progress.floatValue,
         speed = getSpeedString(
             areTransfersPaused = areTransfersPaused,
-            isTransferOverQuota = isTransferOverQuota && isDownload,
-            isStorageOverQuota = isStorageOverQuota && isDownload.not(),
+            isTransferOverQuota = overQuotaStatus.isDownloadBlocked && isDownload,
+            isStorageOverQuota = overQuotaStatus.isUploadBlocked && isDownload.not(),
         ),
         isPaused = isPaused,
-        isOverQuota = (isDownload && isTransferOverQuota) || (isDownload.not() && isStorageOverQuota),
+        hasIssues = (isDownload && overQuotaStatus.hasTransferIssue) || (isDownload.not() && overQuotaStatus.hasStorageIssue) || !hasInternetConnection,
         areTransfersPaused = areTransfersPaused,
         enableSwipeToDismiss = enableSwipeToDismiss,
         onPlayPauseClicked = {

@@ -6,6 +6,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddLabelSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToAlbumSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToFavouritesSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AvailableOfflineSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.CopySelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DeletePermanentlySelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DisputeTakeDownSelectionMenuItem
@@ -15,21 +20,29 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.Hide
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.LeaveShareSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ManageLinkSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.MoveSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveFromFavouritesSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveLinkSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveOfflineSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveShareSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RenameSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RestoreSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RubbishBinSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.SaveToMegaSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.SendToChatSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ShareFolderSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ShareSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.UnhideSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
+import mega.privacy.android.domain.qualifier.features.Chat
 import mega.privacy.android.domain.qualifier.features.CloudDrive
+import mega.privacy.android.domain.qualifier.features.FileLink
+import mega.privacy.android.domain.qualifier.features.FolderLink
 import mega.privacy.android.domain.qualifier.features.IncomingShares
 import mega.privacy.android.domain.qualifier.features.Links
+import mega.privacy.android.domain.qualifier.features.Offline
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
+import mega.privacy.android.domain.qualifier.features.Timeline
 import javax.inject.Singleton
 
 @Module
@@ -57,6 +70,13 @@ abstract class NodeSelectionModeModule {
             removeShareSelectionMenuItem: RemoveShareSelectionMenuItem,
             disputeTakeDownSelectionMenuItem: DisputeTakeDownSelectionMenuItem,
             shareSelectionMenuItem: ShareSelectionMenuItem,
+            addToSelectionMenuItem: AddToSelectionMenuItem,
+            addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem,
+            addLabelSelectionMenuItem: AddLabelSelectionMenuItem,
+            addToFavouritesSelectionMenuItem: AddToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem: RemoveFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem: AvailableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem: RemoveOfflineSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             hideSelectionModeMenuAction,
@@ -72,7 +92,32 @@ abstract class NodeSelectionModeModule {
             shareFolderSelectionMenuItem,
             removeShareSelectionMenuItem,
             disputeTakeDownSelectionMenuItem,
-            shareSelectionMenuItem
+            shareSelectionMenuItem,
+            addToSelectionMenuItem,
+            addToAlbumSelectionMenuItem,
+            addLabelSelectionMenuItem,
+            addToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem,
+        )
+
+        /**
+         * Provide chat selection mode (bottom bar) options for the PDF viewer's bottom bar on
+         * chat-sourced files. Limited to download and save-to-MEGA: available-offline is
+         * intentionally excluded from the bar (it gives no visible feedback when tapped here and
+         * remains reachable from the 3-dot node-options menu).
+         */
+        @Provides
+        @ElementsIntoSet
+        @Chat
+        @Singleton
+        fun provideChatToolbarItems(
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem: SaveToMegaSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            downloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem,
         )
 
         @Provides
@@ -97,12 +142,20 @@ abstract class NodeSelectionModeModule {
             downloadSelectionMenuItem: DownloadSelectionMenuItem,
             renameSelectionMenuItem: RenameSelectionMenuItem,
             leaveShareSelectionMenuItem: LeaveShareSelectionMenuItem,
+            rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem,
+            sendToChatSelectionMenuItem: SendToChatSelectionMenuItem,
+            availableOfflineSelectionMenuItem: AvailableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem: RemoveOfflineSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuItem,
             moveSelectionModeMenuItem,
             downloadSelectionMenuItem,
             renameSelectionMenuItem,
             leaveShareSelectionMenuItem,
+            rubbishBinSelectionMenuAction,
+            sendToChatSelectionMenuItem,
+            availableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem,
         )
 
         @Provides
@@ -122,6 +175,13 @@ abstract class NodeSelectionModeModule {
             removeShareSelectionMenuItem: RemoveShareSelectionMenuItem,
             disputeTakeDownSelectionMenuItem: DisputeTakeDownSelectionMenuItem,
             shareSelectionMenuItem: ShareSelectionMenuItem,
+            addToSelectionMenuItem: AddToSelectionMenuItem,
+            addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem,
+            addLabelSelectionMenuItem: AddLabelSelectionMenuItem,
+            addToFavouritesSelectionMenuItem: AddToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem: RemoveFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem: AvailableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem: RemoveOfflineSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             rubbishBinSelectionMenuAction,
@@ -134,7 +194,14 @@ abstract class NodeSelectionModeModule {
             shareFolderSelectionMenuItem,
             removeShareSelectionMenuItem,
             disputeTakeDownSelectionMenuItem,
-            shareSelectionMenuItem
+            shareSelectionMenuItem,
+            addToSelectionMenuItem,
+            addToAlbumSelectionMenuItem,
+            addLabelSelectionMenuItem,
+            addToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem,
         )
 
 
@@ -151,7 +218,12 @@ abstract class NodeSelectionModeModule {
             sendToChatSelectionMenuItem: SendToChatSelectionMenuItem,
             renameSelectionMenuItem: RenameSelectionMenuItem,
             copySelectionModeMenuAction: CopySelectionMenuItem,
-            rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem
+            rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem,
+            addLabelSelectionMenuItem: AddLabelSelectionMenuItem,
+            addToFavouritesSelectionMenuItem: AddToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem: RemoveFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem: AvailableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem: RemoveOfflineSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             rubbishBinSelectionMenuAction,
@@ -161,7 +233,84 @@ abstract class NodeSelectionModeModule {
             getLinkSelectionMenuItem,
             removeLinkSelectionMenuItem,
             sendToChatSelectionMenuItem,
-            shareSelectionMenuItem
+            shareSelectionMenuItem,
+            addLabelSelectionMenuItem,
+            addToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem,
+        )
+
+
+        @Provides
+        @ElementsIntoSet
+        @Timeline
+        @Singleton
+        fun provideTimelineToolbarItems(
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            getLinkSelectionMenuItem: GetLinkSelectionMenuItem,
+            sendToChatSelectionMenuItem: SendToChatSelectionMenuItem,
+            shareSelectionMenuItem: ShareSelectionMenuItem,
+            rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem,
+            removeLinkSelectionMenuItem: RemoveLinkSelectionMenuItem,
+            hideSelectionMenuItem: HideSelectionMenuItem,
+            unhideSelectionMenuItem: UnhideSelectionMenuItem,
+            moveSelectionModeMenuItem: MoveSelectionMenuItem,
+            copySelectionModeMenuAction: CopySelectionMenuItem,
+            addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            downloadSelectionMenuItem,
+            getLinkSelectionMenuItem,
+            sendToChatSelectionMenuItem,
+            shareSelectionMenuItem,
+            rubbishBinSelectionMenuAction,
+            removeLinkSelectionMenuItem,
+            hideSelectionMenuItem,
+            unhideSelectionMenuItem,
+            moveSelectionModeMenuItem,
+            copySelectionModeMenuAction,
+            addToAlbumSelectionMenuItem
+        )
+
+        @Provides
+        @ElementsIntoSet
+        @FolderLink
+        @Singleton
+        fun provideFolderLinkToolbarItems(
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem: SaveToMegaSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            downloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem,
+        )
+
+        @Provides
+        @ElementsIntoSet
+        @FileLink
+        @Singleton
+        fun provideFileLinkToolbarItems(
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem: SaveToMegaSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            downloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem,
+        )
+
+        /**
+         * Provide offline selection mode options
+         */
+        @Provides
+        @ElementsIntoSet
+        @Offline
+        @Singleton
+        fun provideOfflineToolbarItems(
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            shareSelectionMenuItem: ShareSelectionMenuItem,
+            removeOfflineSelectionMenuItem: RemoveOfflineSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            downloadSelectionMenuItem,
+            shareSelectionMenuItem,
+            removeOfflineSelectionMenuItem,
         )
     }
 }

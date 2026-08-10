@@ -3,18 +3,18 @@ package mega.privacy.android.app.presentation.photos.mediadiscovery.model
 import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity.DEFAULT
-import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.model.MediaListItem
-import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.domain.entity.photos.DateCard
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.MediaListItem
+import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity.Default
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 
 /**
  * Media Discovery View state
@@ -80,7 +80,7 @@ data class MediaDiscoveryViewState(
     @StringRes val errorMessage: Int? = null,
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
-    val storageCapacity: StorageOverQuotaCapacity = DEFAULT,
+    val storageCapacity: StorageOverQuotaCapacity = Default,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
     val isClearSelectedPhotos: Boolean = true,

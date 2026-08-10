@@ -9,36 +9,46 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
+import mega.privacy.android.domain.entity.preference.FolderPreferenceKeys
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTypeUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderViewTypeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MonitorLinksUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksUiState
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class LinksViewModel @Inject constructor(
-    private val monitorPublicLinksUseCase: MonitorPublicLinksUseCase,
+    private val monitorLinksUseCase: MonitorLinksUseCase,
     private val setViewTypeUseCase: SetViewType,
     private val monitorViewTypeUseCase: MonitorViewType,
+    private val monitorFolderViewTypeUseCase: MonitorFolderViewTypeUseCase,
+    private val setFolderViewTypeUseCase: SetFolderViewTypeUseCase,
+    private val monitorFolderSortOrderUseCase: MonitorFolderSortOrderUseCase,
+    private val setFolderSortOrderUseCase: SetFolderSortOrderUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
-    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase,
+    private val monitorLinksSortOrderUseCase: MonitorLinksSortOrderUseCase,
     private val setCloudSortOrder: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
 ) : ViewModel() {
@@ -48,9 +58,7 @@ class LinksViewModel @Inject constructor(
 
     init {
         monitorViewType()
-        getSortOrder()
-        viewModelScope.launch { loadLinks() }
-        monitorLinks()
+        monitorSortOrderAndLinks()
     }
 
     /**
@@ -69,41 +77,37 @@ class LinksViewModel @Inject constructor(
         }
     }
 
-    private fun monitorLinks() {
+    private fun monitorSortOrderAndLinks() {
         viewModelScope.launch {
-            monitorPublicLinksUseCase(true)
+            monitorFolderSortOrderUseCase(
+                folderKey = FolderPreferenceKeys.LINKS,
+                orElse = monitorLinksSortOrderUseCase().filterNotNull(),
+            )
+                .distinctUntilChanged()
                 .catch { Timber.e(it) }
-                .collectLatest { nodes ->
-                    val nodeUiItems = nodeUiItemMapper(
-                        nodeList = nodes,
-                        existingItems = uiState.value.items,
-                        nodeSourceType = NodeSourceType.LINKS
-                    )
-                    _uiState.update { state ->
-                        state.copy(
-                            items = nodeUiItems
+                .collectLatest { sortOrder ->
+                    _uiState.update {
+                        it.copy(
+                            selectedSortConfiguration = nodeSortConfigurationUiMapper(sortOrder),
+                            selectedSortOrder = sortOrder,
                         )
                     }
+                    monitorLinksUseCase(sortOrder)
+                        .catch { Timber.e(it) }
+                        .collectLatest { nodes ->
+                            val nodeUiItems = nodeUiItemMapper(
+                                nodeList = nodes,
+                                existingItems = uiState.value.items,
+                                nodeSourceType = NodeSourceType.LINKS
+                            )
+                            _uiState.update { state ->
+                                state.copy(
+                                    items = nodeUiItems,
+                                    isLoading = false,
+                                )
+                            }
+                        }
                 }
-        }
-    }
-
-    private suspend fun loadLinks() {
-        runCatching {
-            val nodes = monitorPublicLinksUseCase(true).first()
-            val nodeUiItems = nodeUiItemMapper(
-                nodeList = nodes,
-                existingItems = uiState.value.items,
-                nodeSourceType = NodeSourceType.LINKS
-            )
-            _uiState.update { state ->
-                state.copy(
-                    items = nodeUiItems,
-                    isLoading = false,
-                )
-            }
-        }.onFailure {
-            Timber.e(it)
         }
     }
 
@@ -186,10 +190,7 @@ class LinksViewModel @Inject constructor(
     private fun deselectAllItems() {
         val updatedItems = uiState.value.items.map { it.copy(isSelected = false) }
         _uiState.update { state ->
-            state.copy(
-                items = updatedItems,
-                isSelecting = false
-            )
+            state.copy(items = updatedItems)
         }
     }
 
@@ -199,10 +200,7 @@ class LinksViewModel @Inject constructor(
     private fun selectAllItems() {
         val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
         _uiState.update { state ->
-            state.copy(
-                items = updatedItems,
-                isSelecting = false
-            )
+            state.copy(items = updatedItems)
         }
     }
 
@@ -216,7 +214,12 @@ class LinksViewModel @Inject constructor(
                     ViewType.LIST -> ViewType.GRID
                     ViewType.GRID -> ViewType.LIST
                 }
-                setViewTypeUseCase(toggledViewType)
+                setFolderViewTypeUseCase(
+                    folderKey = FolderPreferenceKeys.LINKS,
+                    viewType = toggledViewType,
+                    currentSortOrder = uiState.value.selectedSortOrder,
+                    orElse = { setViewTypeUseCase(it) },
+                )
             }.onFailure {
                 Timber.e(it, "Failed to change view type")
             }
@@ -225,34 +228,14 @@ class LinksViewModel @Inject constructor(
 
     private fun monitorViewType() {
         viewModelScope.launch {
-            monitorViewTypeUseCase()
+            monitorFolderViewTypeUseCase(
+                folderKey = FolderPreferenceKeys.LINKS,
+                orElse = monitorViewTypeUseCase(),
+            )
                 .catch { Timber.e(it) }
                 .collect { viewType ->
                     _uiState.update { it.copy(currentViewType = viewType) }
                 }
-        }
-    }
-
-    private fun getSortOrder(
-        refresh: Boolean = false,
-    ) {
-        viewModelScope.launch {
-            runCatching {
-                getLinksSortOrderUseCase(true)
-            }.onSuccess { sortOrder ->
-                val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
-                _uiState.update {
-                    it.copy(
-                        selectedSortConfiguration = sortOrderPair,
-                        selectedSortOrder = sortOrder
-                    )
-                }
-                if (refresh) {
-                    loadLinks()
-                }
-            }.onFailure {
-                Timber.e(it, "Failed to get sort order")
-            }
         }
     }
 
@@ -263,9 +246,12 @@ class LinksViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val order = nodeSortConfigurationUiMapper(sortConfiguration)
-                setCloudSortOrder(order)
-            }.onSuccess {
-                getSortOrder(refresh = true)
+                setFolderSortOrderUseCase(
+                    folderKey = FolderPreferenceKeys.LINKS,
+                    sortOrder = order,
+                    currentViewType = uiState.value.currentViewType,
+                    orElse = { setCloudSortOrder(it) },
+                )
             }.onFailure {
                 Timber.e(it, "Failed to set sort order")
             }

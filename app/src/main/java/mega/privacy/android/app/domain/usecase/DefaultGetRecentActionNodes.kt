@@ -10,11 +10,9 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
 import javax.inject.Inject
@@ -27,7 +25,6 @@ class DefaultGetRecentActionNodes @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : GetRecentActionNodes {
 
     /**
@@ -57,8 +54,7 @@ class DefaultGetRecentActionNodes @Inject constructor(
     private suspend fun createNodeItem(node: TypedFileNode): NodeItem? =
         runCatching {
             val megaNode = getNodeByHandle.invoke(node.id.longValue)
-            val hiddenNodeEnabled = isHiddenNodesActive()
-            val shouldApplySensitiveMode = hiddenNodeEnabled && run {
+            val shouldApplySensitiveMode = run {
                 val accountType =
                     monitorAccountDetailUseCase().firstOrNull()?.levelDetail?.accountType
                 val isBusinessAccountExpired =
@@ -77,11 +73,4 @@ class DefaultGetRecentActionNodes @Inject constructor(
         }.onFailure {
             Timber.e(it)
         }.getOrNull()
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
-    }
 }

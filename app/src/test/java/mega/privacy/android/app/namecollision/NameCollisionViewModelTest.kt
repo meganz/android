@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -112,7 +113,7 @@ internal class NameCollisionViewModelTest {
                 }
 
                 getFileVersionsOption.stub {
-                    onBlocking { invoke(true) }.thenAnswer { throw Exception("This test failed") }
+                    on { invoke(true) }.thenAnswer { throw Exception("This test failed") }
                 }
 
                 initUnderTest()
@@ -217,9 +218,12 @@ internal class NameCollisionViewModelTest {
             TransferTriggerEvent.StartUpload.CollidedFiles(
                 pathsAndNames = pathsAndNames,
                 destinationId = destinationId,
-                collisionChoice = choice
+                collisionChoice = choice,
+                pitagTrigger = PitagTrigger.NotApplicable,
             )
         )
+
+        initUnderTest()
 
         with(underTest) {
             uploadFiles(pathsAndNames, destinationId, choice)
@@ -294,6 +298,166 @@ internal class NameCollisionViewModelTest {
         verify(deleteCacheFilesUseCase).invoke(expected)
     }
 
+    @Test
+    fun `test that getUploadedFilesCount returns 0 initially`() = runTest {
+        initUnderTest()
+
+        assertThat(underTest.getUploadedFilesCount()).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that getUploadedFilesCount increments when single file is uploaded`() = runTest {
+        val path = UriPath("/cacheFolder/Mega/file.txt")
+        val nameCollision = mock<FileNameCollision> {
+            on { this.path } doReturn path
+            on { this.isFile } doReturn true
+            on { this.parentHandle } doReturn 123L
+            on { this.name } doReturn "file.txt"
+            on { this.renameName } doReturn null
+            on { this.pitagTrigger } doReturn PitagTrigger.NotApplicable
+        }
+        val collisionResult = mock<NodeNameCollisionResult> {
+            on { this.nameCollision } doReturn nameCollision
+        }
+        whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn collisionResult
+        whenever(getFileVersionsOption(any())).thenReturn(false)
+
+        initUnderTest()
+        underTest.setSingleData(nameCollision)
+        advanceUntilIdle()
+
+        assertThat(underTest.getUploadedFilesCount()).isEqualTo(0)
+
+        underTest.replaceUpdateOrMerge(false)
+        advanceUntilIdle()
+
+        assertThat(underTest.getUploadedFilesCount()).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that getUploadedFilesCount increments correctly when multiple files are uploaded`() =
+        runTest {
+            val paths = listOf(
+                UriPath("/cacheFolder/Mega/file1.txt"),
+                UriPath("/cacheFolder/Mega/file2.txt"),
+                UriPath("/cacheFolder/Mega/file3.txt")
+            )
+            val nameCollisions = paths.mapIndexed { index, path ->
+                mock<FileNameCollision> {
+                    on { this.path } doReturn path
+                    on { this.isFile } doReturn true
+                    on { this.parentHandle } doReturn 123L
+                    on { this.name } doReturn "file${index + 1}.txt"
+                    on { this.renameName } doReturn null
+                    on { this.pitagTrigger } doReturn PitagTrigger.NotApplicable
+                }
+            }
+            val collisionResults = nameCollisions.map { nameCollision ->
+                mock<NodeNameCollisionResult> {
+                    on { this.nameCollision } doReturn nameCollision
+                }
+            }
+
+            nameCollisions.forEachIndexed { index, nameCollision ->
+                whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn collisionResults[index]
+                whenever(getNodeNameCollisionsResultUseCase(nameCollisions.drop(index))) doReturn
+                        collisionResults.drop(index)
+            }
+
+            whenever(reorderNodeNameCollisionsUseCase(nameCollisions)) doReturn NodeCollisionsWithSize(
+                nameCollisions,
+                nameCollisions.size - 1,
+                0,
+            )
+            whenever(getFileVersionsOption(any())).thenReturn(false)
+
+            initUnderTest()
+            underTest.setData(nameCollisions)
+            advanceUntilIdle()
+
+            assertThat(underTest.getUploadedFilesCount()).isEqualTo(0)
+
+            underTest.replaceUpdateOrMerge(true)
+            advanceUntilIdle()
+
+            assertThat(underTest.getUploadedFilesCount()).isEqualTo(3)
+        }
+
+    @Test
+    fun `test that getUploadedFilesCount does not increment when folder is uploaded`() = runTest {
+        val path = UriPath("/cacheFolder/Mega/folder")
+        val nameCollision = mock<FileNameCollision> {
+            on { this.path } doReturn path
+            on { this.isFile } doReturn false
+            on { this.parentHandle } doReturn 123L
+            on { this.name } doReturn "folder"
+            on { this.renameName } doReturn null
+            on { this.pitagTrigger } doReturn PitagTrigger.NotApplicable
+        }
+        val collisionResult = mock<NodeNameCollisionResult> {
+            on { this.nameCollision } doReturn nameCollision
+        }
+        whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn collisionResult
+        whenever(getFileVersionsOption(any())).thenReturn(false)
+
+        initUnderTest()
+        underTest.setSingleData(nameCollision)
+        advanceUntilIdle()
+
+        assertThat(underTest.getUploadedFilesCount()).isEqualTo(0)
+
+        underTest.replaceUpdateOrMerge(false)
+        advanceUntilIdle()
+
+        assertThat(underTest.getUploadedFilesCount()).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that cancelAll clears pendingCollisions for non-folder-upload context`() =
+        runTest {
+            val paths = listOf(
+                UriPath("/cacheFolder/Mega/file1.txt"),
+                UriPath("/cacheFolder/Mega/file2.txt"),
+            )
+            val nameCollisions = paths.mapIndexed { index, path ->
+                mock<FileNameCollision> {
+                    on { this.path } doReturn path
+                    on { this.isFile } doReturn true
+                    on { this.parentHandle } doReturn 123L
+                    on { this.name } doReturn "file${index + 1}.txt"
+                    on { this.renameName } doReturn null
+                    on { this.pitagTrigger } doReturn PitagTrigger.NotApplicable
+                }
+            }
+            val collisionResults = nameCollisions.map { nameCollision ->
+                mock<NodeNameCollisionResult> {
+                    on { this.nameCollision } doReturn nameCollision
+                }
+            }
+
+            nameCollisions.forEachIndexed { index, nameCollision ->
+                whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn collisionResults[index]
+                whenever(getNodeNameCollisionsResultUseCase(nameCollisions.drop(index))) doReturn
+                        collisionResults.drop(index)
+            }
+
+            whenever(reorderNodeNameCollisionsUseCase(nameCollisions)) doReturn NodeCollisionsWithSize(
+                nameCollisions,
+                nameCollisions.size - 1,
+                0,
+            )
+            whenever(getFileVersionsOption(any())).thenReturn(false)
+
+            initUnderTest()
+            underTest.isFolderUploadContext = false
+            underTest.setData(nameCollisions)
+            advanceUntilIdle()
+
+            underTest.cancel(true)
+            advanceUntilIdle()
+
+            assertThat(underTest.shouldFinish()).isTrue()
+        }
 
     companion object {
         @JvmField

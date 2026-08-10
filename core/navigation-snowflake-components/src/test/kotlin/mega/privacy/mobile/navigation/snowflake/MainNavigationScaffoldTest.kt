@@ -21,7 +21,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
@@ -33,6 +32,7 @@ import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.navigation.contract.DefaultNumberBadge
 import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.PreferredSlot
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 import org.junit.Rule
@@ -442,5 +442,5 @@ class MainNavigationScaffoldTest {
     }
 
     @Serializable
-    object TestHomeScreen : NavKey
+    private object TestHomeScreen : MainNavItemNavKey
 }

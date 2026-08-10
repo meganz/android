@@ -75,7 +75,7 @@ sealed interface ChatRoomMenuAction : MenuAction {
      * Clear
      */
     object Clear : MenuActionWithoutIcon(
-        descriptionRes = R.string.general_clear,
+        descriptionRes = sharedR.string.general_clear,
         testTag = TEST_TAG_CLEAR_ACTION,
     ), ChatRoomMenuAction {
         override val orderInCategory: Int = 130

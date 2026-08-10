@@ -24,6 +24,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -125,7 +126,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
         super.onCreate(savedInstanceState)
         binding = ActivityVersionsFileBinding.inflate(layoutInflater)
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
         megaApi.addGlobalListener(this)
@@ -565,7 +566,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     showSnackbar(getString(R.string.version_restored))
                 }
             } else {
-                showSnackbar(getString(R.string.general_text_error))
+                showSnackbar(getString(sharedR.string.general_text_error))
             }
         }
     }
@@ -683,14 +684,14 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             } else {
                                 showSnackbar(
                                     Constants.SNACKBAR_TYPE,
-                                    getString(R.string.general_text_error),
+                                    getString(sharedR.string.general_text_error),
                                     -1
                                 )
                             }
                         } else {
                             showSnackbar(
                                 Constants.SNACKBAR_TYPE,
-                                getString(R.string.general_text_error),
+                                getString(sharedR.string.general_text_error),
                                 -1
                             )
                         }
@@ -931,12 +932,16 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun updateVersionsSize() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val size: Long = nodeVersions?.sumOf { node -> node.size } ?: 0L
-            Timber.d("Size: %s", size)
-            val sizeString = size.let { Util.getSizeString(it, this@VersionsFileActivity) }
-            versionsSize = sizeString
-            adapter?.notifyItemChanged(1)
+        lifecycleScope.launch {
+            val newVersionsSize = withContext(Dispatchers.IO) {
+                val size: Long = nodeVersions?.sumOf { node -> node.size } ?: 0L
+                Timber.d("Size: %s", size)
+                size.let { Util.getSizeString(it, this@VersionsFileActivity) }
+            }
+            if (newVersionsSize != versionsSize) {
+                versionsSize = newVersionsSize
+                adapter?.notifyItemChanged(1)
+            }
         }
     }
 

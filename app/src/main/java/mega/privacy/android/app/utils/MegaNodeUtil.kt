@@ -15,10 +15,7 @@ import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -27,35 +24,19 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
-import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER
-import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FRAGMENT_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_LOCATION_FILE_INFO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_ADAPTER
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
-import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
-import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.getTappedNodeLocalFile
 import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
-import mega.privacy.android.app.utils.FileUtil.shareFile
 import mega.privacy.android.app.utils.FileUtil.shareFiles
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE
@@ -67,16 +48,18 @@ import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showSnackbar
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.entity.texteditor.textEditorModeFromValue
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.MegaNavigatorEntryPoint
+import mega.privacy.android.navigation.OpenTextEditorParams
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
@@ -134,54 +117,6 @@ object MegaNodeUtil {
     }
 
     /**
-     *
-     * Shares a node.
-     *
-     * @param context Current Context.
-     * @param node    Node to share.
-     */
-    @JvmStatic
-    fun shareNode(context: Context, node: MegaNode?) {
-        shareNode(context, node, null)
-    }
-
-    /**
-     *
-     * Shares a node.
-     * If the node is a folder creates and/or shares the folder link.
-     * If the node is a file and exists in local storage, shares the file. If not, creates and/or shares the file link.
-     *
-     * @param context                  Current Context.
-     * @param node                     Node to share.
-     * @param onExportFinishedListener Listener to manage the result of export request.
-     */
-    @JvmStatic
-    fun shareNode(
-        context: Context,
-        node: MegaNode?,
-        onExportFinishedListener: (() -> Unit)?,
-    ) {
-        if (shouldContinueWithoutError(context, node)) {
-            val path = getLocalFile(node)
-
-            if (!path.isNullOrBlank() && !node.isFolder) {
-                shareFile(context, File(path), node.name)
-            } else if (node.isExported) {
-                val intent = Intent(Intent.ACTION_SEND)
-                intent.putExtra(Intent.EXTRA_SUBJECT, node.name)
-                startShareIntent(context, intent, node.publicLink, title = node.name)
-            } else {
-                val intent = Intent(Intent.ACTION_SEND)
-                intent.putExtra(Intent.EXTRA_SUBJECT, node.name)
-                MegaApplication.getInstance().megaApi.exportNode(
-                    node,
-                    ExportListener(context, intent, onExportFinishedListener)
-                )
-            }
-        }
-    }
-
-    /**
      * Method to know if all nodes are unloaded. If so, share them.
      *
      * @param context   The Activity context.
@@ -225,55 +160,6 @@ object MegaNodeUtil {
         }
 
         return links
-    }
-
-    /**
-     * Share multiple nodes out of MEGA app.
-     *
-     * If a folder is involved, we will share links of all nodes.
-     *
-     * Other apps can't handle the mixture of link and file, so if there is any file that is not
-     * downloaded, we will share links of all files.
-     *
-     * @param context the context where nodes are shared
-     * @param nodes nodes to share
-     */
-    @JvmStatic
-    fun shareNodes(context: Context, nodes: List<MegaNode>) {
-        if (!shouldContinueWithoutError(context, nodes)) {
-            return
-        }
-
-        if (areAllNodesDownloaded(context, nodes)) {
-            return
-        }
-
-        var notExportedNodes = 0
-        val links = getExportNodesLink(nodes)
-
-        for (node in nodes) {
-            if (!node.isExported) {
-                notExportedNodes++
-            }
-        }
-        val title = nodes.singleOrNull()?.name
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            putExtra(Intent.EXTRA_SUBJECT, title)
-        }
-        if (notExportedNodes == 0) {
-            startShareIntent(context, intent, links.toString(), null)
-            return
-        }
-
-        val megaApi = MegaApplication.getInstance().megaApi
-        val exportListener =
-            ExportListener(context, notExportedNodes, links, intent)
-
-        for (node in nodes) {
-            if (!node.isExported) {
-                megaApi.exportNode(node, exportListener)
-            }
-        }
     }
 
     /**
@@ -371,55 +257,24 @@ object MegaNodeUtil {
      * @return True if the node is "My chat files" attribute, false otherwise
      */
     private fun isMyChatFilesFolder(node: MegaNode?): Boolean {
+        if (node == null || node.handle == INVALID_HANDLE) return false
         val megaApplication = MegaApplication.getInstance()
-
-        return node != null && node.handle != INVALID_HANDLE &&
-                existsMyChatFilesFolder() &&
-                node.handle == megaApplication.dbH.myChatFilesFolderHandle
+        val storedHandle = megaApplication.dbH.myChatFilesFolderHandle
+        if (storedHandle == INVALID_HANDLE || node.handle != storedHandle) return false
+        val storedNode = megaApplication.megaApi.getNodeByHandle(storedHandle) ?: return false
+        return !megaApplication.megaApi.isInRubbish(storedNode)
     }
-
-    /**
-     * Checks if the user attribute "My chat files" is saved in DB and exists
-     *
-     * @return True if the the user attribute "My chat files" is saved in the DB, false otherwise
-     */
-    @JvmStatic
-    fun existsMyChatFilesFolder(): Boolean {
-        val dbH = MegaApplication.getInstance().dbH
-        val megaApi: MegaApiJava = MegaApplication.getInstance().megaApi
-
-        if (dbH.myChatFilesFolderHandle != INVALID_HANDLE) {
-            val myChatFilesFolder = megaApi.getNodeByHandle(dbH.myChatFilesFolderHandle)
-
-            return myChatFilesFolder != null &&
-                    myChatFilesFolder.handle != INVALID_HANDLE &&
-                    !megaApi.isInRubbish(myChatFilesFolder)
-        }
-
-        return false
-    }
-
-    /**
-     * Gets the node of the user attribute "My chat files" from the DB.
-     *
-     * Before call this method is necessary to call existsMyChatFilesFolder() method
-     *
-     * @return "My chat files" folder node
-     * @see MegaNodeUtil.existsMyChatFilesFolder
-     */
-    @JvmStatic
-    val myChatFilesFolder: MegaNode?
-        get() = MegaApplication.getInstance().megaApi.getNodeByHandle(MegaApplication.getInstance().dbH.myChatFilesFolderHandle)
 
     /**
      * Checks if a node is "Camera Uploads" or "Media Uploads" folder.
      *
      * Note: The content of this method is temporary and will have to be modified when the PR of the CU user attribute be merged.
      *
+     * @param megaApi MegaApiAndroid instance to use.
      * @param n MegaNode to check
      * @return True if the node is "Camera Uploads" or "Media Uploads" folder, false otherwise
      */
-    private fun isCameraUploads(n: MegaNode): Boolean {
+    private fun isCameraUploads(megaApi: MegaApiAndroid, n: MegaNode): Boolean {
         var cameraSyncHandle: String? = null
         var secondaryMediaHandle: String? = null
         val dbH = MegaApplication.getInstance().dbH
@@ -432,7 +287,7 @@ object MegaNodeUtil {
 
         val handle = n.handle
         if (cameraSyncHandle != null && cameraSyncHandle.isNotEmpty()
-            && handle == cameraSyncHandle.toLong() && !isNodeInRubbishOrDeleted(handle)
+            && handle == cameraSyncHandle.toLong() && !isNodeInRubbishOrDeletedInternal(megaApi, handle)
         ) {
             return true
         }
@@ -443,50 +298,40 @@ object MegaNodeUtil {
         }
 
         return (secondaryMediaHandle != null && secondaryMediaHandle.isNotEmpty()
-                && handle == secondaryMediaHandle.toLong() && !isNodeInRubbishOrDeleted(handle))
-    }
-
-    /**
-     * Checks if a node is  outgoing or a pending outgoing share.
-     *
-     * @param node MegaNode to check
-     * @return True if the node is a outgoing or a pending outgoing share, false otherwise
-     */
-    @JvmStatic
-    fun isOutShare(node: MegaNode?): Boolean {
-        return node?.isOutShare == true || MegaApplication.getInstance().megaApi.isPendingShare(node)
+                && handle == secondaryMediaHandle.toLong() && !isNodeInRubbishOrDeletedInternal(megaApi, handle))
     }
 
     /**
      * Gets the the icon that has to be displayed for a folder.
      *
+     * @param megaApi       MegaApiAndroid instance to use.
      * @param node          MegaNode referencing the folder to check
      * @param drawerItem    indicates if the icon has to be shown in Outgoing shares section or any other
      * @return The icon of the folder to be displayed.
      */
     @JvmStatic
-    fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem): Int {
+    fun getFolderIcon(megaApi: MegaApiAndroid, node: MegaNode, drawerItem: DrawerItem): Int {
         return if (node.isInShare) {
-            IconPackR.drawable.ic_folder_incoming_medium_solid
-        } else if (isCameraUploads(node)) {
-            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShare(node)) {
-                IconPackR.drawable.ic_folder_outgoing_medium_solid
+            IconPackR.drawable.ic_folder_users_medium_solid
+        } else if (isCameraUploads(megaApi, node)) {
+            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(megaApi, node)) {
+                IconPackR.drawable.ic_folder_users_medium_solid
             } else {
                 IconPackR.drawable.ic_folder_camera_uploads_medium_solid
             }
         } else if (isMyChatFilesFolder(node)) {
-            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShare(node)) {
-                IconPackR.drawable.ic_folder_outgoing_medium_solid
+            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(megaApi, node)) {
+                IconPackR.drawable.ic_folder_users_medium_solid
             } else {
                 IconPackR.drawable.ic_folder_chat_medium_solid
             }
-        } else if (isSynced(node)) {
+        } else if (isSynced(megaApi, node)) {
             IconPackR.drawable.ic_folder_sync_medium_solid
-        } else if (isOutShare(node)) {
-            IconPackR.drawable.ic_folder_outgoing_medium_solid
-        } else if (isRootBackupFolder(node)) {
+        } else if (isOutShareInternal(megaApi, node)) {
+            IconPackR.drawable.ic_folder_users_medium_solid
+        } else if (isRootBackupFolder(megaApi, node)) {
             IconPackR.drawable.ic_backup_medium_solid
-        } else if (isDeviceBackupFolder(node)) {
+        } else if (isDeviceBackupFolder(megaApi, node)) {
             getMyBackupSubFolderIcon(node)
         } else {
             getFolderIconByLabel(node.label)
@@ -510,12 +355,14 @@ object MegaNodeUtil {
     /**
      * Checks if a node is a device folder under the MyBackup folder.
      *
+     * @param megaApi MegaApiAndroid instance to use.
      * @param node MegaNode to check
      * @return True if the node is a device folder, false otherwise
      */
-    private fun isDeviceBackupFolder(node: MegaNode?): Boolean {
+    private fun isDeviceBackupFolder(megaApi: MegaApiAndroid, node: MegaNode?): Boolean {
         Timber.d("MyBackup + isDeviceBackupFolder node.handle = ${node?.handle}")
-        return (node?.parentHandle == myBackupHandle && !node.deviceId.isNullOrBlank() && !isNodeInRubbishOrDeleted(
+        return (node?.parentHandle == myBackupHandle && !node.deviceId.isNullOrBlank() && !isNodeInRubbishOrDeletedInternal(
+            megaApi,
             node.handle
         ))
     }
@@ -523,12 +370,13 @@ object MegaNodeUtil {
     /**
      * Checks if a node is the MyBackup folder.
      *
+     * @param megaApi MegaApiAndroid instance to use.
      * @param node MegaNode to check
      * @return True if the node is the MyBackup folder, false otherwise
      */
-    private fun isRootBackupFolder(node: MegaNode?): Boolean {
+    private fun isRootBackupFolder(megaApi: MegaApiAndroid, node: MegaNode?): Boolean {
         Timber.d("MyBackup + isRootBackupFolder node.handle = ${node?.handle}")
-        return (node?.handle == myBackupHandle && !isNodeInRubbishOrDeleted(node.handle))
+        return (node?.handle == myBackupHandle && !isNodeInRubbishOrDeletedInternal(megaApi, node.handle))
     }
 
     /**
@@ -562,8 +410,7 @@ object MegaNodeUtil {
         }
     }
 
-    private fun isSynced(megaNode: MegaNode): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
+    private fun isSynced(megaApi: MegaApiAndroid, megaNode: MegaNode): Boolean {
         val syncs = megaApi.syncs
         for (i in 0..syncs.size()) {
             syncs.get(i)?.let { syncNode ->
@@ -603,41 +450,27 @@ object MegaNodeUtil {
     }
 
     /**
-     * Checks if the Toolbar option "share" should be visible or not depending on the permissions of the MegaNode
+     * Internal helper to detect whether the node has been deleted completely or is in rubbish bin.
      *
-     * @param adapterType   view in which is required the check
-     * @param isFolderLink  if true, the node comes from a folder link
-     * @param handle        identifier of the MegaNode to check
-     * @return True if the option "share" should be visible, false otherwise
-     */
-    @JvmStatic
-    fun showShareOption(adapterType: Int, isFolderLink: Boolean, handle: Long): Boolean {
-        if (isFolderLink) {
-            return false
-        } else if (adapterType != OFFLINE_ADAPTER &&
-            adapterType != ZIP_ADAPTER && adapterType != FILE_LINK_ADAPTER
-        ) {
-            val megaApi = MegaApplication.getInstance().megaApi
-            val node = megaApi.getNodeByHandle(handle)
-
-            return node != null && megaApi.getAccess(node) == MegaShare.ACCESS_OWNER
-        }
-
-        return true
-    }
-
-    /**
-     * This method is to detect whether the node has been deleted completely
-     * or in rubbish bin
+     * @param megaApi MegaApiAndroid instance to use.
      * @param handle node's handle to be detected
      * @return whether the node is in rubbish
      */
-    @JvmStatic
-    fun isNodeInRubbishOrDeleted(handle: Long): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
+    private fun isNodeInRubbishOrDeletedInternal(megaApi: MegaApiAndroid, handle: Long): Boolean {
         val node = megaApi.getNodeByHandle(handle)
 
         return node == null || megaApi.isInRubbish(node)
+    }
+
+    /**
+     * Internal helper that checks if a node is an outgoing or a pending outgoing share.
+     *
+     * @param megaApi MegaApiAndroid instance to use.
+     * @param node MegaNode to check
+     * @return True if the node is an outgoing or a pending outgoing share, false otherwise
+     */
+    private fun isOutShareInternal(megaApi: MegaApiAndroid, node: MegaNode?): Boolean {
+        return node?.isOutShare == true || megaApi.isPendingShare(node)
     }
 
     /**
@@ -651,84 +484,6 @@ object MegaNodeUtil {
         for (node in nodes) {
             if (!node.isFile || node.isTakenDown) {
                 return false
-            }
-        }
-
-        return true
-    }
-
-    /**
-     * Check if all nodes have full access.
-     *
-     * @param nodes nodes to check
-     * @return whether all nodes have full access
-     */
-    @JvmStatic
-    fun allHaveFullAccess(nodes: List<MegaNode?>): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
-        for (node in nodes) {
-            if (megaApi.checkAccessErrorExtended(
-                    node,
-                    MegaShare.ACCESS_FULL
-                ).errorCode != MegaError.API_OK
-            ) {
-                return false
-            }
-        }
-
-        return true
-    }
-
-    /**
-     * Check if all nodes have owner access and are not taken down.
-     *
-     * @param nodes List of nodes to check.
-     * @return True if all nodes have owner access and are not taken down, false otherwise.
-     */
-    @JvmStatic
-    fun allHaveOwnerAccessAndNotTakenDown(nodes: List<MegaNode?>): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
-
-        for (node in nodes) {
-            if (megaApi.checkAccessErrorExtended(
-                    node,
-                    MegaShare.ACCESS_OWNER
-                ).errorCode != MegaError.API_OK
-                || node?.isTakenDown == true
-            ) {
-                return false
-            }
-        }
-
-        return true
-    }
-
-    /**
-     * Checks if a folder node is empty.
-     * If a folder is empty means although contains more folders inside,
-     * all of them don't contain any file.
-     *
-     * @param node  MegaNode to check.
-     * @return  True if the folder is folder and is empty, false otherwise.
-     */
-    @JvmStatic
-    fun isEmptyFolder(node: MegaNode?): Boolean {
-        if (node == null || node.isFile) {
-            return false
-        }
-
-        val megaApi = MegaApplication.getInstance().megaApi
-        val children: List<MegaNode?>? = megaApi.getChildren(node)
-
-        if (children != null && children.isNotEmpty()) {
-            for (child in children) {
-                if (child == null) {
-                    continue
-                }
-
-                if (child.isFile || !isEmptyFolder(child)) {
-                    return false
-                }
             }
         }
 
@@ -828,19 +583,6 @@ object MegaNodeUtil {
     }
 
     /**
-     * Gets the handle of Cloud root node.
-     *
-     * @return The handle of Cloud root node if available, invalid handle otherwise.
-     */
-    @JvmStatic
-    val cloudRootHandle: Long
-        get() {
-            val rootNode = MegaApplication.getInstance().megaApi.rootNode
-
-            return rootNode?.handle ?: INVALID_HANDLE
-        }
-
-    /**
      * Stop SDK HTTP streaming server.
      *
      * @param shouldStopServer True if should stop the server, false otherwise.
@@ -900,7 +642,7 @@ object MegaNodeUtil {
             dialog.dismiss()
             listener?.onCancelClicked()
         }
-        builder.setNegativeButton(context.getString(R.string.dispute_takendown_file)) { dialog, _ ->
+        builder.setNegativeButton(context.getString(sharedR.string.dispute_takendown_file)) { dialog, _ ->
             context.launchUrl(Constants.DISPUTE_URL)
             dialog.dismiss()
             listener?.onDisputeClicked()
@@ -951,186 +693,6 @@ object MegaNodeUtil {
     }
 
     /**
-     * Get location info of a node.
-     *
-     * @param adapterType node source adapter type
-     * @param fromIncomingShare is from incoming share
-     * @param handle node handle
-     *
-     * @return location info
-     */
-    @JvmStatic
-    fun getNodeLocationInfo(
-        adapterType: Int,
-        fromIncomingShare: Boolean,
-        handle: Long,
-    ): LocationInfo? {
-        val app = MegaApplication.getInstance()
-        val dbHandler = getDbHandler()
-        val megaApi = app.megaApi
-
-        if (adapterType == OFFLINE_ADAPTER) {
-            val node = dbHandler.findByHandle(handle) ?: return null
-            val file = OfflineUtils.getOfflineFile(app, node)
-            if (!file.exists()) {
-                return null
-            }
-
-            val parentName = file.parentFile?.name ?: return null
-            val grandParentName = file.parentFile?.parentFile?.name
-            val location = when {
-                grandParentName != null
-                        && grandParentName + File.separator + parentName == OfflineUtils.OFFLINE_BACKUPS_DIR -> {
-                    app.getString(R.string.section_saved_for_offline_new)
-                }
-
-                parentName == OfflineUtils.OFFLINE_DIR -> {
-                    app.getString(R.string.section_saved_for_offline_new)
-                }
-
-                else -> {
-                    app.getString(
-                        R.string.location_label, parentName,
-                        app.getString(R.string.section_saved_for_offline_new)
-                    )
-                }
-            }
-
-            return LocationInfo(location, offlineParentPath = node.path)
-        } else {
-            val node = megaApi.getNodeByHandle(handle) ?: return null
-
-            val parent = megaApi.getParentNode(node)
-            val topAncestor = megaApi.getRootParentNode(node)
-
-            val inCloudDrive = topAncestor.handle == megaApi.rootNode?.handle
-                    || topAncestor.handle == megaApi.rubbishNode?.handle
-            val inBackups = topAncestor.handle == megaApi.vaultNode?.handle
-
-            val location = when {
-                fromIncomingShare -> {
-                    if (parent != null) {
-                        app.getString(
-                            R.string.location_label, parent.name,
-                            app.getString(R.string.tab_incoming_shares)
-                        )
-                    } else {
-                        app.getString(R.string.tab_incoming_shares)
-                    }
-                }
-
-                parent == null -> {
-                    app.getString(R.string.tab_incoming_shares)
-                }
-
-                inCloudDrive -> {
-                    if (topAncestor.handle == parent.handle) {
-                        getTranslatedNameForParentNode(megaApi, topAncestor, app)
-                    } else {
-                        app.getString(
-                            R.string.location_label, parent.name,
-                            getTranslatedNameForParentNode(megaApi, topAncestor, app)
-                        )
-                    }
-                }
-
-                inBackups -> {
-                    if (node.parentHandle == myBackupHandle) {
-                        // If the Node's parent handle is the same with the My Backups handle,
-                        // only display the name of the Root Node
-                        getTranslatedNameForParentNode(megaApi, topAncestor, app)
-                    } else {
-                        // Otherwise, include the names of both the Parent and Root Nodes
-                        app.getString(
-                            R.string.location_label, parent.name,
-                            getTranslatedNameForParentNode(megaApi, topAncestor, app)
-                        )
-                    }
-                }
-
-                else -> {
-                    app.getString(
-                        R.string.location_label, parent.name,
-                        app.getString(R.string.tab_incoming_shares)
-                    )
-                }
-            }
-
-            val fragmentHandle = when {
-                fromIncomingShare || parent == null -> INVALID_HANDLE
-                inCloudDrive -> topAncestor.handle
-                else -> INVALID_HANDLE
-            }
-
-            return LocationInfo(
-                location,
-                parentHandle = parent?.handle ?: INVALID_HANDLE,
-                fragmentHandle = fragmentHandle
-            )
-        }
-    }
-
-    /**
-     * Handle click event of the location text.
-     *
-     * @param activity current activity
-     * @param adapterType node source adapter type
-     * @param location location info
-     */
-    @JvmStatic
-    fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo) {
-        val intent = Intent(activity, ManagerActivity::class.java)
-
-        intent.action = ACTION_OPEN_FOLDER
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        intent.putExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, true)
-
-        if (adapterType == OFFLINE_ADAPTER) {
-            intent.putExtra(INTENT_EXTRA_KEY_OFFLINE_ADAPTER, true)
-
-            if (location.offlineParentPath != null) {
-                intent.putExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION, location.offlineParentPath)
-            }
-        } else {
-            intent.putExtra(INTENT_EXTRA_KEY_FRAGMENT_HANDLE, location.fragmentHandle)
-
-            if (location.parentHandle != INVALID_HANDLE) {
-                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, location.parentHandle)
-            }
-        }
-
-        activity.startActivity(intent)
-        activity.finish()
-    }
-
-    private fun getTranslatedNameForParentNode(
-        megaApi: MegaApiAndroid,
-        parent: MegaNode,
-        context: Context,
-    ): String {
-        return when {
-            parent.handle == megaApi.rootNode?.handle -> context.getString(R.string.section_cloud_drive)
-            parent.handle == megaApi.rubbishNode?.handle -> context.getString(sharedR.string.general_section_rubbish_bin)
-            parent.handle == megaApi.vaultNode?.handle -> context.getString(R.string.home_side_menu_backups_title)
-            else -> parent.name
-        }
-    }
-
-    /**
-     * Use for companion object injection
-     */
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface MegaNavigatorEntryPoint {
-        /**
-         * Get [MegaNavigator]
-         *
-         * @return [MegaNavigator] instance
-         */
-        fun megaNavigator(): MegaNavigator
-    }
-
-    /**
      * Launch ZipBrowserActivity to preview a zip file.
      *
      * @param context Android context.
@@ -1148,7 +710,7 @@ object MegaNodeUtil {
         nodeHandle: Long,
     ) {
         EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
-            .megaNavigator()
+            .megaNavigator
             .openZipBrowserActivity(
                 context = context,
                 zipFilePath = zipFilePath,
@@ -1271,18 +833,30 @@ object MegaNodeUtil {
         urlFileLink: String?,
         mode: String,
     ) {
-        val textFileIntent = Intent(context, TextEditorActivity::class.java)
-
+        val navigator = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            MegaNavigatorEntryPoint::class.java,
+        ).megaNavigator
         if (adapterType == FILE_LINK_ADAPTER) {
-            textFileIntent.putExtra(EXTRA_SERIALIZE_STRING, node.serialize())
-                .putExtra(URL_FILE_LINK, urlFileLink)
+            navigator.openTextEditor(
+                context = context,
+                params = OpenTextEditorParams.FileLink(
+                    serializedNode = node.serialize(),
+                    urlFileLink = urlFileLink,
+                    mode = textEditorModeFromValue(mode),
+                ),
+            )
         } else {
-            textFileIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
+            navigator.openTextEditor(
+                context = context,
+                params = OpenTextEditorParams.CloudNode(
+                    nodeId = NodeId(node.handle),
+                    nodeSourceType = adapterType,
+                    mode = textEditorModeFromValue(mode),
+                    fileName = null,
+                ),
+            )
         }
-
-        textFileIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
-            .putExtra(MODE, mode)
-        context.startActivity(textFileIntent)
     }
 
     /**
@@ -1392,7 +966,7 @@ object MegaNodeUtil {
                 megaApi.rootNode?.handle -> {
                     // Check if handleList contains backup root node
                     return handleList.firstOrNull {
-                        isRootBackupFolder(megaApi.getNodeByHandle(it))
+                        isRootBackupFolder(megaApi, megaApi.getNodeByHandle(it))
                     }?.let { BACKUP_ROOT } ?: BACKUP_NONE
                 }
 
@@ -1400,7 +974,7 @@ object MegaNodeUtil {
                 myBackupHandle -> {
                     // Check if handleList contains device nodes
                     return handleList.firstOrNull {
-                        isDeviceBackupFolder(megaApi.getNodeByHandle(it))
+                        isDeviceBackupFolder(megaApi, megaApi.getNodeByHandle(it))
                     }?.let { BACKUP_DEVICE } ?: BACKUP_NONE
                 }
 
@@ -1441,7 +1015,7 @@ object MegaNodeUtil {
 
             // First, check if the node exists in Backups.
             // If the node doesn't exist in Backups, or is in Rubbish Bin, return BACKUP_NONE
-            if (!megaApi.isInVault(selectedNode) || isNodeInRubbishOrDeleted(selectedNode.handle)) {
+            if (!megaApi.isInVault(selectedNode) || isNodeInRubbishOrDeletedInternal(megaApi, selectedNode.handle)) {
                 Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $BACKUP_NONE")
                 return BACKUP_NONE
             }

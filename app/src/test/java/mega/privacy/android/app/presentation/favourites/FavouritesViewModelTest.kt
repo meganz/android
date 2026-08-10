@@ -34,7 +34,6 @@ import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.MapFavouriteSortOrderUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
@@ -77,18 +76,18 @@ class FavouritesViewModelTest {
             }
     }
     private val getFavouriteSortOrderUseCase = mock<GetFavouriteSortOrderUseCase> {
-        onBlocking { invoke() }.thenReturn(FavouriteSortOrder.ModifiedDate(false))
+        on { invoke() }.thenReturn(FavouriteSortOrder.ModifiedDate(false))
     }
 
     private val megaNode = mock<MegaNode>()
 
     private val fetchNodeWrapper =
-        mock<FetchNodeWrapper> { onBlocking { invoke(any()) }.thenReturn(megaNode) }
+        mock<FetchNodeWrapper> { on { invoke(any()) }.thenReturn(megaNode) }
 
     private val mapFavouriteSortOrderUseCase = mock<MapFavouriteSortOrderUseCase>()
 
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase> {
-        onBlocking { invoke(any()) }.thenReturn(false)
+        on { invoke(any()) }.thenReturn(false)
     }
 
     private val evenString = "Even"
@@ -119,7 +118,7 @@ class FavouritesViewModelTest {
     }
 
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        onBlocking {
+        on {
             invoke()
         }.thenReturn(false)
     }
@@ -130,14 +129,8 @@ class FavouritesViewModelTest {
         }.thenReturn(flowOf(false))
     }
 
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-        onBlocking {
-            invoke(any())
-        }.thenReturn(false)
-    }
-
     private val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-        onBlocking {
+        on {
             invoke(NodeId(any()))
         }.thenReturn(false)
     }
@@ -178,7 +171,6 @@ class FavouritesViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
@@ -306,10 +298,11 @@ class FavouritesViewModelTest {
         message: String? = "Verify in order failed",
     ) {
         assertThat(items).isInstanceOf(FavouriteLoadState.Success::class.java)
-        assertWithMessage(message).that((items as FavouriteLoadState.Success).favourites.drop(
-            1
-        )
-            .map { (it.favourite?.typedNode as? TypedFileNode)?.modificationTime })
+        assertWithMessage(message).that(
+            (items as FavouriteLoadState.Success).favourites.drop(
+                1
+            )
+                .map { (it.favourite?.typedNode as? TypedFileNode)?.modificationTime })
             .containsExactlyElementsIn(
                 expected
             ).inOrder()

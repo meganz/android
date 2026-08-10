@@ -12,6 +12,7 @@ import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
@@ -37,6 +38,7 @@ internal class OpenLinkViewModelTest {
     private val savedStateHandle: SavedStateHandle = mock()
     private val getHandleFromContactLinkUseCase: GetHandleFromContactLinkUseCase = mock()
     private val getChatLinkContentUseCase: GetChatLinkContentUseCase = mock()
+    private val getChatRoomUseCase: GetChatRoomUseCase = mock()
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase = mock()
     private val getChatCallUseCase: GetChatCallUseCase = mock()
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase = mock()
@@ -59,24 +61,31 @@ internal class OpenLinkViewModelTest {
             getUrlRegexPatternTypeUseCase,
             savedStateHandle,
             getHandleFromContactLinkUseCase,
-            getChatLinkContentUseCase
+            getChatLinkContentUseCase,
+            getChatRoomUseCase,
         )
     }
 
-    private fun initTestClass() {
+    private fun initTestClass(
+        isChatScreen: Boolean = false,
+        isJoinMeeting: Boolean = false,
+    ) {
         underTest = OpenLinkViewModel(
-            getUrlRegexPatternTypeUseCase,
-            savedStateHandle,
-            getHandleFromContactLinkUseCase,
-            getChatLinkContentUseCase,
-            getScheduledMeetingByChatUseCase,
-            getChatCallUseCase,
-            startMeetingInWaitingRoomChatUseCase,
-            answerChatCallUseCase,
-            setChatVideoInDeviceUseCase,
-            rtcAudioManagerGateway,
-            chatManagement,
-            testCoroutineScope,
+            getUrlRegexPatternTypeUseCase = getUrlRegexPatternTypeUseCase,
+            savedStateHandle = savedStateHandle,
+            getHandleFromContactLinkUseCase = getHandleFromContactLinkUseCase,
+            getChatLinkContentUseCase = getChatLinkContentUseCase,
+            getChatRoomUseCase = getChatRoomUseCase,
+            getScheduledMeetingByChatUseCase = getScheduledMeetingByChatUseCase,
+            getChatCallUseCase = getChatCallUseCase,
+            startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
+            answerChatCallUseCase = answerChatCallUseCase,
+            setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
+            rtcAudioManagerGateway = rtcAudioManagerGateway,
+            chatManagement = chatManagement,
+            applicationScope = testCoroutineScope,
+            isChatScreen = isChatScreen,
+            isJoinMeeting = isJoinMeeting,
         )
     }
 
@@ -113,12 +122,8 @@ internal class OpenLinkViewModelTest {
     @Test
     fun `test that linkType update correctly when link is not chat link`() = runTest {
         val link = "https://mega.app/C!86YkxIDC"
-        whenever(savedStateHandle.get<Boolean>(OpenLinkDialogFragment.IS_JOIN_MEETING))
-            .thenReturn(false)
-        whenever(savedStateHandle.get<Boolean>(OpenLinkDialogFragment.IS_CHAT_SCREEN))
-            .thenReturn(false)
         whenever(getUrlRegexPatternTypeUseCase(link)).thenReturn(RegexPatternType.CONTACT_LINK)
-        initTestClass()
+        initTestClass(isChatScreen = false, isJoinMeeting = false)
         underTest.openLink(link)
         underTest.state.test {
             val state = awaitItem()
@@ -141,12 +146,8 @@ internal class OpenLinkViewModelTest {
     fun `test that checkLinkResult update correctly when open link to join meeting`() = runTest {
         val link = "https://mega.app/C!86YkxIDC"
         val chatLinkContent = mock<ChatLinkContent.ChatLink>()
-        whenever(savedStateHandle.get<Boolean>(OpenLinkDialogFragment.IS_JOIN_MEETING))
-            .thenReturn(true)
-        whenever(savedStateHandle.get<Boolean>(OpenLinkDialogFragment.IS_CHAT_SCREEN))
-            .thenReturn(false)
         whenever(getChatLinkContentUseCase(link)).thenReturn(chatLinkContent)
-        initTestClass()
+        initTestClass(isChatScreen = false, isJoinMeeting = true)
         underTest.openLink(link)
         underTest.state.test {
             val state = awaitItem()
@@ -159,12 +160,8 @@ internal class OpenLinkViewModelTest {
     fun `test that checkLinkResult update correctly when open link from chat`() = runTest {
         val link = "https://mega.app/C!86YkxIDC"
         val chatLinkContent = mock<ChatLinkContent.ChatLink>()
-        whenever(savedStateHandle.get<Boolean>(OpenLinkDialogFragment.IS_JOIN_MEETING))
-            .thenReturn(false)
-        whenever(savedStateHandle.get<Boolean>(OpenLinkDialogFragment.IS_CHAT_SCREEN))
-            .thenReturn(true)
         whenever(getChatLinkContentUseCase(link)).thenReturn(chatLinkContent)
-        initTestClass()
+        initTestClass(isChatScreen = true, isJoinMeeting = false)
         underTest.openLink(link)
         underTest.state.test {
             val state = awaitItem()

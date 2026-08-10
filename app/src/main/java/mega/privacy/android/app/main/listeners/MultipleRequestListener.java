@@ -81,17 +81,17 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         int success_items = max_items - error;
                         if (error > 0 && (success_items > 0)) {
                             if (error == 1) {
-                                message = context.getResources().getQuantityString(R.plurals.nodes_correctly_and_node_incorrectly_moved_to_rubbish, success_items, success_items);
+                                message = context.getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.items_moved_and_one_failed_to_rubbish, success_items, success_items);
                             } else if (success_items == 1) {
-                                message = context.getResources().getQuantityString(R.plurals.node_correctly_and_nodes_incorrectly_moved_to_rubbish, error, error);
+                                message = context.getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.one_moved_and_items_failed_to_rubbish, error, error);
                             } else {
-                                message = context.getResources().getQuantityString(R.plurals.number_correctly_moved_to_rubbish, success_items, success_items)
-                                        + ". " + context.getResources().getQuantityString(R.plurals.number_incorrectly_moved_to_rubbish, error, error);
+                                message = context.getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.count_items_moved_to_rubbish, success_items, success_items)
+                                        + ". " + context.getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.count_items_failed_move_to_rubbish, error, error);
                             }
                         } else if (error > 0) {
-                            message = context.getResources().getQuantityString(R.plurals.number_incorrectly_moved_to_rubbish, error, error);
+                            message = context.getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.count_items_failed_move_to_rubbish, error, error);
                         } else {
-                            message = context.getResources().getQuantityString(R.plurals.number_correctly_moved_to_rubbish, success_items, success_items);
+                            message = context.getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.count_items_moved_to_rubbish, success_items, success_items);
                         }
                     }
                     break;

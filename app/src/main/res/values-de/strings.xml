@@ -14,8 +14,6 @@
     <string name="general_select">Auswählen</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Ordner wählen</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Erstellen</string>
     <!-- button -->
     <string name="general_add">Hinzufügen</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -61,10 +59,6 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Hochladen</string>
     <!-- Menu item -->
-    <string name="action_create_folder">Neuer Ordner</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Neue Textdatei</string>
-    <!-- Menu item -->
     <string name="action_settings">Einstellungen</string>
     <!-- Search button -->
     <string name="action_search">Suchen</string>
@@ -93,7 +87,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Das Abonnement wurde storniert</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Wir konnten Ihr Abonnement nicht stornieren. Bitte setzen Sie sich mit support&#64;mega.io in Verbindung.</string>
+    <string name="cancel_subscription_error">Wir konnten Ihr Abonnement leider nicht beenden. Bitte wenden Sie sich für weitere Unterstützung an den Support: https://mega.nz/support</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Alle anderen Sitzungen ausloggen</string>
     <!-- Message after kill all opened sessions -->
@@ -152,10 +146,6 @@
     <string name="login_before_share">Einloggen, um Freigaben in MEGA zu erstellen</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Ihr Bestätigungslink ist nicht mehr gültig. Möglicherweise ist Ihr Account bereits aktiviert oder Sie haben Ihre Registrierung abgebrochen.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Vorname(n)</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Familienname</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Mir ist bekannt, dass ich [B]ohne mein Passwort alle meine Daten verliere[/B] Weitere Informationen über unsere [A]Ende-zu-Ende-Verschlüsselung[/A].</string>
     <!-- warning dialog -->
@@ -276,8 +266,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Dieser Link ist nicht mehr öffentlich verfügbar.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Umbenennen</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Öffnen</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Datei wird vorbereitet</string>
@@ -297,8 +285,6 @@
     <string name="context_move_to_trash">In Papierkorb verschieben</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Von MEGA entfernen</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Ordnername</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Ordner wird erstellt</string>
     <!-- Menu option title -->
@@ -387,8 +373,6 @@
     <string name="subscription_type_monthly">monatlich</string>
     <!--  -->
     <string name="subscription_type_yearly">Jährlich</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Neuer Ordner</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Kontakt hinzufügen</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -680,9 +664,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Die neue E-Mail-Adresse Ihres MEGA-Accounts ist: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Cannot be empty</string>
+    <string name="invalid_string">Darf nicht leer bleiben</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
+    <string name="invalid_input">Keine gültige Eingabe</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Passwort-Reset</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -734,7 +718,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">E-Mail oder Passwort ungültig. Bitte erneut versuchen.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Ihr Account wurde wegen Verletzung unserer Nutzungsbedingungen gesperrt. Bitte setzen Sie sich mit support&#64;mega.io in Verbindung.</string>
+    <string name="error_account_suspended">Ihr Account wurde aufgrund von Verstößen gegen die Nutzungsbedingungen gesperrt. Bitte wenden Sie sich an den Support: https://mega.nz/support</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Zuviele Login-Fehlversuche. Bitte warten Sie eine Stunde.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -1004,12 +988,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">Minuten</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Online</item>
-        <item>Abwesend</item>
-        <item>Beschäftigt</item>
-        <item>Offline</item>
-    </string-array>
+    <string name="settings_chat_status_online">Online</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Abwesend</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Beschäftigt</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Offline</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Aktivieren</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1253,8 +1238,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Hilfe</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Feedback senden</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Android-Feedback</string>
     <!-- mail body -->
@@ -1263,8 +1246,6 @@
     <string name="settings_feedback_body_device_model">Gerätetyp</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Android-Version</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">Neue Textdatei</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Dateiname</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1283,8 +1264,6 @@
     <string name="general_incorrect_names">Bitte korrigieren Sie die Dateinamen, bevor Sie fortfahren</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ungültige Zeichen</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">Die folgenden Zeichen sind nicht zulässig: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Der Dateiname darf nicht leer sein.</item>
@@ -1302,12 +1281,6 @@
     <string name="invalid_connection_state">Die Verbindung zum Server wird aufgebaut</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Ein Fehler ist aufgetreten. Der Anruf kann nicht verbunden werden.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Gefällt Ihnen die MEGA-Mobil-App?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Ja, App bewerten</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Nein, Feedback senden</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Kontakterlaubnis verweigert</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1388,8 +1361,6 @@
     <string name="tab_received_requests">Empfangene Anfragen</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Speicherlimit überschritten</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Link ungültig, bitte lassen Sie sich einen neuen zusenden</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Ungültiges Linkpasswort</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1474,12 +1445,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Videoqualität</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Niedrig</item>
-        <item>Mittel</item>
-        <item>Hoch</item>
-        <item>Original</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Niedrig</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Mittel</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Hoch</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Original</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Verpasster Anruf</string>
     <!-- Refers to a location of file -->
@@ -1904,7 +1876,7 @@
     <!-- General label for files -->
     <string name="general_files">Dateien</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Auf Gerät speichern</string>
+    <string name="general_save_to_device">Herunterladen</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Auf MEGA hochladen</string>
     <!-- Label choose destination -->
@@ -2196,7 +2168,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Ignorieren</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s hat diesen Anruf stummgeschaltet</string>
+    <string name="muted_contact_micro">%s ist stummgeschaltet</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">Stummgeschaltet</string>
     <!-- Subtitle of the call screen when the call is on hold -->
@@ -3932,12 +3904,18 @@
         <item quantity="one">%1$d Element konnte nicht kopiert werden</item>
         <item quantity="other">%1$d Elemente konnten nicht kopiert werden</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">%1$d Element kopiert;&#160;</item>
         <item quantity="other">%1$d Elemente kopiert;&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">%1$d Element konnte nicht kopiert werden</item>
         <item quantity="other">%1$d Elemente konnten nicht kopiert werden</item>
@@ -4546,16 +4524,6 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s moderiert</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Diese Person gibt ihren Bildschirm frei</string>
-    <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">Dieses Gespräch wird aufgezeichnet</string>
-    <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">Durch Ihre weitere Teilnahme am Gespräch geben Sie Ihr Einverständnis zur Aufzeichnung. Die Aufzeichnung wird nur auf dem Gerät der aufzeichnenden Person gespeichert.</string>
-    <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">Alles klar</string>
-    <!-- Label for the negative or cancel button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_negative_button">Konferenz verlassen</string>
-    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Mehr erfahren[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">%1$s hat die Aufzeichnung gestartet</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
@@ -4641,7 +4609,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Upload pausiert, da Akkuladestand unter %1$d&#160;%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Kamera-Uploads funktionieren nicht mehr. Um das Problem zu lösen, versuchen Sie, die Kamera-Uploads wieder zu aktivieren. Wenn das Problem weiterhin besteht, wenden Sie sich an support&#64;mega.io</string>
+    <string name="photos_camera_uploads_general_issue">Kamera-Uploads funktionieren nicht mehr. Um das Problem zu lösen, versuchen Sie, die Kamera-Uploads wieder zu aktivieren. Wenn das Problem weiterhin besteht, wenden Sie sich bitte an den Support unter https://mega.nz/support</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Kamera-Uploads aktiv, noch %1$d Datei</item>
@@ -4812,4 +4780,5 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Kamera-Uploads aktiviert</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Dieser Speicherort existiert nicht mehr.</string>
+    <string name="invalid_link">Ungültiger Link. Bitte versuchen Sie es erneut oder fordern Sie einen neuen Link an.</string>
 </resources>

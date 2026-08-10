@@ -1,0 +1,832 @@
+package mega.privacy.android.feature.texteditor.presentation
+
+import android.content.Intent
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.material3.Button
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
+import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableFloatState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.snackbar.MegaSnackbar
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.privacy.android.feature.texteditor.components.MarkdownPreview
+import mega.privacy.android.feature.texteditor.components.TextEditorContent
+import mega.privacy.android.feature.texteditor.components.TextEditorFastScrollbar
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeEffect
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
+import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.resources.R as sharedR
+import kotlin.math.abs
+
+/** Epsilon in px for float comparison when deciding if top bar is fully hidden. */
+private const val BARS_HIDDEN_EPSILON_PX = 1f
+
+private const val REVEAL_ANIMATION_MS = 200
+private const val ENTRANCE_ANIMATION_MS = 300
+private const val FLING_SNAP_ANIMATION_MS = 150
+private val BottomBarSlideDistance = 100.dp
+private val SnackbarBottomBarClearance = 112.dp
+private val SnackbarHorizontalPadding = 16.dp
+
+/**
+ * Compose screen for viewing and editing text files.
+ */
+@Composable
+fun TextEditorScreen(
+    viewModel: TextEditorComposeViewModel,
+    onBack: () -> Unit,
+    onOpenNodeOptions: (() -> Unit)? = null,
+    onTransfer: (TransferTriggerEvent) -> Unit = {},
+    onShare: (localPath: String?, fileName: String?) -> Unit = { _, _ -> },
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lazyListState = rememberLazyListState()
+    val context = LocalContext.current
+    val megaNavigator = rememberMegaNavigator()
+    val megaResultContract = rememberMegaResultContract()
+    val shareChooserTitle = stringResource(sharedR.string.general_share)
+
+    val sendToChatLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.sendToChatActivityResultContract,
+    ) { result ->
+        result?.let { viewModel.attachNodesToChat(it) }
+    }
+
+    EventEffect(
+        event = uiState.transferEvent,
+        onConsumed = viewModel::consumeTransferEvent,
+    ) { event ->
+        onTransfer(event)
+    }
+
+    EventEffect(
+        event = uiState.nodeEffectEvent,
+        onConsumed = viewModel::consumeNodeEffectEvent,
+    ) { effect ->
+        when (effect) {
+            is TextEditorNodeEffect.ManageLink ->
+                megaNavigator.openGetLinkActivity(context, effect.nodeHandle)
+
+            is TextEditorNodeEffect.SendToChat ->
+                sendToChatLauncher.launch(longArrayOf(effect.nodeHandle))
+
+            is TextEditorNodeEffect.Share -> {
+                val publicLink = effect.resolvedPublicLink
+                if (!publicLink.isNullOrBlank()) {
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_SUBJECT, effect.fileName.orEmpty())
+                        putExtra(Intent.EXTRA_TEXT, publicLink)
+                    }
+                    context.startActivity(
+                        Intent.createChooser(intent, shareChooserTitle)
+                    )
+                } else {
+                    onShare(effect.localPath, effect.fileName)
+                }
+            }
+        }
+    }
+    val isEditable = uiState.mode == TextEditorMode.Edit || uiState.mode == TextEditorMode.Create
+    val scope = rememberCoroutineScope()
+
+    val scrollBarState = rememberScrollToHideBarState(uiState.mode, scope)
+    val barsHidden by scrollBarState.barsHidden
+    val bottomBarTranslationY by scrollBarState.bottomBarTranslationY
+    val bottomBarEntranceOffset = scrollBarState.bottomBarEntranceOffset
+    val bottomBarSlideDistancePx = scrollBarState.bottomBarSlideDistancePx
+
+    val chunkCount = remember(uiState.totalLineCount, uiState.contentVersion) {
+        viewModel.getChunkCount()
+    }
+    val chunkTextProvider = remember(viewModel, uiState.contentVersion) {
+        { idx: Int -> viewModel.getChunkText(idx) }
+    }
+    val chunkStateProvider: ((Int) -> TextFieldState)? =
+        if (isEditable) {
+            remember(viewModel, uiState.contentVersion) {
+                { idx: Int -> viewModel.getOrCreateChunkState(idx) }
+            }
+        } else {
+            null
+        }
+    val chunkStartLineProvider = remember(viewModel, uiState.contentVersion) {
+        { idx: Int -> viewModel.getChunkStartLine(idx) }
+    }
+    val onChunkDisposed: ((Int) -> Unit)? = if (isEditable) {
+        remember(viewModel) { { idx: Int -> viewModel.disposeChunkState(idx) } }
+    } else {
+        null
+    }
+    val focusedChunk = uiState.focusedEditChunk
+    val isChunkReadOnly: (Int) -> Boolean = if (isEditable) {
+        remember(focusedChunk) { { idx: Int -> abs(idx - focusedChunk) > 1 } }
+    } else {
+        remember { { _: Int -> true } }
+    }
+    val onChunkFocused: ((Int) -> Unit)? = if (isEditable) {
+        remember(viewModel) { { idx: Int -> viewModel.setFocusedEditChunk(idx) } }
+    } else {
+        null
+    }
+
+    // Markdown files render as a read-only preview in View mode; Edit shows the raw source.
+    val showMarkdownPreview = uiState.isMarkdown && !isEditable
+    val markdownContent = remember(showMarkdownPreview, uiState.contentVersion) {
+        if (showMarkdownPreview) viewModel.getMarkdownPreviewContent() else null
+    }
+    // Hoisted so the preview scroll position survives leaving/re-entering (Preview -> Edit -> Preview).
+    val markdownListState = rememberLazyListState()
+
+
+    // snapshotFlow re-emits automatically when layoutInfo.totalItemsCount changes as
+    // new chunks are loaded, so chunkCount is intentionally excluded from the key to
+    // avoid cancelling/relaunching the collector on every chunk load. Because this effect
+    // never restarts, the closure must only read live values: lazyListState and uiState are
+    // snapshot state, totalItems is the live chunk count (the list's only items are chunks,
+    // so it must be used instead of the captured chunkCount local, which is stale here), and
+    // chunkStartLineProvider reads current data from the ViewModel.
+    LaunchedEffect(lazyListState) {
+        snapshotFlow {
+            val info = lazyListState.layoutInfo
+            val totalItems = info.totalItemsCount
+            // Anchor scroll restoration on the first visible chunk (chunk-index fraction for CWLO).
+            val scrollFraction = if (totalItems <= 1) 0f
+            else lazyListState.firstVisibleItemIndex.toFloat() / (totalItems - 1).toFloat()
+            // Read-through is measured in LINES at the bottom of the viewport; see
+            // computeReadThroughFraction. This stays accurate even when the whole file is a
+            // single chunk (the common case for short files).
+            val lastItem = info.visibleItemsInfo.lastOrNull()
+            val readThroughFraction = if (lastItem == null) 0f else computeReadThroughFraction(
+                chunkStartLine = chunkStartLineProvider(lastItem.index),
+                nextChunkStartLine = if (lastItem.index + 1 < totalItems)
+                    chunkStartLineProvider(lastItem.index + 1)
+                else uiState.totalLineCount + 1,
+                chunkSizePx = lastItem.size,
+                chunkOffsetPx = lastItem.offset,
+                viewportEndOffsetPx = info.viewportEndOffset,
+                totalLines = uiState.totalLineCount,
+            )
+            Triple(scrollFraction, lazyListState.firstVisibleItemScrollOffset, readThroughFraction)
+        }.collect { (scrollFraction, offset, readThroughFraction) ->
+            viewModel.updateScrollPosition(
+                fraction = scrollFraction.coerceIn(0f, 1f),
+                scrollOffset = offset,
+                readThroughFraction = readThroughFraction.coerceIn(0f, 1f),
+            )
+        }
+    }
+
+    BackHandler {
+        when {
+            barsHidden -> scrollBarState.revealBar()
+            uiState.showDiscardDialog -> viewModel.dismissDiscardDialog()
+            else -> viewModel.handleClose()
+        }
+    }
+
+    if (uiState.showDiscardDialog) {
+        TextEditorDiscardDialog(
+            onDiscard = viewModel::confirmDiscard,
+            onCancel = viewModel::dismissDiscardDialog,
+        )
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val genericErrorMessage = stringResource(sharedR.string.general_request_failed_message)
+    val lineTooltipTemplate = stringResource(sharedR.string.text_editor_fast_scroll_line_tooltip)
+    EventEffect(
+        event = uiState.exitAfterCreateDiscardEvent,
+        onConsumed = viewModel::consumeExitAfterCreateDiscardEvent,
+    ) {
+        onBack()
+    }
+
+    EventEffect(
+        event = uiState.shareErrorEvent,
+        onConsumed = viewModel::consumeShareErrorEvent,
+    ) {
+        snackbarHostState.showSnackbar(genericErrorMessage)
+    }
+
+    EventEffect(
+        event = uiState.sendToChatErrorEvent,
+        onConsumed = viewModel::consumeSendToChatErrorEvent,
+    ) {
+        snackbarHostState.showSnackbar(genericErrorMessage)
+    }
+
+    EventEffect(
+        event = uiState.closeEvent,
+        onConsumed = viewModel::consumeCloseEvent,
+    ) {
+        onBack()
+    }
+
+    val showBottomBar = uiState.mode != TextEditorMode.Edit
+            && uiState.mode != TextEditorMode.Create
+            && uiState.bottomBarActions.isNotEmpty()
+            && !uiState.isLoading
+    MegaScaffold(
+        modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0.dp),
+        snackbarHost = {
+            MegaSnackbar(
+                snackBarHostState = snackbarHostState,
+                safeAreaPadding = if (showBottomBar) {
+                    PaddingValues(
+                        bottom = SnackbarBottomBarClearance,
+                        start = SnackbarHorizontalPadding,
+                        end = SnackbarHorizontalPadding,
+                    )
+                } else {
+                    null
+                },
+            )
+        },
+        topBar = {
+            CollapsingTopBar(
+                scrollBarState = scrollBarState,
+                mode = uiState.mode,
+                fileName = uiState.fileName,
+                scope = scope,
+                lazyListState = lazyListState,
+                viewModel = viewModel,
+                onBack = onBack,
+                onOpenNodeOptions = onOpenNodeOptions,
+                isMarkdownPreview = showMarkdownPreview,
+            )
+        },
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .navigationBarsPadding()
+                // Match the top bar's horizontal safe area (it uses safeDrawing) so the content and
+                // fast-scroll thumb stay clear of the landscape display cutout instead of running
+                // under it while the toolbar is inset — keeping the back button/title aligned with
+                // the text. Reading the same safeDrawing channel as the toolbar also ensures the
+                // inset recomputes on a portrait→landscape rotation, which displayCutout did not
+                // (AND-23925). navigationBarsPadding above consumes the nav-bar inset first, so this
+                // only adds the cutout portion and never double-pads the side bars.
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+                .nestedScroll(scrollBarState.scrollConnection)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    enabled = barsHidden,
+                ) { scrollBarState.revealBar() },
+        ) {
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        TextEditorLoadingContent()
+                    }
+                }
+
+                uiState.errorEvent == triggered -> {
+                    val message = uiState.errorMessage?.takeIf { it.isNotBlank() }
+                    val errorMessage = when {
+                        uiState.isNoInternetError ->
+                            stringResource(sharedR.string.error_no_internet_message)
+
+                        message != null -> message
+                        else -> stringResource(sharedR.string.general_request_failed_message)
+                    }
+                    TextEditorErrorContent(
+                        message = errorMessage,
+                        onDismiss = {
+                            viewModel.consumeErrorEvent()
+                            onBack()
+                        },
+                    )
+                }
+
+                markdownContent != null -> {
+                    MarkdownPreview(
+                        content = markdownContent,
+                        lazyListState = markdownListState,
+                        modifier = Modifier.fillMaxSize(),
+                        restoreLine = uiState.restorePreviewLine,
+                        onRestoreConsumed = viewModel::consumeRestorePreviewLine,
+                        onTopLine = viewModel::updateTopLine,
+                    )
+                }
+
+                else -> {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        TextEditorContent(
+                            lazyListState = lazyListState,
+                            chunkCount = chunkCount,
+                            totalLineCount = uiState.totalLineCount,
+                            chunkTextProvider = chunkTextProvider,
+                            chunkStateProvider = chunkStateProvider,
+                            chunkStartLineProvider = chunkStartLineProvider,
+                            onChunkDisposed = onChunkDisposed,
+                            isChunkReadOnly = isChunkReadOnly,
+                            onChunkFocused = onChunkFocused,
+                            showLineNumbers = uiState.showLineNumbers,
+                            readOnly = !isEditable,
+                            requestInitialFocusOnFirstChunk = uiState.mode == TextEditorMode.Create,
+                            restoreScrollIndex = uiState.restoreScrollIndex,
+                            restoreScrollOffset = uiState.restoreScrollOffset,
+                            restoreScrollWithinChunkLine = uiState.restoreScrollWithinChunkLine,
+                            onRestoreScrollConsumed = viewModel::consumeRestoreScrollIndex,
+                            onTopLineChanged = viewModel::updateTopLine,
+                            restoreFocusChunkIndex = uiState.restoreFocusChunkIndex,
+                            onRestoreFocusConsumed = viewModel::consumeRestoreFocusChunkIndex,
+                        )
+                        TextEditorFastScrollbar(
+                            state = lazyListState,
+                            itemCount = chunkCount,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .fillMaxHeight(),
+                            tooltipText = { chunkIndex, fractionWithinChunk ->
+                                val startLine = chunkStartLineProvider(chunkIndex).coerceAtLeast(1)
+                                // First line of the next chunk (or one past the last line) bounds this
+                                // chunk's line range; interpolating with the in-chunk scroll fraction
+                                // gives the actual top line even when the whole file is one chunk.
+                                val nextStartLine = if (chunkIndex + 1 < chunkCount) {
+                                    chunkStartLineProvider(chunkIndex + 1)
+                                } else {
+                                    uiState.totalLineCount + 1
+                                }
+                                val line = (startLine +
+                                    ((nextStartLine - startLine) * fractionWithinChunk).toInt())
+                                    .coerceIn(1, uiState.totalLineCount.coerceAtLeast(1))
+                                lineTooltipTemplate.format(line)
+                            },
+                        )
+                    }
+                }
+            }
+            if (uiState.isRestoringContent) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    LargeInfiniteSpinnerIndicator()
+                }
+            }
+            LaunchedEffect(showBottomBar) {
+                if (showBottomBar) {
+                    bottomBarEntranceOffset.snapTo(bottomBarSlideDistancePx)
+                    bottomBarEntranceOffset.animateTo(0f, animationSpec = tween(ENTRANCE_ANIMATION_MS))
+                } else {
+                    bottomBarEntranceOffset.snapTo(bottomBarSlideDistancePx)
+                }
+            }
+            if (showBottomBar) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 16.dp)
+                        .graphicsLayer {
+                            translationY =
+                                bottomBarEntranceOffset.value + bottomBarTranslationY
+                        },
+                ) {
+                    MegaFloatingToolbar(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        actions = uiState.bottomBarActions,
+                        actionsEnabled = true,
+                        onActionPressed = { action ->
+                            when (action) {
+                                is TextEditorBottomBarAction.Edit ->
+                                    viewModel.setEditMode(lazyListState.firstVisibleItemIndex)
+                                is TextEditorBottomBarAction ->
+                                    viewModel.onBottomBarAction(action)
+                            }
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Top bar that collapses upward as the user scrolls down, and reveals when
+ * scrolling back up or tapping. Uses a custom [Layout] for pixel-precise offset.
+ */
+@Composable
+private fun CollapsingTopBar(
+    scrollBarState: ScrollToHideBarState,
+    mode: TextEditorMode,
+    fileName: String,
+    scope: CoroutineScope,
+    lazyListState: LazyListState,
+    viewModel: TextEditorComposeViewModel,
+    onBack: () -> Unit,
+    onOpenNodeOptions: (() -> Unit)?,
+    isMarkdownPreview: Boolean,
+) {
+    Column {
+        // Reserve the status-bar height permanently via a window-insets modifier so the content and
+        // the fast-scroll thumb never slide under the system status bar when the toolbar collapses
+        // (AND-23898 / AND-23897). consumeWindowInsets below stops MegaTopAppBar from re-applying the
+        // same top inset, letting the collapsing toolbar shrink all the way to zero behind this spacer.
+        // No background needed: MegaScaffold already paints pageBackground behind the top bar.
+        Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
+        Layout(
+            content = {
+                Box(
+                    modifier = Modifier.onGloballyPositioned { coordinates ->
+                        scrollBarState.topBarHeightPx = coordinates.size.height.toFloat()
+                    },
+                ) {
+                    val onTitleClick: () -> Unit = remember(scope, lazyListState, scrollBarState) {
+                        {
+                            scope.launch {
+                                lazyListState.animateScrollToItem(0)
+                                scrollBarState.topBarOffsetPx = 0f
+                            }
+                            Unit
+                        }
+                    }
+                    val onClose = remember(viewModel) {
+                        { viewModel.handleClose() }
+                    }
+                    val onSaveToolbar = remember(viewModel) {
+                        { viewModel.saveFile() }
+                    }
+                    when (mode) {
+                        TextEditorMode.Edit, TextEditorMode.Create -> TextEditorEditModeTopAppBar(
+                            title = fileName,
+                            onClose = onClose,
+                            onSave = onSaveToolbar,
+                            onMenuAction = viewModel::onMenuAction,
+                            onTitleClick = onTitleClick,
+                        )
+
+                        else -> TextEditorViewModeTopAppBar(
+                            title = fileName,
+                            onBack = viewModel::handleClose,
+                            onMenuAction = viewModel::onMenuAction,
+                            onOpenNodeOptions = onOpenNodeOptions,
+                            onTitleClick = onTitleClick,
+                            isMarkdownPreview = isMarkdownPreview,
+                        )
+                    }
+                }
+            },
+            modifier = Modifier
+                .clipToBounds()
+                .consumeWindowInsets(WindowInsets.statusBars),
+        ) { measurables, constraints ->
+            val placeable = measurables[0].measure(constraints.copy(minHeight = 0))
+            val visibleHeight =
+                (placeable.height + scrollBarState.topBarOffsetPx.toInt()).coerceAtLeast(0)
+            layout(constraints.maxWidth, visibleHeight) {
+                placeable.placeRelative(0, scrollBarState.topBarOffsetPx.toInt())
+            }
+        }
+    }
+}
+
+/**
+ * True when the top bar is considered fully hidden (for back/tap-to-reveal).
+ * Exposed for unit testing the threshold logic.
+ */
+internal fun isBarsHidden(
+    topBarHeightPx: Float,
+    topBarOffsetPx: Float,
+    epsilon: Float = BARS_HIDDEN_EPSILON_PX,
+): Boolean = topBarHeightPx > 0f && topBarOffsetPx <= -topBarHeightPx + epsilon
+
+/**
+ * State and connection for scroll-to-hide top bar and linked bottom bar.
+ * Use [rememberScrollToHideBarState] to create.
+ */
+internal class ScrollToHideBarState(
+    private val topBarHeightPxState: MutableFloatState,
+    private val topBarOffsetPxState: MutableFloatState,
+    val barsHidden: State<Boolean>,
+    val bottomBarSlideDistancePx: Float,
+    val bottomBarTranslationY: State<Float>,
+    val bottomBarEntranceOffset: Animatable<Float, AnimationVector1D>,
+    val scrollConnection: NestedScrollConnection,
+    private val scope: CoroutineScope,
+) {
+    private var revealJob: Job? = null
+
+    var topBarHeightPx: Float
+        get() = topBarHeightPxState.floatValue
+        set(value) {
+            topBarHeightPxState.floatValue = value
+        }
+
+    var topBarOffsetPx: Float
+        get() = topBarOffsetPxState.floatValue
+        set(value) {
+            topBarOffsetPxState.floatValue = value
+        }
+
+    fun revealBar() {
+        revealJob?.cancel()
+        revealJob = scope.launch {
+            try {
+                animate(
+                    topBarOffsetPxState.floatValue,
+                    0f,
+                    animationSpec = tween(REVEAL_ANIMATION_MS),
+                ) { v, _ ->
+                    topBarOffsetPxState.floatValue = v
+                }
+            } finally {
+                if (revealJob === coroutineContext[Job]) {
+                    revealJob = null
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun rememberScrollToHideBarState(
+    mode: TextEditorMode,
+    scope: CoroutineScope,
+): ScrollToHideBarState {
+    val density = LocalDensity.current
+    val topBarHeightPxState = remember { mutableFloatStateOf(0f) }
+    val topBarOffsetPxState = remember { mutableFloatStateOf(0f) }
+    val bottomBarSlideDistancePx = remember(density) { with(density) { BottomBarSlideDistance.toPx() } }
+    val barsHiddenState: State<Boolean> = remember {
+        derivedStateOf {
+            isBarsHidden(
+                topBarHeightPxState.floatValue,
+                topBarOffsetPxState.floatValue,
+            )
+        }
+    }
+    val bottomBarTranslationYState: State<Float> = remember {
+        derivedStateOf {
+            val h = topBarHeightPxState.floatValue
+            val o = topBarOffsetPxState.floatValue
+            if (h > 0f) (-o / h).coerceIn(0f, 1f) * bottomBarSlideDistancePx else 0f
+        }
+    }
+    val bottomBarEntranceOffset = remember(density) {
+        Animatable(bottomBarSlideDistancePx)
+    }
+    LaunchedEffect(mode) { topBarOffsetPxState.floatValue = 0f }
+    val scrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (available.y < 0f && topBarHeightPxState.floatValue > 0f) {
+                    topBarOffsetPxState.floatValue =
+                        (topBarOffsetPxState.floatValue + available.y)
+                            .coerceIn(-topBarHeightPxState.floatValue, 0f)
+                }
+                return Offset.Zero
+            }
+
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource,
+            ): Offset {
+                val revealDelta = consumed.y + available.y.coerceAtLeast(0f)
+                if (revealDelta > 0f && topBarHeightPxState.floatValue > 0f) {
+                    topBarOffsetPxState.floatValue =
+                        (topBarOffsetPxState.floatValue + revealDelta)
+                            .coerceIn(-topBarHeightPxState.floatValue, 0f)
+                }
+                return Offset.Zero
+            }
+
+            override suspend fun onPostFling(
+                consumed: Velocity,
+                available: Velocity,
+            ): Velocity {
+                val height = topBarHeightPxState.floatValue
+                val offset = topBarOffsetPxState.floatValue
+                if (height > 0f && offset > -height && offset < 0f) {
+                    val target = if (offset > -height / 2) 0f else -height
+                    animate(offset, target, animationSpec = tween(FLING_SNAP_ANIMATION_MS)) { v, _ ->
+                        topBarOffsetPxState.floatValue = v
+                    }
+                }
+                return Velocity.Zero
+            }
+        }
+    }
+    return remember(scope) {
+        ScrollToHideBarState(
+            topBarHeightPxState = topBarHeightPxState,
+            topBarOffsetPxState = topBarOffsetPxState,
+            barsHidden = barsHiddenState,
+            bottomBarSlideDistancePx = bottomBarSlideDistancePx,
+            bottomBarTranslationY = bottomBarTranslationYState,
+            bottomBarEntranceOffset = bottomBarEntranceOffset,
+            scrollConnection = scrollConnection,
+            scope = scope,
+        )
+    }
+}
+
+@Composable
+private fun TextEditorErrorContent(
+    message: String,
+    onDismiss: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            MegaText(text = message, modifier = Modifier.padding(16.dp))
+            Button(onClick = onDismiss) {
+                Text(text = stringResource(sharedR.string.general_ok))
+            }
+        }
+    }
+}
+
+@Composable
+private fun TextEditorLoadingContent() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Image(
+            modifier = Modifier.size(96.dp),
+            painter = painterResource(IconPackR.drawable.ic_text_medium_solid),
+            contentDescription = stringResource(sharedR.string.transfers_fake_preview_text),
+        )
+        Spacer(modifier = Modifier.height(30.dp))
+        InfiniteProgressBarIndicator(
+            modifier = Modifier
+                .widthIn(min = 100.dp)
+                .padding(horizontal = 44.dp),
+        )
+    }
+}
+
+@Composable
+private fun TextEditorDiscardDialog(
+    onDiscard: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    BasicDialog(
+        title = stringResource(sharedR.string.general_dialog_title_discard_changes),
+        description = stringResource(sharedR.string.general_dialog_discard_changes_message),
+        positiveButtonText = stringResource(sharedR.string.general_dialog_discard_button),
+        onPositiveButtonClicked = onDiscard,
+        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+        onNegativeButtonClicked = onCancel,
+        onDismiss = onCancel,
+    )
+}
+
+/**
+ * Edit-mode top app bar. [onTitleClick] scrolls to top and reveals the bar; action buttons
+ * (Save, Line numbers) use their own hit targets and are not affected.
+ */
+@Composable
+private fun TextEditorEditModeTopAppBar(
+    title: String,
+    onClose: () -> Unit,
+    onSave: () -> Unit,
+    onMenuAction: (TextEditorTopBarAction) -> Unit,
+    onTitleClick: () -> Unit,
+) {
+    MegaTopAppBar(
+        title = title,
+        navigationType = AppBarNavigationType.Close(onClose),
+        actions = listOf(
+            TextEditorTopBarAction.LineNumbers,
+            TextEditorTopBarAction.Save,
+        ),
+        onActionPressed = {
+            when (it) {
+                is TextEditorTopBarAction.Save -> onSave()
+                is TextEditorTopBarAction -> onMenuAction(it)
+                else -> Unit
+            }
+        },
+        modifier = Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = onTitleClick,
+        ),
+    )
+}
+
+/**
+ * View-mode top app bar. [onTitleClick] scrolls to top and reveals the bar; action buttons
+ * (More, Line numbers) use their own hit targets and are not affected.
+ */
+@Composable
+private fun TextEditorViewModeTopAppBar(
+    title: String,
+    onBack: () -> Unit,
+    onMenuAction: (TextEditorTopBarAction) -> Unit,
+    onOpenNodeOptions: (() -> Unit)?,
+    onTitleClick: () -> Unit,
+    isMarkdownPreview: Boolean = false,
+) {
+    val actions = buildList {
+        // Line numbers are meaningless in the rendered Markdown preview.
+        if (!isMarkdownPreview) add(TextEditorTopBarAction.LineNumbers)
+        if (onOpenNodeOptions != null) add(TextEditorTopBarAction.More)
+    }
+    MegaTopAppBar(
+        title = title,
+        navigationType = AppBarNavigationType.Back(onBack),
+        actions = actions,
+        onActionPressed = {
+            when (it) {
+                is TextEditorTopBarAction.More -> onOpenNodeOptions?.invoke()
+                is TextEditorTopBarAction -> onMenuAction(it)
+                else -> Unit
+            }
+        },
+        modifier = Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = onTitleClick,
+        ),
+    )
+}

@@ -28,8 +28,7 @@
     <fragment
         android:id="@+id/copyright"
         android:name="mega.privacy.android.app.getLink.CopyrightFragment"
-        android:label=""
-        tools:layout="@layout/fragment_copyright"/>
+        android:label="" />
 
     <fragment
         android:id="@+id/decryption_key"

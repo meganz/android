@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -53,11 +54,11 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ads.AdsContainer
+import mega.privacy.android.app.main.ads.LegacyAdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.filelink.view.ImportDownloadView
@@ -66,16 +67,21 @@ import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
-import mega.privacy.android.app.presentation.search.SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG
 import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
+import mega.privacy.android.app.presentation.search.view.SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.app.presentation.view.NodesView
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.buttons.DebouncedButtonContainer
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -122,7 +128,7 @@ internal fun FolderLinkView(
     onDisputeTakeDownClicked: (String) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
-    request: AdManagerAdRequest?,
+    request: BannerAdRequest?,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -211,7 +217,7 @@ internal fun FolderLinkView(
             },
             bottomBar = {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    if (state.showContentActions) {
+                    if (state.showContentActions && state.parentNode?.isNodeKeyDecrypted == true) {
                         ImportDownloadView(
                             Modifier
                                 .fillMaxWidth()
@@ -222,7 +228,7 @@ internal fun FolderLinkView(
                             onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
                         )
                     }
-                    AdsContainer(
+                    LegacyAdsContainer(
                         request = request,
                         modifier = Modifier.fillMaxWidth(),
                         isLoggedInUser = state.hasDbCredentials,
@@ -316,12 +322,29 @@ internal fun FolderLinkView(
                         }
                     }
 
-                    if (state.storageStatusDialogState != null) {
-                        StorageStatusDialogView(
-                            state = state.storageStatusDialogState,
-                            dismissClickListener = onStorageStatusDialogDismiss,
-                            actionButtonClickListener = onStorageDialogActionButtonClick,
-                            achievementButtonClickListener = onStorageDialogAchievementButtonClick,
+                    val storageStatusDialogState = state.storageStatusDialogState
+                    if (storageStatusDialogState != null) {
+                        FeatureFlagGate(
+                            feature = ApiFeatures.QuotaWarningUpsellScreen,
+                            disabled = {
+                                StorageStatusDialogView(
+                                    state = storageStatusDialogState,
+                                    dismissClickListener = onStorageStatusDialogDismiss,
+                                    actionButtonClickListener = onStorageDialogActionButtonClick,
+                                    achievementButtonClickListener = onStorageDialogAchievementButtonClick,
+                                )
+                            },
+                            enabled = {
+                                val context = LocalContext.current
+                                LaunchedEffect(Unit) {
+                                    onStorageStatusDialogDismiss()
+                                    context.megaNavigator.openQuotaWarningUpsell(
+                                        context = context,
+                                        type = QuotaWarningType.Storage,
+                                        trigger = QuotaWarningTrigger.Upload,
+                                    )
+                                }
+                            },
                         )
                     }
                 }
@@ -556,7 +579,7 @@ private fun EmptyFolderLinkViewPreview() {
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .padding(horizontal = 8.dp),
-                emptyViewString = stringResource(id = R.string.file_browser_empty_folder),
+                emptyViewString = stringResource(id = sharedR.string.empty_file_browser_folder),
             )
         }
     }

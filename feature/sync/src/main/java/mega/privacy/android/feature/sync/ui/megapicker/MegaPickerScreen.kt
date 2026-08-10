@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -23,15 +24,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.MegaSnackbar
+import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuAction
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.ui.createnewfolder.CreateNewFolderDialog
-import mega.privacy.android.feature.sync.ui.createnewfolder.model.CreateNewFolderMenuAction
+import mega.privacy.android.navigation.contract.menu.NewFolderMenuAction
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -46,18 +48,17 @@ internal fun MegaPickerScreen(
     currentFolder: Node?,
     nodes: List<TypedNodeUiModel>?,
     folderClicked: (TypedNode) -> Unit,
+    disabledFolderClicked: (TypedNodeUiModel) -> Unit,
     currentFolderSelected: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
-    errorMessageId: Int?,
-    errorMessageShown: () -> Unit,
+    snackbarMessage: LocalizedText?,
+    snackbarMessageShown: () -> Unit,
     isLoading: Boolean,
     isSelectEnabled: Boolean,
     onCreateNewFolderDialogSuccess: (String) -> Unit = {},
     isStopBackupMegaPicker: Boolean = false,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-
-    val context = LocalContext.current
 
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -67,6 +68,7 @@ internal fun MegaPickerScreen(
                 currentFolder.parentId != NodeId(MegaApiJava.INVALID_HANDLE)
 
     var showCreateNewFolderDialog by rememberSaveable { mutableStateOf(false) }
+    val appBarWindowInsets = WindowInsets.statusBars
 
     MegaScaffold(
         topBar = {
@@ -75,15 +77,15 @@ internal fun MegaPickerScreen(
                 title = currentFolder?.name?.takeIf { showCurrentFolderName }
                     ?: stringResource(sharedR.string.general_section_cloud_drive),
                 subtitle = stringResource(sharedR.string.general_select_create_folder).takeIf { isStopBackupMegaPicker },
-                windowInsets = WindowInsets(0.dp),
+                windowInsets = appBarWindowInsets,
                 elevation = 0.dp,
                 onNavigationPressed = {
                     onBackPressedDispatcher?.onBackPressed()
                 },
-                actions = mutableListOf<MenuAction>(CreateNewFolderMenuAction()),
+                actions = mutableListOf<MenuAction>(NewFolderMenuAction),
                 onActionPressed = {
                     when (it) {
-                        is CreateNewFolderMenuAction -> {
+                        is NewFolderMenuAction -> {
                             showCreateNewFolderDialog = true
                         }
                     }
@@ -91,14 +93,17 @@ internal fun MegaPickerScreen(
             )
         }, content = { paddingValues ->
             MegaPickerScreenContent(
+                currentFolder = currentFolder,
                 nodes = nodes,
                 folderClicked = folderClicked,
+                disabledFolderClicked = disabledFolderClicked,
                 currentFolderSelected = currentFolderSelected,
                 fileTypeIconMapper = fileTypeIconMapper,
                 modifier = Modifier.padding(paddingValues),
                 isLoading = isLoading,
                 isSelectEnabled = isSelectEnabled,
                 isStopBackupMegaPicker = isStopBackupMegaPicker,
+                showSelectAtRoot = isStopBackupMegaPicker,
             )
         },
         snackbarHost = {
@@ -119,27 +124,35 @@ internal fun MegaPickerScreen(
         }
     }
 
-    LaunchedEffect(errorMessageId) {
-        if (errorMessageId != null) {
+    val context = LocalContext.current
+    LaunchedEffect(snackbarMessage) {
+        if (snackbarMessage != null) {
             snackbarHostState.showAutoDurationSnackbar(
-                message = context.resources.getString(errorMessageId),
+                message = snackbarMessage.get(context),
             )
-            errorMessageShown()
+            snackbarMessageShown()
         }
     }
 }
 
 @Composable
 private fun MegaPickerScreenContent(
+    currentFolder: Node?,
     nodes: List<TypedNodeUiModel>?,
     folderClicked: (TypedNode) -> Unit,
+    disabledFolderClicked: (TypedNodeUiModel) -> Unit,
     currentFolderSelected: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     isLoading: Boolean,
     isSelectEnabled: Boolean,
     isStopBackupMegaPicker: Boolean,
     modifier: Modifier = Modifier,
+    showSelectAtRoot: Boolean = false,
 ) {
+    val isAtRoot = currentFolder == null ||
+            currentFolder.parentId.longValue == MegaApiJava.INVALID_HANDLE
+    val showSelectButtonArea = (!isAtRoot || showSelectAtRoot) && !isLoading
+
     Box(modifier = modifier.fillMaxSize()) {
         // Main content area
         MegaFolderPickerView(
@@ -149,7 +162,7 @@ private fun MegaPickerScreenContent(
                     start = 12.dp,
                     top = 8.dp,
                     end = 12.dp,
-                    bottom = if (isSelectEnabled) 80.dp else 8.dp
+                    bottom = if (showSelectButtonArea) 80.dp else 8.dp
                 ),
             onSortOrderClick = {},
             onChangeViewTypeClick = {},
@@ -161,12 +174,14 @@ private fun MegaPickerScreenContent(
             onFolderClick = {
                 folderClicked(it)
             },
+            onDisabledFolderClick = disabledFolderClicked,
             fileTypeIconMapper = fileTypeIconMapper,
             isLoading = isLoading,
         )
 
-        // Button positioned at the bottom
-        if (isSelectEnabled && isLoading.not()) {
+        // Button positioned at the bottom: show when not at root so user can select current folder
+        // or see it disabled when current folder has a synced child (navigate into a child to select)
+        if (showSelectButtonArea) {
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -186,12 +201,11 @@ private fun MegaPickerScreenContent(
                     onClick = {
                         currentFolderSelected()
                     },
-                    enabled = true,
+                    enabled = isSelectEnabled,
                 )
             }
         }
     }
-
 }
 
 @CombinedThemePreviews
@@ -201,13 +215,14 @@ private fun SyncNewFolderScreenPreview(
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaPickerScreen(
-            null,
-            SampleNodeDataProvider.values,
-            {},
-            {},
-            FileTypeIconMapper(),
-            errorMessageId = null,
-            errorMessageShown = {},
+            currentFolder = null,
+            nodes = SampleNodeDataProvider.values,
+            folderClicked = {},
+            disabledFolderClicked = {},
+            currentFolderSelected = {},
+            fileTypeIconMapper = FileTypeIconMapper(),
+            snackbarMessage = null,
+            snackbarMessageShown = {},
             isLoading = false,
             isSelectEnabled = isSelectEnabled,
         )

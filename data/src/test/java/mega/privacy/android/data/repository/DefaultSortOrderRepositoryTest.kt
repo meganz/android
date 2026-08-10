@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -13,8 +14,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -31,6 +31,10 @@ internal class DefaultSortOrderRepositoryTest {
 
     @BeforeAll
     fun setUp() {
+        initUnderTest()
+    }
+
+    private fun initUnderTest() {
         underTest = DefaultSortOrderRepository(
             ioDispatcher = UnconfinedTestDispatcher(),
             megaLocalStorageGateway = megaLocalStorageGateway,
@@ -92,42 +96,29 @@ internal class DefaultSortOrderRepositoryTest {
         verify(sortOrderMapper).invoke(order)
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that get links sort order return type is sort order`(isSingleActivityEnabled: Boolean) =
-        runTest {
-            val order = MegaApiJava.ORDER_SIZE_ASC
-            whenever(megaLocalStorageGateway.getLinksSortOrder(isSingleActivityEnabled)).thenReturn(
-                order
-            )
-            whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_SIZE_ASC)
-            assertThat(underTest.getLinksSortOrder(isSingleActivityEnabled)).isInstanceOf(SortOrder::class.java)
-        }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that get links sort order invokes get links sort order of gateway`(
-        isSingleActivityEnabled: Boolean,
-    ) = runTest {
+    @Test
+    fun `test that get links sort order return type is sort order`() = runTest {
         val order = MegaApiJava.ORDER_SIZE_ASC
-        whenever(megaLocalStorageGateway.getLinksSortOrder(isSingleActivityEnabled)).thenReturn(
-            order
-        )
-        underTest.getLinksSortOrder(isSingleActivityEnabled)
-        verify(megaLocalStorageGateway).getLinksSortOrder(isSingleActivityEnabled)
+        whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(order)
+        whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_SIZE_ASC)
+        assertThat(underTest.getLinksSortOrder()).isInstanceOf(SortOrder::class.java)
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that get links sort order invokes sort order mapper`(isSingleActivityEnabled: Boolean) =
-        runTest {
-            val order = MegaApiJava.ORDER_SIZE_ASC
-            whenever(megaLocalStorageGateway.getLinksSortOrder(isSingleActivityEnabled)).thenReturn(
-                order
-            )
-            underTest.getLinksSortOrder(isSingleActivityEnabled)
-            verify(sortOrderMapper).invoke(order)
-        }
+    @Test
+    fun `test that get links sort order invokes get links sort order of gateway`() = runTest {
+        val order = MegaApiJava.ORDER_SIZE_ASC
+        whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(order)
+        underTest.getLinksSortOrder()
+        verify(megaLocalStorageGateway).getLinksSortOrder()
+    }
+
+    @Test
+    fun `test that get links sort order invokes sort order mapper`() = runTest {
+        val order = MegaApiJava.ORDER_SIZE_ASC
+        whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(order)
+        underTest.getLinksSortOrder()
+        verify(sortOrderMapper).invoke(order)
+    }
 
     @Test
     fun `test that get others sort order return type is sort order`() = runTest {
@@ -248,4 +239,89 @@ internal class DefaultSortOrderRepositoryTest {
         underTest.setOthersSortOrder(order)
         verify(sortOrderIntMapper).invoke(order)
     }
+
+    @Test
+    fun `test that monitorCloudSortOrder is emit as expected`() = runTest {
+        val order = SortOrder.ORDER_DEFAULT_ASC
+        val expected = MegaApiJava.ORDER_DEFAULT_ASC
+        whenever(megaLocalStorageGateway.getCloudSortOrder()).thenReturn(expected)
+        whenever(sortOrderMapper(expected)).thenReturn(order)
+
+        initUnderTest()
+
+        val flow = underTest.monitorCloudSortOrder()
+
+        flow.test {
+            val result = awaitItem()
+
+            assertThat(result).isEqualTo(order)
+            cancelAndIgnoreRemainingEvents()
+
+            verify(sortOrderMapper).invoke(expected)
+            verify(megaLocalStorageGateway).getCloudSortOrder()
+        }
+    }
+
+    @Test
+    fun `test that monitorOthersSortOrder is emit as expected`() = runTest {
+        val order = SortOrder.ORDER_SIZE_DESC
+        val expected = MegaApiJava.ORDER_SIZE_DESC
+        whenever(megaLocalStorageGateway.getOthersSortOrder()).thenReturn(expected)
+        whenever(sortOrderMapper(expected)).thenReturn(order)
+
+        initUnderTest()
+
+        val flow = underTest.monitorOthersSortOrder()
+
+        flow.test {
+            val result = awaitItem()
+
+            assertThat(result).isEqualTo(order)
+            cancelAndIgnoreRemainingEvents()
+
+            verify(sortOrderMapper).invoke(expected)
+            verify(megaLocalStorageGateway).getOthersSortOrder()
+        }
+    }
+
+    @Test
+    fun `test that monitorOthersSortOrder emits the new value when the others sort order is set`() =
+        runTest {
+            val initial = MegaApiJava.ORDER_DEFAULT_ASC
+            whenever(megaLocalStorageGateway.getOthersSortOrder()).thenReturn(initial)
+            whenever(sortOrderMapper(initial)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(sortOrderIntMapper(SortOrder.ORDER_SIZE_DESC))
+                .thenReturn(MegaApiJava.ORDER_SIZE_DESC)
+
+            initUnderTest()
+
+            underTest.monitorOthersSortOrder().test {
+                assertThat(awaitItem()).isEqualTo(SortOrder.ORDER_DEFAULT_ASC)
+
+                underTest.setOthersSortOrder(SortOrder.ORDER_SIZE_DESC)
+
+                assertThat(expectMostRecentItem()).isEqualTo(SortOrder.ORDER_SIZE_DESC)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that monitorLinksSortOrder emits the links sort order derived from the cloud sort order`() =
+        runTest {
+            val cloudInt = MegaApiJava.ORDER_DEFAULT_ASC
+            val linksInt = MegaApiJava.ORDER_SIZE_ASC
+            whenever(megaLocalStorageGateway.getCloudSortOrder()).thenReturn(cloudInt)
+            whenever(sortOrderMapper(cloudInt)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(linksInt)
+            whenever(sortOrderMapper(linksInt)).thenReturn(SortOrder.ORDER_SIZE_ASC)
+
+            initUnderTest()
+
+            underTest.monitorLinksSortOrder().test {
+                assertThat(awaitItem()).isEqualTo(SortOrder.ORDER_SIZE_ASC)
+                cancelAndIgnoreRemainingEvents()
+
+                verify(megaLocalStorageGateway, atLeastOnce()).getLinksSortOrder()
+            }
+        }
 }

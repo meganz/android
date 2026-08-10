@@ -13,13 +13,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.preview.model.LoadingPreviewViewModel
 import mega.privacy.android.app.presentation.transfers.preview.view.LoadingPreviewInfo
 import mega.privacy.android.app.presentation.transfers.preview.view.loadingPreviewScreen
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -37,12 +36,6 @@ class LoadingPreviewActivity : AppCompatActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
-    /**
-     * Factory to create PasscodeCryptObject instances
-     */
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
-
     private val viewModel by viewModels<LoadingPreviewViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +46,6 @@ class LoadingPreviewActivity : AppCompatActivity() {
             val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             OriginalTheme(isDark = mode.isDarkMode()) {
                 PasscodeContainer(
-                    passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                     content = {
                         PsaContainer {
                             val navHostController = rememberNavController()

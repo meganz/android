@@ -85,3 +85,11 @@ fun AppDataOwner.isPreviewDownload(): Boolean =
 fun AppDataOwner.isOfflineDownload(): Boolean =
     appData.contains(TransferAppData.OfflineDownload)
 
+/**
+ * Is SAF download
+ *
+ * @return True if the transfer is a download initiated by the SAF document provider, false otherwise.
+ */
+fun AppDataOwner.isSafDownload(): Boolean =
+    appData.contains(TransferAppData.SafDownload)
+

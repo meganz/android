@@ -3,9 +3,10 @@ package mega.privacy.android.app.presentation.search.navigation
 import android.content.Intent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,9 +15,13 @@ import androidx.navigation.navArgument
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 
@@ -34,36 +39,53 @@ internal fun NavGraphBuilder.overQuotaDialogNavigation(
     ) {
         val overQuota = it.arguments?.getBoolean(searchOverQuotaDialogArgumentOverQuota) ?: false
         OriginalTheme(isDark = isSystemInDarkTheme()) {
-            StorageStatusDialogView(
-                modifier = Modifier.padding(horizontal = 24.dp),
-                usePlatformDefaultWidth = false,
-                storageState = if (overQuota) StorageState.Red else StorageState.Orange,
-                preWarning = overQuota.not(),
-                overQuotaAlert = true,
-                viewModel = hiltViewModel(),
-                onUpgradeClick = {
-                    navHostController.navigateUp()
-                    navHostController.context.also { context ->
-                        context.megaNavigator.openUpgradeAccount(context = context)
-                    }
-                },
-                onCustomizedPlanClick = { email, accountType ->
-                    AlertsAndWarnings.askForCustomizedPlan(
-                        navHostController.context,
-                        email,
-                        accountType
+            FeatureFlagGate(
+                feature = ApiFeatures.QuotaWarningUpsellScreen,
+                disabled = {
+                    StorageStatusDialogView(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        usePlatformDefaultWidth = false,
+                        storageState = if (overQuota) StorageState.Red else StorageState.Orange,
+                        preWarning = overQuota.not(),
+                        overQuotaAlert = true,
+                        viewModel = hiltViewModel(),
+                        onUpgradeClick = {
+                            navHostController.navigateUp()
+                            navHostController.context.also { context ->
+                                context.megaNavigator.openUpgradeAccount(context = context)
+                            }
+                        },
+                        onCustomizedPlanClick = { email, accountType ->
+                            AlertsAndWarnings.askForCustomizedPlan(
+                                navHostController.context,
+                                email,
+                                accountType
+                            )
+                        },
+                        onAchievementsClick = {
+                            navHostController.navigateUp()
+                            navHostController.context.apply {
+                                startActivity(
+                                    Intent(this, MyAccountActivity::class.java)
+                                        .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
+                                )
+                            }
+                        },
+                        onClose = { navHostController.navigateUp() },
                     )
                 },
-                onAchievementsClick = {
-                    navHostController.navigateUp()
-                    navHostController.context.apply {
-                        startActivity(
-                            Intent(this, MyAccountActivity::class.java)
-                                .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
-                        )
+                enabled = {
+                    LaunchedEffect(Unit) {
+                        navHostController.navigateUp()
+                        navHostController.context.also { context ->
+                            context.megaNavigator.openQuotaWarningUpsell(
+                                context = context,
+                                type = QuotaWarningType.Storage,
+                                trigger = QuotaWarningTrigger.Upload,
+                            )
+                        }
                     }
                 },
-                onClose = { navHostController.navigateUp() },
             )
         }
     }

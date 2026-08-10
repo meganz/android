@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.settings.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.account.AccountDetail
 
 /**
@@ -19,14 +21,12 @@ import mega.privacy.android.domain.entity.account.AccountDetail
  * @property startScreenSummary
  * @property hideRecentActivityChecked
  * @property mediaDiscoveryViewState
- * @property email
- * @property accountType
  * @property passcodeLock
  * @property subFolderMediaDiscoveryChecked
  * Uploads should be shown
- * @property isHiddenNodesEnabled
  * @property showHiddenItems
  * @property accountDetail
+ * @property deleteAccountEvent one-shot event carrying the account-deletion request result
  */
 data class SettingsState(
     val autoAcceptEnabled: Boolean,
@@ -43,11 +43,9 @@ data class SettingsState(
     val startScreenSummary: String,
     val hideRecentActivityChecked: Boolean,
     val mediaDiscoveryViewState: Int,
-    val email: String,
-    val accountType: String,
     val passcodeLock: Boolean,
     val subFolderMediaDiscoveryChecked: Boolean,
-    val isHiddenNodesEnabled: Boolean?,
     val showHiddenItems: Boolean,
     val accountDetail: AccountDetail?,
+    val deleteAccountEvent: StateEventWithContent<Boolean> = consumed(),
 )

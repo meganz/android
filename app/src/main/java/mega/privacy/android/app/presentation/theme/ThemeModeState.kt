@@ -2,15 +2,15 @@ package mega.privacy.android.app.presentation.theme
 
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,21 +29,15 @@ class ThemeModeState @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
-
-    /**
-     * Current theme mode preference
-     */
-    val themeMode = mutableStateOf(ThemeMode.System)
-
     /**
      * Initialise
      *
      */
     fun initialise() = coroutineScope.launch(ioDispatcher) {
         monitorThemeModeUseCase()
+            .distinctUntilChanged()
             .collect {
                 Timber.d("Theme mode updated to $it")
-                themeMode.value = it
                 setThemeMode(it)
             }
     }

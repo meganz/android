@@ -184,6 +184,11 @@ interface PlayerServiceViewModelGateway {
     fun mediaItemToRemoveUpdate(): Flow<Pair<Int, Long>>
 
     /**
+     * Reset the mediaItemToRemove
+     */
+    fun resetMediaItemToRemove()
+
+    /**
      * Update node name
      *
      * @return Flow<String>
@@ -230,4 +235,15 @@ interface PlayerServiceViewModelGateway {
      * Monitor the media item transition state
      */
     fun monitorMediaItemTransitionState(): Flow<Long?>
+
+
+    /**
+     * Save shuffle enabled state
+     */
+    fun saveShuffleEnabled()
+
+    /**
+     * Reset the error
+     */
+    fun resetError()
 }

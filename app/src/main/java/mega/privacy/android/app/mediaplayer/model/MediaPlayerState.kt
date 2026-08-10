@@ -10,6 +10,8 @@ import mega.privacy.android.domain.entity.AccountType
  * @property isHiddenNodesOnboarded if the user has been onboarded with hidden nodes
  * @property hiddenNodeEnabled whether the hidden node is enabled
  * @property showHiddenItems whether to show hidden items
+ * @property showMoveToTrashDialog whether to show the move to trash dialog
+ * @property nodeToMoveToTrash the node handle to move to trash
  */
 data class MediaPlayerState(
     val accountType: AccountType? = null,
@@ -17,4 +19,6 @@ data class MediaPlayerState(
     val isHiddenNodesOnboarded: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
     val showHiddenItems: Boolean? = null,
+    val showMoveToTrashDialog: Boolean = false,
+    val nodeToMoveToTrash: Long? = null,
 )

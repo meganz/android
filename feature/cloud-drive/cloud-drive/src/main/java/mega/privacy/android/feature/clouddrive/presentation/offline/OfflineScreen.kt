@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -26,42 +28,51 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.model.menu.MenuActionIconWithClick
+import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.components.offline.HandleOfflineNodeAction3
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.list.NodeGridViewItem
-import mega.privacy.android.core.nodecomponents.list.NodeHeaderItem
-import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
-import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeSortOption
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
-import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
-import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineSelectionAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.shared.nodes.components.NodeGridViewItem
+import mega.privacy.android.shared.nodes.components.NodeHeaderItem
+import mega.privacy.android.shared.nodes.components.NodeListViewItem
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
+import mega.privacy.mobile.analytics.event.OfflineScreenEvent
+import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
 
 /**
  * OfflineScreen - A purely composable screen for displaying offline files
@@ -69,17 +80,20 @@ import mega.privacy.android.shared.resources.R as sharedResR
  * @param onBack Callback for back navigation
  * @param viewModel The OfflineViewModel to manage state
  * @param modifier Modifier for the composable
+ * @param onNavigate Callback to navigate to a NavKey destination
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OfflineScreen(
     onBack: () -> Unit,
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
+    onNavigateToTransfers: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     openFileInformation: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: OfflineViewModel = hiltViewModel(),
     actionViewModel: OfflineNodeActionsViewModel = hiltViewModel(),
+    onNavigate: (NavKey) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val actionUiState by actionViewModel.uiState.collectAsStateWithLifecycle()
@@ -87,24 +101,30 @@ fun OfflineScreen(
     HandleOfflineNodeAction3(
         uiState = actionUiState,
         applyShareContentUris = actionViewModel::applyShareContentUris,
+        applyNodeContentUri = actionViewModel::applyNodeContentUri,
         consumeShareFilesEvent = actionViewModel::onShareFilesEventConsumed,
         consumeShareNodeLinksEvent = actionViewModel::onShareNodeLinksEventConsumed,
-        consumeOpenFileEvent = actionViewModel::onOpenFileEventConsumed
+        consumeOpenFileEvent = actionViewModel::onOpenFileEventConsumed,
+        onNavigate = onNavigate,
     )
 
     OfflineScreen(
         uiState = uiState,
+        snackbarEventQueue = rememberSnackBarQueue(),
         onBack = onBack,
         selectAll = viewModel::selectAll,
         deselectAll = viewModel::clearSelection,
         onItemClicked = viewModel::onItemClicked,
         onItemLongClicked = viewModel::onLongItemClicked,
         onOpenFile = actionViewModel::handleOpenOfflineFile,
+        onOpenWithFile = actionViewModel::handleOpenWithIntent,
         onDismissOfflineWarning = viewModel::dismissOfflineWarning,
         onNavigateToFolder = onNavigateToFolder,
+        onNavigateToTransfers = onNavigateToTransfers,
         onSearch = viewModel::setSearchQuery,
         consumeOpenFolderEvent = viewModel::onOpenFolderInPageEventConsumed,
         consumeOpenFileEvent = viewModel::onOpenOfflineNodeEventConsumed,
+        consumeRemoveEvent = viewModel::consumeRemoveNodesEvent,
         shareOfflineFiles = { files ->
             actionViewModel.handleShareOfflineNodes(
                 nodes = files,
@@ -133,7 +153,9 @@ internal fun OfflineScreen(
     onItemClicked: (OfflineNodeUiItem) -> Unit,
     onItemLongClicked: (OfflineNodeUiItem) -> Unit,
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
+    onNavigateToTransfers: () -> Unit,
     onOpenFile: (OfflineFileInformation) -> Unit,
+    onOpenWithFile: (OfflineFileInformation) -> Unit,
     onDismissOfflineWarning: () -> Unit,
     onSearch: (String) -> Unit,
     shareOfflineFiles: (List<OfflineFileInformation>) -> Unit,
@@ -143,14 +165,23 @@ internal fun OfflineScreen(
     onChangeViewType: () -> Unit,
     onSortNodes: (NodeSortConfiguration) -> Unit,
     modifier: Modifier = Modifier,
+    snackbarEventQueue: SnackbarEventQueue = rememberSnackBarQueue(),
     consumeOpenFolderEvent: () -> Unit = {},
     consumeOpenFileEvent: () -> Unit = {},
+    consumeRemoveEvent: () -> Unit = {},
 ) {
     var isSearchMode by rememberSaveable { mutableStateOf(false) }
     var showRemoveDialog by rememberSaveable { mutableStateOf(false) }
     var selectedHandlesToRemove by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val offlineBottomSheetState = rememberModalBottomSheetState()
+    val coroutineScope = rememberCoroutineScope()
+
+    LifecycleResumeEffect(Unit) {
+        Analytics.tracker.trackEvent(OfflineScreenEvent)
+        onPauseOrDispose {}
+    }
 
     EventEffect(
         event = uiState.openFolderInPageEvent,
@@ -166,12 +197,33 @@ internal fun OfflineScreen(
         onOpenFile(file)
     }
 
+    EventEffect(
+        event = uiState.removeNodesSuccessEvent,
+        onConsumed = consumeRemoveEvent
+    ) { size ->
+        if (size > 1) {
+            snackbarEventQueue.queueMessage(
+                sharedR.string.offline_remove_multiple_item_success_message,
+                size
+            )
+        } else {
+            snackbarEventQueue.queueMessage(sharedR.string.offline_remove_singular_item_success_message)
+        }
+    }
+
+    BackHandler(isSearchMode && uiState.selectedNodeHandles.isEmpty()) {
+        isSearchMode = false
+        onSearch("")
+    }
+
     BackHandler(uiState.selectedNodeHandles.isNotEmpty()) {
         deselectAll()
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .navigationBarsPadding(),
         bottomBar = {
             SelectionModeBottomBar(
                 modifier = Modifier
@@ -199,15 +251,24 @@ internal fun OfflineScreen(
             )
         },
         topBar = {
-            if (uiState.selectedNodeHandles.isEmpty()) {
+            val isInSelectionMode = uiState.selectedNodeHandles.isNotEmpty()
+            val defaultTitle = uiState.title.takeIf { uiState.nodeId != -1 }
+                ?: stringResource(sharedR.string.offline_screen_title)
+            if (!isInSelectionMode && (uiState.offlineNodes.isNotEmpty() || !uiState.searchQuery.isNullOrEmpty())) {
                 MegaSearchTopAppBar(
                     modifier = Modifier
                         .testTag(OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG),
-                    navigationType = AppBarNavigationType.Back(onBack),
-                    title = uiState
-                        .title
-                        .takeIf { uiState.nodeId != -1 }
-                        ?: stringResource(R.string.offline_screen_title),
+                    navigationType = AppBarNavigationType.Back {
+                        Analytics.tracker.trackEvent(BackButtonPressedEvent)
+                        onBack()
+                    },
+                    trailingIcons = {
+                        TransfersToolbarWidget(
+                            onClick = onNavigateToTransfers,
+                            modifier = Modifier.testTag(OFFLINE_SCREEN_TRANSFER_WIDGET)
+                        )
+                    },
+                    title = defaultTitle,
                     query = uiState.searchQuery,
                     onQueryChanged = onSearch,
                     isSearchingMode = isSearchMode,
@@ -218,24 +279,33 @@ internal fun OfflineScreen(
                             // reset to the original search result
                             onSearch("")
                         }
-                    },
-                    actions = buildList {
-                        if (uiState.nodeId != -1) {
-                            add(
-                                MenuActionIconWithClick(CloudDriveAppBarAction.More) {
-                                    // Todo implement NodeOptionsBottomSheet
-                                }
-                            )
-                        }
                     }
                 )
             } else {
                 MegaTopAppBar(
                     modifier = Modifier
-                        .testTag(OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG),
-                    title = uiState.selectedNodeHandles.size.toString(),
-                    navigationType = AppBarNavigationType.Close(deselectAll),
-                    actions = OfflineSelectionAction.topBarItems,
+                        .testTag(
+                            if (isInSelectionMode) OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG
+                            else OFFLINE_SCREEN_EMPTY_TOP_APP_BAR_TAG
+                        ),
+                    title = if (isInSelectionMode) {
+                        uiState.selectedNodeHandles.size.toString()
+                    } else {
+                        defaultTitle
+                    },
+                    navigationType = if (isInSelectionMode) {
+                        AppBarNavigationType.Close(deselectAll)
+                    } else {
+                        AppBarNavigationType.Back {
+                            Analytics.tracker.trackEvent(BackButtonPressedEvent)
+                            onBack()
+                        }
+                    },
+                    actions = buildList {
+                        if (isInSelectionMode && !uiState.areAllNodesSelected) {
+                            add(OfflineSelectionAction.SelectAll)
+                        }
+                    },
                     onActionPressed = { action ->
                         when (action) {
                             is OfflineSelectionAction.SelectAll -> selectAll()
@@ -244,21 +314,35 @@ internal fun OfflineScreen(
                     }
                 )
             }
-        }
+        },
     ) { paddingValues ->
         var visibleOfflineInformation by remember { mutableStateOf<OfflineFileInformation?>(null) }
+        val dismissOfflineBottomSheet = remember {
+            {
+                coroutineScope
+                    .launch { offlineBottomSheetState.hide() }
+                    .invokeOnCompletion { visibleOfflineInformation = null }
+            }
+        }
+        val dismissSortBottomSheet = remember {
+            {
+                coroutineScope
+                    .launch { sortBottomSheetState.hide() }
+                    .invokeOnCompletion { showSortBottomSheet = false }
+            }
+        }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()),
+                .padding(paddingValues.excludingBottomPadding()),
         ) {
             if (uiState.showOfflineWarning && !uiState.isLoading) {
                 TopWarningBanner(
                     modifier = Modifier
                         .testTag(OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG)
                         .fillMaxWidth(),
-                    body = stringResource(R.string.offline_warning),
+                    body = stringResource(sharedR.string.logout_offline_content_deletion_warning),
                     showCancelButton = true,
                     onCancelButtonClick = onDismissOfflineWarning
                 )
@@ -277,11 +361,11 @@ internal fun OfflineScreen(
                     }
 
                     uiState.offlineNodes.isEmpty() -> {
-                        MegaEmptyView(
+                        EmptyStateView(
                             modifier = Modifier
                                 .testTag(OFFLINE_SCREEN_EMPTY_TAG)
                                 .align(Alignment.Center),
-                            text = "No offline files available",
+                            title = stringResource(sharedR.string.offline_screen_empty_state_description),
                             imagePainter = painterResource(iconPackR.drawable.ic_arrow_circle_down_glass)
                         )
                     }
@@ -298,7 +382,10 @@ internal fun OfflineScreen(
                             contentPadding = PaddingValues(
                                 bottom = paddingValues.calculateBottomPadding()
                             ),
-                            onChangeViewType = onChangeViewType,
+                            onChangeViewType = {
+                                Analytics.tracker.trackEvent(ViewModeButtonPressedEvent)
+                                onChangeViewType()
+                            },
                             onSortClick = {
                                 showSortBottomSheet = true
                             }
@@ -308,37 +395,36 @@ internal fun OfflineScreen(
             }
         }
 
-        visibleOfflineInformation?.let { file ->
-            OfflineOptionsBottomSheet(
-                modifier = Modifier
-                    .testTag(OFFLINE_SCREEN_BOTTOM_SHEET_TAG),
-                offlineFileInformation = file,
-                onShareOfflineFile = {
-                    shareOfflineFiles(listOf(file))
-                    visibleOfflineInformation = null
-                },
-                onSaveOfflineFileToDevice = {
-                    val safeHandle = file.handle.toLongOrNull() ?: return@OfflineOptionsBottomSheet
-                    saveOfflineFilesToDevice(listOf(safeHandle))
-                    visibleOfflineInformation = null
-                },
-                onOpenOfflineFile = {
-                    openFileInformation(file.handle)
-                    visibleOfflineInformation = null
-                },
-                onOpenWithFile = {
-                    onOpenFile(file)
-                    visibleOfflineInformation = null
-                },
-                onDeleteOfflineFile = {
-                    val safeHandle = file.handle.toLongOrNull() ?: return@OfflineOptionsBottomSheet
-                    selectedHandlesToRemove = listOf(safeHandle)
-                    showRemoveDialog = true
-                    visibleOfflineInformation = null
-                },
-                onDismiss = { visibleOfflineInformation = null }
-            )
-        }
+        OfflineOptionsBottomSheet(
+            modifier = Modifier
+                .testTag(OFFLINE_SCREEN_BOTTOM_SHEET_TAG),
+            offlineFileInformation = visibleOfflineInformation,
+            onShareOfflineFile = { file ->
+                shareOfflineFiles(listOf(file))
+                dismissOfflineBottomSheet()
+            },
+            onSaveOfflineFileToDevice = { file ->
+                val safeHandle = file.handle.toLongOrNull() ?: return@OfflineOptionsBottomSheet
+                saveOfflineFilesToDevice(listOf(safeHandle))
+                dismissOfflineBottomSheet()
+            },
+            onOpenOfflineFile = { file ->
+                openFileInformation(file.handle)
+                dismissOfflineBottomSheet()
+            },
+            onOpenWithFile = { file ->
+                onOpenWithFile(file)
+                dismissOfflineBottomSheet()
+            },
+            onDeleteOfflineFile = { file ->
+                val safeHandle = file.handle.toLongOrNull() ?: return@OfflineOptionsBottomSheet
+                selectedHandlesToRemove = listOf(safeHandle)
+                showRemoveDialog = true
+                dismissOfflineBottomSheet()
+            },
+            onDismiss = { dismissOfflineBottomSheet() },
+            sheetState = offlineBottomSheetState
+        )
 
         if (showRemoveDialog) {
             RemoveFromOfflineDialog(
@@ -360,7 +446,7 @@ internal fun OfflineScreen(
             SortBottomSheet(
                 modifier = Modifier.testTag(OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG),
                 options = NodeSortOption.getOptionsForSourceType(NodeSourceType.OFFLINE),
-                title = stringResource(sharedResR.string.action_sort_by_header),
+                title = stringResource(sharedR.string.action_sort_by_header),
                 sheetState = sortBottomSheetState,
                 selectedSort = SortBottomSheetResult(
                     sortOptionItem = uiState.selectedSortConfiguration.sortOption,
@@ -374,9 +460,13 @@ internal fun OfflineScreen(
                                 sortDirection = it.sortDirection
                             )
                         )
-                        showSortBottomSheet = false
+
+                        dismissSortBottomSheet()
                     }
                 },
+                onDismissRequest = {
+                    dismissSortBottomSheet()
+                }
             )
         }
     }
@@ -418,7 +508,7 @@ private fun OfflineContent(
 
                 items(
                     items = uiState.offlineNodes,
-                    key = { it.offlineFileInformation.handle }
+                    key = { it.offlineFileInformation.id }
                 ) { node ->
                     NodeListViewItem(
                         title = node.offlineFileInformation.name,
@@ -428,7 +518,7 @@ private fun OfflineContent(
                         } else {
                             getFileTypeIcon(node.offlineFileInformation.name) ?: return@items
                         },
-                        thumbnailData = node.offlineFileInformation.thumbnail,
+                        thumbnailData = node.offlineFileInformation.thumbnailData,
                         highlightText = uiState.searchQuery ?: "",
                         isSelected = node.isSelected,
                         isInSelectionMode = uiState.selectedNodeHandles.isNotEmpty(),
@@ -469,7 +559,7 @@ private fun OfflineContent(
 
                 items(
                     items = uiState.offlineNodes,
-                    key = { it.offlineFileInformation.handle }
+                    key = { it.offlineFileInformation.id }
                 ) { node ->
                     NodeGridViewItem(
                         name = node.offlineFileInformation.name,
@@ -478,12 +568,12 @@ private fun OfflineContent(
                         } else {
                             getFileTypeIcon(node.offlineFileInformation.name) ?: return@items
                         },
-                        thumbnailData = node.offlineFileInformation.thumbnail,
+                        thumbnailData = node.offlineFileInformation.thumbnailData,
                         isTakenDown = false,
                         isSelected = node.isSelected,
                         isInSelectionMode = uiState.selectedNodeHandles.isNotEmpty(),
                         isFolderNode = node.offlineFileInformation.isFolder,
-                        isVideoNode = false, // TODO: Add video detection
+                        isVideoNode = node.offlineFileInformation.fileTypeInfo is VideoFileTypeInfo,
                         highlightText = uiState.searchQuery ?: "",
                         isHighlighted = node.isHighlighted,
                         label = null,
@@ -505,9 +595,9 @@ private fun RemoveFromOfflineDialog(
 ) {
     BasicDialog(
         modifier = modifier,
-        description = stringResource(R.string.confirmation_delete_from_save_for_offline),
-        positiveButtonText = stringResource(sharedResR.string.general_remove),
-        negativeButtonText = stringResource(sharedResR.string.general_dialog_cancel_button),
+        description = stringResource(sharedR.string.offline_item_deletion_confirmation_title),
+        positiveButtonText = stringResource(sharedR.string.general_remove),
+        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
         onPositiveButtonClicked = onRemove,
         onNegativeButtonClicked = onCancel,
     )
@@ -526,3 +616,5 @@ internal const val OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG = "offline_screen:top_w
 internal const val OFFLINE_SCREEN_SELECTION_MODE_BOTTOM_BAR_TAG =
     "offline_screen:selection_mode_bottom_bar"
 internal const val OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG = "offline_screen:sort_bottom_sheet"
+internal const val OFFLINE_SCREEN_TRANSFER_WIDGET = "offline_screen:transfers_widget"
+internal const val OFFLINE_SCREEN_EMPTY_TOP_APP_BAR_TAG = "offline_screen:empty_top_app_bar"

@@ -5,8 +5,11 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -14,27 +17,48 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.BlockedMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
+import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -47,7 +71,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import mega.privacy.android.shared.resources.R as sharedResR
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -71,12 +94,12 @@ internal class PdfViewerViewModelTest {
         }.thenReturn(flowOf(AccountDetail()))
     }
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        onBlocking {
+        on {
             invoke()
         }.thenReturn(false)
     }
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>() {
-        onBlocking {
+        on {
             invoke(any())
         }.thenReturn(false)
     }
@@ -86,9 +109,20 @@ internal class PdfViewerViewModelTest {
     private val setOrUpdateLastPageViewedInPdfUseCase =
         mock<SetOrUpdateLastPageViewedInPdfUseCase>()
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
+    private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
+    private val saveRecentlyUsedItemUseCase = mock<SaveRecentlyUsedItemUseCase>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
+    private val moveNodeToRubbishBinUseCase = mock<MoveNodeToRubbishBinUseCase>()
+    private val deleteNodeByHandleUseCase = mock<DeleteNodeByHandleUseCase>()
+    private val exportNodeUseCase = mock<ExportNodeUseCase>()
+    private val getNodeAccessUseCase = mock<GetNodeAccessUseCase>()
 
     @BeforeEach
     fun setUp() {
+        savedStateHandle = mock()
+        whenever(monitorNodeUpdatesUseCase.invoke()).thenReturn(flowOf())
+        whenever(monitorTransferEventsUseCase.invoke()).thenReturn(flowOf())
         initTest()
     }
 
@@ -109,6 +143,14 @@ internal class PdfViewerViewModelTest {
             getLastPageViewedInPdfUseCase = getLastPageViewedInPdfUseCase,
             setOrUpdateLastPageViewedInPdfUseCase = setOrUpdateLastPageViewedInPdfUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            monitorTransferEventsUseCase = monitorTransferEventsUseCase,
+            saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
+            moveNodeToRubbishBinUseCase = moveNodeToRubbishBinUseCase,
+            deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
+            exportNodeUseCase = exportNodeUseCase,
+            getNodeAccessUseCase = getNodeAccessUseCase,
         )
     }
 
@@ -122,6 +164,10 @@ internal class PdfViewerViewModelTest {
             getLastPageViewedInPdfUseCase,
             setOrUpdateLastPageViewedInPdfUseCase,
             broadcastTransferOverQuotaUseCase,
+            isNodeInRubbishBinUseCase,
+            moveNodeToRubbishBinUseCase,
+            deleteNodeByHandleUseCase,
+            getNodeAccessUseCase,
         )
     }
 
@@ -534,11 +580,512 @@ internal class PdfViewerViewModelTest {
     }
 
     @Test
+    internal fun `test that resetPdfUriData sets pdfUriData to null`() = runTest {
+        val uri = mock<Uri>()
+
+        initTest()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().pdfUriData).isNull()
+
+            underTest.setPdfUriData(uri)
+            assertThat(awaitItem().pdfUriData).isEqualTo(uri)
+
+            underTest.resetPdfUriData()
+            assertThat(awaitItem().pdfUriData).isNull()
+        }
+    }
+
+    @Test
     internal fun `test that broadcastTransferOverQuota invokes correctly`() = runTest {
         underTest.broadcastTransferOverQuota()
         advanceUntilIdle()
 
         verify(broadcastTransferOverQuotaUseCase).invoke(true)
+    }
+
+    @Test
+    internal fun `test that QuotaExceededMegaException triggers broadcastTransferOverQuota when conditions are met`() =
+        runTest {
+            val testTransfer = mock<Transfer> {
+                on { isForeignOverQuota } doReturn false
+            }
+            val quotaException = mock<QuotaExceededMegaException> {
+                on { value } doReturn 1000L
+            }
+            val quotaEvent = TransferEvent.TransferTemporaryErrorEvent(
+                transfer = testTransfer,
+                error = quotaException
+            )
+
+            savedStateHandle = SavedStateHandle(mapOf(INTENT_EXTRA_KEY_ADAPTER_TYPE to 0))
+
+            val fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
+            whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+            initTest()
+            advanceUntilIdle()
+
+            fakeMonitorTransferEventsFlow.emit(quotaEvent)
+            advanceUntilIdle()
+
+            verify(broadcastTransferOverQuotaUseCase).invoke(true)
+        }
+
+    @Test
+    internal fun `test that QuotaExceededMegaException does not trigger broadcastTransferOverQuota when isForeignOverQuota is true`() =
+        runTest {
+            val testTransfer = mock<Transfer> {
+                on { isForeignOverQuota } doReturn true
+            }
+            val quotaException = mock<QuotaExceededMegaException> {
+                on { value } doReturn 1000L
+            }
+            val quotaEvent = TransferEvent.TransferTemporaryErrorEvent(
+                transfer = testTransfer,
+                error = quotaException
+            )
+
+            savedStateHandle = SavedStateHandle(mapOf(INTENT_EXTRA_KEY_ADAPTER_TYPE to 0))
+            val fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
+            whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+            initTest()
+            advanceUntilIdle()
+
+            fakeMonitorTransferEventsFlow.emit(quotaEvent)
+            advanceUntilIdle()
+
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+        }
+
+    @Test
+    internal fun `test that QuotaExceededMegaException does not trigger broadcastTransferOverQuota when error value is zero`() =
+        runTest {
+            val testTransfer = mock<Transfer> {
+                on { isForeignOverQuota } doReturn false
+            }
+            val quotaException = mock<QuotaExceededMegaException> {
+                on { value } doReturn 0L
+            }
+            val quotaEvent = TransferEvent.TransferTemporaryErrorEvent(
+                transfer = testTransfer,
+                error = quotaException
+            )
+
+            savedStateHandle = SavedStateHandle(mapOf(INTENT_EXTRA_KEY_ADAPTER_TYPE to 0))
+            val fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
+            whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+            initTest()
+            advanceUntilIdle()
+
+            fakeMonitorTransferEventsFlow.emit(quotaEvent)
+            advanceUntilIdle()
+
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+        }
+
+    @Test
+    internal fun `test that BlockedMegaException triggers showTakenDownDialogEvent`() = runTest {
+        val testTransfer = mock<Transfer>()
+        val blockedException = mock<BlockedMegaException>()
+        val blockedEvent = TransferEvent.TransferTemporaryErrorEvent(
+            transfer = testTransfer,
+            error = blockedException
+        )
+
+        savedStateHandle = SavedStateHandle(mapOf(INTENT_EXTRA_KEY_ADAPTER_TYPE to 0))
+        val fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
+        whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+        initTest()
+        advanceUntilIdle()
+
+        fakeMonitorTransferEventsFlow.emit(blockedEvent)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.showTakenDownDialogEvent).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    internal fun `test that onTakenDownDialogShown resets showTakenDownDialogEvent`() = runTest {
+        val testTransfer = mock<Transfer>()
+        val blockedException = mock<BlockedMegaException>()
+        val blockedEvent = TransferEvent.TransferTemporaryErrorEvent(
+            transfer = testTransfer,
+            error = blockedException
+        )
+
+        savedStateHandle = SavedStateHandle(mapOf(INTENT_EXTRA_KEY_ADAPTER_TYPE to 0))
+        val fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
+        whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+        initTest()
+        advanceUntilIdle()
+
+        fakeMonitorTransferEventsFlow.emit(blockedEvent)
+        advanceUntilIdle()
+
+        underTest.onTakenDownDialogShown()
+
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.showTakenDownDialogEvent).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    internal fun `test that non TransferTemporaryErrorEvent events are filtered out`() = runTest {
+        val testTransfer = mock<Transfer>()
+        val startEvent = TransferEvent.TransferStartEvent(transfer = testTransfer)
+
+        savedStateHandle = SavedStateHandle(mapOf(INTENT_EXTRA_KEY_ADAPTER_TYPE to 0))
+        val fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
+        whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+        initTest()
+        advanceUntilIdle()
+
+        fakeMonitorTransferEventsFlow.emit(startEvent)
+        advanceUntilIdle()
+
+        verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.showTakenDownDialogEvent).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    internal fun `test that QuotaExceededMegaException does not trigger broadcastTransferOverQuota when adapterType is OFFLINE_ADAPTER`() =
+        runTest {
+            val testTransfer = mock<Transfer> {
+                on { isForeignOverQuota } doReturn false
+            }
+            val quotaException = mock<QuotaExceededMegaException> {
+                on { value } doReturn 1000L
+            }
+            val quotaEvent = TransferEvent.TransferTemporaryErrorEvent(
+                transfer = testTransfer,
+                error = quotaException
+            )
+
+            savedStateHandle = SavedStateHandle(mapOf(INTENT_EXTRA_KEY_ADAPTER_TYPE to OFFLINE_ADAPTER))
+            val fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
+            whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+            initTest()
+            advanceUntilIdle()
+
+            fakeMonitorTransferEventsFlow.emit(quotaEvent)
+            advanceUntilIdle()
+
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+        }
+
+    @Test
+    internal fun `test that QuotaExceededMegaException does not trigger broadcastTransferOverQuota when adapterType is ZIP_ADAPTER`() =
+        runTest {
+            val testTransfer = mock<Transfer> {
+                on { isForeignOverQuota } doReturn false
+            }
+            val quotaException = mock<QuotaExceededMegaException> {
+                on { value } doReturn 1000L
+            }
+            val quotaEvent = TransferEvent.TransferTemporaryErrorEvent(
+                transfer = testTransfer,
+                error = quotaException
+            )
+
+            savedStateHandle = SavedStateHandle(mapOf(INTENT_EXTRA_KEY_ADAPTER_TYPE to ZIP_ADAPTER))
+            val fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
+            whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+            initTest()
+            advanceUntilIdle()
+
+            fakeMonitorTransferEventsFlow.emit(quotaEvent)
+            advanceUntilIdle()
+
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+        }
+
+    @Test
+    internal fun `test that BlockedMegaException does not trigger showTakenDownDialogEvent when adapterType is OFFLINE_ADAPTER`() =
+        runTest {
+            val testTransfer = mock<Transfer>()
+            val blockedException = mock<BlockedMegaException>()
+            val blockedEvent = TransferEvent.TransferTemporaryErrorEvent(
+                transfer = testTransfer,
+                error = blockedException
+            )
+
+            savedStateHandle = SavedStateHandle(mapOf(INTENT_EXTRA_KEY_ADAPTER_TYPE to OFFLINE_ADAPTER))
+            val fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
+            whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+            initTest()
+            advanceUntilIdle()
+
+            fakeMonitorTransferEventsFlow.emit(blockedEvent)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.showTakenDownDialogEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    internal fun `test that BlockedMegaException does not trigger showTakenDownDialogEvent when adapterType is ZIP_ADAPTER`() =
+        runTest {
+            val testTransfer = mock<Transfer>()
+            val blockedException = mock<BlockedMegaException>()
+            val blockedEvent = TransferEvent.TransferTemporaryErrorEvent(
+                transfer = testTransfer,
+                error = blockedException
+            )
+
+            savedStateHandle = SavedStateHandle(mapOf(INTENT_EXTRA_KEY_ADAPTER_TYPE to ZIP_ADAPTER))
+            val fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
+            whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+            initTest()
+            advanceUntilIdle()
+
+            fakeMonitorTransferEventsFlow.emit(blockedEvent)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.showTakenDownDialogEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    internal fun `test that invalidateMenuEvent is triggered when current node is updated`() = runTest {
+            val handle = 123456789L
+            val currentNodeId = NodeId(handle)
+
+            val updatedNode = mock<Node> {
+                on { id } doReturn currentNodeId
+            }
+
+            val nodeUpdate = NodeUpdate(
+                changes = mapOf(updatedNode to listOf(NodeChanges.Name))
+            )
+
+            val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(fakeMonitorNodeUpdatesFlow)
+
+            savedStateHandle = SavedStateHandle(mapOf("HANDLE" to handle))
+            initTest()
+            advanceUntilIdle()
+
+            fakeMonitorNodeUpdatesFlow.emit(nodeUpdate)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.invalidateMenuEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    internal fun `test that invalidateMenuEvent is not triggered when other node is updated`() = runTest {
+            val handle = 123456789L
+            val otherNodeId = NodeId(999999L) // Different NodeId
+
+            val otherNode = mock<Node> {
+                on { id } doReturn otherNodeId
+            }
+
+            val nodeUpdate = NodeUpdate(
+                changes = mapOf(otherNode to listOf(NodeChanges.Name))
+            )
+
+            val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(fakeMonitorNodeUpdatesFlow)
+
+            savedStateHandle = SavedStateHandle(mapOf("HANDLE" to handle))
+            initTest()
+            advanceUntilIdle()
+
+            fakeMonitorNodeUpdatesFlow.emit(nodeUpdate)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.invalidateMenuEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    internal fun `test that invalidateMenuEvent is not triggered when handle is invalid`() = runTest {
+            val nodeUpdate = NodeUpdate(
+                changes = mapOf(mock<Node> { on { id } doReturn NodeId(123L) } to listOf(NodeChanges.Name))
+            )
+
+            val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(fakeMonitorNodeUpdatesFlow)
+
+            savedStateHandle = SavedStateHandle() // No set handle
+            initTest()
+            advanceUntilIdle()
+
+            fakeMonitorNodeUpdatesFlow.emit(nodeUpdate)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.invalidateMenuEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    internal fun `test that onMenuInvalidated resets invalidateMenuEvent`() = runTest {
+        val handle = 123456789L
+        val currentNodeId = NodeId(handle)
+
+        val updatedNode = mock<Node> {
+            on { id } doReturn currentNodeId
+        }
+
+        val nodeUpdate = NodeUpdate(
+            changes = mapOf(updatedNode to listOf(NodeChanges.Name))
+        )
+
+        val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(fakeMonitorNodeUpdatesFlow)
+
+        savedStateHandle = SavedStateHandle(mapOf("HANDLE" to handle))
+        initTest()
+        advanceUntilIdle()
+
+        fakeMonitorNodeUpdatesFlow.emit(nodeUpdate)
+        advanceUntilIdle()
+
+        // Verify event triggered
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.invalidateMenuEvent).isEqualTo(triggered)
+        }
+
+        // Call onMenuInvalidated to reset invalidateMenuEvent
+        underTest.onMenuInvalidated()
+
+        // Verify invalidateMenuEvent is reset to consumed
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.invalidateMenuEvent).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that checkMoveOrRemoveNode emits ConfirmMoveToRubbish when node is not in rubbish`() =
+        runTest {
+            val handle = 12345L
+            whenever(isNodeInRubbishBinUseCase(NodeId(handle))).thenReturn(false)
+
+            underTest.checkMoveOrRemoveNode(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                val content = (event as StateEventWithContentTriggered).content
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.ConfirmMoveToRubbish(handle))
+            }
+        }
+
+    @Test
+    fun `test that checkMoveOrRemoveNode emits ConfirmRemoveFromMega when node is in rubbish`() =
+        runTest {
+            val handle = 54321L
+            whenever(isNodeInRubbishBinUseCase(NodeId(handle))).thenReturn(true)
+
+            underTest.checkMoveOrRemoveNode(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                val content = (event as StateEventWithContentTriggered).content
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.ConfirmRemoveFromMega(handle))
+            }
+        }
+
+    @Test
+    fun `test that moveNodeToRubbishBin emits MovedToRubbish on success`() = runTest {
+        val handle = 111L
+
+        underTest.moveNodeToRubbishBin(handle)
+        advanceUntilIdle()
+
+        verify(moveNodeToRubbishBinUseCase).invoke(NodeId(handle))
+        underTest.uiState.test {
+            val event = awaitItem().moveOrRemoveNodeEvent
+            val content = (event as StateEventWithContentTriggered).content
+            assertThat(content).isEqualTo(MoveOrRemoveNodeResult.MovedToRubbish)
+        }
+    }
+
+    @Test
+    fun `test that moveNodeToRubbishBin emits ForeignNodeOverQuota when use case throws ForeignNodeException`() =
+        runTest {
+            val handle = 222L
+            whenever(moveNodeToRubbishBinUseCase(NodeId(handle)))
+                .thenThrow(ForeignNodeException())
+
+            underTest.moveNodeToRubbishBin(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                val content = (event as StateEventWithContentTriggered).content
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.ForeignNodeOverQuota)
+            }
+        }
+
+    @Test
+    fun `test that moveNodeToRubbishBin emits MoveFailed when use case throws other exception`() =
+        runTest {
+            val handle = 333L
+            whenever(moveNodeToRubbishBinUseCase(NodeId(handle)))
+                .thenThrow(RuntimeException("boom"))
+
+            underTest.moveNodeToRubbishBin(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                val content = (event as StateEventWithContentTriggered).content
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.MoveFailed)
+            }
+        }
+
+    @Test
+    fun `test that removeNodeFromMega emits Removed on success`() = runTest {
+        val handle = 444L
+
+        underTest.removeNodeFromMega(handle)
+        advanceUntilIdle()
+
+        verify(deleteNodeByHandleUseCase).invoke(NodeId(handle))
+        underTest.uiState.test {
+            val event = awaitItem().moveOrRemoveNodeEvent
+            val content = (event as StateEventWithContentTriggered).content
+            assertThat(content).isEqualTo(MoveOrRemoveNodeResult.Removed)
+        }
+    }
+
+    @Test
+    fun `test that removeNodeFromMega emits RemoveFailed when use case throws`() = runTest {
+        val handle = 555L
+        whenever(deleteNodeByHandleUseCase(NodeId(handle)))
+            .thenThrow(RuntimeException("boom"))
+
+        underTest.removeNodeFromMega(handle)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val event = awaitItem().moveOrRemoveNodeEvent
+            val content = (event as StateEventWithContentTriggered).content
+            assertThat(content).isEqualTo(MoveOrRemoveNodeResult.RemoveFailed)
+        }
     }
 
     companion object {

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.myAccount
 
 import android.app.NotificationManager
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -43,9 +44,7 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_NO_NAVIGATION
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
-import mega.privacy.android.app.presentation.cancelaccountplan.CancelAccountPlanActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.logout.LogoutViewModel
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
@@ -55,11 +54,12 @@ import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.ACTION_CANCEL_ACCOUNT
 import mega.privacy.android.app.utils.Constants.ACTION_CHANGE_MAIL
+import mega.privacy.android.app.utils.Constants.ACTION_OPEN_USAGE_METER_FROM_MENU
 import mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.NOTIFICATION_STORAGE_OVERQUOTA
+import mega.privacy.android.app.utils.Constants.NOTIFICATION_STORAGE_OVER_QUOTA
 import mega.privacy.android.app.utils.Constants.RESULT
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.Util.isDarkMode
@@ -67,13 +67,16 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.CancelSubscriptionMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ToolbarOverflowMenuItemEvent
 import nz.mega.sdk.MegaApiJava
@@ -81,7 +84,6 @@ import nz.mega.sdk.MegaError.API_OK
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 @AndroidEntryPoint
 internal class MyAccountActivity : PasscodeActivity(),
@@ -96,6 +98,21 @@ internal class MyAccountActivity : PasscodeActivity(),
         private const val CONFIRM_RESET_PASSWORD_SHOWN = "CONFIRM_RESET_PASSWORD_SHOWN"
         private const val TYPE_CHANGE_EMAIL = 1
         private const val TYPE_CANCEL_ACCOUNT = 2
+
+        fun getIntent(
+            context: Context,
+            action: String?,
+            link: Uri?,
+            resultCode: Int = -1,
+        ): Intent {
+            val fileLinkIntent = Intent(context, MyAccountActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                action?.let { setAction(it) }
+                data = link
+                putExtra(RESULT, resultCode)
+            }
+            return fileLinkIntent
+        }
     }
 
     private val viewModel: MyAccountViewModel by viewModels()
@@ -140,7 +157,7 @@ internal class MyAccountActivity : PasscodeActivity(),
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        if (shouldRefreshSessionDueToSDK()) {
+        if (shouldRefreshSessionDueToSDK(true)) {
             return
         }
 
@@ -148,6 +165,11 @@ internal class MyAccountActivity : PasscodeActivity(),
         consumeInsetsWithToolbar(customToolbar = binding.toolbar)
         setContentView(binding.root)
         onBackPressedDispatcher.addCallback(this, onBackPressCallback)
+
+        navController =
+            (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
+                .navController
+        setupNavigationGraph(savedInstanceState)
         setupView()
         setupObservers()
         manageIntentExtras()
@@ -190,7 +212,8 @@ internal class MyAccountActivity : PasscodeActivity(),
                     OriginalTheme(isDark = themeMode.isDarkMode()) {
                         LogoutConfirmationDialog(
                             onDismissed = { viewModel.dismissLogoutConfirmationDialog() },
-                            logoutViewModel = logoutViewModel
+                            logoutViewModel = logoutViewModel,
+                            onLogoutSuccess = { finish() },
                         )
                     }
                 }
@@ -205,8 +228,6 @@ internal class MyAccountActivity : PasscodeActivity(),
                 context = this,
                 source = UpgradeAccountSource.MY_ACCOUNT_SCREEN
             )
-
-            viewModel.setOpenUpgradeFrom()
 
             intent.removeExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE)
         }
@@ -245,6 +266,13 @@ internal class MyAccountActivity : PasscodeActivity(),
                     ::showErrorAlert
                 )
 
+                intent.action = null
+            }
+
+            ACTION_OPEN_USAGE_METER_FROM_MENU -> {
+                supportActionBar?.apply {
+                    title = resources.getString(R.string.storage_space)
+                }
                 intent.action = null
             }
         }
@@ -292,7 +320,7 @@ internal class MyAccountActivity : PasscodeActivity(),
         super.onPostResume()
         try {
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).cancel(
-                NOTIFICATION_STORAGE_OVERQUOTA
+                NOTIFICATION_STORAGE_OVER_QUOTA
             )
         } catch (e: Exception) {
             Timber.e(e, "Exception NotificationManager - remove all notifications")
@@ -314,13 +342,11 @@ internal class MyAccountActivity : PasscodeActivity(),
             R.id.action_kill_all_sessions -> showConfirmationKillSessions()
             R.id.action_change_pass -> navController.navigate(R.id.action_my_account_to_change_password)
             R.id.action_export_MK -> navController.navigate(R.id.action_my_account_to_export_recovery_key)
-            R.id.action_refresh -> viewModel.refresh(this)
             R.id.action_upgrade_account -> {
                 megaNavigator.openUpgradeAccount(
                     context = this,
                     source = UpgradeAccountSource.MY_ACCOUNT_SCREEN
                 )
-                viewModel.setOpenUpgradeFrom()
             }
 
             R.id.action_cancel_subscriptions -> {
@@ -338,7 +364,10 @@ internal class MyAccountActivity : PasscodeActivity(),
      */
     private fun handleShowCancelSubscription() {
         Analytics.tracker.trackEvent(CancelSubscriptionMenuToolbarEvent)
-        navigateToCancelAccountPlan()
+        megaNavigator.navigateToCancelAccountPlan(
+            context = this,
+            usedStorage = viewModel.getUsedStorage(),
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -384,6 +413,41 @@ internal class MyAccountActivity : PasscodeActivity(),
         }
     }
 
+    /**
+     * Sets up the navigation graph based on the intent action.
+     * Only sets the graph when savedInstanceState == null.
+     */
+    private fun setupNavigationGraph(savedInstanceState: Bundle?) {
+        val navGraph = navController.navInflater.inflate(R.navigation.my_account)
+        if (savedInstanceState != null) {
+            navController.setGraph(navGraph, intent.extras)
+        } else {
+            lifecycleScope.launch {
+                runCatching {
+                    val startDestination = when (intent.action) {
+                        ACTION_OPEN_USAGE_METER_FROM_MENU -> {
+                            val myAccountUsageFragmentComposeUI =
+                                runCatching {
+                                    getFeatureFlagValueUseCase(ApiFeatures.MyAccountUsageFragmentComposeUI)
+                                }.getOrDefault(false)
+
+                            if (myAccountUsageFragmentComposeUI) {
+                                R.id.my_account_usage_compose
+                            } else {
+                                R.id.my_account_usage
+                            }
+                        }
+
+                        else -> R.id.my_account
+                    }
+
+                    navGraph.setStartDestination(startDestination)
+                    navController.setGraph(navGraph, intent.extras)
+                }
+            }
+        }
+    }
+
     private fun setupView() {
         updateInfo()
         setSupportActionBar(binding.toolbar)
@@ -394,18 +458,23 @@ internal class MyAccountActivity : PasscodeActivity(),
             setDisplayHomeAsUpEnabled(true)
         }
 
-        navController =
-            (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
-                .navController
-
-        navController.addOnDestinationChangedListener { _, _, _ ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             refreshMenuOptionsVisibility()
+
+            if (destination.id == R.id.my_account_usage_compose) {
+                // MyAccountUsageScreen is the only destination with a title in this Activity.
+                supportActionBar?.title = getString(R.string.storage_space)
+            } else {
+                // Reset to null when leaving so other destinations remain title-free.
+                supportActionBar?.title = null
+            }
 
             supportActionBar?.setHomeAsUpIndicator(
                 ColorUtils.tintIcon(
                     this,
-                    when (navController.currentDestination?.id) {
-                        R.id.my_account -> R.drawable.ic_arrow_back_white
+                    when (destination.id) {
+                        R.id.my_account,
+                        R.id.my_account_usage_compose -> R.drawable.ic_arrow_back_white
                         else -> R.drawable.ic_close_white
                     }
                 )
@@ -507,14 +576,6 @@ internal class MyAccountActivity : PasscodeActivity(),
         }
     }
 
-    private fun navigateToCancelAccountPlan() {
-        startActivity(
-            Intent(this, CancelAccountPlanActivity::class.java).putExtra(
-                CancelAccountPlanActivity.EXTRA_USED_STORAGE, viewModel.getUsedStorage()
-            )
-        )
-    }
-
     /**
      * Shows a confirmation dialog before kill sessions.
      */
@@ -548,7 +609,7 @@ internal class MyAccountActivity : PasscodeActivity(),
                     getString(R.string.send_cancel_subscriptions),
                     null
                 )
-                .setNegativeButton(getString(R.string.general_dismiss), null)
+                .setNegativeButton(getString(sharedR.string.general_dismiss_dialog), null)
                 .create()
 
         cancelSubscriptionsDialog?.apply {
@@ -665,7 +726,7 @@ internal class MyAccountActivity : PasscodeActivity(),
             .setTitle(getString(R.string.delete_account))
             .setMessage(getString(messageId))
             .setView(errorInputBinding.root)
-            .setNegativeButton(getString(R.string.general_dismiss), null)
+            .setNegativeButton(getString(sharedR.string.general_dismiss_dialog), null)
             .setPositiveButton(getString(R.string.delete_account), null)
             .setOnDismissListener {
                 /* Clear the value of current CancelAccountDialogState when the dialog is dismissed
@@ -739,14 +800,16 @@ internal class MyAccountActivity : PasscodeActivity(),
 
                     if (password.isEmpty()) {
                         setEditTextError(
-                            getString(R.string.invalid_string),
+                            getString(sharedR.string.general_invalid_string),
                             editLayout,
                             errorIcon
                         )
                     } else {
                         when (dialogType) {
                             TYPE_CANCEL_ACCOUNT -> viewModel.finishAccountCancellation(password)
-                            TYPE_CHANGE_EMAIL -> viewModel.finishChangeEmailConfirmation(password)
+                            TYPE_CHANGE_EMAIL -> viewModel.finishChangeEmailConfirmation(
+                                password
+                            )
                         }
 
                         textField.hideKeyboard()

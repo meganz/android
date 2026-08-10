@@ -1,7 +1,5 @@
 package mega.privacy.android.domain.repository
 
-import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.logging.LogEntry
 import java.io.File
 
 /**
@@ -17,30 +15,13 @@ interface LoggingRepository {
     fun enableLogAllToConsole(isDebugBuild: Boolean)
 
     /**
-     * Get sdk logging flow
+     * Initialise the underlying logging framework (e.g. Logback) so that
+     * planted Timber trees can route log entries to the correct destinations.
      *
+     * Must be called once at app startup, before any meaningful logging
+     * happens.
      */
-    fun getSdkLoggingFlow(): Flow<LogEntry>
-
-    /**
-     * Get chat logging flow
-     *
-     */
-    fun getChatLoggingFlow(): Flow<LogEntry>
-
-    /**
-     * Log to sdk file
-     *
-     * @param logMessage
-     */
-    suspend fun logToSdkFile(logMessage: LogEntry)
-
-    /**
-     * Log to chat file
-     *
-     * @param logMessage
-     */
-    suspend fun logToChatFile(logMessage: LogEntry)
+    suspend fun initialise()
 
     /**
      * Compress logs

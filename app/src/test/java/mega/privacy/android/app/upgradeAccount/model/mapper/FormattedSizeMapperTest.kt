@@ -1,7 +1,7 @@
 package mega.privacy.android.app.upgradeAccount.model.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.android.core.formatter.model.FormattedSize
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import org.junit.jupiter.api.TestInstance
@@ -15,8 +15,8 @@ class FormattedSizeMapperTest {
     private val underTest = FormattedSizeMapper()
 
     private fun provideTestParameters() = Stream.of(
-        Arguments.of(400, true, FormattedSize(R.string.label_file_size_giga_byte, "400")),
-        Arguments.of(1024, true, FormattedSize(R.string.label_file_size_tera_byte, "1")),
+        Arguments.of(400, true, FormattedSize(SharedR.string.label_file_size_gigabytes, "400")),
+        Arguments.of(1024, true, FormattedSize(SharedR.string.label_file_size_terabytes, "1")),
         Arguments.of(
             400,
             false,

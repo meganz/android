@@ -38,7 +38,7 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
-import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
+import mega.privacy.android.app.presentation.contactinfo.model.LegacyContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.contacts.getMessage
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
@@ -116,6 +116,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
@@ -224,6 +225,7 @@ class MeetingActivityViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getUserAvatarUseCase: GetUserAvatarUseCase,
     private val megaChatRequestHandler: MegaChatRequestHandler,
+    private val megaChatApi: MegaChatApiAndroid,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         MeetingState(
@@ -1326,7 +1328,10 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun isChatCreatedAndIParticipating(): Boolean =
         (_state.value.chatId != MEGACHAT_INVALID_HANDLE &&
-                amIParticipatingInAChat(_state.value.chatId) &&
+                amIParticipatingInAChat(
+                    _state.value.chatId,
+                    megaChatApi
+                ) &&
                 CallUtil.amIParticipatingInThisMeeting(_state.value.chatId))
 
     /**
@@ -1633,7 +1638,9 @@ class MeetingActivityViewModel @Inject constructor(
             }
         }
         enableDeviceCamera(enable = true, isReleasingVideo = false)
-        meetingActivityRepository.addLocalVideo(chatId, listener)
+        viewModelScope.launch {
+            meetingActivityRepository.addLocalVideo(chatId, listener)
+        }
     }
 
     /**
@@ -1647,9 +1654,10 @@ class MeetingActivityViewModel @Inject constructor(
             Timber.e("Listener is null")
             return
         }
-
-        Timber.d("Removing local video")
-        meetingActivityRepository.removeLocalVideo(chatId, listener)
+        viewModelScope.launch {
+            Timber.d("Removing local video")
+            meetingActivityRepository.removeLocalVideo(chatId, listener)
+        }
     }
 
     /**
@@ -2359,9 +2367,9 @@ class MeetingActivityViewModel @Inject constructor(
      * Method handles sent message to chat click from UI
      *
      * returns if user is not online
-     * updates [ContactInfoUiState.isStorageOverQuota] if storage state is [StorageState.PayWall]
+     * updates [LegacyContactInfoUiState.isStorageOverQuota] if storage state is [StorageState.PayWall]
      * creates chatroom exists else returns existing chat room
-     * updates [ContactInfoUiState.shouldNavigateToChat] to true
+     * updates [LegacyContactInfoUiState.shouldNavigateToChat] to true
      */
     fun sendMessageToChat() = viewModelScope.launch {
         if (!isOnline()) return@launch

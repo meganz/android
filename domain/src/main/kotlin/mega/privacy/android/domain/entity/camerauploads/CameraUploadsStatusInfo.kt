@@ -102,4 +102,19 @@ sealed interface CameraUploadsStatusInfo {
      */
     data class FolderUnavailable(val cameraUploadsFolderType: CameraUploadFolderType) :
         CameraUploadsStatusInfo
+
+    /**
+     * Camera/Media Uploads folder conflicts with an existing Sync or Backup folder
+     * (either on the current device or on another device)
+     * @property deviceName The name of the device where the conflicting sync/backup is located
+     * @property backupName The name of the conflicting sync/backup
+     * @property folderName The display name of the conflicting folder (e.g., "DCIM")
+     * @property isLocalFolder Whether the conflicting folder is a local/device folder
+     */
+    data class FolderConflictWithSyncOrBackup(
+        val deviceName: String? = null,
+        val backupName: String? = null,
+        val folderName: String? = null,
+        val isLocalFolder: Boolean = false,
+    ) : CameraUploadsStatusInfo
 }

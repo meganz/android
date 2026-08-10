@@ -23,7 +23,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.R as featurePhotosR
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 
 /**
  * Compose function to handle empty states
@@ -43,10 +44,10 @@ internal fun EmptyView(
             Image(
                 imageVector = when (currentFilterMediaType) {
                     FilterMediaType.ALL_MEDIA, FilterMediaType.IMAGES ->
-                        ImageVector.vectorResource(id = R.drawable.ic_no_images)
+                        ImageVector.vectorResource(id = featurePhotosR.drawable.ic_no_images)
 
                     FilterMediaType.VIDEOS ->
-                        ImageVector.vectorResource(id = R.drawable.ic_no_videos)
+                        ImageVector.vectorResource(id = featurePhotosR.drawable.ic_no_videos)
                 },
                 contentDescription = "Empty",
                 colorFilter = ColorFilter.tint(

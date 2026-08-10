@@ -1,309 +1,136 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.model
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import de.palm.composestateevents.consumed
+import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodesLoadingState
+import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 
 class CloudDriveUiStateTest {
 
     @Test
-    fun `test that visibleItemsCount returns total count when all items are visible`() {
-        val items = createTestItems(
-            selected = listOf(false, false, false),
-            sensitive = listOf(false, false, false)
+    fun `test that isUploadAllowed returns true when all conditions are met`() {
+        val state = createDataState(
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            hasWritePermission = true,
         )
 
-        val state = CloudDriveUiState(
-            items = items,
-            showHiddenNodes = true,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.visibleItemsCount).isEqualTo(3)
+        assertThat(state.isUploadAllowed).isTrue()
     }
 
     @Test
-    fun `test that visibleItemsCount returns total count when hidden nodes disabled`() {
-        val items = createTestItems(
-            selected = listOf(false, false, false),
-            sensitive = listOf(true, false, true)
+    fun `test that isUploadAllowed returns false when hasWritePermission is false`() {
+        val state = createDataState(
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            hasWritePermission = false,
         )
 
-        val state = CloudDriveUiState(
-            items = items,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = false
-        )
-
-        assertThat(state.visibleItemsCount).isEqualTo(3)
+        assertThat(state.isUploadAllowed).isFalse()
     }
 
     @Test
-    fun `test that visibleItemsCount filters out sensitive items when hidden nodes enabled`() {
-        val items = createTestItems(
-            selected = listOf(false, false, false),
-            sensitive = listOf(true, false, true)
+    fun `test that isUploadAllowed returns false when nodeSourceType is RUBBISH_BIN`() {
+        val state = createDataState(
+            nodeSourceType = NodeSourceType.RUBBISH_BIN,
+            hasWritePermission = true,
         )
 
-        val state = CloudDriveUiState(
-            items = items,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.visibleItemsCount).isEqualTo(1)
+        assertThat(state.isUploadAllowed).isFalse()
     }
 
     @Test
-    fun `test that selectedItemsCount returns correct count when all items are visible`() {
-        val items = createTestItems(
-            selected = listOf(true, false, true),
-            sensitive = listOf(false, false, false)
+    fun `test that isUploadAllowed returns false when isNodeInBackups is true`() {
+        val state = createDataState(
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            hasWritePermission = true,
+            isNodeInBackups = true,
         )
 
-        val state = CloudDriveUiState(
-            items = items,
-            showHiddenNodes = true,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.selectedItemsCount).isEqualTo(2)
+        assertThat(state.isUploadAllowed).isFalse()
     }
 
     @Test
-    fun `test that selectedItemsCount returns zero when all selected items are sensitive`() {
-        val items = createTestItems(
-            selected = listOf(true, false, true),
-            sensitive = listOf(true, false, true)
+    fun `test that isMediaDiscoveryAllow returns true when all conditions are met`() {
+        val state = createDataState(
+            isCloudDriveRoot = false,
+            hasMediaItems = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
         )
 
-        val state = CloudDriveUiState(
-            items = items,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.selectedItemsCount).isEqualTo(0)
+        assertThat(state.isMediaDiscoveryAllowed).isTrue()
     }
 
     @Test
-    fun `test that selectedItemsCount returns correct count with mixed sensitive and selected items`() {
-        val items = createTestItems(
-            selected = listOf(true, true, false, true),
-            sensitive = listOf(false, true, false, true)
+    fun `test that isMediaDiscoveryAllow returns false when nodeSourceType is not CLOUD_DRIVE`() {
+        val state = createDataState(
+            isCloudDriveRoot = false,
+            hasMediaItems = true,
+            nodeSourceType = NodeSourceType.RUBBISH_BIN,
         )
 
-        val state = CloudDriveUiState(
-            items = items,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.selectedItemsCount).isEqualTo(1)
+        assertThat(state.isMediaDiscoveryAllowed).isFalse()
     }
 
     @Test
-    fun `test that isInSelectionMode returns false when no items are selected`() {
-        val items = createTestItems(
-            selected = listOf(false, false, false),
-            sensitive = listOf(false, false, false)
+    fun `test that isMediaDiscoveryAllow returns false when hasMediaItems is false`() {
+        val state = createDataState(
+            isCloudDriveRoot = false,
+            hasMediaItems = false,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
         )
 
-        val state = CloudDriveUiState(
-            items = items,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.isInSelectionMode).isFalse()
+        assertThat(state.isMediaDiscoveryAllowed).isFalse()
     }
 
     @Test
-    fun `test that isInSelectionMode returns true when visible items are selected`() {
-        val items = createTestItems(
-            selected = listOf(true, false, false),
-            sensitive = listOf(false, false, false)
+    fun `test that isMediaDiscoveryAllow returns false when isCloudDriveRoot is true`() {
+        val state = createDataState(
+            isCloudDriveRoot = true,
+            hasMediaItems = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
         )
 
-        val state = CloudDriveUiState(
-            items = items,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.isInSelectionMode).isTrue()
+        assertThat(state.isMediaDiscoveryAllowed).isFalse()
     }
 
     @Test
-    fun `test that isInSelectionMode returns false when only sensitive items are selected`() {
-        val items = createTestItems(
-            selected = listOf(true, false, false),
-            sensitive = listOf(true, false, false)
+    fun `test that isMediaDiscoveryAllow returns false when isNodeInBackups is true`() {
+        val state = createDataState(
+            isCloudDriveRoot = false,
+            hasMediaItems = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            isNodeInBackups = true,
         )
 
-        val state = CloudDriveUiState(
-            items = items,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.isInSelectionMode).isFalse()
+        assertThat(state.isMediaDiscoveryAllowed).isFalse()
     }
 
-    @Test
-    fun `test that isEmpty returns true when no visible items and not loading`() {
-        val items = createTestItems(
-            selected = listOf(),
-            sensitive = listOf()
-        )
-
-        val state = CloudDriveUiState(
-            items = items,
-            nodesLoadingState = NodesLoadingState.FullyLoaded,
-            isHiddenNodeSettingsLoading = false,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.isEmpty).isTrue()
-    }
-
-    @Test
-    fun `test that isEmpty returns false when no visible items but loading`() {
-        val items = createTestItems(
-            selected = listOf(),
-            sensitive = listOf()
-        )
-
-        val state = CloudDriveUiState(
-            items = items,
-            nodesLoadingState = NodesLoadingState.Loading,
-            isHiddenNodeSettingsLoading = false,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.isEmpty).isFalse()
-    }
-
-    @Test
-    fun `test that isEmpty returns false when has visible items`() {
-        val items = createTestItems(
-            selected = listOf(false),
-            sensitive = listOf(false)
-        )
-
-        val state = CloudDriveUiState(
-            items = items,
-            nodesLoadingState = NodesLoadingState.FullyLoaded,
-            isHiddenNodeSettingsLoading = false,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.isEmpty).isFalse()
-    }
-
-    @Test
-    fun `test that selectedNodeIds returns correct node ids for selected items`() {
-        val items = createTestItems(
-            selected = listOf(true, false, true),
-            sensitive = listOf(false, false, false)
-        )
-
-        val state = CloudDriveUiState(items = items)
-
-        assertThat(state.selectedNodeIds).isEqualTo(listOf(NodeId(1L), NodeId(3L)))
-    }
-
-    @Test
-    fun `test that selectedNodeIds returns empty list when no items are selected`() {
-        val items = createTestItems(
-            selected = listOf(false, false, false),
-            sensitive = listOf(false, false, false)
-        )
-
-        val state = CloudDriveUiState(items = items)
-
-        assertThat(state.selectedNodeIds).isEmpty()
-    }
-
-    @Test
-    fun `test that selectedNodeIds includes sensitive items when they are selected`() {
-        val items = createTestItems(
-            selected = listOf(true, true, false),
-            sensitive = listOf(true, false, false)
-        )
-
-        val state = CloudDriveUiState(items = items)
-
-        assertThat(state.selectedNodeIds).isEqualTo(listOf(NodeId(1L), NodeId(2L)))
-    }
-
-    @Test
-    fun `test that complex scenario with mixed states works correctly`() {
-        val items = createTestItems(
-            selected = listOf(true, false, true, false, true),
-            sensitive = listOf(false, true, false, true, false)
-        )
-
-        val state = CloudDriveUiState(
-            items = items,
-            nodesLoadingState = NodesLoadingState.FullyLoaded,
-            isHiddenNodeSettingsLoading = false,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        // Only non-sensitive items are visible (items 0, 2, 4)
-        assertThat(state.visibleItemsCount).isEqualTo(3)
-        // Only selected non-sensitive items (items 0, 2, 4 are selected and non-sensitive)
-        assertThat(state.selectedItemsCount).isEqualTo(3)
-        assertThat(state.isInSelectionMode).isTrue()
-        assertThat(state.isEmpty).isFalse()
-        assertThat(state.selectedNodeIds).isEqualTo(listOf(NodeId(1L), NodeId(3L), NodeId(5L)))
-    }
-
-    @Test
-    fun `test that edge case with empty items list works correctly`() {
-        val state = CloudDriveUiState(
-            items = emptyList(),
-            nodesLoadingState = NodesLoadingState.FullyLoaded,
-            isHiddenNodeSettingsLoading = false,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.visibleItemsCount).isEqualTo(0)
-        assertThat(state.selectedItemsCount).isEqualTo(0)
-        assertThat(state.isInSelectionMode).isFalse()
-        assertThat(state.isEmpty).isTrue()
-        assertThat(state.selectedNodeIds).isEmpty()
-    }
-
-    private fun createTestItems(
-        selected: List<Boolean>,
-        sensitive: List<Boolean>,
-    ): List<NodeUiItem<TypedNode>> {
-        require(selected.size == sensitive.size) { "Lists must have same size" }
-
-        return selected.zip(sensitive).mapIndexed { index, (isSelected, isSensitive) ->
-            val node = mock<TypedFolderNode> {
-                on { id } doReturn NodeId((index + 1).toLong())
-                on { name } doReturn "Item ${index + 1}"
-            }
-
-            NodeUiItem(
-                node = node,
-                isSelected = isSelected,
-                isSensitive = isSensitive
-            )
-        }
-    }
+    private fun createDataState(
+        nodesLoadingState: NodesLoadingState = NodesLoadingState.FullyLoaded,
+        isCloudDriveRoot: Boolean = false,
+        hasMediaItems: Boolean = false,
+        nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        hasWritePermission: Boolean = false,
+        isNodeInBackups: Boolean = false,
+    ) = CloudDriveUiState.Data(
+        title = LocalizedText.Literal(""),
+        nodesLoadingState = nodesLoadingState,
+        currentFolderId = NodeId(-1L),
+        isCloudDriveRoot = isCloudDriveRoot,
+        items = emptyList(),
+        currentViewType = ViewType.LIST,
+        navigateBack = consumed,
+        hasMediaItems = hasMediaItems,
+        selectedSortOrder = SortOrder.ORDER_DEFAULT_ASC,
+        selectedSortConfiguration = NodeSortConfiguration.default,
+        showContactNotVerifiedBanner = false,
+        nodeSourceType = nodeSourceType,
+        hasWritePermission = hasWritePermission,
+        isNodeInBackups = isNodeInBackups,
+    )
 }

@@ -24,6 +24,7 @@ import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.BackgroundColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
@@ -85,9 +86,6 @@ internal fun MyAccountQuotaProgressBar(
     }
 }
 
-enum class QuotaLevel {
-    Success, Warning, Error
-}
 
 @CombinedThemePreviews
 @Composable

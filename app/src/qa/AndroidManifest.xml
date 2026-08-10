@@ -4,12 +4,20 @@
 
     <application tools:node="merge">
         <activity
-            android:name=".presentation.login.LoginActivity"
+            android:name=".appstate.MegaActivity"
             android:configChanges="screenSize"
             android:exported="true"
             android:theme="@style/Theme.Mega.Starting"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
-            tools:node="replace" />
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
         <service
             android:name="mega.privacy.android.app.featuretoggle.FeatureFlagTileService"
             android:exported="true"
@@ -20,22 +28,12 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
-        <activity
-            android:name="mega.privacy.android.app.appstate.RerouteActivity"
-            android:theme="@style/Theme.Mega.Starting"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
 
         <activity
             android:name=".presentation.featureflag.FeatureFlagActivity"
             android:exported="false"
             android:label="@string/qa_feature_flag_title"
-            android:launchMode="singleTop"
-            android:parentActivityName=".main.ManagerActivity" />
+            android:launchMode="singleTop" />
         <activity
             android:name=".presentation.featureflag.FeatureFlagForQuickSettingsTileActivity"
             android:exported="false"
@@ -45,6 +43,18 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
             </intent-filter>
         </activity>
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge"
+            tools:replace="android:authorities">
+
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.SyncMonitorInitializer"
+                android:value="androidx.startup" />
+        </provider>
 
     </application>
 

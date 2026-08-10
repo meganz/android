@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AdsGateway
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.preferences.AdPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.MegaStringListMapper
 import mega.privacy.android.data.mapper.advertisements.AdDetailsMapper
@@ -25,6 +26,7 @@ internal class AdsRepositoryImpl @Inject constructor(
     private val adDetailsMapper: AdDetailsMapper,
     private val megaStringListMapper: MegaStringListMapper,
     private val uiPreferencesGateway: UIPreferencesGateway,
+    private val adPreferencesGateway: AdPreferencesGateway,
     private val appEventGateway: AppEventGateway,
 ) : AdsRepository {
 
@@ -74,4 +76,13 @@ internal class AdsRepositoryImpl @Inject constructor(
     }
 
     override fun monitorGoogleConsentLoaded() = appEventGateway.monitorGoogleConsentLoaded()
+
+    override suspend fun incrementRewardedAdAttemptCount() =
+        adPreferencesGateway.incrementRewardedAdAttemptCount()
+
+    override suspend fun resetRewardedAdAttemptCount() =
+        adPreferencesGateway.resetRewardedAdAttemptCount()
+
+    override fun monitorRewardedAdAttemptCount() =
+        adPreferencesGateway.monitorRewardedAdAttemptCount()
 }

@@ -18,6 +18,9 @@ import mega.privacy.android.app.main.adapters.ImportFilesAdapter.OnImportFilesAd
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Fragment for importing files.
@@ -156,19 +159,38 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
 
         val nameFiles = nameFiles
         var emptyNames = 0
-        var wrongNames = 0
+        var invalidCharNames = 0
+        var dotNames = 0
+        var doubleDotNames = 0
 
         for (name in nameFiles.values) {
-            if (name.trim { it <= ' ' }.isEmpty()) {
-                emptyNames++
-            } else if (Constants.NODE_NAME_REGEX.matcher(name).find()) {
-                wrongNames++
+            when {
+                name.trim { it <= ' ' }.isEmpty() -> {
+                    emptyNames++
+                }
+
+                name.isInvalidDotName() -> {
+                    dotNames++
+                }
+
+                name.isInvalidDoubleDotName() -> {
+                    doubleDotNames++
+                }
+
+                Constants.NODE_NAME_REGEX.matcher(name).find() -> {
+                    invalidCharNames++
+                }
             }
         }
 
-        if (wrongNames > 0 || emptyNames > 0) {
+        if (invalidCharNames > 0 || emptyNames > 0 || dotNames > 0 || doubleDotNames > 0) {
             val warning: String = when {
-                emptyNames > 0 && wrongNames > 0 -> {
+                (emptyNames > 0 && dotNames > 0)
+                        || (emptyNames > 0 && doubleDotNames > 0)
+                        || (emptyNames > 0 && invalidCharNames > 0)
+                        || (dotNames > 0 && doubleDotNames > 0)
+                        || (dotNames > 0 && invalidCharNames > 0)
+                        || (doubleDotNames > 0 && invalidCharNames > 0) -> {
                     getString(R.string.general_incorrect_names)
                 }
 
@@ -176,9 +198,17 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
                     resources.getQuantityString(R.plurals.empty_names, emptyNames)
                 }
 
+                dotNames > 0 -> {
+                    resources.getString(sharedR.string.general_invalid_dot_name_warning)
+                }
+
+                doubleDotNames > 0 -> {
+                    resources.getString(sharedR.string.general_invalid_double_dot_name_warning)
+                }
+
                 else -> {
                     getString(
-                        R.string.invalid_characters_defined,
+                        sharedR.string.general_invalid_characters_defined,
                         INVALID_CHARACTERS
                     )
                 }

@@ -1,10 +1,10 @@
 package mega.privacy.android.data.repository
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -20,7 +20,11 @@ import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
+import mega.privacy.android.domain.entity.payment.UpgradeSource
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaCurrency
@@ -44,7 +48,7 @@ import kotlin.test.assertNull
 class DefaultBillingRepositoryTest {
     private lateinit var underTest: BillingRepository
 
-    private val accountInfoWrapper = mock<AccountInfoWrapper>()
+    private val accountRepository = mock<AccountRepository>()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val paymentMethodFlagsCache = mock<Cache<PaymentMethodFlags>>()
     private val pricingCache = mock<Cache<Pricing>>()
@@ -56,16 +60,22 @@ class DefaultBillingRepositoryTest {
     private val skuString = Skus.SKU_PRO_I_MONTH
     private val megaSkuList = listOf(megaSkuObject2, megaSkuObject1)
     private val localPricing =
-        LocalPricing(CurrencyPoint.LocalCurrencyPoint(9990000), Currency("EUR"), skuString, emptyList())
+        LocalPricing(
+            CurrencyPoint.LocalCurrencyPoint(9990000),
+            Currency("EUR"),
+            skuString,
+            emptyList()
+        )
     private val localPricingMapper = mock<LocalPricingMapper>()
     private val pricingMapper = mock<PricingMapper>()
     private val billingGateway = mock<BillingGateway>()
     private val paymentMethodTypeMapper = ::toPaymentMethodType
+    private val sourceCache = mock<Cache<UpgradeSource>>()
 
     @Before
     fun setUp() {
         underTest = DefaultBillingRepository(
-            accountInfoWrapper = accountInfoWrapper,
+            accountRepository = accountRepository,
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             paymentMethodFlagsCache = paymentMethodFlagsCache,
@@ -76,7 +86,8 @@ class DefaultBillingRepositoryTest {
             billingGateway = billingGateway,
             paymentMethodTypeMapper = paymentMethodTypeMapper,
             skusCache = skusCache,
-            activeSubscriptionCache = activeSubscriptionCache
+            activeSubscriptionCache = activeSubscriptionCache,
+            sourceCache = sourceCache
         )
     }
 
@@ -88,7 +99,7 @@ class DefaultBillingRepositoryTest {
 
             val actual = underTest.getLocalPricing(skuString)
 
-            Truth.assertThat(actual).isEqualTo(localPricing)
+            assertThat(actual).isEqualTo(localPricing)
         }
 
     @Test
@@ -292,11 +303,16 @@ class DefaultBillingRepositoryTest {
     fun `test that getCurrentPaymentMethod returns PaymentMethod correctly`() {
         runTest {
             val paymentMethod = PaymentMethod.GOOGLE_WALLET
+            val accountDetail = AccountDetail(
+                levelDetail = mock<AccountLevelDetail> {
+                    on { subscriptionMethodId }.thenReturn(3)
+                }
+            )
 
-            whenever(accountInfoWrapper.subscriptionMethodId).thenReturn(3)
+            whenever(accountRepository.monitorAccountDetail()).thenReturn(flowOf(accountDetail))
 
             val actual = underTest.getCurrentPaymentMethod()
-            Truth.assertThat(actual).isEqualTo(paymentMethod)
+            assertThat(actual).isEqualTo(paymentMethod)
         }
     }
 
@@ -307,7 +323,7 @@ class DefaultBillingRepositoryTest {
 
             val actual = underTest.isBillingAvailable()
 
-            Truth.assertThat(actual).isEqualTo(true)
+            assertThat(actual).isEqualTo(true)
         }
     }
 
@@ -318,7 +334,7 @@ class DefaultBillingRepositoryTest {
 
             val actual = underTest.isBillingAvailable()
 
-            Truth.assertThat(actual).isEqualTo(false)
+            assertThat(actual).isEqualTo(false)
         }
     }
 
@@ -368,7 +384,7 @@ class DefaultBillingRepositoryTest {
             }
 
             val actual = underTest.legacyCancelSubscriptions(feedback)
-            Truth.assertThat(actual).isTrue()
+            assertThat(actual).isTrue()
         }
     }
 
@@ -403,4 +419,25 @@ class DefaultBillingRepositoryTest {
             )
         }
     }
+
+    @Test
+    fun `test that getBillingCountryCode delegates to billingGateway getCountryCode`() = runTest {
+        val expectedCountryCode = "US"
+        whenever(billingGateway.getCountryCode()).thenReturn(expectedCountryCode)
+
+        val actual = underTest.getBillingCountryCode()
+
+        assertThat(actual).isEqualTo(expectedCountryCode)
+    }
+
+    @Test
+    fun `test that getBillingCountryCode returns null when billingGateway returns null`() =
+        runTest {
+            whenever(billingGateway.getCountryCode()).thenReturn(null)
+
+            val actual = underTest.getBillingCountryCode()
+
+            assertThat(actual).isNull()
+            verify(billingGateway).getCountryCode()
+        }
 }

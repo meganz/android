@@ -2,8 +2,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- Title of the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_title">إعادة تسمية الجهاز</string>
-    <!-- The name of the Positive Button for the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_positive_button">إعادة التسمية</string>
     <!-- The name of the Header in Device Center which signifies the User's Device that is currently in use -->
     <string name="device_center_list_view_item_header_this_device">هذا الجهاز</string>
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
@@ -32,8 +30,6 @@
     <string name="device_center_bottom_sheet_item_camera_uploads_enabled_status">تمكين</string>
     <!-- The disabled Camera uploads status that is shown alongside the "Camera uploads" Device Center Bottom Sheet item -->
     <string name="device_center_bottom_sheet_item_camera_uploads_disabled_status">تعطيل</string>
-    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, opens the "Rename device" Dialog to let the User rename the selected Device -->
-    <string name="device_center_bottom_sheet_item_rename">إعادة التسمية</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Node Information screen to view more information about the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_info">معلومات</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -48,16 +44,12 @@
     <string name="device_center_rename_device_dialog_error_message_empty_device_name">ادخل اسم الجهاز.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->
     <string name="device_center_rename_device_dialog_error_message_name_already_exists">يوجد جهاز بهذا الاسم بالفعل. أدخل اسمًا مختلفًا.</string>
-    <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name with invalid characters -->
-    <string name="device_center_rename_device_dialog_error_message_invalid_characters">المحارف التالية غير مسموح بها: %1$s</string>
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
     <string name="device_center_snackbar_message_rename_device_successful">تمت إعادة تسمية الجهاز</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
     <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">الحد الأقصى 32 محرفاً</string>
     <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the Camera uploads feature settings -->
     <string name="device_center_device_top_menu_option_camera_uploads">ترفيعات الكاميرا</string>
-    <!-- Label of the top app bar menu option of selected device in Device Center which opens the dialog to rename the selected Device -->
-    <string name="device_center_device_top_menu_option_rename">إعادة التسمية</string>
     <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the device info screen -->
     <string name="device_center_device_top_menu_option_info">معلومات</string>
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->

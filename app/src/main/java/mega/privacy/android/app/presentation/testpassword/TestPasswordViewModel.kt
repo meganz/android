@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_IS_LOGOUT
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_TEST_PASSWORD_MODE
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.WRONG_PASSWORD_COUNTER
@@ -223,7 +224,7 @@ class TestPasswordViewModel @Inject constructor(
             if (key.isNullOrBlank().not()) {
                 setMasterKeyExportedUseCase()
             } else {
-                _uiState.update { it.copy(userMessage = triggered(R.string.general_text_error)) }
+                _uiState.update { it.copy(userMessage = triggered(sharedR.string.general_text_error)) }
                 return@also
             }
 
@@ -247,12 +248,12 @@ class TestPasswordViewModel @Inject constructor(
                         _uiState.update { it.copy(userMessage = triggered(R.string.save_MK_confirmation)) }
                         notifyPasswordReminderSucceeded()
                     } else {
-                        _uiState.update { it.copy(userMessage = triggered(R.string.general_text_error)) }
+                        _uiState.update { it.copy(userMessage = triggered(sharedR.string.general_text_error)) }
                     }
                 }
                 .onFailure { error ->
                     Timber.e(error)
-                    _uiState.update { it.copy(userMessage = triggered(R.string.general_text_error)) }
+                    _uiState.update { it.copy(userMessage = triggered(sharedR.string.general_text_error)) }
                 }
         }
     }

@@ -12,22 +12,28 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
-import mega.privacy.android.app.R
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.extensions.handleLocationClick
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.navOptions
+import mega.privacy.android.navigation.contract.queue.NavPriority
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedResR
 import javax.inject.Inject
 
 /**
@@ -44,6 +50,12 @@ class TrackInfoFragment : Fragment() {
      */
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var navigationQueue: NavigationEventQueue
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     /**
      * onCreateView
@@ -65,10 +77,23 @@ class TrackInfoFragment : Fragment() {
                     AudioTrackInfoView(
                         uiState = uiState,
                         metadata = metadata,
-                        onLocationClicked = { location ->
-                            location?.let {
-                                handleLocationClick(requireActivity(), args.adapterType, it)
-                            }
+                        onLocationClicked = {
+                            uiState.nodeDestination?.let {
+                                lifecycleScope.launch {
+                                    navigationQueue.emit(
+                                        it,
+                                        NavPriority.Default,
+                                        navOptions {
+                                            launchSingleTop = true
+                                        }
+                                    )
+                                    megaNavigator.launchMegaActivityIfNeeded(context)
+                                }
+                            } ?: uiState.location?.handleLocationClick(
+                                activity = requireActivity(),
+                                adapterType = args.adapterType,
+                                megaNavigator = megaNavigator
+                            )
                         },
                         onCheckedChange = {
                             if (viewModel.getStorageState() == StorageState.PayWall) {
@@ -88,7 +113,7 @@ class TrackInfoFragment : Fragment() {
                         event = uiState.offlineRemovedEvent,
                         onConsumed = viewModel::consumeOfflineRemovedEvent
                     ) {
-                        snackbarHostState.showAutoDurationSnackbar(getString(R.string.file_removed_offline))
+                        snackbarHostState.showAutoDurationSnackbar(getString(sharedResR.string.remove_from_offline_success_message))
                     }
                 }
             }

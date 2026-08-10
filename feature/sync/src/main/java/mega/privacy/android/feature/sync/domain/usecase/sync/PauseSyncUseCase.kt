@@ -6,8 +6,8 @@ import javax.inject.Inject
 /**
  *  Use case to pause a sync by sync id
  */
-class PauseSyncUseCase @Inject constructor(
-    private val syncRepository: SyncRepository
+internal class PauseSyncUseCase @Inject constructor(
+    private val syncRepository: SyncRepository,
 ) {
 
     suspend operator fun invoke(syncId: Long) {

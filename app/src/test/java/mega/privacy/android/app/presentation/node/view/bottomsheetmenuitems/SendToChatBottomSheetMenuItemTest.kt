@@ -5,8 +5,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
 import mega.android.core.ui.model.menu.MenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -14,7 +14,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.chat.GetNodeToAttachUseCase
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -97,7 +97,10 @@ class SendToChatBottomSheetMenuItemTest {
             true,
             AccessPermission.OWNER,
             false,
-            mock<TypedFolderNode> { on { isTakenDown } doReturn true },
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
+            },
             false,
             false,
         ),
@@ -105,7 +108,10 @@ class SendToChatBottomSheetMenuItemTest {
             false,
             AccessPermission.READWRITE,
             false,
-            mock<TypedFolderNode> { on { isTakenDown } doReturn false },
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            },
             false,
             false,
         ),
@@ -113,9 +119,23 @@ class SendToChatBottomSheetMenuItemTest {
             false,
             AccessPermission.FULL,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            },
             true,
             true
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.FULL,
+            false,
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn false
+            },
+            true,
+            false
         ),
     )
 }

@@ -6,5 +6,5 @@ package mega.privacy.android.app.components.session
  * @property doesRootNodeExist whether root node exists
  */
 internal data class SessionState(
-    val doesRootNodeExist: Boolean? = null
+    val doesRootNodeExist: Boolean? = null,
 )

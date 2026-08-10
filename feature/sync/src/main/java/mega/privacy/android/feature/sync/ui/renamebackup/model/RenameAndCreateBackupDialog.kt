@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
@@ -66,7 +66,7 @@ internal fun RenameAndCreateBackupDialogBody(
         message = stringResource(sharedR.string.sync_rename_and_create_backup_dialog_text),
         hint = stringResource(sharedR.string.sync_rename_and_create_backup_dialog_hint_text),
         text = initialInput,
-        confirmButtonText = stringResource(sharedR.string.sync_rename_and_create_backup_dialog_positive_button),
+        confirmButtonText = stringResource(sharedR.string.context_rename),
         cancelButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
         onInputChange = {
             initialInput = it

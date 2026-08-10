@@ -7,11 +7,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.modalbottomsheet.VersionsBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.versions.dialog.VersionsBottomSheetDialogViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
@@ -42,10 +42,11 @@ class VersionsBottomSheetDialogViewModelTest {
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
 
     @BeforeEach
     fun reset() {
-        reset(getNodeAccessPermission, getNodeByHandle, isNodeInBackupsUseCase)
+        reset(getNodeAccessPermission, getNodeByHandle, isNodeInBackupsUseCase, isNodeInRubbishBinUseCase)
     }
 
     fun initViewModel(nodeHandle: Long?, selectedNodePosition: Int, versionsCount: Int) {
@@ -60,6 +61,7 @@ class VersionsBottomSheetDialogViewModelTest {
             getNodeAccessPermission = getNodeAccessPermission,
             getNodeByHandle = getNodeByHandle,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -78,7 +80,12 @@ class VersionsBottomSheetDialogViewModelTest {
             assertThat(state.node).isNull()
         }
 
-        verifyNoInteractions(getNodeAccessPermission, getNodeByHandle, isNodeInBackupsUseCase)
+        verifyNoInteractions(
+            getNodeAccessPermission,
+            getNodeByHandle,
+            isNodeInBackupsUseCase,
+            isNodeInRubbishBinUseCase,
+        )
     }
 
     @Test
@@ -87,7 +94,8 @@ class VersionsBottomSheetDialogViewModelTest {
 
         whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(mock())
         whenever(getNodeByHandle(any())).thenReturn(testNode)
-        whenever(isNodeInBackupsUseCase(any())).thenReturn(any())
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
 
         initViewModel(
             nodeHandle = 123456L,
@@ -105,6 +113,7 @@ class VersionsBottomSheetDialogViewModelTest {
             whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
 
             initViewModel(
                 nodeHandle = 123456,
@@ -124,6 +133,7 @@ class VersionsBottomSheetDialogViewModelTest {
         whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(accessPermission)
         whenever(getNodeByHandle(any())).thenReturn(mock())
         whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
 
         initViewModel(
             nodeHandle = 123456,
@@ -142,6 +152,7 @@ class VersionsBottomSheetDialogViewModelTest {
         whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(mock())
         whenever(getNodeByHandle(any())).thenReturn(mock())
         whenever(isNodeInBackupsUseCase(any())).thenReturn(true)
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
 
         initViewModel(
             nodeHandle = 123456L,
@@ -164,6 +175,7 @@ class VersionsBottomSheetDialogViewModelTest {
                     whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(accessPermission)
                     whenever(getNodeByHandle(any())).thenReturn(mock())
                     whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+                    whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
 
                     initViewModel(
                         nodeHandle = 123456L,
@@ -184,6 +196,7 @@ class VersionsBottomSheetDialogViewModelTest {
             whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
             whenever(isNodeInBackupsUseCase(any())).thenReturn(isNodeInBackups)
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
 
             initViewModel(
                 nodeHandle = 123456L,
@@ -194,6 +207,23 @@ class VersionsBottomSheetDialogViewModelTest {
                 assertThat(awaitItem().canRevertVersion).isEqualTo(false)
             }
         }
+
+    @Test
+    fun `test that a previous version node in the rubbish bin cannot be reverted`() = runTest {
+        whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(AccessPermission.OWNER)
+        whenever(getNodeByHandle(any())).thenReturn(mock())
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(true)
+
+        initViewModel(
+            nodeHandle = 123456L,
+            selectedNodePosition = 1,
+            versionsCount = 2,
+        )
+        underTest.state.test {
+            assertThat(awaitItem().canRevertVersion).isFalse()
+        }
+    }
 
     @TestFactory
     fun `test that a previous version non-backup node could be reverted`() =
@@ -206,6 +236,7 @@ class VersionsBottomSheetDialogViewModelTest {
                     whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(accessPermission)
                     whenever(getNodeByHandle(any())).thenReturn(mock())
                     whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+                    whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
 
                     initViewModel(
                         nodeHandle = 123456L,

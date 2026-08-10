@@ -4,6 +4,7 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.common.truth.Truth
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -19,7 +20,10 @@ class CredentialsPreferencesMigrationTest {
 
     @BeforeEach
     internal fun setUp() {
-        underTest = CredentialsPreferencesMigration { databaseHandler }
+        underTest = CredentialsPreferencesMigration(
+            databaseHandler = { databaseHandler },
+            databaseDispatcher = UnconfinedTestDispatcher(),
+        )
     }
 
     @Test

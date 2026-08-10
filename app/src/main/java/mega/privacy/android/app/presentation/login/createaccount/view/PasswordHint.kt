@@ -95,21 +95,21 @@ private fun HintTitle(
             )
         }
 
-        passwordStrength == PasswordStrength.VERY_WEAK || passwordStrength == PasswordStrength.WEAK -> {
+        passwordStrength == PasswordStrength.VERY_WEAK -> {
             HelpTextError(
                 modifier = modifier,
                 text = stringResource(id = sharedR.string.sign_up_password_weak_password_error_message),
             )
         }
 
-        passwordStrength == PasswordStrength.MEDIUM -> {
+        passwordStrength == PasswordStrength.WEAK -> {
             HelpTextWarning(
                 modifier = modifier,
                 text = stringResource(id = sharedR.string.sign_up_password_medium_password_warning_message),
             )
         }
 
-        passwordStrength == PasswordStrength.GOOD || passwordStrength == PasswordStrength.STRONG -> {
+        passwordStrength == PasswordStrength.MEDIUM || passwordStrength == PasswordStrength.GOOD || passwordStrength == PasswordStrength.STRONG -> {
             HelpTextSuccess(
                 modifier = modifier,
                 text = stringResource(id = sharedR.string.sign_up_password_min_character_error_message),
@@ -130,7 +130,7 @@ private fun HintTitle(
 private fun HintChecklistItem(
     text: String,
     modifier: Modifier = Modifier,
-    isChecklistDone: Boolean = false
+    isChecklistDone: Boolean = false,
 ) {
     Row(
         modifier = modifier

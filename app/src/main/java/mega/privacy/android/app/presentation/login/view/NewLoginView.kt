@@ -33,9 +33,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -49,12 +50,8 @@ import mega.privacy.android.app.presentation.apiserver.view.NewChangeApiServerDi
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
-import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountSession
-import mega.privacy.android.domain.entity.login.FetchNodesUpdate
-import mega.privacy.android.domain.entity.login.TemporaryWaitingError
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.LoginHelpButtonPressedEvent
 
@@ -90,14 +87,13 @@ fun NewLoginView(
     onResendVerificationEmail: () -> Unit,
     onResetResendVerificationEmailEvent: () -> Unit,
     stopLogin: () -> Unit,
+    onGoogleSignInClicked: () -> Unit = {},
     modifier: Modifier = Modifier,
     onLoginExceptionConsumed: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = LocalSnackBarHostState.current ?: remember { SnackbarHostState() }
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
-    val showLoginInProgress =
-        state.isLoginInProgress || state.fetchNodesUpdate != null || state.isRequestStatusInProgress
     val orientation = LocalConfiguration.current.orientation
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
     val isPhoneLandscape =
@@ -113,15 +109,13 @@ fun NewLoginView(
         modifier = modifier
             .fillMaxSize()
             .imePadding()
-            .conditional(!showLoginInProgress) {
-                statusBarsPadding()
-            }
+            .statusBarsPadding()
             .semantics { testTagsAsResourceId = true },
         snackbarHost = {
             MegaSnackbar(snackbarHostState)
         },
         topBar = {
-            if (state.is2FARequired && !showLoginInProgress) {
+            if (state.is2FARequired) {
                 AnimatedVisibility(
                     visible = !isPhoneLandscape || !twoFactorAuthScrollState.canScrollBackward,
                     enter = slideInVertically(initialOffsetY = { -it }),
@@ -132,7 +126,7 @@ fun NewLoginView(
                         title = stringResource(sharedR.string.settings_2fa),
                     )
                 }
-            } else if (!showLoginInProgress) {
+            } else {
                 AnimatedVisibility(
                     visible = !isPhoneLandscape || !requiredLoginScrollState.canScrollBackward,
                     enter = slideInVertically(initialOffsetY = { -it }),
@@ -165,13 +159,6 @@ fun NewLoginView(
     ) { paddingValues ->
         with(state) {
             when {
-                showLoginInProgress -> LoginInProgressContent(
-                    isRequestStatusInProgress = state.isRequestStatusInProgress,
-                    currentProgress = state.currentProgress,
-                    currentStatusText = state.currentStatusText,
-                    requestStatusProgress = state.requestStatusProgress
-                )
-
                 isLoginRequired -> RequireLogin(
                     state = this,
                     paddingValues = paddingValues,
@@ -191,6 +178,7 @@ fun NewLoginView(
                     onResetAccountBlockedEvent = onResetAccountBlockedEvent,
                     onResetResendVerificationEmailEvent = onResetResendVerificationEmailEvent,
                     stopLogin = stopLogin,
+                    onGoogleSignInClicked = onGoogleSignInClicked,
                 )
 
                 is2FARequired || multiFactorAuthState != null -> NewTwoFactorAuthentication(
@@ -335,7 +323,6 @@ private class LoginStateProvider : PreviewParameterProvider<LoginState> {
             isLoginRequired = true,
             accountSession = AccountSession(email = "email@email.es"),
             password = "Password",
-            isLocalLogoutInProgress = true
         ),
         LoginState(
             isLoginRequired = true,
@@ -348,39 +335,15 @@ private class LoginStateProvider : PreviewParameterProvider<LoginState> {
             isLoginInProgress = true,
         ),
         LoginState(
-            isLoginInProgress = true,
-            requestStatusProgress = Progress(0.2f)
-        ),
-        LoginState(
-            isLoginInProgress = true,
-            requestStatusProgress = Progress(0.7f)
-        ),
-        LoginState(
-            fetchNodesUpdate = FetchNodesUpdate(
-                progress = Progress(0.5F),
-                temporaryError = TemporaryWaitingError.ConnectivityIssues
-            ),
-        ),
-        LoginState(
             is2FARequired = true,
-            twoFAPin = listOf("1", "2", "", "", "", "")
         ),
         LoginState(
             multiFactorAuthState = MultiFactorAuthState.Failed,
-            twoFAPin = listOf("1", "2", "3", "4", "5", "6")
         ),
         LoginState(
             multiFactorAuthState = MultiFactorAuthState.Checking,
-            twoFAPin = listOf("1", "2", "3", "4", "5", "6")
         ),
     ).asSequence()
 }
 
 internal const val TWO_FA_PROGRESS_TEST_TAG = "TWO_FA_PROGRESS"
-internal const val ENTER_AUTHENTICATION_CODE_TAG =
-    "two_factor_authentication:text_enter_authentication_code"
-internal const val INVALID_CODE_TAG =
-    "two_factor_authentication:text_invalid_code"
-internal const val LOST_AUTHENTICATION_CODE_TAG =
-    "two_factor_authentication:text_mega_button_lost_authentication_code"
-

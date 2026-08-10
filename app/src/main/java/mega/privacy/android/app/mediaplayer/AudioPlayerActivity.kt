@@ -23,7 +23,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.common.util.Util
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
@@ -43,19 +42,22 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
-import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
+import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
+import mega.privacy.android.app.utils.Constants.ADAPTER_TYPES_WITHOUT_ACCESS_CHECK
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
@@ -79,15 +81,21 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.getFragmentFromNavHost
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AudioPlayerHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -96,6 +104,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
 /**
  * Extending MediaPlayerActivity is to declare portrait in manifest,
@@ -105,20 +114,98 @@ import java.io.File
 class AudioPlayerActivity : MediaPlayerActivity() {
     private lateinit var binding: ActivityAudioPlayerBinding
 
+    @Inject
+    lateinit var exportNodeUseCase: ExportNodeUseCase
+
+    @Inject
+    lateinit var getNodeAccessUseCase: GetNodeAccessUseCase
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
+
+    @Inject
+    lateinit var chatController: ChatController
+
+    @Inject
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
 
     private var serviceBound = false
-
-    private var isHiddenNodesEnabled: Boolean = false
 
     private var takenDownDialog: AlertDialog? = null
 
     private var tempNodeId: NodeId? = null
 
+    @Volatile
+    private var isShareMenuVisible: Boolean = false
+    private var lastShareCheckedHandle: Long = INVALID_HANDLE
+    private var lastShareCheckedAdapter: Int = INVALID_VALUE
+
+    private fun shareCurrentNode(node: MegaNode) {
+        val localPath = FileUtil.getLocalFile(node)
+        if (!localPath.isNullOrBlank() && !node.isFolder) {
+            FileUtil.shareFile(this, File(localPath), node.name)
+            return
+        }
+        if (node.isExported) {
+            val intent = Intent(Intent.ACTION_SEND)
+                .putExtra(Intent.EXTRA_SUBJECT, node.name)
+            MegaNodeUtil.startShareIntent(this, intent, node.publicLink, node.name)
+            return
+        }
+        lifecycleScope.launch {
+            runCatching {
+                exportNodeUseCase(
+                    nodeToExport = NodeId(node.handle),
+                    callerName = "AudioPlayerActivity:share",
+                )
+            }.onSuccess { link ->
+                val intent = Intent(Intent.ACTION_SEND)
+                    .putExtra(Intent.EXTRA_SUBJECT, node.name)
+                MegaNodeUtil.startShareIntent(
+                    this@AudioPlayerActivity,
+                    intent,
+                    link,
+                    node.name,
+                )
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
+    private fun updateShareMenuVisibility(adapterType: Int, handle: Long) {
+        if (adapterType == lastShareCheckedAdapter && handle == lastShareCheckedHandle) return
+        lastShareCheckedAdapter = adapterType
+        lastShareCheckedHandle = handle
+        lifecycleScope.launch {
+            runCatching {
+                (adapterType in ADAPTER_TYPES_WITHOUT_ACCESS_CHECK) || (getNodeAccessUseCase(
+                    NodeId(
+                        handle
+                    )
+                ) == AccessPermission.OWNER)
+            }.onSuccess { visible ->
+                if (visible != isShareMenuVisible) {
+                    isShareMenuVisible = visible
+                    invalidateOptionsMenu()
+                }
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
     private val nameCollisionActivityContract = registerForActivityResult(
         NameCollisionActivityContract()
     ) { result ->
         result?.let {
+            playerServiceGateway?.getCurrentPlayingHandle()?.let {
+                viewModel.updateItemToRemove(it)
+            }
             showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
         }
     }
@@ -144,7 +231,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         }
 
         /**
-         * Called after a successful bind with our AudioPlayerService.
+         * Called after a successful bind with our LegacyAudioPlayerService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is MediaPlayerServiceBinder) {
@@ -200,9 +287,15 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     @androidx.annotation.OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
+
+        // Set orientation before super.onCreate() to ensure it takes effect
+        enableAdaptiveLayout { old, new ->
+            Timber.d("On size change in AudioPlayerActivity from $old to $new")
+        }
+
         super.onCreate(savedInstanceState)
 
-        // Setup the Back Press dispatcher to receive Back Press events
+        // Set up the Back Press dispatcher to receive Back Press events
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         val extras = intent.extras
@@ -220,12 +313,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
         binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
 
-        lifecycleScope.launch {
-            runCatching {
-                isHiddenNodesEnabled = isHiddenNodesActive()
-                invalidateOptionsMenu()
-            }.onFailure { Timber.e(it) }
-        }
+        invalidateOptionsMenu()
 
         setContentView(binding.root)
         addStartDownloadTransferView(binding.root)
@@ -239,13 +327,13 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         setupToolbar()
         setupNavDestListener()
 
-        val playerServiceIntent = Intent(this, AudioPlayerService::class.java).putExtras(extras)
+        val playerServiceIntent = Intent(this, LegacyAudioPlayerService::class.java).putExtras(extras)
 
         if (savedInstanceState == null) {
             PermissionUtils.checkNotificationsPermission(this)
             if (rebuildPlaylist) {
                 playerServiceIntent.setDataAndType(intent.data, intent.type)
-                Util.startForegroundService(this, playerServiceIntent)
+                ContextCompat.startForegroundService(this, playerServiceIntent)
             }
         }
 
@@ -257,13 +345,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         if (CallUtil.participatingInACall()) {
             showNotAllowPlayAlert()
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     @OptIn(FlowPreview::class)
@@ -292,20 +373,29 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
             renameUpdate.observe(this@AudioPlayerActivity) { node ->
                 node?.let {
+                    val actionNodeCallback = object : ActionNodeCallback {
+                        override fun finishRenameActionWithSuccess(newName: String) {
+                            playerServiceGateway?.updateItemName(it.handle, newName)
+                            //Avoid the dialog is shown repeatedly when screen is rotated.
+                            viewModel.renameUpdate(null)
+                        }
+                    }
                     MegaNodeDialogUtil.showRenameNodeDialog(
                         context = this@AudioPlayerActivity,
                         node = it,
                         snackbarShower = this@AudioPlayerActivity,
-                        actionNodeCallback = object : ActionNodeCallback {
-                            override fun finishRenameActionWithSuccess(newName: String) {
-                                playerServiceGateway?.updateItemName(it.handle, newName)
-                                //Avoid the dialog is shown repeatedly when screen is rotated.
-                                viewModel.renameUpdate(null)
-                            }
-                        })
+                        actionNodeCallback = actionNodeCallback,
+                        onRenameConfirmed = { handle, newName ->
+                            renameNode(handle, newName, actionNodeCallback)
+                        },
+                        getRootNodeUseCase = getRootNodeUseCase,
+                        nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
+                    )
                 }
             }
         }
+
+        observeDownloadFileLinkNode()
 
         collectFlow(viewModel.menuClickEventFlow.debounce { (menuId) ->
             if (menuId == R.id.share) {
@@ -335,9 +425,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                         }
 
                         FILE_LINK_ADAPTER -> {
-                            launchIntent.getStringExtra(EXTRA_SERIALIZE_STRING)
-                                ?.let { serialize ->
-                                    saveFileLinkNode(serialize)
+                            launchIntent.getStringExtra(URL_FILE_LINK)
+                                ?.let { url ->
+                                    saveFileLinkNode(url)
                                 }
                         }
 
@@ -411,10 +501,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
                         else -> {
                             playerServiceGateway?.let {
-                                MegaNodeUtil.shareNode(
-                                    context = this,
-                                    node = megaApi.getNodeByHandle(it.getCurrentPlayingHandle())
-                                )
+                                megaApi.getNodeByHandle(it.getCurrentPlayingHandle())
+                                    ?.let { node -> shareCurrentNode(node) }
                             }
                         }
                     }
@@ -446,7 +534,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     node,
                                     OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
                                         if (error.errorCode == MegaError.API_OK) {
-                                            // Some times checking node.isExported immediately will still
+                                            // Sometimes checking node.isExported immediately will still
                                             // get true, so let's add some delay here.
                                             RunOnUIThreadUtils.runDelay(500L) {
                                                 refreshMenuOptionsVisibility()
@@ -509,15 +597,16 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                     if (adapterType == FROM_CHAT) {
                         getChatMessage().let { (chatId, message) ->
                             message?.let {
-                                ChatUtil.removeAttachmentMessage(this, chatId, it)
+                                ChatUtil.removeAttachmentMessage(
+                                    activity = this,
+                                    chatId = chatId,
+                                    message = it,
+                                    chatController = chatController
+                                )
                             }
                         }
                     } else {
-                        MegaNodeDialogUtil.moveToRubbishOrRemove(
-                            handle = playingHandle,
-                            activity = this,
-                            snackbarShower = this
-                        )
+                        viewModel.showMoveToTrashDialog(playingHandle)
                     }
                 }
 
@@ -535,6 +624,11 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     override fun onResume() {
         super.onResume()
         refreshMenuOptionsVisibility()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        playerServiceGateway?.saveShuffleEnabled()
     }
 
     /**
@@ -800,8 +894,17 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private fun onError(megaException: MegaException) {
         when (megaException) {
             is BlockedMegaException -> {
-                if (!AlertDialogUtil.isAlertDialogShown(takenDownDialog)) {
-                    takenDownDialog = AlertsAndWarnings.showTakenDownAlert(this)
+                if (takenDownDialog?.isShowing != true) {
+                    val errorHandle = playerServiceGateway?.getCurrentPlayingHandle()
+                    takenDownDialog = showTakenDownAlert(
+                        activity = this@AudioPlayerActivity,
+                        onDismiss = {
+                            errorHandle?.let {
+                                viewModel.updateItemToRemove(it)
+                            }
+                            playerServiceGateway?.resetError()
+                        }
+                    )
                 }
             }
         }
@@ -817,6 +920,24 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             throwable.message?.let { errorMessage ->
                 showSnackbar(errorMessage)
             }
+        }
+    }
+
+    private fun renameNode(
+        nodeHandle: Long,
+        newName: String,
+        actionNodeCallback: ActionNodeCallback,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    showSnackbar(getString(sharedR.string.context_correctly_renamed))
+                    actionNodeCallback.finishRenameActionWithSuccess(newName)
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    showSnackbar(getString(R.string.context_no_renamed))
+                }
         }
     }
 
@@ -950,17 +1071,14 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     menu.findItem(R.id.properties).isVisible =
                                         currentFragmentId == R.id.audio_main_player
 
-                                    menu.findItem(R.id.share).isVisible =
-                                        currentFragmentId == R.id.audio_main_player
-                                                && MegaNodeUtil.showShareOption(
-                                            adapterType = adapterType,
-                                            isFolderLink = false,
-                                            handle = node.handle
-                                        )
-                                    menu.findItem(R.id.send_to_chat).isVisible = true
-
                                     val access = megaApi.getAccess(node)
                                     val isAccessOwner = access == MegaShare.ACCESS_OWNER
+
+                                    menu.findItem(R.id.share).isVisible =
+                                        currentFragmentId == R.id.audio_main_player
+                                                && isShareMenuVisible
+                                    menu.findItem(R.id.send_to_chat).isVisible = true
+                                    updateShareMenuVisibility(adapterType, node.handle)
 
                                     menu.findItem(R.id.get_link).isVisible =
                                         isAccessOwner && !node.isExported
@@ -985,13 +1103,12 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
 
                                     val shouldShowHideNode = when {
-                                        !isHiddenNodesEnabled || isInSharedItems || isRootParentInShare || isNodeInBackup -> false
+                                        isInSharedItems || isRootParentInShare || isNodeInBackup -> false
                                         isPaidAccount && !isBusinessAccountExpired && (node.isMarkedSensitive || isSensitiveInherited) -> false
                                         else -> true
                                     }
 
-                                    val shouldShowUnhideNode = isHiddenNodesEnabled
-                                            && !isInSharedItems
+                                    val shouldShowUnhideNode = !isInSharedItems
                                             && !isRootParentInShare
                                             && node.isMarkedSensitive
                                             && isPaidAccount
@@ -1152,7 +1269,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                             )
                             mega.privacy.android.app.utils.Util.showSnackbar(this, message)
                         }
-                        // Some times checking node.isMarkedSensitive immediately will still
+                        // Sometimes checking node.isMarkedSensitive immediately will still
                         // get true, so let's add some delay here.
                         RunOnUIThreadUtils.runDelay(500L) {
                             refreshMenuOptionsVisibility()

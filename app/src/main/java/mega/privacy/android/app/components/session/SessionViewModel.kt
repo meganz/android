@@ -56,7 +56,11 @@ internal class SessionViewModel @Inject constructor(
         if (retryConnectionsAndSignalPresenceJob?.isActive == true) return
         retryConnectionsAndSignalPresenceJob = viewModelScope.launch {
             Timber.d("Retry connections and signal presence")
-            retryConnectionsAndSignalPresenceUseCase()
+            runCatching {
+                retryConnectionsAndSignalPresenceUseCase()
+            }.onFailure {
+                Timber.e(it, "Error retrying connections and signaling presence")
+            }
             delay(500L)
         }
     }

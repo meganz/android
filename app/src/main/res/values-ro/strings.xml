@@ -14,8 +14,6 @@
     <string name="general_select">Selectează</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Selectează un folder</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Creează</string>
     <!-- button -->
     <string name="general_add">Adaugă</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -60,10 +58,6 @@
     <string name="action_logout">Deconectați-vă</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Încarcă</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">Folder nou</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Fișier text nou</string>
     <!-- Menu item -->
     <string name="action_settings">Setări</string>
     <!-- Search button -->
@@ -154,10 +148,6 @@
     <string name="login_before_share">Conectați-vă pentru a partaja cu MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Confirmarea link-ului dvs. nu mai este valabil. Este posibil ca contul dvs. să fie deja activat sau este posibil să vă fi anulat înregistrarea.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Prenume</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Nume de familie</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Înțeleg că [B]dacă îmi pierd parola, se poate să îmi pierd datele[/B]. Citește mai multe despre [A]criptarea capăt-la-capăt MEGA[/A].</string>
     <!-- warning dialog -->
@@ -279,8 +269,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Acest link nu va mai fi disponibil publicului.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Redenumește</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Deschide</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Se pregătește fișierul</string>
@@ -300,8 +288,6 @@
     <string name="context_move_to_trash">Mutați în Coșul de gunoi</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Eliminați de pe MEGA</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Numele folderului</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Se creează folderul</string>
     <!-- Menu option title -->
@@ -390,8 +376,6 @@
     <string name="subscription_type_monthly">Lunar</string>
     <!--  -->
     <string name="subscription_type_yearly">Anual</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Folder nou</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Adaugă un contact</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -685,9 +669,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Felicitări, noua adresă de e-mail pentru acest cont MEGA este: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Cannot be empty</string>
+    <string name="invalid_string">Nu poate fi gol</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
+    <string name="invalid_input">Nu este o intrare validă</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Resetarea parolei</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -1019,12 +1003,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">minute</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Online</item>
-        <item>Plecat</item>
-        <item>Ocupat</item>
-        <item>Offline</item>
-    </string-array>
+    <string name="settings_chat_status_online">Online</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Plecat</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Ocupat</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Offline</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Activează</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1277,8 +1262,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Ajutor</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Trimite feedback</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Feedback pentru Android</string>
     <!-- mail body -->
@@ -1287,8 +1270,6 @@
     <string name="settings_feedback_body_device_model">Modelul dispozitivului</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Versiunea Android</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">Fișier text nou</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Numele fișierului</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1307,8 +1288,6 @@
     <string name="general_incorrect_names">Vă rugăm să corectați numele fișierelor înainte de a continua</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caractere nevalide</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">Următoarele caractere nu sunt permise: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Numele fișierului nu poate fi gol.</item>
@@ -1327,12 +1306,6 @@
     <string name="invalid_connection_state">Se reconectează la chat</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">A apărut o eroare și apelul nu poate fi conectat.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Îți place Aplicația Mobilă MEGA?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Da, evaluează aplicația</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Nu, trimite feedback</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Nu au fost acordate permisiunile pentru contacte</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1413,8 +1386,6 @@
     <string name="tab_received_requests">Cereri primite</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Cotă de stocare depășită</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Link nevalid, vă rugăm să solicitați un nou link valid</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Parolă nevalidă a linkului</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1502,12 +1473,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Calitate video</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Scăzută</item>
-        <item>Medie</item>
-        <item>Ridicată</item>
-        <item>Originală</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Scăzută</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Medie</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Ridicată</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Originală</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Apel ratat</string>
     <!-- Refers to a location of file -->
@@ -1941,7 +1913,7 @@
     <!-- General label for files -->
     <string name="general_files">Fișiere</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Salvați pe dispozitiv</string>
+    <string name="general_save_to_device">Descarcă</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Încarcă pe MEGA</string>
     <!-- Label choose destination -->
@@ -2247,7 +2219,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Ignoră</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s a amuțit acest apel</string>
+    <string name="muted_contact_micro">%s este mut</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">Amuțit</string>
     <!-- Subtitle of the call screen when the call is on hold -->
@@ -4096,13 +4068,19 @@
         <item quantity="few">Imposibil de copiat %1$d&#160;elemente</item>
         <item quantity="other">Imposibil de copiat %1$d de elemente</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">%1$d element a fost copiat,&#160;</item>
         <item quantity="few">%1$d elemente au fost copiate,&#160;</item>
         <item quantity="other">%1$d de elemente au fost copiate,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">nu a putut copia %1$d element</item>
         <item quantity="few">nu a putut copia %1$d elemente</item>
@@ -4750,16 +4728,6 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s prezintă</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Această persoană partajează ecranul</string>
-    <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">Acest apel este înregistrat</string>
-    <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">Rămânând în apel, dați permisiunea de a fi înregistrat. Înregistrarea este stocată numai pe dispozitivul persoanei care o înregistrează.</string>
-    <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">Bine, am înțeles</string>
-    <!-- Label for the negative or cancel button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_negative_button">Părăsește apelul</string>
-    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]En apprendre davantage[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">%1$s a început înregistrarea</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
@@ -5024,4 +4992,5 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Încărcări cameră sunt activată</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Această locație nu mai există.</string>
+    <string name="invalid_link">Link invalid. Vă rugăm să încercați din nou sau să solicitați un alt link.</string>
 </resources>

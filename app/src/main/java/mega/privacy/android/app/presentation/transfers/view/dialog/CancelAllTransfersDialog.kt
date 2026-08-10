@@ -13,6 +13,7 @@ import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * All contacts added dialog
@@ -27,7 +28,7 @@ fun CancelAllTransfersDialog(
     modifier = modifier.testTag(TEST_TAG_CANCEL_ALL_TRANSFERS_DIALOG),
     title = SpannableText(stringResource(id = R.string.cancel_all_transfer_confirmation)),
     buttons = listOf(
-        BasicDialogButton(stringResource(id = R.string.general_dismiss), onClick = onDismiss),
+        BasicDialogButton(stringResource(id = sharedR.string.general_dismiss_dialog), onClick = onDismiss),
         BasicDialogButton(stringResource(id = R.string.cancel_all_action), onClick = {
             onCancelAllTransfers()
             onDismiss()

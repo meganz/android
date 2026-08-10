@@ -1,24 +1,21 @@
 package mega.privacy.android.app.presentation.chat.list.view
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
@@ -30,22 +27,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.components.fab.MegaFab
+import mega.android.core.ui.extensions.LaunchedOnceEffect
+import mega.android.core.ui.modifiers.applyScrollToHideBehavior
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
+import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.normalize
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
+import mega.privacy.android.app.presentation.chat.list.toolbar.ChatListToolBar
+import mega.privacy.android.app.presentation.chat.list.toolbar.SelectionModeToolbar
 import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelScheduledMeetingDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.ForceAppUpdateDialog
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
@@ -66,9 +74,11 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatTabsView(
+    isNewSingleActivity: Boolean,
     state: ChatsTabState,
     managementState: ScheduledMeetingManagementUiState,
     noteToSelfChatState: NoteToSelfChatUIState,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
     showMeetingTab: Boolean = false,
     onTabSelected: (ChatTab) -> Unit = {},
     onItemClick: (Long, Boolean) -> Unit = { _, _ -> },
@@ -82,10 +92,23 @@ fun ChatTabsView(
     onScheduleMeeting: () -> Unit = {},
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
     onDismissForceAppUpdateDialog: () -> Unit = {},
+    onSearchTextChange: (String) -> Unit = {},
+    onSearchCloseClicked: () -> Unit = {},
+    onNavigationClick: () -> Unit = {},
+    onChangeUserStatus: () -> Unit = {},
+    onDoNotDisturbActionClick: () -> Unit = {},
+    onOpenLinkActionClick: () -> Unit = {},
+    onArchivedActionClick: () -> Unit = {},
+    onTitleChatArchivedEventConsumed: () -> Unit = {},
+    onClearSelection: () -> Unit = {},
+    onSelectAll: () -> Unit = {},
+    onMuteSelected: () -> Unit = {},
+    onUnmuteSelected: () -> Unit = {},
+    onArchiveSelected: () -> Unit = {},
+    onLeaveSelected: () -> Unit = {},
 ) {
     val initialPage = if (showMeetingTab) ChatTab.MEETINGS.ordinal else ChatTab.CHATS.ordinal
     val context = LocalContext.current
-    val scaffoldState = rememberScaffoldState()
     val pagerState = rememberPagerState(
         initialPage = initialPage,
         initialPageOffsetFraction = 0f
@@ -93,23 +116,56 @@ fun ChatTabsView(
         ChatTab.entries.size
     }
     var scrollToTop by remember { mutableStateOf(false) }
-    var showFabButton by remember { mutableStateOf(true) }
     var filteredChats by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
     var filteredMeetings by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
-
-    Scaffold(
+    val scrollToHideBehavior = rememberScrollToHideBehavior()
+    LaunchedOnceEffect(pagerState.currentPage) {
+        scrollToHideBehavior.reset()
+    }
+    val currentItems = if (pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
+        state.meetings
+    } else {
+        state.chats
+    }
+    val selectedItems = remember(state.selectedIds, currentItems) {
+        if (state.selectedIds.isEmpty()) {
+            emptyList()
+        } else {
+            val selectedSet = state.selectedIds.toHashSet()
+            currentItems.filter { it.chatId in selectedSet }
+        }
+    }
+    MegaScaffold(
+        modifier = if (isNewSingleActivity) Modifier.systemBarsPadding() else Modifier,
         scaffoldState = scaffoldState,
-        snackbarHost = { hostState ->
-            SnackbarHost(
-                hostState = hostState,
-                snackbar = { data ->
-                    Snackbar(
-                        snackbarData = data,
-                        modifier = Modifier.padding(bottom = 4.dp),
-                        backgroundColor = MaterialTheme.colors.onPrimary,
+        contentWindowInsets = WindowInsets(0.dp),
+        topBar = {
+            if (isNewSingleActivity) {
+                if (selectedItems.isNotEmpty()) {
+                    SelectionModeToolbar(
+                        selectedItems = selectedItems,
+                        currentItems = currentItems,
+                        onClearSelection = onClearSelection,
+                        onSelectAll = onSelectAll,
+                        onMuteSelected = onMuteSelected,
+                        onUnmuteSelected = onUnmuteSelected,
+                        onArchiveSelected = onArchiveSelected,
+                        onLeaveSelected = onLeaveSelected,
+                    )
+                } else {
+                    ChatListToolBar(
+                        state = state,
+                        noteToSelfChatState = noteToSelfChatState,
+                        onNavigationClick = onNavigationClick,
+                        onChangeUserStatus = onChangeUserStatus,
+                        onSearchTextChange = onSearchTextChange,
+                        onSearchCloseClicked = onSearchCloseClicked,
+                        onOpenLinkActionClick = onOpenLinkActionClick,
+                        onDoNotDisturbActionClick = onDoNotDisturbActionClick,
+                        onArchivedActionClick = onArchivedActionClick,
                     )
                 }
-            )
+            }
         },
         floatingActionButton = {
             if (state.tooltip == MeetingTooltipItem.CREATE && pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
@@ -120,11 +176,19 @@ fun ChatTabsView(
                     showOnTop = true,
                     onDismissed = { onShowNextTooltip(MeetingTooltipItem.RECURRING_OR_PENDING) },
                 ) {
-                    FabButton(true, onStartChatClick)
+                    FabButton(
+                        modifier = Modifier.applyScrollToHideFabBehavior(scrollToHideBehavior),
+                        newFab = isNewSingleActivity,
+                        onStartChatClick = onStartChatClick,
+                    )
                 }
             } else {
                 if ((state.hasAnyContact.not() && state.chats.isEmpty()) || state.chats.isNotEmpty() || pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
-                    FabButton(showFabButton, onStartChatClick)
+                    FabButton(
+                        modifier = Modifier.applyScrollToHideFabBehavior(scrollToHideBehavior),
+                        newFab = isNewSingleActivity,
+                        onStartChatClick = onStartChatClick
+                    )
                 }
             }
         }
@@ -132,18 +196,21 @@ fun ChatTabsView(
         Column(
             modifier = Modifier
                 .padding(paddingValues)
+                .nestedScroll(scrollToHideBehavior.nestedScrollConnection)
                 .fillMaxSize()
         ) {
             Tabs(
+                modifier = Modifier.applyScrollToHideBehavior(scrollToHideBehavior),
                 pagerEnabled = false,
                 pagerState = pagerState,
                 selectedTabIndex = pagerState.currentPage,
-                onTabSelected = {
-                    if (pagerState.currentPage == it) {
+                onTabSelected = { index, isUserInteraction ->
+                    if (pagerState.currentPage == index && isUserInteraction) {
                         scrollToTop = !scrollToTop
                         false
+                    } else {
+                        true
                     }
-                    true
                 }
             ) {
                 ChatTab.entries.forEachIndexed { index, item ->
@@ -160,6 +227,7 @@ fun ChatTabsView(
                     )
                 }
             }
+
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
@@ -186,10 +254,11 @@ fun ChatTabsView(
                     isMeetingView = isMeetingView,
                     tooltip = state.tooltip,
                     isSearchMode = isSearchMode,
-                    isNew = noteToSelfChatState.isNewFeature,
                     onItemMoreClick = onItemMoreClick,
                     onItemSelected = onItemSelected,
-                    onScrollInProgress = { showFabButton = !it },
+                    onScrollInProgress = {
+                        // Ignore, handle using scrollToHideState
+                    },
                     onEmptyButtonClick = { onStartChatClick(false) },
                     onScheduleMeeting = onScheduleMeeting,
                     onShowNextTooltip = onShowNextTooltip,
@@ -222,7 +291,7 @@ fun ChatTabsView(
                 event = state.snackbarMessageContent, onConsumed = onResetStateSnackbarMessage
             ) { resId ->
                 scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                    context.resources.getString(
+                    context.getString(
                         resId
                     )
                 )
@@ -233,6 +302,15 @@ fun ChatTabsView(
                 onConsumed = onResetManagementStateSnackbarMessage
             ) {
                 scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
+            }
+
+            EventEffect(
+                event = state.titleChatArchivedEvent,
+                onConsumed = onTitleChatArchivedEventConsumed
+            ) {
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                    context.getString(R.string.success_archive_chat, it)
+                )
             }
         }
     }
@@ -262,13 +340,22 @@ private fun ChatRoomItem.matches(searchQuery: String): Boolean =
             || lastMessage?.normalize()?.contains(searchQuery, true) == true
 
 @Composable
-private fun FabButton(showFabButton: Boolean, onStartChatClick: (isFabClicked: Boolean) -> Unit) {
-    AnimatedVisibility(
-        visible = showFabButton,
-        enter = scaleIn(),
-        exit = scaleOut(),
-    ) {
-        FloatingActionButton(onClick = { onStartChatClick(true) }) {
+private fun FabButton(
+    newFab: Boolean,
+    modifier: Modifier = Modifier,
+    onStartChatClick: (isFabClicked: Boolean) -> Unit,
+) {
+    if (newFab) {
+        MegaFab(
+            modifier = modifier,
+            onClick = { onStartChatClick(true) },
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
+        )
+    } else {
+        FloatingActionButton(
+            onClick = { onStartChatClick(true) },
+            modifier = modifier,
+        ) {
             Icon(
                 imageVector = Icons.Filled.Add,
                 contentDescription = "Create new chat",
@@ -283,6 +370,7 @@ private fun FabButton(showFabButton: Boolean, onStartChatClick: (isFabClicked: B
 private fun PreviewEmptyView() {
     OriginalTheme(isSystemInDarkTheme()) {
         ChatTabsView(
+            isNewSingleActivity = false,
             state = ChatsTabState(currentUnreadStatus = true to false),
             managementState = ScheduledMeetingManagementUiState(),
             noteToSelfChatState = NoteToSelfChatUIState(),

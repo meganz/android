@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtFunctionType
 import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtParameter
+import org.jetbrains.uast.UMethod
 
 internal class ParameterOrderDetector : ComposableFunctionDetector(), SourceCodeScanner {
 
@@ -43,7 +44,7 @@ internal class ParameterOrderDetector : ComposableFunctionDetector(), SourceCode
             )
     }
 
-    override fun visitComposable(context: JavaContext, function: KtFunction) {
+    override fun visitComposable(context: JavaContext, function: KtFunction, method: UMethod) {
         // We need to make sure the proper order is respected. It should be:
         // 1. params without defaults
         // 2. modifiers

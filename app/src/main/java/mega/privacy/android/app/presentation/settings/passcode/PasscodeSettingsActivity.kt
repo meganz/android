@@ -11,8 +11,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.components.session.SessionContainer
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.passcode.biometric.BiometricAuth
@@ -20,6 +18,7 @@ import mega.privacy.android.app.presentation.settings.passcode.navigation.Passco
 import mega.privacy.android.app.presentation.settings.passcode.navigation.PasscodeTimeOutDestination
 import mega.privacy.android.app.presentation.settings.passcode.navigation.passCodeSettings
 import mega.privacy.android.app.presentation.settings.passcode.navigation.passCodeTimeOut
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -37,12 +36,6 @@ class PasscodeSettingsActivity() : FragmentActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
-    /**
-     * Handles the Passcode
-     */
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
-
     @Inject
     lateinit var biometricAuth: BiometricAuth
 
@@ -59,7 +52,6 @@ class PasscodeSettingsActivity() : FragmentActivity() {
             SessionContainer {
                 OriginalTheme(isDark = themeMode.isDarkMode()) {
                     PasscodeContainer(
-                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
                             PsaContainer { PasscodeSettingsGraph(biometricAuth) }
                         },

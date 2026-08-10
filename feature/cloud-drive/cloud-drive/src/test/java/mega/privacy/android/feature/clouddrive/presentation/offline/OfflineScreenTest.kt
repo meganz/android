@@ -2,57 +2,92 @@ package mega.privacy.android.feature.clouddrive.presentation.offline
 
 import android.os.Build
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.flow.MutableStateFlow
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
+import mega.privacy.android.core.transfers.widget.TransfersToolabarWidgetUiState
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_EMPTY_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_GRID_COLUMN_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_LIST_COLUMN_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_LOADING_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_REMOVE_FROM_OFFLINE_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_SELECTION_MODE_BOTTOM_BAR_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG
+import mega.privacy.android.feature.transfers.components.widget.TransfersToolbarWidgetStatus
+import mega.privacy.android.shared.nodes.components.GRID_VIEW_TOGGLE_TAG
+import mega.privacy.android.shared.nodes.components.SORT_ORDER_TAG
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.resources.R as SharedR
+import mega.privacy.mobile.analytics.event.OfflineScreenEvent
+import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.jupiter.api.AfterEach
 import org.junit.runner.RunWith
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
 
 @Config(sdk = [Build.VERSION_CODES.Q])
 @RunWith(AndroidJUnit4::class)
 class OfflineScreenTest {
+    private val analyticsTracker: AnalyticsTracker = mock()
 
     @get:Rule
     var composeRule = createAndroidComposeRule<ComponentActivity>()
+
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule(analyticsTracker)
+
+    private val transfersToolbarWidgetViewModel = mock<TransfersToolbarWidgetViewModel> {
+        on { state } doReturn
+                MutableStateFlow(
+                    TransfersToolabarWidgetUiState(
+                        status = TransfersToolbarWidgetStatus.Transferring,
+                        isUserLoggedIn = true,
+                    )
+                )
+    }
+
+    private val viewModelStore = mock<ViewModelStore> {
+        on { get(argThat<String> { contains(TransfersToolbarWidgetViewModel::class.java.canonicalName.orEmpty()) }) } doReturn transfersToolbarWidgetViewModel
+    }
+    private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
+        on { viewModelStore } doReturn viewModelStore
+    }
+
+    @AfterEach
+    fun resetMocks() {
+        reset(analyticsTracker)
+    }
 
     @Test
     fun `test that OfflineScreen displays loading state when isLoading is true`() {
         val uiState = OfflineUiState(isLoadingCurrentFolder = true)
         setupComposeContent(uiState)
 
-        composeRule.onNodeWithText("No offline files available").assertDoesNotExist()
+        composeRule.onNodeWithText(
+            InstrumentationRegistry
+                .getInstrumentation()
+                .targetContext
+                .getString(SharedR.string.offline_screen_empty_state_description)
+        ).assertDoesNotExist()
     }
 
     @Test
@@ -63,7 +98,12 @@ class OfflineScreenTest {
         )
         setupComposeContent(uiState)
 
-        composeRule.onNodeWithText("No offline files available").assertIsDisplayed()
+        composeRule.onNodeWithText(
+            InstrumentationRegistry
+                .getInstrumentation()
+                .targetContext
+                .getString(SharedR.string.offline_screen_empty_state_description)
+        ).assertIsDisplayed()
     }
 
     @Test
@@ -79,15 +119,15 @@ class OfflineScreenTest {
             InstrumentationRegistry
                 .getInstrumentation()
                 .targetContext
-                .getString(R.string.offline_warning)
+                .getString(SharedR.string.logout_offline_content_deletion_warning)
         ).assertIsDisplayed()
     }
 
     @Test
     fun `test that OfflineScreen displays offline nodes when available`() {
         val offlineNodes = listOf(
-            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1"),
-            createOfflineNodeUiItem("test_folder", isFolder = true, handle = "2")
+            createOfflineNodeUiItem(id = 0, name = "test_file.txt", isFolder = false, handle = "1"),
+            createOfflineNodeUiItem(id = 1, name = "test_folder", isFolder = true, handle = "2")
         )
         val uiState = OfflineUiState(
             isLoadingCurrentFolder = false,
@@ -124,7 +164,7 @@ class OfflineScreenTest {
         setupComposeContent(uiState)
 
         composeRule.onNodeWithText(
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.offline_screen_title)
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(SharedR.string.offline_screen_title)
         ).assertIsDisplayed()
     }
 
@@ -180,7 +220,7 @@ class OfflineScreenTest {
     @Test
     fun `test that OfflineScreen displays empty folder description`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val emptyFolderText = context.getString(R.string.file_browser_empty_folder)
+        val emptyFolderText = context.getString(SharedR.string.empty_file_browser_folder)
         val offlineNodes = listOf(
             createOfflineNodeUiItem("EmptyFolder", isFolder = true, numFiles = 0, numFolders = 0)
         )
@@ -199,7 +239,7 @@ class OfflineScreenTest {
     fun `test that OfflineScreen displays folder with files description`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val filesText =
-            context.resources.getQuantityString(R.plurals.num_files_with_parameter, 3, 3)
+            context.resources.getQuantityString(SharedR.plurals.num_of_files_with_parameter, 3, 3)
         val offlineNodes = listOf(
             createOfflineNodeUiItem(
                 "FolderWithFiles",
@@ -223,7 +263,7 @@ class OfflineScreenTest {
     fun `test that OfflineScreen displays folder with subfolders description`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val foldersText =
-            context.resources.getQuantityString(R.plurals.num_folders_with_parameter, 2, 2)
+            context.resources.getQuantityString(SharedR.plurals.num_of_folders_with_parameter, 2, 2)
         val offlineNodes = listOf(
             createOfflineNodeUiItem(
                 "FolderWithSubfolders",
@@ -246,8 +286,13 @@ class OfflineScreenTest {
     @Test
     fun `test that OfflineScreen displays folder with files and subfolders description`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val foldersText = context.resources.getQuantityString(R.plurals.num_folders_num_files, 2, 2)
-        val filesText = context.resources.getQuantityString(R.plurals.num_folders_num_files_2, 5, 5)
+        val foldersText = context.resources.getQuantityString(
+            SharedR.plurals.num_of_folders_and_num_of_files,
+            2,
+            2
+        )
+        val filesText =
+            context.resources.getQuantityString(SharedR.plurals.num_of_files_with_parameter, 5, 5)
         val combinedText = "$foldersText$filesText"
         val offlineNodes = listOf(
             createOfflineNodeUiItem("MixedFolder", isFolder = true, numFiles = 5, numFolders = 2)
@@ -266,8 +311,8 @@ class OfflineScreenTest {
     @Test
     fun `test that OfflineScreen displays grid view when currentViewType is GRID`() {
         val offlineNodes = listOf(
-            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1"),
-            createOfflineNodeUiItem("test_folder", isFolder = true, handle = "2")
+            createOfflineNodeUiItem(id = 0, name = "test_file.txt", isFolder = false, handle = "1"),
+            createOfflineNodeUiItem(id = 1, name = "test_folder", isFolder = true, handle = "2")
         )
         val uiState = OfflineUiState(
             isLoadingCurrentFolder = false,
@@ -318,7 +363,7 @@ class OfflineScreenTest {
         val mockCallback: (String) -> Unit = mock()
         val uiState = OfflineUiState(
             isLoadingCurrentFolder = false,
-            offlineNodes = emptyList(),
+            offlineNodes = listOf(createOfflineNodeUiItem("test_file.txt", isFolder = false)),
             searchQuery = "test query"
         )
 
@@ -344,7 +389,7 @@ class OfflineScreenTest {
         )
 
         composeRule.onNodeWithText(
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.offline_screen_title)
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(SharedR.string.offline_screen_title)
         ).assertIsDisplayed()
     }
 
@@ -363,7 +408,7 @@ class OfflineScreenTest {
         )
 
         composeRule.onNodeWithText(
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.offline_warning)
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(SharedR.string.logout_offline_content_deletion_warning)
         ).assertIsDisplayed()
     }
 
@@ -493,6 +538,31 @@ class OfflineScreenTest {
 
         composeRule.onNodeWithText("test_folder").performClick()
         verify(mockNavigateCallback).invoke(999, "test_folder")
+    }
+
+    @Test
+    fun `test that OfflineScreen handles transfers navigation events correctly`() {
+        val mockNavigateCallback: () -> Unit = mock()
+        val nodeUiItem = createOfflineNodeUiItem(
+            id = 999,
+            name = "test_folder",
+            isFolder = true,
+            handle = "999"
+        )
+        val offlineNodes = listOf(nodeUiItem)
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes,
+            openFolderInPageEvent = triggered(nodeUiItem.offlineFileInformation)
+        )
+
+        setupComposeContent(
+            uiState = uiState,
+            onNavigateToTransfers = mockNavigateCallback,
+        )
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_TRANSFER_WIDGET).performClick()
+        verify(mockNavigateCallback).invoke()
     }
 
     @Test
@@ -710,12 +780,70 @@ class OfflineScreenTest {
         composeRule.onNodeWithTag(OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that on load should track screen event`() {
+        setupComposeContent(OfflineUiState())
+
+        verify(analyticsTracker).trackEvent(OfflineScreenEvent)
+    }
+
+    @Test
+    fun `test that on view mode changed should track event`() {
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes
+        )
+        setupComposeContent(uiState = uiState)
+
+        composeRule.onNodeWithTag(GRID_VIEW_TOGGLE_TAG)
+            .assertIsDisplayed()
+            .performClick()
+
+        verify(analyticsTracker).trackEvent(ViewModeButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that empty top app bar tag is visible when offlineNodes is empty and not in selection mode`() {
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = emptyList(),
+            selectedNodeHandles = emptyList()
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_EMPTY_TOP_APP_BAR_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that offline screen title is shown in empty state top app bar when nodeId is root`() {
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = emptyList(),
+            selectedNodeHandles = emptyList(),
+            nodeId = -1
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithText(
+            InstrumentationRegistry.getInstrumentation().targetContext
+                .getString(SharedR.string.offline_screen_title)
+        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_EMPTY_TOP_APP_BAR_TAG).assertIsDisplayed()
+    }
+
     private fun setupComposeContent(
         uiState: OfflineUiState,
         onItemClicked: (OfflineNodeUiItem) -> Unit = {},
         onItemLongClicked: (OfflineNodeUiItem) -> Unit = {},
         onNavigateToFolder: (Int, String) -> Unit = { _, _ -> },
+        onNavigateToTransfers: () -> Unit = {},
         onOpenFile: (OfflineFileInformation) -> Unit = {},
+        onOpenWithFile: (OfflineFileInformation) -> Unit = {},
         onBack: () -> Unit = {},
         onDismissOfflineWarning: () -> Unit = {},
         selectAll: () -> Unit = {},
@@ -729,7 +857,10 @@ class OfflineScreenTest {
         onChangeViewType: () -> Unit = {},
     ) {
         composeRule.setContent {
-            CompositionLocalProvider(LocalContext provides composeRule.activity) {
+            CompositionLocalProvider(
+                LocalActivity provides null,
+                LocalViewModelStoreOwner provides viewModelStoreOwner
+            ) {
                 AndroidThemeForPreviews {
                     OfflineScreen(
                         uiState = uiState,
@@ -737,7 +868,9 @@ class OfflineScreenTest {
                         onItemClicked = onItemClicked,
                         onItemLongClicked = onItemLongClicked,
                         onNavigateToFolder = onNavigateToFolder,
+                        onNavigateToTransfers = onNavigateToTransfers,
                         onOpenFile = onOpenFile,
+                        onOpenWithFile = onOpenWithFile,
                         onDismissOfflineWarning = onDismissOfflineWarning,
                         selectAll = selectAll,
                         deselectAll = deselectAll,
@@ -748,6 +881,7 @@ class OfflineScreenTest {
                         openFileInformation = openFileInformation,
                         onSortNodes = onSortNodes,
                         onChangeViewType = onChangeViewType,
+                        snackbarEventQueue = mock()
                     )
                 }
             }
@@ -777,6 +911,7 @@ class OfflineScreenTest {
             on { this.handle } doReturn handle
             on { this.totalSize } doReturn size
             on { this.folderInfo } doReturn mockFolderInfo
+            on { this.absolutePath } doReturn ""
         }
 
         return mock<OfflineNodeUiItem> {

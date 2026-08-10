@@ -23,7 +23,7 @@ import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import javax.inject.Inject
 
 /**
- * View model to be shared by legacy screens where there isn't a view model to handle download state following our architecture (like [NodeOptionsBottomSheetDialogFragment] and its callers)
+ * View model to be shared by legacy screens where there isn't a view model to handle download state following our architecture
  * It can receive download events through a state flow instead of of directly calling legacy download methods
  * Once these screens are migrated to compose this view model should be removed and the state added to the corresponding view model.
  */

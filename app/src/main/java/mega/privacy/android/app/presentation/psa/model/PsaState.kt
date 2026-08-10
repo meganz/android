@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.psa.model
 
+import kotlinx.serialization.Serializable
+
 /**
  * Psa state
  */
@@ -22,6 +24,7 @@ sealed interface PsaState {
      * @property id
      * @property url
      */
+    @Serializable
     data class WebPsa(
         override val id: Int,
         val url: String,
@@ -38,6 +41,7 @@ sealed interface PsaState {
      * @property positiveText
      * @property positiveLink
      */
+    @Serializable
     data class StandardPsa(
         override val id: Int,
         val title: String,
@@ -56,6 +60,7 @@ sealed interface PsaState {
      * @property imageUrl
      * @constructor Create empty Info psa
      */
+    @Serializable
     data class InfoPsa(
         override val id: Int,
         val title: String,

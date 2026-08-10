@@ -1,18 +1,22 @@
 package mega.privacy.android.app.menu.presentation
 
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -21,24 +25,31 @@ import mega.privacy.android.app.menu.navigation.AchievementsItem
 import mega.privacy.android.app.menu.navigation.CurrentPlanItem
 import mega.privacy.android.app.menu.navigation.RubbishBinItem
 import mega.privacy.android.app.menu.navigation.StorageItem
+import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
+import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.android.core.formatter.stripLinkAnnotations
+import mega.privacy.android.shared.resources.R as SharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -50,7 +61,8 @@ class MenuViewModel @Inject constructor(
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
-    private val accountNameMapper: AccountNameMapper,
+    private val accountTypeNameMapper: AccountTypeNameMapper,
+    private val accountTypeIconMapper: AccountTypeIconMapper,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
@@ -59,6 +71,10 @@ class MenuViewModel @Inject constructor(
     private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
     private val monitorNotSeenUserAlertsCountUseCase: MonitorNotSeenUserAlertsCountUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
+    private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase,
+    private val avatarContentMapper: AvatarContentMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     // Flows for items that need dynamic subtitles
@@ -70,49 +86,58 @@ class MenuViewModel @Inject constructor(
         .filterValues { it is NavDrawerItem.PrivacySuite }
         .mapValues { it.value as NavDrawerItem.PrivacySuite }
 
-    private val _uiState = MutableStateFlow(
-        MenuUiState(
-            privacySuiteItems = privacySuiteItems
-        )
-    )
+    private val _uiState = MutableStateFlow(MenuUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
-        setMyAccountItems()
+        setMenuItems()
         monitorConnectivity()
         monitorUserDataAndAvatar()
+        refreshAccountStorageDetails()
         monitorAccountDetails()
-        refreshUserName(false)
+        refreshUserName()
         refreshCurrentUserEmail()
         monitorUserChanges()
         monitorUnreadNotificationsCount()
+        monitorNodeUpdatesForRubbishBin()
     }
 
-    private fun setMyAccountItems() {
+    private fun setMenuItems() {
         viewModelScope.launch {
-            val isAchievementsEnabled =
-                runCatching { isAchievementsEnabledUseCase() }.getOrNull() == true
-            val myAccountItems: Map<Int, NavDrawerItem.Account> =
-                filterMyAccountItems(isAchievementsEnabled)
-            _uiState.update {
-                it.copy(myAccountItems = myAccountItems)
+            combine(
+                flow { emit(isAchievementsEnabledUseCase()) }.catch { emit(false) },
+                monitorAccountDetailUseCase().map { it.levelDetail?.accountType }
+                    .catch { emit(null) }
+                    .distinctUntilChanged()
+            ) { isAchievementsEnabled, accountType ->
+                filterMyAccountItems(isAchievementsEnabled, accountType ?: AccountType.FREE)
+            }.collect { myAccountItems ->
+                _uiState.update {
+                    it.copy(myAccountItems = myAccountItems, privacySuiteItems = privacySuiteItems)
+                }
             }
         }
     }
 
-    private fun filterMyAccountItems(isAchievementsEnabled: Boolean): Map<Int, NavDrawerItem.Account> =
+    private fun filterMyAccountItems(
+        isAchievementsEnabled: Boolean,
+        accountType: AccountType?,
+    ): Map<Int, NavDrawerItem.Account> =
         menuItems
-            .filterValues { it is NavDrawerItem.Account && (it !is AchievementsItem || it is AchievementsItem && isAchievementsEnabled) }
+            .filterValues { it is NavDrawerItem.Account && (it !is AchievementsItem || isAchievementsEnabled) }
             .mapValues {
                 val item = it.value as NavDrawerItem.Account
                 when (item) {
                     is CurrentPlanItem -> {
                         NavDrawerItem.Account(
                             destination = item.destination,
-                            icon = item.icon,
+                            icon = accountTypeIconMapper(
+                                accountType = accountType
+                            ),
                             title = item.title,
                             subTitle = currentPlanSubtitleFlow,
-                            actionLabel = item.actionLabel
+                            actionLabel = if (accountType != null && accountType != AccountType.PRO_FLEXI && accountType != AccountType.BUSINESS) item.actionLabel else 0,
+                            analyticsEventIdentifier = item.analyticsEventIdentifier,
                         )
                     }
 
@@ -122,7 +147,8 @@ class MenuViewModel @Inject constructor(
                             icon = item.icon,
                             title = item.title,
                             subTitle = storageSubtitleFlow,
-                            actionLabel = item.actionLabel
+                            actionLabel = item.actionLabel,
+                            analyticsEventIdentifier = item.analyticsEventIdentifier,
                         )
                     }
 
@@ -132,7 +158,8 @@ class MenuViewModel @Inject constructor(
                             icon = item.icon,
                             title = item.title,
                             subTitle = rubbishBinSubtitleFlow,
-                            actionLabel = item.actionLabel
+                            actionLabel = item.actionLabel,
+                            analyticsEventIdentifier = item.analyticsEventIdentifier,
                         )
                     }
 
@@ -151,8 +178,7 @@ class MenuViewModel @Inject constructor(
                         UserChanges.Firstname,
                         UserChanges.Lastname,
                             -> {
-                            refreshUserName(true)
-                            getUserAvatarOrDefault(true)
+                            refreshUserName()
                         }
 
                         else -> Unit
@@ -173,39 +199,76 @@ class MenuViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getUserAvatarOrDefault(isForceRefresh: Boolean) {
-        val avatarFile = runCatching { getMyAvatarFileUseCase(isForceRefresh) }
-            .onFailure { Timber.e(it) }.getOrNull()
-        val color = runCatching { getMyAvatarColorUseCase() }.getOrNull()
-        _uiState.update {
-            it.copy(
-                avatar = avatarFile,
-                avatarColor = color?.let { color -> Color(color) } ?: Color.Unspecified,
-            )
+    private fun monitorNodeUpdatesForRubbishBin() {
+        viewModelScope.launch {
+            runCatching {
+                getRubbishNodeUseCase()?.id?.longValue
+            }.onSuccess { rubbishBinNodeId ->
+                rubbishBinNodeId?.let {
+                    monitorNodeUpdatesUseCase()
+                        .catch { Timber.w("Exception monitoring node updates: $it") }
+                        .collectLatest { nodeUpdate ->
+                            val hasRubbishBinUpdate = nodeUpdate.changes.keys.any { node ->
+                                node.id.longValue == rubbishBinNodeId || node.parentId.longValue == rubbishBinNodeId
+                            }
+                            if (hasRubbishBinUpdate) {
+                                refreshAccountStorageDetails()
+                            }
+                        }
+                }
+            }.onFailure {
+                Timber.e(it, "Error getting rubbish bin node id")
+            }
+        }
+    }
+
+    private fun refreshAccountStorageDetails() {
+        viewModelScope.launch {
+            getSpecificAccountDetail()
+        }
+    }
+
+    private suspend fun getSpecificAccountDetail() {
+        runCatching {
+            getSpecificAccountDetailUseCase(storage = true, transfer = false, pro = false)
+        }.onFailure {
+            Timber.e(it, "Error refreshing account storage details")
         }
     }
 
     private fun monitorUserDataAndAvatar() {
-        viewModelScope.launch {
+        combine(
+            uiState.map { it.name }.distinctUntilChanged(),
             monitorMyAvatarFile().onStart {
                 // emit from cache first and then from remote
-                emit(getMyAvatarFileUseCase(isForceRefresh = false))
-                emit(getMyAvatarFileUseCase(isForceRefresh = true))
-            }.map { file ->
-                file to (file?.lastModified() ?: 0L)
-            }.flowOn(ioDispatcher).catch { Timber.e(it) }
-                .collectLatest { (avatarFile, lastModified) ->
-                    val color = runCatching { getMyAvatarColorUseCase() }.getOrNull()
+                emit(runCatching { getMyAvatarFileUseCase(isForceRefresh = false) }.getOrNull())
+                emit(runCatching { getMyAvatarFileUseCase(isForceRefresh = true) }.getOrNull())
+            }.catch { e ->
+                Timber.e(e, "Error monitoring avatar file: $e")
+                emit(null)
+            }, transform = { name, file ->
+                if (!name.isNullOrEmpty()) {
+                    val avatarColor =
+                        runCatching { getMyAvatarColorUseCase() }.getOrDefault(0)
+                    val avatarContent = avatarContentMapper(
+                        fullName = name,
+                        localFile = file,
+                        showBorder = false,
+                        textSize = 18.sp,
+                        backgroundColor = avatarColor,
+                    )
                     _uiState.update {
                         it.copy(
-                            avatar = avatarFile,
-                            avatarColor = color?.let { color -> Color(color) }
-                                ?: Color.Unspecified,
-                            lastModifiedTime = lastModified
+                            avatarContent = avatarContent,
+                            lastModifiedTime = file?.lastModified() ?: 0L,
                         )
                     }
                 }
-        }
+            }
+        ).flowOn(ioDispatcher)
+            .catch { e ->
+                Timber.e(e, "Error loading avatar data")
+            }.launchIn(viewModelScope)
     }
 
 
@@ -218,9 +281,15 @@ class MenuViewModel @Inject constructor(
                     val totalStorage = accountDetail.storageDetail?.totalStorage ?: 0
                     val usedRubbish = accountDetail.storageDetail?.usedRubbish ?: 0
                     val accountType = accountDetail.levelDetail?.accountType ?: AccountType.FREE
-                    val accountTypeName = accountNameMapper(accountType)
-                    storageSubtitleFlow.value =
+                    val accountTypeName = accountTypeNameMapper(accountType)
+                    storageSubtitleFlow.value = if (accountType.isBusinessAccount) {
+                        getStringFromStringResMapper(
+                            SharedR.string.navigation_drawer_used_space_only,
+                            fileSizeStringMapper(usedStorage)
+                        ).stripLinkAnnotations()
+                    } else {
                         "${fileSizeStringMapper(usedStorage)}/${fileSizeStringMapper(totalStorage)}"
+                    }
                     currentPlanSubtitleFlow.value = getStringFromStringResMapper(accountTypeName)
                     rubbishBinSubtitleFlow.value = fileSizeStringMapper(usedRubbish)
                 }
@@ -235,28 +304,29 @@ class MenuViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(isConnectedToNetwork = isConnected)
                     }
+                    if (!isConnected) {
+                        refreshCurrentUserEmail(false)
+                        refreshUserName(false)
+                    }
                 }
         }
     }
 
-    private fun refreshUserName(forceRefresh: Boolean) {
+    private fun refreshUserName(forceRefresh: Boolean = true) {
         viewModelScope.launch {
+            val name =
+                runCatching { getUserFullNameUseCase(forceRefresh = forceRefresh) }.getOrNull()
             _uiState.update {
-                it.copy(
-                    name = runCatching {
-                        getUserFullNameUseCase(
-                            forceRefresh = forceRefresh,
-                        )
-                    }.getOrNull()
-                )
+                it.copy(name = name ?: it.name)
             }
         }
     }
 
-    private fun refreshCurrentUserEmail() {
+    private fun refreshCurrentUserEmail(forceRefresh: Boolean = true) {
         viewModelScope.launch {
+            val email = runCatching { getCurrentUserEmail(forceRefresh) }.getOrNull()
             _uiState.update {
-                it.copy(email = runCatching { getCurrentUserEmail() }.getOrNull())
+                it.copy(email = email ?: it.email)
             }
         }
     }

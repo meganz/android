@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import timber.log.Timber
@@ -28,7 +28,7 @@ internal class ChangeNodeExtensionDialogViewModel @Inject constructor(
                             action.newNodeName,
                         )
                     }.onSuccess {
-                        snackBarHandler.postSnackbarMessage(R.string.context_correctly_renamed)
+                        snackBarHandler.postSnackbarMessage(sharedR.string.context_correctly_renamed)
                     }.onFailure {
                         Timber.e(it, "Error renaming node")
                     }

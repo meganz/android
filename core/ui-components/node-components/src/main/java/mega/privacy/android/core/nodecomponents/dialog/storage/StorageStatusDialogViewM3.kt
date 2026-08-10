@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
@@ -48,6 +48,7 @@ import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.resources.R as sharedR
 
 // Constants for test tags
@@ -77,6 +78,7 @@ fun StorageStatusDialogViewM3(
     viewModel: StorageStatusViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    if (uiState.isLoading) return
     val coroutineScope = rememberCoroutineScope()
     val dialogState = StorageStatusDialogState(
         storageState = storageState,
@@ -133,7 +135,7 @@ internal fun StorageStatusDialogViewM3(
     ) {
         BasicAlertDialog(
             onDismissRequest = dismissClickListener, /* is not dismissible, but just in case */
-            modifier = modifier,
+            modifier = modifier.testTag(STORAGE_STATUS_DIALOG_TAG),
             properties = DialogProperties(
                 dismissOnClickOutside = false,
                 dismissOnBackPress = false
@@ -187,14 +189,14 @@ internal fun StorageStatusDialogViewM3(
 
                             Box(modifier = Modifier.testTag(ACHIEVEMENT_TAG_M3)) {
                                 DialogButton(
-                                    buttonText = stringResource(R.string.button_bonus_almost_full_warning),
+                                    buttonText = stringResource(NodesR.string.button_bonus_almost_full_warning),
                                     onButtonClicked = achievementButtonClickListener,
                                 )
                             }
 
                             Box(modifier = Modifier.testTag(VERTICAL_DISMISS_TAG_M3)) {
                                 DialogButton(
-                                    buttonText = stringResource(R.string.general_dismiss),
+                                    buttonText = stringResource(sharedR.string.general_dismiss_dialog),
                                     onButtonClicked = dismissClickListener,
                                 )
                             }
@@ -208,7 +210,7 @@ internal fun StorageStatusDialogViewM3(
                         ) {
                             Box(modifier = Modifier.testTag(HORIZONTAL_DISMISS_TAG_M3)) {
                                 DialogButton(
-                                    buttonText = stringResource(R.string.general_dismiss),
+                                    buttonText = stringResource(sharedR.string.general_dismiss_dialog),
                                     onButtonClicked = dismissClickListener,
                                 )
                             }
@@ -284,7 +286,7 @@ private fun getDialogDetail(context: Context, state: StorageStatusDialogState): 
         StorageState.Orange -> {
             imageResource = R.drawable.ic_storage_almost_full
             contentText = String.format(
-                context.getString(R.string.text_almost_full_warning),
+                context.getString(NodesR.string.text_almost_full_warning),
                 storageString,
                 transferString
             )
@@ -293,31 +295,33 @@ private fun getDialogDetail(context: Context, state: StorageStatusDialogState): 
         else -> {
             imageResource = R.drawable.ic_storage_full
             contentText = String.format(
-                context.getString(R.string.text_storage_full_warning),
+                context.getString(NodesR.string.text_storage_full_warning),
                 storageString,
                 transferString
             )
         }
     }
-    titleText = context.getString(R.string.action_upgrade_account)
+    titleText = context.getString(NodesR.string.action_upgrade_account)
 
     when (state.accountType) {
         AccountType.PRO_III -> {
             when (state.storageState) {
                 StorageState.Orange -> {
-                    contentText = context.getString(R.string.text_almost_full_warning_pro3_account)
+                    contentText =
+                        context.getString(NodesR.string.text_almost_full_warning_pro3_account)
                 }
 
                 StorageState.Red -> {
-                    contentText = context.getString(R.string.text_storage_full_warning_pro3_account)
+                    contentText =
+                        context.getString(NodesR.string.text_storage_full_warning_pro3_account)
                 }
 
                 else -> {}
             }
             verticalActionButtonText =
-                context.getString(R.string.button_custom_almost_full_warning)
+                context.getString(NodesR.string.button_custom_almost_full_warning)
             horizontalActionButtonText =
-                context.getString(R.string.button_custom_almost_full_warning)
+                context.getString(NodesR.string.button_custom_almost_full_warning)
         }
 
         AccountType.PRO_LITE, AccountType.PRO_I,
@@ -327,7 +331,7 @@ private fun getDialogDetail(context: Context, state: StorageStatusDialogState): 
             when (state.storageState) {
                 StorageState.Orange -> {
                     contentText = String.format(
-                        context.getString(R.string.text_almost_full_warning_pro_account),
+                        context.getString(NodesR.string.text_almost_full_warning_pro_account),
                         storageString,
                         transferString
                     )
@@ -335,7 +339,7 @@ private fun getDialogDetail(context: Context, state: StorageStatusDialogState): 
 
                 StorageState.Red -> {
                     contentText = String.format(
-                        context.getString(R.string.text_storage_full_warning_pro_account),
+                        context.getString(NodesR.string.text_storage_full_warning_pro_account),
                         storageString,
                         transferString
                     )
@@ -351,19 +355,19 @@ private fun getDialogDetail(context: Context, state: StorageStatusDialogState): 
 
         else -> {
             verticalActionButtonText =
-                context.getString(R.string.button_plans_almost_full_warning)
+                context.getString(NodesR.string.button_plans_almost_full_warning)
             horizontalActionButtonText =
-                context.getString(R.string.button_plans_almost_full_warning)
+                context.getString(NodesR.string.button_plans_almost_full_warning)
         }
     }
 
     if (state.overQuotaAlert) {
         if (state.preWarning) {
-            titleText = context.getString(R.string.action_upgrade_account)
-            contentText = context.getString(R.string.pre_overquota_alert_text)
+            titleText = context.getString(NodesR.string.action_upgrade_account)
+            contentText = context.getString(NodesR.string.pre_overquota_alert_text)
         } else {
-            titleText = context.getString(R.string.overquota_alert_title)
-            contentText = context.getString(R.string.overquota_alert_text)
+            titleText = context.getString(NodesR.string.overquota_alert_title)
+            contentText = context.getString(NodesR.string.overquota_alert_text)
         }
     }
 
@@ -453,3 +457,5 @@ private class StorageStatusDialogM3PreviewProvider :
             )
         )
 }
+
+internal const val STORAGE_STATUS_DIALOG_TAG = "storage_status:dialog"

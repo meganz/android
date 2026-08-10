@@ -1,16 +1,20 @@
 package mega.privacy.android.app.presentation.videosection
 
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.onParent
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.delay
 import mega.privacy.android.app.presentation.videosection.model.VideosFilterOptionEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideosFilterBottomSheet
 import org.junit.Rule
@@ -19,7 +23,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @RunWith(AndroidJUnit4::class)
 class VideosFilterBottomSheetTest {
     @get:Rule
@@ -30,21 +34,26 @@ class VideosFilterBottomSheetTest {
         title: String = "",
         options: List<VideosFilterOptionEntity> = emptyList(),
         onItemSelected: (VideosFilterOptionEntity) -> Unit = {},
+        onDismissRequest: () -> Unit = {},
     ) {
         composeTestRule.setContent {
-            val sheetState = ModalBottomSheetState(
-                initialValue = ModalBottomSheetValue.Expanded,
-                isSkipHalfExpanded = false,
-                density = LocalDensity.current,
+            val sheetState = rememberModalBottomSheetState(
+                skipPartiallyExpanded = true,
+                confirmValueChange = { true }
             )
-            val coroutineScope = rememberCoroutineScope()
+
+            LaunchedEffect(Unit) {
+                delay(500)
+                sheetState.show()
+            }
+
             VideosFilterBottomSheet(
                 modifier = modifier,
-                modalSheetState = sheetState,
-                coroutineScope = coroutineScope,
+                sheetState = sheetState,
                 title = title,
                 options = options,
-                onItemSelected = onItemSelected
+                onItemSelected = onItemSelected,
+                onDismissRequest = onDismissRequest
             )
         }
     }
@@ -74,7 +83,15 @@ class VideosFilterBottomSheetTest {
         val options = listOf(option1, option2)
         setComposeContent(options = options, onItemSelected = onItemSelected)
 
-        composeTestRule.onNodeWithText(option1.title).performClick()
+        val textNode = composeTestRule.onNodeWithText(option1.title, useUnmergedTree = true)
+        textNode.assertIsDisplayed()
+
+        textNode.onParent()
+            .assert(hasClickAction())
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        composeTestRule.waitForIdle()
+
         verify(onItemSelected).invoke(option1)
     }
 }

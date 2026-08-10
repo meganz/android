@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="emojiSize" format="dimension"/>
+    <attr name="maxEllipsize" format="integer"/>
+
+    <declare-styleable name="EmojiEditText">
+        <attr name="emojiSize"/>
+    </declare-styleable>
+
+    <declare-styleable name="EmojiTextView">
+        <attr name="emojiSize"/>
+        <attr name="maxEllipsize"/>
+    </declare-styleable>
+
+    <declare-styleable name="EmojiKeyboard">
+        <attr name="exampleString" format="string" />
+        <attr name="exampleDimension" format="dimension" />
+        <attr name="exampleColor" format="color" />
+        <attr name="exampleDrawable" format="color|reference" />
+    </declare-styleable>
+</resources>
+

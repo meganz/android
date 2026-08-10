@@ -25,23 +25,22 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkMediaDiscoveryImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.PARAM_ERROR_MESSAGE
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryScreen
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.Util.showSnackbar
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import java.io.File
@@ -89,7 +88,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         checkLoginStatus()
 
         val folderId =
-            intent?.getLongExtra(MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID, -1)
+            intent?.getLongExtra(INTENT_KEY_CURRENT_FOLDER_ID, -1)
         val errorMessage = intent?.getIntExtra(PARAM_ERROR_MESSAGE, 0)
         val fromFolderLink = intent?.getBooleanExtra(INTENT_KEY_FROM_FOLDER_LINK, false)
 
@@ -330,14 +329,12 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
             context: Context,
             mediaHandle: Long,
             folderName: String,
-            isOpenByMDIcon: Boolean = false,
             isFromFolderLink: Boolean = true,
         ) {
             val intent = Intent(context, MediaDiscoveryActivity::class.java).apply {
                 putExtra(INTENT_KEY_CURRENT_FOLDER_ID, mediaHandle)
                 putExtra(INTENT_KEY_CURRENT_FOLDER_NAME, folderName)
                 putExtra(INTENT_KEY_FROM_FOLDER_LINK, isFromFolderLink)
-                putExtra(INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON, isOpenByMDIcon)
             }
             context.startActivity(intent)
         }
@@ -345,7 +342,6 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         internal const val INTENT_KEY_CURRENT_FOLDER_ID = "CURRENT_FOLDER_ID"
         internal const val INTENT_KEY_FROM_FOLDER_LINK = "FROM_FOLDER_LINK"
         internal const val INTENT_KEY_CURRENT_FOLDER_NAME = "CURRENT_FOLDER_NAME"
-        private const val INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON =
-            "OPEN_MEDIA_DISCOVERY_BY_MD_ICON"
+        internal const val PARAM_ERROR_MESSAGE = "PARAM_ERROR_MESSAGE"
     }
 }

@@ -2,12 +2,9 @@ package mega.privacy.android.app.main.controllers;
 
 import static mega.privacy.android.app.listeners.ShareListener.REMOVE_SHARE_LISTENER;
 import static mega.privacy.android.app.listeners.ShareListener.SHARE_LISTENER;
-import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CONTACT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.Util.isOnline;
@@ -16,6 +13,8 @@ import static nz.mega.sdk.MegaShare.ACCESS_READ;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+
+import androidx.activity.result.ActivityResultLauncher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +26,9 @@ import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileExplorerActivity;
-import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.navigation.MegaNavigatorEntryPointKt;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -73,7 +71,7 @@ public class NodeController {
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
-        ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
+        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
     }
 
     public void chooseLocationToMoveNodes(List<Long> handleList) {
@@ -85,7 +83,7 @@ public class NodeController {
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("MOVE_FROM", longArray);
-        ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
+        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
     }
 
     public void checkIfNodesAreMine(List<MegaNode> nodes, ArrayList<MegaNode> ownerNodes, ArrayList<MegaNode> notOwnerNodes) {
@@ -154,7 +152,7 @@ public class NodeController {
         return dBT;
     }
 
-    public void selectContactToShareFolders(ArrayList<Long> handleList) {
+    public void selectContactToShareFolders(ArrayList<Long> handleList, ActivityResultLauncher<Intent> launcher) {
         Timber.d("shareFolders ArrayListLong");
 
 
@@ -163,146 +161,28 @@ public class NodeController {
             return;
         }
 
-        Intent intent = new Intent();
-        intent.setClass(context, AddContactActivity.class);
-        intent.putExtra("contactType", CONTACT_TYPE_BOTH);
-
-        long[] handles = new long[handleList.size()];
-        int j = 0;
-        for (int i = 0; i < handleList.size(); i++) {
-            handles[j] = handleList.get(i);
-            j++;
-        }
-        intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, handles);
-        //Multiselect=1 (multiple folders)
-        intent.putExtra("MULTISELECT", 1);
-        ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+        MegaNavigatorEntryPointKt.getMegaNavigator(context).openAddContactToShare(
+                context,
+                launcher,
+                handleList
+        );
     }
 
-    public void selectContactToShareFolder(MegaNode node) {
+    public void selectContactToShareFolder(MegaNode node, ActivityResultLauncher<Intent> launcher) {
         Timber.d("shareFolder");
         long handle = node.getHandle();
 
-        selectContactToShareFolder(handle);
+        selectContactToShareFolder(handle, launcher);
     }
 
-    public void selectContactToShareFolder(long handle) {
-        Intent intent = new Intent();
-        intent.setClass(context, AddContactActivity.class);
-        intent.putExtra("contactType", CONTACT_TYPE_BOTH);
-        //Multiselect=0
-        intent.putExtra("MULTISELECT", 0);
-        intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, handle);
-        ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
-    }
-
-    public void openFolderFromSearch(long folderHandle) {
-        Timber.d("openFolderFromSearch: %s", folderHandle);
-        ((ManagerActivity) context).openFolderRefresh = true;
-        boolean firstNavigationLevel = true;
-        int access = -1;
-        DrawerItem drawerItem = DrawerItem.CLOUD_DRIVE;
-        if (folderHandle != -1) {
-            MegaNode parentIntentN = megaApi.getParentNode(megaApi.getNodeByHandle(folderHandle));
-            if (parentIntentN != null) {
-                Timber.d("Check the parent node: %s handle: %d", parentIntentN.getName(), parentIntentN.getHandle());
-                access = megaApi.getAccess(parentIntentN);
-                switch (access) {
-                    case MegaShare.ACCESS_OWNER:
-                    case MegaShare.ACCESS_UNKNOWN: {
-                        //Not incoming folder, check if Cloud or Rubbish tab
-                        if (parentIntentN.getHandle() == megaApi.getRootNode().getHandle()) {
-                            drawerItem = DrawerItem.CLOUD_DRIVE;
-                            Timber.d("Navigate to TAB CLOUD first level%s", parentIntentN.getName());
-                            firstNavigationLevel = true;
-                            ((ManagerActivity) context).setParentHandleBrowser(parentIntentN.getHandle());
-                        } else if (parentIntentN.getHandle() == megaApi.getRubbishNode().getHandle()) {
-                            drawerItem = DrawerItem.RUBBISH_BIN;
-                            Timber.d("Navigate to TAB RUBBISH first level%s", parentIntentN.getName());
-                            firstNavigationLevel = true;
-                            ((ManagerActivity) context).setParentHandleRubbish(parentIntentN.getHandle());
-                        } else if (parentIntentN.getHandle() == megaApi.getVaultNode().getHandle()) {
-                            Timber.d("Navigate to BACKUPS first level%s", parentIntentN.getName());
-                            firstNavigationLevel = true;
-                            ((ManagerActivity) context).setParentHandleBackups(parentIntentN.getHandle());
-                            drawerItem = DrawerItem.BACKUPS;
-                        } else {
-                            int parent = checkParentNodeToOpenFolder(parentIntentN.getHandle());
-                            Timber.d("The parent result is: %s", parent);
-
-                            switch (parent) {
-                                case 0: {
-                                    //ROOT NODE
-                                    drawerItem = DrawerItem.CLOUD_DRIVE;
-                                    Timber.d("Navigate to TAB CLOUD with parentHandle");
-                                    ((ManagerActivity) context).setParentHandleBrowser(parentIntentN.getHandle());
-                                    firstNavigationLevel = false;
-                                    break;
-                                }
-                                case 1: {
-                                    Timber.d("Navigate to TAB RUBBISH");
-                                    drawerItem = DrawerItem.RUBBISH_BIN;
-                                    ((ManagerActivity) context).setParentHandleRubbish(parentIntentN.getHandle());
-                                    firstNavigationLevel = false;
-                                    break;
-                                }
-                                case 2: {
-                                    Timber.d("Navigate to BACKUPS WITH parentHandle");
-                                    drawerItem = DrawerItem.BACKUPS;
-                                    ((ManagerActivity) context).setParentHandleBackups(parentIntentN.getHandle());
-                                    firstNavigationLevel = false;
-                                    break;
-                                }
-                                case -1: {
-                                    drawerItem = DrawerItem.CLOUD_DRIVE;
-                                    Timber.d("Navigate to TAB CLOUD general");
-                                    ((ManagerActivity) context).setParentHandleBrowser(-1);
-                                    firstNavigationLevel = true;
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-                    }
-
-                    case MegaShare.ACCESS_READ:
-                    case MegaShare.ACCESS_READWRITE:
-                    case MegaShare.ACCESS_FULL: {
-                        Timber.d("GO to INCOMING TAB: %s", parentIntentN.getName());
-                        drawerItem = DrawerItem.SHARED_ITEMS;
-                        if (parentIntentN.getHandle() == -1) {
-                            Timber.d("Level 0 of Incoming");
-                            ((ManagerActivity) context).setDeepBrowserTreeIncoming(0, -1L);
-                            firstNavigationLevel = true;
-                        } else {
-                            firstNavigationLevel = false;
-                            int deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, context);
-                            ((ManagerActivity) context).setDeepBrowserTreeIncoming(deepBrowserTreeIncoming, parentIntentN.getHandle());
-                            Timber.d("After calculating deepBrowserTreeIncoming: %s", deepBrowserTreeIncoming);
-                        }
-                        ((ManagerActivity) context).getSharesViewModel().onTabSelected(SharesTab.Companion.fromPosition(0));
-                        break;
-                    }
-                    default: {
-                        Timber.d("DEFAULT: The intent set the parentHandleBrowser to %s", parentIntentN.getHandle());
-                        ((ManagerActivity) context).setParentHandleBrowser(parentIntentN.getHandle());
-                        drawerItem = DrawerItem.CLOUD_DRIVE;
-                        firstNavigationLevel = true;
-                        break;
-                    }
-                }
-            } else {
-                Timber.w("Parent is already NULL");
-
-                drawerItem = DrawerItem.SHARED_ITEMS;
-                ((ManagerActivity) context).setDeepBrowserTreeIncoming(0, -1L);
-                firstNavigationLevel = true;
-                ((ManagerActivity) context).getSharesViewModel().onTabSelected(SharesTab.Companion.fromPosition(0));
-            }
-            ((ManagerActivity) context).setFirstNavigationLevel(firstNavigationLevel);
-            ((ManagerActivity) context).setDrawerItem(drawerItem);
-            ((ManagerActivity) context).selectDrawerItem(drawerItem);
-        }
+    public void selectContactToShareFolder(long handle, ActivityResultLauncher<Intent> launcher) {
+        List<Long> handleList = new ArrayList<>();
+        handleList.add(handle);
+        MegaNavigatorEntryPointKt.getMegaNavigator(context).openAddContactToShare(
+                context,
+                launcher,
+                handleList
+        );
     }
 
     public int checkParentNodeToOpenFolder(long folderHandle) {

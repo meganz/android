@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -67,11 +68,10 @@ import androidx.navigation.NavController
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mega.android.core.ui.extensions.LaunchedOnceEffect
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
-import mega.privacy.android.app.presentation.avatar.model.AvatarContent
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.meeting.view.dialog.ChangeSFUIdDialog
 import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewActions
@@ -111,6 +111,10 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
@@ -136,6 +140,12 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
+import mega.privacy.mobile.analytics.event.AccountScreenEvent
+import mega.privacy.mobile.analytics.event.MyAccountAchievementsSectionTappedEvent
+import mega.privacy.mobile.analytics.event.MyAccountBackupRecoverySectionTappedEvent
+import mega.privacy.mobile.analytics.event.MyAccountContactsSectionTappedEvent
+import mega.privacy.mobile.analytics.event.MyAccountStorageTransferSectionTappedEvent
 
 internal object Constants {
     const val AVATAR_SIZE = 60
@@ -181,12 +191,16 @@ fun MyAccountHomeView(
     uiState: MyAccountHomeUIState,
     uiActions: MyAccountHomeViewActions,
     navController: NavController?,
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
+    LaunchedOnceEffect {
+        Analytics.tracker.trackEvent(AccountScreenEvent)
+    }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState) { data ->
@@ -227,6 +241,9 @@ fun MyAccountHomeView(
                 .background(MaterialTheme.colors.grey_020_black)
                 .verticalScroll(scrollState)
         ) {
+            val emojifiedName = remember(uiState.name) {
+                uiState.name?.let { EmojiUtilsShortcodes.emojify(it) }.orEmpty()
+            }
             MyAccountHeader(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -238,7 +255,7 @@ fun MyAccountHomeView(
                         headerHeight = with(density) { c.size.height.toDp() }
                     },
                 avatarContent = uiState.avatarContent,
-                name = uiState.name,
+                name = emojifiedName,
                 email = uiState.email,
                 verifiedPhoneNumber = uiState.verifiedPhoneNumber,
                 onClickUserAvatar = uiActions::onClickUserAvatar,
@@ -433,9 +450,9 @@ private fun PaymentAlertSection(
             value = stringResource(
                 if (hasRenewableSubscription) R.string.account_info_renews_on else R.string.account_info_expires_on,
                 TimeUtils.formatDate(
-                    if (hasRenewableSubscription) renewTime else expirationTime,
-                    TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                    LocalContext.current
+                    timestamp = if (hasRenewableSubscription) renewTime else expirationTime,
+                    format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+                    context = LocalContext.current
                 )
             ),
             baseStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.black_white),
@@ -471,7 +488,8 @@ private fun AccountInfoSection(
 
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
     var showChangeSFUIdDialog by rememberSaveable { mutableStateOf(false) }
-    val isUpgradeButtonEnabled = (uiState.isBusinessAccount || uiState.isProFlexiAccount).not()
+    val isUpgradeButtonEnabled =
+        uiState.accountType != null && (uiState.isBusinessAccount || uiState.isProFlexiAccount).not()
 
     Column(
         modifier = modifier
@@ -486,6 +504,7 @@ private fun AccountInfoSection(
                 .padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 8.dp),
             accountDescription = uiState.accountTypeNameResource,
             showUpgradeButton = isUpgradeButtonEnabled,
+            icon = uiState.accountTypeIcon,
             onButtonClickListener = {
                 uiActions.onUpgradeAccount()
             }
@@ -506,7 +525,10 @@ private fun AccountInfoSection(
             usedTransferStatus = uiState.usedTransferStatus,
             showTransfer = uiState.accountType != AccountType.FREE,
             showProgressBar = (uiState.isBusinessAccount || uiState.isProFlexiAccount).not(),
-            onUsageMeterClick = uiActions::onClickUsageMeter
+            onUsageMeterClick = {
+                Analytics.tracker.trackEvent(MyAccountStorageTransferSectionTappedEvent)
+                uiActions.onClickUsageMeter()
+            }
         )
 
         if (shouldShowPaymentInfo(uiState)) {
@@ -575,7 +597,10 @@ private fun AccountInfoSection(
             title = R.string.action_export_master_key,
             description = stringResource(id = R.string.backup_recovery_key_subtitle),
             isIconMode = false,
-            onClickListener = uiActions::onBackupRecoveryKey,
+            onClickListener = {
+                Analytics.tracker.trackEvent(MyAccountBackupRecoverySectionTappedEvent)
+                uiActions.onBackupRecoveryKey()
+            },
             testTag = BACKUP_RECOVERY_KEY,
             withDivider = true,
         )
@@ -587,7 +612,10 @@ private fun AccountInfoSection(
                 pluralStringResource(id = R.plurals.my_account_connections, count = it, it)
             } ?: stringResource(id = R.string.recovering_info),
             isIconMode = true,
-            onClickListener = uiActions::onClickContacts,
+            onClickListener = {
+                Analytics.tracker.trackEvent(MyAccountContactsSectionTappedEvent)
+                uiActions.onClickContacts()
+            },
             testTag = CONTACTS,
             withDivider = true,
         )
@@ -598,7 +626,10 @@ private fun AccountInfoSection(
                 title = sharedR.string.general_section_achievements,
                 description = stringResource(id = R.string.achievements_subtitle),
                 isIconMode = true,
-                onClickListener = uiActions::onClickAchievements,
+                onClickListener = {
+                    Analytics.tracker.trackEvent(MyAccountAchievementsSectionTappedEvent)
+                    uiActions.onClickAchievements()
+                },
                 testTag = ACHIEVEMENTS,
                 withDivider = true,
             )
@@ -649,6 +680,7 @@ internal fun AccountTypeSection(
     @StringRes accountDescription: Int,
     showUpgradeButton: Boolean,
     onButtonClickListener: () -> Unit,
+    icon: ImageVector,
     modifier: Modifier = Modifier,
 ) {
 
@@ -668,7 +700,7 @@ internal fun AccountTypeSection(
                     bottom.linkTo(parent.bottom, 25.dp)
                     start.linkTo(parent.start, 16.dp)
                 },
-            painter = painterResource(id = R.drawable.ic_account_type),
+            painter = rememberVectorPainter(icon),
             contentDescription = stringResource(id = accountDescription),
         )
 

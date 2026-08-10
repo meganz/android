@@ -1,9 +1,10 @@
 package mega.privacy.android.core.nodecomponents.dialog.sharefolder
 
+import androidx.compose.runtime.remember
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.compose.ui.window.DialogProperties
 import kotlinx.serialization.Serializable
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 
@@ -11,7 +12,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 data class ShareFolderAccessDialogNavKey(
     val nodes: String,
     val contacts: String,
-    val isFromBackups: Boolean
+    val isFromBackups: Boolean,
 ) : NavKey
 
 fun EntryProviderScope<NavKey>.shareFolderAccessDialogM3(
@@ -24,9 +25,11 @@ fun EntryProviderScope<NavKey>.shareFolderAccessDialogM3(
             )
         )
     ) { key ->
-        val mapper = NodeHandlesToJsonMapper()
-        val handles = mapper(key.nodes)
-        val contacts = key.contacts.split(",").filter { contact -> contact.isNotBlank() }
+        val mapper = remember { NodeHandlesToJsonMapper() }
+        val handles = remember(key.nodes) { mapper(key.nodes) }
+        val contacts = remember(key.contacts) {
+            key.contacts.split(",").filter { contact -> contact.isNotBlank() }
+        }
 
         ShareFolderAccessDialogM3(
             handles = handles,

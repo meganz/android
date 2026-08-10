@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -22,7 +21,7 @@ import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.components.util.shimmerEffect
+import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
@@ -65,12 +64,12 @@ fun LoadingItemView() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(
             modifier = Modifier
-                .size(48.dp)
+                .size(32.dp)
                 .shimmerEffect(shape = CircleShape)
         )
         Column(
@@ -93,13 +92,6 @@ fun LoadingItemView() {
                     .shimmerEffect()
             )
         }
-        Spacer(modifier = Modifier.weight(0.1f))
-        Spacer(
-            modifier = Modifier
-                .width(16.dp)
-                .height(32.dp)
-                .shimmerEffect(shape = RoundedCornerShape(4.dp))
-        )
     }
 }
 

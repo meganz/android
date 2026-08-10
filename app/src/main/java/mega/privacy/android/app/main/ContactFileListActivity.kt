@@ -52,9 +52,7 @@ import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentScanningErrorDialog
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -72,7 +70,6 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.UploadUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.getAudioPermissionByVersion
@@ -81,6 +78,8 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternal
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -88,11 +87,14 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -129,6 +131,12 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
 
     @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
+
+    @Inject
     @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
@@ -140,6 +148,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
 
     @Inject
     lateinit var nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper
+
     private val viewModel: ContactFileListViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by viewModels()
     private lateinit var fragmentContainer: FrameLayout
@@ -304,12 +313,26 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
 
     override fun showNewFolderDialog(typedText: String?) {
         newFolderDialog =
-            showNewFolderDialog(this, this, megaApi.getNodeByHandle(parentHandle), typedText)
+            showNewFolderDialog(
+                context = this,
+                actionNodeCallback = this,
+                parentNode = megaApi.getNodeByHandle(parentHandle),
+                typedText = typedText,
+                getRootNodeUseCase = getRootNodeUseCase,
+                nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
+            )
     }
 
     override fun showNewTextFileDialog(typedName: String?) {
         megaApi.getNodeByHandle(parentHandle)?.let {
-            newTextFileDialog = showNewTxtFileDialog(this, it, typedName, false)
+            newTextFileDialog = showNewTxtFileDialog(
+                context = this,
+                parent = it,
+                typedName = typedName,
+                fromHome = false,
+                getRootNodeUseCase = getRootNodeUseCase,
+                nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
+            )
         }
     }
 
@@ -353,7 +376,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
         if (savedInstanceState == null) {
@@ -386,7 +409,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             if (contact == null) {
                 finish()
             }
-            fullName = ContactUtil.getMegaUserNameDB(contact)
+            fullName = ContactUtil.getMegaUserNameDB(contact).orEmpty()
             fragmentContainer =
                 findViewById<View>(R.id.fragment_container_contact_properties) as FrameLayout
             Timber.d("Shared Folders are:")
@@ -668,14 +691,16 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     }
 
     fun showMove(handleList: ArrayList<Long>) {
+        val handles = handleList.toLongArray()
         val intent = Intent(this, FileExplorerActivity::class.java)
         intent.action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
-        intent.putExtra("MOVE_FROM", handleList.toLongArray())
+        intent.putExtra("MOVE_FROM", handles)
         startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
     }
 
     fun showCopy(handleList: ArrayList<Long>) {
-        selectFolderToCopyLauncher.launch(handleList.toLongArray())
+        val handles = handleList.toLongArray()
+        selectFolderToCopyLauncher.launch(handles)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -698,7 +723,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         } else if (requestCode == Constants.REQUEST_CODE_GET_FOLDER_CONTENT) {
             if (intent != null && resultCode == RESULT_OK) {
                 val result = intent.getStringExtra(ExtraConstant.EXTRA_ACTION_RESULT)
-                if (TextUtil.isTextEmpty(result)) {
+                if (result.isNullOrBlank()) {
                     return
                 }
                 showSnackbar(SNACKBAR_TYPE, result)
@@ -719,7 +744,8 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                                         uri = UriPath(it.toUri().toString()),
                                     )
                                 }),
-                                parentNodeId = NodeId(parentHandle)
+                                parentNodeId = NodeId(parentHandle),
+                                pitagTrigger = PitagTrigger.CameraCapture,
                             )
                         }.onSuccess { fileCollisions ->
                             val collision = fileCollisions.firstOrNull()
@@ -728,7 +754,8 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                             } else {
                                 viewModel.uploadFile(
                                     file = file,
-                                    destination = parentHandle
+                                    destination = parentHandle,
+                                    pitagTrigger = PitagTrigger.CameraCapture,
                                 )
                             }
                         }.onFailure {
@@ -765,7 +792,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         if (infos.isEmpty()) {
             dismissAlertDialogIfExists(statusDialog)
             Util.showErrorAlertDialog(
-                getString(R.string.upload_can_not_open),
+                getString(sharedR.string.unable_to_open_selected_file_message),
                 false, this
             )
             return
@@ -780,7 +807,8 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             runCatching {
                 checkFileNameCollisionsUseCase(
                     files = infos,
-                    parentNodeId = NodeId(parentNode.handle)
+                    parentNodeId = NodeId(parentNode.handle),
+                    pitagTrigger = PitagTrigger.Picker,
                 )
             }.onSuccess { collisions ->
                 dismissAlertDialogIfExists(statusDialog)
@@ -795,7 +823,8 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                     viewModel.uploadFiles(
                         pathsAndNames = sharesWithoutCollision.map { it.uri.value }
                             .associateWith { null },
-                        destinationId = NodeId(parentNode.handle)
+                        destinationId = NodeId(parentNode.handle),
+                        pitagTrigger = PitagTrigger.Picker,
                     )
                 }
             }.onFailure {
@@ -908,7 +937,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 if (contactFileListFragment?.isVisible == true) {
                     showSnackbar(
                         SNACKBAR_TYPE,
-                        getString(R.string.context_folder_created)
+                        getString(sharedR.string.folder_created_success_message)
                     )
                     contactFileListFragment?.navigateToFolder(folderNode)
                 }
@@ -916,7 +945,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 if (contactFileListFragment?.isVisible == true) {
                     showSnackbar(
                         SNACKBAR_TYPE,
-                        getString(R.string.context_folder_no_created)
+                        getString(sharedR.string.folder_not_created_error_message)
                     )
                     contactFileListFragment?.setNodes()
                 }

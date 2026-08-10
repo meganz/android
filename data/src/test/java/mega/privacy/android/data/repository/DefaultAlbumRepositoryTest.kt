@@ -34,6 +34,7 @@ import nz.mega.sdk.MegaSetList
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -337,13 +338,16 @@ class DefaultAlbumRepositoryTest {
             AlbumId(3L),
         )
 
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest>()
         whenever(megaApiGateway.removeSet(any(), any())).thenAnswer {
             (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                mock(),
-                mock {
-                    on { errorCode }.thenReturn(MegaError.API_OK)
-                },
+                api,
+                request,
+                megaError,
             )
         }
 
@@ -411,28 +415,18 @@ class DefaultAlbumRepositoryTest {
 
     @Test
     fun `test that download public thumbnail executes properly`() = runTest {
-        // given
-        val photo = mock<Photo.Image>()
-
         // when
         underTest = createUnderTest(this)
-        underTest.downloadPublicThumbnail(photo) { isSuccess ->
-            // then
-            assertThat(isSuccess).isFalse()
-        }
+
+        assertThat(underTest.downloadPublicThumbnail(1, "path")).isFalse()
     }
 
     @Test
     fun `test that download public preview executes properly`() = runTest {
-        // given
-        val photo = mock<Photo.Image>()
-
         // when
         underTest = createUnderTest(this)
-        underTest.downloadPublicPreview(photo) { isSuccess ->
-            // then
-            assertThat(isSuccess).isFalse()
-        }
+
+        assertThat(underTest.downloadPublicPreview(1, "path")).isFalse()
     }
 
     @Test
@@ -576,6 +570,190 @@ class DefaultAlbumRepositoryTest {
             val elementIds = awaitItem()
             assertThat(elementIds).isNotEmpty()
         }
+    }
+
+    @Test
+    fun `test that monitorUserSetsContentUpdate emits correct result when set elements are updated`() =
+        runTest {
+            val albumId1 = AlbumId(1L)
+            val albumId2 = AlbumId(2L)
+            val expectedUserSet1 = createUserSet(
+                id = albumId1.id,
+                name = "Album 1",
+                type = MegaSet.SET_TYPE_ALBUM,
+                cover = null,
+                creationTime = 1000L,
+                modificationTime = 2000L,
+                isExported = false,
+            )
+            val expectedUserSet2 = createUserSet(
+                id = albumId2.id,
+                name = "Album 2",
+                type = MegaSet.SET_TYPE_ALBUM,
+                cover = null,
+                creationTime = 1001L,
+                modificationTime = 2001L,
+                isExported = false,
+            )
+
+            val megaSetElement1 = mock<MegaSetElement> {
+                on { setId() }.thenReturn(albumId1.id)
+                on { id() }.thenReturn(10L)
+            }
+            val megaSetElement2 = mock<MegaSetElement> {
+                on { setId() }.thenReturn(albumId2.id)
+                on { id() }.thenReturn(20L)
+            }
+
+            val megaSet1 = mock<MegaSet> {
+                on { id() }.thenReturn(albumId1.id)
+                on { name() }.thenReturn(expectedUserSet1.name)
+                on { cover() }.thenReturn(-1L)
+                on { ts() }.thenReturn(expectedUserSet1.modificationTime)
+            }
+            val megaSet2 = mock<MegaSet> {
+                on { id() }.thenReturn(albumId2.id)
+                on { name() }.thenReturn(expectedUserSet2.name)
+                on { cover() }.thenReturn(-1L)
+                on { ts() }.thenReturn(expectedUserSet2.modificationTime)
+            }
+
+            whenever(megaApiGateway.globalUpdates)
+                .thenReturn(
+                    flowOf(
+                        OnSetElementsUpdate(
+                            ArrayList(
+                                listOf(
+                                    megaSetElement1,
+                                    megaSetElement2
+                                )
+                            )
+                        )
+                    )
+                )
+
+            whenever(megaApiGateway.getSet(albumId1.id)).thenReturn(megaSet1)
+            whenever(megaApiGateway.getSet(albumId2.id)).thenReturn(megaSet2)
+
+            underTest = createUnderTest(this)
+            underTest.monitorUserSetsContentUpdate().test {
+                val userSets = awaitItem()
+                assertThat(userSets).hasSize(2)
+                assertThat(userSets[0].id).isEqualTo(expectedUserSet1.id)
+                assertThat(userSets[1].id).isEqualTo(expectedUserSet2.id)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that monitorUserSetsContentUpdate filters out duplicate elements`() = runTest {
+        val albumId = AlbumId(1L)
+        val expectedUserSet = createUserSet(
+            id = albumId.id,
+            name = "Album 1",
+            type = MegaSet.SET_TYPE_ALBUM,
+            cover = null,
+            creationTime = 1000L,
+            modificationTime = 2000L,
+            isExported = false,
+        )
+
+        // Two elements with the same id() - should be deduplicated
+        val megaSetElement1 = mock<MegaSetElement> {
+            on { setId() }.thenReturn(albumId.id)
+            on { id() }.thenReturn(10L)
+        }
+        val megaSetElement2 = mock<MegaSetElement> {
+            on { setId() }.thenReturn(albumId.id)
+            on { id() }.thenReturn(10L) // Same id
+        }
+
+        val megaSet = mock<MegaSet> {
+            on { id() }.thenReturn(albumId.id)
+            on { name() }.thenReturn(expectedUserSet.name)
+            on { cover() }.thenReturn(-1L)
+            on { ts() }.thenReturn(expectedUserSet.modificationTime)
+        }
+
+        whenever(megaApiGateway.globalUpdates)
+            .thenReturn(
+                flowOf(
+                    OnSetElementsUpdate(
+                        ArrayList(
+                            listOf(
+                                megaSetElement1,
+                                megaSetElement2
+                            )
+                        )
+                    )
+                )
+            )
+
+        whenever(megaApiGateway.getSet(albumId.id)).thenReturn(megaSet)
+
+        underTest = createUnderTest(this)
+        underTest.monitorUserSetsContentUpdate().test {
+            val userSets = awaitItem()
+            // Should only have one UserSet even though there are two elements (duplicate filtered)
+            assertThat(userSets).hasSize(1)
+            assertThat(userSets[0].id).isEqualTo(expectedUserSet.id)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that true is returned when at least one album has links`() = runTest {
+        val megaSet1 = mock<MegaSet> {
+            on { isExported } doReturn false
+        }
+        val megaSet2 = mock<MegaSet> {
+            on { isExported } doReturn true
+        }
+        val megaSetList = mock<MegaSetList> {
+            on { size() } doReturn 2
+            on { get(0) } doReturn megaSet1
+            on { get(1) } doReturn megaSet2
+        }
+        whenever(megaApiGateway.getSets()) doReturn megaSetList
+
+        underTest = createUnderTest(this)
+        val actual = underTest.haveLinks()
+
+        assertThat(actual).isTrue()
+    }
+
+    @Test
+    fun `test that false is returned when no albums have links`() = runTest {
+        val megaSet1 = mock<MegaSet> {
+            on { isExported } doReturn false
+        }
+        val megaSet2 = mock<MegaSet> {
+            on { isExported } doReturn false
+        }
+        val megaSetList = mock<MegaSetList> {
+            on { size() } doReturn 2
+            on { get(0) } doReturn megaSet1
+            on { get(1) } doReturn megaSet2
+        }
+        whenever(megaApiGateway.getSets()) doReturn megaSetList
+
+        underTest = createUnderTest(this)
+        val actual = underTest.haveLinks()
+
+        assertThat(actual).isFalse()
+    }
+
+    @Test
+    fun `test that false is returned when no album exists`() = runTest {
+        val megaSetList = mock<MegaSetList> {
+            on { size() } doReturn 0
+        }
+        whenever(megaApiGateway.getSets()) doReturn megaSetList
+
+        underTest = createUnderTest(this)
+        val actual = underTest.haveLinks()
+
+        assertThat(actual).isFalse()
     }
 
     private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultAlbumRepository(

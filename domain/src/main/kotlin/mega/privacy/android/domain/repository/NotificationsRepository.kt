@@ -115,6 +115,15 @@ interface NotificationsRepository {
     suspend fun isChatDoNotDisturbEnabled(chatId: Long): Boolean
 
     /**
+     * Returns the timestamp until which Do-Not-Disturb mode for a chat is enabled
+     *
+     * @param chatId handle of the node that identifies the chat room
+     * @return timestamp until DND mode is enabled (in seconds since the Epoch), 0 when
+     * notifications are muted until turned back on
+     */
+    suspend fun getChatDoNotDisturbTime(chatId: Long): Long
+
+    /**
      * Set Do-Not-Disturb mode for a chat
      *
      * @param chatId handle of the node that identifies the chat room
@@ -169,4 +178,11 @@ interface NotificationsRepository {
      * @return ID of the last read Notification
      */
     suspend fun getLastReadNotificationId(): Long
+
+    /**
+     * Monitor sdk reload needed
+     *
+     * @return a flow of [Boolean], true indicating if sdk reload is needed
+     */
+    fun monitorSdkReloadNeeded(): Flow<Boolean>
 }

@@ -4,8 +4,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.R
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import org.junit.jupiter.api.AfterEach
@@ -55,6 +55,6 @@ internal class ChangeNodeExtensionDialogViewModelTest {
             )
 
             verify(renameNodeUseCase).invoke(nodeId, newNodeName)
-            verify(snackBarHandler).postSnackbarMessage(R.string.context_correctly_renamed)
+            verify(snackBarHandler).postSnackbarMessage(sharedR.string.context_correctly_renamed)
         }
 }

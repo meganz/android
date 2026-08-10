@@ -1,24 +1,24 @@
 package mega.privacy.android.data.gateway.global
 
-import dagger.Lazy
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.IsUseHttpsEnabledUseCase
-import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.ResetAccountDetailsTimeStampUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.SetUnverifiedBusinessAccountUseCase
 import mega.privacy.android.domain.usecase.backup.SetupDeviceNameUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
@@ -27,7 +27,6 @@ import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.network.BroadcastSslVerificationFailedUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -47,7 +46,7 @@ import javax.inject.Inject
  * @property setupMegaChatApiWrapper
  * @property accountInfoWrapper
  * @property megaChatApi
- * @property dbH
+ * @property localStorageGateway
  * @property megaApi
  * @property applicationScope
  * @property getFullAccountInfoUseCase
@@ -59,12 +58,11 @@ import javax.inject.Inject
  * @property updatePushNotificationSettingsUseCase
  * @property shouldShowRichLinkWarningUseCase
  * @property isRichPreviewsEnabledUseCase
- * @property isUseHttpsEnabledUseCase
- * @property setUseHttpsUseCase
  * @property resetAccountDetailsTimeStampUseCase
  * @property broadcastSslVerificationFailedUseCase
  * @property setLoggedOutFromAnotherLocationUseCase
  * @property setIsUnverifiedBusinessAccountUseCase
+ * @property getChatFilesFolderIdUseCase
  */
 internal class GlobalRequestListener @Inject constructor(
     private val appEventGateway: AppEventGateway,
@@ -73,9 +71,10 @@ internal class GlobalRequestListener @Inject constructor(
     private val setupMegaChatApiWrapper: SetupMegaChatApiWrapper,
     private val accountInfoWrapper: AccountInfoWrapper,
     private val megaChatApi: MegaChatApiAndroid,
-    private val dbH: Lazy<DatabaseHandler>,
+    private val localStorageGateway: MegaLocalStorageGateway,
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
     private val broadcastFetchNodesFinishUseCase: BroadcastFetchNodesFinishUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
@@ -85,12 +84,11 @@ internal class GlobalRequestListener @Inject constructor(
     private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
     private val shouldShowRichLinkWarningUseCase: ShouldShowRichLinkWarningUseCase,
     private val isRichPreviewsEnabledUseCase: IsRichPreviewsEnabledUseCase,
-    private val isUseHttpsEnabledUseCase: IsUseHttpsEnabledUseCase,
-    private val setUseHttpsUseCase: SetUseHttpsUseCase,
     private val resetAccountDetailsTimeStampUseCase: ResetAccountDetailsTimeStampUseCase,
     private val broadcastSslVerificationFailedUseCase: BroadcastSslVerificationFailedUseCase,
     private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
     private val setIsUnverifiedBusinessAccountUseCase: SetUnverifiedBusinessAccountUseCase,
+    private val getChatFilesFolderIdUseCase: GetChatFilesFolderIdUseCase,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -143,38 +141,37 @@ internal class GlobalRequestListener @Inject constructor(
     private fun handleGetAttrUserRequest(request: MegaRequest, e: MegaError) {
         if (e.errorCode == MegaError.API_OK) {
             if (request.paramType == MegaApiJava.USER_ATTR_FIRSTNAME || request.paramType == MegaApiJava.USER_ATTR_LASTNAME) {
+                val paramType = request.paramType
+                val text = request.text
                 request.email?.let { email ->
-                    megaApi.getContact(email)?.let { user ->
-                        Timber.d("User handle: ${user.handle}")
-                        Timber.d("Visibility: ${user.visibility}") //If user visibility == MegaUser.VISIBILITY_UNKNOWN then, non contact
-                        if (user.visibility != MegaUser.VISIBILITY_VISIBLE) {
-                            Timber.d("Non-contact")
-                            when (request.paramType) {
-                                MegaApiJava.USER_ATTR_FIRSTNAME -> {
-                                    dbH.get().setNonContactEmail(
-                                        request.email,
-                                        user.handle.toString() + ""
-                                    )
-                                    dbH.get().setNonContactFirstName(
-                                        request.text,
-                                        user.handle.toString() + ""
-                                    )
-                                }
+                    applicationScope.launch(ioDispatcher) {
+                        runCatching {
+                            megaApi.getContact(email)?.let { user ->
+                                Timber.d("User handle: ${user.handle}")
+                                Timber.d("Visibility: ${user.visibility}") //If user visibility == MegaUser.VISIBILITY_UNKNOWN then, non contact
+                                if (user.visibility != MegaUser.VISIBILITY_VISIBLE) {
+                                    Timber.d("Non-contact")
+                                    when (paramType) {
+                                        MegaApiJava.USER_ATTR_FIRSTNAME -> {
+                                            localStorageGateway.setNonContactEmail(user.handle, email)
+                                            localStorageGateway.setNonContactFirstName(user.handle, text)
+                                        }
 
-                                MegaApiJava.USER_ATTR_LASTNAME -> {
-                                    dbH.get().setNonContactLastName(
-                                        request.text,
-                                        user.handle.toString() + ""
-                                    )
-                                }
+                                        MegaApiJava.USER_ATTR_LASTNAME -> {
+                                            localStorageGateway.setNonContactLastName(user.handle, text)
+                                        }
 
-                                else -> {}
+                                        else -> {}
+                                    }
+                                } else {
+                                    Timber.d("The user is or was CONTACT:")
+                                }
+                            } ?: run {
+                                Timber.w("User is NULL")
                             }
-                        } else {
-                            Timber.d("The user is or was CONTACT:")
+                        }.onFailure {
+                            Timber.e(it, "Failed handling get-user-attr request (paramType=$paramType)")
                         }
-                    } ?: run {
-                        Timber.w("User is NULL")
                     }
                 }
             }
@@ -189,7 +186,6 @@ internal class GlobalRequestListener @Inject constructor(
 
             broadcastFetchNodesFinishUseCase()
             runCatching {
-                setUseHttpsUseCase(isUseHttpsEnabledUseCase())
                 resetAccountDetailsTimeStampUseCase()
             }.onFailure {
                 Timber.e(it)
@@ -206,8 +202,14 @@ internal class GlobalRequestListener @Inject constructor(
                     Timber.e(it, "Error checking rich link settings")
                 }
             }
-            if (dbH.get().myChatFilesFolderHandle == INVALID_HANDLE) {
-                megaApi.getMyChatFilesFolder(userAttributeDatabaseUpdater)
+            applicationScope.launch {
+                runCatching {
+                    if (getChatFilesFolderIdUseCase() == null) {
+                        megaApi.getMyChatFilesFolder(userAttributeDatabaseUpdater)
+                    }
+                }.onFailure {
+                    Timber.e(it, "Error checking chat files folder handle")
+                }
             }
             setupMegaChatApiWrapper()
             applicationScope.launch {

@@ -159,6 +159,105 @@ internal class CheckNodesNameCollisionUseCaseTest {
         }
     }
 
+    @Test
+    fun `test that no collision is reported for a move when the conflicting child is the node being moved`() =
+        runTest {
+            val nodes = mapOf(2L to 101L)
+            val currentNode = mock<FileNode> {
+                on { id }.thenReturn(NodeId(2L))
+                on { name }.thenReturn("current")
+                on { parentId }.thenReturn(NodeId(101L))
+            }
+            val conflictNode = mock<FileNode> {
+                on { id }.thenReturn(NodeId(2L))
+            }
+            whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
+            whenever(getNodeByHandleUseCase(101L, false)).thenReturn(mock<FolderNode>())
+            whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
+            whenever(getNodeByHandleUseCase(2L, true)).thenReturn(currentNode)
+            whenever(getChildNodeUseCase(NodeId(101L), currentNode.name)).thenReturn(conflictNode)
+
+            assertThat(underTest(nodes, NodeNameCollisionType.MOVE)).isEqualTo(
+                NodeNameCollisionsResult(
+                    mapOf(2L to 101L),
+                    emptyMap(),
+                    NodeNameCollisionType.MOVE,
+                )
+            )
+        }
+
+    @Test
+    fun `test that no collision is reported for a move when the node already lives in the target folder`() =
+        runTest {
+            val nodes = mapOf(2L to 101L)
+            val currentNode = mock<FileNode> {
+                on { id }.thenReturn(NodeId(2L))
+                on { name }.thenReturn("current")
+                on { parentId }.thenReturn(NodeId(101L))
+            }
+            val conflictNode = mock<FileNode> {
+                on { id }.thenReturn(NodeId(999L))
+            }
+            whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
+            whenever(getNodeByHandleUseCase(101L, false)).thenReturn(mock<FolderNode>())
+            whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
+            whenever(getNodeByHandleUseCase(2L, true)).thenReturn(currentNode)
+            whenever(getChildNodeUseCase(NodeId(101L), currentNode.name)).thenReturn(conflictNode)
+
+            assertThat(underTest(nodes, NodeNameCollisionType.MOVE)).isEqualTo(
+                NodeNameCollisionsResult(
+                    mapOf(2L to 101L),
+                    emptyMap(),
+                    NodeNameCollisionType.MOVE,
+                )
+            )
+        }
+
+    @Test
+    fun `test that a collision is reported for a copy when the node already lives in the target folder`() =
+        runTest {
+            val nodes = mapOf(2L to 101L)
+            val currentNode = mock<FileNode> {
+                on { id }.thenReturn(NodeId(2L))
+                on { name }.thenReturn("current")
+                on { parentId }.thenReturn(NodeId(101L))
+                on { size }.thenReturn(Random(1000L).nextLong())
+                on { modificationTime }.thenReturn(System.currentTimeMillis())
+                on { creationTime }.thenReturn(System.currentTimeMillis())
+            }
+            val parent = mock<FolderNode> {
+                on { id }.thenReturn(NodeId(101L))
+                on { childFileCount }.thenReturn(Random(1000).nextInt())
+                on { childFolderCount }.thenReturn(Random(1000).nextInt())
+            }
+            whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
+            whenever(getNodeByHandleUseCase(101L, false)).thenReturn(parent)
+            whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
+            whenever(getNodeByHandleUseCase(2L, true)).thenReturn(currentNode)
+            whenever(getChildNodeUseCase(NodeId(101L), currentNode.name)).thenReturn(currentNode)
+
+            assertThat(underTest(nodes, NodeNameCollisionType.COPY)).isEqualTo(
+                NodeNameCollisionsResult(
+                    emptyMap(),
+                    mapOf(
+                        2L to NodeNameCollision.Default(
+                            collisionHandle = 2L,
+                            nodeHandle = 2L,
+                            parentHandle = 101L,
+                            name = currentNode.name,
+                            size = currentNode.size,
+                            childFolderCount = parent.childFolderCount,
+                            childFileCount = parent.childFileCount,
+                            lastModified = currentNode.modificationTime,
+                            isFile = true,
+                            type = NodeNameCollisionType.COPY,
+                        )
+                    ),
+                    NodeNameCollisionType.COPY,
+                )
+            )
+        }
+
     companion object {
         private const val INVALID_NODE_HANDLE = -1L
     }

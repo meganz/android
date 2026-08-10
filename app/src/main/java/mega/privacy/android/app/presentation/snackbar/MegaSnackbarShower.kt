@@ -5,6 +5,10 @@ import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 /**
  * Interface to show snackbar
  */
+@Deprecated(
+    message = "Use SnackbarEventQueue to show snackbar",
+    replaceWith = ReplaceWith("mega.privacy.android.navigation.contract.queue.SnackbarEventQueue")
+)
 interface MegaSnackbarShower {
 
     /**

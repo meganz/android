@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.SubmitIssueRequest
 import mega.privacy.android.domain.entity.UserAccount
@@ -39,13 +40,21 @@ class SubmitIssueUseCase @Inject constructor(
      * @param request
      * @return
      */
-    operator fun invoke(request: SubmitIssueRequest): Flow<Progress> {
+    operator fun invoke(
+        request: SubmitIssueRequest,
+        accountTypeMapper: (AccountType?) -> String,
+    ): Flow<Progress> {
         return flow {
             val logFileName = uploadLogs(request.includeLogs)
             if (currentCoroutineContext().isActive) {
                 val account = getAccountDetailsUseCase(false)
                 val formattedTicket =
-                    createFormattedSupportTicket(request.description, logFileName, account)
+                    createFormattedSupportTicket(
+                        request.description,
+                        logFileName,
+                        account,
+                        accountTypeMapper(account.accountTypeIdentifier),
+                    )
                 supportRepository.logTicket(formattedTicket)
             }
         }.flowOn(defaultDispatcher)
@@ -74,11 +83,13 @@ class SubmitIssueUseCase @Inject constructor(
         description: String,
         logFileName: String?,
         account: UserAccount,
+        accountTypeString: String,
     ) = formatSupportTicketUseCase(
         createSupportTicketUseCase(
             description = description,
             logFileName = logFileName,
-            accountDetails = account
+            accountDetails = account,
+            accountTypeString = accountTypeString,
         )
     )
 

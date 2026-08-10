@@ -14,11 +14,11 @@ import mega.privacy.android.data.facade.ClipboardFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.FileManagementPreferencesFacade
+import mega.privacy.android.data.facade.FirebaseAnalyticsFacade
+import mega.privacy.android.data.facade.FirebaseRemoteConfigFacade
 import mega.privacy.android.data.facade.HttpConnectionFacade
 import mega.privacy.android.data.facade.MediaRecorderFacade
-import mega.privacy.android.data.facade.MegaApiFacade
 import mega.privacy.android.data.facade.MegaApiFolderFacade
-import mega.privacy.android.data.facade.MegaChatApiFacade
 import mega.privacy.android.data.facade.MegaLocalRoomFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.data.facade.NotificationsFacade
@@ -31,6 +31,8 @@ import mega.privacy.android.data.facade.WorkManagerGatewayImpl
 import mega.privacy.android.data.facade.WorkerClassGatewayImpl
 import mega.privacy.android.data.facade.chat.ChatStorageFacade
 import mega.privacy.android.data.gateway.AdsGateway
+import mega.privacy.android.data.gateway.AgeSignalsGateway
+import mega.privacy.android.data.gateway.AgeSignalsGatewayImpl
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.AssetsGateway
@@ -45,58 +47,62 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.FirebaseAnalyticsGateway
 import mega.privacy.android.data.gateway.HttpConnectionGateway
 import mega.privacy.android.data.gateway.MediaRecorderGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.NotificationsGateway
 import mega.privacy.android.data.gateway.PermissionGateway
+import mega.privacy.android.data.gateway.QAAccountCacheGateway
+import mega.privacy.android.data.gateway.RemoteConfigGateway
 import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
-import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.WorkerClassGateway
 import mega.privacy.android.data.gateway.ZipFileCompressionGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
-import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.data.gateway.contact.ContactGateway
 import mega.privacy.android.data.gateway.contact.ContactGatewayImpl
 import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.AdPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.InAppUpdatePreferencesGateway
 import mega.privacy.android.data.gateway.preferences.MediaPlayerPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.MediaTimelinePreferencesGateway
 import mega.privacy.android.data.gateway.preferences.RequestPhoneNumberPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.SlideshowPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
-import mega.privacy.android.data.gateway.psa.PsaPreferenceGateway
 import mega.privacy.android.data.gateway.security.PasscodeStoreGateway
 import mega.privacy.android.data.preferences.AccountPreferencesDataStore
+import mega.privacy.android.data.preferences.AdPreferencesDataStore
 import mega.privacy.android.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.data.preferences.CallsPreferencesDataStore
 import mega.privacy.android.data.preferences.CameraUploadsSettingsPreferenceDataStore
 import mega.privacy.android.data.preferences.ChatPreferencesDataStore
+import mega.privacy.android.data.preferences.ChatSettingsPreferenceDataStore
 import mega.privacy.android.data.preferences.CredentialsPreferencesDataStore
 import mega.privacy.android.data.preferences.EphemeralCredentialsDataStore
 import mega.privacy.android.data.preferences.InAppUpdatePreferencesDatastore
 import mega.privacy.android.data.preferences.MediaPlayerPreferencesDatastore
+import mega.privacy.android.data.preferences.MediaTimelinePreferencesDataStore
+import mega.privacy.android.data.preferences.QAAccountCacheDataStore
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore
 import mega.privacy.android.data.preferences.SlideshowPreferencesDataStore
 import mega.privacy.android.data.preferences.StatisticsPreferencesDataStore
-import mega.privacy.android.data.preferences.TransfersPreferencesDataStore
 import mega.privacy.android.data.preferences.UIPreferencesDatastore
-import mega.privacy.android.data.preferences.psa.PsaPreferenceDataStore
 import mega.privacy.android.data.preferences.security.PasscodeDataStore
 import javax.inject.Singleton
 
@@ -111,6 +117,10 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindSlideshowPreferencesGateway(implementation: SlideshowPreferencesDataStore): SlideshowPreferencesGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindAdPreferencesGateway(implementation: AdPreferencesDataStore): AdPreferencesGateway
 
     @Binds
     @Singleton
@@ -172,14 +182,11 @@ internal abstract class GatewayModule {
 
     @Binds
     @Singleton
-    abstract fun MediaPlayerPreferencesGateway(implementation: MediaPlayerPreferencesDatastore): MediaPlayerPreferencesGateway
-
-    @Binds
-    abstract fun bindMegaApiWrapper(implementation: MegaApiFacade): MegaApiGateway
+    abstract fun bindAccountCacheGateway(implementation: QAAccountCacheDataStore): QAAccountCacheGateway
 
     @Binds
     @Singleton
-    abstract fun bindMegaChatApiGateway(implementation: MegaChatApiFacade): MegaChatApiGateway
+    abstract fun MediaPlayerPreferencesGateway(implementation: MediaPlayerPreferencesDatastore): MediaPlayerPreferencesGateway
 
     @Binds
     @Singleton
@@ -283,15 +290,15 @@ internal abstract class GatewayModule {
 
     @Binds
     @Singleton
+    abstract fun bindChatSettingsPreferenceGateway(implementation: ChatSettingsPreferenceDataStore): ChatSettingsPreferenceGateway
+
+    @Binds
+    @Singleton
     abstract fun bindInAppUpdatePreferencesGateway(implementation: InAppUpdatePreferencesDatastore): InAppUpdatePreferencesGateway
 
     @Binds
     @Singleton
     abstract fun bindAdsGateway(implementation: AdsFacade): AdsGateway
-
-    @Binds
-    @Singleton
-    abstract fun bindPsaPreferenceGateway(implementation: PsaPreferenceDataStore): PsaPreferenceGateway
 
     @Binds
     @Singleton
@@ -307,6 +314,14 @@ internal abstract class GatewayModule {
 
     @Binds
     @Singleton
+    abstract fun bindRemoteConfigGateway(implementation: FirebaseRemoteConfigFacade): RemoteConfigGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindFirebaseAnalyticsGateway(implementation: FirebaseAnalyticsFacade): FirebaseAnalyticsGateway
+
+    @Binds
+    @Singleton
     abstract fun bindMediaRecorderGateway(implementation: MediaRecorderFacade): MediaRecorderGateway
 
     @Binds
@@ -319,5 +334,9 @@ internal abstract class GatewayModule {
 
     @Binds
     @Singleton
-    abstract fun bindTransfersPreferencesDataStoreGateway(implementation: TransfersPreferencesDataStore): TransfersPreferencesGateway
+    abstract fun bindMediaTimelinePreferencesGateway(implementation: MediaTimelinePreferencesDataStore): MediaTimelinePreferencesGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindAgeSignalsGateway(implementation: AgeSignalsGatewayImpl): AgeSignalsGateway
 }

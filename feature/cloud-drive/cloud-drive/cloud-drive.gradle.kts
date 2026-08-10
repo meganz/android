@@ -5,7 +5,6 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
-    id("kotlin-android")
 }
 
 android {
@@ -22,17 +21,27 @@ dependencies {
     lintChecks(project(":lint"))
     lintChecks(lib.slack.compose.lints)
 
+    implementation(project(":shared:ads"))
+    implementation(project(":shared:nodes"))
+    implementation(project(":shared:search"))
+    implementation(project(":shared:account"))
+    implementation(project(":shared:sync"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:ui-components:shared-components"))
+    implementation(project(":feature:transfers:transfers-snowflake-components"))
     implementation(project(":core:transfers"))
+    implementation(project(":shared:transfers"))
     implementation(project(":core:formatter"))
+    implementation(project(":core:feature-flags"))
     implementation(project(":core:analytics:analytics-tracker"))
-    implementation(project(":shared:resources"))
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:string-resources"))
+    implementation(project(":resources:icon-pack"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
     implementation(project(":feature:sync"))
+    implementation(project(":shared:sync"))
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
     implementation(lib.kotlin.ktx)
@@ -51,8 +60,10 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation3.runtime)
     implementation(google.services.mlkit.document.scanner)
+    implementation(androidx.navigation3.ui)
 
     // test
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     testImplementation(androidx.navigation.testing)

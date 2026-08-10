@@ -1,0 +1,345 @@
+package mega.privacy.android.feature.photos.presentation.playlists
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
+import mega.privacy.android.domain.entity.videosection.VideoPlaylist
+import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
+import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
+import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
+import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
+import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
+import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationErrorMessageMapper
+import mega.privacy.android.feature.photos.mapper.VideoPlaylistUiEntityMapper
+import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
+import mega.privacy.android.core.coroutine.asUiStateFlow
+import timber.log.Timber
+import javax.inject.Inject
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class VideoPlaylistsTabViewModel @Inject constructor(
+    private val getVideoPlaylistsUseCase: GetVideoPlaylistsUseCase,
+    private val videoPlaylistUiEntityMapper: VideoPlaylistUiEntityMapper,
+    private val setCloudSortOrderUseCase: SetCloudSortOrder,
+    private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
+    private val removeVideoPlaylistsUseCase: RemoveVideoPlaylistsUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
+    private val monitorVideoPlaylistSetsUpdateUseCase: MonitorVideoPlaylistSetsUpdateUseCase,
+    private val videoPlaylistTitleValidationErrorMessageMapper: VideoPlaylistTitleValidationErrorMessageMapper,
+    private val updateVideoPlaylistTitleUseCase: UpdateVideoPlaylistTitleUseCase,
+    private val createVideoPlaylistUseCase: CreateVideoPlaylistUseCase,
+    private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
+) : ViewModel() {
+    private val selectedVideoPlaylistsFlow =
+        MutableStateFlow<Set<VideoPlaylistUiEntity>>(emptySet())
+    private val queryFlow = MutableStateFlow<String?>(null)
+    private val optimisticallyRemovedIds = MutableStateFlow<Set<NodeId>>(emptySet())
+
+    internal val videoPlaylistEditState: StateFlow<VideoPlaylistEditState>
+        field: MutableStateFlow<VideoPlaylistEditState> = MutableStateFlow(VideoPlaylistEditState())
+
+    private val sortOrder: StateFlow<SortOrder> by lazy {
+        monitorSortCloudOrderUseCase()
+            .mapLatest { it ?: SortOrder.ORDER_DEFAULT_ASC }
+            .catch { Timber.e(it) }
+            .asUiStateFlow(
+                viewModelScope,
+                SortOrder.ORDER_DEFAULT_ASC
+            )
+    }
+
+    private fun combinedTriggerFlow(): Flow<Unit> = merge(
+        monitorNodeUpdatesUseCase().filter {
+            it.changes.keys.any { node ->
+                node is FileNode && node.type is VideoFileTypeInfo
+            }
+        }.mapLatest { }
+            .catch { Timber.e(it) },
+        monitorVideoPlaylistSetsUpdateUseCase().mapLatest { }
+            .catch { Timber.e(it) },
+        monitorSortCloudOrderUseCase().mapLatest { }
+            .catch { Timber.e(it) }
+    ).onStart { emit(Unit) }
+
+    private fun getVideoPlaylistsFlow(): Flow<Pair<List<VideoPlaylist>, String?>> =
+        combinedTriggerFlow().flatMapLatest {
+            queryFlow.mapLatest { query ->
+                getVideoPlaylistsUseCase() to query
+            }
+        }
+
+    internal val uiState: StateFlow<VideoPlaylistsTabUiState> by lazy(LazyThreadSafetyMode.NONE) {
+        combine(
+            getVideoPlaylistsFlow(),
+            sortOrder,
+            selectedVideoPlaylistsFlow,
+            optimisticallyRemovedIds,
+        ) { (videoPlaylists, query), sortOrder, selectedItems, removedIds ->
+            if (removedIds.isNotEmpty()) {
+                val backendIds = videoPlaylists.filterIsInstance<UserVideoPlaylist>()
+                    .mapTo(mutableSetOf()) { it.id }
+                val pendingIds = removedIds.intersect(backendIds)
+                if (pendingIds != removedIds) {
+                    optimisticallyRemovedIds.value = pendingIds
+                }
+            }
+            val videoPlaylistEntities = videoPlaylists
+                .filter { it !is UserVideoPlaylist || it.id !in removedIds }
+                .map { videoPlaylistUiEntityMapper(it) }
+                .map { it.copy(isSelected = it.id in selectedItems.map { item -> item.id }) }
+            val convertedSortOrder = sortOrder.convertPlaylistSortOrder()
+            val sortOrderPair = nodeSortConfigurationUiMapper(convertedSortOrder)
+
+            VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = videoPlaylistEntities,
+                selectedSortConfiguration = sortOrderPair,
+                selectedPlaylists = selectedItems,
+                query = query
+            )
+        }.catch {
+            Timber.e(it)
+        }.asUiStateFlow(
+            viewModelScope,
+            VideoPlaylistsTabUiState.Loading
+        )
+    }
+
+    private fun SortOrder.convertPlaylistSortOrder() =
+        when (this) {
+            SortOrder.ORDER_DEFAULT_DESC -> SortOrder.ORDER_DEFAULT_DESC
+            SortOrder.ORDER_CREATION_ASC -> SortOrder.ORDER_CREATION_ASC
+            SortOrder.ORDER_CREATION_DESC -> SortOrder.ORDER_CREATION_DESC
+            SortOrder.ORDER_MODIFICATION_ASC -> SortOrder.ORDER_MODIFICATION_ASC
+            SortOrder.ORDER_MODIFICATION_DESC -> SortOrder.ORDER_MODIFICATION_DESC
+            else -> SortOrder.ORDER_DEFAULT_ASC
+        }
+
+    internal fun setCloudSortOrder(sortConfiguration: NodeSortConfiguration) {
+        viewModelScope.launch {
+            runCatching {
+                val order = nodeSortConfigurationUiMapper(sortConfiguration)
+                setCloudSortOrderUseCase(order)
+            }.onFailure {
+                Timber.e(it, "Failed to set cloud sort order")
+            }
+        }
+    }
+
+    internal fun onItemClicked(item: VideoPlaylistUiEntity) {
+        if (selectedVideoPlaylistsFlow.value.isNotEmpty() && !item.isSystemVideoPlayer) {
+            toggleItemSelection(item)
+        }
+    }
+
+    internal fun onItemLongClicked(item: VideoPlaylistUiEntity) {
+        if (!item.isSystemVideoPlayer) {
+            toggleItemSelection(item = item)
+        }
+    }
+
+    private fun toggleItemSelection(item: VideoPlaylistUiEntity) {
+        val updatedSelectedPlaylists =
+            selectedVideoPlaylistsFlow.value.toMutableSet()
+        val existingItem = updatedSelectedPlaylists.firstOrNull { it.id == item.id }
+        if (existingItem == null) {
+            updatedSelectedPlaylists += item
+        } else {
+            updatedSelectedPlaylists -= existingItem
+        }
+        selectedVideoPlaylistsFlow.update { updatedSelectedPlaylists }
+    }
+
+    internal fun selectAllVideos() {
+        val state = uiState.value as? VideoPlaylistsTabUiState.Data ?: return
+        val allPlaylists = state.videoPlaylistEntities.toSet()
+        selectedVideoPlaylistsFlow.update { allPlaylists }
+    }
+
+    internal fun clearSelection() {
+        selectedVideoPlaylistsFlow.update { emptySet() }
+    }
+
+    internal fun removeVideoPlaylists(deletedItems: Set<VideoPlaylistUiEntity>) =
+        viewModelScope.launch {
+            runCatching {
+                val ids = deletedItems.map { it.id }
+                removeVideoPlaylistsUseCase(ids)
+            }.onSuccess { deletedPlaylistIDs ->
+                optimisticallyRemovedIds.update { current ->
+                    current + deletedPlaylistIDs.map { NodeId(it) }.toSet()
+                }
+                val deletedTitlesById = deletedItems.associate {
+                    it.id.longValue to it.title
+                }
+                val deletedPlaylistTitles = deletedPlaylistIDs.mapNotNull { id ->
+                    deletedTitlesById[id]
+                }
+                Timber.d("removeVideoPlaylists deletedPlaylistTitles: $deletedPlaylistTitles")
+                videoPlaylistEditState.update {
+                    it.copy(
+                        playlistsRemovedEvent = triggered(deletedPlaylistTitles)
+                    )
+                }
+                clearSelection()
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    internal fun resetPlaylistsRemovedEvent() {
+        videoPlaylistEditState.update {
+            it.copy(
+                playlistsRemovedEvent = consumed()
+            )
+        }
+    }
+
+    internal fun searchQuery(queryString: String?) {
+        if (queryFlow.value != queryString) {
+            queryFlow.update { queryString }
+        }
+    }
+
+    internal fun updateVideoPlaylistTitle(playlistID: NodeId, newTitle: String) {
+        viewModelScope.launch {
+            val title = newTitle.trim()
+            runCatching {
+                updateVideoPlaylistTitleUseCase(playlistID, title)
+            }.onSuccess { title ->
+                Timber.d("Updated video playlist title: $title")
+                videoPlaylistEditState.update { it.copy(updateTitleSuccessEvent = triggered) }
+            }.onFailure { exception ->
+                Timber.e(exception)
+                if (exception is PlaylistNameValidationException) {
+                    val errorMessage = videoPlaylistTitleValidationErrorMessageMapper(exception)
+                    videoPlaylistEditState.update {
+                        it.copy(
+                            editVideoPlaylistErrorMessage = errorMessage
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    internal fun resetUpdateTitleSuccessEvent() {
+        videoPlaylistEditState.update {
+            it.copy(
+                updateTitleSuccessEvent = consumed
+            )
+        }
+    }
+
+    internal fun resetEditVideoPlaylistErrorMessage() {
+        videoPlaylistEditState.update {
+            it.copy(
+                editVideoPlaylistErrorMessage = null
+            )
+        }
+    }
+
+    internal fun showUpdateVideoPlaylistDialog() {
+        videoPlaylistEditState.update {
+            it.copy(
+                showUpdateVideoPlaylist = true
+            )
+        }
+    }
+
+    internal fun resetShowUpdateVideoPlaylist() {
+        videoPlaylistEditState.update {
+            it.copy(
+                showUpdateVideoPlaylist = false
+            )
+        }
+    }
+
+    internal fun showCreateVideoPlaylistDialog() {
+        videoPlaylistEditState.update {
+            it.copy(showCreateVideoPlaylist = true)
+        }
+    }
+
+    internal fun getPresetNewVideoPlaylistTitle(placeholderTitle: String): String {
+        val playlistTitles =
+            (uiState.value as? VideoPlaylistsTabUiState.Data)?.videoPlaylistEntities?.map {
+                it.title
+            } ?: emptyList()
+        return runCatching {
+            getNextDefaultAlbumNameUseCase(
+                defaultName = placeholderTitle,
+                currentNames = playlistTitles
+            )
+        }.getOrNull() ?: ""
+    }
+
+    internal fun resetShowCreateVideoPlaylist() {
+        videoPlaylistEditState.update {
+            it.copy(
+                showCreateVideoPlaylist = false
+            )
+        }
+    }
+
+    internal fun createNewPlaylist(title: String) {
+        viewModelScope.launch {
+            runCatching {
+                createVideoPlaylistUseCase(title.trim())
+            }.onSuccess { videoPlaylist ->
+                (videoPlaylist as? UserVideoPlaylist)?.let { playlist ->
+                    videoPlaylistEditState.update {
+                        it.copy(createVideoPlaylistSuccessEvent = triggered(playlist))
+                    }
+                    Timber.d("Current video playlist: ${playlist.title}")
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+                if (exception is PlaylistNameValidationException) {
+                    val errorMessage = videoPlaylistTitleValidationErrorMessageMapper(exception)
+                    videoPlaylistEditState.update {
+                        it.copy(
+                            editVideoPlaylistErrorMessage = errorMessage
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    internal fun resetCreateVideoPlaylistSuccessEvent() {
+        videoPlaylistEditState.update {
+            it.copy(
+                createVideoPlaylistSuccessEvent = consumed()
+            )
+        }
+    }
+}

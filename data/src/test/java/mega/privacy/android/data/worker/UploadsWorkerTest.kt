@@ -13,14 +13,11 @@ import androidx.work.impl.utils.WorkForegroundUpdater
 import androidx.work.impl.utils.futures.SettableFuture
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
-import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -103,7 +100,6 @@ class UploadsWorkerTest {
         mock<TransfersFinishNotificationSummaryBuilder>()
     private val transfersActionGroupFinishNotificationBuilder =
         mock<TransfersActionGroupFinishNotificationBuilder>()
-    private val displayPathFromUriCache = mock<HashMap<String, String>>()
 
     private val nodeId = 1L
     private val localPath = "localPath"
@@ -154,7 +150,8 @@ class UploadsWorkerTest {
             transfersActionGroupProgressNotificationBuilder = transfersActionGroupProgressNotificationBuilder,
             transfersFinishNotificationSummaryBuilder = transfersFinishNotificationSummaryBuilder,
             transfersActionGroupFinishNotificationBuilder = transfersActionGroupFinishNotificationBuilder,
-            displayPathFromUriCache = displayPathFromUriCache
+            clearCompletedTransfersCacheUseCase = mock(),
+            deleteActiveTransferGroupUseCase = mock(),
         )
     }
 

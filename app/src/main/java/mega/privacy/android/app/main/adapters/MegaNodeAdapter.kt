@@ -40,7 +40,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
-import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -48,11 +47,11 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel.Compani
 import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.ContactFileListFragment
 import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_GRID
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_HEADER
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_LIST
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ViewHolderBrowser
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
-import mega.privacy.android.app.presentation.backups.BackupsFragment
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
@@ -67,11 +66,13 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest.Companion.fromHandle
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
+import mega.privacy.android.shared.resources.R as SharedR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -179,13 +180,8 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         fun bind() {
             var orderType = sortByViewModel?.order?.cloudSortOrder
 
-            // Root of incoming shares tab, display sort options OTHERS
             if (type == NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
-                && (context as ManagerActivity).deepBrowserTreeIncoming == 0
-            ) {
-                orderType = sortByViewModel?.order?.othersSortOrder
-            } else if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
-                && (context as ManagerActivity).deepBrowserTreeOutgoing == 0
+                || type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
             ) {
                 orderType = sortByViewModel?.order?.othersSortOrder
             }
@@ -330,9 +326,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
     fun hideMultipleSelect() {
         if (selectedItems.size() <= 0) {
-            if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
-                (fragment as BackupsFragment).hideMultipleSelect()
-            } else if (type == Constants.CONTACT_FILE_ADAPTER) {
+            if (type == Constants.CONTACT_FILE_ADAPTER) {
                 (fragment as ContactFileListFragment).hideMultipleSelect()
             } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
                 (fragment as ContactSharedFolderFragment).hideMultipleSelect()
@@ -515,11 +509,6 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
             Constants.FOLDER_LINK_ADAPTER -> {
                 megaApi = ((context as Activity).application as MegaApplication).megaApiFolder
-            }
-
-            NodeSourceTypeInt.BACKUPS_ADAPTER -> {
-                Timber.d("onCreate BACKUPS_ADAPTER")
-                (context as ManagerActivity).setParentHandleBackups(parentHandle)
             }
 
             else -> {}
@@ -764,12 +753,15 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             setFolderGridSelected(holder, position)
 
             holder.imageViewIcon?.visibility = View.VISIBLE
-            holder.imageViewIcon?.setImageResource(
+            megaApi?.let {
                 getFolderIcon(
+                    it,
                     node,
                     if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
                 )
-            )
+            }?.let {
+                holder.imageViewIcon?.setImageResource(it)
+            }
             holder.imageViewThumb?.visibility = View.GONE
             holder.thumbLayout?.setBackgroundColor(Color.TRANSPARENT)
         } else if (node.isFile) {
@@ -971,20 +963,26 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             holder.imageView?.layoutParams = params
 
             holder.textViewFileSize?.visibility = View.VISIBLE
-            holder.textViewFileSize?.text = if (type == Constants.FOLDER_LINK_ADAPTER)
-                MegaApiUtils.getMegaNodeFolderLinkInfo(node, context)
-            else
-                MegaApiUtils.getMegaNodeFolderInfo(node, context)
+            holder.textViewFileSize?.let { txtView ->
+                txtView.text = MegaApplication.getInstance().megaApiFolder.let {
+                    if (type == Constants.FOLDER_LINK_ADAPTER)
+                        MegaApiUtils.getMegaNodeFolderLinkInfo(node, it, txtView.context)
+                    else
+                        MegaApiUtils.getMegaNodeFolderInfo(node, it, txtView.context)
+                }
+            }
             holder.versionsIcon?.visibility = View.GONE
 
-            setFolderListSelected(
-                holder,
-                position,
-                getFolderIcon(
-                    node,
-                    if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
+            megaApi?.let {
+                setFolderListSelected(
+                    holder, position, getFolderIcon(
+                        it,
+                        node,
+                        if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
+                    )
                 )
-            )
+            }
+
             if (isMultipleSelect) {
                 holder.threeDotsLayout?.visibility = View.INVISIBLE
             } else {
@@ -1067,24 +1065,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                         }
                     }
                 }
-                if ((context as ManagerActivity).deepBrowserTreeIncoming == 0) {
-                    val accessLevel = megaApi?.getAccess(node)
-
-                    if (accessLevel == MegaShare.ACCESS_FULL) {
-                        holder.permissionsIcon?.setImageResource(R.drawable.ic_shared_fullaccess)
-                    } else if (accessLevel == MegaShare.ACCESS_READWRITE) {
-                        holder.permissionsIcon?.setImageResource(R.drawable.ic_shared_read_write)
-                    } else {
-                        holder.permissionsIcon?.setImageResource(R.drawable.ic_shared_read)
-                    }
-                    val hasUnverifiedNodes = shareData != null && shareData?.get(position) != null
-                    if (hasUnverifiedNodes) {
-                        showUnverifiedNodeUi(holder, true, node, null)
-                    }
-                    holder.permissionsIcon?.visibility = View.VISIBLE
-                } else {
-                    holder.permissionsIcon?.visibility = View.GONE
-                }
+                holder.permissionsIcon?.visibility = View.GONE
             } else if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) {
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize?.apply {
@@ -1099,8 +1080,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             }
         } else {
             Timber.d("Node is file")
-            val isLinksRoot =
-                type == NodeSourceTypeInt.LINKS_ADAPTER && (context as ManagerActivity).getHandleFromLinksViewModel() == -1L
+            val isLinksRoot = false
             holder.textViewFileSize?.text = TextUtil.getFileInfo(
                 Util.getSizeString(node.size, context),
                 TimeUtils.formatLongDateTime(if (isLinksRoot) node.publicLinkCreationTime else node.modificationTime)
@@ -1292,9 +1272,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
     }
 
     private fun fileClicked(currentPosition: Int) {
-        if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
-            (fragment as BackupsFragment).onNodeSelected(currentPosition)
-        } else if (type == Constants.CONTACT_FILE_ADAPTER) {
+        if (type == Constants.CONTACT_FILE_ADAPTER) {
             (fragment as ContactFileListFragment).itemClick(currentPosition)
         } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
             (fragment as ContactSharedFolderFragment).itemClick(currentPosition)
@@ -1308,9 +1286,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         }
 
         if (isMultipleSelect) {
-            if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
-                (fragment as BackupsFragment).onNodeSelected(currentPosition)
-            } else if (type == Constants.CONTACT_FILE_ADAPTER) {
+            if (type == Constants.CONTACT_FILE_ADAPTER) {
                 (fragment as ContactFileListFragment).itemClick(currentPosition)
             } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
                 (fragment as ContactSharedFolderFragment).itemClick(currentPosition)
@@ -1320,12 +1296,6 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 (fragment as ContactFileListFragment).showOptionsPanel(n)
             } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
                 (fragment as ContactSharedFolderFragment).showOptionsPanel(n)
-            } else {
-                (context as ManagerActivity).showNodeOptionsPanel(
-                    n,
-                    NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
-                    sd
-                )
             }
         }
     }
@@ -1339,10 +1309,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
         val holder = view.tag as ViewHolderBrowser
         val currentPosition = holder.adapterPosition
-        if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
-            (fragment as BackupsFragment).activateActionMode()
-            (fragment as BackupsFragment).onNodeSelected(currentPosition)
-        } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
+        if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
             (fragment as ContactSharedFolderFragment).activateActionMode()
             (fragment as ContactSharedFolderFragment).itemClick(currentPosition)
         } else if (type == Constants.CONTACT_FILE_ADAPTER) {
@@ -1405,7 +1372,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 }
             } else {
                 subtitle = context.resources
-                    .getQuantityString(R.plurals.general_num_shared_with, sl.size, sl.size)
+                    .getQuantityString(SharedR.plurals.general_num_shared_with_count, sl.size, sl.size)
             }
         }
 
@@ -1485,9 +1452,5 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         holder.permissionsIcon?.setImageResource(R.drawable.serious_warning)
     }
 
-    companion object {
-        const val ITEM_VIEW_TYPE_LIST: Int = 0
-        const val ITEM_VIEW_TYPE_GRID: Int = 1
-        const val ITEM_VIEW_TYPE_HEADER: Int = 2
-    }
 }
+

@@ -1,6 +1,9 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getRequestListener
@@ -27,29 +30,42 @@ internal class DefaultRecentActionsRepository @Inject constructor(
     private val nodeInfoForRecentActionsMapper: NodeInfoForRecentActionsMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : RecentActionsRepository {
+    private val recentActivityCleared = MutableSharedFlow<Unit>()
 
     override suspend fun getRecentActions(
         excludeSensitives: Boolean,
+        maxBucketCount: Int,
     ) = withContext(ioDispatcher) {
         runCatching {
-            val list = getMegaRecentAction(
-                excludeSensitives = excludeSensitives
-            ).map {
-                megaApiGateway.copyBucket(it).let { bucket ->
+            val list = getMegaRecentAction(excludeSensitives = excludeSensitives)
+                .take(maxBucketCount)
+                .map { bucket ->
                     bucket to megaApiGateway.getNodesFromMegaNodeList(bucket.nodes)
+                }.mapAsync {
+                    recentActionBucketMapper(
+                        megaRecentActionBucket = it.first,
+                        megaNodes = it.second
+                    )
                 }
-            }.mapAsync {
-                recentActionBucketMapper(
-                    megaRecentActionBucket = it.first,
-                    megaNodes = it.second
-                )
-            }
             return@withContext list
         }.onFailure {
             Timber.e(it)
         }
-        return@withContext emptyList<RecentActionBucketUnTyped>()
+        return@withContext emptyList()
     }
+
+    override suspend fun clearRecentActions(until: Long): Long = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("clearRecentActions") {
+                it.number
+            }
+            megaApiGateway.clearRecentActions(until, listener)
+        }.also {
+            recentActivityCleared.emit(Unit)
+        }
+    }
+
+    override fun monitorRecentActivityCleared(): Flow<Unit> = recentActivityCleared.asSharedFlow()
 
     override suspend fun getNodeInfo(nodeId: NodeId) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
@@ -57,6 +73,28 @@ internal class DefaultRecentActionsRepository @Inject constructor(
                 megaNode = it,
                 isPendingShare = megaApiGateway.isPendingShare(it)
             )
+        }
+    }
+
+    override suspend fun getRecentActionBucketById(
+        id: String,
+        excludeSensitives: Boolean,
+    ): RecentActionBucketUnTyped? = withContext(ioDispatcher) {
+        val result = suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("getRecentActionById") {
+                megaApiGateway.copyBucketList(it.recentActions)
+            }
+            megaApiGateway.getRecentBucketById(id, excludeSensitives, listener)
+        }
+
+        if (result.size() > 0) {
+            val bucket = megaApiGateway.copyBucket(result.get(0))
+            recentActionBucketMapper(
+                megaRecentActionBucket = bucket,
+                megaNodes = megaApiGateway.getNodesFromMegaNodeList(bucket.nodes)
+            )
+        } else {
+            return@withContext null
         }
     }
 
@@ -70,7 +108,9 @@ internal class DefaultRecentActionsRepository @Inject constructor(
                 }
                 megaApiGateway.getRecentActionsAsync(DAYS, MAX_NODES, excludeSensitives, listener)
             }
-            recentActionsMapper(result)
+            recentActionsMapper(result).map {
+                megaApiGateway.copyBucket(it)
+            }
         }
 
     companion object {

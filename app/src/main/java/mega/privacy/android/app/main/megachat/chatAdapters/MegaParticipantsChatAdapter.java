@@ -17,7 +17,6 @@ import static mega.privacy.android.app.utils.ChatUtil.updateRetentionTimeLayout;
 import static mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR;
 import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static nz.mega.sdk.MegaChatApi.INIT_ANONYMOUS;
 
@@ -45,7 +44,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.MegaChatParticipant;
@@ -53,6 +51,7 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -80,7 +79,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     private long chatId;
     private boolean isPreview;
 
-    private ChatController chatC;
+    private ChatController chatController;
 
     public MegaParticipantsChatAdapter(GroupChatInfoActivity groupChatInfoActivity, RecyclerView listView) {
         this.groupChatInfoActivity = groupChatInfoActivity;
@@ -95,7 +94,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        chatC = groupChatInfoActivity.getChatC();
+        chatController = groupChatInfoActivity.getChatController();
     }
 
     /*private view holder class*/
@@ -414,7 +413,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                             }
                         }
 
-                        updateRetentionTimeLayout(holderHeader.retentionTimeText, getUpdatedRetentionTimeFromAChat(getChat().getChatId()), groupChatInfoActivity);
+                        updateRetentionTimeLayout(holderHeader.retentionTimeText, getUpdatedRetentionTimeFromAChat(getChat().getChatId(), megaChatApi), groupChatInfoActivity);
                     } else {
                         holderHeader.editImageView.setVisibility(View.GONE);
                         holderHeader.dividerClearLayout.setVisibility(View.GONE);
@@ -489,7 +488,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 holderParticipantsList.textViewContactName.setText(participant.getFullName());
                 MegaUser contact = participant.isEmpty() ? null : megaApi.getContact(participant.getEmail());
                 holderParticipantsList.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
-                int userStatus = handle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(handle);
+                int userStatus = handle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(handle, megaApi, megaChatApi);
                 setContactStatusParticipantList(userStatus, ((ViewHolderParticipantsList) holder).textViewContactIcon, ((ViewHolderParticipantsList) holder).textViewContent, StatusIconLocation.STANDARD);
                 setContactLastGreen(groupChatInfoActivity, userStatus, participant.getLastGreen(), ((ViewHolderParticipantsList) holder).textViewContent);
 
@@ -653,11 +652,11 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         } else if (id == R.id.manage_chat_history_group_info_layout) {
             groupChatInfoActivity.openManageChatHistory(chatId);
         } else if (id == R.id.chat_group_contact_properties_archive_layout) {
-            new ChatController(groupChatInfoActivity).archiveChat(groupChatInfoActivity.getChat());
+            groupChatInfoActivity.archiveChat();
         } else if (id == R.id.chat_group_contact_properties_layout) {
             if (holderHeader != null) {
                 if (holderHeader.notificationsSwitch.isChecked()) {
-                    createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId);
+                    createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId, megaChatApi);
                 } else {
                     MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
                 }
@@ -787,12 +786,12 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         if (participant.isEmpty()) {
             long handle = participant.getHandle();
 
-            String fullName = chatC.getParticipantFullName(handle);
+            String fullName = chatController.getParticipantFullName(handle);
             if (!isTextEmpty(fullName)) {
                 participant.setFullName(fullName);
             }
 
-            String email = chatC.getParticipantEmail(handle);
+            String email = chatController.getParticipantEmail(handle);
             if (!isTextEmpty(email)) {
                 participant.setEmail(email);
             }
@@ -847,6 +846,10 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         }
 
         return avatarBitmap;
+    }
+
+    private boolean isTextEmpty(String text){
+        return text == null || text.trim().isEmpty();
     }
 
     private MegaChatRoom getChat() {

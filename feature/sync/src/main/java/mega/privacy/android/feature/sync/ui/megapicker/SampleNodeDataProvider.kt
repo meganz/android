@@ -21,6 +21,7 @@ internal class SampleNodeDataProvider {
             override val device = null
             override val childFolderCount = 1
             override val childFileCount = 1
+            override val isS4Container = false
             override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode> = { emptyList() }
             override val type = FolderType.Default
             override val id = NodeId(1L)
@@ -53,6 +54,7 @@ internal class SampleNodeDataProvider {
             override val device = null
             override val childFolderCount = 1
             override val childFileCount = 1
+            override val isS4Container = false
             override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode> = { emptyList() }
             override val type = FolderType.Default
             override val id = NodeId(2L)
@@ -85,6 +87,7 @@ internal class SampleNodeDataProvider {
             override val device = null
             override val childFolderCount = 1
             override val childFileCount = 1
+            override val isS4Container = false
             override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode> = { emptyList() }
             override val type = FolderType.Default
             override val id = NodeId(3L)
@@ -148,8 +151,31 @@ internal class SampleNodeDataProvider {
         val values: List<TypedNodeUiModel> =
             listOf(
                 TypedNodeUiModel(nodeUIItem1),
-                TypedNodeUiModel(nodeUIItem2, isDisabled = true),
+                TypedNodeUiModel(
+                    nodeUIItem2,
+                    isDisabled = true,
+                    backupId = 123L,
+                    deviceName = "My Laptop"
+                ),
                 TypedNodeUiModel(nodeUIItem3),
+                TypedNodeUiModel(nodeUIItem4)
+            )
+
+        val valuesWithDisabledFolders: List<TypedNodeUiModel> =
+            listOf(
+                TypedNodeUiModel(nodeUIItem1),
+                TypedNodeUiModel(
+                    nodeUIItem2,
+                    isDisabled = true,
+                    backupId = 123L,
+                    deviceName = "My Laptop"
+                ),
+                TypedNodeUiModel(
+                    nodeUIItem3,
+                    isDisabled = true,
+                    backupId = null,
+                    deviceName = null
+                ),
                 TypedNodeUiModel(nodeUIItem4)
             )
     }

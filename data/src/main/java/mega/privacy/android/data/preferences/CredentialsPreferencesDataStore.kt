@@ -28,6 +28,18 @@ internal class CredentialsPreferencesDataStore @Inject constructor(
         }
     }
 
+    override suspend fun saveSession(session: String) {
+        dataStore.edit {
+            it[sessionKey] = session
+        }
+    }
+
+    override suspend fun saveMyHandle(myHandle: String) {
+        dataStore.edit {
+            it[myHandleKey] = myHandle
+        }
+    }
+
     override suspend fun saveFirstName(firstName: String) {
         dataStore.edit {
             it[firstNameKey] = firstName

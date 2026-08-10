@@ -47,7 +47,7 @@
     <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
     <string name="api_eread">讀取錯誤</string>
     <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
-    <string name="api_eappkey">無效應用程式金鑰</string>
+    <string name="api_eappkey">無效的應用程式金鑰</string>
     <!-- Error shown when SSL check has failed -->
     <string name="api_essl">SSL驗證失敗</string>
     <!-- Label shown when current account does not have enough quota to complete the operation -->

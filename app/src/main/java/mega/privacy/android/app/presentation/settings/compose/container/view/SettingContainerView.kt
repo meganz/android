@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.settings.compose.container.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.settings.compose.container.SettingContainerViewModel
 

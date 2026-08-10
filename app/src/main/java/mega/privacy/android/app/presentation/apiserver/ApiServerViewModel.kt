@@ -3,14 +3,20 @@ package mega.privacy.android.app.presentation.apiserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.apiserver.model.ApiServerUIState
 import mega.privacy.android.domain.entity.apiserver.ApiServer
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.apiserver.GetCurrentApiServerUseCase
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -25,16 +31,26 @@ import javax.inject.Inject
 class ApiServerViewModel @Inject constructor(
     private val getCurrentApiServerUseCase: GetCurrentApiServerUseCase,
     private val updateApiServerUseCase: UpdateApiServerUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ApiServerUIState())
-    val state = _state.asStateFlow()
+    private val newApiServerFlow = MutableStateFlow<ApiServer?>(null)
 
-    init {
-        viewModelScope.launch {
-            val currentApiServer = getCurrentApiServerUseCase()
-            _state.update { state -> state.copy(currentApiServer = currentApiServer) }
-        }
+    internal val state: StateFlow<ApiServerUIState> by lazy {
+        combine(
+            flow { emit(getCurrentApiServerUseCase()) }.catch { Timber.e(it) },
+            newApiServerFlow
+        ) { currentApiServer, newApiServer ->
+            ApiServerUIState(
+                currentApiServer = currentApiServer,
+                newApiServer = newApiServer,
+            )
+        }.catch {
+            Timber.e(it)
+        }.asUiStateFlow(
+            scope = viewModelScope,
+            initialValue = ApiServerUIState()
+        )
     }
 
     /**
@@ -43,14 +59,14 @@ class ApiServerViewModel @Inject constructor(
      * @param apiServer
      */
     fun updateNewApiServer(apiServer: ApiServer) {
-        _state.update { state -> state.copy(newApiServer = apiServer) }
+        newApiServerFlow.update { apiServer }
     }
 
     /**
      * Updates api server
      */
     fun confirmUpdateApiServer() {
-        viewModelScope.launch {
+        applicationScope.launch {
             with(state.value) {
                 runCatching {
                     if (currentApiServer != null && newApiServer != null) {

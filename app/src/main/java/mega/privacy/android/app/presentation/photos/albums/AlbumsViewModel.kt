@@ -19,16 +19,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.PhotosCache.updateAlbums
-import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
-import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -36,6 +31,8 @@ import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
@@ -43,7 +40,12 @@ import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.provider.PhotosCache.updateAlbums
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -94,24 +96,13 @@ class AlbumsViewModel @Inject constructor(
     init {
         loadAlbums()
 
-        viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorShowHiddenItems()
-                monitorAccountDetail()
-            }
-        }
+        monitorShowHiddenItems()
+        monitorAccountDetail()
 
         updateAlbums(listOf())
         viewModelScope.launch {
             _state.collectLatest { updateAlbums(it.albums) }
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     private fun loadAlbums() {
@@ -406,13 +397,15 @@ class AlbumsViewModel @Inject constructor(
                     photos.filter { !it.isSensitive && !it.isSensitiveInherited }
                 }
 
-                val cover = userAlbum.cover?.let { photo ->
-                    if (showHiddenItems || !isPaid) {
-                        photo
-                    } else {
-                        photo.takeIf { !it.isSensitive && !it.isSensitiveInherited }
+                val cover = (userAlbum as? Album.UserAlbum)
+                    ?.cover
+                    ?.let { photo ->
+                        if (showHiddenItems || !isPaid) {
+                            photo
+                        } else {
+                            photo.takeIf { !it.isSensitive && !it.isSensitiveInherited }
+                        }
                     }
-                }
                 val defaultCover = filteredPhotos.firstOrNull()
                 val (imageCount, videoCount) = getImageAndVideoCount(filteredPhotos)
 
@@ -611,24 +604,21 @@ class AlbumsViewModel @Inject constructor(
     private suspend fun checkTitleValidity(
         title: String,
     ): Boolean {
-        val proscribedStrings = getProscribedAlbumNamesUseCase()
+        val errorMessage = when {
+            title.isEmpty() -> sharedR.string.general_invalid_string
+            title.isInvalidDotName() -> sharedR.string.general_invalid_dot_name_warning
+            title.isInvalidDoubleDotName() -> sharedR.string.general_invalid_double_dot_name_warning
+            "[\\\\*/:<>?\"|]".toRegex()
+                .containsMatchIn(title) -> sharedR.string.general_invalid_characters_defined
 
-        var errorMessage: Int? = null
-        var isTitleValid = true
+            getProscribedAlbumNamesUseCase().any { it.equals(title, true) }
+                -> R.string.photos_create_album_error_message_systems_album
 
-        if (title.isEmpty()) {
-            isTitleValid = false
-            errorMessage = R.string.invalid_string
-        } else if (title.isEmpty() || proscribedStrings.any { it.equals(title, true) }) {
-            isTitleValid = false
-            errorMessage = R.string.photos_create_album_error_message_systems_album
-        } else if (title in getAllUserAlbumsNames()) {
-            isTitleValid = false
-            errorMessage = R.string.photos_create_album_error_message_duplicate
-        } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
-            isTitleValid = false
-            errorMessage = R.string.invalid_characters_defined
+            title in getAllUserAlbumsNames() -> sharedR.string.album_name_exists_error_message
+
+            else -> null
         }
+        val isTitleValid = errorMessage == null
 
         _state.update {
             it.copy(

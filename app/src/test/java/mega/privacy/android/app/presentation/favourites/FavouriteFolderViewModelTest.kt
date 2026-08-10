@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.favourites
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,7 +24,6 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import nz.mega.sdk.MegaNode
@@ -64,11 +62,6 @@ class FavouriteFolderViewModelTest {
             invoke()
         }.thenReturn(flowOf(false))
     }
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-        onBlocking {
-            invoke(any())
-        }.thenReturn(false)
-    }
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
@@ -86,7 +79,7 @@ class FavouriteFolderViewModelTest {
     }
 
     private val fetchNodeWrapper = mock<FetchNodeWrapper> {
-        onBlocking { invoke(any()) }.thenReturn(megaNode)
+        on { invoke(any()) }.thenReturn(megaNode)
     }
 
     private val megaUtilWrapper = mock<MegaUtilWrapper>()
@@ -118,12 +111,10 @@ class FavouriteFolderViewModelTest {
             getFavouriteFolderInfoUseCase = getFavouriteFolderInfoUseCase,
             stringUtilWrapper = stringUtilWrapper,
             megaUtilWrapper = megaUtilWrapper,
-            savedStateHandle = SavedStateHandle(),
             favouriteMapper = favouriteMapper,
             fetchNodeWrapper = fetchNodeWrapper,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,

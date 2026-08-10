@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.login.createaccount.view
 
 import android.content.res.Configuration
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -49,22 +48,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import mega.android.core.ui.components.LinkSpannedText
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.inputfields.HelpTextError
 import mega.android.core.ui.components.inputfields.PasswordTextInputField
 import mega.android.core.ui.components.inputfields.TextInputField
+import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.MegaSpanStyle
@@ -107,25 +109,23 @@ import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
+
 @Composable
 internal fun NewCreateAccountRoute(
     activityViewModel: LoginViewModel,
     modifier: Modifier = Modifier,
     viewModel: CreateAccountViewModel = hiltViewModel(),
+    initialEmail: String? = null,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    BackHandler(
-        onBack = {
-            activityViewModel.setPendingFragmentToShow(LoginScreen.Tour)
-        },
-    )
-    val snackBarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = LocalSnackBarHostState.current ?: remember { SnackbarHostState() }
     NewCreateAccountScreen(
         uiState = uiState,
         snackBarHostState = snackBarHostState,
+        initialEmail = initialEmail,
         onFirstNameInputChanged = viewModel::onFirstNameInputChanged,
         onLastNameInputChanged = viewModel::onLastNameInputChanged,
         onEmailInputChanged = viewModel::onEmailInputChanged,
@@ -173,6 +173,7 @@ internal fun NewCreateAccountScreen(
     onBackIconPressed: () -> Unit,
     onNetworkWarningShown: () -> Unit,
     modifier: Modifier = Modifier,
+    initialEmail: String? = null,
 ) {
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
@@ -183,9 +184,15 @@ internal fun NewCreateAccountScreen(
     val confirmPasswordFocusRequester = remember { FocusRequester() }
 
     val orientation = LocalConfiguration.current.orientation
-    var firstName by rememberSaveable { mutableStateOf("") }
-    var lastName by rememberSaveable { mutableStateOf("") }
-    var email by rememberSaveable { mutableStateOf("") }
+    var firstName by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(""))
+    }
+    var lastName by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(""))
+    }
+    var email by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(""))
+    }
     var password by rememberSaveable { mutableStateOf("") }
     var isPasswordFocus by rememberSaveable { mutableStateOf(false) }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
@@ -196,7 +203,7 @@ internal fun NewCreateAccountScreen(
     val fieldOffsets = remember { mutableMapOf<String, Int>() }
     val isMinimumCharacterError = uiState.isPasswordLengthSufficient == false
     val isWeakPassword =
-        uiState.passwordStrength == PasswordStrength.WEAK || uiState.passwordStrength == PasswordStrength.VERY_WEAK
+        uiState.passwordStrength == PasswordStrength.VERY_WEAK
     var showAccountExistsMessage by rememberSaveable { mutableStateOf(false) }
     val softKeyboard = LocalSoftwareKeyboardController.current
 
@@ -211,9 +218,28 @@ internal fun NewCreateAccountScreen(
         showAgreeToTerms = true
     }
 
+    // Tracks the focused field so it can be restored after a configuration change
+    var focusedFieldKey by rememberSaveable { mutableStateOf<String?>(null) }
     LaunchedEffect(Unit) {
         delay(300L)
-        firstNameFocusRequester.requestFocus()
+        val focusRequester = when (focusedFieldKey) {
+            KEY_LAST_NAME -> lastNameFocusRequester
+            KEY_EMAIL -> emailFocusRequester
+            KEY_PASSWORD -> passwordFocusRequester
+            KEY_CONFIRM_PASSWORD -> confirmPasswordFocusRequester
+            else -> firstNameFocusRequester
+        }
+        runCatching { focusRequester.requestFocus() }
+    }
+
+    LaunchedEffect(initialEmail) {
+        initialEmail?.let { emailValue ->
+            val normalizedEmail = emailValue.trim().lowercase()
+            if (normalizedEmail.isNotEmpty() && email.text.isEmpty()) {
+                email = TextFieldValue(normalizedEmail, TextRange(normalizedEmail.length))
+                onEmailInputChanged(normalizedEmail)
+            }
+        }
     }
 
     EventEffect(
@@ -335,21 +361,21 @@ internal fun NewCreateAccountScreen(
                             start = LocalSpacing.current.x16,
                             end = LocalSpacing.current.x16
                         ),
-                    label = stringResource(id = R.string.first_name_text),
+                    label = stringResource(id = sharedR.string.general_first_name),
                     keyboardType = KeyboardType.Text,
                     maxCharLimit = NAME_CHAR_LIMIT,
                     onValueChanged = {
-                        val trimmedValue = it.trim()
-                        firstName = trimmedValue
-                        onFirstNameInputChanged(firstName)
+                        firstName = it.normalizeText(String::trimStart)
+                        onFirstNameInputChanged(firstName.text.trim())
                     },
+                    onFocusChanged = { if (it) focusedFieldKey = KEY_FIRST_NAME },
                     imeAction = ImeAction.Next,
                     errorText = when {
                         uiState.isFirstNameLengthExceeded == true -> stringResource(id = sharedR.string.sign_up_first_name_text_field_char_limit_exceed_error)
                         uiState.isFirstNameValid == false -> stringResource(id = sharedR.string.sign_up_first_name_text_field_error_message)
                         else -> null
                     },
-                    text = firstName
+                    textFieldValue = firstName
                 )
 
                 TextInputField(
@@ -368,21 +394,21 @@ internal fun NewCreateAccountScreen(
                             start = LocalSpacing.current.x16,
                             end = LocalSpacing.current.x16
                         ),
-                    label = stringResource(id = R.string.lastname_text),
+                    label = stringResource(id = sharedR.string.general_last_name),
                     keyboardType = KeyboardType.Text,
                     maxCharLimit = NAME_CHAR_LIMIT,
                     onValueChanged = {
-                        val trimmedValue = it.trim()
-                        lastName = trimmedValue
-                        onLastNameInputChanged(lastName)
+                        lastName = it.normalizeText(String::trimStart)
+                        onLastNameInputChanged(lastName.text.trim())
                     },
+                    onFocusChanged = { if (it) focusedFieldKey = KEY_LAST_NAME },
                     imeAction = ImeAction.Next,
                     errorText = when {
                         uiState.isLastNameLengthExceeded == true -> stringResource(id = sharedR.string.sign_up_last_name_text_field_char_limit_exceed_error)
                         uiState.isLastNameValid == false -> stringResource(id = sharedR.string.sign_up_last_name_text_field_error_message)
                         else -> null
                     },
-                    text = lastName
+                    textFieldValue = lastName
                 )
 
                 TextInputField(
@@ -406,13 +432,11 @@ internal fun NewCreateAccountScreen(
                     capitalization = KeyboardCapitalization.None,
                     maxCharLimit = EMAIL_CHAR_LIMIT,
                     onValueChanged = {
-                        val normalizedEmail = it.trim().lowercase()
-                        if (normalizedEmail.length <= EMAIL_CHAR_LIMIT) {
-                            email = normalizedEmail
-                            showAccountExistsMessage = false
-                            onEmailInputChanged(email)
-                        }
+                        email = it.normalizeText { text -> text.trim().lowercase() }
+                        showAccountExistsMessage = false
+                        onEmailInputChanged(email.text)
                     },
+                    onFocusChanged = { if (it) focusedFieldKey = KEY_EMAIL },
                     imeAction = ImeAction.Next,
                     errorText = when {
                         showAccountExistsMessage -> stringResource(id = R.string.error_email_registered)
@@ -420,7 +444,7 @@ internal fun NewCreateAccountScreen(
                         uiState.isEmailValid == false -> stringResource(id = sharedR.string.login_invalid_email_error_message)
                         else -> null
                     },
-                    text = email
+                    textFieldValue = email
                 )
 
                 PasswordTextInputField(
@@ -446,7 +470,10 @@ internal fun NewCreateAccountScreen(
 
                     },
                     imeAction = ImeAction.Next,
-                    onFocusChanged = { isPasswordFocus = it },
+                    onFocusChanged = {
+                        isPasswordFocus = it
+                        if (it) focusedFieldKey = KEY_PASSWORD
+                    },
                     errorText = when {
                         !isPasswordFocus && (isMinimumCharacterError || isWeakPassword) -> ""
                         else -> null
@@ -504,6 +531,7 @@ internal fun NewCreateAccountScreen(
                         confirmPassword = it
                         onConfirmPasswordInputChanged(it)
                     },
+                    onFocusChanged = { if (it) focusedFieldKey = KEY_CONFIRM_PASSWORD },
                     errorText = when {
                         confirmPassword.isEmpty() && uiState.isConfirmPasswordMatched == false -> stringResource(
                             id = R.string.confirm_password_text
@@ -616,6 +644,19 @@ internal fun NewCreateAccountScreen(
                 )
             }
         }
+    }
+}
+/**
+ * Applies [transform] to the text while keeping the caret stable: the original value (caret and IME
+ * composition intact) is returned when the text is unchanged, otherwise the caret is clamped to the
+ * new length. Used to keep input fields trimmed/normalized without resetting the cursor on rotation.
+ */
+private fun TextFieldValue.normalizeText(transform: (String) -> String): TextFieldValue {
+    val normalized = transform(text)
+    return if (normalized == text) {
+        this
+    } else {
+        TextFieldValue(normalized, TextRange(selection.end.coerceAtMost(normalized.length)))
     }
 }
 

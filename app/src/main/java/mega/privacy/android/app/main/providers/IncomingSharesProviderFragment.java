@@ -52,7 +52,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
 
     Context context;
     MegaApiAndroid megaApi;
-    ArrayList<MegaNode> nodes;
+    ArrayList<MegaNode> nodes = new ArrayList<>();
     long parentHandle = -1;
 
     long[] hashes;
@@ -507,7 +507,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
 
                 if (parentHandle == -1) {
                     emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_folder_arrow_up_glass);
-                    String textToShow = String.format(context.getString(R.string.context_empty_incoming));
+                    String textToShow = String.format(context.getString(mega.privacy.android.shared.resources.R.string.shares_screen_incoming_empty));
                     try {
                         textToShow = textToShow.replace(
                                 "[A]", "<font color=\'"
@@ -524,7 +524,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
                     emptyTextViewFirst.setText(result);
                 } else {
                     emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_empty_folder_glass);
-                    String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+                    String textToShow = String.format(context.getString(mega.privacy.android.shared.resources.R.string.annotated_empty_folder));
                     try {
                         textToShow = textToShow.replace(
                                 "[A]", "<font color=\'"

@@ -2,11 +2,12 @@ package mega.privacy.android.data.di
 
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 import mega.privacy.android.data.repository.AdsRepositoryImpl
 import mega.privacy.android.data.repository.AndroidBillingRepository
-import mega.privacy.android.data.repository.AudioSectionRepositoryImpl
 import mega.privacy.android.data.repository.BackupRepositoryImpl
 import mega.privacy.android.data.repository.CacheRepositoryImpl
 import mega.privacy.android.data.repository.CallRepositoryImpl
@@ -19,6 +20,7 @@ import mega.privacy.android.data.repository.DefaultCancelTokenRepository
 import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
 import mega.privacy.android.data.repository.DefaultClipboardRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
+import mega.privacy.android.data.repository.DefaultContinueWhereLeftOffRepository
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
@@ -41,20 +43,25 @@ import mega.privacy.android.data.repository.DocumentSectionRepositoryImpl
 import mega.privacy.android.data.repository.DomainNameMigrationRepositoryImpl
 import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.FileLinkRepositoryImpl
+import mega.privacy.android.data.repository.FileServiceRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
 import mega.privacy.android.data.repository.FolderLinkRepositoryImpl
+import mega.privacy.android.data.repository.FolderPreferenceRepositoryImpl
+import mega.privacy.android.data.repository.GeocoderRepositoryImpl
 import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.HttpConnectionRepositoryImpl
-import mega.privacy.android.data.repository.ImageRepositoryImpl
 import mega.privacy.android.data.repository.InAppUpdateRepositoryImpl
 import mega.privacy.android.data.repository.InitializationRepositoryImpl
 import mega.privacy.android.data.repository.LegacyNotificationRepository
+import mega.privacy.android.data.repository.LinksRepositoryImpl
 import mega.privacy.android.data.repository.MediaRecorderRepositoryImpl
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
 import mega.privacy.android.data.repository.PermissionRepositoryImpl
 import mega.privacy.android.data.repository.RegexRepositoryImpl
+import mega.privacy.android.data.repository.FirebaseAnalyticsRepositoryImpl
+import mega.privacy.android.data.repository.RemoteConfigRepositoryImpl
 import mega.privacy.android.data.repository.RemotePreferencesRepositoryImpl
 import mega.privacy.android.data.repository.SearchRepositoryImpl
 import mega.privacy.android.data.repository.SlideshowRepositoryImpl
@@ -62,9 +69,11 @@ import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.VideoRepositoryImpl
 import mega.privacy.android.data.repository.VideoSectionRepositoryImpl
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
+import mega.privacy.android.data.repository.ViewedLinksRepositoryImpl
 import mega.privacy.android.data.repository.ZipBrowserRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
+import mega.privacy.android.data.repository.agesignal.AgeSignalRepositoryImpl
 import mega.privacy.android.data.repository.apiserver.ApiServerRepositoryImpl
 import mega.privacy.android.data.repository.banner.BannerRepositoryImpl
 import mega.privacy.android.data.repository.chat.ChatMessageRepositoryImpl
@@ -79,7 +88,6 @@ import mega.privacy.android.data.repository.thumbnailpreview.ThumbnailPreviewRep
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AdsRepository
 import mega.privacy.android.domain.repository.AlbumRepository
-import mega.privacy.android.domain.repository.AudioSectionRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.BackupRepository
 import mega.privacy.android.domain.repository.BannerRepository
@@ -93,19 +101,23 @@ import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ClipboardRepository
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.repository.ContinueWhereLeftOffRepository
 import mega.privacy.android.domain.repository.DocumentSectionRepository
 import mega.privacy.android.domain.repository.DomainNameMigrationRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileLinkRepository
+import mega.privacy.android.domain.repository.FileServiceRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.FolderLinkRepository
+import mega.privacy.android.domain.repository.FolderPreferenceRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
+import mega.privacy.android.domain.repository.GeocoderRepository
 import mega.privacy.android.domain.repository.HttpConnectionRepository
-import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.InAppUpdateRepository
 import mega.privacy.android.domain.repository.InitializationRepository
+import mega.privacy.android.domain.repository.LinksRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.MediaRecorderRepository
 import mega.privacy.android.domain.repository.NetworkRepository
@@ -117,6 +129,8 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.RegexRepository
+import mega.privacy.android.domain.repository.FirebaseAnalyticsRepository
+import mega.privacy.android.domain.repository.RemoteConfigRepository
 import mega.privacy.android.domain.repository.RemotePreferencesRepository
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -131,7 +145,9 @@ import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.repository.VideoRepository
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import mega.privacy.android.domain.repository.ViewTypeRepository
+import mega.privacy.android.domain.repository.ViewedLinksRepository
 import mega.privacy.android.domain.repository.ZipBrowserRepository
+import mega.privacy.android.domain.repository.agesignal.AgeSignalRepository
 import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
@@ -142,12 +158,25 @@ import mega.privacy.android.domain.repository.psa.PsaRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.repository.security.PasscodeRepository
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
+import mega.privacy.android.domain.usecase.logout.LogoutTask
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class RepositoryModule {
+    @Binds
+    abstract fun bindGeocoderRepository(repository: GeocoderRepositoryImpl): GeocoderRepository
+
+    @Binds
+    abstract fun bindRemoteConfigRepository(repository: RemoteConfigRepositoryImpl): RemoteConfigRepository
+
+    @Binds
+    abstract fun bindFirebaseAnalyticsRepository(repository: FirebaseAnalyticsRepositoryImpl): FirebaseAnalyticsRepository
+
+    @Binds
+    abstract fun bindFolderPreferenceRepository(implementation: FolderPreferenceRepositoryImpl): FolderPreferenceRepository
+
     @Binds
     abstract fun bindSlideshowRepository(implementation: SlideshowRepositoryImpl): SlideshowRepository
 
@@ -179,6 +208,7 @@ internal abstract class RepositoryModule {
      * Bind recent actions repository
      */
     @Binds
+    @Singleton
     abstract fun bindRecentActionsRepository(repository: DefaultRecentActionsRepository): RecentActionsRepository
 
     @Binds
@@ -209,14 +239,16 @@ internal abstract class RepositoryModule {
     @Binds
     abstract fun bindDomainTransfersRepository(repository: DefaultTransfersRepository): TransferRepository
 
+    @ExperimentalContracts
+    @Binds
+    @IntoSet
+    abstract fun bindDefaultTransfersRepositoryLogoutTask(repository: DefaultTransfersRepository): LogoutTask
+
     @Binds
     abstract fun bindCameraUploadsRepository(repository: CameraUploadsRepositoryImpl): CameraUploadsRepository
 
     @Binds
     abstract fun bindGlobalUpdatesRepository(repository: DefaultGlobalStatesRepository): GlobalStatesRepository
-
-    @Binds
-    abstract fun bindGetImageRepository(repository: ImageRepositoryImpl): ImageRepository
 
     @Binds
     abstract fun bindFilesRepository(repository: MegaNodeRepositoryImpl): MegaNodeRepository
@@ -240,8 +272,17 @@ internal abstract class RepositoryModule {
     abstract fun bindFavouritesRepository(repository: DefaultFavouritesRepository): FavouritesRepository
 
     @ExperimentalContracts
+    @Singleton
     @Binds
     abstract fun bindAccountRepository(repository: DefaultAccountRepository): AccountRepository
+
+    companion object {
+        @ExperimentalContracts
+        @Provides
+        @IntoSet
+        fun provideAccountRepositoryLogoutTask(repository: DefaultAccountRepository): LogoutTask =
+            repository
+    }
 
     @Binds
     abstract fun bindTimeSystemRepository(repository: DefaultTimeSystemRepository): TimeSystemRepository
@@ -301,6 +342,9 @@ internal abstract class RepositoryModule {
     abstract fun bindFileLinkRepository(implementation: FileLinkRepositoryImpl): FileLinkRepository
 
     @Binds
+    abstract fun bindLinksRepository(implementation: LinksRepositoryImpl): LinksRepository
+
+    @Binds
     @Singleton
     abstract fun bindPasscodeRepository(implementation: PasscodeRepositoryImpl): PasscodeRepository
 
@@ -329,6 +373,7 @@ internal abstract class RepositoryModule {
     abstract fun bindSearchRepository(implementation: SearchRepositoryImpl): SearchRepository
 
     @Binds
+    @Singleton
     abstract fun bindBackupRepository(implementation: BackupRepositoryImpl): BackupRepository
 
     @Binds
@@ -351,9 +396,6 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindVideoSectionRepository(implementation: VideoSectionRepositoryImpl): VideoSectionRepository
-
-    @Binds
-    abstract fun bindAudioSectionRepository(implementation: AudioSectionRepositoryImpl): AudioSectionRepository
 
     @Binds
     abstract fun bindDocumentSectionRepository(implementation: DocumentSectionRepositoryImpl): DocumentSectionRepository
@@ -387,4 +429,21 @@ internal abstract class RepositoryModule {
     @Singleton
     abstract fun bindInitializationRepository(implementation: InitializationRepositoryImpl): InitializationRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindAgeSignalRepository(implementation: AgeSignalRepositoryImpl): AgeSignalRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFileServiceRepository(implementation: FileServiceRepositoryImpl): FileServiceRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindViewedLinksRepository(implementation: ViewedLinksRepositoryImpl): ViewedLinksRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindContinueWhereLeftOffRepository(
+        implementation: DefaultContinueWhereLeftOffRepository,
+    ): ContinueWhereLeftOffRepository
 }

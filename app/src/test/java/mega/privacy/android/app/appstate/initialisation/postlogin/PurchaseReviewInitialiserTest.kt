@@ -2,6 +2,7 @@ package mega.privacy.android.app.appstate.initialisation.postlogin
 
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.PurchaseReviewInitialiser
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.usecase.billing.MonitorSuccessfulPurchasesUseCase
@@ -40,7 +41,7 @@ class PurchaseReviewInitialiserTest {
 
         whenever(monitorSuccessfulPurchasesUseCase()).thenReturn(flowOf(billingEvent))
 
-        underTest.invoke("test-session")
+        underTest.invoke("test-session", true)
 
         verify(ratingHandlerImpl).updateTransactionFlag(true)
     }
@@ -58,7 +59,7 @@ class PurchaseReviewInitialiserTest {
                 )
             )
 
-            underTest.invoke("test-session")
+            underTest.invoke("test-session", true)
 
             verify(ratingHandlerImpl, times(2)).updateTransactionFlag(true)
         }

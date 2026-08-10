@@ -3,20 +3,24 @@ package mega.privacy.android.app.menu.presentation
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,27 +40,28 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.badge.NotificationBadge
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.SecondaryFilledButton
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.list.SecondaryHeaderListItem
-import mega.android.core.ui.components.profile.MediumProfilePicture
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM
+import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.AVATAR
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.LOGOUT_BUTTON
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.MY_ACCOUNT_ITEM
@@ -66,6 +71,8 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVA
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLBAR
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialogM3NavKey
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem
@@ -74,6 +81,12 @@ import mega.privacy.android.navigation.destination.NotificationsNavKey
 import mega.privacy.android.navigation.destination.TestPasswordNavKey
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
+import mega.privacy.mobile.analytics.event.LogoutButtonPressedEvent
+import mega.privacy.mobile.analytics.event.MyAccountProfileNavigationItemEvent
+import mega.privacy.mobile.analytics.event.NotificationsEntryButtonPressedEvent
+import mega.privacy.mobile.analytics.event.PrivacySuiteCollapsedEvent
+import mega.privacy.mobile.analytics.event.PrivacySuiteExpandedEvent
 import mega.privacy.mobile.navigation.snowflake.NavigationBadge
 
 @Composable
@@ -118,10 +131,10 @@ fun MenuHomeScreenUi(
         navigateToFeature(LogoutConfirmationDialogM3NavKey)
     }
 
-    MegaScaffold(
+    @OptIn(ExperimentalMaterial3Api::class)
+    MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
             .semantics { testTagsAsResourceId = true },
         topBar = {
             MegaTopAppBar(
@@ -134,15 +147,19 @@ fun MenuHomeScreenUi(
                             modifier = Modifier
                                 .size(48.dp)
                                 .testTag(NOTIFICATION_ICON),
-                            onClick = { navigateToFeature(NotificationsNavKey) }
+                            enabled = uiState.isConnectedToNetwork,
+                            onClick = {
+                                navigateToFeature(NotificationsNavKey)
+                                Analytics.tracker.trackEvent(NotificationsEntryButtonPressedEvent)
+                            }
                         ) {
                             MegaIcon(
                                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Bell),
-                                tint = IconColor.Primary,
+                                tint = if (uiState.isConnectedToNetwork) IconColor.Secondary else IconColor.Disabled,
                                 contentDescription = "Notification Icon",
                             )
                         }
-                        if (uiState.unreadNotificationsCount > 0) {
+                        if (uiState.unreadNotificationsCount > 0 && uiState.isConnectedToNetwork) {
                             NotificationBadge(
                                 uiState.unreadNotificationsCount,
                                 modifier = Modifier
@@ -154,42 +171,49 @@ fun MenuHomeScreenUi(
                 },
                 navigationType = AppBarNavigationType.None
             )
-
-        }
+        },
     ) { paddingValues ->
         LazyColumn(
             state = listState,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .animateContentSize(),
-            contentPadding = PaddingValues(top = paddingValues.calculateTopPadding()),
+                .fillMaxWidth(),
+            contentPadding = paddingValues,
         )
         {
             item(key = "${uiState.name} ${uiState.email} ${uiState.lastModifiedTime}") {
+                val emojifiedName = remember(uiState.name) {
+                    uiState.name?.let { EmojiUtilsShortcodes.emojify(it) }.orEmpty()
+                }
                 FlexibleLineListItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag(MY_ACCOUNT_ITEM),
-                    title = uiState.name.orEmpty(),
+                    title = emojifiedName,
                     subtitle = uiState.email.orEmpty(),
                     leadingElement = {
-                        MediumProfilePicture(
-                            imageFile = uiState.avatar,
-                            contentDescription = uiState.name,
-                            name = uiState.name,
-                            avatarColor = uiState.avatarColor
+                        Avatar(
+                            modifier = Modifier.testTag(AVATAR),
+                            content = uiState.avatarContent ?: TextAvatarContent(
+                                avatarText = uiState.name?.trim()?.firstOrNull()?.uppercaseChar()
+                                    ?.toString()
+                                    ?: "?",
+                                backgroundColor = 0,
+                                showBorder = false,
+                                textSize = 18.sp,
+                            )
                         )
                     },
+                    enableClick = uiState.isConnectedToNetwork,
                     trailingElement = {
                         MegaIcon(
                             painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
-                            tint = IconColor.Secondary,
+                            tint = if (uiState.isConnectedToNetwork) IconColor.Secondary else IconColor.Disabled,
                             contentDescription = "arrow right",
                         )
                     },
                     onClickListener = {
-                        navigateToFeature(MyAccountNavKey)
+                        navigateToFeature(MyAccountNavKey())
+                        Analytics.tracker.trackEvent(MyAccountProfileNavigationItemEvent)
                     }
                 )
             }
@@ -199,8 +223,10 @@ fun MenuHomeScreenUi(
             ) { item ->
                 AccountItem(
                     item = item,
+                    enable = uiState.isConnectedToNetwork || item.availableOffline,
                     onNavigate = {
                         navigateToFeature(item.destination)
+                        item.analyticsEventIdentifier?.let { Analytics.tracker.trackEvent(it) }
                     }
                 )
             }
@@ -216,40 +242,60 @@ fun MenuHomeScreenUi(
                         isPrivacySuiteExpanded = !isPrivacySuiteExpanded
 
                         // Scroll to bottom only when expanding
-                        if (!wasExpanded) {
-                            delay(100)
+                        if (wasExpanded) {
+                            Analytics.tracker.trackEvent(PrivacySuiteCollapsedEvent)
+                        } else {
                             val itemCount = listState.layoutInfo.totalItemsCount
                             if (itemCount > 0) {
                                 listState.animateScrollToItem(itemCount - 1)
                             }
+                            Analytics.tracker.trackEvent(PrivacySuiteExpandedEvent)
                         }
                     }
                 })
                 Spacer(modifier = Modifier.height(16.dp))
             }
+            item {
+                AnimatedVisibility(
+                    visible = isPrivacySuiteExpanded,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        uiState.privacySuiteItems.values.forEach { item ->
+                            PrivacySuiteItem(
+                                enabled = uiState.isConnectedToNetwork,
+                                item = item,
+                                onNavigate = {
+                                    item.appPackage?.let { appPackage ->
+                                        openInSpecificApp(
+                                            context = context,
+                                            link = item.link,
+                                            packageName = appPackage
+                                        )
+                                    } ?: context.launchUrl(item.link)
+                                    item.analyticsEventIdentifier?.let {
+                                        Analytics.tracker.trackEvent(it)
+                                    }
+                                }
+                            )
 
-            if (isPrivacySuiteExpanded) {
-                items(
-                    items = uiState.privacySuiteItems.values.toList()
-                ) { item ->
-                    PrivacySuiteItem(
-                        item = item,
-                        onNavigate = {
-                            item.appPackage?.let { appPackage ->
-                                openInSpecificApp(
-                                    context = context,
-                                    link = item.link,
-                                    packageName = appPackage
-                                )
-                            } ?: context.launchUrl(item.link)
                         }
-                    )
+                    }
                 }
             }
 
             item {
-                LogoutButton(uiState.isLoggingOut) {
-                    onLogoutClicked()
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    LogoutButton(
+                        enabled = uiState.isConnectedToNetwork,
+                        isLoggingOut = uiState.isLoggingOut,
+                    ) {
+                        onLogoutClicked()
+                        Analytics.tracker.trackEvent(LogoutButtonPressedEvent)
+                    }
                 }
             }
         }
@@ -260,12 +306,14 @@ fun MenuHomeScreenUi(
 @Composable
 private fun AccountItem(
     item: NavDrawerItem.Account,
+    enable: Boolean,
     onNavigate: () -> Unit,
 ) {
     val hasActionLabel = item.actionLabel != null
     val subtitle by item.subTitle?.collectAsState(null) ?: remember { mutableStateOf(null) }
     val badge by item.badge?.collectAsState(null) ?: remember { mutableStateOf(null) }
     FlexibleLineListItem(
+        enable = enable,
         modifier = Modifier
             .fillMaxWidth()
             .testTag(ACCOUNT_ITEM),
@@ -274,26 +322,28 @@ private fun AccountItem(
         leadingElement = {
             MegaIcon(
                 painter = rememberVectorPainter(item.icon),
-                tint = IconColor.Primary,
                 contentDescription = null
             )
         },
         trailingElement = {
-            item.actionLabel?.let {
-                PrimaryFilledButton(
-                    modifier = Modifier
-                        .wrapContentSize(),
-                    text = stringResource(id = it),
-                    isLoading = false,
-                    onClick = onNavigate,
-                )
+            item.actionLabel?.let { actionLabelResId ->
+                if (actionLabelResId > 0) {
+                    PrimaryFilledButton(
+                        modifier = Modifier
+                            .wrapContentSize(),
+                        text = stringResource(id = actionLabelResId),
+                        isLoading = false,
+                        enabled = enable,
+                        onClick = onNavigate,
+                    )
+                }
             } ?: MegaIcon(
                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
-                tint = IconColor.Primary,
+                tint = if (enable) IconColor.Secondary else IconColor.Disabled,
                 contentDescription = "arrow right",
             )
         },
-        enableClick = hasActionLabel.not(),
+        enableClick = hasActionLabel.not() && enable,
         onClickListener = onNavigate,
         titleTrailingElement = badge?.composeLet { count ->
             NavigationBadge(
@@ -317,6 +367,7 @@ private fun PrivacySuiteHeader(isExpanded: Boolean, onClick: () -> Unit) {
 
 @Composable
 private fun PrivacySuiteItem(
+    enabled: Boolean,
     item: NavDrawerItem.PrivacySuite,
     onNavigate: () -> Unit,
 ) {
@@ -329,14 +380,15 @@ private fun PrivacySuiteItem(
         leadingElement = {
             MegaIcon(
                 painter = rememberVectorPainter(item.icon),
-                tint = IconColor.Primary,
                 contentDescription = null
             )
         },
+        enable = enabled,
+        enableClick = enabled,
         trailingElement = {
             MegaIcon(
                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ExternalLink),
-                tint = IconColor.Secondary,
+                tint = if (enabled) IconColor.Secondary else IconColor.Disabled,
                 contentDescription = null,
             )
         },
@@ -346,10 +398,12 @@ private fun PrivacySuiteItem(
 
 @Composable
 private fun LogoutButton(
+    enabled: Boolean,
     isLoggingOut: Boolean,
     onLogoutClicked: () -> Unit,
 ) {
     SecondaryFilledButton(
+        enabled = enabled,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp)
@@ -370,7 +424,8 @@ private fun MenuHomeScreenUiPreview(
             uiState = MenuUiState(
                 name = "John Doe",
                 email = "john.doe@example.com",
-                unreadNotificationsCount = if (showBadge) 2 else 0
+                unreadNotificationsCount = if (showBadge) 2 else 0,
+                analyticsEventIdentifier = null,
             ),
             navigateToFeature = {},
             onLogoutClicked = {},
@@ -416,4 +471,5 @@ internal object MenuHomeScreenUiTestTags {
     const val PRIVACY_SUITE_ITEM = "$MENU_HOME_SCREEN:privacy_suite_item"
     const val LOGOUT_BUTTON = "$MENU_HOME_SCREEN:logout_button"
     const val BADGE = "$MENU_HOME_SCREEN:badge"
+    const val AVATAR = "$MENU_HOME_SCREEN:avatar"
 }

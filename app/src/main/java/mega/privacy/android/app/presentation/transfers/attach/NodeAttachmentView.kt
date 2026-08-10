@@ -14,18 +14,25 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+
+@Composable
+fun NodeAttachmentView(
+    viewModel: NodeAttachmentViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState? = null,
+) {
+    NodeAttachmentView(viewModel, snackbarHostState, { _, _ -> })
+}
 
 /**
  * Node attachment view
@@ -34,10 +41,10 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  *
  */
 @Composable
-fun NodeAttachmentView(
-    viewModel: NodeAttachmentViewModel = hiltViewModel(),
-    snackbarHostState: SnackbarHostState? = null,
-    showMessage: (String, Long) -> Unit = { _, _ -> },
+private fun NodeAttachmentView(
+    viewModel: NodeAttachmentViewModel,
+    snackbarHostState: SnackbarHostState?,
+    showMessage: (String, Long) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -76,26 +83,15 @@ fun NodeAttachmentView(
                 }
 
                 is NodeAttachmentEvent.AttachNodeSuccess -> {
-                    val chatId =
-                        event.chatIds.firstOrNull().takeIf { event.chatIds.size == 1 } ?: -1
+                    val chatId = event.chatIds.singleOrNull() ?: -1
                     if (snackbarHostState != null) {
                         coroutineScope.launch {
-                            val result = snackbarHostState.showSnackbar(
+                            val result = snackbarHostState.showAutoDurationSnackbar(
                                 message = context.getString(R.string.sent_as_message),
                                 actionLabel = context.getString(R.string.action_see)
                             )
                             if (result == SnackbarResult.ActionPerformed) {
-                                context.startActivity(
-                                    Intent(
-                                        context,
-                                        ManagerActivity::class.java
-                                    ).apply {
-                                        action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-                                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                        putExtra(Constants.CHAT_ID, chatId)
-                                        putExtra(Constants.EXTRA_MOVE_TO_CHAT_SECTION, true)
-                                    },
-                                )
+                                viewModel.navigateToChat(chatId, context)
                                 context.findActivity()?.finish()
                             }
                         }
@@ -129,7 +125,8 @@ fun createNodeAttachmentView(
         OriginalTheme(isDark = isSystemInDarkTheme()) {
             NodeAttachmentView(
                 viewModel = viewModel,
-                showMessage = showMessage
+                snackbarHostState = null,
+                showMessage = showMessage,
             )
         }
     }

@@ -8,7 +8,6 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.lifecycle.Lifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.settingsFragments.SettingsChatNotificationsFragment
@@ -27,6 +26,9 @@ class ChatNotificationsPreferencesActivity : PreferencesBaseActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
+            return
+        }
         setTitle(R.string.title_properties_chat_notifications_contact)
         sttChatNotifications = SettingsChatNotificationsFragment().apply {
             replaceFragment(this)

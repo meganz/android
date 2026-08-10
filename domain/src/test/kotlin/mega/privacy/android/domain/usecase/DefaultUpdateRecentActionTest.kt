@@ -12,6 +12,8 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultUpdateRecentActionTest {
@@ -32,15 +34,29 @@ class DefaultUpdateRecentActionTest {
         timestamp: Long,
         parentNodeId: NodeId,
         userEmail: String,
-    ): RecentActionBucket =
-        RecentActionBucket(
+    ): RecentActionBucket {
+        val date = Instant.ofEpochMilli(timestamp)
+            .atZone(ZoneOffset.UTC)
+            .toLocalDate()
+            .toString()
+        val dateTimestamp = Instant.ofEpochMilli(timestamp)
+            .atZone(ZoneOffset.UTC)
+            .toLocalDate()
+            .atStartOfDay(ZoneOffset.UTC)
+            .toEpochSecond()
+        val identifier =
+            "M_$isMedia-U_$isUpdate-D_$date-UE_$userEmail-PNH_${parentNodeId.longValue}"
+        return RecentActionBucket(
+            id = identifier,
             isMedia = isMedia,
             isUpdate = isUpdate,
             timestamp = timestamp,
+            dateTimestamp = dateTimestamp,
             parentNodeId = parentNodeId,
             userEmail = userEmail,
             nodes = emptyList(),
         )
+    }
 
     @Test
     fun `test that is same bucket return true if two buckets have same properties`() = runTest {
@@ -48,16 +64,16 @@ class DefaultUpdateRecentActionTest {
         val bucket2 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(1L), "1")
         val bucket3 = createBucket(isMedia = false, isUpdate = false, 0L, NodeId(1L), "1")
         val bucket4 = createBucket(isMedia = true, isUpdate = false, 0L, NodeId(1L), "1")
-        val bucket5 = createBucket(isMedia = true, isUpdate = true, 1L, NodeId(1L), "1")
+        val bucket5 = createBucket(isMedia = true, isUpdate = true, 86400000L, NodeId(1L), "1")
         val bucket6 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(0L), "1")
         val bucket7 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(1L), "2")
 
-        assertThat(bucket1.identifier == bucket2.identifier).isEqualTo(true)
-        assertThat(bucket1.identifier == bucket3.identifier).isEqualTo(false)
-        assertThat(bucket1.identifier == bucket4.identifier).isEqualTo(false)
-        assertThat(bucket1.identifier == bucket5.identifier).isEqualTo(false)
-        assertThat(bucket1.identifier == bucket6.identifier).isEqualTo(false)
-        assertThat(bucket1.identifier == bucket7.identifier).isEqualTo(false)
+        assertThat(bucket1.id == bucket2.id).isEqualTo(true)
+        assertThat(bucket1.id == bucket3.id).isEqualTo(false)
+        assertThat(bucket1.id == bucket4.id).isEqualTo(false)
+        assertThat(bucket1.id == bucket5.id).isEqualTo(false)
+        assertThat(bucket1.id == bucket6.id).isEqualTo(false)
+        assertThat(bucket1.id == bucket7.id).isEqualTo(false)
     }
 
     @Test
@@ -65,7 +81,7 @@ class DefaultUpdateRecentActionTest {
         runTest {
             val expected = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(1L), "1")
             val list = listOf(expected, expected, expected)
-            whenever(getRecentActionsUseCase(any())).thenReturn(list)
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(list)
 
             assertThat(underTest.invoke(expected, null, false)).isEqualTo(expected)
         }
@@ -78,12 +94,12 @@ class DefaultUpdateRecentActionTest {
             val item1 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(2L), "1")
             val item2 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(3L), "1")
 
-            val expected = createBucket(isMedia = true, isUpdate = true, 1L, NodeId(0L), "1")
+            val expected = createBucket(isMedia = true, isUpdate = true, 86400000L, NodeId(0L), "1")
 
             val cachedActionList = listOf(current, item1, item2)
 
             val list = listOf(expected, item1, item2)
-            whenever(getRecentActionsUseCase(any())).thenReturn(list)
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(list)
 
             assertThat(underTest.invoke(current, cachedActionList, false)).isEqualTo(expected)
         }
@@ -99,7 +115,7 @@ class DefaultUpdateRecentActionTest {
             val cachedActionList = listOf(current, item1, item2)
 
             val list = listOf(item1, item2)
-            whenever(getRecentActionsUseCase(any())).thenReturn(list)
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(list)
 
             assertThat(underTest.invoke(current, cachedActionList, false)).isEqualTo(null)
         }

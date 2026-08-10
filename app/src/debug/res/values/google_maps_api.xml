@@ -1,0 +1,12 @@
+<resources>
+    <!--
+    Placeholder Google Maps API key for the debug build variant.
+    CI/CD pipelines inject the real key automatically during builds.
+
+    For local geolocation testing, replace the empty value below with
+    your own key (it starts with "AIza"). Get one here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+    -->
+
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false"></string>
+</resources>

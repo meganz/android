@@ -23,17 +23,17 @@ object TestGetNodeModule {
 
     @Provides
     fun provideCopyNode() = mock<CopyNodeUseCase> {
-        onBlocking { invoke(any(), any(), any()) }.thenReturn(NodeId(1L))
+        on { invoke(any(), any(), any()) }.thenReturn(NodeId(1L))
     }
 
     @Provides
     fun provideGetChildrenNode() = mock<GetChildrenNode> {
-        onBlocking { invoke(any(), any()) }.thenReturn(emptyList())
+        on { invoke(any(), any()) }.thenReturn(emptyList())
     }
 
     @Provides
     fun provideGetNodeByHandle() = mock<GetNodeByHandle> {
-        onBlocking { invoke(any()) }.thenReturn(MegaNode())
+        on { invoke(any()) }.thenReturn(MegaNode())
     }
 
 }

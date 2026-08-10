@@ -45,9 +45,32 @@ class SortFavouritesUseCaseTest {
     }
 
     @Test
+    fun `test that file nodes are sorted by label ascending`() = runTest {
+        val order = FavouriteSortOrder.Label(sortDescending = false)
+        val fileA = mock<FileNode> {
+            on { name } doReturn "file1"
+            on { label } doReturn 1
+            on { modificationTime } doReturn 100L
+            on { size } doReturn 50L
+
+        }
+        val fileB = mock<FileNode> {
+            on { name } doReturn "file2"
+            on { label } doReturn 2
+            on { modificationTime } doReturn 200L
+            on { size } doReturn 100L
+        }
+
+        val nodes = listOf(fileB, fileA)
+
+        val result = underTest(nodes, order)
+
+        assertThat(result).containsExactly(fileA, fileB).inOrder()
+    }
+
+    @Test
     fun `test that file nodes are sorted by label descending`() = runTest {
-        // FavouriteSortOrder.Label is always descending.
-        val order = FavouriteSortOrder.Label
+        val order = FavouriteSortOrder.Label(sortDescending = true)
         val fileA = mock<FileNode> {
             on { name } doReturn "file1"
             on { label } doReturn 1
@@ -180,10 +203,80 @@ class SortFavouritesUseCaseTest {
         assertThat(result).containsExactly(smallFile, bigFile).inOrder()
     }
 
+    @Test
+    fun `test that file nodes sorted by size descending`() = runTest {
+        val order = FavouriteSortOrder.Size(sortDescending = true)
+        val smallFile = mock<FileNode> {
+            on { name } doReturn "file1"
+            on { label } doReturn 3
+            on { modificationTime } doReturn 100L
+            on { size } doReturn 50L
+        }
+        val bigFile = mock<FileNode> {
+            on { name } doReturn "file2"
+            on { label } doReturn 3
+            on { modificationTime } doReturn 200L
+            on { size } doReturn 100L
+        }
+        val nodes = listOf(smallFile, bigFile)
+
+        val result = underTest(nodes, order)
+
+        assertThat(result).containsExactly(bigFile, smallFile).inOrder()
+    }
+
+
+    @Test
+    fun `test that file nodes are sorted by added date ascending`() = runTest {
+        val order = FavouriteSortOrder.AddedDate(sortDescending = false)
+        val fileOld = mock<FileNode> {
+            on { name } doReturn "file1"
+            on { label } doReturn 1
+            on { modificationTime } doReturn 100L
+            on { creationTime } doReturn 100L
+            on { size } doReturn 50L
+        }
+        val fileNew = mock<FileNode> {
+            on { name } doReturn "file2"
+            on { label } doReturn 1
+            on { modificationTime } doReturn 200L
+            on { creationTime } doReturn 200L
+            on { size } doReturn 100L
+        }
+        val nodes = listOf(fileNew, fileOld)
+
+        val result = underTest(nodes, order)
+
+        assertThat(result).containsExactly(fileOld, fileNew).inOrder()
+    }
+
+    @Test
+    fun `test that file nodes are sorted by added date descending`() = runTest {
+        val order = FavouriteSortOrder.AddedDate(sortDescending = true)
+        val fileOld = mock<FileNode> {
+            on { name } doReturn "file1"
+            on { label } doReturn 1
+            on { modificationTime } doReturn 100L
+            on { creationTime } doReturn 100L
+            on { size } doReturn 50L
+        }
+        val fileNew = mock<FileNode> {
+            on { name } doReturn "file2"
+            on { label } doReturn 1
+            on { modificationTime } doReturn 200L
+            on { creationTime } doReturn 200L
+            on { size } doReturn 100L
+        }
+        val nodes = listOf(fileOld, fileNew)
+
+        val result = underTest(nodes, order)
+
+        assertThat(result).containsExactly(fileNew, fileOld).inOrder()
+    }
 
     @Test
     fun `test that folder nodes are sorted correctly`() = runTest {
-        val order = FavouriteSortOrder.Label
+        val order = FavouriteSortOrder.Label(sortDescending = false)
         val folder = mock<FolderNode> {
             on { name } doReturn "folder"
             on { label } doReturn 1

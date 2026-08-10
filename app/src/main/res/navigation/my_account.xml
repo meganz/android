@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_my_account_to_my_account_usage"
             app:destination="@id/my_account_usage" />
+        <action
+            android:id="@+id/action_my_account_to_my_account_usage_compose"
+            app:destination="@id/my_account_usage_compose" />
 
         <action
             android:id="@+id/action_my_account_to_edit_profile"
@@ -40,6 +43,10 @@
         android:id="@+id/my_account_usage"
         android:name="mega.privacy.android.app.myAccount.MyAccountUsageFragment"
         tools:layout="@layout/fragment_my_account_usage"/>
+
+    <fragment
+        android:id="@+id/my_account_usage_compose"
+        android:name="mega.privacy.android.app.myAccount.MyAccountUsageComposeFragment" />
 
     <activity
         android:id="@+id/edit_profile"

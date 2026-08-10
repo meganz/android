@@ -4,6 +4,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
@@ -32,13 +33,14 @@ class SendChatAttachmentsUseCaseTest {
     private val doesCacheHaveSufficientSpaceForUrisUseCase =
         mock<DoesCacheHaveSufficientSpaceForUrisUseCase>()
 
+    private val pitagTrigger = PitagTrigger.Picker
+
     @BeforeAll
     fun setup() {
         underTest = SendChatAttachmentsUseCase(
             startChatUploadsWorkerUseCase,
             chatMessageRepository,
             deviceCurrentTimeUseCase,
-            doesCacheHaveSufficientSpaceForUrisUseCase,
         )
     }
 
@@ -48,7 +50,6 @@ class SendChatAttachmentsUseCaseTest {
             startChatUploadsWorkerUseCase,
             chatMessageRepository,
             deviceCurrentTimeUseCase,
-            doesCacheHaveSufficientSpaceForUrisUseCase,
         )
     }
 
@@ -58,7 +59,7 @@ class SendChatAttachmentsUseCaseTest {
         val uri = UriPath("file")
         val uris = mapOf<UriPath, String?>(uri to null)
         commonStub()
-        underTest(uris, false, chatId)
+        underTest(uris, false, chatId, pitagTrigger = pitagTrigger)
         verify(chatMessageRepository).savePendingMessages(
             SavePendingMessageRequest(
                 chatId = chatId,
@@ -72,6 +73,7 @@ class SendChatAttachmentsUseCaseTest {
                 nodeHandle = -1,
                 fingerprint = null,
                 name = uris[uri],
+                pitagTrigger = pitagTrigger,
             ),
             listOf(chatId)
         )
@@ -82,7 +84,7 @@ class SendChatAttachmentsUseCaseTest {
         val chatId = 123L
         val uris = List(3) { UriPath("file$it") }.associateWith { null }
         commonStub()
-        underTest(uris, false, chatId)
+        underTest(uris, false, chatId, pitagTrigger = pitagTrigger)
         verify(chatMessageRepository, times(uris.size))
             .savePendingMessages(any(), eq(listOf(chatId)))
     }
@@ -94,7 +96,7 @@ class SendChatAttachmentsUseCaseTest {
             val pendingMsgId = 123L
             val uris = mapOf<UriPath, String?>(UriPath("file") to null)
             commonStub(pendingMsgId)
-            underTest(uris, isVoiceClip = true, chatId)
+            underTest(uris, isVoiceClip = true, chatId, pitagTrigger = pitagTrigger)
             verify(chatMessageRepository).savePendingMessages(argThat {
                 this.type == PendingMessage.TYPE_VOICE_CLIP
             }, eq(listOf(chatId)))
@@ -108,7 +110,7 @@ class SendChatAttachmentsUseCaseTest {
             val name = "file renamed"
             val uris = mapOf<UriPath, String?>(UriPath("file") to name)
             commonStub(pendingMsgId)
-            underTest(uris, isVoiceClip = true, chatId)
+            underTest(uris, isVoiceClip = true, chatId, pitagTrigger = pitagTrigger)
             verify(chatMessageRepository).savePendingMessages(argThat {
                 this.name == name
             }, eq(listOf(chatId)))
@@ -122,7 +124,7 @@ class SendChatAttachmentsUseCaseTest {
         val uris = mapOf<UriPath, String?>(expected to null)
         commonStub(pendingMsgId)
 
-        underTest(uris, isVoiceClip = false, chatId)
+        underTest(uris, isVoiceClip = false, chatId, pitagTrigger = pitagTrigger)
 
         verify(chatMessageRepository).cacheOriginalPathForPendingMessage(
             pendingMsgId, expected

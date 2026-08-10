@@ -33,7 +33,10 @@ interface MediaPlayerCallback {
      *
      * @param playWhenReady true is play when ready, otherwise is false
      */
-    fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean)
+    fun onPlayWhenReadyChangedCallback(
+        playWhenReady: Boolean,
+        reason: Int,
+    )
 
     /**
      * Callback from onPlaybackStateChanged
@@ -44,8 +47,10 @@ interface MediaPlayerCallback {
 
     /**
      * Callback from onPlayerError
+     *
+     * @param errorCode the ExoPlayer error code from [androidx.media3.common.PlaybackException]
      */
-    fun onPlayerErrorCallback()
+    fun onPlayerErrorCallback(errorCode: Int)
 
     /**
      * Callback from onVideoSizeChanged
@@ -54,4 +59,10 @@ interface MediaPlayerCallback {
      * @param videoHeight video height
      */
     fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int)
+
+    /**
+     * Callback when the media contains a video track but no video renderer is active,
+     * indicating a silent decoder failure (e.g. hardware decoder exceeds capabilities).
+     */
+    fun onVideoNotRenderedCallback()
 }

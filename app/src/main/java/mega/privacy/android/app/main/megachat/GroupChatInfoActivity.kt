@@ -39,7 +39,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PositionDividerItemDecoration
-import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.ActivityGroupChatPropertiesBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -65,12 +64,7 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -86,7 +80,9 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCas
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -112,7 +108,7 @@ import javax.inject.Inject
  * @property binding [ActivityGroupChatPropertiesBinding]
  * @property chatLink The chat link
  * @property chat [MegaChatRoom]
- * @property chatC [ChatController]
+ * @property chatController [ChatController]
  * @property chatHandle The chat id
  * @property selectedHandleParticipant The handle of participant selected
  * @property participantsCount Number of participants
@@ -140,11 +136,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     @Inject
     lateinit var navigator: MegaNavigator
 
+    @Inject
+    lateinit var chatController: ChatController
+
     lateinit var binding: ActivityGroupChatPropertiesBinding
     private val viewModel by viewModels<GroupChatInfoViewModel>()
 
     var chatLink: String? = null
-    var chatC: ChatController? = null
     var chatHandle: Long = 0
     var selectedHandleParticipant: Long = 0
     var participantsCount: Long = 0
@@ -175,7 +173,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         Timber.d("onCreate")
 
         groupChatInfoActivity = this
-        chatC = ChatController(this)
 
         if (shouldRefreshSessionDueToKarere()) return
 
@@ -279,6 +276,33 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 updateParticipants()
                 invalidateOptionsMenu()
             }
+
+            state.archiveChatResult?.let { result ->
+                when {
+                    result.success && result.isArchive -> finish()
+                    result.success -> {
+                        showSnackbar(getString(R.string.success_unarchive_chat, result.chatTitle))
+                        updateAdapterHeader()
+                    }
+
+                    result.isArchive ->
+                        showSnackbar(getString(R.string.error_archive_chat, result.chatTitle))
+
+                    else ->
+                        showSnackbar(getString(R.string.error_unarchive_chat, result.chatTitle))
+                }
+                viewModel.onConsumeArchiveChatResult()
+            }
+
+            state.removeParticipantSuccess?.let { success ->
+                if (success) {
+                    updateParticipants()
+                    showSnackbar(getString(R.string.remove_participant_success))
+                } else {
+                    showSnackbar(getString(R.string.remove_participant_error))
+                }
+                viewModel.onConsumeRemoveParticipantResult()
+            }
             updateParticipantsWarning()
             val call = state.call
             val chatRoom = state.chatRoom
@@ -367,7 +391,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 val peerHandle = chatRoom.getPeerHandle(i)
                 val participant = MegaChatParticipant(peerHandle, peerPrivilege)
                 participants.add(participant)
-                val userStatus = ChatUtil.getUserStatus(peerHandle)
+                val userStatus = ChatUtil.getUserStatus(peerHandle, megaApi, megaChatApi)
                 if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
                     megaChatApi.requestLastGreen(participant.handle)
                 }
@@ -457,21 +481,18 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
                 val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
                 dialog.show(supportFragmentManager, dialog.tag)
-            } else if (ChatUtil.areAllMyContactsChatParticipants(chat)) {
+            } else if (ChatUtil.areAllMyContactsChatParticipants(
+                    chat,
+                    megaApi
+                )) {
                 val dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
                 dialog.show(supportFragmentManager, dialog.tag)
             } else {
-                val intent = Intent(this, AddContactActivity::class.java)
-                intent.putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-                intent.putExtra(INTENT_EXTRA_KEY_CHAT, true)
-                intent.putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatHandle)
-                intent.putExtra(
-                    INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                    getString(R.string.add_participants_menu_item)
+                navigator.openAddChatParticipantsForResult(
+                    activity = this,
+                    chatId = chatHandle,
+                    requestCode = Constants.REQUEST_ADD_PARTICIPANTS,
                 )
-
-                @Suppress("deprecation")
-                startActivityForResult(intent, Constants.REQUEST_ADD_PARTICIPANTS)
             }
         } else {
             Timber.w("Online but not megaApi")
@@ -495,7 +516,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             val builder = MaterialAlertDialogBuilder(
                 activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog
             )
-            val name = chatC?.getParticipantFullName(handle)
+            val name = chatController?.getParticipantFullName(handle)
             builder.setMessage(resources.getString(R.string.confirmation_remove_chat_contact, name))
                 .setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int -> removeParticipant() }
                 .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
@@ -504,7 +525,14 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     }
 
     private fun removeParticipant() =
-        chatC?.removeParticipant(chatHandle, selectedHandleParticipant)
+        viewModel.removeParticipant(chatHandle, selectedHandleParticipant)
+
+    /**
+     * Archives or unarchives the current chat.
+     */
+    fun archiveChat() {
+        viewModel.archiveChat()
+    }
 
     /**
      * Shows change permissions dialog
@@ -582,7 +610,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     private fun changePermissions(newPermissions: Int) {
         Timber.d("New permissions: %s", newPermissions)
-        chatC?.alterParticipantsPermissions(chatHandle, selectedHandleParticipant, newPermissions)
+        val permission = when (newPermissions) {
+            MegaChatRoom.PRIV_MODERATOR -> ChatRoomPermission.Moderator
+            MegaChatRoom.PRIV_STANDARD -> ChatRoomPermission.Standard
+            MegaChatRoom.PRIV_RO -> ChatRoomPermission.ReadOnly
+            else -> ChatRoomPermission.Unknown
+        }
+        viewModel.updateChatPermissions(chatHandle, selectedHandleParticipant, permission)
     }
 
     /**
@@ -730,10 +764,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             }
             false
         }
-        input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE)
+        input.setImeActionLabel(
+            getString(sharedR.string.context_rename),
+            EditorInfo.IME_ACTION_DONE
+        )
 
-        builder.setTitle(R.string.context_rename)
-            .setPositiveButton(getString(R.string.context_rename), null)
+        builder.setTitle(sharedR.string.context_rename)
+            .setPositiveButton(getString(sharedR.string.context_rename), null)
             .setNegativeButton(android.R.string.cancel, null)
             .setView(layout)
             .setOnDismissListener {
@@ -756,7 +793,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         when {
             title.isEmpty() -> {
                 Timber.w("Input is empty")
-                input.error = getString(R.string.invalid_string)
+                input.error = getString(sharedR.string.general_invalid_string)
                 input.requestFocus()
             }
 
@@ -768,7 +805,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
             else -> {
                 Timber.d("Positive button pressed - change title")
-                chatC?.changeTitle(chatHandle, title)
+                viewModel.setChatTitle(chatHandle, title)
                 changeTitleDialog?.dismiss()
             }
         }
@@ -837,97 +874,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         Timber.d("onRequestFinish CHAT: %d %d", request.type, e.errorCode)
 
         when (request.type) {
-            MegaChatRequest.TYPE_UPDATE_PEER_PERMISSIONS -> {
-                Timber.d("Permissions changed")
-                var index = -1
-                var participantToUpdate: MegaChatParticipant? = null
-                Timber.d("Participants count: %s", participantsCount)
-                for (i in 0 until participantsCount) {
-                    if (request.userHandle == participants[i.toInt()]?.handle) {
-                        participantToUpdate = participants[i.toInt()]
-                        participantToUpdate?.privilege = request.privilege
-                        index = i.toInt()
-                        break
-                    }
-                }
-
-                if (index != -1 && participantToUpdate != null) {
-                    participants[index] = participantToUpdate
-                    adapter?.updateParticipant(index, participants)
-                }
-            }
-
-            MegaChatRequest.TYPE_ARCHIVE_CHATROOM -> {
-                val chatHandle = request.chatHandle
-                val chat = megaChatApi.getChatRoom(chatHandle)
-                var chatTitle = ChatUtil.getTitleChat(chat)
-                if (chatTitle == null) {
-                    chatTitle = ""
-                } else if (chatTitle.isNotEmpty() && chatTitle.length > MAX_LENGTH_CHAT_TITLE) {
-                    chatTitle = chatTitle.substring(0, 59) + "..."
-                }
-
-                if (chatTitle.isNotEmpty() && chat.isGroup && !chat.hasCustomTitle()) {
-                    chatTitle = "\"" + chatTitle + "\""
-                }
-
-                if (e.errorCode == MegaChatError.ERROR_OK) {
-                    if (request.flag) {
-                        Timber.d("Chat archived")
-                        viewModel.launchBroadcastChatArchived(chatTitle)
-                        finish()
-                    } else {
-                        Timber.d("Chat unarchived")
-                        showSnackbar(getString(R.string.success_unarchive_chat, chatTitle))
-                    }
-                } else if (request.flag) {
-                    Timber.e("ERROR WHEN ARCHIVING CHAT %s", e.errorString)
-                    showSnackbar(getString(R.string.error_archive_chat, chatTitle))
-                } else {
-                    Timber.e("ERROR WHEN UNARCHIVING CHAT %s", e.errorString)
-                    showSnackbar(getString(R.string.error_unarchive_chat, chatTitle))
-                }
-
-                updateAdapterHeader()
-            }
-
-            MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM -> {
-                Timber.d("Remove participant: %s", request.userHandle)
-                Timber.d("My user handle: %s", megaChatApi.myUserHandle)
-
-                if (e.errorCode == MegaChatError.ERROR_OK) {
-                    if (request.userHandle == MegaApiJava.INVALID_HANDLE) {
-                        Timber.d("I left the chatroom")
-                        finish()
-                    } else {
-                        Timber.d("Removed from chat")
-                        megaChatApi.getChatRoom(chatHandle)?.let { chatRoom ->
-                            chat = chatRoom
-                            Timber.d("Peers after onChatListItemUpdate: %s", chatRoom.peerCount)
-                        }
-                        updateParticipants()
-                        showSnackbar(getString(R.string.remove_participant_success))
-                    }
-                } else if (request.userHandle == -1L) {
-                    Timber.e("ERROR WHEN LEAVING CHAT%s", e.errorString)
-                    showSnackbar("Error.Chat not left")
-                } else {
-                    Timber.e("ERROR WHEN TYPE_REMOVE_FROM_CHATROOM %s", e.errorString)
-                    showSnackbar(getString(R.string.remove_participant_error))
-                }
-            }
-
-            MegaChatRequest.TYPE_EDIT_CHATROOM_NAME -> {
-                Timber.d("Change title")
-                if (e.errorCode == MegaChatError.ERROR_OK) {
-                    if (request.text != null) {
-                        updateAdapterHeader()
-                    }
-                } else {
-                    Timber.e("ERROR WHEN TYPE_EDIT_CHATROOM_NAME %s", e.errorString)
-                }
-            }
-
             MegaChatRequest.TYPE_CREATE_CHATROOM -> {
                 Timber.d("Create chat request finish!!!")
                 if (e.errorCode == MegaChatError.ERROR_OK) {
@@ -1410,7 +1356,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
         for (positionInAdapter in participantAvatars.keys) {
             val handle = participantAvatars[positionInAdapter]
-            if (!TextUtil.isTextEmpty(handle)) {
+            if (!handle.isNullOrBlank()) {
                 megaApi.getUserAvatar(
                     handle,
                     buildAvatarFile(handle + FileUtil.JPG_EXTENSION)?.absolutePath,
@@ -1438,7 +1384,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
         for (i in 0 until handleList.size()) {
             val handle = handleList[i]
-            chatC?.setNonContactAttributesInDB(handle)
+            chatController?.setNonContactAttributesInDB(handle)
 
             for (positionInAdapter in participantUpdates.keys) {
                 positionInAdapter?.let { pos ->
@@ -1447,8 +1393,9 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                             if (positionInArray >= 0 && positionInArray < participants.size && participants[positionInArray]?.handle == handle
                             ) {
                                 participantUpdates[pos]?.let { participant ->
-                                    participant.email = chatC?.getParticipantEmail(handle)
-                                    participant.fullName = chatC?.getParticipantFullName(handle)
+                                    participant.email = chatController?.getParticipantEmail(handle)
+                                    participant.fullName =
+                                        chatController?.getParticipantFullName(handle)
                                     chat?.let { chatRoom ->
                                         participant.privilege =
                                             chatRoom.getPeerPrivilegeByHandle(handle)
@@ -1510,7 +1457,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      * @return True if the participant was correctly updated, false otherwise.
      */
     fun hasParticipantAttributes(participant: MegaChatParticipant?): Boolean =
-        !TextUtil.isTextEmpty(participant?.email) || !TextUtil.isTextEmpty(participant?.fullName)
+        !participant?.email.isNullOrBlank() || !participant?.fullName.isNullOrBlank()
 
     private fun updateAdapterHeader() = adapter?.notifyItemChanged(0)
 
@@ -1557,7 +1504,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         chat?.let {
-            outState.putLong(Constants.CHAT_ID, it.chatId)
+            outState.putLong(ChatNavKey.LEGACY_CHAT_ID, it.chatId)
         }
 
         outState.putBoolean(END_CALL_FOR_ALL_DIALOG, isAlertDialogShown(endCallForAllDialog))
@@ -1576,7 +1523,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     companion object {
         private const val TIMEOUT = 300
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100
-        private const val MAX_LENGTH_CHAT_TITLE = 60
         private const val END_CALL_FOR_ALL_DIALOG = "isEndCallForAllDialogShown"
     }
 

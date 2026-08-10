@@ -129,6 +129,47 @@ class GetIncomingSharesChildrenNodeUseCaseTest {
             verify(areCredentialsVerifiedUseCase).invoke(any())
         }
 
+    @Test
+    fun `test that the provided sort order is used for the root list and the global others sort order is not read`() =
+        runTest {
+            val shareData = mock<ShareData> {
+                on { nodeHandle }.thenReturn(1L)
+            }
+            val node = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(1L))
+            }
+            whenever(getContactVerificationWarningUseCase.invoke()).thenReturn(false)
+            whenever(nodeRepository.getAllIncomingShares(SortOrder.ORDER_SIZE_ASC)).thenReturn(
+                listOf(shareData)
+            )
+            whenever(getNodeByHandle.invoke(NodeId(shareData.nodeHandle))).thenReturn(node)
+            whenever(mapNodeToShareUseCase.invoke(node, shareData)).thenReturn(mock<ShareFileNode>())
+
+            underTest.invoke(-1L, sortOrder = SortOrder.ORDER_SIZE_ASC)
+
+            verify(nodeRepository).getAllIncomingShares(SortOrder.ORDER_SIZE_ASC)
+            verifyNoInteractions(getOthersSortOrder)
+        }
+
+    @Test
+    fun `test that the provided sort order is used for child nodes and the global cloud sort order is not read`() =
+        runTest {
+            val childNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(2L))
+            }
+            whenever(mapNodeToShareUseCase.invoke(any(), any())).thenReturn(mock<ShareFileNode>())
+            whenever(getContactVerificationWarningUseCase.invoke()).thenReturn(false)
+            whenever(getNodeByHandle.invoke(NodeId(123L))).thenReturn(childNode)
+            whenever(
+                getChildrenNode.invoke(childNode.id, SortOrder.ORDER_SIZE_ASC)
+            ).thenReturn(listOf(mock(), mock()))
+
+            underTest.invoke(123L, sortOrder = SortOrder.ORDER_SIZE_ASC)
+
+            verify(getChildrenNode).invoke(childNode.id, SortOrder.ORDER_SIZE_ASC)
+            verifyNoInteractions(getCloudSortOrder)
+        }
+
     @BeforeEach
     fun resetMocks() {
         reset(

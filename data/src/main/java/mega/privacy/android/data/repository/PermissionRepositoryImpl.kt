@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import android.Manifest
 import android.os.Build
 import android.os.Environment
 import kotlinx.coroutines.CoroutineDispatcher
@@ -51,6 +52,10 @@ internal class PermissionRepositoryImpl @Inject constructor(
                 || permissionGateway.hasPermissions(android.Manifest.permission.ACCESS_COARSE_LOCATION)
     }
 
+    override fun hasNotificationPermission() =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                permissionGateway.hasPermissions(Manifest.permission.POST_NOTIFICATIONS)
+
     override suspend fun setNotificationPermissionShownTimestamp(timestamp: Long) =
         withContext(ioDispatcher) {
             uiPreferencesGateway.setNotificationPermissionShownTimestamp(timestamp)
@@ -60,4 +65,28 @@ internal class PermissionRepositoryImpl @Inject constructor(
         uiPreferencesGateway
             .monitorNotificationPermissionShownTimestamp()
             .flowOn(ioDispatcher)
+
+    override fun hasCameraUploadsPermission(): Boolean {
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            arrayOf(
+                permissionGateway.getImagePermissionByVersion(),
+                permissionGateway.getVideoPermissionByVersion(),
+                permissionGateway.getPartialMediaPermission(),
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(
+                permissionGateway.getImagePermissionByVersion(),
+                permissionGateway.getVideoPermissionByVersion()
+            )
+        } else {
+            arrayOf(
+                permissionGateway.getImagePermissionByVersion(),
+                permissionGateway.getVideoPermissionByVersion()
+            )
+        }
+        val hasMediaPermissions = permissionGateway.hasPermissions(*permissions)
+        return hasMediaPermissions.also {
+            Timber.d("Device has required CU permissions $it")
+        }
+    }
 }

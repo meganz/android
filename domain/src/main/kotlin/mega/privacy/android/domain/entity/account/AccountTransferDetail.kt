@@ -5,14 +5,10 @@ package mega.privacy.android.domain.entity.account
  *
  * @property totalTransfer
  * @property usedTransfer
+ * @property usedTransferPercentage
  */
 data class AccountTransferDetail(
     val totalTransfer: Long,
     val usedTransfer: Long,
-) {
-    /**
-     * Used transfer percentage
-     */
-    val usedTransferPercentage: Int
-        get() = if (totalTransfer > 0) (100 * usedTransfer / totalTransfer).toInt() else 0
-}
+    val usedTransferPercentage: Int,
+)

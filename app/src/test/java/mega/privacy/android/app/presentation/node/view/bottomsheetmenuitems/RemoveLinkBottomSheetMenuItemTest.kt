@@ -3,8 +3,10 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -27,7 +29,7 @@ class RemoveLinkBottomSheetMenuItemTest {
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
-        node: TypedFileNode,
+        node: TypedNode,
         expected: Boolean,
     ) = runTest {
         val result = underTest.shouldDisplay(
@@ -46,14 +48,16 @@ class RemoveLinkBottomSheetMenuItemTest {
             false,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn true },
+            mock<TypedFileNode> { on { isTakenDown } doReturn true
+                on { isNodeKeyDecrypted } doReturn true},
             false
         ),
         Arguments.of(
             false,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
+            mock<TypedFileNode> { on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true},
             false
         ),
         Arguments.of(
@@ -63,6 +67,7 @@ class RemoveLinkBottomSheetMenuItemTest {
             mock<TypedFileNode> {
                 on { isTakenDown } doReturn false
                 on { exportedData } doReturn exportedData
+                on { isNodeKeyDecrypted } doReturn true
             },
             true
         ),
@@ -73,6 +78,7 @@ class RemoveLinkBottomSheetMenuItemTest {
             mock<TypedFileNode> {
                 on { isTakenDown } doReturn false
                 on { exportedData } doReturn exportedData
+                on { isNodeKeyDecrypted } doReturn true
             },
             false
         ),
@@ -83,6 +89,7 @@ class RemoveLinkBottomSheetMenuItemTest {
             mock<TypedFileNode> {
                 on { isTakenDown } doReturn false
                 on { exportedData } doReturn exportedData
+                on { isNodeKeyDecrypted } doReturn true
             },
             false
         ),
@@ -93,8 +100,32 @@ class RemoveLinkBottomSheetMenuItemTest {
             mock<TypedFileNode> {
                 on { isTakenDown } doReturn false
                 on { exportedData } doReturn exportedData
+                on { isNodeKeyDecrypted } doReturn true
             },
             true
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { exportedData } doReturn exportedData
+                on { isS4Container } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
+            },
+            false
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+                on { exportedData } doReturn exportedData
+                on { isNodeKeyDecrypted } doReturn false
+            },
+            false
         ),
     )
 }

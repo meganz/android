@@ -1,12 +1,14 @@
 package mega.privacy.android.app.namecollision.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity.Upload.Companion.toFileNameCollision
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
-import java.io.Serializable
 
 /**
  * Name collision UI entity
@@ -23,7 +25,7 @@ import java.io.Serializable
  * @property renameName
  * @constructor Create empty Name collision
  */
-sealed class NameCollisionUiEntity : Serializable {
+sealed class NameCollisionUiEntity : Parcelable {
     abstract val collisionHandle: Long
     abstract val name: String
     abstract val size: Long?
@@ -39,6 +41,7 @@ sealed class NameCollisionUiEntity : Serializable {
      *
      * @property absolutePath
      */
+    @Parcelize
     data class Upload(
         override val collisionHandle: Long,
         val absolutePath: String,
@@ -50,6 +53,7 @@ sealed class NameCollisionUiEntity : Serializable {
         override val parentHandle: Long?,
         override val isFile: Boolean = true,
         override val renameName: String? = null,
+        val pitagTrigger: PitagTrigger,
     ) : NameCollisionUiEntity() {
 
         companion object {
@@ -71,7 +75,8 @@ sealed class NameCollisionUiEntity : Serializable {
                 lastModified = collision.lastModified,
                 parentHandle = collision.parentHandle,
                 isFile = collision.isFile,
-                renameName = collision.renameName
+                renameName = collision.renameName,
+                pitagTrigger = collision.pitagTrigger,
             )
 
             /**
@@ -87,7 +92,8 @@ sealed class NameCollisionUiEntity : Serializable {
                 parentHandle = parentHandle ?: -1L,
                 isFile = isFile,
                 renameName = renameName,
-                path = UriPath(absolutePath)
+                path = UriPath(absolutePath),
+                pitagTrigger = pitagTrigger,
             )
         }
     }
@@ -98,6 +104,7 @@ sealed class NameCollisionUiEntity : Serializable {
      * @property nodeHandle
      * @property serializedNode
      */
+    @Parcelize
     data class Copy(
         override val collisionHandle: Long,
         val nodeHandle: Long,
@@ -148,7 +155,7 @@ sealed class NameCollisionUiEntity : Serializable {
             isFile = isFile,
             serializedData = serializedNode,
             renameName = renameName,
-            type = NodeNameCollisionType.COPY
+            type = NodeNameCollisionType.COPY,
         )
     }
 
@@ -159,6 +166,7 @@ sealed class NameCollisionUiEntity : Serializable {
      * @property chatId
      * @property messageId
      */
+    @Parcelize
     data class Import(
         override val collisionHandle: Long,
         val nodeHandle: Long,
@@ -212,7 +220,7 @@ sealed class NameCollisionUiEntity : Serializable {
             serializedData = null,
             renameName = renameName,
             chatId = chatId,
-            messageId = messageId
+            messageId = messageId,
         )
     }
 
@@ -221,6 +229,7 @@ sealed class NameCollisionUiEntity : Serializable {
      *
      * @property nodeHandle
      */
+    @Parcelize
     data class Movement(
         override val collisionHandle: Long,
         val nodeHandle: Long,
@@ -269,7 +278,7 @@ sealed class NameCollisionUiEntity : Serializable {
             isFile = isFile,
             serializedData = null,
             renameName = renameName,
-            type = NodeNameCollisionType.MOVE
+            type = NodeNameCollisionType.MOVE,
         )
     }
 }

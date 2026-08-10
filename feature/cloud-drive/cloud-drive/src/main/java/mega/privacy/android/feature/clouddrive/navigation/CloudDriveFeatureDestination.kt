@@ -2,18 +2,25 @@ package mega.privacy.android.feature.clouddrive.navigation
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.feature.clouddrive.presentation.audio.audioScreen
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
-import mega.privacy.android.feature.clouddrive.presentation.offline.offlineInfoScreen
+import mega.privacy.android.feature.clouddrive.presentation.favourites.favouritesScreen
+import mega.privacy.android.feature.clouddrive.presentation.filelink.fileLinkScreen
+import mega.privacy.android.feature.clouddrive.presentation.folderlink.folderLinkScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineScreen
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
+import mega.privacy.android.feature.clouddrive.presentation.search.searchScreen
+import mega.privacy.android.feature.clouddrive.presentation.shares.links.openPasswordLinkDialog
 import mega.privacy.android.feature.clouddrive.presentation.shares.shares
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.FileLinkNavKey
+import mega.privacy.android.navigation.destination.FolderLinkNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
-import mega.privacy.android.navigation.destination.SearchNodeNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
 
 class CloudDriveFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
@@ -22,22 +29,17 @@ class CloudDriveFeatureDestination : FeatureDestination {
                 navigationHandler = navigationHandler,
                 onBack = navigationHandler::back,
                 onTransfer = transferHandler::setTransferEvent,
-                openSearch = { isFirstNavigationLevel, parentHandle, nodeSourceType ->
-                    navigationHandler.navigate(
-                        SearchNodeNavKey(
-                            isFirstNavigationLevel = isFirstNavigationLevel,
-                            nodeSourceType = nodeSourceType,
-                            parentHandle = parentHandle
-                        )
-                    )
-                }
             )
 
-            rubbishBin(navigationHandler, transferHandler)
+            rubbishBin(
+                navigationHandler = navigationHandler,
+                transferHandler = transferHandler,
+            )
 
             shares(navigationHandler, transferHandler)
 
             offlineScreen(
+                navigationHandler = navigationHandler,
                 onBack = navigationHandler::back,
                 onNavigateToFolder = { parentId, name ->
                     navigationHandler.navigate(
@@ -47,27 +49,56 @@ class CloudDriveFeatureDestination : FeatureDestination {
                         )
                     )
                 },
+                onNavigateToTransfers = {
+                    navigationHandler.navigate(TransfersNavKey())
+                },
                 onTransfer = transferHandler::setTransferEvent,
                 openFileInformation = { handle ->
                     navigationHandler.navigate(OfflineInfoNavKey(handle = handle))
-                }
+                },
             )
-
-            offlineInfoScreen(navigationHandler::back)
 
             driveSyncScreen(
                 navigationHandler = navigationHandler,
                 setNavigationVisibility = { /* No-op for FeatureDestination */ },
                 onTransfer = transferHandler::setTransferEvent,
-                openSearch = { isFirstNavigationLevel, parentHandle, nodeSourceType ->
-                    navigationHandler.navigate(
-                        SearchNodeNavKey(
-                            isFirstNavigationLevel = isFirstNavigationLevel,
-                            nodeSourceType = nodeSourceType,
-                            parentHandle = parentHandle
-                        )
-                    )
-                }
+            )
+
+            favouritesScreen(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent,
+            )
+
+            searchScreen(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent,
+            )
+
+            openPasswordLinkDialog(
+                onBack = navigationHandler::back,
+                onNavigateToFileLink = { folderLinkUri ->
+                    navigationHandler.back() //to dismiss the dialog
+                    navigationHandler.navigate(FileLinkNavKey(folderLinkUri))
+                },
+                onNavigateToFolderLink = { folderLinkUri ->
+                    navigationHandler.back() //to dismiss the dialog
+                    navigationHandler.navigate(FolderLinkNavKey(folderLinkUri))
+                },
+            )
+
+            folderLinkScreen(
+                navigationHandler = navigationHandler,
+                transferHandler = transferHandler
+            )
+
+            fileLinkScreen(
+                navigationHandler = navigationHandler,
+                transferHandler = transferHandler
+            )
+
+            audioScreen(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent,
             )
         }
 }

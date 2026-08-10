@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
@@ -18,6 +17,7 @@ import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
@@ -25,11 +25,16 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.entity.toDuration
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentFromPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
+import mega.privacy.android.shared.nodes.R as NodesR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -41,15 +46,34 @@ import javax.inject.Inject
 class OfflineNodeActionsViewModel @Inject constructor(
     private val getOfflineFileUseCase: GetOfflineFileUseCase,
     private val getOfflineFilesUseCase: GetOfflineFilesUseCase,
+    private val getFileTypeInfoByContentFromPathUseCase: GetFileTypeInfoByContentFromPathUseCase,
     private val exportNodesUseCase: ExportNodesUseCase,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
     private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
     private val snackBarHandler: SnackBarHandler,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val nodeShareContentUrisIntentMapper: NodeShareContentUrisIntentMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OfflineNodeActionsUiState())
+
+    init {
+        loadPdfViewerFeatureFlag()
+    }
+
+    private fun loadPdfViewerFeatureFlag() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
+            }.onSuccess { enabled ->
+                _uiState.update { it.copy(isPdfViewerComposeEnabled = enabled) }
+            }.onFailure {
+                Timber.e(it, "Failed to load PDF viewer feature flag")
+                _uiState.update { it.copy(isPdfViewerComposeEnabled = false) }
+            }
+        }
+    }
 
     /**
      * Immutable UI State
@@ -69,7 +93,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
                     shareNodes(nodes)
                 } else {
                     snackBarHandler.postSnackbarMessage(
-                        R.string.error_server_connection_problem
+                        NodesR.string.error_server_connection_problem
                     )
                 }
             }
@@ -114,7 +138,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
 
     private suspend fun shareNodes(nodes: List<OfflineFileInformation>) {
         runCatching {
-            exportNodesUseCase(nodes.map { it.handle.toLong() })
+            exportNodesUseCase(nodes.map { it.handle.toLong() }, "OfflineNodeActionsViewModel")
         }.onSuccess { linksMap ->
             if (linksMap.isEmpty()) return@onSuccess
 
@@ -148,7 +172,15 @@ class OfflineNodeActionsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val localFile = getOfflineFileUseCase(info.nodeInfo)
-                val fileType = info.fileTypeInfo
+                val storedType = info.fileTypeInfo
+                val fileType = if (storedType == null || storedType is UnMappedFileTypeInfo) {
+                    getFileTypeInfoByContentFromPathUseCase(
+                        localFile.absolutePath,
+                        storedType?.toDuration()?.inWholeSeconds?.toInt() ?: 0,
+                    ) ?: storedType
+                } else {
+                    storedType
+                }
                 val nodeId = NodeId(info.handle.toLong())
                 when {
                     fileType is PdfFileTypeInfo -> OfflineNodeActionUiEntity.Pdf(

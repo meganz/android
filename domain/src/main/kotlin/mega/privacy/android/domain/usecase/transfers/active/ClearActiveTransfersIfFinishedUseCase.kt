@@ -18,7 +18,7 @@ class ClearActiveTransfersIfFinishedUseCase @Inject constructor(
         // first make sure we don't have any corrupted entity
         correctActiveTransfersUseCase(null)
         // clear all active transfers of this type if all transfers have finished
-        val activeTransfers = transferRepository.getCurrentActiveTransfers()
+        val activeTransfers = transferRepository.getActiveTransfers()
         if (activeTransfers.isNotEmpty() && activeTransfers.all { it.isFinished }) {
             transferRepository.deleteAllActiveTransfers()
         }

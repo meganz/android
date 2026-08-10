@@ -23,7 +23,7 @@ class FormatSupportTicketUseCase @Inject constructor() {
         Email: ${ticket.accountEmail}
         Type: ${ticket.accountType}
         
-        AppInformation:
+        App Information:
         App name: Mega
         App version: ${ticket.androidAppVersion}
         Sdk version: ${ticket.sdkVersion}

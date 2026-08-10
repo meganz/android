@@ -11,7 +11,7 @@ import mega.privacy.android.app.sslverification.model.SSLDialogState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.apiserver.ResetConnectionUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -32,7 +32,7 @@ class SSLErrorViewModel @Inject constructor(
 
     val state by lazy {
         flow<SSLDialogState> {
-            emit(SSLDialogState.Ready(webUrl = getDomainNameUseCase()))
+            emit(SSLDialogState.Ready(webUrl = "https://${getDomainNameUseCase()}/"))
         }.catch {
             Timber.e(it, "Error fetching domain name for SSL verification")
         }.asUiStateFlow(viewModelScope, SSLDialogState.Loading)

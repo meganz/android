@@ -1,61 +1,41 @@
 package mega.privacy.android.feature.clouddrive.presentation.shares
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import de.palm.composestateevents.StateEventWithContentTriggered
-import kotlinx.coroutines.launch
-import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.sheets.MegaModalBottomSheet
-import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
-import mega.android.core.ui.components.tabs.MegaScrollableTabRow
+import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.model.TabItems
-import mega.android.core.ui.model.menu.MenuActionIconWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
-import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeSortOption
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
-import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.HandleNodeOptionEvent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
@@ -66,10 +46,17 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshare
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.SearchNodeNavKey
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.destination.SearchNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
-import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.SharesScreenEvent
 
 
 /**
@@ -80,17 +67,18 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun SharesScreen(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(null) }
+        ),
     incomingSharesViewModel: IncomingSharesViewModel = hiltViewModel(),
     outgoingSharesViewModel: OutgoingSharesViewModel = hiltViewModel(),
     linksViewModel: LinksViewModel = hiltViewModel(),
 ) {
     val megaNavigator = rememberMegaNavigator()
-    val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackBarHostState.current
     var selectedTab by rememberSaveable { mutableStateOf(SharesTab.IncomingShares) }
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    val nodeActionHandler = rememberNodeActionHandler(
+    val selectionModeActionHandler = rememberMultiNodeActionHandler(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel,
         megaNavigator = megaNavigator
@@ -103,35 +91,16 @@ internal fun SharesScreen(
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
-    // Node options modal state
-    var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
-    val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-    var shareNodeHandles by remember { mutableStateOf<List<Long>>(emptyList()) }
-    val megaResultContract = rememberMegaResultContract()
-    val shareFolderLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.shareFolderActivityResultContract
-    ) { result ->
-        result?.let { (contactIds, nodeHandles) ->
-            nodeOptionsActionViewModel.contactSelectedForShareFolder(
-                contactIds,
-                nodeHandles
-            )
-        }
-    }
-    val nameCollisionLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            coroutineScope.launch {
-                snackbarHostState?.showAutoDurationSnackbar(message)
-            }
-        }
-    }
-
     val (isInSelectionMode, selectedItemsCount) = when (selectedTab) {
         SharesTab.IncomingShares -> incomingSharesUiState.isInSelectionMode to incomingSharesUiState.selectedItemsCount
         SharesTab.OutgoingShares -> outgoingSharesUiState.isInSelectionMode to outgoingSharesUiState.selectedItemsCount
         SharesTab.Links -> linksUiState.isInSelectionMode to linksUiState.selectedItemsCount
+    }
+
+    val isAllItemsSelected = when (selectedTab) {
+        SharesTab.IncomingShares -> incomingSharesUiState.isAllSelected
+        SharesTab.OutgoingShares -> outgoingSharesUiState.isAllSelected
+        SharesTab.Links -> linksUiState.isAllSelected
     }
 
     fun deselectAllItems() {
@@ -166,15 +135,20 @@ internal fun SharesScreen(
         deselectAllItems()
     }
 
+    LaunchedOnceEffect {
+        Analytics.tracker.trackEvent(SharesScreenEvent)
+    }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
-        contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             if (isInSelectionMode) {
                 NodeSelectionModeAppBar(
+                    modifier = Modifier.testTag(SHARES_SELECTION_MODE_APP_BAR_TAG),
                     count = selectedItemsCount,
+                    isAllSelected = isAllItemsSelected,
                     isSelecting = false,
                     onSelectAllClicked = {
                         selectAllItems()
@@ -185,21 +159,23 @@ internal fun SharesScreen(
                 )
             } else {
                 MegaTopAppBar(
+                    modifier = Modifier.testTag(SHARES_MAIN_APP_BAR_TAG),
                     navigationType = AppBarNavigationType.Back {
                         navigationHandler.back()
                     },
-                    title = stringResource(R.string.title_shared_items),
+                    title = stringResource(sharedR.string.video_section_videos_location_option_shared_items),
                     trailingIcons = {
-                        TransfersToolbarWidget(navigationHandler)
+                        TransfersToolbarWidget {
+                            navigationHandler.navigate(TransfersNavKey())
+                        }
                     },
                     actions = buildList {
                         add(
-                            MenuActionIconWithClick(CloudDriveAppBarAction.Search) {
+                            MenuActionWithClick(CommonMenuAction.Search) {
                                 navigationHandler.navigate(
-                                    SearchNodeNavKey(
-                                        isFirstNavigationLevel = false,
-                                        nodeSourceType = selectedTab.toNodeSourceType(),
-                                        parentHandle = -1L
+                                    SearchNavKey(
+                                        parentHandle = -1L,
+                                        nodeSourceType = selectedTab.toNodeSourceType()
                                     )
                                 )
                             }
@@ -209,59 +185,102 @@ internal fun SharesScreen(
             }
         },
         bottomBar = {
+            @SuppressLint("ComposeViewModelForwarding")
             NodeSelectionModeBottomBar(
+                modifier = Modifier.testTag(SHARES_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeActionState.availableActions,
                 visibleActions = nodeActionState.visibleActions,
                 visible = nodeActionState.visibleActions.isNotEmpty() && isInSelectionMode,
-                nodeActionHandler = nodeActionHandler,
+                multiNodeActionHandler = selectionModeActionHandler,
                 selectedNodes = getSelectedNodes(),
-                isSelecting = false
+                isSelecting = false,
             )
         },
     ) { paddingValues ->
-        MegaScrollableTabRow(
+        MegaCollapsibleTabRow(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()),
+                .testTag(SHARES_TAB_ROW_TAG),
+            contentPadding = paddingValues.excludingBottomPadding(),
             beyondViewportPageCount = 1,
             hideTabs = isInSelectionMode,
             pagerScrollEnabled = !isInSelectionMode,
             cells = {
                 addTextTabWithScrollableContent(
-                    tabItem = TabItems(stringResource(R.string.tab_incoming_shares)),
+                    tabItem = TabItems(
+                        title = stringResource(sharedR.string.shares_screen_incoming_shares_tab_title),
+                        testTag = SHARES_INCOMING_TAB_TAG
+                    ),
                 ) { _, modifier ->
                     IncomingSharesContent(
                         modifier = modifier,
                         uiState = incomingSharesUiState,
                         navigationHandler = navigationHandler,
                         onAction = incomingSharesViewModel::processAction,
-                        onShowNodeOptions = { visibleNodeOptionId = it },
-                        onSortOrderClick = { showSortBottomSheet = true }
+                        onShowNodeOptions = { nodeId ->
+                            navigationHandler.navigate(
+                                NodeOptionsBottomSheetNavKey(
+                                    nodeHandle = nodeId.longValue,
+                                    nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                                    partiallyExpand = false
+                                )
+                            )
+                        },
+                        onSortOrderClick = { showSortBottomSheet = true },
+                        contentPadding = PaddingValues(
+                            bottom = paddingValues.calculateBottomPadding()
+                        ),
                     )
                 }
                 addTextTabWithScrollableContent(
-                    tabItem = TabItems(stringResource(R.string.tab_outgoing_shares)),
+                    tabItem = TabItems(
+                        title = stringResource(sharedR.string.shares_screen_outgoing_shares_tab_title),
+                        testTag = SHARES_OUTGOING_TAB_TAG
+                    ),
                 ) { _, modifier ->
                     OutgoingSharesContent(
                         modifier = modifier,
                         uiState = outgoingSharesUiState,
                         navigationHandler = navigationHandler,
                         onAction = outgoingSharesViewModel::processAction,
-                        onShowNodeOptions = { visibleNodeOptionId = it },
-                        onSortOrderClick = { showSortBottomSheet = true }
+                        onShowNodeOptions = { nodeId ->
+                            navigationHandler.navigate(
+                                NodeOptionsBottomSheetNavKey(
+                                    nodeHandle = nodeId.longValue,
+                                    nodeSourceType = NodeSourceType.OUTGOING_SHARES
+                                )
+                            )
+                        },
+                        onSortOrderClick = { showSortBottomSheet = true },
+                        contentPadding = PaddingValues(
+                            bottom = paddingValues.calculateBottomPadding()
+                        ),
                     )
                 }
                 addTextTabWithScrollableContent(
-                    tabItem = TabItems(stringResource(R.string.tab_links_shares)),
+                    tabItem = TabItems(
+                        title = stringResource(sharedR.string.shares_screen_links_shares_tab_title),
+                        testTag = SHARES_LINKS_TAB_TAG
+                    ),
                 ) { _, modifier ->
                     LinksContent(
                         modifier = modifier,
                         uiState = linksUiState,
                         navigationHandler = navigationHandler,
                         onAction = linksViewModel::processAction,
-                        onShowNodeOptions = { visibleNodeOptionId = it },
+                        onShowNodeOptions = { nodeId ->
+                            navigationHandler.navigate(
+                                NodeOptionsBottomSheetNavKey(
+                                    nodeHandle = nodeId.longValue,
+                                    nodeSourceType = NodeSourceType.LINKS
+                                )
+                            )
+                        },
                         onSortOrderClick = { showSortBottomSheet = true },
-                        onTransfer = onTransfer
+                        onTransfer = onTransfer,
+                        contentPadding = PaddingValues(
+                            bottom = paddingValues.calculateBottomPadding()
+                        ),
                     )
                 }
             },
@@ -273,24 +292,12 @@ internal fun SharesScreen(
         )
     }
 
-    HandleNodeOptionEvent(
-        megaNavigator = megaNavigator,
-        nodeActionState = nodeActionState,
-        nameCollisionLauncher = nameCollisionLauncher,
-        snackbarHostState = snackbarHostState,
-        onNodeNameCollisionResultHandled = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
-        onInfoToShowEventConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
-        onForeignNodeDialogShown = nodeOptionsActionViewModel::markForeignNodeDialogShown,
-        onQuotaDialogShown = nodeOptionsActionViewModel::markQuotaDialogShown,
-        onHandleNodesWithoutConflict = { collisionType, nodes ->
-            when (collisionType) {
-                NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(nodes)
-                NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
-                else -> { /* No-op for other types */
-                }
-            }
-        },
-    )
+    EventEffect(
+        nodeActionState.actionTriggeredEvent,
+        nodeOptionsActionViewModel::resetActionTriggered
+    ) {
+        deselectAllItems()
+    }
 
     LaunchedEffect(selectedItemsCount) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
@@ -298,111 +305,6 @@ internal fun SharesScreen(
             nodeSourceType = selectedTab.toNodeSourceType()
         )
     }
-
-    EventEffect(
-        event = nodeActionState.downloadEvent,
-        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = onTransfer
-    )
-
-    // Reset selection mode after handling move, copy, delete action
-    LaunchedEffect(nodeActionState.infoToShowEvent) {
-        if (nodeActionState.infoToShowEvent is StateEventWithContentTriggered) {
-            deselectAllItems()
-        }
-    }
-
-    // Reset selection mode after handling name collision
-    LaunchedEffect(nodeActionState.nodeNameCollisionsResult) {
-        if (nodeActionState.nodeNameCollisionsResult is StateEventWithContentTriggered) {
-            deselectAllItems()
-        }
-    }
-
-    EventEffect(
-        event = nodeActionState.renameNodeRequestEvent,
-        onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
-        action = { nodeId ->
-            deselectAllItems()
-            navigationHandler.navigate(RenameNodeDialogNavKey(nodeId = nodeId.longValue))
-        }
-    )
-
-    EventEffect(
-        event = nodeActionState.shareFolderDialogEvent,
-        onConsumed = nodeOptionsActionViewModel::resetShareFolderDialogEvent,
-        action = { handles ->
-            shareNodeHandles = handles
-        }
-    )
-
-    EventEffect(
-        event = nodeActionState.shareFolderEvent,
-        onConsumed = nodeOptionsActionViewModel::resetShareFolderEvent,
-        action = { handles ->
-            shareFolderLauncher.launch(handles.toLongArray())
-        }
-    )
-
-    // Node options modal
-    LaunchedEffect(visibleNodeOptionId) {
-        if (visibleNodeOptionId != null) {
-            nodeOptionSheetState.show()
-        } else {
-            nodeOptionSheetState.hide()
-        }
-    }
-
-    // Todo: We will remove this, and replace it with NavigationHandler
-    visibleNodeOptionId?.let { nodeId ->
-        MegaModalBottomSheet(
-            modifier = Modifier.statusBarsPadding(),
-            sheetState = nodeOptionSheetState,
-            onDismissRequest = {
-                visibleNodeOptionId = null
-            },
-            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
-        ) {
-            NodeOptionsBottomSheetRoute(
-                navigationHandler = navigationHandler,
-                onDismiss = {
-                    visibleNodeOptionId = null
-                },
-                nodeId = nodeId.longValue,
-                nodeSourceType = selectedTab.toNodeSourceType(),
-                onTransfer = onTransfer,
-                actionHandler = nodeActionHandler,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            )
-        }
-    }
-
-    if (shareNodeHandles.isNotEmpty()) {
-        ShareFolderDialogM3(
-            nodeIds = shareNodeHandles.map { NodeId(it) },
-            onDismiss = {
-                shareNodeHandles = emptyList()
-            },
-            onConfirm = { nodes ->
-                val handles = nodes.map { it.id.longValue }.toLongArray()
-                shareFolderLauncher.launch(handles)
-            }
-        )
-    }
-
-    EventEffect(
-        event = nodeActionState.contactsData,
-        onConsumed = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
-        action = { (contactData, isFromBackups, nodeHandles) ->
-            navigationHandler.navigate(
-                ShareFolderAccessDialogNavKey(
-                    nodes = nodeHandles,
-                    contacts = contactData.joinToString(separator = ","),
-                    isFromBackups = isFromBackups
-                )
-            )
-        },
-    )
 
     if (showSortBottomSheet) {
         val selectedSortConfiguration = when (selectedTab) {
@@ -464,3 +366,12 @@ private enum class SharesTab {
         fun fromOrdinal(ordinal: Int) = entries.getOrNull(ordinal) ?: IncomingShares
     }
 }
+
+internal const val SHARES_MAIN_APP_BAR_TAG = "shares_screen:main_app_bar"
+internal const val SHARES_SELECTION_MODE_APP_BAR_TAG = "shares_screen:selection_mode_app_bar"
+internal const val SHARES_SELECTION_MODE_BOTTOM_BAR_TAG =
+    "shares_screen:selection_mode_bottom_bar"
+internal const val SHARES_TAB_ROW_TAG = "shares_screen:tab_row"
+internal const val SHARES_INCOMING_TAB_TAG = "shares_screen:incoming_tab"
+internal const val SHARES_OUTGOING_TAB_TAG = "shares_screen:outgoing_tab"
+internal const val SHARES_LINKS_TAB_TAG = "shares_screen:links_tab"

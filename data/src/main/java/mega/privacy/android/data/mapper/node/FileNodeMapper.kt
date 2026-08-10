@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.node
 
+import mega.privacy.android.data.extensions.expirationTimeOrNull
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getThumbnailFileName
@@ -9,12 +10,15 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.Offline
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -32,6 +36,7 @@ internal class FileNodeMapper @Inject constructor(
     private val cacheGateway: CacheGateway,
     private val megaApiGateway: MegaApiGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val nodeMediaTypeMapper: NodeMediaTypeMapper,
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper,
     private val stringListMapper: StringListMapper,
     private val nodeLabelMapper: NodeLabelMapper,
@@ -47,63 +52,82 @@ internal class FileNodeMapper @Inject constructor(
         megaNode: MegaNode,
         requireSerializedData: Boolean,
         offline: Offline?,
-    ): FileNode = DefaultFileNode(
-        id = NodeId(megaNode.handle),
-        name = megaNode.name,
-        size = megaNode.size,
-        label = megaNode.label,
-        nodeLabel = nodeLabelMapper(megaNode.label),
-        parentId = NodeId(megaNode.parentHandle),
-        base64Id = megaNode.base64Handle,
-        restoreId = NodeId(megaNode.restoreHandle).takeIf {
-            it.longValue != MegaApiJava.INVALID_HANDLE
-        },
-        creationTime = megaNode.creationTime,
-        modificationTime = megaNode.modificationTime,
-        thumbnailPath = getThumbnailCacheFilePath(
-            megaNode,
-            cacheGateway.getThumbnailCacheFolder()
-        ),
-        previewPath = getPreviewCacheFilePath(
-            megaNode,
-            cacheGateway.getPreviewCacheFolder()
-        ),
-        fullSizePath = getFullSizeCacheFilePath(
-            megaNode,
-            cacheGateway.getFullSizeCacheFolder()
-        ),
-        type = fileTypeInfoMapper(megaNode.name, megaNode.duration),
-        isFavourite = megaNode.isFavourite,
-        isMarkedSensitive = megaNode.isMarkedSensitive,
-        isSensitiveInherited = megaApiGateway.isSensitiveInherited(megaNode),
-        exportedData = megaNode.takeIf { megaNode.isExported }?.let {
-            ExportedData(it.publicLink, it.publicLinkCreationTime)
-        },
-        isTakenDown = megaNode.isTakenDown,
-        isIncomingShare = megaNode.isInShare,
-        fingerprint = megaNode.fingerprint,
-        originalFingerprint = megaNode.originalFingerprint,
-        isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
-        hasThumbnail = megaNode.hasThumbnail(),
-        hasPreview = megaNode.hasPreview(),
-        serializedData = if (requireSerializedData) megaNode.serialize() else null,
-        isAvailableOffline = offline?.let { offlineAvailabilityMapper(megaNode, it) } ?: false,
-        versionCount = (megaApiGateway.getNumVersions(megaNode) - 1).coerceAtLeast(0),
-        description = megaNode.description,
-        tags = megaNode.tags?.let { stringListMapper(it) }
-    )
+    ): FileNode? = runCatching {
+        DefaultFileNode(
+            id = NodeId(megaNode.handle),
+            name = megaNode.name,
+            size = megaNode.size,
+            label = megaNode.label,
+            nodeLabel = nodeLabelMapper(megaNode.label),
+            parentId = NodeId(megaNode.parentHandle),
+            base64Id = megaNode.base64Handle,
+            restoreId = NodeId(megaNode.restoreHandle).takeIf {
+                it.longValue != MegaApiJava.INVALID_HANDLE
+            },
+            creationTime = megaNode.creationTime,
+            modificationTime = megaNode.modificationTime,
+            thumbnailPath = getThumbnailCacheFilePath(
+                megaNode,
+                cacheGateway.getThumbnailCacheFolderPath()
+            ),
+            previewPath = getPreviewCacheFilePath(
+                megaNode,
+                cacheGateway.getPreviewCacheFolderPath()
+            ),
+            fullSizePath = getFullSizeCacheFilePath(
+                megaNode,
+                cacheGateway.getFullSizeCacheFolderPath()
+            ),
+            type = resolveType(megaNode),
+            isFavourite = megaNode.isFavourite,
+            isMarkedSensitive = megaNode.isMarkedSensitive,
+            isSensitiveInherited = megaApiGateway.isSensitiveInherited(megaNode),
+            exportedData = megaNode.takeIf { megaNode.isExported }?.let {
+                ExportedData(it.publicLink, it.publicLinkCreationTime, it.expirationTimeOrNull())
+            },
+            isTakenDown = megaNode.isTakenDown,
+            isIncomingShare = megaNode.isInShare,
+            fingerprint = megaNode.fingerprint,
+            originalFingerprint = megaNode.originalFingerprint,
+            isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
+            hasThumbnail = megaNode.hasThumbnail(),
+            hasPreview = megaNode.hasPreview(),
+            serializedData = if (requireSerializedData) megaNode.serialize() else null,
+            isAvailableOffline = offline?.let { offlineAvailabilityMapper(megaNode, it) } ?: false,
+            versionCount = (megaApiGateway.getNumVersions(megaNode) - 1).coerceAtLeast(0),
+            description = megaNode.description,
+            tags = megaNode.tags?.let { stringListMapper(it) }
+        )
+    }.onFailure {
+        Timber.e(it, "FileNodeMapper failed for handle=${megaNode.handle}")
+    }.getOrNull()
 
-    private fun getThumbnailCacheFilePath(megaNode: MegaNode, thumbnailFolder: File?): String? =
+    private fun resolveType(megaNode: MegaNode): FileTypeInfo {
+        val nameType = fileTypeInfoMapper(megaNode.name, megaNode.duration)
+        return if (nameType is UnMappedFileTypeInfo) {
+            nodeMediaTypeMapper(
+                videoCodecId = megaNode.videocodecid,
+                shortFormat = megaNode.shortformat,
+                width = megaNode.width,
+                height = megaNode.height,
+                duration = megaNode.duration,
+            ) ?: nameType
+        } else {
+            nameType
+        }
+    }
+
+    private fun getThumbnailCacheFilePath(megaNode: MegaNode, thumbnailFolder: String?): String? =
         thumbnailFolder?.let {
             "$it${File.separator}${megaNode.getThumbnailFileName()}"
         }?.takeUnless { megaNode.isFolder }
 
-    private fun getPreviewCacheFilePath(megaNode: MegaNode, previewFolder: File?): String? =
+    private fun getPreviewCacheFilePath(megaNode: MegaNode, previewFolder: String?): String? =
         previewFolder?.let {
             "$it${File.separator}${megaNode.getPreviewFileName()}"
         }?.takeUnless { megaNode.isFolder }
 
-    private fun getFullSizeCacheFilePath(megaNode: MegaNode, tempFolder: File?): String? =
+    private fun getFullSizeCacheFilePath(megaNode: MegaNode, tempFolder: String?): String? =
         tempFolder?.let {
             "$it${File.separator}${megaNode.getFileName()}"
         }?.takeUnless { megaNode.isFolder }

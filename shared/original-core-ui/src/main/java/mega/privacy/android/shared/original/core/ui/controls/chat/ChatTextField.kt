@@ -21,12 +21,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentDataType
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDataType
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -76,7 +79,8 @@ fun ChatTextField(
 ) = Box(modifier = modifier) {
     val colors = TextFieldDefaults.textFieldColors(
         textColor = DSTokens.colors.text.placeholder,
-        backgroundColor = DSTokens.colors.background.surface1,
+        // Transparent so the parent ChatInputTextToolbar's rounded surface2 background shows through
+        backgroundColor = Color.Transparent,
         cursorColor = DSTokens.colors.border.strongSelected,
         errorCursorColor = DSTokens.colors.text.error,
         errorIndicatorColor = DSTokens.colors.text.error,
@@ -91,6 +95,12 @@ fun ChatTextField(
             onValueChange = onTextChange,
             modifier = Modifier
                 .testTag(CHAT_TEXT_FIELD_TEXT_TAG)
+                // Opt the chat input out of autofill. A large draft message can make the
+                // autofill framework serialize the field value across a Binder transaction,
+                // exceeding the 1MB limit and crashing with TransactionTooLargeException when
+                // focus is requested (AND-23666). ContentDataType.None stops Compose from
+                // emitting autofill value-change events for this field.
+                .semantics { contentDataType = ContentDataType.None }
                 .indicatorLine(
                     enabled = true,
                     isError = false,

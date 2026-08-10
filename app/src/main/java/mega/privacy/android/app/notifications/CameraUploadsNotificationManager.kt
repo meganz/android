@@ -11,9 +11,8 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.ForegroundInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.photos.PhotosFragment.Companion.ACTION_SHOW_CU_PROGRESS_VIEW
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
@@ -26,11 +25,22 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPL
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
+import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
+import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.CameraUploadsFolderConflictDetectedEvent
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -43,6 +53,8 @@ class CameraUploadsNotificationManager @Inject constructor(
     private val stringWrapper: StringWrapper,
     private val getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val megaNavigator: MegaNavigator,
+    private val folderConflictMessageFormatter: FolderConflictMessageFormatter,
 ) {
 
     companion object {
@@ -63,13 +75,13 @@ class CameraUploadsNotificationManager @Inject constructor(
         private const val NOT_ENOUGH_STORAGE_NOTIFICATION_ID =
             Constants.NOTIFICATION_NOT_ENOUGH_STORAGE
         private const val OVER_STORAGE_QUOTA_NOTIFICATION_ID =
-            Constants.NOTIFICATION_STORAGE_OVERQUOTA
+            Constants.NOTIFICATION_STORAGE_OVER_QUOTA
         private const val NO_WIFI_CONNECTION_NOTIFICATION_ID =
             Constants.NOTIFICATION_NO_WIFI_CONNECTION
         private const val NO_NETWORK_CONNECTION_NOTIFICATION_ID =
             Constants.NOTIFICATION_NO_NETWORK_CONNECTION
-        private const val ACTION_SHOW_SETTINGS = Constants.ACTION_SHOW_SETTINGS
-        private const val ACTION_OVER_QUOTA_STORAGE = Constants.ACTION_OVERQUOTA_STORAGE
+        private const val FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP_NOTIFICATION_ID =
+            Constants.NOTIFICATION_FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP
     }
 
     /**
@@ -127,6 +139,13 @@ class CameraUploadsNotificationManager @Inject constructor(
 
             CameraUploadsStatusInfo.NoWifiConnection -> showNoWifiConnectionNotification()
             CameraUploadsStatusInfo.NoNetworkConnection -> showNoNetworkConnectionNotification()
+            is CameraUploadsStatusInfo.FolderConflictWithSyncOrBackup ->
+                showFolderConflictWithSyncOrBackupNotification(
+                    deviceName = cameraUploadsStatusInfo.deviceName,
+                    backupName = cameraUploadsStatusInfo.backupName,
+                    folderName = cameraUploadsStatusInfo.folderName,
+                    isLocalFolder = cameraUploadsStatusInfo.isLocalFolder,
+                )
         }
     }
 
@@ -180,14 +199,17 @@ class CameraUploadsNotificationManager @Inject constructor(
         return builder.build()
     }
 
-    private fun getDefaultPendingIntent() = PendingIntent.getActivity(
-        context,
-        0,
-        Intent(context, ManagerActivity::class.java).apply {
-            action = ACTION_SHOW_CU_PROGRESS_VIEW
-        },
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
+    private suspend fun getDefaultPendingIntent() = megaNavigator
+        .getPendingIntentWithDestination(
+            context = context,
+            singleActivityDestination = { CameraUploadsProgressNavKey }
+        )
+
+    private suspend fun getCUSettingsPendingIntent() = megaNavigator
+        .getPendingIntentWithDestination(
+            context = context,
+            singleActivityDestination = { SettingsCameraUploadsNavKey }
+        )
 
     /**
      * Display a notification for upload progress
@@ -202,7 +224,7 @@ class CameraUploadsNotificationManager @Inject constructor(
         progress: Int,
         areUploadsPaused: Boolean,
     ) {
-        getDefaultPendingIntent()?.let { defaultPendingIntent ->
+        getDefaultPendingIntent().let { defaultPendingIntent ->
             val content = context.getString(
                 if (areUploadsPaused)
                     R.string.upload_service_notification_paused
@@ -253,12 +275,12 @@ class CameraUploadsNotificationManager @Inject constructor(
      *
      *  @progress an Int between 0 and 100
      */
-    private fun showVideoCompressionProgressNotification(
+    private suspend fun showVideoCompressionProgressNotification(
         progress: Int,
         currentFileIndex: Int,
         totalCount: Int,
     ) {
-        getDefaultPendingIntent()?.let { defaultPendingIntent ->
+        getDefaultPendingIntent().let { defaultPendingIntent ->
             val content = context.getString(
                 R.string.title_compress_video,
                 currentFileIndex,
@@ -280,8 +302,8 @@ class CameraUploadsNotificationManager @Inject constructor(
     /**
      *  Display a notification for checking files to upload
      */
-    private fun showCheckUploadsNotification() {
-        getDefaultPendingIntent()?.let { defaultPendingIntent ->
+    private suspend fun showCheckUploadsNotification() {
+        getDefaultPendingIntent().let { defaultPendingIntent ->
             val notification = createNotification(
                 title = context.getString(R.string.section_photo_sync),
                 content = context.getString(R.string.settings_camera_notif_checking_title),
@@ -296,18 +318,30 @@ class CameraUploadsNotificationManager @Inject constructor(
     /**
      *  Display a notification in case the cloud storage does not have enough space
      */
-    private fun showStorageOverQuotaNotification() {
+    private suspend fun showStorageOverQuotaNotification() {
+        val useUpsell = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
+        }.getOrDefault(false)
+        val pendingIntent = if (useUpsell) {
+            megaNavigator.getPendingIntentWithDestination(
+                context = context,
+                singleActivityDestination = {
+                    QuotaWarningUpgradeNavKey(
+                        type = QuotaWarningType.Storage,
+                        trigger = QuotaWarningTrigger.Upload,
+                    )
+                }
+            )
+        } else {
+            megaNavigator.getPendingIntentWithDestination(
+                context = context,
+                singleActivityDestination = { OverQuotaDialogNavKey(isOverQuota = true) }
+            )
+        }
         val notification = createNotification(
             title = context.getString(R.string.overquota_alert_title),
             content = context.getString(R.string.download_show_info),
-            intent = PendingIntent.getActivity(
-                context,
-                0,
-                Intent(context, ManagerActivity::class.java).apply {
-                    action = ACTION_OVER_QUOTA_STORAGE
-                },
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            ),
+            intent = pendingIntent,
         )
         notificationManager.notify(OVER_STORAGE_QUOTA_NOTIFICATION_ID, notification)
     }
@@ -320,12 +354,6 @@ class CameraUploadsNotificationManager @Inject constructor(
         val notification = createNotification(
             title = context.getString(R.string.title_out_of_space),
             content = context.getString(R.string.message_out_of_space),
-            intent = PendingIntent.getActivity(
-                context,
-                0,
-                Intent(context, ManagerActivity::class.java),
-                PendingIntent.FLAG_IMMUTABLE
-            ),
         )
         notificationManager.notify(NOT_ENOUGH_STORAGE_NOTIFICATION_ID, notification)
     }
@@ -338,12 +366,6 @@ class CameraUploadsNotificationManager @Inject constructor(
         val notification = createNotification(
             title = context.getString(R.string.title_out_of_space),
             content = context.getString(R.string.error_not_enough_free_space),
-            intent = PendingIntent.getActivity(
-                context,
-                0,
-                Intent(context, ManagerActivity::class.java),
-                PendingIntent.FLAG_IMMUTABLE
-            ),
         )
         notificationManager.notify(NOT_ENOUGH_STORAGE_NOTIFICATION_ID, notification)
     }
@@ -357,18 +379,11 @@ class CameraUploadsNotificationManager @Inject constructor(
             content = context.getString(
                 R.string.message_compression_size_over_limit,
                 context.getString(
-                    R.string.label_file_size_mega_byte,
+                    sharedR.string.label_file_size_megabytes,
                     getVideoCompressionSizeLimitUseCase().toString()
                 )
             ),
-            intent = PendingIntent.getActivity(
-                context,
-                0,
-                Intent(context, ManagerActivity::class.java).apply {
-                    action = ACTION_SHOW_SETTINGS
-                },
-                PendingIntent.FLAG_IMMUTABLE
-            ),
+            intent = getCUSettingsPendingIntent(),
         )
         notificationManager.notify(COMPRESSION_ERROR_NOTIFICATION_ID, notification)
     }
@@ -379,7 +394,7 @@ class CameraUploadsNotificationManager @Inject constructor(
      *
      * @param cameraUploadsFolderType
      */
-    private fun showFolderUnavailableNotification(cameraUploadsFolderType: CameraUploadFolderType) {
+    private suspend fun showFolderUnavailableNotification(cameraUploadsFolderType: CameraUploadFolderType) {
         val (resId, notificationId) = when (cameraUploadsFolderType) {
             CameraUploadFolderType.Primary ->
                 Pair(
@@ -399,14 +414,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             val notification = createNotification(
                 title = context.getString(R.string.section_photo_sync),
                 content = context.getString(resId),
-                intent = PendingIntent.getActivity(
-                    context,
-                    0,
-                    Intent(context, ManagerActivity::class.java).apply {
-                        action = ACTION_SHOW_SETTINGS
-                    },
-                    PendingIntent.FLAG_IMMUTABLE
-                ),
+                intent = getCUSettingsPendingIntent(),
             )
             notificationManager.notify(notificationId, notification)
         }
@@ -445,6 +453,43 @@ class CameraUploadsNotificationManager @Inject constructor(
             content = context.getString(sharedR.string.camera_uploads_notification_content_no_network_connection),
         )
         notificationManager.notify(NO_NETWORK_CONNECTION_NOTIFICATION_ID, notification)
+    }
+
+    /**
+     * Display a notification when Camera/Media Uploads folder conflicts with Sync/Backup folder
+     * @param deviceName The name of the device where the conflicting sync/backup is located
+     * @param backupName The name of the conflicting sync/backup
+     * @param folderName The display name of the conflicting folder
+     * @param isLocalFolder Whether the conflicting folder is a local/device folder
+     */
+    private suspend fun showFolderConflictWithSyncOrBackupNotification(
+        deviceName: String?,
+        backupName: String?,
+        folderName: String?,
+        isLocalFolder: Boolean,
+    ) {
+        val folderTypeLabelRes = if (isLocalFolder) sharedR.string.sync_label_device_folder
+        else sharedR.string.sync_label_cloud_folder
+        val content = folderConflictMessageFormatter.format(
+            folderDisplayName = folderName ?: run {
+                Timber.d("Skip folder conflict notification: folder name missing")
+                return
+            },
+            folderTypeLabelRes = folderTypeLabelRes,
+            featureLabel = backupName
+                ?: context.getString(sharedR.string.sync_label_a_sync_or_backup),
+            deviceName = deviceName,
+        )
+        val notification = createNotification(
+            title = context.getString(R.string.section_photo_sync),
+            content = content,
+            intent = getCUSettingsPendingIntent(),
+        )
+        Analytics.tracker.trackEvent(CameraUploadsFolderConflictDetectedEvent)
+        notificationManager.notify(
+            FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP_NOTIFICATION_ID,
+            notification
+        )
     }
 
     /**
@@ -491,6 +536,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             cancel(COMPRESSION_NOTIFICATION_ID)
             cancel(NO_WIFI_CONNECTION_NOTIFICATION_ID)
             cancel(NO_NETWORK_CONNECTION_NOTIFICATION_ID)
+            cancel(FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP_NOTIFICATION_ID)
         }
     }
 

@@ -39,7 +39,6 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.call.CallCompositionChanges
 import mega.privacy.android.domain.entity.call.ChatCallChanges
@@ -51,6 +50,7 @@ import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.ChatNavKey
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -100,6 +100,9 @@ class CallService : LifecycleService() {
     @Inject
     lateinit var monitorCallScreenOpenedUseCase: MonitorCallScreenOpenedUseCase
 
+    @Inject
+    lateinit var chatController: ChatController
+
     private var monitorChatListItemUpdatesJob: Job? = null
     private var monitorChatCallUpdatesJob: Job? = null
     private var monitorCallScreenOpenedUpdatesJob: Job? = null
@@ -110,7 +113,7 @@ class CallService : LifecycleService() {
     private var mBuilderCompat: NotificationCompat.Builder? = null
     private var mNotificationManager: NotificationManager? = null
     private var mBuilderCompatO: NotificationCompat.Builder? = null
-    private val notificationChannelId = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID
+    private val notificationChannelId = Constants.NOTIFICATION_CHANNEL_IN_PROGRESS_MISSED_CALLS_ID
     private var myUserHandle: Long = MEGACHAT_INVALID_HANDLE
 
     /**
@@ -168,7 +171,7 @@ class CallService : LifecycleService() {
         Timber.d("Starting Call service (flags: %d, startId: %d)", flags, startId)
         intent.extras?.let { extras ->
             currentChatId =
-                extras.getLong(Constants.CHAT_ID, MEGACHAT_INVALID_HANDLE)
+                extras.getLong(ChatNavKey.LEGACY_CHAT_ID, MEGACHAT_INVALID_HANDLE)
             Timber.d("Chat handle to call: $currentChatId")
         }
 
@@ -356,16 +359,18 @@ class CallService : LifecycleService() {
                 val largeIcon: Bitmap =
                     if (chat.isGroup)
                         createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title)
-                    else
+                    else {
+                        val email = chatController.getParticipantEmail(
+                            chat.getPeerHandle(
+                                0
+                            )
+                        )
                         setProfileContactAvatar(
                             chat.getPeerHandle(0),
                             title,
-                            ChatController(this@CallService).getParticipantEmail(
-                                chat.getPeerHandle(
-                                    0
-                                )
-                            )
+                            email.orEmpty()
                         )
+                    }
 
                 val actionIcon = iconPackR.drawable.ic_phone_01_medium_thin_outline
                 val actionPendingIntent = getPendingIntent(call, notificationId + 1)
@@ -383,7 +388,7 @@ class CallService : LifecycleService() {
                         actionPendingIntent
                     )
 
-                    if (!TextUtil.isTextEmpty(contentText))
+                    if (contentText.isNotBlank())
                         setContentText(contentText)
                 }
                 val newNotification: Notification? = mBuilderCompatO?.build()
@@ -467,16 +472,18 @@ class CallService : LifecycleService() {
                 val largeIcon: Bitmap =
                     if (chat.isGroup)
                         createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title)
-                    else
+                    else {
+                        val email = chatController.getParticipantEmail(
+                            chat.getPeerHandle(
+                                0
+                            )
+                        )
                         setProfileContactAvatar(
                             chat.getPeerHandle(0),
                             title,
-                            ChatController(this@CallService).getParticipantEmail(
-                                chat.getPeerHandle(
-                                    0
-                                )
-                            )
+                            email.orEmpty()
                         )
+                    }
                 val actionIcon = iconPackR.drawable.ic_phone_01_medium_thin_outline
                 val actionPendingIntent = getPendingIntent(call, notificationId + 1)
                 val actionTitle =
@@ -484,7 +491,7 @@ class CallService : LifecycleService() {
 
                 val channel = NotificationChannel(
                     notificationChannelId,
-                    Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME,
+                    Constants.NOTIFICATION_CHANNEL_IN_PROGRESS_MISSED_CALLS_NAME,
                     NotificationManager.IMPORTANCE_DEFAULT
                 )
 
@@ -673,6 +680,7 @@ class CallService : LifecycleService() {
      * Service ends
      */
     override fun onDestroy() {
+        stopForeground(STOP_FOREGROUND_REMOVE)
         cancelNotification()
 
         callChangesObserver.setOpenCallChatId(MEGACHAT_INVALID_HANDLE)

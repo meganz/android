@@ -9,11 +9,12 @@ import org.slf4j.Logger
  *
  * Writes log messages to file
  *
- * @property logger
+ * @param loggerProvider lazy provider for the SLF4J [Logger] instance
  */
 internal class FileLogWriter(
-    private val logger: Logger,
+    loggerProvider: () -> Logger,
 ) : LogWriterGateway {
+    private val logger: Logger by lazy(loggerProvider)
     /**
      * Log to file
      *

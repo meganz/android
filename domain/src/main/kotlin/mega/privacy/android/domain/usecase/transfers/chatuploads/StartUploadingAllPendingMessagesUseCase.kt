@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
@@ -35,6 +36,7 @@ class StartUploadingAllPendingMessagesUseCase @Inject constructor(
                         val originalUriPath =
                             pendingMessages.firstOrNull()?.originalUriPath?.takeIf { uriPath != it }
                                 ?.let { TransferAppData.OriginalUriPath(it) }
+                        val pitagTrigger = pendingMessages.firstOrNull()?.pitagTrigger
                         // Start the upload and wait until scanning has finished:
                         // - One by one because the pending messages are different
                         // - Wait until scanning finished as required by the sdk
@@ -42,6 +44,7 @@ class StartUploadingAllPendingMessagesUseCase @Inject constructor(
                             uriPath = uriPath,
                             fileName = filesAndNames.second,
                             extraAppData = originalUriPath,
+                            pitagTrigger = pitagTrigger ?: PitagTrigger.NotApplicable,
                             pendingMessageIds = pendingMessages.map { it.id }
                         )
                         updatePendingMessageUseCase(

@@ -18,6 +18,7 @@ internal class PricingMapperTest {
         val baseMonth = 12
         val baseStorage = 1212
         val baseTransfer = 12134
+        val discountNames = listOf("Easter Sale", "", "World Backup Day Sale")
         whenever(megaPricing.numProducts).thenReturn(expectedNumProducts)
         whenever(megaCurrency.currencyName).thenReturn(expectedCurrency)
         (0 until expectedNumProducts).forEach { i ->
@@ -26,6 +27,7 @@ internal class PricingMapperTest {
             whenever(megaPricing.getMonths(i)).thenReturn(baseMonth + i)
             whenever(megaPricing.getGBStorage(i)).thenReturn(baseStorage + i)
             whenever(megaPricing.getGBTransfer(i)).thenReturn(baseTransfer + i)
+            whenever(megaPricing.getMobileOfferLabel(i)).thenReturn(discountNames[i])
         }
         val pricing = toPricing(megaPricing, megaCurrency)
         assertEquals(pricing.products.size, expectedNumProducts)
@@ -35,6 +37,7 @@ internal class PricingMapperTest {
             assertEquals(item.months, baseMonth + index)
             assertEquals(item.storage, baseStorage + index)
             assertEquals(item.transfer, baseTransfer + index)
+            assertEquals(item.discountName, discountNames[index])
         }
     }
 }

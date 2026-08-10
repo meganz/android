@@ -3,17 +3,16 @@ package mega.privacy.android.feature.devicecenter.ui.lists
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
@@ -55,12 +54,11 @@ internal fun DeviceCenterListViewItem(
     onDeviceMenuClicked: (DeviceUINode) -> Unit = {},
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit = {},
     onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit = {},
-    onInfoClicked: (DeviceCenterUINode) -> Unit = {},
+    onFolderMenuClicked: (DeviceFolderUINode) -> Unit = {},
 ) {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
-            .height(72.dp)
     ) {
         val (item, divider) = createRefs()
 
@@ -92,15 +90,16 @@ internal fun DeviceCenterListViewItem(
             applySecondaryColorIconTint = uiNode.icon.applySecondaryColorTint,
             statusIcon = uiNode.status.icon,
             statusColor = uiNode.status.color,
-            onMoreClicked = if (uiNode is DeviceUINode) { ->
-                onDeviceMenuClicked(uiNode)
-            } else {
-                null
-            },
-            onInfoClicked = if (uiNode is DeviceUINode) {
-                null
-            } else { ->
-                onInfoClicked(uiNode)
+            onMoreClicked = when (uiNode) {
+                is DeviceUINode -> {
+                    { onDeviceMenuClicked(uiNode) }
+                }
+
+                is DeviceFolderUINode -> {
+                    { onFolderMenuClicked(uiNode) }
+                }
+
+                else -> null
             },
         )
         MegaDivider(
@@ -123,7 +122,7 @@ internal fun DeviceCenterListViewItem(
  * @return The corresponding Status Text
  */
 @Composable
-private fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
+internal fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
     when (uiNodeStatus) {
         is DeviceCenterUINodeStatus.UpdatingWithPercentage -> {
             // Apply String Formatting for this UI Status

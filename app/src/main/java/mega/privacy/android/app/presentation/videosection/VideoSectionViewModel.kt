@@ -27,6 +27,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -38,6 +39,8 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionTabS
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FileNode
@@ -50,7 +53,6 @@ import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -59,7 +61,8 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -77,8 +80,8 @@ import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedIte
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.PlaylistCreatedSuccessfullyEvent
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -112,7 +115,6 @@ class VideoSectionViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val monitorVideoRecentlyWatchedUseCase: MonitorVideoRecentlyWatchedUseCase,
     private val clearRecentlyWatchedVideosUseCase: ClearRecentlyWatchedVideosUseCase,
@@ -146,7 +148,6 @@ class VideoSectionViewModel @Inject constructor(
     private var searchQueryJob: Job? = null
 
     init {
-        checkSearchFlags()
         refreshNodesIfAnyUpdates()
         viewModelScope.launch {
             monitorVideoPlaylistSetsUpdateUseCase().conflate()
@@ -164,10 +165,8 @@ class VideoSectionViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                handleHiddenNodesUIFlow()
-                monitorIsHiddenNodesOnboarded()
-            }
+            handleHiddenNodesUIFlow()
+            monitorIsHiddenNodesOnboarded()
         }
 
         viewModelScope.launch {
@@ -197,33 +196,7 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Check if the search by tags and description flags are enabled
-     */
-    fun checkSearchFlags() {
-        viewModelScope.launch {
-            runCatching {
-                val description = getFeatureFlagValueUseCase(AppFeatures.SearchWithDescription)
-                val tags = getFeatureFlagValueUseCase(AppFeatures.SearchWithTags)
-                description to tags
-            }.onSuccess { (description, tags) ->
-                _state.update {
-                    it.copy(searchDescriptionEnabled = description, searchTagsEnabled = tags)
-                }
-            }.onFailure {
-                Timber.e("Get feature flag failed $it")
-            }
-        }
-    }
-
     private fun getCurrentSearchQuery() = state.value.query.orEmpty()
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
-    }
 
     private fun handleHiddenNodesUIFlow() {
         combine(
@@ -369,8 +342,8 @@ class VideoSectionViewModel @Inject constructor(
     private suspend fun getVideoUIEntityList() =
         getAllVideosUseCase(
             searchQuery = getCurrentSearchQuery(),
-            tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery().removePrefix("#") else null,
-            description = if (state.value.searchDescriptionEnabled == true) getCurrentSearchQuery() else null
+            tag = getCurrentSearchQuery().removePrefix("#"),
+            description = getCurrentSearchQuery()
         ).filterNonSensitiveItems(
             showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
             isPaid = _state.value.accountType?.isPaid,
@@ -922,8 +895,14 @@ class VideoSectionViewModel @Inject constructor(
                     }.onSuccess { title ->
                         Timber.d("Updated video playlist title: $title")
                         refreshVideoPlaylistsWithUpdatedTitle(title)
+                        _state.update {
+                            it.copy(isVideoPlaylistUpdated = true)
+                        }
                     }.onFailure { exception ->
                         Timber.e(exception)
+                        _state.update {
+                            it.copy(isVideoPlaylistUpdated = false)
+                        }
                     }
                 }
             }
@@ -972,19 +951,17 @@ class VideoSectionViewModel @Inject constructor(
     private fun checkVideoPlaylistTitleValidity(
         title: String,
     ): Boolean {
-        var errorMessage: Int? = null
-        var isTitleValid = true
+        val errorMessage = when {
+            title.isBlank() -> sharedR.string.general_invalid_string
+            title.isInvalidDotName() -> sharedR.string.general_invalid_dot_name_warning
+            title.isInvalidDoubleDotName() -> sharedR.string.general_invalid_double_dot_name_warning
+            "[\\\\*/:<>?\"|]".toRegex()
+                .containsMatchIn(title) -> sharedR.string.general_invalid_characters_defined
 
-        if (title.isBlank()) {
-            isTitleValid = false
-            errorMessage = R.string.invalid_string
-        } else if (title in getAllVideoPlaylistTitles()) {
-            isTitleValid = false
-            errorMessage = ERROR_MESSAGE_REPEATED_TITLE
-        } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
-            isTitleValid = false
-            errorMessage = R.string.invalid_characters_defined
+            title in getAllVideoPlaylistTitles() -> sharedR.string.video_section_playlists_error_message_playlist_name_exists
+            else -> null
         }
+        val isTitleValid = errorMessage == null
 
         _state.update {
             it.copy(
@@ -1124,20 +1101,17 @@ class VideoSectionViewModel @Inject constructor(
 
         if (_tabState.value.selectedTab == VideoSectionTab.All) {
             val selectedNodes = getSelectedNodes()
-            val isHiddenNodesEnabled = isHiddenNodesActive()
             val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
 
-            if (isHiddenNodesEnabled) {
-                val hasNonSensitiveNode =
-                    getSelectedNodes().any { !it.isMarkedSensitive }
-                val isPaid = _state.value.accountType?.isPaid ?: false
-                val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+            val hasNonSensitiveNode =
+                getSelectedNodes().any { !it.isMarkedSensitive }
+            val isPaid = _state.value.accountType?.isPaid ?: false
+            val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
 
-                isHideMenuActionVisible =
-                    !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
-                isUnhideMenuActionVisible =
-                    isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
-            }
+            isHideMenuActionVisible =
+                !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+            isUnhideMenuActionVisible =
+                isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
 
             isRemoveLinkMenuActionVisible = if (selectedNodes.size == 1) {
                 selectedNodes.firstOrNull()?.let {
@@ -1157,7 +1131,7 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun checkPlaylistDetailActionsVisible() {
+    private fun checkPlaylistDetailActionsVisible() {
         var isHideMenuActionVisible = false
         var isUnhideMenuActionVisible = false
         _state.value.currentVideoPlaylist?.let { playlist ->
@@ -1166,20 +1140,17 @@ class VideoSectionViewModel @Inject constructor(
             val selectedVideos = selectedVideoElementIDs.mapNotNull { elementId ->
                 videos.find { video -> video.elementID == elementId }
             }
-            val isHiddenNodesEnabled = isHiddenNodesActive()
             val includeSensitiveInheritedNode = selectedVideos.any { it.isSensitiveInherited }
 
-            if (isHiddenNodesEnabled) {
-                val hasNonSensitiveNode =
-                    selectedVideos.any { !it.isMarkedSensitive }
-                val isPaid = _state.value.accountType?.isPaid ?: false
-                val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+            val hasNonSensitiveNode =
+                selectedVideos.any { !it.isMarkedSensitive }
+            val isPaid = _state.value.accountType?.isPaid ?: false
+            val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
 
-                isHideMenuActionVisible =
-                    !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
-                isUnhideMenuActionVisible =
-                    isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
-            }
+            isHideMenuActionVisible =
+                !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+            isUnhideMenuActionVisible =
+                isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
         }
         _state.update {
             it.copy(
@@ -1287,7 +1258,25 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    companion object {
-        private const val ERROR_MESSAGE_REPEATED_TITLE = 0
+    internal fun addFabButtonClicked() {
+        if (_state.value.currentVideoPlaylist != null) {
+            updateNavigateToVideoSelected(true)
+        } else {
+            if (getStorageState() == StorageState.PayWall) {
+                showOverDiskQuotaPaywallWarning()
+            } else {
+                updateShowCreateDialog(true)
+                val placeholderText = "New playlist"
+                setPlaceholderTitle(placeholderText)
+            }
+        }
+    }
+
+    internal fun updateShowCreateDialog(show: Boolean) {
+        _state.update { it.copy(showCreatedDialog = show) }
+    }
+
+    internal fun updateNavigateToVideoSelected(value: Boolean) {
+        _state.update { it.copy(navigateToVideoSelected = value) }
     }
 }

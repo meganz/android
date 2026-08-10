@@ -1,7 +1,5 @@
 package mega.privacy.android.app.main
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.text.Spanned
 import android.view.LayoutInflater
@@ -47,6 +45,8 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -331,7 +331,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
 
         when {
             modeCloud == FileExplorerActivity.UPLOAD ->
-                binding.actionText.text = getString(R.string.context_upload)
+                binding.actionText.text = getString(sharedR.string.general_upload_label)
 
             modeCloud == FileExplorerActivity.IMPORT ->
                 binding.actionText.text = getString(R.string.add_to_cloud)
@@ -382,11 +382,11 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
 
         emptyRootText = TextUtil.formatEmptyScreenText(
             requireContext(),
-            getString(R.string.context_empty_incoming)
+            getString(sharedR.string.shares_screen_incoming_empty)
         )
         emptyGeneralText = TextUtil.formatEmptyScreenText(
             requireContext(),
-            getString(R.string.file_browser_empty_folder_new)
+            getString(sharedR.string.annotated_empty_folder)
         )
         updateEmptyScreen()
 
@@ -628,10 +628,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                         fileExplorerActivity.hideTabs(true, INCOMING_FRAGMENT)
 
                         if (modeCloud == COPY || modeCloud == MOVE) {
-                            when {
-                                adapter.itemCount == 0 -> activateButton(true)
-                                fileExplorerActivity.deepBrowserTree > 0 -> checkCopyMoveButton()
-                            }
+                            activateButton(true)
                         }
                     }
                 }
@@ -712,7 +709,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                                 updateNodesByAdapter(originalData)
 
                                 if (modeCloud == COPY || modeCloud == MOVE) {
-                                    checkCopyMoveButton()
+                                    activateButton(true)
                                 }
 
                                 val lastVisiblePosition = if (lastPositionStack.isNotEmpty()) {
@@ -782,6 +779,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             adapter.setNodes(it)
             nodes.addAll(it)
             updateView()
+            fileExplorerActivity.invalidateOptionsMenu()
         }
         checkWritePermissions()
     }
@@ -795,7 +793,13 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
         if (modeCloud == FileExplorerActivity.SELECT)
             binding.fabSelect.isVisible = selectFile && show
         else
-            binding.actionText.isEnabled = hasWritePermissions && show
+            binding.actionText.isEnabled = hasWritePermissions && show && !isMovingToSameParent()
+
+    /**
+     * Returns true if moving to the same parent folder, in which case the move button should be disabled.
+     */
+    private fun isMovingToSameParent(): Boolean =
+        modeCloud == MOVE && fileExplorerActivity.parentMoveCopy()?.handle == parentHandle
 
     /**
      * Select all items
@@ -947,20 +951,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
      *
      * @return true is empty, otherwise is false
      */
-    fun isFolderEmpty() = adapter.itemCount <= 0
-
-    /**
-     * Checks if copy or move button should be shown or hidden depending on the current navigation level.
-     * Shows it if the current navigation level is not the parent of moving/copying nodes.
-     * Hides it otherwise.
-     */
-    private fun checkCopyMoveButton() {
-        fileExplorerActivity.parentMoveCopy().let { parentNode ->
-            activateButton(
-                modeCloud == COPY || parentNode == null || parentNode.handle != parentHandle
-            )
-        }
-    }
+    fun isFolderEmpty() = if (::adapter.isInitialized) adapter.itemCount <= 0 else true
 
     companion object {
         private const val SPAN_COUNT = 2

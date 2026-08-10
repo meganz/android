@@ -51,5 +51,9 @@ sealed interface FileNodeContent {
      *
      * @property localFile
      */
-    data class Other(val localFile: File?) : FileNodeContent
+    open class Other(open val localFile: File?) : FileNodeContent
+    /**
+     * Local Zip file
+     */
+    class LocalZipFile(override val localFile: File) : Other(localFile)
 }

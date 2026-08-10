@@ -238,7 +238,7 @@ private fun getActionButtonString(
     return when (selectedAction.resolutionActionType) {
 
         StalledIssueResolutionActionType.RENAME_ALL_ITEMS ->
-            sharedR.string.sync_apply_all_dialog_rename_button
+            sharedR.string.context_rename
 
         StalledIssueResolutionActionType.MERGE_FOLDERS ->
             sharedR.string.sync_apply_all_dialog_merge_button

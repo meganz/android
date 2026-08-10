@@ -64,6 +64,20 @@ interface UIPreferencesGateway {
     suspend fun setMediaDiscoveryView(value: Int)
 
     /**
+     * Monitor the timeline grid size preference
+     *
+     * @return a [Flow] to observe the timeline grid size preference
+     */
+    fun monitorTimelineGridSize(): Flow<Int?>
+
+    /**
+     * Set the timeline grid size preference
+     *
+     * @param value An [Int] representing the new timeline grid size preference
+     */
+    suspend fun setTimelineGridSize(value: Int)
+
+    /**
      * Monitor subfolder media discovery setting
      *
      * @return subfolder media discovery option enabled status as a flow
@@ -76,6 +90,34 @@ interface UIPreferencesGateway {
      * @param enabled
      */
     suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean)
+
+    /**
+     * Monitor the sorting order preference
+     *
+     * @return a [Flow] to observe the sorting order preference
+     */
+    fun monitorSortingPreference(): Flow<Int?>
+
+    /**
+     * Set the sorting order preference
+     *
+     * @param value An [Int] representing the new sorting order preference
+     */
+    suspend fun setSortingPreference(value: Int)
+
+    /**
+     * Monitor the view mode preference
+     *
+     * @return a [Flow] to observe the view mode preference
+     */
+    fun monitorViewModePreference(): Flow<Int?>
+
+    /**
+     * Set the view mode preference
+     *
+     * @param value An [Int] representing the new view mode preference
+     */
+    suspend fun setViewModePreference(value: Int)
 
 
     /**
@@ -167,4 +209,18 @@ interface UIPreferencesGateway {
      * @return serialised string representing the start screen preference destination
      */
     fun monitorSerialisedStartScreenPreferenceDestination(): Flow<String?>
+
+    /**
+     * Monitor the last version that a new feature was shown
+     *
+     * @return ve
+     */
+    fun monitorLastVersionNewFeatureShownPreference(): Flow<String?>
+
+    /**
+     * Set the last version that a new feature was shown
+     *
+     * @param value
+     */
+    suspend fun setLastVersionNewFeatureShownPreference(value: String)
 }

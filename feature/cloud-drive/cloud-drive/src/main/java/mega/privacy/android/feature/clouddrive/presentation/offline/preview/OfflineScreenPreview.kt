@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.OfflineScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 
 @CombinedThemePreviews
 @Composable
@@ -33,14 +34,17 @@ private fun PreviewOfflineScreenList() {
                 searchQuery = null,
                 showOfflineWarning = true,
             ),
+            snackbarEventQueue = rememberSnackBarQueue(),
             selectAll = {},
             deselectAll = {},
             onItemClicked = {},
             onItemLongClicked = {},
             onBack = {},
             onNavigateToFolder = { _, _ -> },
+            onNavigateToTransfers = {},
             onSearch = {},
             onOpenFile = {},
+            onOpenWithFile = {},
             onDismissOfflineWarning = {},
             shareOfflineFiles = {},
             saveOfflineFilesToDevice = {},
@@ -85,7 +89,9 @@ private fun PreviewOfflineScreenGrid() {
             onItemLongClicked = {},
             onBack = {},
             onNavigateToFolder = { _, _ -> },
+            onNavigateToTransfers = {},
             onOpenFile = {},
+            onOpenWithFile = {},
             onDismissOfflineWarning = {},
             onSearch = {},
             shareOfflineFiles = {},
@@ -121,6 +127,8 @@ private fun PreviewEmptyOfflineScreen() {
             onItemLongClicked = {},
             onBack = {},
             onNavigateToFolder = { _, _ -> },
+            onOpenWithFile = {},
+            onNavigateToTransfers = {},
             onOpenFile = {},
             onDismissOfflineWarning = {},
             onSearch = {},
@@ -157,6 +165,8 @@ private fun PreviewLoadingOfflineScreen() {
             onItemLongClicked = {},
             onBack = {},
             onNavigateToFolder = { _, _ -> },
+            onOpenWithFile = {},
+            onNavigateToTransfers = {},
             onOpenFile = {},
             onDismissOfflineWarning = {},
             onSearch = {},

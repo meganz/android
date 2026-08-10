@@ -3,7 +3,9 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import android.content.Intent
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -96,7 +98,9 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
             if (type == MegaRequest.TYPE_GET_ATTR_USER) {
                 when (paramType) {
                     MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER ->
-                        checkMyChatFilesFolderRequest(api, this, e)
+                        databaseEntryPoint.applicationScope().launch {
+                            checkMyChatFilesFolderRequest(api, this@with, e)
+                        }
                     MegaApiJava.USER_ATTR_FIRSTNAME -> if (e.errorCode == MegaError.API_OK) {
                         databaseEntryPoint.applicationScope().launch {
                             if (!email.isNullOrBlank()) {
@@ -154,7 +158,7 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
      * @param request result of the request
      * @param e       MegaError received when the request finished
      */
-    private fun checkMyChatFilesFolderRequest(
+    private suspend fun checkMyChatFilesFolderRequest(
         api: MegaApiJava,
         request: MegaRequest,
         e: MegaError,
@@ -202,16 +206,18 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
             return
         }
 
-        with(context) {
-            if (myChatFolderFound) {
-                (this as? FileExplorerActivity)?.let {
-                    it.setMyChatFilesFolder(myChatFolderNode)
-                    it.checkIfFilesExistsInMEGA()
-                }
+        withContext(Dispatchers.Main) {
+            with(context) {
+                if (myChatFolderFound) {
+                    (this as? FileExplorerActivity)?.let {
+                        it.setMyChatFilesFolder(myChatFolderNode)
+                        it.checkIfFilesExistsInMEGA()
+                    }
 
-                (this as? NodeAttachmentHistoryActivity)?.let {
-                    it.setMyChatFilesFolder(myChatFolderNode)
-                    it.handleStoredData()
+                    (this as? NodeAttachmentHistoryActivity)?.let {
+                        it.setMyChatFilesFolder(myChatFolderNode)
+                        it.handleStoredData()
+                    }
                 }
             }
         }

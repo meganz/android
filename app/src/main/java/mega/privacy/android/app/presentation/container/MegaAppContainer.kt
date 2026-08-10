@@ -6,11 +6,10 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContainer
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.MegaPsaContainer
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
@@ -20,7 +19,8 @@ val LocalIsDarkTheme = staticCompositionLocalOf { false }
  * Mega app container
  *
  * @param themeMode
- * @param passcodeCryptObjectFactory
+ * @param isSessionRequired
+ * @param finishOnSessionRefresh forwarded to [SessionContainer]
  * @param content
  *
  * *** IMPORTANT PLEASE NOTE ***
@@ -29,7 +29,8 @@ val LocalIsDarkTheme = staticCompositionLocalOf { false }
 @Composable
 fun MegaAppContainer(
     themeMode: ThemeMode,
-    passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
+    isSessionRequired: Boolean = true,
+    finishOnSessionRefresh: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
@@ -37,7 +38,6 @@ fun MegaAppContainer(
         { PsaContainer(content = it) },
         {
             PasscodeContainer(
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                 content = it
             )
         },
@@ -49,7 +49,13 @@ fun MegaAppContainer(
                 OriginalTheme(isDark = darkMode, content = it)
             }
         },
-        { SessionContainer(content = it) },
+        {
+            SessionContainer(
+                isSessionRequired = isSessionRequired,
+                finishOnSessionRefresh = finishOnSessionRefresh,
+                content = it
+            )
+        },
     )
 
     AppContainer(
@@ -63,39 +69,53 @@ fun MegaAppContainer(
  * Implements the same functionality as [MegaAppContainer] using the updated ui components and theme
  *
  * @param themeMode
- * @param passcodeCryptObjectFactory
+ * @param isSessionRequired
+ * @param useLegacyStatusBarColor
+ * @param includePsa
+ * @param finishOnSessionRefresh forwarded to [SessionContainer]
  * @param content
  *
  */
 @Composable
 fun SharedAppContainer(
     themeMode: ThemeMode,
-    passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
+    isSessionRequired: Boolean = true,
     useLegacyStatusBarColor: Boolean = true,
+    includePsa: Boolean = true,
+    finishOnSessionRefresh: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
-        { MegaPsaContainer(content = it) },
-        {
-            PasscodeContainer(
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                content = it
-            )
-        },
-        {
-            val darkMode = themeMode.isDarkMode()
-            CompositionLocalProvider(
-                LocalIsDarkTheme provides darkMode
-            ) {
-                AndroidTheme(
-                    isDark = darkMode,
-                    content = it,
-                    useLegacyStatusBarColor = useLegacyStatusBarColor
+    val containers: List<@Composable (@Composable () -> Unit) -> Unit> = buildList {
+        if (includePsa) add({ MegaPsaContainer(content = it) })
+        add(
+            {
+                PasscodeContainer(
+                    content = it
                 )
             }
-        },
-        { SessionContainer(content = it) },
-    )
+        )
+        add(
+            {
+                val darkMode = themeMode.isDarkMode()
+                CompositionLocalProvider(
+                    LocalIsDarkTheme provides darkMode
+                ) {
+                    AndroidTheme(
+                        isDark = darkMode,
+                        content = it,
+                        useLegacyStatusBarColor = useLegacyStatusBarColor
+                    )
+                }
+            }
+        )
+        add({
+            SessionContainer(
+                isSessionRequired = isSessionRequired,
+                finishOnSessionRefresh = finishOnSessionRefresh,
+                content = it
+            )
+        })
+    }
 
     AppContainer(
         containers = containers,

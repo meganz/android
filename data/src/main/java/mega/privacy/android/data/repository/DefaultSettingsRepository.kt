@@ -1,12 +1,12 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
-import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.decodeBase64
 import mega.privacy.android.data.extensions.encodeBase64
 import mega.privacy.android.data.extensions.failWithError
@@ -23,7 +22,6 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getValueFor
 import mega.privacy.android.data.extensions.hasParam
 import mega.privacy.android.data.extensions.isTypeWithParam
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -34,27 +32,36 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.data.preferences.PinnedItemsSortPreferenceDataStore
 import mega.privacy.android.data.qualifier.FileVersionsOption
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.AppVersion
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.entity.home.PinnedHomeItem
+import mega.privacy.android.domain.entity.home.PinnedHomeItemsSortField
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KEY_ANDROID
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_SENSITIVES
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_VAL_SHOW_HIDDEN_NODES
+import mega.privacy.android.domain.entity.preference.SortingPreference
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
+import mega.privacy.android.domain.entity.preference.ViewModePreference
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
-import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
-import nz.mega.sdk.MegaAccountDetails
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_ENOENT
@@ -73,7 +80,6 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default settings repository implementation
  *
- * @property databaseHandler [DatabaseHandler]
  * @property context [Context]
  * @property megaApiGateway [MegaApiGateway]
  * @property megaLocalStorageGateway [MegaLocalStorageGateway]
@@ -88,7 +94,6 @@ import kotlin.coroutines.suspendCoroutine
  */
 @ExperimentalContracts
 internal class DefaultSettingsRepository @Inject constructor(
-    private val databaseHandler: Lazy<DatabaseHandler>,
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
@@ -100,9 +105,11 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
-    private val myAccountInfoFacade: AccountInfoWrapper,
+    private val getAccountTypeUseCase: GetAccountTypeUseCase,
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
+    private val appVersionMapper: AppVersionMapper,
+    private val pinnedItemsSortPreferenceDataStore: PinnedItemsSortPreferenceDataStore,
 ) : SettingsRepository {
     private val showHiddenNodesFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
@@ -127,11 +134,8 @@ internal class DefaultSettingsRepository @Inject constructor(
                         continuation.resumeWith(Result.success(request.flag))
                     }
 
-                    API_ENOENT -> continuation.failWithException(
-                        SettingNotFoundException(
-                            error.errorCode, error.errorString
-                        )
-                    )
+                    // The server treats the option as enabled when it has never been set
+                    API_ENOENT -> continuation.resumeWith(Result.success(true))
 
                     else -> continuation.failWithError(
                         error,
@@ -188,14 +192,33 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setMediaDiscoveryView(value: Int) =
         uiPreferencesGateway.setMediaDiscoveryView(value)
 
+    override fun monitorTimelineGridSize(): Flow<Int?> =
+        uiPreferencesGateway.monitorTimelineGridSize()
+
+    override suspend fun setTimelineGridSize(value: Int) =
+        uiPreferencesGateway.setTimelineGridSize(value)
+
     override fun monitorSubfolderMediaDiscoveryEnabled(): Flow<Boolean?> =
         uiPreferencesGateway.monitorSubfolderMediaDiscoveryEnabled()
 
     override suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean) =
         uiPreferencesGateway.setSubfolderMediaDiscoveryEnabled(enabled)
 
+    override fun monitorSortingPreference(): Flow<SortingPreference?> =
+        uiPreferencesGateway.monitorSortingPreference().map { SortingPreference(it) }
+
+    override suspend fun setSortingPreference(preference: SortingPreference) =
+        uiPreferencesGateway.setSortingPreference(preference.id)
+
+    override fun monitorViewModePreference(): Flow<ViewModePreference?> =
+        uiPreferencesGateway.monitorViewModePreference().map { ViewModePreference(it) }
+
+    override suspend fun setViewModePreference(preference: ViewModePreference) =
+        uiPreferencesGateway.setViewModePreference(preference.id)
+
     override fun monitorShowHiddenItems(): Flow<Boolean> = showHiddenNodesFlow
         .onStart {
+            Timber.d("monitorShowHiddenItems, isShowHiddenNodesPopulated: $isShowHiddenNodesPopulated")
             if (!isShowHiddenNodesPopulated) {
                 isShowHiddenNodesPopulated = true
                 populateShowHiddenNodesPreference()
@@ -204,11 +227,13 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     private suspend fun populateShowHiddenNodesPreference() {
         val isEnabled = getShowHiddenNodesPreference()
+        Timber.d("populateShowHiddenNodesPreference isEnabled: $isEnabled")
         showHiddenNodesFlow.update { isEnabled }
     }
 
     override suspend fun setShowHiddenItems(enabled: Boolean) {
         showHiddenNodesFlow.update { enabled }
+        Timber.d("setShowHiddenItems enable: $enabled")
         setShowHiddenNodesPreference(enabled)
     }
 
@@ -253,7 +278,15 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean) =
         megaLocalStorageGateway.setAskBeforeLargeDownloads(askForConfirmation)
 
-    override suspend fun setShowCopyright() {
+    override fun monitorAskBeforePreviewDownloads(): Flow<Boolean> =
+        appPreferencesGateway.monitorBoolean(ASK_BEFORE_PREVIEW_DOWNLOADS_KEY, true)
+            .flowOn(ioDispatcher)
+
+    override suspend fun setAskBeforePreviewDownloads(askForConfirmation: Boolean) {
+        appPreferencesGateway.putBoolean(ASK_BEFORE_PREVIEW_DOWNLOADS_KEY, askForConfirmation)
+    }
+
+    override suspend fun setShowCopyright() = withContext(ioDispatcher) {
         if (megaApiGateway.getPublicLinks().isEmpty()) {
             Timber.d("No public links: showCopyright set true")
             megaLocalStorageGateway.setShowCopyright(true)
@@ -263,13 +296,8 @@ internal class DefaultSettingsRepository @Inject constructor(
         }
     }
 
-
-    override suspend fun isUseHttpsPreferenceEnabled(): Boolean = withContext(ioDispatcher) {
-        databaseHandler.get().useHttpsOnly.toBoolean()
-    }
-
-    override suspend fun setUseHttpsPreference(enabled: Boolean) = withContext(ioDispatcher) {
-        databaseHandler.get().setUseHttpsOnly(enabled)
+    override suspend fun setShowCopyright(show: Boolean) = withContext(ioDispatcher) {
+        megaLocalStorageGateway.setShowCopyright(show)
     }
 
     override fun getChatImageQuality(): Flow<ChatImageQuality> =
@@ -623,7 +651,7 @@ internal class DefaultSettingsRepository @Inject constructor(
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
                     when (error.errorCode) {
-                        API_ENOENT -> if (myAccountInfoFacade.accountTypeId == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+                        API_ENOENT -> if (getAccountTypeUseCase() == AccountType.FREE) {
                             continuation.resumeWith(Result.success(DAYS_USER_FREE))
                         } else {
                             continuation.resumeWith(Result.success(DAYS_USER_PRO))
@@ -665,6 +693,16 @@ internal class DefaultSettingsRepository @Inject constructor(
         }
     }
 
+    override fun monitorHomeConfigurationTooltipShown(): Flow<Boolean> =
+        appPreferencesGateway.monitorBoolean(HOME_CONFIGURATION_TOOLTIP_SHOWN_KEY, false)
+            .flowOn(ioDispatcher)
+
+    override suspend fun setHomeConfigurationTooltipShown(shown: Boolean) {
+        withContext(ioDispatcher) {
+            appPreferencesGateway.putBoolean(HOME_CONFIGURATION_TOOLTIP_SHOWN_KEY, shown)
+        }
+    }
+
     override fun monitorHomeScreenWidgetConfiguration(): Flow<List<HomeWidgetConfiguration>> =
         megaLocalRoomGateway.monitorHomeScreenWidgetConfigurations()
             .flowOn(ioDispatcher)
@@ -674,14 +712,62 @@ internal class DefaultSettingsRepository @Inject constructor(
             megaLocalRoomGateway.insertOrUpdateHomeScreenWidgetConfigurations(configurations)
         }
 
-    override suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String){
+    override suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String) {
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteHomeScreenWidgetConfiguration(widgetIdentifier)
         }
     }
 
+    override suspend fun resetHomeScreenWidgetConfigurations() {
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.deleteAllHomeScreenWidgetConfigurations()
+        }
+    }
+
+    override fun monitorPinnedHomeItems(): Flow<List<PinnedHomeItem>> =
+        megaLocalRoomGateway.monitorPinnedHomeItems()
+
+    override suspend fun addPinnedHomeItems(items: List<PinnedHomeItem>) =
+        megaLocalRoomGateway.insertPinnedHomeItems(items)
+
+    override suspend fun removePinnedHomeItem(nodeId: NodeId) {
+        megaLocalRoomGateway.deletePinnedHomeItem(nodeId.longValue)
+    }
+
+    override suspend fun updatePinnedHomeItemName(nodeId: NodeId, name: String) {
+        megaLocalRoomGateway.updatePinnedHomeItemName(nodeId.longValue, name)
+    }
+
+    override suspend fun clearPinnedHomeItems() {
+        megaLocalRoomGateway.deleteAllPinnedHomeItems()
+    }
+
+    override fun monitorPinnedItemsSortPreference() =
+        pinnedItemsSortPreferenceDataStore.monitorSortPreference().flowOn(ioDispatcher)
+
+    override suspend fun setPinnedItemsSortPreference(
+        sortField: PinnedHomeItemsSortField,
+        sortDirection: SortDirection,
+    ) = pinnedItemsSortPreferenceDataStore.setSortPreference(sortField, sortDirection)
+
+    override suspend fun getLastVersionNewFeatureShown(): AppVersion? =
+        withContext(ioDispatcher) {
+            uiPreferencesGateway
+                .monitorLastVersionNewFeatureShownPreference()
+                .firstOrNull()
+                ?.let { appVersionMapper(it) }
+        }
+
+
+    override suspend fun setLastVersionNewFeatureShown(version: AppVersion) =
+        withContext(ioDispatcher) {
+            uiPreferencesGateway.setLastVersionNewFeatureShownPreference(appVersionMapper(version))
+        }
+
     companion object {
+        private const val ASK_BEFORE_PREVIEW_DOWNLOADS_KEY = "ask_before_preview_downloads"
         private const val COLORED_FOLDERS_ONBOARDING_SHOWN_KEY = "colored_folders_onboarding_shown"
+        private const val HOME_CONFIGURATION_TOOLTIP_SHOWN_KEY = "home_configuration_tooltip_shown"
         private const val DAYS_USER_FREE = 30
         private const val DAYS_USER_PRO = 90
     }

@@ -17,18 +17,13 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
-import mega.privacy.android.app.presentation.photos.PhotosCache.updatePhotos
-import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.app.presentation.photos.model.LocationPreference
 import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
 import mega.privacy.android.app.presentation.photos.model.RememberPreferences
-import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.TimelineFilterPreferences
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
-import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.util.createDaysCardList
@@ -50,7 +45,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
@@ -77,6 +71,11 @@ import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUs
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
+import mega.privacy.android.feature.photos.model.CameraUploadsStatus
+import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.domain.entity.photos.ZoomLevel
+import mega.privacy.android.feature.photos.provider.PhotosCache.updatePhotos
 import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -187,15 +186,14 @@ class TimelineViewModel @Inject constructor(
      * Private method to start all monitoring tasks
      * Used by both legacy behavior (init) and UI-driven behavior (startPhotoMonitoring)
      */
-    private suspend fun startMonitoring() {
+    private fun startMonitoring() {
         monitorPhotos()
         monitorCameraUploadsStatus()
 
-        if (isHiddenNodesActive()) {
-            monitorShowHiddenItems()
-            monitorAccountDetail()
-            monitorIsHiddenNodesOnboarded()
-        }
+        monitorShowHiddenItems()
+        monitorAccountDetail()
+        monitorIsHiddenNodesOnboarded()
+
         checkCameraUploadsTransferScreenEnabled()
         checkCameraUploadsPausedWarningBannerEnabled()
     }
@@ -213,13 +211,6 @@ class TimelineViewModel @Inject constructor(
             getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
         }
 
-        return result.getOrNull() ?: false
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
         return result.getOrNull() ?: false
     }
 
@@ -598,6 +589,7 @@ class TimelineViewModel @Inject constructor(
         _state.update {
             it.copy(
                 photos = sourcePhotos,
+                enableFilterOption = sourcePhotos.isNotEmpty(),
                 loadPhotosDone = true,
                 currentShowingPhotos = sortedPhotos,
                 enableCameraUploadPageShowing = sortedPhotos.isEmpty() && !isCameraUploadsEnabled,
@@ -801,7 +793,7 @@ class TimelineViewModel @Inject constructor(
             is DateCard.YearsCard -> {
                 val monthsCardList = _state.value.monthsCardPhotos
                 val photo = monthsCardList.find {
-                    it.photo.modificationTime == dateCard.photo.modificationTime
+                    it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
                 }
                 updateSelectedTimeBarState(TimeBarTab.Months, monthsCardList.indexOf(photo))
             }
@@ -809,7 +801,7 @@ class TimelineViewModel @Inject constructor(
             is DateCard.MonthsCard -> {
                 val daysCardList = _state.value.daysCardPhotos
                 val photo = daysCardList.find {
-                    it.photo.modificationTime == dateCard.photo.modificationTime
+                    it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
                 }
                 updateSelectedTimeBarState(TimeBarTab.Days, daysCardList.indexOf(photo))
             }

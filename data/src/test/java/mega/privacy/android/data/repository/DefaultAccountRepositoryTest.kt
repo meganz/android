@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
@@ -21,18 +20,20 @@ import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.AccountTypeMapper
+import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.account.AccountInactivityMapper
 import mega.privacy.android.data.mapper.account.RecoveryKeyToFileMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
@@ -40,19 +41,23 @@ import mega.privacy.android.data.mapper.contact.UserChangeMapper
 import mega.privacy.android.data.mapper.contact.UserMapper
 import mega.privacy.android.data.mapper.contact.UserVisibilityMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
-import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsMapper
+import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.LastPurgeEvent
+import mega.privacy.android.domain.entity.account.AccountInactivity
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -81,6 +86,7 @@ import nz.mega.sdk.MegaError.API_EINTERNAL
 import nz.mega.sdk.MegaPricing
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -93,6 +99,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.NullSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -113,19 +120,16 @@ class DefaultAccountRepositoryTest {
     private lateinit var underTest: AccountRepository
 
     private val accountInfoWrapper =
-        mock<AccountInfoWrapper> { on { accountTypeString }.thenReturn("") }
+        mock<AccountInfoWrapper>()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val userAccountMapper = UserAccountMapper()
-    private val accountTypeMapper = mock<AccountTypeMapper>()
     private val currencyMapper = ::Currency
     private val subscriptionOptionListMapper = mock<SubscriptionOptionListMapper>()
     private val megaAchievementMapper = mock<MegaAchievementMapper>()
     private val achievementsOverviewMapper = mock<AchievementsOverviewMapper>()
-    private val dbHandler = mock<DatabaseHandler>()
-    private val userCredentialsMapper = mock<UserCredentialsMapper>()
     private val accountSessionMapper = mock<AccountSessionMapper>()
     private val chatPreferencesGateway = mock<ChatPreferencesGateway>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
@@ -139,6 +143,7 @@ class DefaultAccountRepositoryTest {
     private val recoveryKeyToFileMapper = mock<RecoveryKeyToFileMapper>()
     private val cameraUploadsSettingsPreferenceGateway =
         mock<CameraUploadsSettingsPreferenceGateway>()
+    private val chatSettingsPreferenceGateway = mock<ChatSettingsPreferenceGateway>()
     private val cookieSettingsMapper = mock<CookieSettingsMapper>()
     private val cookieSettingsIntMapper = mock<CookieSettingsIntMapper>()
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
@@ -151,7 +156,10 @@ class DefaultAccountRepositoryTest {
                 emailMap = emptyMap()
             )
         }
+    private val accountDetailMapper = mock<AccountDetailMapper>()
     private val storageStateMapper = mock<StorageStateMapper>()
+    private val eventMapper = mock<EventMapper>()
+    private val accountInactivityMapper = mock<AccountInactivityMapper>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -180,6 +188,7 @@ class DefaultAccountRepositoryTest {
         amount = CurrencyPoint.SystemCurrencyPoint(13),
         currency = currencyMapper("EUR"),
         sku = "com.mega.pro1.monthly",
+        hasOffer = false,
     )
     private val mockEmail = "my@email.com"
     private val excludeFileNames = setOf(
@@ -194,13 +203,10 @@ class DefaultAccountRepositoryTest {
             megaChatApiGateway,
             megaApiFolderGateway,
             localStorageGateway,
-            accountTypeMapper,
             subscriptionOptionListMapper,
             megaAchievementMapper,
             achievementsOverviewMapper,
-            dbHandler,
             myAccountCredentialsMapper,
-            userCredentialsMapper,
             accountSessionMapper,
             chatPreferencesGateway,
             callsPreferencesGateway,
@@ -213,13 +219,19 @@ class DefaultAccountRepositoryTest {
             fileGateway,
             recoveryKeyToFileMapper,
             cameraUploadsSettingsPreferenceGateway,
+            chatSettingsPreferenceGateway,
             cookieSettingsMapper,
             cookieSettingsIntMapper,
             credentialsPreferencesGateway,
+            accountDetailMapper,
             storageStateMapper,
             uiPreferencesGateway,
             getDomainNameUseCase,
+            accountInactivityMapper,
         )
+        whenever(
+            accountDetailMapper(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
+        ).thenReturn(AccountDetail())
     }
 
 
@@ -236,15 +248,12 @@ class DefaultAccountRepositoryTest {
             userUpdateMapper = userUpdateMapper,
             localStorageGateway = localStorageGateway,
             userAccountMapper = userAccountMapper,
-            accountTypeMapper = accountTypeMapper,
             currencyMapper = currencyMapper,
             subscriptionOptionListMapper = subscriptionOptionListMapper,
             megaAchievementMapper = megaAchievementMapper,
             achievementsOverviewMapper = achievementsOverviewMapper,
-            dbHandler = { dbHandler },
             myAccountCredentialsMapper = myAccountCredentialsMapper,
-            accountDetailMapper = mock(),
-            userCredentialsMapper = userCredentialsMapper,
+            accountDetailMapper = accountDetailMapper,
             accountSessionMapper = accountSessionMapper,
             chatPreferencesGateway = chatPreferencesGateway,
             callsPreferencesGateway = callsPreferencesGateway,
@@ -257,6 +266,7 @@ class DefaultAccountRepositoryTest {
             fileGateway = fileGateway,
             recoveryKeyToFileMapper = recoveryKeyToFileMapper,
             cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
+            chatSettingsPreferenceGateway = chatSettingsPreferenceGateway,
             cookieSettingsMapper = cookieSettingsMapper,
             cookieSettingsIntMapper = cookieSettingsIntMapper,
             credentialsPreferencesGateway = { credentialsPreferencesGateway },
@@ -265,6 +275,8 @@ class DefaultAccountRepositoryTest {
             uiPreferencesGateway = uiPreferencesGateway,
             excludeFileNames = excludeFileNames,
             getDomainNameUseCase = getDomainNameUseCase,
+            eventMapper = eventMapper,
+            accountInactivityMapper = accountInactivityMapper,
         )
 
     }
@@ -272,15 +284,11 @@ class DefaultAccountRepositoryTest {
     @Test
     fun `test that get account does not throw exception if email is null`() = runTest {
         val expectedUserIdObj = null
-        val expectedAccountTypeString = "Free"
-
-        whenever(accountInfoWrapper.accountTypeId).thenReturn(-1)
         whenever(megaChatApiGateway.getMyEmail()).thenReturn(null)
         megaApiGateway.stub {
-            onBlocking { isMasterBusinessAccount() }.thenReturn(false)
-            onBlocking { getLoggedInUser() }.thenReturn(expectedUserIdObj)
+            on { isMasterBusinessAccount() }.thenReturn(false)
+            on { getLoggedInUser() }.thenReturn(expectedUserIdObj)
         }
-        whenever(accountInfoWrapper.accountTypeString).thenReturn(expectedAccountTypeString)
 
         assertThat(underTest.getUserAccount()).isNotNull()
     }
@@ -289,17 +297,14 @@ class DefaultAccountRepositoryTest {
     fun `test that user id is included in account info if user is logged in`() = runTest {
         val expectedUserId = 4L
         val expectedUserIdObj = UserId(expectedUserId)
-        val expectedAccountTypeString = "Free"
-
         val user = mock<MegaUser> {
             on { handle }.thenReturn(expectedUserId)
             on { email }.thenReturn(mockEmail)
         }
         megaApiGateway.stub {
-            onBlocking { isMasterBusinessAccount() }.thenReturn(false)
-            onBlocking { getLoggedInUser() }.thenReturn(user)
+            on { isMasterBusinessAccount() }.thenReturn(false)
+            on { getLoggedInUser() }.thenReturn(user)
         }
-        whenever(accountInfoWrapper.accountTypeString).thenReturn(expectedAccountTypeString)
 
         assertThat(underTest.getUserAccount().userId).isEqualTo(expectedUserIdObj)
     }
@@ -735,13 +740,13 @@ class DefaultAccountRepositoryTest {
     @Test
     fun `test resetAccountDetailsTimeStamp invoke correct method`() = runTest {
         underTest.resetAccountDetailsTimeStamp()
-        verify(dbHandler).resetAccountDetailsTimeStamp()
+        verify(localStorageGateway).resetAccountDetailsTimeStamp()
     }
 
     @Test
     fun `test resetExtendedAccountDetailsTimestamp invoke correct method`() = runTest {
         underTest.resetExtendedAccountDetailsTimestamp()
-        verify(dbHandler).resetExtendedAccountDetailsTimestamp()
+        verify(localStorageGateway).resetExtendedAccountDetailsTimestamp()
     }
 
     @Test
@@ -883,13 +888,20 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
-    fun `test that MegaLocalStorageGateway is invoked for saving credentials and clearing ephemeral while saving credentials`() =
+    fun `test that credentialsPreferencesGateway is invoked for saving session and clearing ephemeral while saving credentials`() =
         runTest {
-            val credentials =
-                userCredentialsMapper("test@mega.io", "AFasdffW456sdfg", null, null, "1536456")
+            val email = "test@mega.io"
+            val session = "AFasdffW456sdfg"
+            val handle = 1536456L
+            val user = mock<MegaUser> {
+                on { this.email }.thenReturn(email)
+                on { this.handle }.thenReturn(handle)
+            }
+            whenever(megaApiGateway.myUser).thenReturn(user)
+            whenever(megaApiGateway.dumpSession).thenReturn(session)
             mockGetUserDataSuccess()
             underTest.saveAccountCredentials()
-            verify(credentialsPreferencesGateway).save(credentials)
+            verify(credentialsPreferencesGateway).saveSession(session)
             verify(ephemeralCredentialsGateway).clear()
         }
 
@@ -914,9 +926,31 @@ class DefaultAccountRepositoryTest {
         val email = "test@mega.io"
         val session = "AFasdffW456sdfg"
         val handle = 1536456L
+        val user = mock<MegaUser> {
+            on { this.email }.thenReturn(email)
+            on { this.handle }.thenReturn(handle)
+        }
+        whenever(megaApiGateway.myUser).thenReturn(user)
+        whenever(megaApiGateway.dumpSession).thenReturn(session)
         mockGetUserDataSuccess()
         assertThat(underTest.saveAccountCredentials())
             .isEqualTo(accountSessionMapper(email, session, handle))
+    }
+
+    @Test
+    fun `test that saveSession is not called when session is null`() = runTest {
+        val email = "test@mega.io"
+        val handle = 1536456L
+        val user = mock<MegaUser> {
+            on { this.email }.thenReturn(email)
+            on { this.handle }.thenReturn(handle)
+        }
+        whenever(megaApiGateway.myUser).thenReturn(user)
+        whenever(megaApiGateway.dumpSession).thenReturn(null)
+        mockGetUserDataSuccess()
+        underTest.saveAccountCredentials()
+        verify(credentialsPreferencesGateway, never()).saveSession(any())
+        verify(ephemeralCredentialsGateway).clear()
     }
 
     @Test
@@ -1055,7 +1089,7 @@ class DefaultAccountRepositoryTest {
             verify(localStorageGateway).clearChatItems()
             verify(localStorageGateway).clearAttributes()
             verify(megaLocalRoomGateway).deleteAllCompletedTransfers()
-            verify(localStorageGateway).clearChatSettings()
+            verify(chatSettingsPreferenceGateway).clearPreferences()
             verify(megaLocalRoomGateway).deleteAllBackups()
             verify(cameraUploadsSettingsPreferenceGateway).clearPreferences()
         }
@@ -1131,36 +1165,69 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
-    fun `test that getLatestTargetPathCopyPreference is not invoked whenever latestTargetTimeStamp is over 60 minutes old`() =
+    fun `test that getLatestTargetCopyPreference is not invoked whenever latestTargetTimeStamp is over 60 minutes old`() =
         runTest {
             val latestTargetTimestamp = System.currentTimeMillis().minus(3700000)
             whenever(accountPreferencesGateway.getLatestTargetTimestampCopyPreference()).thenReturn(
                 flowOf(latestTargetTimestamp)
             )
-            underTest.getLatestTargetPathCopyPreference()
-            verify(accountPreferencesGateway, never()).getLatestTargetPathCopyPreference()
+            underTest.getLatestTargetCopyPreference()
+            verify(accountPreferencesGateway, never()).getLatestTargetCopyPreference()
         }
 
     @Test
-    fun `test that getLatestTargetPathCopyPreference is invoked whenever latestTargetTimeStamp is less than 60 minutes old`() =
+    fun `test that getLatestTargetCopyPreference is invoked whenever latestTargetTimeStamp is less than 60 minutes old`() =
         runTest {
             val latestTargetTimestamp = System.currentTimeMillis().minus(3500000)
             whenever(accountPreferencesGateway.getLatestTargetTimestampCopyPreference()).thenReturn(
                 flowOf(latestTargetTimestamp)
             )
-            whenever(accountPreferencesGateway.getLatestTargetPathCopyPreference()).thenReturn(
+            whenever(accountPreferencesGateway.getLatestTargetCopyPreference()).thenReturn(
                 flowOf(1234)
             )
-            underTest.getLatestTargetPathCopyPreference()
-            verify(accountPreferencesGateway).getLatestTargetPathCopyPreference()
+            underTest.getLatestTargetCopyPreference()
+            verify(accountPreferencesGateway).getLatestTargetCopyPreference()
         }
 
     @Test
-    fun `test that setLatestTargetPathCopyPreference is invoked when setLatestTargetPathPreference called`() =
+    fun `test that setLatestTargetCopyPreference is invoked when setLatestTargetPathPreference called`() =
         runTest {
             val handle = 1234L
-            underTest.setLatestTargetPathCopyPreference(handle)
-            verify(accountPreferencesGateway).setLatestTargetPathCopyPreference(handle)
+            underTest.setLatestTargetCopyPreference(handle)
+            verify(accountPreferencesGateway).setLatestTargetCopyPreference(handle)
+        }
+
+    @Test
+    fun `test that getLatestTargetMovePreference is not invoked whenever latestTargetTimeStamp is over 60 minutes old`() =
+        runTest {
+            val latestTargetTimestamp = System.currentTimeMillis().minus(3700000)
+            whenever(accountPreferencesGateway.getLatestTargetTimestampMovePreference()).thenReturn(
+                flowOf(latestTargetTimestamp)
+            )
+            underTest.getLatestTargetMovePreference()
+            verify(accountPreferencesGateway, never()).getLatestTargetMovePreference()
+        }
+
+    @Test
+    fun `test that getLatestTargetMovePreference is invoked whenever latestTargetTimeStamp is less than 60 minutes old`() =
+        runTest {
+            val latestTargetTimestamp = System.currentTimeMillis().minus(3500000)
+            whenever(accountPreferencesGateway.getLatestTargetTimestampMovePreference()).thenReturn(
+                flowOf(latestTargetTimestamp)
+            )
+            whenever(accountPreferencesGateway.getLatestTargetMovePreference()).thenReturn(
+                flowOf(1234)
+            )
+            underTest.getLatestTargetMovePreference()
+            verify(accountPreferencesGateway).getLatestTargetMovePreference()
+        }
+
+    @Test
+    fun `test that setLatestTargetMovePreference is invoked when setLatestTargetMovePreference called`() =
+        runTest {
+            val handle = 1234L
+            underTest.setLatestTargetMovePreference(handle)
+            verify(accountPreferencesGateway).setLatestTargetMovePreference(handle)
         }
 
     @Test
@@ -1651,8 +1718,38 @@ class DefaultAccountRepositoryTest {
         val actual = underTest.getUserData()
 
         // Then
+        verify(appEventGateway).broadcastMiscState(MiscLoadedState.MethodCalled)
         verify(megaApiGateway).getUserData(any())
         assertThat(actual).isEqualTo(Unit)
+    }
+
+    @Test
+    fun `test that get user data saves email when accountEmail exists`() = runTest {
+        // Given
+        val email = "test@mega.io"
+        val megaErrorCode = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        whenever(megaApiGateway.accountEmail).thenReturn(email)
+        whenever(
+            megaApiGateway.getUserData(
+                listener = any()
+            )
+        ).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = megaErrorCode
+            )
+        }
+
+        // When
+        underTest.getUserData()
+
+        // Then
+        verify(appEventGateway).broadcastMiscState(MiscLoadedState.MethodCalled)
+        verify(megaApiGateway).getUserData(any())
+        verify(credentialsPreferencesGateway).saveEmail(email)
     }
 
     @ParameterizedTest(name = "when the sdk returns {0} error code which is not a success code")
@@ -1678,6 +1775,7 @@ class DefaultAccountRepositoryTest {
         assertThrows<MegaException> {
             underTest.getUserData()
         }
+        verify(appEventGateway).broadcastMiscState(MiscLoadedState.MethodCalled)
     }
 
     private fun provideMegaError() = Stream.of(
@@ -2209,22 +2307,31 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
-    fun `test that monitorMiscLoaded is invoked when monitorMiscLoaded called`() =
+    fun `test that monitorMiscState is invoked when monitorMiscState called`() =
         runTest {
-            whenever(appEventGateway.monitorMiscLoaded()).thenReturn(
-                flowOf(true)
-            )
-            underTest.monitorMiscLoaded().test {
-                assertThat(awaitItem()).isEqualTo(true)
-                cancelAndIgnoreRemainingEvents()
+            val flow = flowOf(MiscLoadedState.FlagsReady)
+            whenever(appEventGateway.monitorMiscState()).thenReturn(flow)
+            underTest.monitorMiscState().test {
+                assertThat(awaitItem()).isEqualTo(MiscLoadedState.FlagsReady)
+                awaitComplete()
             }
         }
 
     @Test
-    fun `test that appEventGateway invokes broadcastMiscLoaded when calling broadcastMiscLoaded`() =
+    fun `test that getCurrentMiscState is invoked when getCurrentMiscState called`() =
         runTest {
-            underTest.broadcastMiscLoaded()
-            verify(appEventGateway).broadcastMiscLoaded()
+            val state = MiscLoadedState.FlagsReady
+            whenever(appEventGateway.getCurrentMiscState()).thenReturn(state)
+            assertThat(underTest.getCurrentMiscState()).isEqualTo(state)
+            verify(appEventGateway).getCurrentMiscState()
+        }
+
+    @Test
+    fun `test that appEventGateway invokes broadcastMiscState when calling broadcastMiscState`() =
+        runTest {
+            val state = MiscLoadedState.FlagsReady
+            underTest.broadcastMiscState(state)
+            verify(appEventGateway).broadcastMiscState(state)
         }
 
     @Test
@@ -2380,4 +2487,113 @@ class DefaultAccountRepositoryTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that setLastPurgeAcknowledged succeeds when MegaApi returns API_OK`() = runTest {
+        val ts = 1_700_000_000L
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        val megaRequest = mock<MegaRequest>()
+        whenever(
+            megaApiGateway.setLastPurgeAcknowledged(ts = eq(ts), listener = any())
+        ).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaError,
+            )
+        }
+
+        underTest.setLastPurgeAcknowledged(ts)
+
+        verify(megaApiGateway).setLastPurgeAcknowledged(ts = eq(ts), listener = any())
+    }
+
+    @Test
+    fun `test that setLastPurgeAcknowledged throws MegaException when MegaApi returns an error`() =
+        runTest {
+            val ts = 1_700_000_000L
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EACCESS)
+            }
+            val megaRequest = mock<MegaRequest>()
+            whenever(
+                megaApiGateway.setLastPurgeAcknowledged(ts = eq(ts), listener = any())
+            ).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            assertThrows<MegaException> {
+                underTest.setLastPurgeAcknowledged(ts)
+            }
+        }
+
+    @Test
+    fun `test that monitorSuppressedPurgeTimestamp emits the timestamp set by setSuppressedPurgeTimestamp`() =
+        runTest {
+            val ts = 1_700_000_000L
+
+            underTest.monitorSuppressedPurgeTimestamp().test {
+                assertThat(awaitItem()).isNull()
+
+                underTest.setSuppressedPurgeTimestamp(ts)
+
+                assertThat(awaitItem()).isEqualTo(ts)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that monitorAccountInactivity emits the account inactivity mapped from a last purge event`() =
+        runTest {
+            val megaEvent = mock<MegaEvent>()
+            val lastPurgeEvent = LastPurgeEvent(
+                handle = 1L,
+                ts = 1_700_000_000L,
+                reason = REASON_INACTIVE,
+                warningTs = null,
+                lastActiveTs = 1_704_067_200L,
+            )
+            val expected = AccountInactivity(inactivityMonths = 3, purgeTimestamp = 1_700_000_000L)
+            whenever(megaApiGateway.globalUpdates)
+                .thenReturn(flowOf(GlobalUpdate.OnEvent(megaEvent)))
+            whenever(eventMapper(megaEvent)).thenReturn(lastPurgeEvent)
+            whenever(accountInactivityMapper(lastPurgeEvent)).thenReturn(expected)
+
+            underTest.monitorAccountInactivity().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that monitorAccountInactivity does not emit when the mapper returns null`() =
+        runTest {
+            val megaEvent = mock<MegaEvent>()
+            val lastPurgeEvent = LastPurgeEvent(
+                handle = 1L,
+                ts = 1_700_000_000L,
+                reason = REASON_NOT_INACTIVE,
+                warningTs = null,
+                lastActiveTs = 0L,
+            )
+            whenever(megaApiGateway.globalUpdates)
+                .thenReturn(flowOf(GlobalUpdate.OnEvent(megaEvent)))
+            whenever(eventMapper(megaEvent)).thenReturn(lastPurgeEvent)
+            whenever(accountInactivityMapper(lastPurgeEvent)).thenReturn(null)
+
+            underTest.monitorAccountInactivity().test {
+                awaitComplete()
+            }
+        }
+
+    private companion object {
+        private const val REASON_INACTIVE = 4
+        private const val REASON_NOT_INACTIVE = 1
+    }
 }

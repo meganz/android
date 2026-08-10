@@ -14,8 +14,6 @@
     <string name="general_select">Wybierz</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Wybierz katalog</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Utwórz</string>
     <!-- button -->
     <string name="general_add">Dodaj</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -41,7 +39,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Trwa ładowanie</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Dodawanie</string>
+    <string name="general_importing">Dodawanie&#8230;</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Przekierowanie</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
@@ -61,17 +59,13 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Wgrywane</string>
     <!-- Menu item -->
-    <string name="action_create_folder">Nowy katalog</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Nowy plik tekstowy</string>
-    <!-- Menu item -->
     <string name="action_settings">Ustawienia</string>
     <!-- Search button -->
     <string name="action_search">Szukaj</string>
     <!-- Select country page title -->
     <string name="action_search_country">Wybierz swój region</string>
     <!-- Alternative text or description text for the “Play” button -->
-    <string name="action_play">Play</string>
+    <string name="action_play">Graj</string>
     <!-- Search button -->
     <string name="action_pause">Wstrzymaj</string>
     <!-- Menu item -->
@@ -93,7 +87,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Subskrypcja została anulowana</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Anulowanie Twojej subksrypcji nie powiodło się. Skontaktuj się z nami support&#64;mega.io</string>
+    <string name="cancel_subscription_error">Nie udało się anulować Twojej subskrypcji. Prosimy o kontakt z pomocą techniczną pod adresem https://mega.nz/support w celu uzyskania pomocy.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Zamknij pozostałe sesje</string>
     <!-- Message after kill all opened sessions -->
@@ -156,10 +150,6 @@
     <string name="login_before_share">Zaloguj się, aby udostępnić MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Twój link potwierdzający nie jest już ważny. Twoje konto może być już aktywowane lub anulowałeś rejestrację.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Imię</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Nazwisko</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Rozumiem, że [B]jeśli utracę hasło, mogę utracić dane[/B]. Przeczytaj więcej o kompleksowym szyfrowaniu [A]MEGA[/A].</string>
     <!-- warning dialog -->
@@ -282,8 +272,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Ten link nie będzie już&#160;dostępny publicznie.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Zmień nazwę</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Otwórz</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Przygotowywanie pliku</string>
@@ -303,8 +291,6 @@
     <string name="context_move_to_trash">Przenieś do Kosza</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Usuń z MEGA</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Nazwa katalogu</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Tworzenie katalogu</string>
     <!-- Menu option title -->
@@ -393,8 +379,6 @@
     <string name="subscription_type_monthly">Miesięcznie</string>
     <!--  -->
     <string name="subscription_type_yearly">Rocznie</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Nowy katalog</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Dodaj kontakt</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -744,7 +728,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Nieprawidłowy e-mail lub hasło. Proszę spróbować ponownie.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Twoje konto zostało zawieszone ze względu na naruszenie Regulaminu serwisu. Prosimy o kontakt support&#64;mega.io</string>
+    <string name="error_account_suspended">Twoje konto zostało zawieszone z powodu naruszeń Warunków korzystania z usług. Prosimy o kontakt z pomocą techniczną pod adresem https://mega.nz/support</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Zbyt wiele nieudanych prób logowania. Zaczekaj godzinę.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -1034,12 +1018,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">minut</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Online</item>
-        <item>Nieaktywny</item>
-        <item>Zajęty</item>
-        <item>Lokalne</item>
-    </string-array>
+    <string name="settings_chat_status_online">Online</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Nieaktywny</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Zajęty</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Lokalne</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Odblokuj</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1301,8 +1286,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Pomoc</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Wyślij opinię</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Opinia Android</string>
     <!-- mail body -->
@@ -1311,8 +1294,6 @@
     <string name="settings_feedback_body_device_model">Model urządzenia</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Wersja Adroid</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">Nowy plik tekstowy</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Nazwa pliku</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1331,8 +1312,6 @@
     <string name="general_incorrect_names">Proszę poprawić nazwy plików przed kontynuowaniem</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Nieprawidłowe znaki</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">Następujące znaki są niedozwolone: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Nazwa pliku nie może być pusta.</item>
@@ -1352,12 +1331,6 @@
     <string name="invalid_connection_state">Ponowne łączenie do czatu</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Wystąpił błąd i połączenie nie może zostać nawiązane.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Podoba Ci się MEGA Mobile App?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Tak, oceń aplikację</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Nie, wyślij opinię</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Nie przyznano uprawnień</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1439,7 +1412,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Przekroczono limit miejsca</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Link nieprawidłowy, poproś o prawidłowy link</string>
+    <string name="invalid_link">Nieprawidłowy link. Spróbuj ponownie lub poproś o nowy.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Nieprawidłowe hasło do łącza</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1530,12 +1503,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Jakość wideo</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Niska</item>
-        <item>Średnia</item>
-        <item>Wysoka</item>
-        <item>Oryginalny</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Niska</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Średnia</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Wysoka</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Oryginalny</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Opuszczone rozmowy</string>
     <!-- Refers to a location of file -->
@@ -1978,7 +1952,7 @@
     <!-- General label for files -->
     <string name="general_files">Pliki</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Zapisz na urządzeniu</string>
+    <string name="general_save_to_device">Pobierz</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Wgraj na MEGA</string>
     <!-- Label choose destination -->
@@ -2298,7 +2272,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Zignorowane</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s wyciszył to połączenie</string>
+    <string name="muted_contact_micro">%s jest wyciszony</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">Wyciszony</string>
     <!-- Subtitle of the call screen when the call is on hold -->
@@ -3491,10 +3465,10 @@
     <string name="photos_album_selection_title">Dodaj elementy do “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Dodano %1$d element do “%2$s”</item>
-        <item quantity="few">Dodano %1$d elementów do “%2$s”</item>
-        <item quantity="many">Dodano %1$d elementów do “%2$s”</item>
-        <item quantity="other">Dodano %1$d elementów do “%2$s”</item>
+        <item quantity="one">Dodano %1$d element do \“%2$s\“</item>
+        <item quantity="few">Dodano %1$d elementów do \“%2$s\“</item>
+        <item quantity="many">Dodano %1$d elementów do \“%2$s\“</item>
+        <item quantity="other">Dodano %1$d elementów do \“%2$s\“</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[B]Pusty[/B] [A]album[/A]</string>
@@ -3570,17 +3544,17 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Nie przyznawaj</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="one">Usunięto %1$d element z “%2$s”</item>
-        <item quantity="few">Usunięto %1$d elementów z “%2$s”</item>
-        <item quantity="many">Usunięto %1$d elementów z “%2$s”</item>
-        <item quantity="other">Usunięto %1$d elementów z “%2$s”</item>
+        <item quantity="one">Usunięto %1$d element z \“%2$s\“</item>
+        <item quantity="few">Usunięto %1$d elementów z \“%2$s\“</item>
+        <item quantity="many">Usunięto %1$d elementów z \“%2$s\“</item>
+        <item quantity="other">Usunięto %1$d elementów z \“%2$s\“</item>
     </plurals>
     <!-- Label to describe one off meetings -->
     <string name="meetings_list_one_off_meeting_label">Spotkanie jednorazowe</string>
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Wznowić wideo?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">“%1$s” zostanie wznowione od %2$s.</string>
+    <string name="video_playback_position_dialog_message">\“%1$s\“ zostanie wznowione od %2$s.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">Wznów</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -4260,14 +4234,20 @@
         <item quantity="many">Nie można skopiować %1$d elementów</item>
         <item quantity="other">Nie można było skopiować %1$d elementów</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Skopiowano %1$d element,&#160;</item>
         <item quantity="few">Skopiowano %1$d elementów,&#160;</item>
         <item quantity="many">Skopiowano %1$d elementów,&#160;</item>
         <item quantity="other">Skopiowano %1$d elementów,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">nie można było skopiować %1$d elementu</item>
         <item quantity="few">nie można było skopiować %1$d elementów</item>
@@ -4506,10 +4486,6 @@
     <string name="dialog_taken_down_folder_title">Nie można otworzyć katalogu</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Nie można otworzyć pliku</string>
-    <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
-    <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Tylko Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -4574,7 +4550,7 @@
     <!-- Album import rename album title -->
     <string name="album_import_rename_album_title">Zmień nazwę albumu</string>
     <!-- Album import rename album description -->
-    <string name="album_import_rename_album_description">Album o nazwie “%1$s” już istnieje w albumach. Wprowadź nową nazwę zapisywanego albumu.</string>
+    <string name="album_import_rename_album_description">Album o nazwie \“%1$s\“ już istnieje w albumach. Wprowadź nową nazwę zapisywanego albumu.</string>
     <!-- Album import enter album name -->
     <string name="album_import_enter_album_name">Wprowadź nazwę albumu</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -4589,9 +4565,9 @@
     <!-- Album import saving -->
     <string name="album_import_saving">Zapisywanie&#8230;</string>
     <!-- Album import success message -->
-    <string name="album_import_success_message">“%1$s” zapisane na Dysku w chmurze</string>
+    <string name="album_import_success_message">\“%1$s\“ zapisane na Dysku w chmurze</string>
     <!-- Album import error message -->
-    <string name="album_import_error_message">Nie można zapisać pliku “%1$s” na Dysku w chmurze. Spróbuj ponownie później, a jeśli problem będzie się powtarzał, skontaktuj się z osobą, która udostępniła Ci link.</string>
+    <string name="album_import_error_message">Nie można zapisać pliku \“%1$s\“ na Dysku w chmurze. Spróbuj ponownie później, a jeśli problem będzie się powtarzał, skontaktuj się z osobą, która udostępniła Ci link.</string>
     <!-- Text of the option weekdays in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_weekdays_button">Dni robocze</string>
     <!-- Title of occurs ever section in Custom Recurrence screen -->
@@ -4740,7 +4716,7 @@
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">Koniec</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
-    <string name="meetings_cancel_scheduled_meeting_dialog_title">Anulować “%1$s”?</string>
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">Anulować \“%1$s\“?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">Spotkanie to zostanie zarchiwizowane, a wszyscy uczestnicy zostaną o tym powiadomieni.</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
@@ -4874,13 +4850,13 @@
     <!-- Message after selected albums are deleted (singular) -->
     <string name="photos_album_deleted_message_singular">“%s” usunięty</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
-    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s oczekuje na dołączenie do “%2$s”.</string>
+    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s oczekuje na dołączenie do \“%2$s\“.</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
-        <item quantity="one">Uczestnik %1$d oczekuje na dołączenie do “%2$s”.</item>
-        <item quantity="few">%1$d uczestników oczekuje na dołączenie do “%2$s”.</item>
-        <item quantity="many">%1$d uczestników oczekuje na dołączenie do “%2$s”.</item>
-        <item quantity="other">%1$d uczestników oczekuje na dołączenie do “%2$s”.</item>
+        <item quantity="one">Uczestnik %1$d oczekuje na dołączenie do \“%2$s\“.</item>
+        <item quantity="few">%1$d uczestników oczekuje na dołączenie do \“%2$s\“.</item>
+        <item quantity="many">%1$d uczestników oczekuje na dołączenie do \“%2$s\“.</item>
+        <item quantity="other">%1$d uczestników oczekuje na dołączenie do \“%2$s\“.</item>
     </plurals>
     <!-- Title of video option of snapshot-->
     <string name="media_player_video_option_snapshot_title">Zrób zdjęcie</string>
@@ -4947,23 +4923,13 @@
     <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
     <string name="account_my_account_usage_get_more_storage_button">Uzyskaj więcej pamięci</string>
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
-    <string name="chat_chatroom_first_message_header_mega_info_text">MEGA chroni Twoją komunikację za pomocą naszego systemu szyfrowania “zero wiedzy”, zapewniając istotne gwarancje bezpieczeństwa:</string>
+    <string name="chat_chatroom_first_message_header_mega_info_text">MEGA chroni Twoją komunikację za pomocą naszego systemu szyfrowania \“zero wiedzy\“, zapewniając istotne gwarancje bezpieczeństwa:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">System zapewnia, że otrzymane dane pochodzą od nadawcy, a ich zawartość nie została zmanipulowana podczas przesyłania.</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s prezentuje</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Ta osoba udostępnia ekran</string>
-    <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">Ta rozmowa jest nagrywana</string>
-    <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">Pozostając w trakcie rozmowy, wyrażasz zgodę na nagrywanie. Nagranie jest przechowywane wyłącznie na urządzeniu osoby, która je nagrywa.</string>
-    <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">OK, rozumiem</string>
-    <!-- Label for the negative or cancel button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_negative_button">Opuść połączenie</string>
-    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Dowiedz się więcej[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">%1$s rozpoczął nagrywanie</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
@@ -5053,7 +5019,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Przesyłanie wstrzymane, ponieważ bateria jest poniżej %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Przesyłanie z kamery przestało działać. Spróbuj ponownie włączyć przesyłanie z kamery, aby rozwiązać ten problem. Jeśli problem nie ustąpi, skontaktuj się z support&#64;mega.io.</string>
+    <string name="photos_camera_uploads_general_issue">Przesyłanie z aparatu przestało działać. Spróbuj ponownie włączyć przesyłanie z aparatu, aby to naprawić. Jeśli problem będzie nadal występował, skontaktuj się z pomocą techniczną pod adresem https://mega.nz/support</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Trwa przesyłanie kamery, %1$d plików oczekuje na przesłanie</item>
@@ -5236,4 +5202,6 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Przesyłanie z kamery odblokowane</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Ta lokalizacja już nie istnieje.</string>
+    <string name="dialog_taken_down_folder_description">Ten folder został usunięty zgodnie z naszą [A]Polityką wytycznych dotyczących usuwania treści[/A]. Możesz wnieść sprzeciw wobec tego usunięcia, jeśli uważasz, że popełniliśmy błąd.</string>
+    <string name="dialog_taken_down_file_description">Ten plik został usunięty zgodnie z naszą [A]Polityką wytycznych dotyczących usuwania treści[/A]. Możesz odwołać się od tego usunięcia, jeśli uważasz, że popełniliśmy błąd.</string>
 </resources>

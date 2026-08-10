@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.core.content.FileProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
+import mega.privacy.android.shared.resources.R as sharedResR
 import javax.inject.Inject
 
 /**
@@ -44,6 +45,19 @@ class NodeShareContentUrisIntentMapper @Inject constructor(
             Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, content.links.joinToString(separator = "\n\n"))
+                // Only shown when sharing multiple links.
+                // Keep the "one" plural item: some locales (e.g. Russian) classify numbers like 21 and 31 as "one".
+                val linkCount = content.links.size
+                if (linkCount > 1) {
+                    putExtra(
+                        Intent.EXTRA_TITLE,
+                        context.resources.getQuantityString(
+                            sharedResR.plurals.general_share_link_count_title,
+                            linkCount,
+                            linkCount,
+                        ),
+                    )
+                }
             }
         }
     }.apply {

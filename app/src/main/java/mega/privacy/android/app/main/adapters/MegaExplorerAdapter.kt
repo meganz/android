@@ -44,9 +44,9 @@ import mega.privacy.android.app.main.CloudDriveExplorerFragment
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileExplorerViewModel
 import mega.privacy.android.app.main.IncomingSharesExplorerFragment
-import mega.privacy.android.app.main.adapters.MegaNodeAdapter.Companion.ITEM_VIEW_TYPE_GRID
-import mega.privacy.android.app.main.adapters.MegaNodeAdapter.Companion.ITEM_VIEW_TYPE_HEADER
-import mega.privacy.android.app.main.adapters.MegaNodeAdapter.Companion.ITEM_VIEW_TYPE_LIST
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_GRID
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_HEADER
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_LIST
 import mega.privacy.android.app.utils.BlurTransformation
 import mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP
 import mega.privacy.android.app.utils.Constants.ICON_SIZE_DP
@@ -613,7 +613,7 @@ class MegaExplorerAdapter(
                         ) {
                             val numChildFolders = megaApi.getNumChildFolders(node)
                             val numChildFiles = megaApi.getNumChildFiles(node)
-                            val folderIconRes = getFolderIcon(node, DrawerItem.CLOUD_DRIVE)
+                            val folderIconRes = getFolderIcon(megaApi, node, DrawerItem.CLOUD_DRIVE)
                             Triple(numChildFolders, numChildFiles, folderIconRes)
                         }
                         if ((bindingAdapterPosition != RecyclerView.NO_POSITION) &&
@@ -792,6 +792,7 @@ class MegaExplorerAdapter(
                 textViewSettings(binding.fileExplorerGridFolderFilename, node)
                 binding.fileExplorerGridFolderIcon.setImageResource(
                     getFolderIcon(
+                        megaApi,
                         node,
                         DrawerItem.CLOUD_DRIVE
                     )

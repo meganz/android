@@ -34,9 +34,9 @@ class AmIAloneOnAnyCallUseCase @Inject constructor(
         flow {
             emitAll(
                 listOf(
-                    callRepository.getCallHandleList(ChatCallStatus.Connecting),
-                    callRepository.getCallHandleList(ChatCallStatus.Joining),
-                    callRepository.getCallHandleList(ChatCallStatus.InProgress)
+                    callRepository.getCallChatIdList(ChatCallStatus.Connecting),
+                    callRepository.getCallChatIdList(ChatCallStatus.Joining),
+                    callRepository.getCallChatIdList(ChatCallStatus.InProgress)
                 ).flatten().mapNotNull {
                     callRepository.getChatCall(it)
                 }.asFlow().map {

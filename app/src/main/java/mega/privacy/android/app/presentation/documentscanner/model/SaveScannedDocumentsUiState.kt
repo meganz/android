@@ -4,6 +4,9 @@ import android.net.Uri
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import java.io.File
 
 /**
  * The UI State for Save Scanned Documents
@@ -14,6 +17,9 @@ import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidation
  * User
  * @property filenameValidationStatus The filename validation status
  * @property originatedFromChat true if the Document Scanner was accessed from Chat
+ * @property parentsList Ordered chain of ancestors (top-most first) leading to [cloudDriveParentHandle].
+ * Empty when the upload destination is the Cloud Drive root.
+ * @property nodeSourceType
  * @property pdfUri The PDF Uri containing all scans
  * @property scanFileType The file type to upload the scanned document
  * @property scanDestination Specifies where to save the scans
@@ -28,12 +34,15 @@ internal data class SaveScannedDocumentsUiState(
     val filename: String = "",
     val filenameValidationStatus: ScanFilenameValidationStatus? = null,
     val originatedFromChat: Boolean = false,
+    val parentsList: List<NodeId> = emptyList(),
+    val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val pdfUri: Uri? = null,
     val scanFileType: ScanFileType = ScanFileType.Pdf,
     val scanDestination: ScanDestination = ScanDestination.CloudDrive,
     val snackbarMessage: StateEventWithContent<ScanFilenameValidationStatus> = consumed(),
     val soloImageUri: Uri? = null,
-    val uploadScansEvent: StateEventWithContent<Uri> = consumed(),
+    val uploadScansEvent: StateEventWithContent<File> = consumed(),
+    val isCloudExplorerAvailable: Boolean = false,
 ) {
 
     /**

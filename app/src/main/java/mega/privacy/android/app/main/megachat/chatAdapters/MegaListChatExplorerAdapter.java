@@ -39,13 +39,13 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
-import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment;
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem;
 import mega.privacy.android.app.main.megachat.chat.explorer.ContactItemUiState;
 import mega.privacy.android.domain.entity.chat.ChatListItem;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -57,7 +57,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
-    ChatController cC;
+    ChatController chatController;
 
     ViewHolderChatExplorerList holder;
     RecyclerView listView;
@@ -73,7 +73,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     boolean isSearchEnabled;
     SparseBooleanArray searchSelectedItems;
 
-    public MegaListChatExplorerAdapter(Context _context, Object _fragment, ArrayList<ChatExplorerListItem> _items, RecyclerView _listView) {
+    public MegaListChatExplorerAdapter(Context _context, Object _fragment, ArrayList<ChatExplorerListItem> _items, RecyclerView _listView, ChatController _chatController) {
         Timber.d("New adapter");
         this.context = _context;
         this.items = _items;
@@ -90,7 +90,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         selectedItems = new SparseBooleanArray();
 
-        cC = new ChatController(context);
+        chatController = _chatController;
     }
 
     public static class ViewHolderChatExplorerList extends RecyclerView.ViewHolder {

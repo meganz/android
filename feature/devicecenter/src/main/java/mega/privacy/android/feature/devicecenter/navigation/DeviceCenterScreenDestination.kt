@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -159,6 +159,9 @@ fun EntryProviderScope<NavKey>.deviceCenterScreen(
                 },
                 onCameraUploadsClicked = onNavigateToCameraUploads,
                 onInfoOptionClicked = viewModel::onInfoClicked,
+                onFolderMenuClicked = viewModel::setMenuClickedFolder,
+                onRemoveConnectionClicked = viewModel::removeFolderConnection,
+                onRemoveFolderConnectionSuccessSnackbarShown = viewModel::resetRemoveFolderConnectionSuccess,
                 onAddNewSyncOptionClicked = { onNavigateToNewSync(SyncType.TYPE_TWOWAY) },
                 onAddBackupOptionClicked = { onNavigateToNewSync(SyncType.TYPE_BACKUP) },
                 onRenameDeviceOptionClicked = viewModel::setDeviceToRename,

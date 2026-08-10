@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
@@ -33,7 +34,7 @@ internal fun VideoCompressionTile(
             modifier = Modifier.testTag(VIDEO_COMPRESSION_TILE),
             title = stringResource(R.string.settings_video_compression_queue_size_title),
             subtitle = stringResource(
-                R.string.label_file_size_mega_byte,
+                SharedR.string.label_file_size_megabytes,
                 maximumNonChargingVideoCompressionSize.toString(),
             ),
             onItemClicked = onItemClicked,

@@ -63,16 +63,21 @@ internal class GetAvailableNodeActionsUseCaseTest {
     @TestFactory
     fun `test that Delete action is returned if the node is in rubbish bin`() =
         listOf(true, false).flatMap { inRubbish ->
-            mockedNodes.map { (name, mockNode) ->
-                dynamicTest("node: $name, in rubbish bin: $inRubbish") {
-                    runTest {
-                        val node = mockNode()
-                        whenever(isNodeInRubbishBinUseCase(node.id)).thenReturn(inRubbish)
-                        val result = underTest(node)
-                        if (inRubbish) {
-                            Truth.assertThat(result).containsExactly(NodeAction.Delete)
-                        } else {
-                            Truth.assertThat(result).doesNotContain(NodeAction.Delete)
+            listOf(true, false).flatMap { isNodeKeyDecrypted ->
+                mockedNodes.map { (name, mockNode) ->
+                    dynamicTest("node: $name, in rubbish bin: $inRubbish, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
+                        runTest {
+                            val node = mockNode()
+                            whenever(isNodeInRubbishBinUseCase(node.id)).thenReturn(inRubbish)
+                            whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                            val result = underTest(node)
+                            if (inRubbish) {
+                                Truth.assertThat(result).containsExactly(NodeAction.Delete)
+                            } else if (!isNodeKeyDecrypted) {
+                                Truth.assertThat(result).isEmpty()
+                            } else {
+                                Truth.assertThat(result).doesNotContain(NodeAction.Delete)
+                            }
                         }
                     }
                 }
@@ -81,20 +86,26 @@ internal class GetAvailableNodeActionsUseCaseTest {
 
 
     @TestFactory
-    fun `test that Send to chat action is returned if the node is a file and not taken down`() =
+    fun `test that Send to chat action is returned if the node is a file and not taken down and key is decrypted`() =
         listOf(true, false).flatMap { takenDown ->
-            mockedNodes.map { (name, mockNode) ->
-                val isFile = mockNode.isFile()
-                dynamicTest("node: $name, takeDown: $takenDown, isFile: $isFile") {
-                    runTest {
-                        val node = mockNode()
-                        whenever(node.isTakenDown).thenReturn(takenDown)
-                        val result = underTest(node)
+            listOf(true, false).flatMap { isNodeKeyDecrypted ->
+                mockedNodes.map { (name, mockNode) ->
+                    val isFile = mockNode.isFile()
+                    dynamicTest("node: $name, takeDown: $takenDown, isFile: $isFile, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
+                        runTest {
+                            val node = mockNode()
+                            whenever(node.isTakenDown).thenReturn(takenDown)
+                            whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                            whenever(getNodeAccessPermission(node.id)).thenReturn(AccessPermission.OWNER)
+                            val result = underTest(node)
 
-                        if (takenDown || !isFile) {
-                            Truth.assertThat(result).doesNotContain(NodeAction.SendToChat)
-                        } else {
-                            Truth.assertThat(result).contains(NodeAction.SendToChat)
+                            if (!isNodeKeyDecrypted) {
+                                Truth.assertThat(result).isEmpty()
+                            } else if (takenDown || !isFile) {
+                                Truth.assertThat(result).doesNotContain(NodeAction.SendToChat)
+                            } else {
+                                Truth.assertThat(result).contains(NodeAction.SendToChat)
+                            }
                         }
                     }
                 }
@@ -102,19 +113,25 @@ internal class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Download action is returned if the node is not taken down`() =
+    fun `test that Download action is returned if the node is not taken down and key is decrypted`() =
         listOf(true, false).flatMap { takenDown ->
-            mockedNodes.map { (name, mockNode) ->
-                dynamicTest("node: $name, takeDown: $takenDown") {
-                    runTest {
-                        val node = mockNode()
-                        whenever(node.isTakenDown).thenReturn(takenDown)
-                        val result = underTest(node)
+            listOf(true, false).flatMap { isNodeKeyDecrypted ->
+                mockedNodes.map { (name, mockNode) ->
+                    dynamicTest("node: $name, takeDown: $takenDown, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
+                        runTest {
+                            val node = mockNode()
+                            whenever(node.isTakenDown).thenReturn(takenDown)
+                            whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                            whenever(getNodeAccessPermission(node.id)).thenReturn(AccessPermission.OWNER)
+                            val result = underTest(node)
 
-                        if (takenDown) {
-                            Truth.assertThat(result).doesNotContain(NodeAction.Download)
-                        } else {
-                            Truth.assertThat(result).contains(NodeAction.Download)
+                            if (!isNodeKeyDecrypted) {
+                                Truth.assertThat(result).isEmpty()
+                            } else if (takenDown) {
+                                Truth.assertThat(result).doesNotContain(NodeAction.Download)
+                            } else {
+                                Truth.assertThat(result).contains(NodeAction.Download)
+                            }
                         }
                     }
                 }
@@ -122,19 +139,25 @@ internal class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Copy action is returned if the node is not taken down`() =
+    fun `test that Copy action is returned if the node is not taken down and key is decrypted`() =
         listOf(true, false).flatMap { takenDown ->
-            mockedNodes.map { (name, mockNode) ->
-                dynamicTest("node: $name, takeDown: $takenDown") {
-                    runTest {
-                        val node = mockNode()
-                        whenever(node.isTakenDown).thenReturn(takenDown)
-                        val result = underTest(node)
+            listOf(true, false).flatMap { isNodeKeyDecrypted ->
+                mockedNodes.map { (name, mockNode) ->
+                    dynamicTest("node: $name, takeDown: $takenDown, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
+                        runTest {
+                            val node = mockNode()
+                            whenever(node.isTakenDown).thenReturn(takenDown)
+                            whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                            whenever(getNodeAccessPermission(node.id)).thenReturn(AccessPermission.OWNER)
+                            val result = underTest(node)
 
-                        if (takenDown) {
-                            Truth.assertThat(result).doesNotContain(NodeAction.Copy)
-                        } else {
-                            Truth.assertThat(result).contains(NodeAction.Copy)
+                            if (!isNodeKeyDecrypted) {
+                                Truth.assertThat(result).isEmpty()
+                            } else if (takenDown) {
+                                Truth.assertThat(result).doesNotContain(NodeAction.Copy)
+                            } else {
+                                Truth.assertThat(result).contains(NodeAction.Copy)
+                            }
                         }
                     }
                 }
@@ -142,21 +165,32 @@ internal class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Leave action is returned if the node is not taken down and is a shared root node`() =
+    fun `test that Leave action is returned if the node is not taken down and is a shared root node and key is decrypted`() =
         listOf(true, false).flatMap { takenDown ->
-            mockedNodes.map { (name, mockNode) ->
-                val root = mockNode.isRootInShared()
-                dynamicTest("node: $name, root: $root, takenDown: $takenDown") {
-                    runTest {
-                        val node = mockNode()
-                        whenever(node.isTakenDown).thenReturn(takenDown)
-                        whenever(getNodeAccessPermission(node.id)).thenReturn(if (root) AccessPermission.READ else AccessPermission.OWNER)
-                        val result = underTest(node)
+            listOf(true, false).flatMap { isNodeKeyDecrypted ->
+                mockedNodes.map { (name, mockNode) ->
+                    val root = mockNode.isRootInShared()
+                    dynamicTest("node: $name, root: $root, takenDown: $takenDown, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
+                        runTest {
+                            val node = mockNode()
+                            whenever(node.isTakenDown).thenReturn(takenDown)
+                            whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                            whenever(getNodeAccessPermission(node.id)).thenReturn(if (root) AccessPermission.READ else AccessPermission.OWNER)
+                            // For non-root shared nodes, we need to set up parent node
+                            if (!root && mockNode.isInShared()) {
+                                whenever(node.parentId).thenReturn(parentId)
+                                whenever(getNodeByIdUseCase(parentId)).thenReturn(parentNode)
+                                whenever(parentNode.parentId).thenReturn(invalidNode)
+                            }
+                            val result = underTest(node)
 
-                        if (root && !takenDown) {
-                            Truth.assertThat(result).contains(NodeAction.Leave)
-                        } else {
-                            Truth.assertThat(result).doesNotContain(NodeAction.Leave)
+                            if (!isNodeKeyDecrypted) {
+                                Truth.assertThat(result).isEmpty()
+                            } else if (root && !takenDown) {
+                                Truth.assertThat(result).contains(NodeAction.Leave)
+                            } else {
+                                Truth.assertThat(result).doesNotContain(NodeAction.Leave)
+                            }
                         }
                     }
                 }
@@ -164,25 +198,41 @@ internal class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Rename action is returned if the non backup node is not a shared node, or is a shared node and has owner permission`() =
+    fun `test that Rename action is returned if the non backup node is not a shared node, or is a shared node and has owner permission and key is decrypted`() =
         listOf(
             AccessPermission.OWNER,
             AccessPermission.READ,
             AccessPermission.FULL,
             AccessPermission.READWRITE
         ).flatMap { permission ->
-            mockedNodes.map { (name, mockNode) ->
-                dynamicTest("node $name, permission: $permission") {
-                    runTest {
-                        val node = mockNode()
-                        whenever(getNodeAccessPermission(node.id)).thenReturn(permission)
-                        whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
-                        val result = underTest(node)
+            listOf(true, false).flatMap { isNodeKeyDecrypted ->
+                mockedNodes.map { (name, mockNode) ->
+                    dynamicTest("node $name, permission: $permission, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
+                        runTest {
+                            val node = mockNode()
+                            whenever(getNodeAccessPermission(node.id)).thenReturn(permission)
+                            whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
+                            whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                            // Set up parent node for non-OWNER permissions to check incomingShareFirstLevel
+                            if (permission != AccessPermission.OWNER) {
+                                val isRoot = mockNode.isRootInShared()
+                                if (isRoot) {
+                                    whenever(node.parentId).thenReturn(invalidNode)
+                                } else if (mockNode.isInShared()) {
+                                    whenever(node.parentId).thenReturn(parentId)
+                                    whenever(getNodeByIdUseCase(parentId)).thenReturn(parentNode)
+                                    whenever(parentNode.parentId).thenReturn(invalidNode)
+                                }
+                            }
+                            val result = underTest(node)
 
-                        if (permission == AccessPermission.OWNER || permission == AccessPermission.FULL) {
-                            Truth.assertThat(result).contains(NodeAction.Rename)
-                        } else {
-                            Truth.assertThat(result).doesNotContain(NodeAction.Rename)
+                            if (!isNodeKeyDecrypted) {
+                                Truth.assertThat(result).isEmpty()
+                            } else if (permission == AccessPermission.OWNER || permission == AccessPermission.FULL) {
+                                Truth.assertThat(result).contains(NodeAction.Rename)
+                            } else {
+                                Truth.assertThat(result).doesNotContain(NodeAction.Rename)
+                            }
                         }
                     }
                 }
@@ -190,7 +240,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Move to rubbish action is returned if the non backup node is not a shared node, or is a shared root node and has owner permission`() =
+    fun `test that Move to rubbish action is returned if the non backup node is not a shared node, or is a shared root node and has owner permission and key is decrypted`() =
         listOf(
             AccessPermission.FULL,
             AccessPermission.READ,
@@ -198,90 +248,36 @@ internal class GetAvailableNodeActionsUseCaseTest {
             AccessPermission.READWRITE,
             AccessPermission.UNKNOWN
         ).flatMap { permission ->
-            mockedNodes.map { (name, mockNode) ->
-                val shared = mockNode.isInShared()
-                val root = mockNode.isRootInShared()
-                dynamicTest("node: $name, shared: $shared, permission: $permission, in shared root:$root") {
-                    runTest {
-                        val node = mockNode()
-                        whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
-                        whenever(getNodeAccessPermission(node.id)).thenReturn(permission)
-                        val result = underTest(node)
-
-                        if ((permission == AccessPermission.OWNER) || (permission == AccessPermission.FULL && node.parentId.longValue == -1L)) {
-                            Truth.assertThat(result).contains(NodeAction.MoveToRubbishBin)
-                        } else {
-                            Truth.assertThat(result).doesNotContain(NodeAction.MoveToRubbishBin)
-                        }
-                    }
-                }
-            }
-        }
-
-    @TestFactory
-    fun `test that Move action is returned if the non backup node is not a shared node`() =
-        listOf(true, false).flatMap { takenDown ->
-            mockedNodes.map { (name, mockNode) ->
-                val shared = mockNode.isInShared()
-                dynamicTest("node: $name, shared: $shared, takenDown: $takenDown") {
-                    runTest {
-                        val node = mockNode()
-                        whenever(node.isTakenDown).thenReturn(takenDown)
-                        whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
-                        whenever(getNodeAccessPermission(node.id)).thenReturn(if (shared) AccessPermission.READ else AccessPermission.OWNER)
-                        val result = underTest(node)
-
-                        if (!shared) {
-                            Truth.assertThat(result).contains(NodeAction.Move)
-                        } else {
-                            Truth.assertThat(result).doesNotContain(NodeAction.Move)
-                        }
-                    }
-                }
-            }
-        }
-
-    @TestFactory
-    fun `test that share folder action is returned if the node is a folder, not taken down, and not a shared folder`() =
-        listOf(true, false).flatMap { takenDown ->
-            mockedNodes.map { (name, mockNode) ->
-                val inShared = mockNode.isInShared()
-                val folder = mockNode.isFolder()
-                dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared, folder: $folder") {
-                    runTest {
-                        val node = mockNode()
-                        whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
-                        whenever(node.isTakenDown).thenReturn(takenDown)
-                        val result = underTest(node)
-
-                        if (takenDown || inShared || !folder) {
-                            Truth.assertThat(result).doesNotContain(NodeAction.ShareFolder)
-                        } else {
-                            Truth.assertThat(result).contains(NodeAction.ShareFolder)
-                        }
-                    }
-                }
-            }
-        }
-
-    @TestFactory
-    fun `test that Manage link action is returned if the node is exported, not taken down, and not a shared node`() =
-        listOf(true, false).flatMap { takenDown ->
-            listOf(true, false).flatMap { exported ->
+            listOf(true, false).flatMap { isNodeKeyDecrypted ->
                 mockedNodes.map { (name, mockNode) ->
-                    val inShared = mockNode.isInShared()
-                    dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared, exported: $exported") {
+                    val shared = mockNode.isInShared()
+                    val root = mockNode.isRootInShared()
+                    dynamicTest("node: $name, shared: $shared, permission: $permission, in shared root:$root, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
                         runTest {
                             val node = mockNode()
-                            whenever(node.isTakenDown).thenReturn(takenDown)
-                            whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
-                            whenever(node.exportedData).thenReturn(if (exported) mock() else null)
+                            whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
+                            whenever(getNodeAccessPermission(node.id)).thenReturn(permission)
+                            whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                            // Set up parent node for incomingShareFirstLevel check
+                            if (root) {
+                                whenever(node.parentId).thenReturn(invalidNode)
+                            } else if (shared) {
+                                whenever(node.parentId).thenReturn(parentId)
+                                whenever(getNodeByIdUseCase(parentId)).thenReturn(parentNode)
+                                whenever(parentNode.parentId).thenReturn(invalidNode)
+                            }
                             val result = underTest(node)
 
-                            if (exported && !takenDown && !inShared) {
-                                Truth.assertThat(result).contains(NodeAction.ManageLink)
+                            if (!isNodeKeyDecrypted) {
+                                Truth.assertThat(result).isEmpty()
                             } else {
-                                Truth.assertThat(result).doesNotContain(NodeAction.ManageLink)
+                                val incomingShareFirstLevel =
+                                    node.parentId.longValue == -1L || getNodeByIdUseCase(node.parentId)?.parentId?.longValue == -1L
+                                if ((permission == AccessPermission.OWNER) || (permission == AccessPermission.FULL && incomingShareFirstLevel)) {
+                                    Truth.assertThat(result).contains(NodeAction.MoveToRubbishBin)
+                                } else {
+                                    Truth.assertThat(result).doesNotContain(NodeAction.MoveToRubbishBin)
+                                }
                             }
                         }
                     }
@@ -290,23 +286,26 @@ internal class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Remove link action is returned if the node is exported, not taken down, and not a shared node`() =
+    fun `test that Move action is returned if the non backup node is not a shared node and key is decrypted`() =
         listOf(true, false).flatMap { takenDown ->
-            listOf(true, false).flatMap { exported ->
+            listOf(true, false).flatMap { isNodeKeyDecrypted ->
                 mockedNodes.map { (name, mockNode) ->
-                    val inShared = mockNode.isInShared()
-                    dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared, exported: $exported") {
+                    val shared = mockNode.isInShared()
+                    dynamicTest("node: $name, shared: $shared, takenDown: $takenDown, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
                         runTest {
                             val node = mockNode()
                             whenever(node.isTakenDown).thenReturn(takenDown)
-                            whenever(node.exportedData).thenReturn(if (exported) mock() else null)
-                            whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
+                            whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                            whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
+                            whenever(getNodeAccessPermission(node.id)).thenReturn(if (shared) AccessPermission.READ else AccessPermission.OWNER)
                             val result = underTest(node)
 
-                            if (exported && !takenDown && !inShared) {
-                                Truth.assertThat(result).contains(NodeAction.RemoveLink)
+                            if (!isNodeKeyDecrypted) {
+                                Truth.assertThat(result).isEmpty()
+                            } else if (!shared) {
+                                Truth.assertThat(result).contains(NodeAction.Move)
                             } else {
-                                Truth.assertThat(result).doesNotContain(NodeAction.RemoveLink)
+                                Truth.assertThat(result).doesNotContain(NodeAction.Move)
                             }
                         }
                     }
@@ -315,23 +314,26 @@ internal class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Get link action is returned if the node is not exported, not taken down, and not a shared node`() =
+    fun `test that share folder action is returned if the node is a folder, not taken down, and not a shared folder and key is decrypted`() =
         listOf(true, false).flatMap { takenDown ->
-            listOf(true, false).flatMap { exported ->
+            listOf(true, false).flatMap { isNodeKeyDecrypted ->
                 mockedNodes.map { (name, mockNode) ->
                     val inShared = mockNode.isInShared()
-                    dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared, exported: $exported") {
+                    val folder = mockNode.isFolder()
+                    dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared, folder: $folder, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
                         runTest {
                             val node = mockNode()
-                            whenever(node.isTakenDown).thenReturn(takenDown)
-                            whenever(node.exportedData).thenReturn(if (exported) mock() else null)
                             whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
+                            whenever(node.isTakenDown).thenReturn(takenDown)
+                            whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
                             val result = underTest(node)
 
-                            if (!exported && !takenDown && !inShared) {
-                                Truth.assertThat(result).contains(NodeAction.GetLink)
+                            if (!isNodeKeyDecrypted) {
+                                Truth.assertThat(result).isEmpty()
+                            } else if (takenDown || inShared || !folder) {
+                                Truth.assertThat(result).doesNotContain(NodeAction.ShareFolder)
                             } else {
-                                Truth.assertThat(result).doesNotContain(NodeAction.GetLink)
+                                Truth.assertThat(result).contains(NodeAction.ShareFolder)
                             }
                         }
                     }
@@ -340,21 +342,116 @@ internal class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Dispute taken down action is returned if the node is taken down and not a shared node`() =
+    fun `test that Manage link action is returned if the node is exported, not taken down, and not a shared node and key is decrypted`() =
         listOf(true, false).flatMap { takenDown ->
-            mockedNodes.map { (name, mockNode) ->
-                val inShared = mockNode.isInShared()
-                dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared") {
-                    runTest {
-                        val node = mockNode()
-                        whenever(node.isTakenDown).thenReturn(takenDown)
-                        whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
-                        val result = underTest(node)
+            listOf(true, false).flatMap { exported ->
+                listOf(true, false).flatMap { isNodeKeyDecrypted ->
+                    mockedNodes.map { (name, mockNode) ->
+                        val inShared = mockNode.isInShared()
+                        dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared, exported: $exported, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
+                            runTest {
+                                val node = mockNode()
+                                whenever(node.isTakenDown).thenReturn(takenDown)
+                                whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                                whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
+                                whenever(node.exportedData).thenReturn(if (exported) mock() else null)
+                                val result = underTest(node)
 
-                        if (takenDown && !inShared) {
-                            Truth.assertThat(result).contains(NodeAction.DisputeTakedown)
-                        } else {
-                            Truth.assertThat(result).doesNotContain(NodeAction.DisputeTakedown)
+                                if (!isNodeKeyDecrypted) {
+                                    Truth.assertThat(result).isEmpty()
+                                } else if (exported && !takenDown && !inShared) {
+                                    Truth.assertThat(result).contains(NodeAction.ManageLink)
+                                } else {
+                                    Truth.assertThat(result).doesNotContain(NodeAction.ManageLink)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    @TestFactory
+    fun `test that Remove link action is returned if the node is exported, not taken down, and not a shared node and key is decrypted`() =
+        listOf(true, false).flatMap { takenDown ->
+            listOf(true, false).flatMap { exported ->
+                listOf(true, false).flatMap { isNodeKeyDecrypted ->
+                    mockedNodes.map { (name, mockNode) ->
+                        val inShared = mockNode.isInShared()
+                        dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared, exported: $exported, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
+                            runTest {
+                                val node = mockNode()
+                                whenever(node.isTakenDown).thenReturn(takenDown)
+                                whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                                whenever(node.exportedData).thenReturn(if (exported) mock() else null)
+                                whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
+                                val result = underTest(node)
+
+                                if (!isNodeKeyDecrypted) {
+                                    Truth.assertThat(result).isEmpty()
+                                } else if (exported && !takenDown && !inShared) {
+                                    Truth.assertThat(result).contains(NodeAction.RemoveLink)
+                                } else {
+                                    Truth.assertThat(result).doesNotContain(NodeAction.RemoveLink)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    @TestFactory
+    fun `test that Get link action is returned if the node is not exported, not taken down, and not a shared node and key is decrypted`() =
+        listOf(true, false).flatMap { takenDown ->
+            listOf(true, false).flatMap { exported ->
+                listOf(true, false).flatMap { isNodeKeyDecrypted ->
+                    mockedNodes.map { (name, mockNode) ->
+                        val inShared = mockNode.isInShared()
+                        dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared, exported: $exported, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
+                            runTest {
+                                val node = mockNode()
+                                whenever(node.isTakenDown).thenReturn(takenDown)
+                                whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                                whenever(node.exportedData).thenReturn(if (exported) mock() else null)
+                                whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
+                                val result = underTest(node)
+
+                                if (!isNodeKeyDecrypted) {
+                                    Truth.assertThat(result).isEmpty()
+                                } else if (!exported && !takenDown && !inShared) {
+                                    Truth.assertThat(result).contains(NodeAction.GetLink)
+                                } else {
+                                    Truth.assertThat(result).doesNotContain(NodeAction.GetLink)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    @TestFactory
+    fun `test that Dispute taken down action is returned if the node is taken down and not a shared node and key is decrypted`() =
+        listOf(true, false).flatMap { takenDown ->
+            listOf(true, false).flatMap { isNodeKeyDecrypted ->
+                mockedNodes.map { (name, mockNode) ->
+                    val inShared = mockNode.isInShared()
+                    dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared, isNodeKeyDecrypted: $isNodeKeyDecrypted") {
+                        runTest {
+                            val node = mockNode()
+                            whenever(node.isTakenDown).thenReturn(takenDown)
+                            whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+                            whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
+                            val result = underTest(node)
+
+                            if (!isNodeKeyDecrypted) {
+                                Truth.assertThat(result).isEmpty()
+                            } else if (takenDown && !inShared) {
+                                Truth.assertThat(result).contains(NodeAction.DisputeTakedown)
+                            } else {
+                                Truth.assertThat(result).doesNotContain(NodeAction.DisputeTakedown)
+                            }
                         }
                     }
                 }
@@ -364,15 +461,18 @@ internal class GetAvailableNodeActionsUseCaseTest {
     @ParameterizedTest(name = "folder with access permission : {0}")
     @EnumSource(AccessPermission::class)
     fun `test that share folder action is not returned when node is an incoming share`(permission: AccessPermission) {
-        mockedNodes.map { (name, mockNode) ->
-            dynamicTest("node: $name, permission: $permission") {
+        listOf(true, false).forEach { isNodeKeyDecrypted ->
+            mockedNodes.forEach { (name, mockNode) ->
                 runTest {
                     val node = mockNode()
                     whenever(getNodeAccessPermission(node.id)).thenReturn(permission)
                     whenever(node.isTakenDown).thenReturn(false)
                     whenever(node.isIncomingShare).thenReturn(false)
+                    whenever(node.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
                     val result = underTest(node)
-                    if (permission == AccessPermission.OWNER && mockNode.isFolder()) {
+                    if (!isNodeKeyDecrypted) {
+                        Truth.assertThat(result).isEmpty()
+                    } else if (permission == AccessPermission.OWNER && mockNode.isFolder()) {
                         Truth.assertThat(result).contains(NodeAction.ShareFolder)
                     } else {
                         Truth.assertThat(result).doesNotContain(NodeAction.ShareFolder)

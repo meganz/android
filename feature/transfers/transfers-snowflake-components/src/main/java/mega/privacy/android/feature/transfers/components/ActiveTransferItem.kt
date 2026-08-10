@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.indicators.ProgressBarIndicator
@@ -60,7 +63,7 @@ fun ActiveTransferItem(
     progress: Float,
     speed: String?,
     isPaused: Boolean,
-    isOverQuota: Boolean,
+    hasIssues: Boolean,
     areTransfersPaused: Boolean,
     enableSwipeToDismiss: Boolean,
     onPlayPauseClicked: () -> Unit,
@@ -70,143 +73,148 @@ fun ActiveTransferItem(
     isSelected: Boolean? = null,
     isBeingDragged: Boolean = false,
 ) {
-    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { swipeToDismissBoxValue ->
-            if (swipeToDismissBoxValue == SwipeToDismissBoxValue.EndToStart) {
-                onSetToCancel()
-            }
-
-            swipeToDismissBoxValue != SwipeToDismissBoxValue.StartToEnd
-        }
-    )
-
-    SwipeToDismissBox(
-        state = swipeToDismissBoxState,
-        backgroundContent = {
-            when (swipeToDismissBoxState.dismissDirection) {
-                SwipeToDismissBoxValue.EndToStart -> if (enableSwipeToDismiss) {
-                    MegaIcon(
-                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash),
-                        contentDescription = "Cancel icon",
-                        tint = IconColor.Inverse,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(DSTokens.colors.support.error)
-                            .wrapContentSize(Alignment.CenterEnd)
-                            .padding(12.dp)
-                            .testTag(TEST_TAG_CANCEL_ICON)
-                    )
-                }
-
-                else -> {}
-            }
-        },
+    val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
+    val scope = rememberCoroutineScope()
+    // Box isolates animateItem() from SwipeToDismissBox's anchor measure pass (AND-23610).
+    Box(
         modifier = modifier
             .height(68.dp)
             .fillMaxWidth()
-            .testTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag"),
-        enableDismissFromStartToEnd = false,
-        enableDismissFromEndToStart = enableSwipeToDismiss,
+            .testTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag")
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(if (isBeingDragged) DSTokens.colors.background.surface1 else DSTokens.colors.background.pageBackground)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 12.dp, end = 16.dp)
-                    .weight(1f),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val subTitle = listOf(
-                    progressPercentageString,
-                    progressSizeString,
-                    speed,
-                ).joinToString(" · ")
-                AnimatedVisibility(
-                    isDraggable,
-                    enter = fadeIn() + expandHorizontally(),
-                    exit = fadeOut() + shrinkHorizontally(),
-                ) {
-                    MegaIcon(
-                        painter = rememberVectorPainter(IconPack.Small.Thin.Outline.QueueLine),
-                        contentDescription = "Reorder icon",
-                        tint = IconColor.Secondary,
-                        modifier = Modifier
-                            .size(16.dp)
-                            .padding(end = 4.dp)
-                            .testTag(TEST_TAG_QUEUE_ICON)
-                    )
-                }
-                TransferImage(
-                    fileTypeResId = fileTypeResId,
-                    previewUri = previewUri,
-                    modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE),
-                )
-                Column(
-                    Modifier
-                        .padding(start = 12.dp, end = 8.dp)
-                        .weight(1f)
-                ) {
-                    MegaText(
-                        text = fileName,
-                        maxLines = 1,
-                        overflow = TextOverflow.MiddleEllipsis,
-                        style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.W400),
-                        textColor = TextColor.Primary,
-                        modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_NAME),
-                    )
-                    Row(
-                        modifier = Modifier.padding(top = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        LeadingIndicator(
-                            modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
-                            isDownload = isDownload,
-                            isOverQuota = isOverQuota,
-                        )
-                        MegaText(
-                            text = subTitle,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            style = AppTheme.typography.bodySmall,
-                            textColor = TextColor.Secondary,
-                            modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_SUBTITLE),
-                        )
-                    }
-                }
-                if (isSelected == null) {
-                    IconButton(
-                        onClick = onPlayPauseClicked,
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .size(24.dp)
-                            .testTag(if (isPaused) TEST_TAG_PLAY_ICON else TEST_TAG_PAUSE_ICON)
-                    ) {
+        SwipeToDismissBox(
+            state = swipeToDismissBoxState,
+            backgroundContent = {
+                when (swipeToDismissBoxState.dismissDirection) {
+                    SwipeToDismissBoxValue.EndToStart -> if (enableSwipeToDismiss) {
                         MegaIcon(
-                            painter = rememberVectorPainter(if (isPaused) IconPack.Medium.Thin.Outline.Play else IconPack.Medium.Thin.Outline.Pause),
-                            contentDescription = if (isPaused) stringResource(id = sharedR.string.transfers_section_action_play)
-                            else stringResource(id = sharedR.string.transfers_section_action_pause),
-                            tint = if (areTransfersPaused) IconColor.Disabled else IconColor.Secondary,
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash),
+                            contentDescription = "Cancel icon",
+                            tint = IconColor.Inverse,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(DSTokens.colors.support.error)
+                                .wrapContentSize(Alignment.CenterEnd)
+                                .padding(12.dp)
+                                .testTag(TEST_TAG_CANCEL_ICON)
                         )
                     }
-                } else {
-                    SelectedTransferIcon(
-                        isSelected,
-                        modifier = Modifier.padding(start = 8.dp),
-                    )
+
+                    else -> {}
+                }
+            },
+            modifier = Modifier.fillMaxSize(),
+            enableDismissFromStartToEnd = false,
+            enableDismissFromEndToStart = enableSwipeToDismiss,
+            onDismiss = { direction ->
+                if (direction == SwipeToDismissBoxValue.EndToStart) {
+                    scope.launch {
+                        swipeToDismissBoxState.snapTo(SwipeToDismissBoxValue.Settled) // we need to set it to settle state in case the cancel is undone and the item recycled
+                        onSetToCancel()
+                    }
                 }
             }
-            ProgressBarIndicator(
+        ) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(2.dp),
-                progressPercentage = progress * 100f,
-                supportColor = if (isOverQuota) SupportColor.Warning else SupportColor.Success
-            )
+                    .fillMaxSize()
+                    .background(if (isBeingDragged) DSTokens.colors.background.surface1 else DSTokens.colors.background.pageBackground)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 12.dp, end = 16.dp)
+                        .weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val subTitle = listOf(
+                        progressPercentageString,
+                        progressSizeString,
+                        speed,
+                    ).joinToString(" · ")
+                    AnimatedVisibility(
+                        isDraggable,
+                        enter = fadeIn() + expandHorizontally(),
+                        exit = fadeOut() + shrinkHorizontally(),
+                    ) {
+                        MegaIcon(
+                            painter = rememberVectorPainter(IconPack.Small.Thin.Outline.QueueLine),
+                            contentDescription = "Reorder icon",
+                            tint = IconColor.Secondary,
+                            modifier = Modifier
+                                .size(16.dp)
+                                .padding(end = 4.dp)
+                                .testTag(TEST_TAG_QUEUE_ICON)
+                        )
+                    }
+                    TransferImage(
+                        fileTypeResId = fileTypeResId,
+                        previewUri = previewUri,
+                        modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE),
+                    )
+                    Column(
+                        Modifier
+                            .padding(start = 12.dp, end = 8.dp)
+                            .weight(1f)
+                    ) {
+                        MegaText(
+                            text = fileName,
+                            maxLines = 1,
+                            overflow = TextOverflow.MiddleEllipsis,
+                            style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.W400),
+                            textColor = TextColor.Primary,
+                            modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_NAME),
+                        )
+                        Row(
+                            modifier = Modifier.padding(top = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            LeadingIndicator(
+                                modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
+                                isDownload = isDownload,
+                                hasIssues = hasIssues,
+                            )
+                            MegaText(
+                                text = subTitle,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                style = AppTheme.typography.bodySmall,
+                                textColor = TextColor.Secondary,
+                                modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_SUBTITLE),
+                            )
+                        }
+                    }
+                    if (isSelected == null) {
+                        IconButton(
+                            onClick = onPlayPauseClicked,
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .size(24.dp)
+                                .testTag(if (isPaused) TEST_TAG_PLAY_ICON else TEST_TAG_PAUSE_ICON)
+                        ) {
+                            MegaIcon(
+                                painter = rememberVectorPainter(if (isPaused) IconPack.Medium.Thin.Outline.Play else IconPack.Medium.Thin.Outline.Pause),
+                                contentDescription = if (isPaused) stringResource(id = sharedR.string.transfers_section_action_play)
+                                else stringResource(id = sharedR.string.transfers_section_action_pause),
+                                tint = if (areTransfersPaused || hasIssues) IconColor.Disabled else IconColor.Secondary,
+                            )
+                        }
+                    } else {
+                        SelectedTransferIcon(
+                            isSelected,
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                    }
+                }
+                ProgressBarIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp),
+                    progressPercentage = progress * 100f,
+                    supportColor = if (hasIssues) SupportColor.Warning else SupportColor.Success
+                )
+            }
         }
     }
 }
@@ -238,7 +246,7 @@ private fun Preview(activeTransferUI: ActiveTransferUI) {
                 progress = progress,
                 speed = speed,
                 isPaused = isPaused,
-                isOverQuota = isOverQuota,
+                hasIssues = hasIssues,
                 areTransfersPaused = areTransfersPaused,
                 enableSwipeToDismiss = true,
                 isSelected = isSelected,
@@ -259,7 +267,7 @@ internal data class ActiveTransferUI(
     val progress: Float,
     val speed: String,
     val isPaused: Boolean,
-    val isOverQuota: Boolean,
+    val hasIssues: Boolean,
     val areTransfersPaused: Boolean,
     val isDraggable: Boolean = true,
     val isSelected: Boolean? = null,
@@ -287,7 +295,7 @@ private class ActiveTransferItemOrdinaryProvider :
                     progress = PROGRESS,
                     speed = if (isPaused) PAUSED else SPEED,
                     isPaused = isPaused,
-                    isOverQuota = false,
+                    hasIssues = false,
                     areTransfersPaused = false,
                 )
             }
@@ -309,7 +317,7 @@ private class ActiveTransferItemUnusualProvider :
                     progress = PROGRESS,
                     speed = if (areTransfersPaused) PAUSED else SPEED,
                     isPaused = false,
-                    isOverQuota = isOverQuota,
+                    hasIssues = isOverQuota,
                     areTransfersPaused = areTransfersPaused,
                     isDraggable = !isSelected,
                     isSelected = isSelected,

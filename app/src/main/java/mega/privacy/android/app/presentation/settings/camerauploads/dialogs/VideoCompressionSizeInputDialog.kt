@@ -50,8 +50,8 @@ internal fun VideoCompressionSizeInputDialog(
         onInputChange = { input = it },
         error = stringResource(
             R.string.settings_compression_queue_subtitle,
-            stringResource(R.string.label_file_size_mega_byte, MIN_COMPRESSION_SIZE.toString()),
-            stringResource(R.string.label_file_size_mega_byte, MAX_COMPRESSION_SIZE.toString()),
+            stringResource(sharedResR.string.label_file_size_megabytes, MIN_COMPRESSION_SIZE.toString()),
+            stringResource(sharedResR.string.label_file_size_megabytes, MAX_COMPRESSION_SIZE.toString()),
         ).takeIf { showErrorMessage },
         onConfirm = { newVideoCompressionSizeInput ->
             handleVideoCompressionSizeInput(

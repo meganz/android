@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -29,6 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
@@ -36,10 +38,12 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.preview.contactItemForPreviews
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
-import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.shared.contact.model.AvatarData
+import mega.privacy.android.shared.contact.model.ContactItemUiState
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
@@ -52,7 +56,31 @@ import java.time.Instant
 import kotlin.time.Duration.Companion.days
 
 /**
- * View to render the File Info Screen, including toolbar, content, etc.
+ * File info screen
+ *
+ * @param viewState
+ * @param snackBarHostState
+ * @param onBackPressed
+ * @param onTakeDownLinkClick
+ * @param onLocationClick
+ * @param availableOfflineChanged
+ * @param onVersionsClick
+ * @param onSetDescriptionClick
+ * @param onSharedWithContactClick
+ * @param onSharedWithContactSelected
+ * @param onSharedWithContactUnselected
+ * @param onSharedWithContactMoreOptionsClick
+ * @param onSharedWithContactMoreInfoClick
+ * @param onSharedWithContactChangePermissionClicked
+ * @param onSharedWithContactRemoveClicked
+ * @param onShowMoreSharedWithContactsClick
+ * @param onPublicLinkCopyClick
+ * @param onMenuActionClick
+ * @param onVerifyContactClick
+ * @param onAddTagClick
+ * @param onShareContactOptionsDismissed
+ * @param modifier
+ * @param getAddress
  */
 @Composable
 internal fun FileInfoScreen(
@@ -64,13 +92,13 @@ internal fun FileInfoScreen(
     availableOfflineChanged: (checked: Boolean) -> Unit,
     onVersionsClick: () -> Unit,
     onSetDescriptionClick: (String) -> Unit,
-    onSharedWithContactClick: (ContactPermission) -> Unit,
-    onSharedWithContactSelected: (ContactPermission) -> Unit,
-    onSharedWithContactUnselected: (ContactPermission) -> Unit,
-    onSharedWithContactMoreOptionsClick: (ContactPermission) -> Unit,
-    onSharedWithContactMoreInfoClick: (ContactPermission) -> Unit,
-    onSharedWithContactChangePermissionClicked: (ContactPermission) -> Unit,
-    onSharedWithContactRemoveClicked: (ContactPermission) -> Unit,
+    onSharedWithContactClick: (ContactPermissionUiState) -> Unit,
+    onSharedWithContactSelected: (ContactPermissionUiState) -> Unit,
+    onSharedWithContactUnselected: (ContactPermissionUiState) -> Unit,
+    onSharedWithContactMoreOptionsClick: (ContactPermissionUiState) -> Unit,
+    onSharedWithContactMoreInfoClick: (ContactPermissionUiState) -> Unit,
+    onSharedWithContactChangePermissionClicked: (ContactPermissionUiState) -> Unit,
+    onSharedWithContactRemoveClicked: (ContactPermissionUiState) -> Unit,
     onShowMoreSharedWithContactsClick: () -> Unit,
     onPublicLinkCopyClick: () -> Unit,
     onMenuActionClick: (FileInfoMenuAction) -> Unit,
@@ -93,29 +121,30 @@ internal fun FileInfoScreen(
             onShareContactOptionsDismissed()
         }
     }
-    BottomSheet(modalSheetState = modalSheetState, sheetBody =
-    {
-        viewState.contactToShowOptions?.let {
-            ShareContactOptionsContent(
-                contactPermission = it,
-                allowChangePermission = !viewState.isNodeInBackups,
-                onInfoClicked = {
-                    onSharedWithContactMoreInfoClick(it)
+    BottomSheet(
+        modalSheetState = modalSheetState, sheetBody =
+            {
+                viewState.contactToShowOptions?.let {
+                    ShareContactOptionsContent(
+                        contactPermission = it,
+                        allowChangePermission = !viewState.isNodeInBackups,
+                        onInfoClicked = {
+                            onSharedWithContactMoreInfoClick(it)
+                            coroutineScope.launch { modalSheetState.hide() }
+                        },
+                        onChangePermissionClicked = {
+                            onSharedWithContactChangePermissionClicked(it)
+                            coroutineScope.launch { modalSheetState.hide() }
+                        },
+                        onRemoveClicked = {
+                            onSharedWithContactRemoveClicked(it)
+                            coroutineScope.launch { modalSheetState.hide() }
+                        },
+                    )
+                } ?: run {
                     coroutineScope.launch { modalSheetState.hide() }
-                },
-                onChangePermissionClicked = {
-                    onSharedWithContactChangePermissionClicked(it)
-                    coroutineScope.launch { modalSheetState.hide() }
-                },
-                onRemoveClicked = {
-                    onSharedWithContactRemoveClicked(it)
-                    coroutineScope.launch { modalSheetState.hide() }
-                },
-            )
-        } ?: run {
-            coroutineScope.launch { modalSheetState.hide() }
-        }
-    }) {
+                }
+            }) {
         ScaffoldWithCollapsibleHeader(
             modifier = modifier.imePadding(),
             headerIncludingSystemBar = viewState.actualPreviewUriString?.takeIf { viewState.hasPreview }
@@ -124,7 +153,7 @@ internal fun FileInfoScreen(
                         //looks like automation tool (appium) doesn't see anything behind a scaffold,
                         // so we need to draw [FileInfoHeader] below the Scaffold. The preview needs to be drawn here to don't overlap other views.
                         PreviewWithShadow(
-                            previewUri = previewUri,
+                            model = previewUri,
                         )
                     }
                 },
@@ -231,11 +260,11 @@ private fun FileInfoScreenPreview(
             onSharedWithContactClick = {},
             onSharedWithContactSelected = {
                 state =
-                    state.copy(outShareContactsSelected = state.outShareContactsSelected + it.contactItem.email)
+                    state.copy(outShareContactsSelected = state.outShareContactsSelected + it.email)
             },
             onSharedWithContactUnselected = {
                 state =
-                    state.copy(outShareContactsSelected = state.outShareContactsSelected - it.contactItem.email)
+                    state.copy(outShareContactsSelected = state.outShareContactsSelected - it.email)
             },
             onSharedWithContactMoreOptionsClick = {},
             onShowMoreSharedWithContactsClick = {},
@@ -248,7 +277,7 @@ private fun FileInfoScreenPreview(
 
                     FileInfoMenuAction.SelectionModeAction.SelectAll -> {
                         state = state.copy(
-                            outShareContactsSelected = state.outSharesCoerceMax.map { it.contactItem.email })
+                            outShareContactsSelected = state.outSharesCoerceMax.map { it.email })
                     }
 
                     else -> {}
@@ -313,6 +342,15 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             actions = listOf(FileInfoMenuAction.Move, FileInfoMenuAction.Copy)
         )
 
+        val contact = ContactItemUiState(
+            handle = 2L,
+            displayName = "Bob Brown",
+            status = ContactItemStatus.Away,
+            lastSeen = 65535,
+            avatar = AvatarData.Initials(initials = "B", avatarColor = Color(0xFF1565C0)),
+            isVerified = false,
+        )
+
         val viewStateFile2 = FileInfoViewState(
             title = "File with long name taken down",
             isFile = true,
@@ -325,7 +363,14 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             thumbnailUriString = null,
             folderTreeInfo = null,
             outShares = List(6) {
-                ContactPermission(contactItemForPreviews(it), AccessPermission.READWRITE)
+                ContactPermissionUiState(
+                    contactItemUiState = contact.copy(
+                        handle = it.toLong(),
+                        displayName = contact.displayName + it,
+                    ),
+                    email = "${contact.displayName}@$it.com",
+                    permission = AccessPermission.READWRITE,
+                )
             },
             nodeLocationInfo = LocationInfo("Cloud drive"),
             isAvailableOffline = false,
@@ -398,7 +443,14 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             isAvailableOfflineEnabled = true,
             isAvailableOfflineAvailable = false,
             outShares = List(6) {
-                ContactPermission(contactItemForPreviews(it), AccessPermission.READWRITE)
+                ContactPermissionUiState(
+                    contactItemUiState = contact.copy(
+                        handle = it.toLong(),
+                        displayName = contact.displayName + it,
+                    ),
+                    email = "${contact.displayName}@$it.com",
+                    permission = AccessPermission.READWRITE,
+                )
             },
             inShareOwnerContactItem = contactItemForPreviews,
             accessPermission = AccessPermission.FULL,

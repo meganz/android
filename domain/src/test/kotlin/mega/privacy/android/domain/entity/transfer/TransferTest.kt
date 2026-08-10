@@ -28,17 +28,30 @@ class TransferTest {
             state = TransferState.STATE_COMPLETED,
             isFinished = true,
             transferredBytes = 0,
+            totalBytes = 1024L,
         )
 
         assertThat(underTest.isAlreadyTransferred).isTrue()
     }
 
+    @Test
+    fun `test that isAlreadyTransferred is false when totalBytes is zero`() {
+        underTest = createEmptyTransfer().copy(
+            state = TransferState.STATE_COMPLETED,
+            isFinished = true,
+            transferredBytes = 0,
+            totalBytes = 0,
+        )
+
+        assertThat(underTest.isAlreadyTransferred).isFalse()
+    }
+
     @ParameterizedTest
     @MethodSource("notIsAlreadyDownloaded")
-    fun `test that isAlreadyDownloaded is false when the conditions are not met`() {
-        underTest = createAlreadyDownloadedTransfer()
+    fun `test that isAlreadyDownloaded is false when the conditions are not met`(transfer: Transfer) {
+        underTest = transfer
 
-        assertThat(underTest.isAlreadyTransferred).isTrue()
+        assertThat(underTest.isAlreadyTransferred).isFalse()
     }
 
     @Test
@@ -70,14 +83,19 @@ class TransferTest {
     private fun notIsAlreadyDownloaded() = listOf(
         createAlreadyDownloadedTransfer().copy(state = TransferState.STATE_FAILED),
         createAlreadyDownloadedTransfer().copy(state = TransferState.STATE_CANCELLED),
+        createAlreadyDownloadedTransfer().copy(state = TransferState.STATE_QUEUED),
+        createAlreadyDownloadedTransfer().copy(state = TransferState.STATE_ACTIVE),
+        createAlreadyDownloadedTransfer().copy(state = TransferState.STATE_COMPLETING),
         createAlreadyDownloadedTransfer().copy(isFinished = false),
         createAlreadyDownloadedTransfer().copy(transferredBytes = 1L),
+        createAlreadyDownloadedTransfer().copy(totalBytes = 0L),
     )
 
     private fun createAlreadyDownloadedTransfer() = createEmptyTransfer().copy(
         state = TransferState.STATE_COMPLETED,
         isFinished = true,
         transferredBytes = 0,
+        totalBytes = 1024L,
     )
 
     private fun createEmptyTransfer() = Transfer(

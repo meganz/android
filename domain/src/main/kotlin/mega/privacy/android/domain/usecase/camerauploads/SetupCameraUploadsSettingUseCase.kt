@@ -10,10 +10,12 @@ import javax.inject.Inject
  *
  * @property cameraUploadsRepository [CameraUploadsRepository]
  * @property updateBackupStateUseCase [UpdateBackupStateUseCase]
+ * @property setUploadFileNamesKeptUseCase [SetUploadFileNamesKeptUseCase]
  */
 class SetupCameraUploadsSettingUseCase @Inject constructor(
     private val cameraUploadsRepository: CameraUploadsRepository,
     private val updateBackupStateUseCase: UpdateBackupStateUseCase,
+    private val setUploadFileNamesKeptUseCase: SetUploadFileNamesKeptUseCase,
 ) {
 
     /**
@@ -22,6 +24,9 @@ class SetupCameraUploadsSettingUseCase @Inject constructor(
      * @param isEnabled [Boolean]
      */
     suspend operator fun invoke(isEnabled: Boolean) {
+        if (isEnabled && cameraUploadsRepository.isCameraUploadsEnabled() == null) {
+            setUploadFileNamesKeptUseCase(true)
+        }
         cameraUploadsRepository.setCameraUploadsEnabled(isEnabled)
         cameraUploadsRepository.getBackupFolderId(CameraUploadFolderType.Primary)?.let { backupId ->
             updateBackupStateUseCase(

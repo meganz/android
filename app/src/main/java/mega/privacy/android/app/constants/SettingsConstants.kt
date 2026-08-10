@@ -17,7 +17,7 @@ object SettingsConstants {
     const val KEY_2FA = "settings_2fa_activated"
     const val KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept"
     const val KEY_HELP_CENTRE = "settings_help_centre"
-    const val KEY_HELP_SEND_FEEDBACK = "settings_help_send_feedback"
+    const val KEY_HELP_RATE_APP = "settings_help_rate_app"
     const val KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy"
     const val KEY_ABOUT_COOKIE_POLICY = "settings_about_cookie_policy"
     const val KEY_COOKIE_SETTINGS = "settings_cookie"
@@ -27,6 +27,8 @@ object SettingsConstants {
     const val KEY_CANCEL_ACCOUNT = "settings_about_cancel_account"
     const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED = "settings_audio_background_play_enabled"
     const val KEY_FEATURES_CALLS = "settings_features_calls"
+    const val KEY_FEATURES_TRANSFERS = "settings_features_transfers"
+
 
     /* Chat settings */
     const val KEY_CHAT_NOTIFICATIONS_CHAT = "settings_chat_notification_chat"
@@ -66,6 +68,7 @@ object SettingsConstants {
     const val KEY_MEDIA_DISCOVERY_VIEW = "settings_media_discovery_view"
     const val KEY_SUB_FOLDER_MEDIA_DISCOVERY = "settings_sub_folder_media_discovery"
     const val KEY_HIDDEN_ITEMS = "settings_hidden_items"
+    const val KEY_SORTING_VIEW_MODE = "settings_sorting_view_mode"
 
     /* Cookie settings  */
     const val KEY_COOKIE_ACCEPT = "settings_cookie_accept"

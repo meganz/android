@@ -2,7 +2,7 @@ package mega.privacy.android.feature.clouddrive.presentation.offline.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -40,6 +40,7 @@ data class OfflineUiState(
     val openOfflineNodeEvent: StateEventWithContent<OfflineFileInformation> = consumed(),
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
+    val removeNodesSuccessEvent: StateEventWithContent<Int> = consumed()
 ) {
 
     /**
@@ -53,4 +54,15 @@ data class OfflineUiState(
      */
     val selectedOfflineNodes: List<OfflineFileInformation>
         get() = offlineNodes.filter { it.isSelected }.map { it.offlineFileInformation }
+
+    /**
+     * Check if all nodes are selected
+     *
+     * Works by comparing the size of the selected nodes with the size of the offline nodes
+     * to make the calculation more efficient and avoid looping through all the nodes to check
+     * if they are selected.
+     *
+     * @return true if all nodes are selected
+     */
+    val areAllNodesSelected: Boolean = selectedNodeHandles.size == offlineNodes.size
 }

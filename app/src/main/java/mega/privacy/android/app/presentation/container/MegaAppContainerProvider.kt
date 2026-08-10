@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -17,7 +16,6 @@ import javax.inject.Inject
  * without exposing internal implementation details.
  */
 class MegaAppContainerProvider @Inject constructor(
-    private val passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
 ) : AppContainerProvider {
     override fun buildAppContainer(
@@ -30,7 +28,6 @@ class MegaAppContainerProvider @Inject constructor(
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 MegaAppContainer(
                     themeMode = mode,
-                    passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                     content = content
                 )
             }
@@ -39,6 +36,7 @@ class MegaAppContainerProvider @Inject constructor(
     override fun buildSharedAppContainer(
         context: Context,
         useLegacyStatusBarColor: Boolean,
+        includePsa: Boolean,
         content: @Composable (() -> Unit),
     ): ComposeView =
         ComposeView(context).apply {
@@ -48,8 +46,8 @@ class MegaAppContainerProvider @Inject constructor(
                 SharedAppContainer(
                     themeMode = mode,
                     useLegacyStatusBarColor = useLegacyStatusBarColor,
-                    passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                    content = content
+                    content = content,
+                    includePsa = includePsa,
                 )
             }
         }

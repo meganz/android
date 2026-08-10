@@ -20,11 +20,15 @@ class ExportNodesUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         nodes: List<Long>,
+        callerName: String,
     ): Map<Long, String> = supervisorScope {
         nodes.map { nodeHandle ->
             async {
                 runCatching {
-                    nodeHandle to exportNodeUseCase(NodeId(nodeHandle))
+                    nodeHandle to exportNodeUseCase(
+                        nodeToExport = NodeId(nodeHandle),
+                        callerName = "ExportNodesUseCase:$callerName",
+                    )
                 }
             }
         }

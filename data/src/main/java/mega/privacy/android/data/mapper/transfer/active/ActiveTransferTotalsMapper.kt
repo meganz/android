@@ -1,9 +1,9 @@
 package mega.privacy.android.data.mapper.transfer.active
 
 import dagger.Lazy
-import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.getTransferGroup
@@ -11,24 +11,22 @@ import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
 
 /**
- * Mapper for converting a list of [ActiveTransferEntity] into [ActiveTransferTotals].
+ * Mapper for converting a list of [Transfer] into [ActiveTransferTotals].
  */
 internal class ActiveTransferTotalsMapper @Inject constructor(
     private val transferRepository: Lazy<TransferRepository>,
 ) {
     /**
      * @param type
-     * @param list the list of active transfers of which the total will be calculated
-     * @param transferredBytes Map of transfer tag to transferred bytes
+     * @param transfers the collection of active transfers of which the total will be calculated
      * @param previousActionGroups The previously returned groups, this will be used to optimize performance, as groups can't be changed.
      */
     suspend operator fun invoke(
         type: TransferType,
-        list: List<ActiveTransfer>,
-        transferredBytes: Map<Long, Long>,
+        transfers: Collection<ActiveTransfer>,
         previousActionGroups: List<ActiveTransferTotals.ActionGroup>? = null,
     ): ActiveTransferTotals {
-        val onlyFiles = list.filter { !it.isFolderTransfer }
+        val onlyFiles = transfers.filter { !it.isFolderTransfer }
         val actionGroups = onlyFiles
             .groupBy { it.getTransferGroup()?.groupId }
             .mapNotNull { (key, activeTransfersFiles) ->
@@ -49,7 +47,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                             groupId = groupId,
                             totalFiles = activeTransfersFiles.size,
                             finishedFiles = activeTransfersFiles.count { it.isFinished },
-                            completedFiles = activeTransfersFiles.count { it.isFinished && transferredBytes[it.uniqueId] == it.totalBytes },
+                            completedFiles = activeTransfersFiles.count { it.isFinished && it.transferredBytes == it.totalBytes },
                             alreadyTransferred = activeTransfersFiles.count { it.isAlreadyTransferred },
                             destination = dest,
                             selectedNames = names,
@@ -59,8 +57,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                             totalBytes = activeTransfersFiles.sumOf { it.totalBytes },
                             transferredBytes = activeTransfersFiles.sumOf {
                                 //if it's finished always totalBytes as it can be cancelled or failed
-                                if (it.isFinished) it.totalBytes else transferredBytes[it.uniqueId]
-                                    ?: 0L
+                                if (it.isFinished) it.totalBytes else it.transferredBytes
                             },
                             pendingTransferNodeId = pendingTransferNodeIdentifier,
                             appData = activeTransfersFiles
@@ -73,19 +70,19 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
             }
         return ActiveTransferTotals(
             transfersType = type,
-            totalTransfers = list.size,
+            totalTransfers = transfers.size,
             totalFileTransfers = onlyFiles.size,
             pausedFileTransfers = onlyFiles.count { it.isPaused },
-            totalFinishedTransfers = list.count { it.isFinished },
+            totalFinishedTransfers = transfers.count { it.isFinished },
             totalFinishedFileTransfers = onlyFiles.count { it.isFinished },
-            totalCompletedFileTransfers = onlyFiles.count { it.isFinished && transferredBytes[it.uniqueId] == it.totalBytes },
+            totalCompletedFileTransfers = onlyFiles.count { it.isFinished && it.transferredBytes == it.totalBytes },
             totalBytes = onlyFiles.sumOf { it.totalBytes },
             transferredBytes = onlyFiles.sumOf {
                 //if it's finished always totalBytes as it can be cancelled or failed
-                if (it.isFinished) it.totalBytes else transferredBytes[it.uniqueId] ?: 0L
+                if (it.isFinished) it.totalBytes else it.transferredBytes
             },
             totalAlreadyTransferredFiles = onlyFiles.count { it.isAlreadyTransferred },
-            totalCancelled = list.count { it.isCancelled },
+            totalCancelled = transfers.count { it.isCancelled },
             actionGroups = actionGroups
         )
     }

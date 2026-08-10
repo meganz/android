@@ -1,16 +1,22 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.entity.account.AccountTransferDetail
+import javax.inject.Inject
 
-internal typealias AccountTransferDetailMapper = (
-    @JvmSuppressWildcards Long,
-    @JvmSuppressWildcards Long,
-) -> @JvmSuppressWildcards AccountTransferDetail
+internal class AccountTransferDetailMapper @Inject constructor() {
+    operator fun invoke(
+        totalTransfer: Long,
+        usedTransfer: Long,
+    ): AccountTransferDetail {
+        val usedTransferPercentage = when {
+            totalTransfer <= 0 -> 0
+            else -> ((usedTransfer.toFloat() / totalTransfer.toFloat()) * 100).toInt()
+        }
 
-internal fun toAccountTransferDetail(
-    totalTransfer: Long,
-    usedTransfer: Long,
-) = AccountTransferDetail(
-    totalTransfer = totalTransfer,
-    usedTransfer = usedTransfer,
-)
+        return AccountTransferDetail(
+            totalTransfer = totalTransfer,
+            usedTransfer = usedTransfer,
+            usedTransferPercentage = usedTransferPercentage,
+        )
+    }
+}

@@ -3,9 +3,10 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
 
 /**
@@ -13,7 +14,6 @@ import javax.inject.Inject
  */
 class ManageLinkBottomSheetMenuItem @Inject constructor(
     override val menuAction: ManageLinkMenuAction,
-    private val megaNavigator: MegaNavigator
 ) :
     NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
@@ -22,10 +22,12 @@ class ManageLinkBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType,
     ) = node.isTakenDown.not()
             && node.exportedData?.publicLink != null
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
+            && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override val groupId = 7
 }

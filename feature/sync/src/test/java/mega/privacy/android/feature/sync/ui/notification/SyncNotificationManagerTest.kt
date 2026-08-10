@@ -4,7 +4,6 @@ import android.app.Notification
 import android.content.Context
 import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationManagerCompat
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
@@ -12,15 +11,17 @@ import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.CreateSyncNotificationIdUseCase
 import mega.privacy.android.shared.resources.R as sharedResR
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@RunWith(AndroidJUnit4::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class SyncNotificationManagerTest {
 
     private lateinit var underTest: SyncNotificationManager
@@ -31,12 +32,21 @@ internal class SyncNotificationManagerTest {
     private val syncNotificationMapper: SyncNotificationMapper = mock()
 
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = SyncNotificationManager(
             notificationManagerCompat,
             syncNotificationMapper,
-            createSyncNotificationIdUseCase
+            createSyncNotificationIdUseCase,
+        )
+    }
+
+    @AfterEach
+    fun clear() {
+        reset(
+            notificationManagerCompat,
+            syncNotificationMapper,
+            createSyncNotificationIdUseCase,
         )
     }
 
@@ -52,7 +62,9 @@ internal class SyncNotificationManagerTest {
                 notificationDetails = NotificationDetails(path = "Path", errorCode = null)
             )
             val notification: Notification = mock()
-            whenever(syncNotificationMapper(context, notificationMessage)).thenReturn(notification)
+            whenever(syncNotificationMapper(context, notificationMessage)).thenReturn(
+                notification
+            )
 
             underTest.show(context, notificationMessage)
 
@@ -94,5 +106,18 @@ internal class SyncNotificationManagerTest {
         val result = underTest.isSyncNotificationDisplayed()
 
         assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `test that createForegroundNotification returns notification from mapper`() {
+        val notification: Notification = mock()
+        whenever(syncNotificationMapper.createForegroundNotification(context)).thenReturn(
+            notification
+        )
+
+        val result = underTest.createForegroundNotification(context)
+
+        assertThat(result).isEqualTo(notification)
+        verify(syncNotificationMapper).createForegroundNotification(context)
     }
 }

@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.FileConstant
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.findItemByHandle
 import mega.privacy.android.data.extensions.getDecodedAliases
@@ -33,6 +32,7 @@ import mega.privacy.android.data.extensions.replaceIfExists
 import mega.privacy.android.data.extensions.sortList
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.contact.ContactGateway
@@ -57,13 +57,14 @@ import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestAction
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -118,8 +119,8 @@ internal class DefaultContactsRepository @Inject constructor(
     private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
     private val contactWrapper: ContactWrapper,
     private val contactRequestActionMapper: ContactRequestActionMapper,
-    private val databaseHandler: Lazy<DatabaseHandler>,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
+    private val localStorageGateway: MegaLocalStorageGateway,
     @ApplicationContext private val context: Context,
     private val userChatStatusMapper: UserChatStatusMapper,
     private val userMapper: UserMapper,
@@ -131,7 +132,9 @@ internal class DefaultContactsRepository @Inject constructor(
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
-            .mapNotNull { it.requests?.map(contactRequestMapper) }
+            .mapNotNull {
+                it.requests?.filter { request -> !request.sourceEmail.isNullOrEmpty() }?.map(contactRequestMapper)
+            }
             .flowOn(ioDispatcher)
 
     override fun monitorChatPresenceLastGreenUpdates() = megaChatApiGateway.chatUpdates
@@ -626,7 +629,8 @@ internal class DefaultContactsRepository @Inject constructor(
                 getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
                     .also { credentialsPreferencesGateway.get().saveFirstName(it) }
             } else {
-                credentialsPreferencesGateway.get().monitorCredentials().firstOrNull()?.firstName.takeIf { !it.isNullOrBlank() }
+                credentialsPreferencesGateway.get().monitorCredentials()
+                    .firstOrNull()?.firstName.takeIf { !it.isNullOrBlank() }
                     ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
                         .also { credentialsPreferencesGateway.get().saveFirstName(it) }
             }
@@ -638,7 +642,8 @@ internal class DefaultContactsRepository @Inject constructor(
                 getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
                     .also { credentialsPreferencesGateway.get().saveLastName(it) }
             } else {
-                credentialsPreferencesGateway.get().monitorCredentials().firstOrNull()?.lastName.takeIf { !it.isNullOrBlank() }
+                credentialsPreferencesGateway.get().monitorCredentials()
+                    .firstOrNull()?.lastName.takeIf { !it.isNullOrBlank() }
                     ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
                         .also { credentialsPreferencesGateway.get().saveLastName(it) }
             }
@@ -726,7 +731,7 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun clearContactDatabase() = withContext(ioDispatcher) {
         Timber.d("clear Database")
-        databaseHandler.get().clearContacts()
+        localStorageGateway.clearContacts()
     }
 
     override suspend fun createOrUpdateContact(
@@ -827,7 +832,10 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun getIncomingContactRequests(): List<ContactRequest> =
         withContext(ioDispatcher) {
-            megaApiGateway.getIncomingContactRequests()?.map(contactRequestMapper).orEmpty()
+            megaApiGateway.getIncomingContactRequests()
+                ?.filter { !it.sourceEmail.isNullOrEmpty() }
+                ?.map(contactRequestMapper)
+                .orEmpty()
         }
 
     override suspend fun manageReceivedContactRequest(
@@ -887,20 +895,15 @@ internal class DefaultContactsRepository @Inject constructor(
     ) = megaApiGateway.getContactRequestByHandle(requestHandle)
         ?.takeIf { it.isOutgoing == isOutgoing }
 
-    override suspend fun getContactLink(userHandle: Long) = withContext(ioDispatcher) {
+    override suspend fun contactLinkQuery(userHandle: Long) = withContext(ioDispatcher) {
         val result = suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
                     when (error.errorCode) {
                         MegaError.API_OK -> {
-                            databaseHandler.get().apply {
-                                setLastPublicHandle(request.nodeHandle)
-                                setLastPublicHandleTimeStamp()
-                                lastPublicHandleType = MegaApiJava.AFFILIATE_TYPE_CONTACT
-                            }
                             continuation.resumeWith(
                                 Result.success(
-                                    ContactLink(
+                                    ContactLinkQueryResult(
                                         email = request.email,
                                         contactHandle = request.parentHandle,
                                         contactLinkHandle = request.nodeHandle,
@@ -909,14 +912,15 @@ internal class DefaultContactsRepository @Inject constructor(
                                             megaChatApiGateway.getUserOnlineStatus(
                                                 request.parentHandle
                                             )
-                                        )
+                                        ),
+                                        avatarFileInBase64 = request.file,
                                     )
                                 )
                             )
                         }
 
                         MegaError.API_EEXIST -> continuation.resumeWith(
-                            Result.success(ContactLink(isContact = false))
+                            Result.success(ContactLinkQueryResult(isContact = false))
                         )
 
                         else -> continuation.failWithError(error, "getContactLink")
@@ -924,7 +928,12 @@ internal class DefaultContactsRepository @Inject constructor(
                     }
                 },
             )
-            megaApiGateway.getContactLink(userHandle, listener)
+            megaApiGateway.contactLinkQuery(userHandle, listener)
+        }
+        if (!result.email.isNullOrBlank()) {
+            localStorageGateway.setLastPublicHandle(result.contactLinkHandle)
+            localStorageGateway.setLastPublicHandleTimeStamp()
+            localStorageGateway.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CONTACT)
         }
         val isContact = !result.email.isNullOrBlank() && megaApiGateway.getContacts()
             .any { contact -> result.email == contact.email && contact.visibility == MegaUser.VISIBILITY_VISIBLE }
@@ -995,10 +1004,14 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override val monitorContactCacheUpdates: Flow<UserUpdate> = _monitorContactCacheUpdates
 
-    private suspend fun updateContactCache(userUpdate: UserUpdate) {
+    override suspend fun updateContactCache(userUpdate: UserUpdate) {
         Timber.d("updateContactCache")
         if (userUpdate.changes.any { it.value.contains(UserChanges.Alias) }) {
-            getCurrentUserAliases()
+            runCatching {
+                getCurrentUserAliases()
+            }.onFailure {
+                Timber.e(it, "reload user aliases failed")
+            }
         }
         userUpdate.changes.forEach { entry ->
             entry.value.forEach {
@@ -1031,6 +1044,11 @@ internal class DefaultContactsRepository @Inject constructor(
         contactGateway.getLocalContacts()
     }
 
+    override suspend fun getLocalContactsFromUri(uriPath: UriPath): List<LocalContact> =
+        withContext(ioDispatcher) {
+            contactGateway.getLocalContactsFromUri(uriPath)
+        }
+
     override suspend fun getLocalContactNumbers(): List<LocalContact> = withContext(ioDispatcher) {
         contactGateway.getLocalContactNumbers()
     }
@@ -1048,7 +1066,9 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun getOutgoingContactRequests(): List<ContactRequest> =
         withContext(ioDispatcher) {
-            megaApiGateway.getOutgoingContactRequests().map(contactRequestMapper)
+            megaApiGateway.getOutgoingContactRequests()
+                .filter { !it.sourceEmail.isNullOrEmpty() }
+                .map(contactRequestMapper)
         }
 
     override fun monitorContactByHandle(contactId: Long): Flow<Contact> =

@@ -8,9 +8,12 @@ import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringRes
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.mapper.RecurrenceDialogOptionMapper
 import mega.privacy.android.app.presentation.meeting.mapper.WeekDayMapper
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.QueryChatLinkUseCase
@@ -35,6 +38,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
@@ -51,10 +55,10 @@ class CreateScheduledMeetingViewModelTest {
     private val accountDetailFlow = MutableStateFlow(AccountDetail())
     private val connectivityFlow = MutableStateFlow(false)
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
-        onBlocking { invoke() }.thenReturn(accountDetailFlow)
+        on { invoke() }.thenReturn(accountDetailFlow)
     }
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
-        onBlocking { invoke() }.thenReturn(connectivityFlow)
+        on { invoke() }.thenReturn(connectivityFlow)
     }
 
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
@@ -153,5 +157,24 @@ class CreateScheduledMeetingViewModelTest {
             setOpenInviteUseCase,
             monitorAccountDetailUseCase
         )
+    }
+
+    @Test
+    fun `test that getParticipantHandles returns the handles of the current participants`() =
+        runTest {
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            val alice = mock<ContactItem> { on { handle }.thenReturn(1L) }
+            val bob = mock<ContactItem> { on { handle }.thenReturn(2L) }
+            whenever(getContactFromEmailUseCase("a@mega.co.nz", true)).thenReturn(alice)
+            whenever(getContactFromEmailUseCase("b@mega.co.nz", true)).thenReturn(bob)
+
+            underTest.addContactsSelected(arrayListOf("a@mega.co.nz", "b@mega.co.nz"))
+
+            assertThat(underTest.getParticipantHandles()).containsExactly(1L, 2L).inOrder()
+        }
+
+    @Test
+    fun `test that getParticipantHandles returns an empty list when there are no participants`() {
+        assertThat(underTest.getParticipantHandles()).isEmpty()
     }
 }

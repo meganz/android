@@ -125,6 +125,9 @@ class MonitorAndHandleTransferEventsUseCaseTest {
         },
         mock {
             on { transferType } doReturn TransferType.CU_UPLOAD
-        }
+        },
+        mock {
+            on { appData } doReturn listOf(TransferAppData.SafDownload)
+        },
     )
 }

@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.clouddrive.presentation.rubbishbin
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -12,11 +11,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeSortOption
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
@@ -31,14 +25,12 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
@@ -49,6 +41,11 @@ import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenU
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -82,13 +79,11 @@ class NewRubbishBinViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val accountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val nodeUiItemMapper = mock<NodeUiItemMapper>()
     private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
     private val cleanRubbishBinUseCase = mock<CleanRubbishBinUseCase>()
-    private val savedStateHandle = mock<SavedStateHandle>()
     private val getNodesByIdInChunkUseCase = mock<GetNodesByIdInChunkUseCase>()
 
     @BeforeEach
@@ -110,7 +105,6 @@ class NewRubbishBinViewModelTest {
             getRubbishBinFolderUseCase,
             getRubbishBinNodeChildrenUseCase,
             getBusinessStatusUseCase,
-            getFeatureFlagValueUseCase,
             isConnectedToInternetUseCase,
             getNodeByIdUseCase,
             nodeUiItemMapper,
@@ -131,14 +125,13 @@ class NewRubbishBinViewModelTest {
             getRubbishBinFolderUseCase = getRubbishBinFolderUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
             cleanRubbishBinUseCase = cleanRubbishBinUseCase,
             navKey = RubbishBinNavKey(null),
-            getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase
+            getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
         )
     }
 
@@ -156,7 +149,6 @@ class NewRubbishBinViewModelTest {
             assertThat(initial.sortConfiguration).isEqualTo(NodeSortConfiguration.default)
             assertThat(initial.accountType).isNull()
             assertThat(initial.isBusinessAccountExpired).isFalse()
-            assertThat(initial.isHiddenNodesEnabled).isFalse()
         }
     }
 
@@ -168,6 +160,7 @@ class NewRubbishBinViewModelTest {
                 assertThat(awaitItem()).isEqualTo(-1L)
                 underTest.setRubbishBinHandle(newValue)
                 assertThat(awaitItem()).isEqualTo(newValue)
+                cancelAndIgnoreRemainingEvents()
             }
     }
 
@@ -438,7 +431,6 @@ class NewRubbishBinViewModelTest {
     @Test
     fun `test that account type is updated when monitorAccountDetailUseCase emits`() = runTest {
         stubCommon()
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         initViewModel()
         val newAccountDetail = AccountDetail(
             levelDetail = AccountLevelDetail(
@@ -541,7 +533,6 @@ class NewRubbishBinViewModelTest {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(getRubbishBinFolderUseCase()).thenReturn(null)
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(getNodeByIdUseCase(any())).thenReturn(null)
         whenever(
@@ -575,7 +566,6 @@ class NewRubbishBinViewModelTest {
             getRubbishBinNodeChildrenUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase,
-            getFeatureFlagValueUseCase,
             isConnectedToInternetUseCase,
             getNodeByIdUseCase,
             nodeUiItemMapper,

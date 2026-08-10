@@ -2,9 +2,6 @@ package mega.privacy.android.app.presentation.transfers.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -22,25 +19,27 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
 import mega.privacy.android.app.extensions.moveElement
-import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
-import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersUseCase
@@ -48,24 +47,21 @@ import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCan
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersByStateWithLimitUseCase
 import mega.privacy.android.domain.usecase.transfers.errorstatus.ClearTransferErrorStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.errorstatus.IsTransferInErrorStatusUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
-import mega.privacy.android.navigation.destination.TransfersNavKey
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * ViewModel for Transfers screen.
  *
  * @property uiState [TransfersUiState] for UI state.
  */
-@HiltViewModel(assistedFactory = TransfersViewModel.Factory::class)
-class TransfersViewModel @AssistedInject constructor(
+@HiltViewModel()
+class TransfersViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorInProgressTransfersUseCase: MonitorInProgressTransfersUseCase,
-    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
@@ -82,26 +78,20 @@ class TransfersViewModel @AssistedInject constructor(
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val clearTransferErrorStatusUseCase: ClearTransferErrorStatusUseCase,
     private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase,
-    private val isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
-    @Assisted private val navKey: TransfersNavKey,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
+    isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransfersUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
-        val initialTabIndex = navKey.tabIndex
-            ?: if (isTransferInErrorStatusUseCase()) {
-                FAILED_TAB_INDEX
-            } else {
-                ACTIVE_TAB_INDEX
-            }
-        updateSelectedTab(initialTabIndex)
+        _uiState.update { it.copy(transferInError = isTransferInErrorStatusUseCase()) }
         monitorActiveTransfers()
-        monitorStorageOverQuota()
-        monitorTransferOverQuota()
         monitorPausedTransfers()
         monitorCompletedTransfers()
+        monitorConnectivity()
     }
 
     private fun monitorActiveTransfers() {
@@ -129,65 +119,6 @@ class TransfersViewModel @AssistedInject constructor(
                     ?.filter { id -> activeTransfers.any { it.uniqueId == id } }
             )
         }
-    }
-
-    private fun monitorStorageOverQuota() {
-        viewModelScope.launch {
-            monitorStorageStateEventUseCase()
-                .collectLatest { storageState ->
-                    _uiState.update { state ->
-                        val isStorageOverQuota = storageState.storageState == StorageState.Red
-                                || storageState.storageState == StorageState.PayWall
-                        val quotaWarning = getQuotaWarning(
-                            isStorageOverQuota = isStorageOverQuota,
-                            isTransferOverQuota = state.isTransferOverQuota
-                        )
-
-                        state.copy(
-                            isStorageOverQuota = isStorageOverQuota,
-                            quotaWarning = quotaWarning,
-                        )
-                    }
-                }
-        }
-    }
-
-    private fun monitorTransferOverQuota() {
-        viewModelScope.launch {
-            monitorTransferOverQuotaUseCase()
-                .collectLatest { isTransferOverQuota ->
-                    _uiState.update { state ->
-                        val quotaWarning = getQuotaWarning(
-                            isStorageOverQuota = state.isStorageOverQuota,
-                            isTransferOverQuota = isTransferOverQuota,
-                        )
-
-                        state.copy(
-                            isTransferOverQuota = isTransferOverQuota,
-                            quotaWarning = quotaWarning,
-                        )
-                    }
-                }
-        }
-    }
-
-    private fun getQuotaWarning(
-        isStorageOverQuota: Boolean,
-        isTransferOverQuota: Boolean,
-    ): QuotaWarning? {
-        return when {
-            isStorageOverQuota && isTransferOverQuota -> QuotaWarning.StorageAndTransfer
-            isStorageOverQuota -> QuotaWarning.Storage
-            isTransferOverQuota -> QuotaWarning.Transfer
-            else -> null
-        }
-    }
-
-    /**
-     * Consume quota warning.
-     */
-    fun onConsumeQuotaWarning() {
-        _uiState.update { state -> state.copy(quotaWarning = null) }
     }
 
     private fun monitorPausedTransfers() {
@@ -228,10 +159,25 @@ class TransfersViewModel @AssistedInject constructor(
         }
     }
 
+    private fun monitorConnectivity() {
+        viewModelScope.launch {
+            monitorConnectivityUseCase()
+                .skipUnstable(waitTimeToShowOffline, true) { it }
+                .collect { connected ->
+                    _uiState.update { state ->
+                        state.copy(hasInternetConnection = connected)
+                    }
+                }
+        }
+    }
+
     /**
      * Pause or resume a transfer by tag.
      */
     fun playOrPauseTransfer(tag: Int) {
+        if (!uiState.value.hasInternetConnection) {
+            return
+        }
         runCatching { uiState.value.activeTransfers.first { it.tag == tag }.isPaused }
             .getOrNull()?.let { isPaused ->
                 viewModelScope.launch {
@@ -272,9 +218,6 @@ class TransfersViewModel @AssistedInject constructor(
      * Update selected tab.
      */
     fun updateSelectedTab(tabIndex: Int) {
-        _uiState.update { state ->
-            state.copy(selectedTab = tabIndex)
-        }
         if (tabIndex == FAILED_TAB_INDEX) {
             viewModelScope.launch { clearTransferErrorStatusUseCase() }
         }
@@ -286,6 +229,8 @@ class TransfersViewModel @AssistedInject constructor(
     fun cancelAllTransfers() {
         viewModelScope.launch {
             runCatching { cancelTransfersUseCase() }
+                .onFailure { Timber.e(it) }
+            runCatching { correctActiveTransfersUseCase(null) }
                 .onFailure { Timber.e(it) }
         }
     }
@@ -364,14 +309,16 @@ class TransfersViewModel @AssistedInject constructor(
                         }.onFailure {
                             //No chat uploads retried, try general upload only.
                             return TransferTriggerEvent.StartUpload.Files(
-                                mapOf(path to null),
-                                NodeId(parentHandle)
+                                mapOf(path to failedTransfer.fileName),
+                                NodeId(parentHandle),
+                                pitagTrigger = PitagTrigger.NotApplicable,
                             )
                         }
                     } else {
                         return TransferTriggerEvent.StartUpload.Files(
-                            mapOf(path to null),
-                            NodeId(parentHandle)
+                            mapOf(path to failedTransfer.fileName),
+                            NodeId(parentHandle),
+                            pitagTrigger = PitagTrigger.NotApplicable,
                         )
                     }
                 }
@@ -669,7 +616,11 @@ class TransfersViewModel @AssistedInject constructor(
             getTransferByUniqueIdUseCase(uniqueId)?.let { transfer ->
                 runCatching { cancelTransferByTagUseCase(transfer.tag) }
                     .onFailure { Timber.e(it, "Retry cancel transfer failed") }
-            } ?: Timber.e("Transfer not found, probably already finished")
+            } ?: run {
+                Timber.e("Transfer not found, probably already finished")
+                runCatching { correctActiveTransfersUseCase(null) }
+                    .onFailure { Timber.e(it) }
+            }
         }
     }
 
@@ -754,11 +705,6 @@ class TransfersViewModel @AssistedInject constructor(
                 cancelActiveTransfer(pendingToCancel.tag, uniqueId)
             }
         }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(navKey: TransfersNavKey): TransfersViewModel
     }
 
     companion object {

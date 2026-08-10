@@ -45,18 +45,18 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.model.MediaListItem
-import mega.privacy.android.app.presentation.photos.model.MediaListMedia
+import mega.privacy.android.domain.entity.photos.MediaListItem
+import mega.privacy.android.domain.entity.photos.MediaListMedia
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotoImageView
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_DAY
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH_WITH_DAY
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_YEAR_WITH_MONTH
 import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 import mega.privacy.android.shared.original.core.ui.theme.white
 import java.text.SimpleDateFormat
@@ -332,30 +332,3 @@ private fun dateText(
         )
     )
 }
-
-fun Modifier.photosZoomGestureDetector(
-    onZoomIn: () -> Unit,
-    onZoomOut: () -> Unit,
-) = then(pointerInput(Unit) {
-    awaitEachGesture {
-        awaitFirstDown(requireUnconsumed = false)
-        do {
-            val event = awaitPointerEvent(
-                pass = PointerEventPass.Initial
-            )
-            if (event.changes.any { it.isConsumed })
-                break
-            val zoomChange = event.calculateZoom()
-            if (zoomChange != 1.0f) {
-                if (zoomChange > 1.0f) {
-                    onZoomIn()
-                } else {
-                    onZoomOut()
-                }
-                // Consume event in case to trigger scroll
-                event.changes.map { it.consume() }
-                break
-            }
-        } while (event.changes.any { it.pressed })
-    }
-})

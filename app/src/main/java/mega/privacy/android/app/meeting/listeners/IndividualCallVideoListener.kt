@@ -9,7 +9,6 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatVideoListenerInterface
-import timber.log.Timber
 import java.nio.ByteBuffer
 
 /**

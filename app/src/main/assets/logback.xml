@@ -3,9 +3,10 @@
     <property name="LOG_DIR" value="${LOG_DIR}" />
 
     <!--    SDK Rolling File appender -->
-    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="ROLLING" class="mega.privacy.android.data.logging.FlushableRollingFileAppender">
         <!-- active log file -->
         <file>${LOG_DIR}/log.txt</file>
+        <immediateFlush>false</immediateFlush>
         <encoder>
             <pattern>[%d{dd-MM HH:mm:ss,UTC}][%-5level] %msg %n</pattern>
         </encoder>
@@ -18,10 +19,20 @@
         </rollingPolicy>
     </appender>
 
+    <!--    SDK async wrapper -->
+    <appender name="ASYNC_ROLLING" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>true</neverBlock>
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="ROLLING" />
+    </appender>
+
     <!--    Chat Rolling File appender -->
-    <appender name="ROLLING_CHAT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="ROLLING_CHAT" class="mega.privacy.android.data.logging.FlushableRollingFileAppender">
         <!-- active log file -->
         <file>${LOG_DIR}/logKarere.txt</file>
+        <immediateFlush>false</immediateFlush>
         <encoder>
             <pattern>%msg %n</pattern>
         </encoder>
@@ -34,6 +45,15 @@
         </rollingPolicy>
     </appender>
 
+    <!--    Chat async wrapper -->
+    <appender name="ASYNC_ROLLING_CHAT" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>true</neverBlock>
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="ROLLING_CHAT" />
+    </appender>
+
     <!--    logcat appender -->
     <appender name="LOGCAT" class="ch.qos.logback.classic.android.LogcatAppender">
         <encoder>
@@ -42,11 +62,11 @@
     </appender>
 
     <logger name="mega.privacy.android.data.gateway.TimberMegaLogger" level="TRACE" >
-        <appender-ref ref="ROLLING" />
+        <appender-ref ref="ASYNC_ROLLING" />
     </logger>
 
     <logger name="mega.privacy.android.data.gateway.TimberChatLogger" level="TRACE" >
-        <appender-ref ref="ROLLING_CHAT" />
+        <appender-ref ref="ASYNC_ROLLING_CHAT" />
     </logger>
 
     <logger name="mega.privacy.android.data.logging.LineNumberDebugTree">

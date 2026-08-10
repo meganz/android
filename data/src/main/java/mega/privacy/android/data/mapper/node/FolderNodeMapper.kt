@@ -5,6 +5,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.model.node.DefaultFolderNode
+import mega.privacy.android.data.extensions.expirationTimeOrNull
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -67,7 +68,7 @@ internal class FolderNodeMapper @Inject constructor(
         isMarkedSensitive = megaNode.isMarkedSensitive,
         isSensitiveInherited = megaApiGateway.isSensitiveInherited(megaNode),
         exportedData = megaNode.takeIf { megaNode.isExported }?.let {
-            ExportedData(it.publicLink, it.publicLinkCreationTime)
+            ExportedData(it.publicLink, it.publicLinkCreationTime, it.expirationTimeOrNull())
         },
         isTakenDown = megaNode.isTakenDown,
         isInRubbishBin = megaApiGateway.isInRubbish(megaNode),
@@ -77,6 +78,7 @@ internal class FolderNodeMapper @Inject constructor(
         isSynced = syncedNodeIds?.contains(NodeId(megaNode.handle)) ?: isSynced(megaNode),
         device = megaNode.deviceId,
         isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
+        isS4Container = megaApiGateway.isNodeS4Container(megaNode.handle),
         creationTime = megaNode.creationTime,
         fetchChildren = fetChildrenMapper(megaNode),
         serializedData = if (requireSerializedData) megaNode.serialize() else null,

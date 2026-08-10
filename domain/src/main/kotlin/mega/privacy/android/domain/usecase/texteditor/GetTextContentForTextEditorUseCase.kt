@@ -1,0 +1,178 @@
+package mega.privacy.android.domain.usecase.texteditor
+
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
+import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
+import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
+import mega.privacy.android.domain.usecase.streaming.StartStreamingServer
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import java.io.FileNotFoundException
+import javax.inject.Inject
+
+/**
+ * Use case to load text content for the text editor.
+ * Always loads gradually in chunks of lines so the first emission is quick and the UI stays responsive.
+ * Orchestrates: local path, then node local file, then streaming, then download.
+ *
+ * The returned flow uses [flowOn] with [ioDispatcher] so all upstream work
+ * (source resolution, streaming string processing, and file reads) runs off the main thread.
+ * Callers can safely collect on Main.
+ *
+ * For local paths (and after download), lines are read from disk in chunks. For streaming,
+ * the full content is fetched once then emitted in chunks; very large streamed content may use more memory.
+ *
+ * @param chunkSizeLines Max lines per emission (default 500).
+ * @return Flow of line chunks; caller should accumulate and cap display.
+ */
+class GetTextContentForTextEditorUseCase @Inject constructor(
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase,
+    private val getCacheFileUseCase: GetCacheFileUseCase,
+    private val startStreamingServer: StartStreamingServer,
+    private val getStreamingUriStringForNode: GetStreamingUriStringForNode,
+    private val downloadNodeUseCase: DownloadNodeUseCase,
+    private val fileSystemRepository: FileSystemRepository,
+    private val readStreamingContentUseCase: ReadStreamingContentUseCase,
+) {
+
+    /**
+     * Load text gradually in chunks of lines. First emission is quick for responsive UI.
+     * Throws on error; caller (e.g. ViewModel) should catch and map to UI state.
+     *
+     * @param nodeHandle Handle used to look up the node.
+     * @param localPath  Optional local file path to read directly.
+     * @param chunkSizeLines Max lines per emission (default 500).
+     */
+    operator fun invoke(
+        nodeHandle: Long,
+        localPath: String? = null,
+        chunkSizeLines: Int = 500,
+    ): Flow<List<String>> = flow {
+        val contextLocalPath = localPath
+        if (contextLocalPath != null &&
+            fileSystemRepository.doesFileExist(contextLocalPath) &&
+            !fileSystemRepository.isFolderPath(contextLocalPath)
+        ) {
+            emitAll(fileSystemRepository.readLinesFromPathInChunks(contextLocalPath, chunkSizeLines))
+            return@flow
+        }
+        val node = getNodeByIdUseCase(NodeId(nodeHandle)) as? TypedFileNode
+            ?: throw IllegalStateException("Node not found or not a file")
+        emitAll(buildContentFlow(node, localPath, chunkSizeLines))
+    }.flowOn(ioDispatcher)
+
+    /**
+     * Load text gradually in chunks of lines using a pre-resolved node (e.g. from chat).
+     * Skips the node handle lookup. First emission is quick for responsive UI.
+     * Throws on error; caller (e.g. ViewModel) should catch and map to UI state.
+     *
+     * @param resolvedNode Pre-resolved file node (e.g. from GetChatFileUseCase).
+     * @param localPath  Optional local file path to read directly.
+     * @param chunkSizeLines Max lines per emission (default 500).
+     */
+    operator fun invoke(
+        resolvedNode: TypedFileNode,
+        localPath: String? = null,
+        chunkSizeLines: Int = 500,
+    ): Flow<List<String>> = buildContentFlow(resolvedNode, localPath, chunkSizeLines)
+        .flowOn(ioDispatcher)
+
+    private fun buildContentFlow(
+        node: TypedFileNode,
+        localPath: String?,
+        chunkSizeLines: Int,
+    ): Flow<List<String>> = flow {
+        when (val resolved = resolveContentSource(node, localPath)) {
+            is ContentSource.LocalPath ->
+                emitAll(fileSystemRepository.readLinesFromPathInChunks(resolved.path, chunkSizeLines))
+
+            is ContentSource.StreamingContent -> {
+                val lines = resolved.content.split("\n")
+                lines.chunked(chunkSizeLines).forEach { emit(it) }
+            }
+        }
+    }
+
+    private suspend fun resolveContentSource(
+        node: TypedFileNode,
+        localPath: String?,
+    ): ContentSource {
+        val contextLocalPath = localPath
+        if (contextLocalPath != null &&
+            fileSystemRepository.doesFileExist(contextLocalPath) &&
+            !fileSystemRepository.isFolderPath(contextLocalPath)
+        ) {
+            return ContentSource.LocalPath(contextLocalPath)
+        }
+        val nodeLocalPath = getLocalFileForNodeUseCase(node)?.absolutePath
+        if (nodeLocalPath != null &&
+            fileSystemRepository.doesFileExist(nodeLocalPath) &&
+            fileSystemRepository.isFilePath(nodeLocalPath)
+        ) {
+            return ContentSource.LocalPath(nodeLocalPath)
+        }
+        return tryStreamingThenDownload(node)
+    }
+
+    private suspend fun tryStreamingThenDownload(node: TypedFileNode): ContentSource {
+        return runCatching {
+            startStreamingServer()
+            val urlString = getStreamingUriStringForNode(node)
+            if (!urlString.isNullOrBlank()) {
+                ContentSource.StreamingContent(readStreamingContentUseCase(urlString))
+            } else null
+        }.getOrNull() ?: ContentSource.LocalPath(downloadThenReadPath(node))
+    }
+
+    private suspend fun downloadThenReadPath(node: TypedFileNode): String {
+        val nodeFileName = node.name.ifEmpty { "file.txt" }
+        val destFile = getCacheFileUseCase(TEXT_EDITOR_TEMP_FOLDER, nodeFileName)
+            ?: throw IllegalStateException("Cannot get cache file for download")
+        val destDir = destFile.parentFile?.absolutePath
+            ?: throw IllegalStateException("Cannot resolve parent directory for download")
+        if (destFile.exists() && destFile.isDirectory) {
+            fileSystemRepository.deleteFile(destFile)
+        }
+        var finishError: MegaException? = null
+        var downloadedPath: String? = null
+        downloadNodeUseCase(
+            node = node,
+            destinationPath = destDir,
+            appData = listOf(TransferAppData.BackgroundTransfer),
+            isHighPriority = true,
+        ).collect { event ->
+            if (event is TransferEvent.TransferFinishEvent) {
+                if (event.error != null) {
+                    finishError = event.error
+                } else {
+                    downloadedPath = event.transfer.localPath
+                }
+            }
+        }
+        finishError?.let { throw it }
+        val resolvedPath = downloadedPath ?: destFile.absolutePath
+        if (!fileSystemRepository.doesFileExist(resolvedPath)) {
+            throw FileNotFoundException("Downloaded file not found: $resolvedPath")
+        }
+        return resolvedPath
+    }
+
+    /** Local file path to read from, or content already read from streaming URL. */
+    private sealed interface ContentSource {
+        data class LocalPath(val path: String) : ContentSource
+        data class StreamingContent(val content: String) : ContentSource
+    }
+}

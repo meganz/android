@@ -2,6 +2,9 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.content.res.Resources
+import android.os.LocaleList
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,6 +14,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.R
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.environment.DevicePowerConnectionStateMapper
 import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
@@ -19,6 +23,7 @@ import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
 import mega.privacy.android.domain.entity.environment.ThermalState
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import org.junit.jupiter.api.BeforeAll
+import java.util.Locale
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -41,6 +46,7 @@ internal class EnvironmentRepositoryImplTest {
     private val applicationIpAddressWrapper = mock<ApplicationIpAddressWrapper>()
     private val thermalStateMapper = mock<ThermalStateMapper>()
     private val devicePowerConnectionStateMapper = mock<DevicePowerConnectionStateMapper>()
+    private val appVersionMapper = mock<AppVersionMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -52,6 +58,7 @@ internal class EnvironmentRepositoryImplTest {
             applicationIpAddressWrapper = applicationIpAddressWrapper,
             thermalStateMapper = thermalStateMapper,
             devicePowerConnectionStateMapper = devicePowerConnectionStateMapper,
+            appVersionMapper = appVersionMapper
         )
     }
 
@@ -64,6 +71,7 @@ internal class EnvironmentRepositoryImplTest {
             applicationIpAddressWrapper,
             thermalStateMapper,
             devicePowerConnectionStateMapper,
+            appVersionMapper
         )
         whenever(deviceGateway.getCurrentDeviceLanguage()).thenReturn("en")
     }
@@ -175,5 +183,40 @@ internal class EnvironmentRepositoryImplTest {
         whenever(deviceGateway.getTimezone()).thenReturn(expectedTimezone)
 
         assertThat(underTest.getTimezone()).isEqualTo(expectedTimezone)
+    }
+
+    @Test
+    fun `test that getLocale returns the first locale from configuration when available`() {
+        val expectedLocale = Locale("fr", "FR")
+        val localeList = mock<LocaleList> {
+            on { size() }.thenReturn(1)
+            on { get(0) }.thenReturn(expectedLocale)
+        }
+        val configuration = mock<Configuration>()
+        val resources = mock<Resources>()
+        whenever(context.resources).thenReturn(resources)
+        whenever(resources.configuration).thenReturn(configuration)
+        whenever(configuration.locales).thenReturn(localeList)
+
+        val actual = underTest.getLocale()
+
+        assertThat(actual).isEqualTo(expectedLocale)
+    }
+
+    @Test
+    fun `test that getLocale returns default locale when configuration locales list is empty`() {
+        val defaultLocale = Locale.getDefault()
+        val localeList = mock<LocaleList> {
+            on { size() }.thenReturn(0)
+        }
+        val configuration = mock<Configuration>()
+        val resources = mock<Resources>()
+        whenever(context.resources).thenReturn(resources)
+        whenever(resources.configuration).thenReturn(configuration)
+        whenever(configuration.locales).thenReturn(localeList)
+
+        val actual = underTest.getLocale()
+
+        assertThat(actual).isEqualTo(defaultLocale)
     }
 }

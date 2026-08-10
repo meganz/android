@@ -8,8 +8,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
+import mega.privacy.android.shared.nodes.dialog.sharefolder.ShareHiddenNodeWarningDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,7 +26,9 @@ internal fun FileContactHomeScreen(
     shareRemovedEventHandled: () -> Unit,
     shareCompletedEventHandled: () -> Unit,
     navigateToInfo: (ShareRecipient) -> Unit,
-    addContact: (Long) -> Unit,
+    addContact: () -> Unit,
+    onShareHiddenNodeWarningConfirmed: () -> Unit,
+    onShareHiddenNodeWarningDismissed: () -> Unit,
     modifier: Modifier = Modifier,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
@@ -52,6 +56,14 @@ internal fun FileContactHomeScreen(
                 coroutineScope = coroutineScope,
                 snackbarHostState = snackbarHostState,
             )
+
+            if (state.sensitiveNodeShareWarning != SensitiveNodeShareWarning.None) {
+                ShareHiddenNodeWarningDialog(
+                    sharingMultipleFolders = state.sensitiveNodeShareWarning == SensitiveNodeShareWarning.Folders,
+                    onConfirm = onShareHiddenNodeWarningConfirmed,
+                    onCancel = onShareHiddenNodeWarningDismissed,
+                )
+            }
 
             if (newShareRecipients != null) {
                 if (state.accessPermissions.all { it == AccessPermission.READ }) {

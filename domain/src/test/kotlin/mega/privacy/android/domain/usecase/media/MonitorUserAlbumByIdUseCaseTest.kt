@@ -1,0 +1,202 @@
+package mega.privacy.android.domain.usecase.media
+
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.set.UserSet
+import mega.privacy.android.domain.repository.AlbumRepository
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
+
+/**
+ * Test class for [MonitorUserAlbumByIdUseCase]
+ */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+internal class MonitorUserAlbumByIdUseCaseTest {
+    private lateinit var underTest: MonitorUserAlbumByIdUseCase
+
+    private val albumRepository: AlbumRepository = mock()
+    private val getAlbumCoverPhotoUseCase: GetUserAlbumCoverPhotoUseCase = mock()
+
+    @BeforeEach
+    fun setUp() {
+        reset(albumRepository, getAlbumCoverPhotoUseCase)
+        underTest = MonitorUserAlbumByIdUseCase(
+            albumRepository = albumRepository,
+            getAlbumCoverPhotoUseCase = getAlbumCoverPhotoUseCase
+        )
+    }
+
+    @Test
+    fun `test that cached album is emitted on start`() = runTest {
+        val albumId = AlbumId(1L)
+        val userSet = createMockUserSet(id = 1L, name = "Test Album")
+        val updatedUserSets = listOf(createMockUserSet(id = 2L, name = "Other Album"))
+
+        whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(updatedUserSets))
+        whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
+        whenever(getAlbumCoverPhotoUseCase(albumId, false)).thenReturn(null)
+
+        underTest(albumId).test {
+            // First emission from onStart (cache, refresh = false)
+            val cachedAlbum = awaitItem()
+            assertThat(cachedAlbum).isNotNull()
+            assertThat(cachedAlbum?.id).isEqualTo(albumId)
+            assertThat(cachedAlbum?.title).isEqualTo("Test Album")
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that album is updated when user sets are updated`() = runTest {
+        val albumId = AlbumId(1L)
+        val initialUserSet = createMockUserSet(id = 1L, name = "Initial Album")
+        val updatedUserSet = createMockUserSet(id = 1L, name = "Updated Album")
+
+        whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(listOf(updatedUserSet)))
+        whenever(albumRepository.getUserSet(albumId))
+            .thenReturn(initialUserSet) // First call from onStart
+            .thenReturn(updatedUserSet) // Second call from mapLatest
+        whenever(getAlbumCoverPhotoUseCase(albumId, false)).thenReturn(null)
+        whenever(getAlbumCoverPhotoUseCase(albumId, true)).thenReturn(null)
+
+        underTest(albumId).test {
+            // First emission from onStart
+            val cachedAlbum = awaitItem()
+            assertThat(cachedAlbum?.title).isEqualTo("Initial Album")
+
+            // Second emission from monitorUserSetsUpdate
+            val updatedAlbum = awaitItem()
+            assertThat(updatedAlbum?.title).isEqualTo("Updated Album")
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that album cache is cleared when user sets are updated`() = runTest {
+        val albumId = AlbumId(1L)
+        val userSet = createMockUserSet(id = 1L, name = "Test Album")
+
+        whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(listOf(userSet)))
+        whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
+        whenever(getAlbumCoverPhotoUseCase(albumId, false)).thenReturn(null)
+        whenever(getAlbumCoverPhotoUseCase(albumId, true)).thenReturn(null)
+
+        underTest(albumId).test {
+            // First emission from onStart
+            awaitItem()
+
+            // Second emission from monitorUserSetsUpdate
+            awaitItem()
+
+            awaitComplete()
+        }
+
+        // Verify cache was cleared
+        verify(albumRepository).clearAlbumCache(albumId)
+    }
+
+    @Test
+    fun `test that null is emitted when album does not exist in cache`() = runTest {
+        val albumId = AlbumId(999L)
+        val updatedUserSets = listOf(createMockUserSet(id = 1L, name = "Other Album"))
+
+        whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(updatedUserSets))
+        whenever(albumRepository.getUserSet(albumId)).thenReturn(null)
+
+        underTest(albumId).test {
+            // First emission from onStart should be null
+            val cachedAlbum = awaitItem()
+            assertThat(cachedAlbum).isNull()
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that only cached album is emitted when album is not in updated sets`() = runTest {
+        val albumId = AlbumId(1L)
+        val initialUserSet = createMockUserSet(id = 1L, name = "Test Album")
+        val updatedUserSets = listOf(createMockUserSet(id = 2L, name = "Other Album"))
+
+        whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(updatedUserSets))
+        whenever(albumRepository.getUserSet(albumId))
+            .thenReturn(initialUserSet) // First call from onStart
+            .thenReturn(null) // Not in updated sets
+        whenever(getAlbumCoverPhotoUseCase(albumId, false)).thenReturn(null)
+
+        underTest(albumId).test {
+            // First emission from onStart
+            val cachedAlbum = awaitItem()
+            assertThat(cachedAlbum).isNotNull()
+            assertThat(cachedAlbum?.title).isEqualTo("Test Album")
+
+            // Flow completes since album is not in updated sets (filtered out by mapNotNull)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that album without cover photo is handled correctly`() = runTest {
+        val albumId = AlbumId(1L)
+        val userSet = createMockUserSet(id = 1L, name = "Album without Cover", cover = null)
+
+        whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(listOf(userSet)))
+        whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
+        whenever(getAlbumCoverPhotoUseCase(albumId, false)).thenReturn(null)
+        whenever(getAlbumCoverPhotoUseCase(albumId, true)).thenReturn(null)
+
+        underTest(albumId).test {
+            // First emission from onStart
+            val cachedAlbum = awaitItem()
+            assertThat(cachedAlbum).isNotNull()
+            assertThat(cachedAlbum?.cover).isNull()
+
+            // Second emission from monitorUserSetsUpdate
+            val updatedAlbum = awaitItem()
+            assertThat(updatedAlbum).isNotNull()
+            assertThat(updatedAlbum?.cover).isNull()
+
+            awaitComplete()
+        }
+    }
+
+    private fun createMockUserSet(
+        id: Long,
+        name: String,
+        cover: Long? = null,
+        creationTime: Long = 1000L,
+        modificationTime: Long = 2000L,
+        isExported: Boolean = false,
+    ): UserSet {
+        return mock<UserSet> {
+            on { this.id }.thenReturn(id)
+            on { this.name }.thenReturn(name)
+            on { this.cover }.thenReturn(cover)
+            on { this.creationTime }.thenReturn(creationTime)
+            on { this.modificationTime }.thenReturn(modificationTime)
+            on { this.isExported }.thenReturn(isExported)
+        }
+    }
+
+    private fun createMockPhoto(): Photo.Image {
+        return mock<Photo.Image> {
+            on { id }.thenReturn(1L)
+            on { name }.thenReturn("test_photo.jpg")
+            on { modificationTime }.thenReturn(LocalDateTime.now())
+        }
+    }
+
+}
+

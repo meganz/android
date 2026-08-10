@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -12,6 +14,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -30,6 +33,12 @@ interface TransferRepository {
 
     companion object {
         const val MAX_COMPLETED_TRANSFERS = 100
+
+        /**
+         * The valid range for the maximum number of transfer connections
+         * (both downloads and uploads).
+         */
+        val MAX_TRANSFER_CONNECTIONS_RANGE = 1..8
     }
 
     /**
@@ -119,6 +128,21 @@ interface TransferRepository {
     suspend fun broadcastTransferOverQuota(isCurrentOverQuota: Boolean)
 
     /**
+     * Monitor transfer over quota events, covering both over quota and almost over quota.
+     *
+     * Unlike [monitorTransferOverQuota], this emits an event on every occurrence rather than only
+     * on state changes.
+     */
+    fun monitorTransferOverQuotaEvent(): Flow<TransferOverQuotaStatus>
+
+    /**
+     * Broadcast a transfer over quota event.
+     *
+     * @param status the [TransferOverQuotaStatus] to broadcast
+     */
+    suspend fun broadcastTransferOverQuotaEvent(status: TransferOverQuotaStatus)
+
+    /**
      * Monitor storage over quota
      */
     fun monitorStorageOverQuota(): Flow<Boolean>
@@ -201,7 +225,7 @@ interface TransferRepository {
      * Get in progress transfers
      *
      */
-    suspend fun getInProgressTransfers(): List<Transfer>
+    suspend fun getInProgressTransfersFromSdk(): List<Transfer>
 
     /**
      * Monitors list of completed transfers
@@ -212,6 +236,12 @@ interface TransferRepository {
         limit: Int,
         vararg states: TransferState,
     ): Flow<List<CompletedTransfer>>
+
+    /**
+     * Get completed transfers
+     */
+    suspend fun getCompletedTransfers(): List<CompletedTransfer>
+
 
     /**
      * Add a list of completed transfer to local storage. Please note that completed transfers are pruned to prevent them from growing without limit.
@@ -294,6 +324,8 @@ interface TransferRepository {
      * should be deleted or not
      * @param shouldStartFirst Whether the file or folder should be placed on top of the upload
      * queue or not
+     * @param pitagTrigger [PitagTrigger].
+     * @param pitagTarget [PitagTarget].
      *
      * @return a Flow of [TransferEvent]
      */
@@ -305,58 +337,42 @@ interface TransferRepository {
         appData: List<TransferAppData>?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
+        pitagTrigger: PitagTrigger,
+        pitagTarget: PitagTarget,
     ): Flow<TransferEvent>
-
-    /**
-     * Get active transfer by uniqueId
-     */
-    suspend fun getActiveTransferByUniqueId(uniqueId: Long): ActiveTransfer?
-
-    /**
-     * Get active transfer by tag
-     *
-     * Make you sure you use this only for getting the parent folder Transfer using
-     * Transfer.folderTransferTag, otherwise it may lead to unexpected results.
-     */
-    suspend fun getActiveTransferByTag(tag: Int): ActiveTransfer?
 
     /**
      * Get active transfers by type
      * @return a flow of all active transfers list
      */
-    fun getActiveTransfersByType(transferType: TransferType): Flow<List<ActiveTransfer>>
+    fun monitorActiveTransfersByType(transferType: TransferType): Flow<List<ActiveTransfer>>
 
     /**
      * Get current active transfers by type
      * @return A list of all active transfers of this type
      */
-    suspend fun getCurrentActiveTransfersByType(transferType: TransferType): List<ActiveTransfer>
+    suspend fun getActiveTransfersByType(transferType: TransferType): List<ActiveTransfer>
 
     /**
      * Get current active transfers
      * @return all active transfers list
      */
-    suspend fun getCurrentActiveTransfers(): List<ActiveTransfer>
+    suspend fun getActiveTransfers(): Collection<ActiveTransfer>
 
     /**
-     * Insert a new active transfer or replace it if there's already an active transfer with the same tag
+     * Insert a new active transfer or replace it if there's already an active transfer with the same uniqueId
      */
-    suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer)
+    suspend fun putActiveTransfer(activeTransfer: Transfer)
 
     /**
-     * Insert (or replace  if there's already an active transfer with the same tag) a list of active transfers
+     * Insert (or replace  if there's already an active transfer with the same uniqueId) a list of active transfers
      */
-    suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>)
+    suspend fun putActiveTransfers(activeTransfers: List<ActiveTransfer>)
 
     /**
-     * Set or update the transferred bytes counter of this transfer
+     * Set or update the transfers if they are not already finished or has bigger progress
      */
-    suspend fun updateTransferredBytes(transfers: List<Transfer>)
-
-    /**
-     * Delete all active transfer of this type
-     */
-    suspend fun deleteAllActiveTransfersByType(transferType: TransferType)
+    suspend fun updateActiveTransfersBytes(transfers: List<Transfer>)
 
     /**
      * Delete all active transfer
@@ -364,17 +380,10 @@ interface TransferRepository {
     suspend fun deleteAllActiveTransfers()
 
     /**
-     * Set an active transfer as finished by its uniqueId
-     * @param uniqueIds the unique ids of the active transfers to be set as finished
-     * @param cancelled whether the transfer was cancelled or not
-     */
-    suspend fun setActiveTransfersAsFinishedByUniqueId(uniqueIds: List<Long>, cancelled: Boolean)
-
-    /**
      * Get active transfer totals by type
      * @return a flow of active transfer totals
      */
-    fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals>
+    fun monitorActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals>
 
     /**
      * Get the current active transfer totals by type
@@ -512,9 +521,9 @@ interface TransferRepository {
     fun monitorInProgressTransfers(): Flow<Map<Long, InProgressTransfer>>
 
     /**
-     * Remove in progress transfer by uniqueId.
+     * Get in progress transfers
      */
-    suspend fun removeInProgressTransfer(uniqueId: Long)
+    suspend fun getInProgressTransfers(): List<InProgressTransfer>
 
     /**
      * Remove a list of in progress transfers by uniqueId.
@@ -587,21 +596,6 @@ interface TransferRepository {
     suspend fun deleteAllPendingTransfers()
 
     /**
-     * Sets whether the user has denied the file access permission request
-     */
-    suspend fun setRequestFilesPermissionDenied()
-
-    /**
-     * Monitors whether the user has denied the file access permission request
-     */
-    fun monitorRequestFilesPermissionDenied(): Flow<Boolean>
-
-    /**
-     * Clear all preferences
-     */
-    suspend fun clearPreferences()
-
-    /**
      * Get the time during which transfers will be stopped due to a bandwidth over quota
      *
      * @return Time during which transfers will be stopped, otherwise 0
@@ -620,6 +614,18 @@ interface TransferRepository {
      * @return [ActiveTransferActionGroup] with this [id] or null if it's not found
      */
     suspend fun getActiveTransferGroupById(id: Int): ActiveTransferActionGroup?
+
+    /**
+     * Get all active transfer groups
+     *
+     * @return List of [ActiveTransferActionGroup]
+     */
+    suspend fun getActiveTransferGroups(): List<ActiveTransferActionGroup>
+
+    /**
+     * Delete an active transfers group by id
+     */
+    suspend fun deleteActiveTransferGroup(id: Int)
 
     /**
      * Broadcast transfer tag to cancel. Null it no transfer to cancel.
@@ -657,4 +663,37 @@ interface TransferRepository {
      * It should be set when the user sees the error (transfers section is opened)
      */
     fun clearTransferErrorStatus()
+
+    /**
+     * Clears cache related to completed transfers
+     */
+    fun clearCompletedTransfersCache()
+
+    /**
+     * Get the maximum number of download connections.
+     *
+     * @return the maximum number of download connections.
+     */
+    suspend fun getMaxDownloadConnections(): Int
+
+    /**
+     * Get the maximum number of upload connections.
+     *
+     * @return the maximum number of upload connections.
+     */
+    suspend fun getMaxUploadConnections(): Int
+
+    /**
+     * Set the maximum number of download connections.
+     *
+     * @param connections the maximum number of download connections.
+     */
+    suspend fun setMaxDownloadConnections(connections: Int)
+
+    /**
+     * Set the maximum number of upload connections.
+     *
+     * @param connections the maximum number of upload connections.
+     */
+    suspend fun setMaxUploadConnections(connections: Int)
 }

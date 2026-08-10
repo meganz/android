@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -55,14 +56,18 @@ class TransfersToolbarWidgetViewModel @Inject constructor(
 
         viewModelScope.launch {
             val samplePeriodFinal = samplePeriod ?: DEFAULT_SAMPLE_PERIOD
-            if (samplePeriodFinal > 0) {
-                monitorTransfersStatusUseCase().sample(samplePeriodFinal)
-            } else {
-                monitorTransfersStatusUseCase()
-            }
-                .catch { Timber.e(it) }
-                .collect { transfersInfo ->
-                    updateUiState(transfersInfo)
+            combine(
+                if (samplePeriodFinal > 0) {
+                    monitorTransfersStatusUseCase().sample(samplePeriodFinal)
+                } else {
+                    monitorTransfersStatusUseCase()
+                },
+                monitorConnectivityUseCase().skipUnstable(waitTimeToShowOffline, true) { it }
+            ) { transfersInfo, connected ->
+                transfersInfo to connected
+            }.catch { Timber.e(it) }
+                .collect { (transfersInfo, isOnline) ->
+                    updateUiState(transfersInfo, isOnline)
                 }
         }
         viewModelScope.launch {
@@ -71,16 +76,6 @@ class TransfersToolbarWidgetViewModel @Inject constructor(
                 .collect {
                     _state.update {
                         it.copy(lastTransfersCancelled = true)
-                    }
-                }
-        }
-        viewModelScope.launch {
-            monitorConnectivityUseCase()
-                .skipUnstable(waitTimeToShowOffline) { it }
-                .catch { Timber.e(it) }
-                .collect { online ->
-                    _state.update {
-                        it.copy(isOnline = online)
                     }
                 }
         }
@@ -115,6 +110,7 @@ class TransfersToolbarWidgetViewModel @Inject constructor(
      */
     private fun updateUiState(
         transfersStatusInfo: TransfersStatusInfo,
+        isOnline: Boolean,
     ) {
         val status = with(transfersStatusInfo) {
             if (pendingUploads + pendingDownloads <= 0) {
@@ -129,7 +125,7 @@ class TransfersToolbarWidgetViewModel @Inject constructor(
                     (transferOverQuota && (pendingUploads <= 0 || storageOverQuota))
                             || (storageOverQuota && pendingDownloads <= 0) -> TransfersToolbarWidgetStatus.OverQuota
 
-                    state.value.isTransferError || !state.value.isOnline -> TransfersToolbarWidgetStatus.Error
+                    state.value.isTransferError || !isOnline -> TransfersToolbarWidgetStatus.Error
                     else -> TransfersToolbarWidgetStatus.Transferring
                 }
             }
@@ -148,7 +144,14 @@ class TransfersToolbarWidgetViewModel @Inject constructor(
     }
 
     companion object {
-        private const val DEFAULT_SAMPLE_PERIOD = 500L
-        internal val waitTimeToShowOffline = 30_000L.milliseconds
+        /**
+         * Default sample period for transfers status updates (in milliseconds).
+         */
+        const val DEFAULT_SAMPLE_PERIOD = 500L
+
+        /**
+         * The duration time to wait before showing error status since the last registered "offline" state.
+         */
+        val waitTimeToShowOffline = 5_000L.milliseconds
     }
 }

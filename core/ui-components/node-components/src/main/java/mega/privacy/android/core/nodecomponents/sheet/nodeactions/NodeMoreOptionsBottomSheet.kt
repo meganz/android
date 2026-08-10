@@ -2,18 +2,24 @@
 
 package mega.privacy.android.core.nodecomponents.sheet.nodeactions
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
@@ -40,41 +46,56 @@ internal fun NodeMoreOptionsBottomSheet(
     onActionPressed: ((MenuActionWithIcon) -> Unit)? = null,
     onHelpClicked: ((MenuActionWithIcon) -> Unit)? = null,
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     MegaModalBottomSheet(
         bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
         sheetState = sheetState,
         modifier = modifier,
         onDismissRequest = onDismissRequest
     ) {
-        actions.distinct().forEach { action ->
-            FlexibleLineListItem(
-                modifier = Modifier
-                    .testTag(action.testTag),
-                title = action.getDescription(),
-                titleTextColor = action.getTextColor(),
-                leadingElement = {
-                    NodeActionIcon(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(24.dp),
-                        action = action,
-                        contentDescription = action.getDescription()
-                    )
-                },
-                trailingElement = {
-                    if (action is HideMenuAction) {
-                        HelpIcon(
+        BackHandler(sheetState.currentValue == SheetValue.Expanded) {
+            coroutineScope.launch {
+                sheetState.hide()
+            }.invokeOnCompletion {
+                onDismissRequest()
+            }
+        }
+
+        LazyColumn {
+            items(
+                items = actions,
+                key = { action -> action.testTag }
+            ) { action ->
+                FlexibleLineListItem(
+                    modifier = Modifier
+                        .testTag(action.testTag),
+                    title = action.getDescription(),
+                    titleTextColor = action.getTextColor(),
+                    leadingElement = {
+                        NodeActionIcon(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(24.dp),
                             action = action,
-                            contentDescription = "Help for ${action.getDescription()}",
-                            onHelpClicked = onHelpClicked
+                            contentDescription = action.getDescription()
                         )
-                    }
-                },
-                onClickListener = {
-                    onActionPressed?.invoke(action)
-                },
-                enableClick = action.enabled
-            )
+                    },
+                    trailingElement = {
+                        if (action is HideMenuAction) {
+                            HelpIcon(
+                                action = action,
+                                contentDescription = "Help for ${action.getDescription()}",
+                                onHelpClicked = onHelpClicked
+                            )
+                        }
+                    },
+                    onClickListener = {
+                        onActionPressed?.invoke(action)
+                    },
+                    enableClick = action.enabled
+                )
+            }
         }
     }
 }
@@ -92,7 +113,7 @@ private fun NodeActionIcon(
                 .size(24.dp),
             painter = action.getIconPainter(),
             contentDescription = contentDescription,
-            textColorTint = TextColor.Error,
+            textColorTint = TextColor.Brand,
         )
     } else {
         MegaIcon(
@@ -125,7 +146,7 @@ private fun HelpIcon(
 
 @Composable
 private fun MenuActionWithIcon.getTextColor(): TextColor = when (this) {
-    is TrashMenuAction -> TextColor.Error
+    is TrashMenuAction -> TextColor.Brand
     else -> TextColor.Primary
 }
 

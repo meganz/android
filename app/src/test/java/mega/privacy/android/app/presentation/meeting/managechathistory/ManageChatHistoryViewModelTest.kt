@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomUiMapper
-import mega.privacy.android.app.presentation.meeting.managechathistory.ManageChatHistoryViewModel
+import mega.privacy.android.app.presentation.meeting.model.newChatRoom
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRetentionTimeUpdateUseCase
 import mega.privacy.android.domain.usecase.chat.SetChatRetentionTimeUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_CHAT_ID
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -37,7 +38,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import mega.privacy.android.app.presentation.meeting.model.newChatRoom
 import java.util.stream.Stream
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -170,7 +170,7 @@ class ManageChatHistoryViewModelTest {
             setRetentionTime(chatRoomId = newChatRoomId, retentionTime = retentionTime)
 
             val actual =
-                savedStateHandle.get<Long>(Constants.CHAT_ID) ?: MEGACHAT_INVALID_HANDLE
+                savedStateHandle.get<Long>(LEGACY_CHAT_ID) ?: MEGACHAT_INVALID_HANDLE
             assertThat(actual).isEqualTo(newChatRoomId)
         }
 
@@ -296,7 +296,7 @@ class ManageChatHistoryViewModelTest {
     ) {
         savedStateHandle = SavedStateHandle(
             mapOf(
-                Constants.CHAT_ID to chatRoomId,
+                LEGACY_CHAT_ID to chatRoomId,
                 Constants.EMAIL to email
             )
         )

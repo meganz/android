@@ -1,36 +1,38 @@
 package mega.privacy.android.app.presentation.documentscanner
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalResources
+import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_CLOUD_DRIVE_PARENT_HANDLE
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_ORIGINATED_FROM_CHAT
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_SCAN_PDF_URI
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_SCAN_SOLO_IMAGE_URI
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.INITIAL_FILENAME_FORMAT
-import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
-import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.documentscanner.navigation.SaveScannedDocumentsDestination
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
 import mega.privacy.android.shared.resources.R as SharedR
-import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
-import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
 import javax.inject.Inject
 
 /**
@@ -45,13 +47,14 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
-    /**
-     * Handles the Passcode
-     */
     @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+    lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
 
-    private val viewModel by viewModels<SaveScannedDocumentsViewModel>()
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    @Inject
+    lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
 
     /**
      * onCreate
@@ -61,7 +64,8 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = themeMode.isDarkMode().not()
             systemUiController.setSystemBarsColor(
@@ -69,31 +73,78 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
                 darkIcons = useDarkIcons
             )
 
-            MegaAppContainer(
-                themeMode = themeMode,
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory
-            ) {
-                SaveScannedDocumentsScreen(
-                    viewModel = viewModel,
-                    onUploadScansStarted = { uriToUpload ->
-                        val uiState = viewModel.uiState.value
-                        if (uiState.originatedFromChat) {
-                            Analytics.tracker.trackEvent(
-                                if (uiState.scanFileType == ScanFileType.Pdf) {
-                                    DocumentScannerUploadingPDFToChatEvent
-                                } else {
-                                    DocumentScannerUploadingImageToChatEvent
-                                }
+            val initialNavKey = remember { buildInitialNavKey() }
+            LegacyActivityScaffold(
+                container = { content ->
+                    MegaAppContainer(
+                        themeMode = themeMode,
+                        finishOnSessionRefresh = false,
+                        content = content
+                    )
+                },
+                initialKey = initialNavKey,
+                navigationResultManager = navigationResultManager,
+                featureDestinations = featureDestinations,
+                appDialogDestinations = appDialogDestinations,
+                excludeOwnDestination = SaveScannedDocumentsDestination::class,
+                onEmptyBackStack = { if (!isFinishing) finish() },
+            ) { navigationHandler, _ ->
+                entry<SaveScannedDocumentsNavKey> { key ->
+                    val resources = LocalResources.current
+                    val viewModel =
+                        hiltViewModel<SaveScannedDocumentsViewModel, SaveScannedDocumentsViewModel.Factory> { factory ->
+                            factory.create(
+                                SaveScannedDocumentsViewModel.Args(
+                                    originatedFromChat = key.originatedFromChat,
+                                    cloudDriveParentHandle = key.cloudDriveParentHandle
+                                        ?.takeIf { it != -1L },
+                                    pdfUri = key.scanPdfUri.takeIf { it.isNotEmpty() }
+                                        ?.toUri(),
+                                    soloImageUri = key.scanSoloImageUri?.toUri(),
+                                    fileFormat = resources.getString(
+                                        SharedR.string.document_scanning_default_file_name
+                                    ),
+                                )
                             )
-                            redirectBackToChat(uriToUpload)
-                        } else {
-                            proceedToFileExplorer(uriToUpload)
                         }
-                    }
-                )
+                    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                    SaveScannedDocumentsView(
+                        uiState = uiState,
+                        onFilenameChanged = viewModel::onFilenameChanged,
+                        onFilenameConfirmed = viewModel::onFilenameConfirmed,
+                        onSaveButtonClicked = viewModel::onSaveButtonClicked,
+                        onScanDestinationSelected = viewModel::onScanDestinationSelected,
+                        onScanFileTypeSelected = viewModel::onScanFileTypeSelected,
+                        onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
+                        onUploadScansEventConsumed = viewModel::onUploadScansEventConsumed,
+                        onBackToChat = ::redirectBackToChat,
+                        onNavigate = { navKeys ->
+                            navigationHandler.navigate(navKeys)
+                            navigationHandler.remove(key)
+                        },
+                    )
+                }
             }
         }
     }
+
+    private fun buildInitialNavKey(): SaveScannedDocumentsNavKey =
+        SaveScannedDocumentsNavKey(
+            originatedFromChat = intent.getBooleanExtra(EXTRA_ORIGINATED_FROM_CHAT, false),
+            cloudDriveParentHandle = intent.getLongExtra(EXTRA_CLOUD_DRIVE_PARENT_HANDLE, -1L)
+                .takeIf { it != -1L },
+            scanPdfUri = intent.getUriExtra(EXTRA_SCAN_PDF_URI)?.toString().orEmpty(),
+            scanSoloImageUri = intent.getUriExtra(EXTRA_SCAN_SOLO_IMAGE_URI)?.toString(),
+        )
+
+    private fun Intent.getUriExtra(key: String): Uri? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getParcelableExtra(key, Uri::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            getParcelableExtra(key)
+        }
 
     /**
      * When the Activity is accessed from Chat and the Document Scanning finishes, this creates an
@@ -105,43 +156,9 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
     private fun redirectBackToChat(uriToUpload: Uri) {
         val intent = Intent().apply {
             setDataAndType(uriToUpload, contentResolver.getType(uriToUpload))
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        setResult(Activity.RESULT_OK, intent)
-        finish()
-    }
-
-    /**
-     * When the Activity is accessed from anywhere other than Cloud Drive and the Document Scanning
-     * finishes, this creates an [Intent] to [FileExplorerActivity] with the [Uri] containing the
-     * scans to be uploaded. This Activity gets finished afterwards
-     *
-     * @param uriToUpload The [Uri] containing the scans to be uploaded
-     */
-    private fun proceedToFileExplorer(uriToUpload: Uri) {
-        val uiState = viewModel.uiState.value
-        val scanDestination = viewModel.uiState.value.scanDestination
-
-        val intent = Intent(this, FileExplorerActivity::class.java).apply {
-            putExtra(Intent.EXTRA_STREAM, uriToUpload)
-            putExtra(FileExplorerActivity.EXTRA_SCAN_FILE_TYPE, uiState.scanFileType.ordinal)
-            putExtra(FileExplorerActivity.EXTRA_HAS_MULTIPLE_SCANS, !uiState.canSelectScanFileType)
-            when (scanDestination) {
-                ScanDestination.CloudDrive -> {
-                    action = FileExplorerActivity.ACTION_SAVE_TO_CLOUD
-                    putExtra(
-                        FileExplorerActivity.EXTRA_PARENT_HANDLE,
-                        uiState.cloudDriveParentHandle,
-                    )
-                }
-
-                ScanDestination.Chat -> {
-                    action = FileExplorerActivity.ACTION_UPLOAD_TO_CHAT
-                }
-            }
-            type = contentResolver.getType(uriToUpload)
-        }
-
-        startActivity(intent)
+        setResult(RESULT_OK, intent)
         finish()
     }
 

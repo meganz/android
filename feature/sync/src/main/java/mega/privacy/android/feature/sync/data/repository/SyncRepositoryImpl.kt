@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -24,7 +23,6 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncWorkManagerGateway
@@ -39,6 +37,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaSyncList
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class SyncRepositoryImpl @Inject constructor(
     private val syncWorkManagerGateway: SyncWorkManagerGateway,
@@ -50,7 +49,6 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val syncErrorMapper: SyncErrorMapper,
     private val syncTypeMapper: SyncTypeMapper,
     private val syncByWifiToNetworkTypeMapper: SyncByWifiToNetworkTypeMapper,
-    private val accountRepository: AccountRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : SyncRepository {
@@ -87,22 +85,21 @@ internal class SyncRepositoryImpl @Inject constructor(
             .getOrElse { emptyList() }
     }
 
-    private suspend fun mapToDomain(model: MegaSyncList): List<FolderPair> =
-        (0 until model.size())
+    private suspend fun mapToDomain(model: MegaSyncList): List<FolderPair> {
+        return (0 until model.size())
             .map { index ->
                 val folderPairModel = model.get(index)
                 val megaFolderName =
                     megaApiGateway.getMegaNodeByHandle(folderPairModel.megaHandle)?.name ?: ""
                 val syncStats = syncStatsCacheGateway.getSyncStatsById(folderPairModel.backupId)
-                val storageUsedPercentage =
-                    (100 * accountRepository.getUsedStorage() / accountRepository.getMaxStorage()).toInt()
                 folderPairMapper(
                     model = folderPairModel,
                     megaFolderName = megaFolderName,
                     syncStats = syncStats,
-                    isStorageOverQuota = storageUsedPercentage >= FULL_STORAGE_PERCENTAGE,
                 )
             }
+    }
+
 
     override suspend fun removeFolderPair(folderPairId: Long) = withContext(ioDispatcher) {
         syncGateway.removeFolderPair(folderPairId)
@@ -124,15 +121,15 @@ internal class SyncRepositoryImpl @Inject constructor(
                 MegaSyncListenerEvent.OnRefreshSyncState
             }
         ).flowOn(ioDispatcher)
-            .shareIn(appScope, SharingStarted.Eagerly)
+            .shareIn(appScope, SharingStarted.Lazily)
     }
-    override val syncChanges: Flow<MegaSyncListenerEvent> = _syncChanges
+    override val syncChanges: Flow<MegaSyncListenerEvent> get() = _syncChanges
 
     override suspend fun getSyncStalledIssues(): List<StalledIssue> = withContext(ioDispatcher) {
         runCatching {
             syncGateway.getSyncStalledIssues()?.let { stalledIssues ->
                 stalledIssuesMapper(
-                    syncs = monitorFolderPairChanges().first(),
+                    syncs = getFolderPairs(),
                     stalledIssues = stalledIssues
                 )
             }.orEmpty()
@@ -144,11 +141,12 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val _syncStalledIssues by lazy {
         _syncChanges
             .onEach {
-                delay(SYNC_REFRESH_DELAY)
+                delay(SYNC_REFRESH_DELAY.milliseconds)
             }
             .map { getSyncStalledIssues() }
+            .onStart { emit(getSyncStalledIssues()) }
             .flowOn(ioDispatcher)
-            .shareIn(appScope, SharingStarted.Eagerly, replay = 1)
+            .shareIn(appScope, SharingStarted.Lazily, replay = 1)
     }
 
     override fun monitorStalledIssues() = _syncStalledIssues
@@ -158,7 +156,7 @@ internal class SyncRepositoryImpl @Inject constructor(
             .map { getFolderPairs() }
             .onStart { emit(getFolderPairs()) }
             .flowOn(ioDispatcher)
-            .shareIn(appScope, SharingStarted.Eagerly, replay = 1)
+            .shareIn(appScope, SharingStarted.Lazily, replay = 1)
     }
 
     override fun monitorFolderPairChanges() = _folderPair
@@ -203,6 +201,15 @@ internal class SyncRepositoryImpl @Inject constructor(
         syncGateway.changeSyncLocalRoot(syncBackupId, newLocalSyncRootUri)
     }
 
+    override suspend fun getSyncedNodeIds(): List<NodeId> = withContext(ioDispatcher) {
+        runCatching {
+            val megaSyncList = syncGateway.getFolderPairs()
+            (0 until megaSyncList.size()).map { index ->
+                NodeId(megaSyncList.get(index).megaHandle)
+            }
+        }.getOrElse { emptyList() }
+    }
+
     private companion object {
         /**
          * Delay to ensure two things:
@@ -212,7 +219,5 @@ internal class SyncRepositoryImpl @Inject constructor(
          * issues that are later resolved by the following sync loop.
          */
         const val SYNC_REFRESH_DELAY = 5000L
-
-        const val FULL_STORAGE_PERCENTAGE = 100
     }
 }

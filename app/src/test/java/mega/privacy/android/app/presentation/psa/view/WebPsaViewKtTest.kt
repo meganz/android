@@ -9,10 +9,10 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.psa.model.PsaJavascriptInterface
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.android.core.ui.theme.values.TextColor
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,6 +40,7 @@ class WebPsaViewKtTest {
                         id = 0,
                         url = "https://megaad.nz/psa/test1.html"
                     ),
+                    onDisplay = {},
                     markAsSeen = {},
                 )
             }
@@ -59,12 +60,13 @@ class WebPsaViewKtTest {
                     url = "https://megaad.nz/psa/test1.html"
                 ),
                 markAsSeen = {},
+                onDisplay = {},
                 javascriptInterfaceFactory = { show, hide ->
                     jsInterface = PsaJavascriptInterface(
                         onShowPsa = show,
                         onHidePsa = hide
                     )
-                    jsInterface!!
+                    jsInterface
                 }
             )
         }
@@ -84,12 +86,13 @@ class WebPsaViewKtTest {
                     url = "https://megaad.nz/psa/test1.html"
                 ),
                 markAsSeen = markAsSeen,
+                onDisplay = {},
                 javascriptInterfaceFactory = { show, hide ->
                     jsInterface = PsaJavascriptInterface(
                         onShowPsa = show,
                         onHidePsa = hide
                     )
-                    jsInterface!!
+                    jsInterface
                 }
             )
         }
@@ -114,6 +117,7 @@ class WebPsaViewKtTest {
                     url = "https://megaad.nz/psa/test1.html"
                 ),
                 markAsSeen = markAsSeen,
+                onDisplay = {},
             )
         }
 

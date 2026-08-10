@@ -26,24 +26,24 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.DatePickerType.END_DATE
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.DatePickerType.START_DATE
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.DatePickerType.UNTIL
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.view.CreateScheduledMeetingView
 import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
-import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.CHAT_ID
+import mega.privacy.android.core.passcode.PasscodeCheck
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.CreateMeetingMaxDurationReachedEvent
 import mega.privacy.mobile.analytics.event.EditMeetingMaxDurationReachedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingCreateConfirmButtonEvent
@@ -60,7 +60,6 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Activity which shows scheduled meeting info screen.
@@ -111,7 +110,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
         collectFlows()
 
         val chatId = intent.getLongExtra(
-            CHAT_ID,
+            ChatNavKey.LEGACY_CHAT_ID,
             MegaChatApiJava.MEGACHAT_INVALID_HANDLE
         )
 
@@ -146,24 +145,11 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 if (shouldOpen) {
                     viewModel.setOnOpenAddContactConsumed()
                     Timber.d("Open Invite participants screen")
-                    addContactLauncher.launch(
-                        Intent(
-                            this@CreateScheduledMeetingActivity,
-                            AddContactActivity::class.java
-                        )
-                            .putExtra(
-                                Constants.INTENT_EXTRA_KEY_CONTACT_TYPE,
-                                Constants.CONTACT_TYPE_MEGA
-                            )
-                            .putStringArrayListExtra(
-                                Constants.INTENT_EXTRA_KEY_CONTACTS_SELECTED,
-                                viewModel.getEmails()
-                            )
-                            .putExtra(Constants.INTENT_EXTRA_KEY_CHAT, true)
-                            .putExtra(
-                                Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                                getString(R.string.add_participants_menu_item)
-                            )
+                    megaNavigator.openAddContactsForResult(
+                        context = this@CreateScheduledMeetingActivity,
+                        launcher = addContactLauncher,
+                        preselectedHandles = viewModel.getParticipantHandles(),
+                        preselectedEmails = viewModel.getEmails(),
                     )
                 }
             }
@@ -180,7 +166,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
             result,
             Intent().apply {
                 putExtra(
-                    CHAT_ID,
+                    ChatNavKey.LEGACY_CHAT_ID,
                     viewModel.state.value.chatIdToOpenInfoScreen
                 )
                 Timber.d("Chat id ${viewModel.state.value.chatIdToOpenInfoScreen}")

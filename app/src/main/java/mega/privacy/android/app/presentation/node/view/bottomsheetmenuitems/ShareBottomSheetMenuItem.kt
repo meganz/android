@@ -9,12 +9,13 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuAction
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.app.utils.Constants
-import mega.android.core.ui.model.menu.MenuAction
-import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -46,6 +47,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
     ) = node.isTakenDown.not()
             && accessPermission == AccessPermission.OWNER
             && isNodeInRubbish.not()
+            && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override val groupId = 7
 
@@ -94,13 +96,21 @@ class ShareBottomSheetMenuItem @Inject constructor(
                             name = node.name
                         )
                     } else {
-                        val exportPath = exportNodesUseCase(node.id)
-                        parentCoroutineScope.ensureActive()
-                        startShareIntent(
-                            context = context,
-                            path = exportPath,
-                            name = node.name
-                        )
+                        runCatching {
+                            exportNodesUseCase(
+                                nodeToExport = node.id,
+                                callerName = "ShareBottomSheetMenuItem"
+                            )
+                        }.onSuccess { exportPath ->
+                            parentCoroutineScope.ensureActive()
+                            startShareIntent(
+                                context = context,
+                                path = exportPath,
+                                name = node.name
+                            )
+                        }.onFailure {
+                            Timber.e(it)
+                        }
                     }
                 }
             }

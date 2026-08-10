@@ -1,0 +1,673 @@
+package mega.privacy.android.feature.photos.presentation.playlists.detail
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.NavigationEventEffect
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
+import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
+import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.AddContentFab
+import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveFavouriteMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.feature.photos.components.EditVideoPlaylistDialog
+import mega.privacy.android.feature.photos.components.VideoItemView
+import mega.privacy.android.feature.photos.components.VideoPlaylistDetailHeaderView
+import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
+import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailSelectionMenuAction
+import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistBottomSheet
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistRenameMenuAction
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTrashMenuAction
+import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG
+import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.destination.AddVideoToPlaylistNavKey
+import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
+import mega.privacy.android.shared.nodes.components.NodeLabelCircle
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.shared.resources.R as sharedR
+import java.util.Locale
+
+@Composable
+internal fun VideoPlaylistDetailRoute(
+    numberOfAddedVideos: Int?,
+    clearResult: (key: String) -> Unit,
+    navigate: (navKey: NavKey) -> Unit,
+    onBack: () -> Unit,
+    addedVideoIds: List<NodeId>? = null,
+    viewModel: VideoPlaylistDetailViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val videoPlaylistEditState by viewModel.videoPlaylistEditState.collectAsStateWithLifecycle()
+    val navigateEvent by viewModel.navigateToVideoPlayerEvent.collectAsStateWithLifecycle()
+
+    NavigationEventEffect(
+        event = navigateEvent,
+        onConsumed = viewModel::resetNavigateToVideoPlayer,
+        action = navigate
+    )
+
+    // Videos picked from the cloud explorer (AddVideoToPlaylistNavKey) are added here.
+    LaunchedEffect(addedVideoIds) {
+        val videoIds = addedVideoIds ?: return@LaunchedEffect
+        if (videoIds.isNotEmpty()) {
+            viewModel.addVideosToPlaylist(videoIds)
+        }
+        clearResult(AddVideoToPlaylistNavKey.RESULT)
+    }
+
+    VideoPlaylistDetailScreen(
+        uiState = uiState,
+        videoPlaylistEditState = videoPlaylistEditState,
+        numberOfAddedVideos = numberOfAddedVideos,
+        showRenameVideoPlaylistDialog = viewModel::showUpdateVideoPlaylistDialog,
+        updatedVideoPlaylistTitle = viewModel::updateVideoPlaylistTitle,
+        resetErrorMessage = viewModel::resetEditVideoPlaylistErrorMessage,
+        resetShowRenameVideoPlaylistDialog = viewModel::resetUpdateVideoPlaylistDialogEvent,
+        resetUpdateTitleSuccessEvent = viewModel::resetUpdateTitleSuccessEvent,
+        onDeleteButtonClicked = viewModel::removeVideoPlaylists,
+        onConsumedPlaylistRemovedEvent = viewModel::resetPlaylistsRemovedEvent,
+        onClick = viewModel::onItemClicked,
+        onLongClick = viewModel::onItemLongClicked,
+        selectAll = viewModel::selectAllVideos,
+        clearSelection = viewModel::clearSelection,
+        resetRemoveVideosEvent = viewModel::resetNumberOfRemovedVideosEvent,
+        resetAddedVideosEvent = viewModel::resetNumberOfAddedVideosEvent,
+        removeVideosFromPlaylist = viewModel::removeVideosFromPlaylist,
+        clearResultFlow = clearResult,
+        navigate = navigate,
+        onBack = onBack,
+        onMenuClick = navigate,
+        onSortNodes = viewModel::setCloudSortOrder
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun VideoPlaylistDetailScreen(
+    uiState: VideoPlaylistDetailUiState,
+    videoPlaylistEditState: VideoPlaylistEditState,
+    numberOfAddedVideos: Int?,
+    onBack: () -> Unit,
+    removeVideosFromPlaylist: (List<Long>) -> Unit,
+    modifier: Modifier = Modifier,
+    showRenameVideoPlaylistDialog: () -> Unit = {},
+    updatedVideoPlaylistTitle: (NodeId, String) -> Unit = { _, _ -> },
+    resetErrorMessage: () -> Unit = {},
+    resetShowRenameVideoPlaylistDialog: () -> Unit = {},
+    resetUpdateTitleSuccessEvent: () -> Unit = {},
+    onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
+    onConsumedPlaylistRemovedEvent: () -> Unit = {},
+    onClick: (item: VideoUiEntity) -> Unit = {},
+    onLongClick: (item: VideoUiEntity) -> Unit = {},
+    selectAll: () -> Unit = {},
+    clearSelection: () -> Unit = {},
+    navigate: (NavKey) -> Unit = {},
+    clearResultFlow: (key: String) -> Unit = {},
+    resetRemoveVideosEvent: () -> Unit = {},
+    resetAddedVideosEvent: () -> Unit = {},
+    onMenuClick: (NavKey) -> Unit = {},
+    onSortNodes: (NodeSortConfiguration) -> Unit = {},
+    multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(),
+) {
+    val resources = LocalResources.current
+    val lazyListState = rememberLazyListState()
+    var showPlaylistBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val playlistBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showRemovedPlaylistDialog by rememberSaveable { mutableStateOf(false) }
+    var showRemovedVideosDialog by rememberSaveable { mutableStateOf(false) }
+    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val snackbarHostState = LocalSnackBarHostState.current
+
+    val dataState = uiState as? VideoPlaylistDetailUiState.Data
+    val selectedNodes = dataState?.selectedTypedNodes ?: emptySet()
+    val areAllVideosSelected = dataState?.areAllSelected ?: false
+    val videoSelectedCount = dataState?.selectedCount ?: 0
+
+    BackHandler(videoSelectedCount > 0) {
+        clearSelection()
+    }
+
+    MegaScaffoldWithTopAppBarScrollBehavior(
+        modifier = modifier
+            .fillMaxSize()
+            .semantics { testTagsAsResourceId = true },
+        floatingActionButton = {
+            if (dataState?.playlistDetail?.uiEntity?.isSystemVideoPlayer == false) {
+                AddContentFab(
+                    modifier = Modifier
+                        .applyScrollToHideFabBehavior()
+                        .testTag(VIDEO_PLAYLIST_DETAIL_ADD_VIDEO_FAB_TEST_TAG),
+                    visible = selectedNodes.isEmpty(),
+                    onClick = {
+                        if (uiState.isCloudExplorerAvailable) {
+                            val addedVideos = uiState.playlistDetail?.videos?.map { it.id }
+                                ?: emptyList()
+                            navigate(AddVideoToPlaylistNavKey(addedVideos))
+                        } else {
+                            val playlistHandle = dataState.playlistDetail.uiEntity.id.longValue
+                            navigate(
+                                SelectVideosForPlaylistNavKey(playlistHandle = playlistHandle)
+                            )
+                        }
+                    }
+                )
+            }
+        },
+        topBar = {
+            MegaTopAppBar(
+                modifier = Modifier
+                    .testTag(VIDEO_PLAYLISTS_DETAIL_APP_BAR_VIEW_TEST_TAG),
+                navigationType = AppBarNavigationType.Back(onBack),
+                title = if (videoSelectedCount > 0) {
+                    String.format(Locale.ROOT, "%s", videoSelectedCount)
+                } else {
+                    dataState?.playlistDetail?.uiEntity?.title ?: ""
+                },
+                actions = buildList {
+                    val isSystemPlaylist =
+                        dataState?.playlistDetail?.uiEntity?.isSystemVideoPlayer == true
+                    when {
+                        videoSelectedCount > 0 -> {
+                            if (!areAllVideosSelected) {
+                                add(CommonMenuAction.SelectAll)
+                            }
+                        }
+
+                        isSystemPlaylist -> {
+                            add(VideoPlaylistDetailSelectionMenuAction.SortOrder)
+                        }
+
+                        else -> add(CommonMenuAction.More)
+                    }
+                },
+                onActionPressed = { action ->
+                    when (action) {
+                        is CommonMenuAction.More -> showPlaylistBottomSheet = true
+                        is CommonMenuAction.SelectAll -> selectAll()
+                        is VideoPlaylistDetailSelectionMenuAction.SortOrder ->
+                            showSortBottomSheet = true
+                    }
+                }
+            )
+        },
+        bottomBar = {
+            SelectionModeBottomBar(
+                visible = videoSelectedCount > 0,
+                actions = dataState?.bottomBarActions ?: emptyList(),
+                onActionPressed = { action ->
+                    when (action) {
+                        is VideoPlaylistDetailSelectionMenuAction.Hide -> {
+                            multiNodeActionHandler(
+                                HideMenuAction(),
+                                selectedNodes.toList()
+                            )
+                            clearSelection()
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.Unhide -> {
+                            multiNodeActionHandler(
+                                UnhideMenuAction(),
+                                selectedNodes.toList()
+                            )
+                            clearSelection()
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.RemoveFromPlaylist -> {
+                            showRemovedVideosDialog = true
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.Download -> {
+                            multiNodeActionHandler(
+                                DownloadMenuAction(),
+                                selectedNodes.toList()
+                            )
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.SendToChat -> {
+                            multiNodeActionHandler(
+                                SendToChatMenuAction(),
+                                selectedNodes.toList()
+                            )
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.Share -> {
+                            multiNodeActionHandler(
+                                ShareMenuAction(),
+                                selectedNodes.toList()
+                            )
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.RemoveFavourite -> {
+                            multiNodeActionHandler(
+                                RemoveFavouriteMenuAction(),
+                                selectedNodes.toList()
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        when (uiState) {
+            is VideoPlaylistDetailUiState.Loading -> NodesViewSkeleton(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .testTag(VIDEO_PLAYLIST_DETAIL_LOADING_VIEW_TEST_TAG),
+                isListView = true,
+                contentPadding = PaddingValues()
+            )
+
+            is VideoPlaylistDetailUiState.Data -> {
+                EventEffect(
+                    event = videoPlaylistEditState.updateTitleSuccessEvent,
+                    onConsumed = resetUpdateTitleSuccessEvent,
+                    action = {
+                        resetShowRenameVideoPlaylistDialog()
+                        snackbarHostState?.showAutoDurationSnackbar(
+                            resources.getString(sharedR.string.context_correctly_renamed)
+                        )
+                    }
+                )
+
+                EventEffect(
+                    event = videoPlaylistEditState.playlistsRemovedEvent,
+                    onConsumed = {
+                        showRemovedPlaylistDialog = false
+                        onConsumedPlaylistRemovedEvent()
+                    },
+                    action = { deletedVideoPlaylistTitles ->
+                        if (deletedVideoPlaylistTitles.isNotEmpty()) {
+                            val deletedMessage = if (deletedVideoPlaylistTitles.size == 1) {
+                                resources.getString(
+                                    sharedR.string.video_section_playlists_delete_playlists_message_singular,
+                                    deletedVideoPlaylistTitles[0]
+                                )
+                            } else {
+                                resources.getQuantityString(
+                                    sharedR.plurals.video_section_playlists_delete_playlists_message,
+                                    deletedVideoPlaylistTitles.size,
+                                    deletedVideoPlaylistTitles.size
+                                )
+                            }
+                            snackbarHostState?.showAutoDurationSnackbar(deletedMessage)
+                        }
+                        onBack()
+                    }
+                )
+
+                EventEffect(
+                    event = videoPlaylistEditState.numberOfRemovedVideosEvent,
+                    onConsumed = resetRemoveVideosEvent,
+                ) { number ->
+                    if (number > 0) {
+                        val title = uiState.playlistDetail?.uiEntity?.title ?: ""
+                        val message = resources.getQuantityString(
+                            sharedR.plurals.video_section_playlist_detail_remove_videos_message,
+                            number,
+                            number,
+                            title
+                        )
+                        snackbarHostState?.showAutoDurationSnackbar(message)
+                    }
+                }
+
+                EventEffect(
+                    event = videoPlaylistEditState.numberOfAddedVideosEvent,
+                    onConsumed = resetAddedVideosEvent,
+                ) { number ->
+                    if (number > 0) {
+                        val title = uiState.playlistDetail?.uiEntity?.title ?: ""
+                        val message = resources.getQuantityString(
+                            sharedR.plurals.video_section_playlist_detail_add_videos_message,
+                            number,
+                            number,
+                            title
+                        )
+                        snackbarHostState?.showAutoDurationSnackbar(message)
+                    }
+                }
+
+                LaunchedEffect(numberOfAddedVideos, uiState.playlistDetail?.uiEntity?.title) {
+                    val number = numberOfAddedVideos ?: 0
+                    if (number <= 0) return@LaunchedEffect
+                    val title = uiState.playlistDetail?.uiEntity?.title ?: return@LaunchedEffect
+                    val message = resources.getQuantityString(
+                        sharedR.plurals.video_section_playlist_detail_add_videos_message,
+                        number,
+                        number,
+                        title
+                    )
+                    snackbarHostState?.showAutoDurationSnackbar(message)
+                    clearResultFlow(SelectVideosForPlaylistNavKey.RESULT)
+                }
+
+                val playlistDetail = uiState.playlistDetail
+                if (playlistDetail == null || playlistDetail.videos.isEmpty()
+                ) {
+                    VideoPlaylistDetailEmptyView(
+                        title = playlistDetail?.uiEntity?.title,
+                        totalDuration = playlistDetail?.uiEntity?.totalDuration,
+                        numberOfVideos = playlistDetail?.uiEntity?.numberOfVideos,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                } else {
+                    val items = uiState.playlistDetail.videos
+                    FastScrollLazyColumn(
+                        state = lazyListState,
+                        totalItems = items.size,
+                        contentPadding = PaddingValues(
+                            bottom = innerPadding.calculateSafeBottomPadding()
+                        ),
+                        modifier = Modifier
+                            .padding(
+                                PaddingValues(
+                                    top = innerPadding.calculateTopPadding(),
+                                    end = innerPadding.calculateEndPadding(LocalLayoutDirection.current)
+                                )
+                            )
+                            .testTag(VIDEO_PLAYLISTS_DETAIL_PLAYLIST_DETAIL_VIEW_TEST_TAG)
+                    ) {
+                        item(key = "header") {
+                            VideoPlaylistDetailHeaderView(
+                                thumbnailList =
+                                    playlistDetail.uiEntity.thumbnailList?.map { id ->
+                                        ThumbnailRequest(id)
+                                    },
+                                title = playlistDetail.uiEntity.title,
+                                totalDuration = playlistDetail.uiEntity.totalDuration,
+                                numberOfVideos = playlistDetail.uiEntity.numberOfVideos,
+                                modifier = Modifier.padding(16.dp),
+                                onPlayAllClicked = { onClick(items[0]) },
+                                enabled = !uiState.isSelectionMode
+                            )
+                        }
+
+                        items(items = items, key = { it.id.longValue }) { videoItem ->
+                            VideoItemView(
+                                icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
+                                name = videoItem.name,
+                                description = videoItem.description?.replace("\n", " "),
+                                fileSize = formatFileSize(videoItem.size, LocalContext.current),
+                                duration = videoItem.durationString,
+                                isFavourite = videoItem.isFavourite,
+                                isSelected = videoItem.isSelected,
+                                isSelectionMode = uiState.isSelectionMode,
+                                isSharedWithPublicLink = videoItem.isSharedItems,
+                                labelView = {
+                                    videoItem.nodeLabel?.let { label ->
+                                        NodeLabelCircle(
+                                            modifier = Modifier.padding(start = 10.dp),
+                                            label = label
+                                        )
+                                    }
+                                },
+                                thumbnailData = ThumbnailRequest(videoItem.id),
+                                nodeAvailableOffline = videoItem.nodeAvailableOffline,
+                                onClick = { onClick(videoItem) },
+                                onMenuClick = {
+                                    onMenuClick(
+                                        NodeOptionsBottomSheetNavKey(
+                                            nodeHandle = videoItem.id.longValue,
+                                            nodeSourceType = NodeSourceType.VIDEO_PLAYLISTS
+                                        )
+                                    )
+                                },
+                                onLongClick = {
+                                    onLongClick(videoItem)
+                                },
+                                isSensitive = uiState.showHiddenItems &&
+                                        (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
+                                isTakenDown = videoItem.isTakenDown
+                            )
+                        }
+                    }
+                }
+
+                if (showPlaylistBottomSheet) {
+                    VideoPlaylistBottomSheet(
+                        actions = listOf(
+                            VideoPlaylistRenameMenuAction(),
+                            VideoPlaylistsTrashMenuAction()
+                        ),
+                        sheetState = playlistBottomSheetState,
+                        onActionClicked = { action ->
+                            when (action) {
+                                is VideoPlaylistRenameMenuAction -> showRenameVideoPlaylistDialog()
+                                is VideoPlaylistsTrashMenuAction -> {
+                                    showRemovedPlaylistDialog = true
+                                    showPlaylistBottomSheet = false
+                                }
+                            }
+                        },
+                        onDismissRequest = {
+                            showPlaylistBottomSheet = false
+                        },
+                        modifier = Modifier.testTag(VIDEO_PLAYLIST_DETAIL_BOTTOM_SHEET_TEST_TAG)
+                    )
+                }
+
+                if (videoPlaylistEditState.showUpdateVideoPlaylist) {
+                    EditVideoPlaylistDialog(
+                        modifier = Modifier.testTag(
+                            VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG
+                        ),
+                        handle = playlistDetail?.uiEntity?.id?.longValue ?: -1L,
+                        title = stringResource(id = sharedR.string.context_rename),
+                        positiveButtonText = stringResource(id = sharedR.string.context_rename),
+                        onConfirm = { handle, title ->
+                            updatedVideoPlaylistTitle(NodeId(handle), title)
+                            showPlaylistBottomSheet = false
+                        },
+                        resetErrorMessage = resetErrorMessage,
+                        onDismiss = {
+                            resetShowRenameVideoPlaylistDialog()
+                        },
+                        initialInputText = playlistDetail?.uiEntity?.title ?: "",
+                        errorText = videoPlaylistEditState.editVideoPlaylistErrorMessage,
+                    )
+                }
+
+                if (showRemovedPlaylistDialog) {
+                    BasicDialog(
+                        modifier = Modifier.testTag(
+                            VIDEO_PLAYLIST_DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
+                        ),
+                        title = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_title),
+                        description = null,
+                        positiveButtonText = stringResource(sharedR.string.video_section_playlists_delete_playlist_dialog_delete_button),
+                        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+                        onPositiveButtonClicked = {
+                            uiState.playlistDetail?.uiEntity?.let {
+                                onDeleteButtonClicked(setOf(it))
+                            }
+                            showRemovedPlaylistDialog = false
+                        },
+                        onNegativeButtonClicked = { showRemovedPlaylistDialog = false },
+                        onDismiss = { showRemovedPlaylistDialog = false }
+                    )
+                }
+
+                if (showRemovedVideosDialog) {
+                    BasicDialog(
+                        modifier = Modifier.testTag(
+                            VIDEO_PLAYLIST_DETAIL_REMOVE_VIDEOS_DIALOG_TEST_TAG
+                        ),
+                        title = stringResource(id = sharedR.string.video_section_playlist_detail_remove_videos_dialog_title),
+                        description = null,
+                        positiveButtonText = stringResource(sharedR.string.video_section_playlist_detail_remove_videos_dialog_remove_button),
+                        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+                        onPositiveButtonClicked = {
+                            dataState?.selectedElementIds?.takeIf { it.isNotEmpty() }?.let { ids ->
+                                removeVideosFromPlaylist(ids.toList())
+                            }
+                            showRemovedVideosDialog = false
+                            clearSelection()
+                        },
+                        onNegativeButtonClicked = { showRemovedVideosDialog = false },
+                        onDismiss = { showRemovedVideosDialog = false }
+                    )
+                }
+
+                if (showSortBottomSheet) {
+                    SortBottomSheet(
+                        modifier = Modifier.testTag(VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG),
+                        title = stringResource(sharedR.string.action_sort_by_header),
+                        options = NodeSortOption.getOptionsForSourceType(NodeSourceType.CLOUD_DRIVE),
+                        sheetState = sortBottomSheetState,
+                        selectedSort = SortBottomSheetResult(
+                            sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                            sortDirection = uiState.selectedSortConfiguration.sortDirection
+                        ),
+                        onSortOptionSelected = { result ->
+                            result?.let {
+                                onSortNodes(
+                                    NodeSortConfiguration(
+                                        sortOption = it.sortOptionItem,
+                                        sortDirection = it.sortDirection
+                                    )
+                                )
+                                showSortBottomSheet = false
+                            }
+                        },
+                        onDismissRequest = {
+                            showSortBottomSheet = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun VideoPlaylistDetailEmptyView(
+    title: String?,
+    totalDuration: String?,
+    numberOfVideos: Int?,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.testTag(VIDEO_PLAYLIST_DETAIL_VIDEOS_EMPTY_VIEW_TEST_TAG)) {
+        VideoPlaylistDetailHeaderView(
+            thumbnailList = null,
+            title = title,
+            totalDuration = totalDuration,
+            numberOfVideos = numberOfVideos,
+            modifier = Modifier.padding(16.dp),
+            enabled = false,
+            onPlayAllClicked = {}
+        )
+
+        EmptyStateView(
+            title = stringResource(id = sharedR.string.videos_tab_empty_hint_video),
+            imagePainter = painterResource(id = iconPackR.drawable.ic_video_glass)
+        )
+    }
+}
+
+/**
+ * Test tag for the video playlist detail loading view
+ */
+internal const val VIDEO_PLAYLIST_DETAIL_LOADING_VIEW_TEST_TAG =
+    "video_playlist_detail:view_loading"
+
+/**
+ * Test tag for the video playlist detail videos empty view
+ */
+internal const val VIDEO_PLAYLIST_DETAIL_VIDEOS_EMPTY_VIEW_TEST_TAG =
+    "video_playlist_detail:view_videos_empty"
+
+/**
+ * Test tag for the video playlist detail view
+ */
+internal const val VIDEO_PLAYLISTS_DETAIL_PLAYLIST_DETAIL_VIEW_TEST_TAG =
+    "video_playlists_detail:view_playlist_detail"
+
+/**
+ * Test tag for the video playlist detail app bar
+ */
+internal const val VIDEO_PLAYLISTS_DETAIL_APP_BAR_VIEW_TEST_TAG =
+    "video_playlists_detail:view_app_bar"
+
+/**
+ * Test tag for RenameVideoPlaylistDialog
+ */
+internal const val VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+    "video_playlist_detail:dialog_rename_video_playlist"
+
+/**
+ * Test tag for VideoPlaylistBottomSheet
+ */
+internal const val VIDEO_PLAYLIST_DETAIL_BOTTOM_SHEET_TEST_TAG =
+    "video_playlist_detail:bottom_sheet"
+
+/**
+ * Test tag for delete video playlist dialog
+ */
+internal const val VIDEO_PLAYLIST_DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+    "video_playlist_detail:dialog_delete_video_playlist"
+
+/**
+ * Test tag for removing videos dialog
+ */
+internal const val VIDEO_PLAYLIST_DETAIL_REMOVE_VIDEOS_DIALOG_TEST_TAG =
+    "video_playlist_detail:dialog_remove_videos"
+
+/**
+ * Test tag for adding video to playlist FAB
+ */
+internal const val VIDEO_PLAYLIST_DETAIL_ADD_VIDEO_FAB_TEST_TAG =
+    "video_playlist_detail:add_video_fab"

@@ -2,12 +2,12 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.SortOrderSource
+import mega.privacy.android.data.database.dao.RecentSearchDao
+import mega.privacy.android.data.database.entity.RecentSearchEntity
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -18,6 +18,8 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.search.SearchParameters
+import mega.privacy.android.domain.extension.getNodeMappingStrategy
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -41,8 +43,10 @@ internal class SearchRepositoryImpl @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
+    private val recentSearchDao: RecentSearchDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SearchRepository {
+
     override suspend fun search(
         nodeId: NodeId?,
         order: SortOrder,
@@ -71,7 +75,6 @@ internal class SearchRepositoryImpl @Inject constructor(
         }
         mapMegaNodesToUnTypedNodes(searchList.await(), offlineItems.await())
     }
-
 
     override suspend fun getChildren(
         nodeId: NodeId?,
@@ -107,23 +110,16 @@ internal class SearchRepositoryImpl @Inject constructor(
     private suspend fun mapMegaNodesToUnTypedNodes(
         childList: List<MegaNode>,
         offlineItems: Map<String, Offline>?,
-    ): List<UnTypedNode> = coroutineScope {
-        val semaphore = Semaphore(10)
-        childList.map { megaNode ->
-            async {
-                semaphore.withPermit {
-                    nodeMapper(
-                        megaNode = megaNode,
-                        offline = offlineItems?.get(megaNode.handle.toString())
-                    )
-                }
-            }
-        }.awaitAll()
-    }
+    ): List<UnTypedNode> = childList.mapAsync(getNodeMappingStrategy(childList.size)) {
+        nodeMapper(
+            megaNode = it,
+            offline = offlineItems?.get(it.handle.toString())
+        )
+    }.filterNotNull()
 
     override suspend fun getInShares() = withContext(ioDispatcher) {
         megaApiGateway.getInShares(sortOrderIntMapper(getOthersSortOrder())).let { list ->
-            list.map { nodeMapper(it) }
+            list.mapNotNull { nodeMapper(it) }
         }
     }
 
@@ -144,20 +140,18 @@ internal class SearchRepositoryImpl @Inject constructor(
                 }
             }
         }
-        searchNodes.map { nodeMapper(it) }
+        searchNodes.mapNotNull { nodeMapper(it) }
     }
 
-    override suspend fun getPublicLinks(isSingleActivityEnabled: Boolean) =
+    override suspend fun getPublicLinks() =
         withContext(ioDispatcher) {
             megaApiGateway.getPublicLinks(
                 sortOrderIntMapper(
-                    getLinksSOrtOrderUseCase(
-                        isSingleActivityEnabled
-                    )
+                    getLinksSOrtOrderUseCase(true)
                 )
             )
                 .let { list ->
-                    list.map { nodeMapper(it) }
+                    list.mapNotNull { nodeMapper(it) }
                 }
         }
 
@@ -181,5 +175,26 @@ internal class SearchRepositoryImpl @Inject constructor(
 
     override suspend fun getInvalidHandle(): NodeId = withContext(ioDispatcher) {
         NodeId(megaApiGateway.getInvalidHandle())
+    }
+
+    override suspend fun saveRecentSearch(query: String) {
+        if (query.isNotEmpty()) {
+            recentSearchDao.insertRecentSearchWithPrefixCleanup(
+                RecentSearchEntity(
+                    searchQuery = query,
+                    timestamp = System.currentTimeMillis()
+                )
+            )
+        }
+    }
+
+    override fun monitorRecentSearches(): Flow<List<String>> =
+        recentSearchDao.monitorRecentSearches()
+            .map { entities ->
+                entities.map { it.searchQuery }
+            }
+
+    override suspend fun clearRecentSearches() {
+        recentSearchDao.clearRecentSearches()
     }
 }

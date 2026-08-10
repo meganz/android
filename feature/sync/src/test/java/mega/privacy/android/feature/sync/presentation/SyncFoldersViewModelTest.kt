@@ -4,6 +4,7 @@ import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -196,6 +197,7 @@ internal class SyncFoldersViewModelTest {
         )
 
         whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(stalledIssues))
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow { awaitCancellation() })
     }
 
     @AfterEach
@@ -323,6 +325,68 @@ internal class SyncFoldersViewModelTest {
         }
 
     @Test
+    fun `test that selected mega folder hides stop backup dialog before move completes`() =
+        runTest {
+            val remoteFolder = RemoteFolder(NodeId(999L), "Picked Folder")
+            val selectedMegaFolderFlow = MutableStateFlow<RemoteFolder?>(null)
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(selectedMegaFolderFlow)
+            whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
+            val syncUiItem = syncUiItems.first { it.syncType == SyncType.TYPE_BACKUP }
+            whenever(removeFolderPairUseCase(syncUiItem.id)).thenReturn(Unit)
+            initViewModel()
+            underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
+
+            underTest.uiState.test {
+                val dialogVisible = awaitItem()
+                assertThat(dialogVisible.showConfirmRemoveSyncFolderDialog).isTrue()
+                assertThat(dialogVisible.syncUiItemToRemove).isEqualTo(syncUiItem)
+
+                selectedMegaFolderFlow.value = remoteFolder
+
+                val dialogHiddenStillRemoving = awaitItem()
+                assertThat(dialogHiddenStillRemoving.showConfirmRemoveSyncFolderDialog).isFalse()
+                assertThat(dialogHiddenStillRemoving.syncUiItemToRemove).isEqualTo(syncUiItem)
+
+                val moveCompleted = awaitItem()
+                assertThat(moveCompleted.syncUiItemToRemove).isNull()
+                assertThat(moveCompleted.showConfirmRemoveSyncFolderDialog).isFalse()
+                assertThat(moveCompleted.snackbarMessage).isEqualTo(
+                    sharedResR.string.sync_snackbar_message_confirm_backup_moved,
+                )
+                assertThat(moveCompleted.movedFolderName).isEqualTo(remoteFolder.name)
+            }
+
+            verify(moveDeconfiguredBackupNodesUseCase).invoke(
+                deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
+                backupDestination = remoteFolder.id,
+            )
+        }
+
+    @Test
+    fun `test that starting move destination selection hides the dialog but keeps the folder to remove`() =
+        runTest {
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(MutableStateFlow(null))
+            whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
+            val syncUiItem = syncUiItems.first { it.syncType == SyncType.TYPE_BACKUP }
+            initViewModel()
+            underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
+
+            underTest.uiState.test {
+                val dialogVisible = awaitItem()
+                assertThat(dialogVisible.showConfirmRemoveSyncFolderDialog).isTrue()
+                assertThat(dialogVisible.syncUiItemToRemove).isEqualTo(syncUiItem)
+
+                underTest.handleAction(
+                    SyncFoldersAction.OnStopBackupMoveDestinationSelectionStarted
+                )
+
+                val dialogHidden = awaitItem()
+                assertThat(dialogHidden.showConfirmRemoveSyncFolderDialog).isFalse()
+                assertThat(dialogHidden.syncUiItemToRemove).isEqualTo(syncUiItem)
+            }
+        }
+
+    @Test
     fun `test that confirm the remove action for a Backup with delete option removes folder pair and delete remote folder`() =
         runTest {
             whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
@@ -372,7 +436,7 @@ internal class SyncFoldersViewModelTest {
         }
 
     @Test
-    fun `test that view model pause run click pauses sync if sync is not paused`() = runTest {
+    fun `test that pause run clicked pauses sync when sync is syncing`() = runTest {
         val syncUiItem = getSyncUiItem(SyncStatus.SYNCING)
         initViewModel()
 
@@ -383,8 +447,30 @@ internal class SyncFoldersViewModelTest {
     }
 
     @Test
-    fun `test that view model pause run clicked runs sync if sync is paused`() = runTest {
+    fun `test that pause run clicked pauses sync when sync is synced`() = runTest {
+        val syncUiItem = getSyncUiItem(SyncStatus.SYNCED)
+        initViewModel()
+
+        underTest.handleAction(SyncFoldersAction.PauseRunClicked(syncUiItem))
+
+        verify(pauseSyncUseCase).invoke(syncUiItem.id)
+        verify(setUserPausedSyncsUseCase).invoke(syncUiItem.id, true)
+    }
+
+    @Test
+    fun `test that pause run clicked resumes sync when sync is paused`() = runTest {
         val syncUiItem = getSyncUiItem(SyncStatus.PAUSED)
+        initViewModel()
+
+        underTest.handleAction(SyncFoldersAction.PauseRunClicked(syncUiItem))
+
+        verify(resumeSyncUseCase).invoke(syncUiItem.id)
+        verify(setUserPausedSyncsUseCase).invoke(syncUiItem.id, false)
+    }
+
+    @Test
+    fun `test that pause run clicked resumes sync when sync has error status`() = runTest {
+        val syncUiItem = getSyncUiItem(SyncStatus.ERROR)
         initViewModel()
 
         underTest.handleAction(SyncFoldersAction.PauseRunClicked(syncUiItem))
@@ -587,6 +673,21 @@ internal class SyncFoldersViewModelTest {
             assertThat(state.stalledIssueCount).isEqualTo(2)
         }
     }
+
+    @Test
+    fun `test that sync ui items load with zero stalled issues count when monitor stalled issues use case does not emit`() =
+        runTest {
+            whenever(monitorStalledIssuesUseCase()).thenReturn(flow { awaitCancellation() })
+            initViewModel()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.syncUiItems).hasSize(syncUiItems.size)
+                assertThat(state.stalledIssueCount).isEqualTo(0)
+                assertThat(state.syncUiItems.all { !it.hasStalledIssues }).isTrue()
+            }
+        }
 
 
     private fun getSyncUiItem(status: SyncStatus): SyncUiItem = SyncUiItem(

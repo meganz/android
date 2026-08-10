@@ -1,0 +1,179 @@
+package mega.privacy.android.domain.usecase.backup
+
+import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.node.FolderUsageResult
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeRelationship
+import mega.privacy.android.domain.extension.TimeCache
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.DetermineNodeRelationshipUseCase
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
+
+/**
+ * Use case to check if a folder is used by Sync or Backup across devices
+ */
+class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
+    private val getBackupInfoUseCase: GetBackupInfoUseCase,
+    private val determineNodeRelationshipUseCase: DetermineNodeRelationshipUseCase,
+    private val getDeviceIdUseCase: GetDeviceIdUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getDeviceIdAndNameMapUseCase: GetDeviceIdAndNameMapUseCase,
+) {
+    private val cachedBackups = TimeCache(CACHE_DURATION) {
+        getBackupInfoUseCase()
+    }
+
+    suspend operator fun invoke(
+        nodeId: NodeId,
+        isSyncFolderSelection: Boolean,
+        shouldExcludeCurrentDevice: Boolean,
+        useCache: Boolean,
+    ): FolderUsageResult {
+        // Check if DCIMSelectionAsSyncBackup feature flag is enabled
+        val isDCIMFeatureEnabled = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
+        }.getOrElse {
+            false
+        }
+        if (isDCIMFeatureEnabled.not()) {
+            return FolderUsageResult.NotUsed
+        }
+
+        // Check if RestrictSyncAcrossDevices feature flag is enabled
+        // When disabled (default), Sync folder selection will exclude Sync/Backup from other devices,
+        // allowing the same folder to be synced across different devices
+        // When enabled, reverts to old behavior (blocks Sync-Sync across devices)
+        val restrictSyncAcrossDevices = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices)
+        }.getOrElse {
+            false
+        }
+
+        val allBackups = if (useCache) {
+            cachedBackups.get()
+        } else {
+            cachedBackups.refresh()
+        }
+
+        val deviceNameMap = runCatching {
+            getDeviceIdAndNameMapUseCase()
+        }.getOrNull() ?: emptyMap()
+
+        val currentDeviceId = if (shouldExcludeCurrentDevice) {
+            getDeviceIdUseCase()
+        } else {
+            null
+        }
+
+        val backups = allBackups
+            .filterNot { shouldExcludeCurrentDevice && currentDeviceId != null && it.deviceId == currentDeviceId }
+            .filter { backup ->
+                when (backup.type) {
+                    BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS -> {
+                        // When selecting a Sync folder, always check for CU/MU conflicts from all devices
+                        isSyncFolderSelection
+                    }
+
+                    BackupInfoType.TWO_WAY_SYNC,
+                    BackupInfoType.BACKUP_UPLOAD,
+                    BackupInfoType.UP_SYNC,
+                    BackupInfoType.DOWN_SYNC,
+                        -> {
+                        // When selecting a CU/MU folder, always check for Sync/Backup conflicts
+                        // When selecting a Sync folder, only check if kill switch is enabled
+                        !isSyncFolderSelection || restrictSyncAcrossDevices
+                    }
+
+                    else -> false
+                }
+            }
+
+        for (backup in backups) {
+            when (backup.type) {
+                BackupInfoType.CAMERA_UPLOADS -> {
+                    val result = checkCameraUploadsRelationship(nodeId, backup.rootHandle)
+                    result?.let { return it }
+                }
+
+                BackupInfoType.MEDIA_UPLOADS -> {
+                    val result = checkMediaUploadsRelationship(nodeId, backup.rootHandle)
+                    result?.let { return it }
+                }
+
+                else -> {
+                    // If not related to Camera/Media Uploads, check all backup entries
+                    val relationship = determineNodeRelationshipUseCase(nodeId, backup.rootHandle)
+                    val resolvedDeviceName = backup.deviceId?.let { deviceNameMap[it] }
+                    when (relationship) {
+                        NodeRelationship.ExactMatch -> {
+                            return FolderUsageResult.UsedBySyncOrBackup(
+                                deviceId = backup.deviceId,
+                                deviceName = resolvedDeviceName,
+                                backupName = backup.name,
+                            )
+                        }
+
+                        NodeRelationship.TargetIsAncestor -> {
+                            return FolderUsageResult.UsedBySyncOrBackupChild(
+                                deviceId = backup.deviceId,
+                                deviceName = resolvedDeviceName,
+                                backupName = backup.name,
+                            )
+                        }
+
+                        NodeRelationship.TargetIsDescendant -> {
+                            return FolderUsageResult.UsedBySyncOrBackupParent(
+                                deviceId = backup.deviceId,
+                                deviceName = resolvedDeviceName,
+                                backupName = backup.name,
+                            )
+                        }
+
+                        else -> { /* continue checking other backups */
+                        }
+                    }
+                }
+            }
+        }
+
+        return FolderUsageResult.NotUsed
+    }
+
+    /**
+     * Checks the relationship between the given node and the Camera Uploads folder.
+     * Returns the appropriate [FolderUsageResult] or null if no relationship exists.
+     */
+    private suspend fun checkCameraUploadsRelationship(
+        nodeId: NodeId,
+        cameraUploadsNodeId: NodeId,
+    ): FolderUsageResult? {
+        val relationship = determineNodeRelationshipUseCase(nodeId, cameraUploadsNodeId)
+        return when (relationship) {
+            NodeRelationship.ExactMatch -> FolderUsageResult.UsedByCameraUpload
+            NodeRelationship.TargetIsAncestor -> FolderUsageResult.UsedByCameraUploadChild
+            NodeRelationship.TargetIsDescendant -> FolderUsageResult.UsedByCameraUploadParent
+            else -> null
+        }
+    }
+
+    /**
+     * Checks the relationship between the given node and the Media Uploads folder.
+     * Returns the appropriate [FolderUsageResult] or null if no relationship exists.
+     */
+    private suspend fun checkMediaUploadsRelationship(
+        nodeId: NodeId,
+        mediaUploadsNodeId: NodeId,
+    ): FolderUsageResult? {
+        val relationship = determineNodeRelationshipUseCase(nodeId, mediaUploadsNodeId)
+        return when (relationship) {
+            NodeRelationship.ExactMatch -> FolderUsageResult.UsedByMediaUpload
+            NodeRelationship.TargetIsAncestor -> FolderUsageResult.UsedByMediaUploadChild
+            NodeRelationship.TargetIsDescendant -> FolderUsageResult.UsedByMediaUploadParent
+            else -> null
+        }
+    }
+}
+
+private val CACHE_DURATION = 5.minutes

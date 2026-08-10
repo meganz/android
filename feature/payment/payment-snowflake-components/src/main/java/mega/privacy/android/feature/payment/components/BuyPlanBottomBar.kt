@@ -4,11 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -27,17 +27,18 @@ fun BuyPlanBottomBar(
     Box(
         modifier = modifier
             .background(color = DSTokens.colors.background.pageBackground)
-            .navigationBarsPadding()
             .fillMaxWidth(),
     ) {
         HorizontalDivider(
             thickness = 1.dp,
             color = DSTokens.colors.border.strong
         )
+
         PrimaryFilledButton(
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 20.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .testTag(TEST_TAG_BUY_BUTTON),
             text = text,
             onClick = onClick,
         )
@@ -53,3 +54,8 @@ private fun BuyPlanBottomBarPreview() {
         )
     }
 }
+
+/**
+ * Tag for the ProPlanCard root container
+ */
+const val TEST_TAG_BUY_BUTTON = "buy_button"

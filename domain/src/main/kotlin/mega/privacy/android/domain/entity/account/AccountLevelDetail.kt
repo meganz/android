@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.SubscriptionStatus
  * @property proExpirationTime
  * @property accountPlanDetail
  * @property accountSubscriptionDetailList
+ * @property subscriptionMethodId
  */
 class AccountLevelDetail(
     val accountType: AccountType?,
@@ -23,4 +24,5 @@ class AccountLevelDetail(
     val proExpirationTime: Long,
     val accountPlanDetail: AccountPlanDetail?,
     val accountSubscriptionDetailList: List<AccountSubscriptionDetail>,
+    val subscriptionMethodId: Int = 0,
 )

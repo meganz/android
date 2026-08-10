@@ -83,7 +83,7 @@ class InviteContactScreenTest {
             val onInviteContactClick = mock<() -> Unit>()
             setScreen(onInviteContactClick = onInviteContactClick)
 
-            onNodeWithTag(INVITE_CONTACT_FAB_TAG).performClick()
+            onNodeWithTag(INVITE_CONTACT_FAB_TAG).assertDoesNotExist()
 
             verify(onInviteContactClick, never()).invoke()
         }
@@ -203,7 +203,7 @@ class InviteContactScreenTest {
         with(composeRule) {
             setScreen(uiState = InviteContactUiState(areContactsInitialized = true))
 
-            onNodeWithTag(NO_CONTACTS_TEXT_TAG).assertIsDisplayed()
+            onNodeWithTag(NO_CONTACTS_EMPTY_VIEW_TAG).assertIsDisplayed()
         }
     }
 

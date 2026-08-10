@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.transfers.pending
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -93,6 +94,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
                 appData = expectedAppData,
                 isHighPriority = isHighPriority,
                 fileName = "fileName$index",
+                pitagTrigger = PitagTrigger.NotApplicable,
             )
         }
 

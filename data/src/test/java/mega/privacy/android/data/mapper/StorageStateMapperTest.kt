@@ -34,12 +34,12 @@ class StorageStateMapperTest {
     }
 
     private fun provideStorageStateParameters() = listOf(
-        arrayOf(STORAGE_STATE_UNKNOWN, StorageState.Unknown),
-        arrayOf(STORAGE_STATE_GREEN, StorageState.Green),
-        arrayOf(STORAGE_STATE_ORANGE, StorageState.Orange),
-        arrayOf(STORAGE_STATE_RED, StorageState.Red),
-        arrayOf(STORAGE_STATE_CHANGE, StorageState.Change),
-        arrayOf(STORAGE_STATE_PAYWALL, StorageState.PayWall),
-        arrayOf(100, StorageState.Unknown),
+        arrayOf<Any>(STORAGE_STATE_UNKNOWN, StorageState.Unknown),
+        arrayOf<Any>(STORAGE_STATE_GREEN, StorageState.Green),
+        arrayOf<Any>(STORAGE_STATE_ORANGE, StorageState.Orange),
+        arrayOf<Any>(STORAGE_STATE_RED, StorageState.Red),
+        arrayOf<Any>(STORAGE_STATE_CHANGE, StorageState.Change),
+        arrayOf<Any>(STORAGE_STATE_PAYWALL, StorageState.PayWall),
+        arrayOf<Any>(100, StorageState.Unknown),
     )
 }

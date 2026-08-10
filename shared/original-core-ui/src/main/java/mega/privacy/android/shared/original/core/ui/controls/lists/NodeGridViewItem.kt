@@ -164,7 +164,7 @@ fun NodeGridViewItem(
                     }
 
                     // Video/Audio duration
-                    if (duration != null) {
+                    if (duration?.isNotEmpty() == true) {
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)

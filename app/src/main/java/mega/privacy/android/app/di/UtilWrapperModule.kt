@@ -1,6 +1,5 @@
 package mega.privacy.android.app.di
 
-import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Base64
@@ -16,6 +15,7 @@ import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
+import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
@@ -31,14 +31,13 @@ import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.global.SetupMegaChatApiWrapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
-import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.shared.resources.R as sharedR
-import org.webrtc.Camera1Enumerator
+import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraEnumerator
 
 /**
@@ -122,7 +121,7 @@ abstract class UtilWrapperModule {
                     context.getString(sharedR.string.general_section_rubbish_bin)
 
                 override fun getTitleIncomingSharesExplorer() =
-                    context.getString(R.string.title_incoming_shares_explorer)
+                    context.getString(sharedR.string.general_title_incoming_shares)
 
                 override fun getErrorStorageQuota() =
                     context.getString(R.string.error_share_owner_storage_quota)
@@ -141,14 +140,14 @@ abstract class UtilWrapperModule {
          * Provides the [ApplicationIpAddressWrapper]
          */
         @Provides
-        fun provideApplicationIpAddressWrapper(application: Application) =
+        fun provideApplicationIpAddressWrapper(globalNetworkStateHandler: GlobalNetworkStateHandler) =
             object : ApplicationIpAddressWrapper {
                 override fun setIpAddress(ipAddress: String?) {
-                    (application as MegaApplication).localIpAddress = ipAddress
+                    globalNetworkStateHandler.localIpAddress = ipAddress
                 }
 
                 override fun getIpAddress(): String? {
-                    return (application as MegaApplication).localIpAddress
+                    return globalNetworkStateHandler.localIpAddress
                 }
             }
 
@@ -160,17 +159,6 @@ abstract class UtilWrapperModule {
             object : CameraUploadsNotificationManagerWrapper {
                 override fun getForegroundInfo() =
                     cameraUploadsNotificationManager.getForegroundInfo()
-            }
-
-        /**
-         * Provides the [ApplicationWrapper]
-         */
-        @Provides
-        fun provideApplicationWrapper() =
-            object : ApplicationWrapper {
-                override fun setHeartBeatAlive(isAlive: Boolean) {
-                    MegaApplication.setHeartBeatAlive(isAlive)
-                }
             }
 
         /**
@@ -188,10 +176,12 @@ abstract class UtilWrapperModule {
          * Provides [CameraEnumeratorWrapper]
          */
         @Provides
-        fun provideCameraEnumeratorWrapper(): CameraEnumeratorWrapper =
+        fun provideCameraEnumeratorWrapper(
+            @ApplicationContext context: Context,
+        ): CameraEnumeratorWrapper =
             object : CameraEnumeratorWrapper {
                 override fun invoke(): CameraEnumerator =
-                    Camera1Enumerator(true)
+                    Camera2Enumerator(context)
             }
     }
 }

@@ -15,3 +15,4 @@ mega-android-hilt = { id = "mega.android.hilt", version = "unspecified" }
 mega-jvm-hilt = { id = "mega.jvm.hilt", version = "unspecified" }
 mega-android-application-compose = { id = "mega.android.application.compose", version = "unspecified" }
 mega-android-library-compose = { id = "mega.android.library.compose", version = "unspecified" }
+mega-android-architecture = { id = "mega.android.architecture", version = "unspecified" }

@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -52,9 +51,9 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.HeaderItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.legacyfab.LegacyFabButtonSend
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
-import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.PhoneContactInfo
 import mega.privacy.android.app.main.ShareContactInfo
@@ -87,6 +86,8 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava
@@ -105,7 +106,6 @@ import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Add contact activity
@@ -142,6 +142,15 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     private var isFromMeeting = false
 
     private var multipleSelectIntent = 0
+
+    /**
+     * Tracks whether the share-folder picker is currently in multi-select
+     * mode. Entered by long-pressing a contact; exited when the selection
+     * becomes empty. While `false`, a single tap on a contact short-circuits
+     * the share with just that contact instead of toggling its selection.
+     */
+    private var isShareMultiSelect: Boolean = false
+
     private var nodeHandle: Long = -1
     private var nodeHandles: LongArray = LongArray(0)
     private var chatId: Long = -1
@@ -300,7 +309,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     private var fastScroller: FastScroller? = null
 
     private var fabImageGroup: FloatingActionButton? = null
-    private var fabButton: FloatingActionButton? = null
+    private var fabButton: LegacyFabButtonSend? = null
     private var nameGroup: EmojiEditText? = null
 
     /**
@@ -566,14 +575,14 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     fun setMegaAdapterContacts(contacts: ArrayList<MegaContactAdapter>, adapter: Int) {
         if (onNewGroup) {
             adapterMEGA =
-                MegaContactsAdapter(addContactActivity, contacts, newGroupRecyclerView, adapter)
+                MegaContactsAdapter(addContactActivity!!, contacts, newGroupRecyclerView!!, adapter)
 
             adapterMEGA?.positionClicked = -1
             newGroupRecyclerView?.adapter = adapterMEGA
         } else {
             if (adapterMEGA == null) {
                 adapterMEGA =
-                    MegaContactsAdapter(addContactActivity, contacts, recyclerViewList, adapter)
+                    MegaContactsAdapter(addContactActivity!!, contacts, recyclerViewList!!, adapter)
             } else {
                 adapterMEGA?.setAdapterType(adapter)
                 adapterMEGA?.contacts = contacts
@@ -622,13 +631,13 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
      */
     fun setShareAdapterContacts(contacts: ArrayList<ShareContactInfo>) {
         if (adapterShareHeader == null) {
-            adapterShareHeader = ShareContactsHeaderAdapter(addContactActivity, contacts)
+            adapterShareHeader = ShareContactsHeaderAdapter(addContactActivity!!, contacts)
             recyclerViewList?.adapter = adapterShareHeader
             adapterShareHeader?.SetOnItemClickListener { view, position ->
-                itemClick(
-                    view,
-                    position
-                )
+                itemClick(view, position)
+            }
+            adapterShareHeader?.SetOnLongItemClickListener { view, position ->
+                itemLongClick(view, position)
             }
         } else {
             adapterShareHeader?.setContacts(contacts)
@@ -654,6 +663,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
             }
             val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
             emptyTextView?.text = result
+            setEmptyStateVisibility(true)
         } else {
             setEmptyStateVisibility(false)
         }
@@ -974,7 +984,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
 
@@ -1079,8 +1089,27 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
 
         relativeLayout = findViewById<View>(R.id.relative_container_add_contact) as RelativeLayout
 
-        fabButton = findViewById<View>(R.id.fab_button_next) as FloatingActionButton
-        fabButton?.setOnClickListener(this)
+        fabButton = findViewById<LegacyFabButtonSend>(R.id.fab_button_next)
+        fabButton?.setOnClickListener {
+            when (contactType) {
+                Constants.CONTACT_TYPE_DEVICE -> {
+                    inviteContacts(addedContactsPhone)
+                }
+
+                Constants.CONTACT_TYPE_MEGA -> {
+                    if (onlyCreateGroup && !isStartConversation && addedContactsMEGA.isEmpty()) {
+                        showSnackbar(getString(R.string.error_creating_group_and_attaching_file))
+                        return@setOnClickListener
+                    }
+                    setResultContacts(addedContactsMEGA, true)
+                }
+
+                else -> {
+                    shareWith(addedContactsShare)
+                }
+            }
+            hideSoftKeyboard()
+        }
 
         mailError = findViewById<View>(R.id.add_contact_email_error) as RelativeLayout
         mailError?.visibility = View.GONE
@@ -1406,7 +1435,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
             return
         }
 
-        setEmptyStateVisibility(true)
+        setEmptyStateVisibility(false)
         progressBar?.visibility = View.VISIBLE
         getContactsTask = GetContactsTask(this)
         getContactsTask?.execute()
@@ -2386,29 +2415,68 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
                 return
             }
 
-            if (contact.isPhoneContact) {
-                filteredContactsPhone.remove(contact.phoneContactInfo)
-                if (filteredContactsPhone.size == 0) {
-                    filteredContactsShare.removeAt(filteredContactsShare.size - 2)
-                }
-                filteredContactsShare.remove(contact)
-            } else if (contact.isMegaContact) {
-                val contactPosition = filteredContactsShare.indexOf(contact)
-                if (contactPosition != Constants.INVALID_POSITION) {
-                    filteredContactsShare[contactPosition].getMegaContactAdapter().isSelected = true
-                }
+            if (!isShareMultiSelect) {
+                // Single-pick: confirm the share with just this contact.
+                // Multi-select is only entered via long-press.
+                shareWith(arrayListOf(contact))
+                return
             }
 
-            if (inputString != "") {
-                filterContactsTask = FilterContactsTask(this)
-                filterContactsTask?.execute()
-            } else {
-                adapterShareHeader?.setContacts(filteredContactsShare)
+            toggleShareContactSelection(contact)
+            // Exit multi-select when the user has deselected everything.
+            if (addedContactsShare.isEmpty()) {
+                isShareMultiSelect = false
             }
-
-            addShareContact(contact)
         }
         setSearchVisibility()
+    }
+
+    private fun itemLongClick(view: View, position: Int) {
+        if (contactType != Constants.CONTACT_TYPE_BOTH) return
+        if (adapterShareHeader == null) return
+
+        val contact = adapterShareHeader?.getItem(position) ?: return
+        if (contact.isHeader || contact.isProgress) return
+
+        // Long-press always selects the pressed contact and switches the
+        // picker into multi-select mode. If we were already in multi-select,
+        // a long-press behaves like a single tap (toggle).
+        val wasMultiSelect = isShareMultiSelect
+        isShareMultiSelect = true
+        toggleShareContactSelection(contact)
+        if (wasMultiSelect && addedContactsShare.isEmpty()) {
+            isShareMultiSelect = false
+        }
+        setSearchVisibility()
+    }
+
+    /**
+     * Adds the contact to (or removes it from) the share picker's selection
+     * and updates both the row list and the chip strip accordingly. This is
+     * the toggle behaviour that originally fired on every tap.
+     */
+    private fun toggleShareContactSelection(contact: ShareContactInfo) {
+        if (contact.isPhoneContact) {
+            filteredContactsPhone.remove(contact.phoneContactInfo)
+            if (filteredContactsPhone.size == 0) {
+                filteredContactsShare.removeAt(filteredContactsShare.size - 2)
+            }
+            filteredContactsShare.remove(contact)
+        } else if (contact.isMegaContact) {
+            val contactPosition = filteredContactsShare.indexOf(contact)
+            if (contactPosition != Constants.INVALID_POSITION) {
+                filteredContactsShare[contactPosition].getMegaContactAdapter().isSelected = true
+            }
+        }
+
+        if (inputString != "") {
+            filterContactsTask = FilterContactsTask(this)
+            filterContactsTask?.execute()
+        } else {
+            adapterShareHeader?.setContacts(filteredContactsShare)
+        }
+
+        addShareContact(contact)
     }
 
     /**
@@ -2514,27 +2582,6 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
 
             R.id.allow_add_participants_switch -> {
                 isAllowAddParticipantsEnabled = allowAddParticipantsSwitch?.isChecked == true
-            }
-
-            R.id.fab_button_next -> {
-                when (contactType) {
-                    Constants.CONTACT_TYPE_DEVICE -> {
-                        inviteContacts(addedContactsPhone)
-                    }
-
-                    Constants.CONTACT_TYPE_MEGA -> {
-                        if (onlyCreateGroup && !isStartConversation && addedContactsMEGA.isEmpty()) {
-                            showSnackbar(getString(R.string.error_creating_group_and_attaching_file))
-                            return
-                        }
-                        setResultContacts(addedContactsMEGA, true)
-                    }
-
-                    else -> {
-                        shareWith(addedContactsShare)
-                    }
-                }
-                hideSoftKeyboard()
             }
         }
     }
@@ -3170,6 +3217,11 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
          * Extra Chat Link
          */
         const val EXTRA_CHAT_LINK: String = "chatLink"
+
+        /**
+         * Extra group chat image URI (as a string), chosen for the new group's avatar.
+         */
+        const val EXTRA_GROUP_CHAT_IMAGE: String = "groupChatImage"
 
         /**
          * Extra Contact Type

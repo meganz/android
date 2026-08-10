@@ -1,63 +1,33 @@
 package mega.privacy.android.app.presentation.login
 
-import androidx.compose.runtime.remember
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import androidx.navigation.compose.composable
-import androidx.navigation.navOptions
+import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
-import mega.privacy.android.app.presentation.login.onboarding.TourScreen
+import mega.privacy.android.app.utils.Constants.ACTION_CONFIRM
+import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
-
-@Serializable
-data object Login : NavKey
-
-internal fun NavGraphBuilder.loginScreen(
-    navController: NavController,
-    onFinish: () -> Unit,
-    activityViewModel: LoginViewModel? = null,
-    stopShowingSplashScreen: () -> Unit,
-) {
-    composable<Login> { backStackEntry ->
-        val parentEntry = remember(backStackEntry) {
-            navController.getBackStackEntry<LoginGraph>()
-        }
-        val sharedViewModel = activityViewModel ?: hiltViewModel<LoginViewModel>(parentEntry)
-        val billingViewModel = hiltViewModel<BillingViewModel>(parentEntry)
-        LoginNavigationHandler(
-            navigateToLoginScreen = { navController.navigate(Login) },
-            navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
-            navigateToTourScreen = {
-                navController.navigate(TourScreen, navOptions {
-                    popUpTo<StartRoute> {
-                        inclusive = false
-                    }
-                })
-            },
-            navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailScreen) },
-            viewModel = sharedViewModel,
-            onFinish = onFinish,
-            stopShowingSplashScreen = stopShowingSplashScreen,
-        ) {
-            LoginScreen(
-                viewModel = sharedViewModel,
-                billingViewModel = billingViewModel
-            )
-        }
-    }
-}
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
+import mega.privacy.android.navigation.contract.suppression.withOverlaySuppression
+import mega.privacy.android.navigation.destination.LoginNavKey
 
 internal fun EntryProviderScope<NavKey>.loginScreen(
     sharedViewModel: LoginViewModel,
 ) {
-    entry<Login> { key ->
+    entry<LoginNavKey>(
+        metadata = buildMetadata { withOverlaySuppression() }
+    ) { key ->
         val billingViewModel = hiltViewModel<BillingViewModel>()
+
+        LaunchedEffect(key.timeStamp, key.action, key.link) {
+            checkActions(
+                sharedViewModel = sharedViewModel,
+                action = key.action,
+                link = key.link,
+                timeStamp = key.timeStamp
+            )
+        }
+
         LoginScreen(
             viewModel = sharedViewModel,
             billingViewModel = billingViewModel
@@ -65,18 +35,17 @@ internal fun EntryProviderScope<NavKey>.loginScreen(
     }
 }
 
-internal fun EntryProviderScope<NavKey>.loginStartScreen(
+private fun checkActions(
+    sharedViewModel: LoginViewModel,
+    action: String?,
+    link: String?,
+    timeStamp: Long,
 ) {
-    entry<StartRoute> { key ->
-    }
-}
-
-internal fun NavController.openLoginScreen(
-    options: NavOptions? = navOptions {
-        popUpTo(0) {
-            inclusive = true
+    when (action) {
+        ACTION_CONFIRM -> link?.let { sharedViewModel.checkSignupLink(it, timeStamp) }
+        ACTION_RESET_PASS -> link?.let {
+            sharedViewModel.onRequestRecoveryKey(it)
+            sharedViewModel.intentSet()
         }
-    },
-) {
-    navigate(Login, options)
+    }
 }

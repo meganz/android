@@ -12,6 +12,7 @@ import mega.android.core.ui.components.dialogs.BasicDialogButton
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Dialog to confirm cancel selected transfers
@@ -27,7 +28,7 @@ fun CancelTransfersConfirmationDialog(
         title = stringResource(R.string.option_cancel_transfer),
         description = pluralStringResource(R.plurals.cancel_selected_transfers, selectedAmount),
         buttons = listOf(
-            BasicDialogButton(stringResource(id = R.string.general_dismiss), onClick = onDismiss),
+            BasicDialogButton(stringResource(id = sharedR.string.general_dismiss_dialog), onClick = onDismiss),
             BasicDialogButton(stringResource(id = R.string.button_continue), onClick = {
                 onCancelTransfers()
                 onDismiss()

@@ -3,13 +3,15 @@ package mega.privacy.android.app.contacts.list.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.contacts.list.data.ContactItem
+import mega.privacy.android.app.contacts.list.mapper.ContactItemDataToContactItemUiStateMapper
 import mega.privacy.android.app.databinding.ItemContactDataBinding
 import mega.privacy.android.app.databinding.ItemContactHeaderBinding
-import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
 /**
  * RecyclerView's ListAdapter to show ContactItem.
@@ -30,6 +32,8 @@ class ContactListAdapter(
         private const val VIEW_TYPE_DATA = 1
     }
 
+    private var contactItemUiStateMapper: ContactItemDataToContactItemUiStateMapper? = null
+
     init {
         setHasStableIds(true)
     }
@@ -45,28 +49,17 @@ class ContactListAdapter(
             else -> {
                 // Data row
                 val binding = ItemContactDataBinding.inflate(layoutInflater, parent, false)
-                ContactListDataViewHolder(binding).apply {
-                    binding.root.setOnClickListener {
-                        if (isValidPosition(bindingAdapterPosition)) {
-                            val handle =
-                                (getItem(bindingAdapterPosition) as ContactItem.Data).handle
-                            itemCallback.invoke(handle)
-                        }
-                    }
-                    binding.imgThumbnail.setOnClickListener {
-                        if (isValidPosition(bindingAdapterPosition)) {
-                            val email = (getItem(bindingAdapterPosition) as ContactItem.Data).email
-                            itemInfoCallback.invoke(email)
-                        }
-                    }
-                    binding.btnMore.setOnClickListener {
-                        if (isValidPosition(bindingAdapterPosition)) {
-                            val handle =
-                                (getItem(bindingAdapterPosition) as ContactItem.Data).handle
-                            itemMoreCallback.invoke(handle)
-                        }
-                    }
-                }
+                val mapper = getMapper(parent.context)
+                binding.contactComposeView.setViewCompositionStrategy(
+                    DisposeOnViewTreeLifecycleDestroyed
+                )
+                ContactListDataViewHolder(
+                    binding = binding,
+                    contactItemUiStateMapper = mapper,
+                    itemCallback = itemCallback,
+                    itemInfoCallback = itemInfoCallback,
+                    itemMoreCallback = itemMoreCallback,
+                )
             }
         }
     }
@@ -89,4 +82,12 @@ class ContactListAdapter(
 
     override fun getSectionTitle(position: Int, context: Context): String =
         getItem(position).getSection()
+
+    private fun getMapper(context: Context): ContactItemDataToContactItemUiStateMapper =
+        contactItemUiStateMapper ?: EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            ContactListAdapterEntryPoint::class.java,
+        ).contactItemDataToContactItemUiStateMapper().also {
+            contactItemUiStateMapper = it
+        }
 }

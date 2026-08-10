@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.filelink
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -19,9 +20,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -29,26 +30,26 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.view.FileLinkView
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import mega.privacy.android.shared.ads.advertisements.GoogleAdsManager
+import mega.privacy.android.shared.ads.rewarded.rememberRewardedAdGate
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -59,6 +60,7 @@ import javax.inject.Inject
  * FileLinkActivity with compose view
  */
 @AndroidEntryPoint
+@Deprecated("Use revamp")
 class FileLinkComposeActivity : PasscodeActivity(),
     DecryptAlertDialog.DecryptDialogListener {
 
@@ -80,7 +82,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
     @Inject
     lateinit var googleAdsManager: GoogleAdsManager
 
-    private val viewModel: FileLinkViewModel by viewModels()
+    private val viewModel: LegacyFileLinkViewModel by viewModels()
 
     private var mKey: String? = null
 
@@ -110,16 +112,22 @@ class FileLinkComposeActivity : PasscodeActivity(),
         viewModel.handleIntent(intent)
         viewModel.checkLoginRequired()
 
-        viewModel.state.map { it.shouldShowAdsForLink }
-            .distinctUntilChanged()
-            .combine(googleAdsManager.isAdsFeatureEnabled) { shouldShowAdsForLink, isAdsFeatureEnabled ->
-                if (shouldShowAdsForLink && isAdsFeatureEnabled) {
+        collectFlow(
+            viewModel.state.map { it.shouldShowAdsForLink }
+                .distinctUntilChanged()
+                .combine(googleAdsManager.isAdsFeatureEnabled) { shouldShowAdsForLink, isAdsFeatureEnabled ->
+                    shouldShowAdsForLink to isAdsFeatureEnabled
+                }
+        ) { (shouldShowAdsForLink, isAdsFeatureEnabled) ->
+            if (shouldShowAdsForLink && isAdsFeatureEnabled) {
+                lifecycleScope.launch {
                     googleAdsManager.checkLatestConsentInformation(
-                        activity = this,
+                        activity = this@FileLinkComposeActivity,
                         onConsentInformationUpdated = { googleAdsManager.fetchAdRequest() }
                     )
                 }
-            }.launchIn(lifecycleScope)
+            }
+        }
 
         setContent {
             val themeMode by monitorThemeModeUseCase()
@@ -133,27 +141,35 @@ class FileLinkComposeActivity : PasscodeActivity(),
                 action = ::onOpenFile
             )
 
-            EventEffect(
-                event = uiState.showLoginScreenEvent,
-                onConsumed = viewModel::onShowLoginScreenEventConsumed,
-                action = ::showLoginScreen
-            )
-
             val snackBarHostState = remember { SnackbarHostState() }
             OriginalTheme(isDark = themeMode.isDarkMode()) {
-                FileLinkView(
-                    viewState = uiState,
-                    snackBarHostState = snackBarHostState,
-                    onBackPressed = { onBackPressedDispatcher.onBackPressed() },
-                    onShareClicked = ::onShareClicked,
-                    onPreviewClick = ::onPreviewClick,
-                    onSaveToDeviceClicked = viewModel::handleSaveFile,
-                    onImportClicked = ::onImportClicked,
-                    onErrorMessageConsumed = viewModel::resetErrorMessage,
-                    onOverQuotaErrorConsumed = viewModel::resetOverQuotaError,
-                    onForeignNodeErrorConsumed = viewModel::resetForeignNodeError,
-                    request = request,
-                )
+                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                    val rewardedAdGate = rememberRewardedAdGate(
+                        onNavigate = { navKey ->
+                            // Rewarded Ad Gate only navigates to UpgradeAccountNavKey
+                            if (navKey is UpgradeAccountNavKey) {
+                                megaNavigator.openUpgradeAccount(
+                                    this@FileLinkComposeActivity,
+                                    navKey.source,
+                                )
+                            }
+                        },
+                        isAdsAllowedForScreen = uiState.shouldShowAdsForLink,
+                    )
+                    FileLinkView(
+                        viewState = uiState,
+                        snackBarHostState = snackBarHostState,
+                        onBackPressed = { onBackPressedDispatcher.onBackPressed() },
+                        onShareClicked = ::onShareClicked,
+                        onPreviewClick = { rewardedAdGate.requestAction(::onPreviewClick) },
+                        onSaveToDeviceClicked = { rewardedAdGate.requestAction { viewModel.handleSaveFile() } },
+                        onImportClicked = { rewardedAdGate.requestAction(::onImportClicked) },
+                        onErrorMessageConsumed = viewModel::resetErrorMessage,
+                        onOverQuotaErrorConsumed = viewModel::resetOverQuotaError,
+                        onForeignNodeErrorConsumed = viewModel::resetForeignNodeError,
+                        request = request,
+                    )
+                }
                 StartTransferComponent(
                     event = uiState.downloadEvent,
                     onConsumeEvent = viewModel::resetDownloadFile,
@@ -177,7 +193,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
                     event = uiState.copySuccessEvent,
                     onConsumed = viewModel::resetCopySuccessEvent,
                 ) {
-                    launchManagerActivityAfterCopy()
+                    sendMessageAfterCopy()
                 }
             }
         }
@@ -227,27 +243,11 @@ class FileLinkComposeActivity : PasscodeActivity(),
         selectImportFolderLauncher.launch(intent)
     }
 
-    private fun launchManagerActivityAfterCopy() {
-        Intent(this, ManagerActivity::class.java).apply {
-            action = Constants.ACTION_SHOW_WARNING
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra(
-                Constants.INTENT_EXTRA_WARNING_MESSAGE,
-                getString(R.string.context_correctly_copied)
-            )
-            startActivity(this)
-        }
-        finish()
-    }
-
-    private fun showLoginScreen() {
-        Timber.d("Refresh session - sdk or karere")
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-        intent.data = Uri.parse(viewModel.state.value.url)
-        intent.action = Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(intent)
+    private suspend fun sendMessageAfterCopy() {
+        megaNavigator.sendMessageConsideringSingleActivity(
+            context = this,
+            message = getString(R.string.context_correctly_copied)
+        )
         finish()
     }
 
@@ -258,7 +258,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
         Timber.d("askForDecryptionKeyDialog")
         val decryptAlertDialog = DecryptAlertDialog.Builder()
             .setTitle(getString(R.string.alert_decryption_key))
-            .setPosText(R.string.general_decryp)
+            .setPosText(sharedR.string.general_decrypt)
             .setNegText(sharedR.string.general_dialog_cancel_button)
             .setMessage(getString(R.string.message_decryption_key))
             .setErrorMessage(R.string.invalid_decryption_key).setKey(mKey)
@@ -291,6 +291,8 @@ class FileLinkComposeActivity : PasscodeActivity(),
                                     fileNode = fileNode,
                                     isFolderLink = true,
                                     viewType = FILE_LINK_ADAPTER,
+                                    serializedData = serializedData,
+                                    publicLinkUrl = viewModel.state.value.url,
                                 )
                             }.onFailure {
                                 Toast.makeText(
@@ -309,9 +311,13 @@ class FileLinkComposeActivity : PasscodeActivity(),
                 }
 
                 nameType.isOpenableTextFile(sizeInBytes) -> {
-                    val intent =
-                        Intent(this@FileLinkComposeActivity, TextEditorActivity::class.java)
-                    viewModel.updateTextEditorIntent(intent)
+                    megaNavigator.openTextEditor(
+                        context = this@FileLinkComposeActivity,
+                        params = OpenTextEditorParams.FileLink(
+                            serializedNode = viewModel.state.value.serializedData,
+                            urlFileLink = viewModel.state.value.url,
+                        ),
+                    )
                 }
 
                 else -> {
@@ -340,5 +346,13 @@ class FileLinkComposeActivity : PasscodeActivity(),
 
     companion object {
         private const val TAG_DECRYPT = "decrypt"
+
+        fun getIntent(context: Context, link: Uri?): Intent {
+            val fileLinkIntent = Intent(context, FileLinkComposeActivity::class.java)
+            fileLinkIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            fileLinkIntent.action = Constants.ACTION_IMPORT_LINK_FETCH_NODES
+            fileLinkIntent.data = link
+            return fileLinkIntent
+        }
     }
 }

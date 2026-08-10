@@ -1,0 +1,269 @@
+package mega.privacy.android.feature.payment.presentation.upgrade
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.billing.Pricing
+import mega.privacy.android.domain.exception.LocalPricingNotAvailableException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
+import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
+import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
+import mega.privacy.android.domain.usecase.billing.IsSubscriptionFeatureAvailableUseCase
+import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import mega.privacy.android.feature.payment.model.UpgradeAccountState
+import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
+import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountViewModel.Companion.EXPIRING_SOON_THRESHOLD
+import timber.log.Timber
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
+
+/**
+ * Choose account view model
+ *
+ * @params getPricing use case to get the pricing list of products
+ * @param getSubscriptionsUseCase use case to get the list of yearly subscriptions available in the app
+ * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
+ * @param getRecommendedSubscriptionUseCase use case to get the cheapest subscription available in the app
+ *
+ * @property state The current UI state
+ */
+@HiltViewModel(assistedFactory = UpgradeAccountViewModel.Factory::class)
+class UpgradeAccountViewModel @AssistedInject constructor(
+    private val getPricing: GetPricing,
+    private val getSubscriptionsUseCase: GetSubscriptionsUseCase,
+    private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
+    private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
+    private val isSubscriptionFeatureAvailableUseCase: IsSubscriptionFeatureAvailableUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val ageSignalUseCase: AgeSignalUseCase,
+    private val getCurrentTimeInMillisUseCase: GetCurrentTimeInMillisUseCase,
+    @Assisted val isUpgradeAccount: Boolean,
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(UpgradeAccountState())
+    val state: StateFlow<UpgradeAccountState> = _state
+
+    init {
+        loadSubscriptions()
+        viewModelScope.launch {
+            val isSubscriptionFeatureAvailable =
+                runCatching { isSubscriptionFeatureAvailableUseCase() }.getOrElse { false }
+            _state.update {
+                it.copy(
+                    isSubscriptionFeatureAvailable = isSubscriptionFeatureAvailable
+                )
+            }
+        }
+        viewModelScope.launch {
+            runCatching {
+                val ageSignalsCheckEnabled =
+                    getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)
+                if (ageSignalsCheckEnabled) {
+                    val userAgeComplianceStatus = ageSignalUseCase()
+                    _state.update {
+                        it.copy(
+                            userAgeComplianceStatus = userAgeComplianceStatus
+                        )
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+        if (isUpgradeAccount) {
+            loadCurrentSubscriptionPlan()
+        } else {
+            viewModelScope.launch { refreshRecommendedSubscription() }
+        }
+        refreshPricing()
+    }
+
+    private fun loadSubscriptions() {
+        viewModelScope.launch {
+            runCatching { getSubscriptionsUseCase() }
+                .onSuccess { (monthlySubscriptions, yearlySubscriptions) ->
+                    val allAccountTypes = (monthlySubscriptions.map { it.accountType } +
+                            yearlySubscriptions.map { it.accountType }).distinct()
+                    val localisedSubscriptions = allAccountTypes.mapNotNull { accountType ->
+                        val monthly =
+                            monthlySubscriptions.firstOrNull { it.accountType == accountType }
+                        val yearly =
+                            yearlySubscriptions.firstOrNull { it.accountType == accountType }
+                        if (monthly != null || yearly != null) {
+                            localisedSubscriptionMapper(
+                                monthlySubscription = monthly,
+                                yearlySubscription = yearly
+                            )
+                        } else null
+                    }.sortedBy { subscription ->
+                        subscription.monthlySubscription?.amount?.value
+                            ?: subscription.yearlySubscription?.amount?.value?.let { it / 12 }
+                    }
+                    _state.update {
+                        it.copy(
+                            localisedSubscriptionsList = localisedSubscriptions,
+                            offerValidUntil = resolveOfferValidUntil(localisedSubscriptions),
+                        )
+                    }
+                }.onFailure { error ->
+                    Timber.w(error, "Failed to get subscriptions")
+                    if (error is LocalPricingNotAvailableException) {
+                        _state.update { it.copy(isSubscriptionFeatureAvailable = false) }
+                    }
+                }
+        }
+    }
+
+    /**
+     * Resolves the offer-countdown expiry (utqa "mo.e") that drives the revamp offer header
+     * countdown. Only discounted plans are considered, matching how the offer content is selected;
+     * the timestamps are campaign-wide, so the latest is used when plans disagree. Returns null when
+     * no discounted plan carries an expiry, which hides the countdown.
+     */
+    private fun resolveOfferValidUntil(subscriptions: List<LocalisedSubscription>): Long? =
+        subscriptions
+            .flatMap { listOfNotNull(it.monthlySubscription, it.yearlySubscription) }
+            .filter { it.hasOffer }
+            .mapNotNull { it.offerValidUntil }
+            .maxOrNull()
+
+    /**
+     * Load current subscription plan information.
+     */
+    private fun loadCurrentSubscriptionPlan() {
+        viewModelScope.launch {
+            monitorAccountDetailUseCase()
+                .catch { Timber.e(it) }
+                .mapNotNull { it.levelDetail }
+                .distinctUntilChanged()
+                .collectLatest { levelDetail ->
+                    val proExpirationTime =
+                        levelDetail.proExpirationTime.takeIf { time -> time > 0 }
+                    val cycle = resolveCurrentPlanCycle(levelDetail)
+                    _state.update {
+                        it.copy(
+                            subscriptionCycle = cycle,
+                            currentSubscriptionPlan = levelDetail.accountType,
+                            subscriptionStatus = levelDetail.subscriptionStatus,
+                            subscriptionRenewTime = levelDetail.subscriptionRenewTime
+                                .takeIf { time -> time > 0 },
+                            proExpirationTime = proExpirationTime,
+                            proPlanStartTime = levelDetail.accountPlanDetail?.startTime
+                                ?.takeIf { time -> time > 0 },
+                            isCurrentPlanExpiring = isPlanExpiringSoon(
+                                cycle = cycle,
+                                proExpirationTime = proExpirationTime,
+                            ),
+                        )
+                    }
+                    refreshRecommendedSubscription()
+                }
+        }
+    }
+
+    /**
+     * Recomputes the recommended plan (the tier above the current plan). Driven by
+     * [monitorAccountDetailUseCase] for upgrade accounts so it is resolved against the known current
+     * plan; otherwise the recommendation would fall back to the cheapest plan and stay stale.
+     */
+    private suspend fun refreshRecommendedSubscription() {
+        val recommended = runCatching { getRecommendedSubscriptionUseCase() }.getOrElse {
+            Timber.e(it)
+            null
+        }
+        _state.update {
+            it.copy(
+                cheapestSubscriptionAvailable = recommended?.let { plan ->
+                    localisedSubscriptionMapper(
+                        monthlySubscription = plan,
+                        yearlySubscription = plan,
+                    )
+                }
+            )
+        }
+    }
+
+    /**
+     * Resolves the billing cycle of the current plan from its own subscription, since the
+     * account-level cycle can be wrong when the account holds more than one subscription.
+     *
+     * @return the cycle of the subscription matching the current plan (by id, then by level), or the
+     * account-level cycle when no subscription matches or the match reports an unknown cycle.
+     */
+    private fun resolveCurrentPlanCycle(levelDetail: AccountLevelDetail): AccountSubscriptionCycle {
+        val subscriptions = levelDetail.accountSubscriptionDetailList
+        val planSubscriptionId = levelDetail.accountPlanDetail?.subscriptionId
+        val matchingSubscription = planSubscriptionId?.let { id ->
+            subscriptions.firstOrNull { it.subscriptionId == id }
+        } ?: subscriptions.firstOrNull { it.subscriptionLevel == levelDetail.accountType }
+        return matchingSubscription?.subscriptionCycle
+            ?.takeIf { it != AccountSubscriptionCycle.UNKNOWN }
+            ?: levelDetail.accountSubscriptionCycle
+    }
+
+    /**
+     * Whether the current plan is expiring soon: a one-off (non-recurring) plan — identified by an
+     * unknown billing cycle, which excludes renewing subscriptions — whose expiry is within the next
+     * [EXPIRING_SOON_THRESHOLD]. Drives the "Expiring" badge on the current plan card.
+     */
+    private fun isPlanExpiringSoon(
+        proExpirationTime: Long?,
+        cycle: AccountSubscriptionCycle,
+    ): Boolean {
+        if (proExpirationTime == null || cycle != AccountSubscriptionCycle.UNKNOWN) return false
+        val remaining = (proExpirationTime - getCurrentTimeInMillisUseCase() / 1000).seconds
+        return remaining > Duration.ZERO && remaining <= EXPIRING_SOON_THRESHOLD
+    }
+
+    /**
+     * Asks for pricing if needed.
+     */
+    fun refreshPricing() {
+        viewModelScope.launch {
+            val pricing = runCatching { getPricing(false) }.getOrElse {
+                Timber.w(it, "Returning empty pricing as get pricing failed.")
+                Pricing(emptyList())
+            }
+            _state.update {
+                it.copy(product = pricing.products)
+            }
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(isUpgradeAccount: Boolean): UpgradeAccountViewModel
+    }
+
+    companion object {
+        /**
+         * Extra key to indicate if the activity is for upgrading an account.
+         */
+        const val EXTRA_IS_UPGRADE_ACCOUNT = "EXTRA_IS_UPGRADE_ACCOUNT"
+
+        /**
+         * Remaining time below which an expiring plan shows the "Expiring" badge.
+         */
+        private val EXPIRING_SOON_THRESHOLD = 30.days
+    }
+}

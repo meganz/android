@@ -83,7 +83,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Wi-Fi seulement</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">Vous devez configurer un dossier local sur votre appareil qui se synchronisera avec un dossier choisi sur votre Disque nuagique.</string>
+    <string name="sync_empty_state_message">Vous devez configurer un dossier local sur votre appareil qui se synchronisera avec un dossier choisi sur votre disque Cloud.</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">Problème de fichier ou de dossier</string>
     <!-- Sync stalled issue reason is move or rename-->

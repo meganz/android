@@ -14,7 +14,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.utils.Constants.URL_INDICATOR
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
-import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener
@@ -41,10 +40,6 @@ class MegaNodeUtilFacade @Inject constructor(
     private val streamingGateway: StreamingGateway,
     @ApplicationScope private val coroutineScope: CoroutineScope,
 ) : MegaNodeUtilWrapper {
-    override fun getMyChatFilesFolder() = MegaNodeUtil.myChatFilesFolder
-
-    override fun getCloudRootHandle() = MegaNodeUtil.cloudRootHandle
-
     override fun getNumberOfFolders(nodes: List<MegaNode?>?) =
         MegaNodeUtil.getNumberOfFolders(nodes)
 
@@ -53,27 +48,11 @@ class MegaNodeUtilFacade @Inject constructor(
         context: Context,
     ) = MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(node, context)
 
-    override fun shareNode(context: Context, node: MegaNode?) {
-        MegaNodeUtil.shareNode(context, node)
-    }
-
-    override fun shareNode(
-        context: Context,
-        node: MegaNode?,
-        onExportFinishedListener: (() -> Unit)?,
-    ) {
-        MegaNodeUtil.shareNode(context, node, onExportFinishedListener)
-    }
-
     override fun areAllNodesDownloaded(context: Context, listNodes: List<MegaNode>) =
         MegaNodeUtil.areAllNodesDownloaded(context, listNodes)
 
     override fun getExportNodesLink(listNodes: List<MegaNode>) =
         MegaNodeUtil.getExportNodesLink(listNodes)
-
-    override fun shareNodes(context: Context, nodes: List<MegaNode>) {
-        MegaNodeUtil.shareNodes(context, nodes)
-    }
 
     override fun shouldContinueWithoutError(context: Context, node: MegaNode?) =
         MegaNodeUtil.shouldContinueWithoutError(context, node)
@@ -81,31 +60,14 @@ class MegaNodeUtilFacade @Inject constructor(
     override fun shouldContinueWithoutError(context: Context, nodes: List<MegaNode>?) =
         MegaNodeUtil.shouldContinueWithoutError(context, nodes)
 
-    override fun existsMyChatFilesFolder() = MegaNodeUtil.existsMyChatFilesFolder()
-
-    override suspend fun isOutShare(node: MegaNode) = MegaNodeUtil.isOutShare(node)
-
-    override fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem) =
-        MegaNodeUtil.getFolderIcon(node, drawerItem)
+    override fun getFolderIcon(megaApi: MegaApiAndroid, node: MegaNode, drawerItem: DrawerItem) =
+        MegaNodeUtil.getFolderIcon(megaApi, node, drawerItem)
 
     override fun isInRootLinksLevel(adapterType: Int, parentHandle: Long) =
         MegaNodeUtil.isInRootLinksLevel(adapterType, parentHandle)
 
-    override fun showShareOption(adapterType: Int, isFolderLink: Boolean, handle: Long) =
-        MegaNodeUtil.showShareOption(adapterType, isFolderLink, handle)
-
-    override fun isNodeInRubbishOrDeleted(handle: Long) =
-        MegaNodeUtil.isNodeInRubbishOrDeleted(handle)
-
     override fun areAllFileNodesAndNotTakenDown(nodes: List<MegaNode>) =
         MegaNodeUtil.areAllFileNodesAndNotTakenDown(nodes)
-
-    override fun allHaveFullAccess(nodes: List<MegaNode?>) = MegaNodeUtil.allHaveFullAccess(nodes)
-
-    override fun allHaveOwnerAccessAndNotTakenDown(nodes: List<MegaNode?>) =
-        MegaNodeUtil.allHaveOwnerAccessAndNotTakenDown(nodes)
-
-    override fun isEmptyFolder(node: MegaNode?) = MegaNodeUtil.isEmptyFolder(node)
 
     override fun getDlList(
         megaApi: MegaApiAndroid,
@@ -140,16 +102,6 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun selectFolderToCopy(activity: Activity, handles: LongArray) {
         MegaNodeUtil.selectFolderToCopy(activity, handles)
-    }
-
-    override fun getNodeLocationInfo(
-        adapterType: Int,
-        fromIncomingShare: Boolean,
-        handle: Long,
-    ) = MegaNodeUtil.getNodeLocationInfo(adapterType, fromIncomingShare, handle)
-
-    override fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo) {
-        MegaNodeUtil.handleLocationClick(activity, adapterType, location)
     }
 
     override fun openZip(

@@ -160,9 +160,9 @@ abstract class ChatModule {
         @IntoSet
         fun provideInProgressMissedCallsNotificationChannel(): NotificationChannelCompat =
             NotificationChannelCompat.Builder(
-                Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID,
+                Constants.NOTIFICATION_CHANNEL_IN_PROGRESS_MISSED_CALLS_ID,
                 NotificationManager.IMPORTANCE_HIGH
-            ).setName(Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME).build()
+            ).setName(Constants.NOTIFICATION_CHANNEL_IN_PROGRESS_MISSED_CALLS_NAME).build()
 
 
     }

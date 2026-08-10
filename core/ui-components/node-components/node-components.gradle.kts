@@ -3,7 +3,6 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
-    id("kotlin-android")
 }
 
 android {
@@ -17,18 +16,21 @@ android {
 
 dependencies {
     implementation(project(":domain"))
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
     implementation(project(":core:formatter"))
     implementation(project(":navigation"))
     implementation(project(":core:ui-components:shared-components"))
     implementation(project(":core:feature-flags"))
+    implementation(project(":core:passcode:passcode"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":core:analytics:analytics-tracker"))
 
     //core components
     implementation(lib.mega.core.ui)
     implementation(lib.mega.core.ui.tokens)
+    implementation(project(":shared:nodes"))
 
     // Compose
     implementation(androidx.bundles.compose.bom)

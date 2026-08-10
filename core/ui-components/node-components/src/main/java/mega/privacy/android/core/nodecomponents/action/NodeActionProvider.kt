@@ -19,10 +19,12 @@ data class SingleNodeActionProvider(
     override val navigationHandler: NavigationHandler?,
     override val moveLauncher: ActivityResultLauncher<LongArray>,
     override val copyLauncher: ActivityResultLauncher<LongArray>,
-    override val shareFolderLauncher: ActivityResultLauncher<LongArray>,
+    override val publicCopyLauncher: ActivityResultLauncher<LongArray>,
     override val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     override val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     override val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
+    override val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>,
+    override val videoToPlaylistLauncher: ActivityResultLauncher<Long>,
     val versionsLauncher: ActivityResultLauncher<Long>,
 ) : NodeActionProvider(
     viewModel = viewModel,
@@ -33,10 +35,12 @@ data class SingleNodeActionProvider(
     navigationHandler = navigationHandler,
     moveLauncher = moveLauncher,
     copyLauncher = copyLauncher,
-    shareFolderLauncher = shareFolderLauncher,
+    publicCopyLauncher = publicCopyLauncher,
     restoreLauncher = restoreLauncher,
     sendToChatLauncher = sendToChatLauncher,
-    hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher
+    hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
+    addToAlbumLauncher = addToAlbumLauncher,
+    videoToPlaylistLauncher = videoToPlaylistLauncher,
 )
 
 /**
@@ -51,10 +55,12 @@ data class MultipleNodesActionProvider(
     override val navigationHandler: NavigationHandler?,
     override val moveLauncher: ActivityResultLauncher<LongArray>,
     override val copyLauncher: ActivityResultLauncher<LongArray>,
-    override val shareFolderLauncher: ActivityResultLauncher<LongArray>,
+    override val publicCopyLauncher: ActivityResultLauncher<LongArray>,
     override val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     override val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     override val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
+    override val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>,
+    override val videoToPlaylistLauncher: ActivityResultLauncher<Long>? = null,
 ) : NodeActionProvider(
     viewModel = viewModel,
     context = context,
@@ -64,10 +70,12 @@ data class MultipleNodesActionProvider(
     navigationHandler = navigationHandler,
     moveLauncher = moveLauncher,
     copyLauncher = copyLauncher,
-    shareFolderLauncher = shareFolderLauncher,
+    publicCopyLauncher = publicCopyLauncher,
     restoreLauncher = restoreLauncher,
     sendToChatLauncher = sendToChatLauncher,
     hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
+    addToAlbumLauncher = addToAlbumLauncher,
+    videoToPlaylistLauncher = null,
 )
 
 open class NodeActionProvider(
@@ -79,8 +87,10 @@ open class NodeActionProvider(
     open val navigationHandler: NavigationHandler?,
     open val moveLauncher: ActivityResultLauncher<LongArray>,
     open val copyLauncher: ActivityResultLauncher<LongArray>,
-    open val shareFolderLauncher: ActivityResultLauncher<LongArray>,
+    open val publicCopyLauncher: ActivityResultLauncher<LongArray>,
     open val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     open val sendToChatLauncher: ActivityResultLauncher<LongArray>,
-    open val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>
+    open val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
+    open val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>,
+    open val videoToPlaylistLauncher: ActivityResultLauncher<Long>?,
 )

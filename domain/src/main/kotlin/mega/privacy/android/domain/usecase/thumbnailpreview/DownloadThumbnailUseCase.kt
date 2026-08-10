@@ -11,8 +11,8 @@ class DownloadThumbnailUseCase @Inject constructor(
 ) {
     /**
      * Download thumbnail
-     * @param callback success true, fail false
      */
-    suspend operator fun invoke(nodeId: Long, callback: (success: Boolean) -> Unit) =
-        thumbnailPreviewRepository.downloadThumbnail(nodeId, callback)
+    suspend operator fun invoke(nodeId: Long) {
+        thumbnailPreviewRepository.downloadThumbnail(handle = nodeId)
+    }
 }

@@ -43,6 +43,7 @@ interface ContactAlert {
 sealed interface IncomingShareAlert {
     val nodeId: Long?
     val contact: Contact
+    val destination: UserAlertDestination?
 }
 
 /**
@@ -308,6 +309,7 @@ data class NewShareAlert(
     override val isOwnChange: Boolean,
     override val nodeId: Long?,
     override val contact: Contact,
+    override val destination: UserAlertDestination?,
 ) : UserAlert, IncomingShareAlert {}
 
 /**
@@ -329,6 +331,7 @@ data class DeletedShareAlert(
     override val nodeId: Long?,
     val nodeName: String?,
     override val contact: Contact,
+    override val destination: UserAlertDestination?,
 ) : UserAlert, IncomingShareAlert {}
 
 
@@ -349,6 +352,7 @@ data class RemovedFromShareByOwnerAlert(
     override val isOwnChange: Boolean,
     override val nodeId: Long?,
     override val contact: Contact,
+    override val destination: UserAlertDestination?,
 ) : UserAlert, IncomingShareAlert {}
 
 /**
@@ -372,6 +376,7 @@ data class NewSharedNodesAlert(
     override val contact: Contact,
     val folderCount: Int,
     val fileCount: Int,
+    override val destination: UserAlertDestination?,
 ) : UserAlert, IncomingShareAlert {}
 
 /**
@@ -393,6 +398,29 @@ data class RemovedSharedNodesAlert(
     override val nodeId: Long?,
     override val contact: Contact,
     val itemCount: Int,
+    override val destination: UserAlertDestination?,
+) : UserAlert, IncomingShareAlert {}
+
+/**
+ * Updated shared nodes alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property nodeId
+ * @property contact
+ * @property itemCount
+ */
+data class UpdatedSharedNodesAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val nodeId: Long?,
+    override val contact: Contact,
+    val itemCount: Int,
+    override val destination: UserAlertDestination?,
 ) : UserAlert, IncomingShareAlert {}
 
 /**
@@ -403,7 +431,7 @@ data class RemovedSharedNodesAlert(
  * @property createdTime
  * @property isOwnChange
  * @property heading
- * @property title
+ * @property planName the Pro plan name the payment was for, e.g. "Pro I"
  */
 data class PaymentSucceededAlert(
     override val id: Long,
@@ -411,7 +439,7 @@ data class PaymentSucceededAlert(
     override val createdTime: Long,
     override val isOwnChange: Boolean,
     override val heading: String?,
-    val title: String?,
+    val planName: String?,
 ) : UserAlert, CustomAlert {}
 
 /**
@@ -422,7 +450,7 @@ data class PaymentSucceededAlert(
  * @property createdTime
  * @property isOwnChange
  * @property heading
- * @property title
+ * @property planName the Pro plan name the payment was for, e.g. "Pro I"
  */
 data class PaymentFailedAlert(
     override val id: Long,
@@ -430,7 +458,7 @@ data class PaymentFailedAlert(
     override val createdTime: Long,
     override val isOwnChange: Boolean,
     override val heading: String?,
-    val title: String?,
+    val planName: String?,
 ) : UserAlert, CustomAlert {}
 
 /**
@@ -441,7 +469,7 @@ data class PaymentFailedAlert(
  * @property createdTime
  * @property isOwnChange
  * @property heading
- * @property title
+ * @property endTimestamp the Pro plan expiry time, in seconds
  */
 data class PaymentReminderAlert(
     override val id: Long,
@@ -449,7 +477,7 @@ data class PaymentReminderAlert(
     override val createdTime: Long,
     override val isOwnChange: Boolean,
     override val heading: String?,
-    val title: String?,
+    val endTimestamp: Long,
 ) : UserAlert, CustomAlert {}
 
 /**

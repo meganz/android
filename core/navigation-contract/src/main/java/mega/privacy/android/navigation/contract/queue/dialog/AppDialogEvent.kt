@@ -1,0 +1,17 @@
+package mega.privacy.android.navigation.contract.queue.dialog
+
+import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.navigation.contract.navkey.Suppressable
+import mega.privacy.android.navigation.contract.queue.QueueEvent
+
+/**
+ * App dialog event
+ *
+ * @property dialogDestination
+ */
+data class AppDialogEvent(
+    val dialogDestination: NavKey,
+) : QueueEvent {
+    override val suppressableKey: NavKey?
+        get() = dialogDestination.takeIf { it is Suppressable }
+}

@@ -10,27 +10,32 @@ import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
@@ -38,7 +43,7 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
-import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
@@ -49,6 +54,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChange1XEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChange2XEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeHalfXEvent
@@ -62,6 +68,7 @@ import javax.inject.Inject
 /**
  * MediaPlayer Fragment
  */
+@androidx.annotation.OptIn(UnstableApi::class)
 @AndroidEntryPoint
 class AudioPlayerFragment : Fragment() {
     /**
@@ -77,7 +84,8 @@ class AudioPlayerFragment : Fragment() {
     @Inject
     lateinit var mediaPlayerGateway: MediaPlayerGateway
 
-    private val audioViewModel by viewModels<AudioPlayerViewModel>()
+    private val audioViewModel by viewModels<LegacyAudioPlayerViewModel>()
+    private val mediaPlayerViewModel by activityViewModels<MediaPlayerViewModel>()
 
     private var playerViewHolder: AudioPlayerViewHolder? = null
 
@@ -94,6 +102,9 @@ class AudioPlayerFragment : Fragment() {
 
     private var retryFailedDialog: AlertDialog? = null
 
+    // top-level inside class
+    private var playerGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             serviceGateway = null
@@ -101,7 +112,7 @@ class AudioPlayerFragment : Fragment() {
         }
 
         /**
-         * Called after a successful bind with our AudioPlayerService.
+         * Called after a successful bind with our LegacyAudioPlayerService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is MediaPlayerServiceBinder) {
@@ -130,17 +141,24 @@ class AudioPlayerFragment : Fragment() {
             playerViewHolder = AudioPlayerViewHolder(this)
         }.root
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         context?.bindService(
             Intent(
                 requireContext(),
-                AudioPlayerService::class.java
+                LegacyAudioPlayerService::class.java
             ).putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false),
             connection,
             BIND_AUTO_CREATE
+        )
+
+        // Re-apply artwork layout after any layout pass (e.g., rotation/size change)
+        playerGlobalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+            playerViewHolder?.layoutArtwork()
+        }
+        playerViewHolder?.binding?.playerView?.viewTreeObserver?.addOnGlobalLayoutListener(
+            playerGlobalLayoutListener
         )
 
         observeFlow()
@@ -153,7 +171,6 @@ class AudioPlayerFragment : Fragment() {
         if (serviceGateway != null && serviceViewModelGateway != null) {
             setupPlayer()
         }
-
         if (!toolbarVisible) {
             showToolbar()
             delayHideToolbar()
@@ -162,6 +179,9 @@ class AudioPlayerFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        playerViewHolder?.binding?.playerView?.viewTreeObserver?.let { vto ->
+            playerGlobalLayoutListener?.let { vto.removeOnGlobalLayoutListener(it) }
+        }
         playlistObserved = false
         // Close the dialog after fragment is destroyed to avoid adding dialog view repeatedly after screen is rotated.
         playbackPositionDialog?.run {
@@ -170,6 +190,7 @@ class AudioPlayerFragment : Fragment() {
         playerViewHolder = null
         serviceGateway?.removeListener(playerListener)
         serviceGateway = null
+        serviceViewModelGateway = null
         context?.unbindService(connection)
     }
 
@@ -221,16 +242,20 @@ class AudioPlayerFragment : Fragment() {
                         }
                     }
 
-                    viewLifecycleOwner.collectFlow(gateway.monitorMediaItemTransitionState()) { handle ->
+                    viewLifecycleOwner.collectFlow(
+                        gateway.monitorMediaItemTransitionState()
+                            .filter { audioViewModel.shouldProcessMediaItem(it) }) { handle ->
                         handle?.let {
                             val name = gateway.getPlaylistItem(it.toString())?.nodeName
                                 ?: activity?.intent?.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)
                                 ?: ""
+                            val isPausedByUser = serviceGateway?.isPausedByUser() ?: false
                             audioViewModel.checkPlaybackPositionOfPlayingItem(
                                 handle = handle,
                                 name = name,
                                 status = serviceGateway?.getPlaybackPositionStatus()
-                                    ?: PlaybackPositionStatus.Initial
+                                    ?: PlaybackPositionStatus.Initial,
+                                isResume = !isPausedByUser
                             ) { status ->
                                 serviceGateway?.updatePlaybackPositionStatus(status)
                             }
@@ -253,6 +278,7 @@ class AudioPlayerFragment : Fragment() {
             serviceGateway?.run {
                 setupPlayerView(this, viewHolder.binding.playerView)
                 viewHolder.layoutArtwork()
+                viewHolder.applyControlIcons(requireContext())
             }
 
             serviceViewModelGateway?.run {
@@ -275,6 +301,7 @@ class AudioPlayerFragment : Fragment() {
                     audioViewModel.updateIsSpeedPopupShown(true)
                 }
                 initPlaybackPositionDialog(viewHolder.playbackPositionDialog)
+                initMoveToTrashDialog(viewHolder.moveToTrashDialog)
             }
         }
     }
@@ -311,9 +338,39 @@ class AudioPlayerFragment : Fragment() {
                         showPlaybackDialog = uiState.showPlaybackDialog,
                         currentPlayingItemName = uiState.currentPlayingItemName ?: "",
                         playbackPosition = uiState.playbackPosition ?: 0,
-                        onPlaybackPositionStatusUpdated = { status ->
-                            audioViewModel.updatePlaybackPositionStatus(status)
+                        onPlaybackPositionStatusUpdated = { status, isClearPosition ->
+                            audioViewModel.updatePlaybackPositionStatus(
+                                handle = uiState.currentPlayingHandle,
+                                status = status,
+                                isClearPosition = isClearPosition
+                            )
                             serviceGateway?.updatePlaybackPositionStatus(status)
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun initMoveToTrashDialog(composeView: ComposeView) {
+        composeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val uiState by mediaPlayerViewModel.state.collectAsStateWithLifecycle()
+                OriginalTheme(isDark = isSystemInDarkTheme()) {
+                    BasicDialog(
+                        isVisible = uiState.showMoveToTrashDialog,
+                        description = stringResource(id = R.string.confirmation_move_to_rubbish),
+                        positiveButtonText = stringResource(id = R.string.general_move),
+                        negativeButtonText = stringResource(id = sharedResR.string.general_dialog_cancel_button),
+                        onPositiveButtonClicked = {
+                            uiState.nodeToMoveToTrash?.let { node ->
+                                mediaPlayerViewModel.moveNodeToRubbishBin(node)
+                            }
+                            mediaPlayerViewModel.hideMoveToTrashDialog()
+                        },
+                        onNegativeButtonClicked = {
+                            mediaPlayerViewModel.hideMoveToTrashDialog()
                         }
                     )
                 }
@@ -340,6 +397,7 @@ class AudioPlayerFragment : Fragment() {
         mediaPlayerServiceGateway: MediaPlayerServiceGateway,
         playerView: PlayerView,
     ) {
+        playerView.setControllerAnimationEnabled(false)
         mediaPlayerServiceGateway.setupPlayerView(
             playerView = playerView,
             isAudioPlayer = true,

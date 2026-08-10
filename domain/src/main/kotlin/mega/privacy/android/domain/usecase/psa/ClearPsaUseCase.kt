@@ -15,6 +15,5 @@ class ClearPsaUseCase @Inject constructor(private val psaRepository: PsaReposito
      */
     suspend operator fun invoke() {
         psaRepository.clearCache()
-        psaRepository.setLastFetchedTime(null)
     }
 }

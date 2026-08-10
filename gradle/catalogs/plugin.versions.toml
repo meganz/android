@@ -1,20 +1,20 @@
 [versions]
-firebase-crashlytics = "3.0.2"
-firebase-performance = "1.4.2"
-firebase-app-distribution = "5.0.0"
-gradle = "8.10.1"
-google-services = "4.4.2"
-hilt = "2.56.1"
-jacoco = "0.8.11"
-jfrog = "5.2.0"
-android-junit5 = "1.10.0.0"
-kotlin = "2.1.0"
-navigation = "2.7.7"
-paparazzi = "1.3.2"
-ksp = "2.1.0-1.0.28"
-megagradle = "0.75.20250718034747"
-jfrog-artifactory = "5.2.0"
-serialisation = "2.1.0"
+firebase-crashlytics = "3.0.7"
+firebase-performance = "2.0.2"
+firebase-app-distribution = "5.3.0"
+gradle = "9.2.1"
+google-services = "4.5.0"
+hilt = "2.60.1"
+jacoco = "0.8.15"
+jfrog = "6.0.4"
+kotlin = "2.4.0"
+navigation = "2.10.0-alpha06"
+ksp = "2.3.7"
+megagradle = "0.88.20260519024856"
+jfrog-artifactory = "6.0.4"
+serialisation = "2.4.0"
+benchmark-baseline-profile = "1.5.0-alpha07"
+compose-screenshot = "0.0.1-alpha15"
 
 [libraries]
 build-tools = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
@@ -25,19 +25,17 @@ google-services = { module = "com.google.gms:google-services", version.ref = "go
 hilt-android = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
 jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }
 jfrog = { module = "org.jfrog.buildinfo:build-info-extractor-gradle", version.ref = "jfrog" }
-junit5 = { module = "de.mannodermaus.gradle.plugins:android-junit5", version.ref = "android-junit5" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 navigation-safeargs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
-paparazzi = { module = "app.cash.paparazzi:paparazzi-gradle-plugin", version.ref = "paparazzi" }
 ksp-gradle-plugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+benchmark-baseline-profile = { module = "androidx.benchmark:benchmark-baseline-profile-gradle-plugin", version.ref = "benchmark-baseline-profile" }
 
 [plugins]
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 jfrog-artifactory = { id = "com.jfrog.artifactory", version.ref = "jfrog-artifactory" }
 mega-artifactory-publish-convention = { id = "mega.artifactory.publish.convention", version.ref = "megagradle" }
 mega-android-release = { id = "mega.android.release", version.ref = "megagradle" }
 mega-android-cicd = { id = "mega.android.cicd", version.ref = "megagradle" }
-de-mannodermaus-android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "android-junit5" }
 kotlin-serialisation = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialisation"}
+compose-screenshot = { id = "com.android.compose.screenshot", version.ref = "compose-screenshot" }

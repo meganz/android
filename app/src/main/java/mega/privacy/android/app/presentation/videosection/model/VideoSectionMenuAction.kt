@@ -1,11 +1,11 @@
 package mega.privacy.android.app.presentation.videosection.model
 
-import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.IconPack
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionPlural
 import mega.android.core.ui.model.menu.MenuActionString
 import mega.android.core.ui.model.menu.MenuActionWithoutIcon
+import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -112,7 +112,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      * Video section rename action
      */
     object VideoSectionRenameAction : MenuActionWithoutIcon(
-        descriptionRes = R.string.context_rename,
+        descriptionRes = sharedR.string.context_rename,
         testTag = TEST_TAG_VIDEO_SECTION_RENAME_ACTION
     ), VideoSectionMenuAction {
         override val orderInCategory = 145
@@ -186,7 +186,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      */
     object VideoRecentlyWatchedClearAction : MenuActionString(
         icon = IconPack.Medium.Thin.Outline.Trash,
-        descriptionRes = R.string.general_clear,
+        descriptionRes = sharedR.string.general_clear,
         testTag = TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_CLEAR_ACTION
     ), VideoSectionMenuAction {
         override val orderInCategory = 180

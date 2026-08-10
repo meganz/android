@@ -3,10 +3,13 @@ package mega.privacy.android.domain.usecase.transfers.active
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaEventUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import javax.inject.Inject
 
@@ -17,6 +20,7 @@ class HandleDownloadTransferEventsUseCase @Inject constructor(
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
     private val handleAvailableOfflineEventUseCase: HandleAvailableOfflineEventUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
+    private val broadcastTransferOverQuotaEventUseCase: BroadcastTransferOverQuotaEventUseCase,
 ) : IHandleTransferEventUseCase {
     /**
      * Invoke
@@ -46,6 +50,19 @@ class HandleDownloadTransferEventsUseCase @Inject constructor(
         }.lastOrNull()?.let { isTransferOverQuota ->
             broadcastTransferOverQuotaUseCase(isTransferOverQuota)
         }
+
+        events.mapNotNull { it.overQuotaStatusOrNull() }
+            .minByOrNull { it.ordinal }
+            ?.let { broadcastTransferOverQuotaEventUseCase(it) }
+    }
+
+    private fun TransferEvent.overQuotaStatusOrNull(): TransferOverQuotaStatus? {
+        if (!transfer.transferType.isDownloadType()) return null
+        return when ((this as? TransferEvent.TransferTemporaryErrorEvent)?.error) {
+            is QuotaExceededMegaException -> TransferOverQuotaStatus.OverQuota
+            is NotEnoughQuotaMegaException -> TransferOverQuotaStatus.AlmostOverQuota
+            else -> null
+        }
     }
 
     private suspend fun handleAvailableOffline(events: List<TransferEvent>) {
@@ -64,7 +81,10 @@ class HandleDownloadTransferEventsUseCase @Inject constructor(
         }.takeIf { it.isNotEmpty() }
             ?.let { paths ->
                 runCatching {
-                    scanMediaFileUseCase(paths.toTypedArray(), arrayOf(""))
+                    scanMediaFileUseCase(
+                        paths.toTypedArray(),
+                        Array(paths.size) { "" },
+                    )
                 }
             }
     }

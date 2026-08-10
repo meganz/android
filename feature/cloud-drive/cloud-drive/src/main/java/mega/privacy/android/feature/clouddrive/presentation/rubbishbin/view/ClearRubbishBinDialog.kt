@@ -1,16 +1,17 @@
 package mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * M3 Compose dialog for clearing rubbish bin
- * 
+ *
  * @param onDismiss Callback when dialog is dismissed
  * @param onClearRubbishBin Callback when user confirms clearing the rubbish bin
  */
@@ -18,11 +19,13 @@ import mega.privacy.android.shared.resources.R as sharedR
 fun ClearRubbishBinDialog(
     onDismiss: () -> Unit,
     onClearRubbishBin: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     BasicDialog(
-        title = stringResource(R.string.context_clear_rubbish),
-        description = stringResource(R.string.clear_rubbish_confirmation),
-        positiveButtonText = stringResource(R.string.general_clear),
+        modifier = modifier.testTag(CLEAR_RUBBISH_BIN_EMPTY_DIALOG_TAG),
+        title = stringResource(sharedR.string.empty_rubbish_bin_menu),
+        description = stringResource(sharedR.string.remove_all_rubbish_bin_confirmation),
+        positiveButtonText = stringResource(sharedR.string.general_clear),
         onPositiveButtonClicked = {
             onDismiss()
             onClearRubbishBin()
@@ -43,3 +46,5 @@ private fun ClearRubbishBinDialogPreview() {
         )
     }
 }
+
+internal const val CLEAR_RUBBISH_BIN_EMPTY_DIALOG_TAG = "clear_rubbish_bin:dialog_empty"

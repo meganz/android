@@ -9,11 +9,10 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -46,45 +45,13 @@ class HideSelectionMenuItemTest {
     }
 
     @Test
-    fun `test shouldDisplay returns false when feature flag is disabled`() = runTest {
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) } doReturn false
-        }
-        val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase>()
-        val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
-        val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
-
-        val hideMenuItem = HideSelectionMenuItem(
-            mock<HideMenuAction>(),
-            getFeatureFlagValueUseCase,
-            isHidingActionAllowedUseCase,
-            monitorAccountDetailUseCase,
-            getBusinessStatusUseCase
-        )
-
-        val result = hideMenuItem.shouldDisplay(
-            hasNodeAccessPermission = true,
-            selectedNodes = listOf(mockFileNode),
-            canBeMovedToTarget = true,
-            noNodeInBackups = true,
-            noNodeTakenDown = true
-        )
-
-        assertThat(result).isFalse()
-    }
-
-    @Test
     fun `test shouldDisplay returns false when no access permission`() = runTest {
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) } doReturn true
-        }
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase>()
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
         val hideMenuItem = HideSelectionMenuItem(
             mock<HideMenuAction>(),
-            getFeatureFlagValueUseCase,
             isHidingActionAllowedUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase
@@ -95,7 +62,8 @@ class HideSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -103,16 +71,12 @@ class HideSelectionMenuItemTest {
 
     @Test
     fun `test shouldDisplay returns false when node is taken down`() = runTest {
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) } doReturn true
-        }
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase>()
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
         val hideMenuItem = HideSelectionMenuItem(
             mock<HideMenuAction>(),
-            getFeatureFlagValueUseCase,
             isHidingActionAllowedUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase
@@ -123,7 +87,8 @@ class HideSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = false
+            noNodeTakenDown = false,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -131,16 +96,12 @@ class HideSelectionMenuItemTest {
 
     @Test
     fun `test shouldDisplay returns false when node is in backups`() = runTest {
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) } doReturn true
-        }
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase>()
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
         val hideMenuItem = HideSelectionMenuItem(
             mock<HideMenuAction>(),
-            getFeatureFlagValueUseCase,
             isHidingActionAllowedUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase
@@ -151,7 +112,8 @@ class HideSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = false,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -159,18 +121,14 @@ class HideSelectionMenuItemTest {
 
     @Test
     fun `test shouldDisplay returns false when hiding action is not allowed for node`() = runTest {
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) } doReturn true
-        }
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn false
+            on { invoke(any()) } doReturn false
         }
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
         val hideMenuItem = HideSelectionMenuItem(
             mock<HideMenuAction>(),
-            getFeatureFlagValueUseCase,
             isHidingActionAllowedUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase
@@ -189,11 +147,8 @@ class HideSelectionMenuItemTest {
 
     @Test
     fun `test shouldDisplay returns true for free account with non-sensitive nodes`() = runTest {
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) } doReturn true
-        }
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn true
+            on { invoke(any()) } doReturn true
         }
         val accountType = mock<AccountType> {
             on { isPaid } doReturn false
@@ -205,15 +160,14 @@ class HideSelectionMenuItemTest {
             on { levelDetail } doReturn accountLevelDetail
         }
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-            onBlocking { invoke() } doReturn flowOf(accountDetail)
+            on { invoke() } doReturn flowOf(accountDetail)
         }
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-            onBlocking { invoke() } doReturn BusinessAccountStatus.Active
+            on { invoke() } doReturn BusinessAccountStatus.Active
         }
 
         val hideMenuItem = HideSelectionMenuItem(
             mock<HideMenuAction>(),
-            getFeatureFlagValueUseCase,
             isHidingActionAllowedUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase
@@ -232,11 +186,8 @@ class HideSelectionMenuItemTest {
 
     @Test
     fun `test shouldDisplay returns true for paid account with non-sensitive nodes`() = runTest {
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) } doReturn true
-        }
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn true
+            on { invoke(any()) } doReturn true
         }
         val accountType = mock<AccountType> {
             on { isPaid } doReturn true
@@ -248,15 +199,14 @@ class HideSelectionMenuItemTest {
             on { levelDetail } doReturn accountLevelDetail
         }
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-            onBlocking { invoke() } doReturn flowOf(accountDetail)
+            on { invoke() } doReturn flowOf(accountDetail)
         }
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-            onBlocking { invoke() } doReturn BusinessAccountStatus.Active
+            on { invoke() } doReturn BusinessAccountStatus.Active
         }
 
         val hideMenuItem = HideSelectionMenuItem(
             mock<HideMenuAction>(),
-            getFeatureFlagValueUseCase,
             isHidingActionAllowedUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase
@@ -275,11 +225,8 @@ class HideSelectionMenuItemTest {
 
     @Test
     fun `test shouldDisplay returns true for expired business account`() = runTest {
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) } doReturn true
-        }
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn true
+            on { invoke(any()) } doReturn true
         }
         val accountType = mock<AccountType> {
             on { isPaid } doReturn true
@@ -291,15 +238,14 @@ class HideSelectionMenuItemTest {
             on { levelDetail } doReturn accountLevelDetail
         }
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-            onBlocking { invoke() } doReturn flowOf(accountDetail)
+            on { invoke() } doReturn flowOf(accountDetail)
         }
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-            onBlocking { invoke() } doReturn BusinessAccountStatus.Expired
+            on { invoke() } doReturn BusinessAccountStatus.Expired
         }
 
         val hideMenuItem = HideSelectionMenuItem(
             mock<HideMenuAction>(),
-            getFeatureFlagValueUseCase,
             isHidingActionAllowedUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase
@@ -317,98 +263,91 @@ class HideSelectionMenuItemTest {
     }
 
     @Test
-    fun `test shouldDisplay returns false when all nodes are sensitive for paid account`() = runTest {
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) } doReturn true
-        }
-        val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn true
-        }
-        val accountType = mock<AccountType> {
-            on { isPaid } doReturn true
-        }
-        val accountLevelDetail = mock<AccountLevelDetail> {
-            on { this.accountType } doReturn accountType
-        }
-        val accountDetail = mock<AccountDetail> {
-            on { levelDetail } doReturn accountLevelDetail
-        }
-        val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-            onBlocking { invoke() } doReturn flowOf(accountDetail)
-        }
-        val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-            onBlocking { invoke() } doReturn BusinessAccountStatus.Active
-        }
+    fun `test shouldDisplay returns false when all nodes are sensitive for paid account`() =
+        runTest {
+            val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
+                on { invoke(any()) } doReturn true
+            }
+            val accountType = mock<AccountType> {
+                on { isPaid } doReturn true
+            }
+            val accountLevelDetail = mock<AccountLevelDetail> {
+                on { this.accountType } doReturn accountType
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { levelDetail } doReturn accountLevelDetail
+            }
+            val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
+                on { invoke() } doReturn flowOf(accountDetail)
+            }
+            val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
+                on { invoke() } doReturn BusinessAccountStatus.Active
+            }
 
-        val hideMenuItem = HideSelectionMenuItem(
-            mock<HideMenuAction>(),
-            getFeatureFlagValueUseCase,
-            isHidingActionAllowedUseCase,
-            monitorAccountDetailUseCase,
-            getBusinessStatusUseCase
-        )
+            val hideMenuItem = HideSelectionMenuItem(
+                mock<HideMenuAction>(),
+                isHidingActionAllowedUseCase,
+                monitorAccountDetailUseCase,
+                getBusinessStatusUseCase
+            )
 
         val result = hideMenuItem.shouldDisplay(
             hasNodeAccessPermission = true,
             selectedNodes = listOf(mockSensitiveFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
-        assertThat(result).isFalse()
-    }
+            assertThat(result).isFalse()
+        }
 
     @Test
-    fun `test shouldDisplay returns false when any node has inherited sensitivity for paid account`() = runTest {
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) } doReturn true
-        }
-        val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn true
-        }
-        val accountType = mock<AccountType> {
-            on { isPaid } doReturn true
-        }
-        val accountLevelDetail = mock<AccountLevelDetail> {
-            on { this.accountType } doReturn accountType
-        }
-        val accountDetail = mock<AccountDetail> {
-            on { levelDetail } doReturn accountLevelDetail
-        }
-        val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-            onBlocking { invoke() } doReturn flowOf(accountDetail)
-        }
-        val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-            onBlocking { invoke() } doReturn BusinessAccountStatus.Active
-        }
+    fun `test shouldDisplay returns false when any node has inherited sensitivity for paid account`() =
+        runTest {
+            val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
+                on { invoke(any()) } doReturn true
+            }
+            val accountType = mock<AccountType> {
+                on { isPaid } doReturn true
+            }
+            val accountLevelDetail = mock<AccountLevelDetail> {
+                on { this.accountType } doReturn accountType
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { levelDetail } doReturn accountLevelDetail
+            }
+            val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
+                on { invoke() } doReturn flowOf(accountDetail)
+            }
+            val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
+                on { invoke() } doReturn BusinessAccountStatus.Active
+            }
 
-        val hideMenuItem = HideSelectionMenuItem(
-            mock<HideMenuAction>(),
-            getFeatureFlagValueUseCase,
-            isHidingActionAllowedUseCase,
-            monitorAccountDetailUseCase,
-            getBusinessStatusUseCase
-        )
+            val hideMenuItem = HideSelectionMenuItem(
+                mock<HideMenuAction>(),
+                isHidingActionAllowedUseCase,
+                monitorAccountDetailUseCase,
+                getBusinessStatusUseCase
+            )
 
         val result = hideMenuItem.shouldDisplay(
             hasNodeAccessPermission = true,
             selectedNodes = listOf(mockFileNode, mockInheritedSensitiveFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
-        assertThat(result).isFalse()
-    }
+            assertThat(result).isFalse()
+        }
 
     @Test
     fun `test shouldDisplay ignores canBeMovedToTarget parameter`() = runTest {
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) } doReturn true
-        }
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn true
+            on { invoke(any()) } doReturn true
         }
         val accountType = mock<AccountType> {
             on { isPaid } doReturn true
@@ -420,15 +359,14 @@ class HideSelectionMenuItemTest {
             on { levelDetail } doReturn accountLevelDetail
         }
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-            onBlocking { invoke() } doReturn flowOf(accountDetail)
+            on { invoke() } doReturn flowOf(accountDetail)
         }
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-            onBlocking { invoke() } doReturn BusinessAccountStatus.Active
+            on { invoke() } doReturn BusinessAccountStatus.Active
         }
 
         val hideMenuItem = HideSelectionMenuItem(
             mock<HideMenuAction>(),
-            getFeatureFlagValueUseCase,
             isHidingActionAllowedUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase
@@ -440,7 +378,8 @@ class HideSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = false,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         val result2 = hideMenuItem.shouldDisplay(
@@ -448,7 +387,8 @@ class HideSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result1).isTrue()

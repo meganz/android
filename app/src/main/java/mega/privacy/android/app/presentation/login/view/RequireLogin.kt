@@ -4,9 +4,11 @@ import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
@@ -23,6 +25,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -82,7 +85,10 @@ import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.feature.signin.external.ui.GoogleSignInButton
 import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.shared.original.core.ui.model.KeyboardState
 import mega.privacy.android.shared.resources.R
 import mega.privacy.mobile.analytics.event.ForgotPasswordButtonPressedEvent
@@ -104,6 +110,7 @@ fun RequireLogin(
     onResetResendVerificationEmailEvent: () -> Unit,
     stopLogin: () -> Unit,
     onToggleTitle: (Boolean) -> Unit,
+    onGoogleSignInClicked: () -> Unit = {},
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     paddingValues: PaddingValues = PaddingValues(0.dp),
@@ -343,13 +350,31 @@ fun RequireLogin(
                     .padding(top = 24.dp, start = 16.dp, end = 16.dp)
                     .align(Alignment.CenterHorizontally),
                 text = stringResource(id = R.string.login_text),
-                isLoading = false,
+                isLoading = state.isLoginInProgress,
                 onClick = {
                     Analytics.tracker.trackEvent(LoginButtonPressedEvent)
                     focusManager.clearFocus(true)
                     onLoginClicked()
                 },
             )
+
+            // Google Sign-In section — gated by feature flag. No loading content, so the
+            // login screen renders nothing while the flag resolves instead of a shimmer
+            // placeholder that lingers (e.g. after logout). AND-23890.
+            FeatureFlagGate(
+                feature = ApiFeatures.GoogleSignIn,
+            ) {
+                Spacer(modifier = Modifier.height(8.dp))
+                OrDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                GoogleSignInButton(
+                    onClick = onGoogleSignInClicked,
+                    isLoading = state.isLoginInProgress,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
 
             TextOnlyButton(
                 modifier = Modifier
@@ -446,6 +471,24 @@ private fun rememberMinContentHeight(
             val systemBarsPadding = systemBars.getTop(this) + systemBars.getBottom(this)
             (windowHeight - contentTopPadding - systemBarsPadding).toDp()
         }
+    }
+}
+
+@Composable
+private fun OrDivider(modifier: Modifier = Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        HorizontalDivider(modifier = Modifier.weight(1f))
+        MegaText(
+            text = stringResource(R.string.or_divider),
+            modifier = Modifier.padding(horizontal = 16.dp),
+            style = AppTheme.typography.bodySmall,
+            textColor = TextColor.Secondary,
+        )
+        HorizontalDivider(modifier = Modifier.weight(1f))
     }
 }
 

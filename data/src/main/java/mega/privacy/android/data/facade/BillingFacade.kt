@@ -11,8 +11,10 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams
+import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams.SubscriptionProductReplacementParams
 import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.GetBillingConfigParams
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
@@ -26,6 +28,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -35,23 +42,28 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
+import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaSkuMapper
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.exception.ConnectBillingServiceException
 import mega.privacy.android.domain.exception.ProductNotFoundException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.repository.security.LoginRepository
+import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Billing facade
@@ -73,15 +85,17 @@ internal class BillingFacade @Inject constructor(
     private val verifyPurchaseGateway: VerifyPurchaseGateway,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val skusCache: Cache<List<MegaSku>>,
-    private val accountInfoWrapper: AccountInfoWrapper,
+    private val megaApiGateway: MegaApiGateway,
     private val productDetailsListCache: Cache<List<ProductDetails>>,
     private val activeSubscription: Cache<MegaPurchase>,
-    private val accountRepository: AccountRepository,
-    private val loginRepository: LoginRepository,
+    private val source: Cache<UpgradeSource>,
+    private val appEventGateway: AppEventGateway,
 ) : BillingGateway, PurchasesUpdatedListener, DefaultLifecycleObserver {
     private val mutex = Mutex()
     private val proceedPurchaseMutex = Mutex()
+    private val submittedPurchaseTokens = mutableSetOf<String>()
     private val billingEvent = MutableSharedFlow<BillingEvent>()
+    private var disconnectJob: Job? = null
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Timber.e(throwable)
@@ -92,7 +106,7 @@ internal class BillingFacade @Inject constructor(
             ProcessLifecycleOwner.get().lifecycle.addObserver(this@BillingFacade)
         }
         applicationScope.launch(exceptionHandler) {
-            loginRepository.monitorFetchNodesFinish().collect {
+            appEventGateway.monitorFetchNodesFinish().collect {
                 if (it) {
                     queryPurchase()
                 }
@@ -101,16 +115,19 @@ internal class BillingFacade @Inject constructor(
     }
 
     override fun onStart(owner: LifecycleOwner) {
+        disconnectJob?.cancel()
+        disconnectJob = null
         applicationScope.launch(exceptionHandler) {
             ensureConnect()
-            if (accountRepository.isMegaApiLoggedIn()) {
+            if (megaApiGateway.isMegaApiLoggedIn() > 0) {
                 queryPurchase()
             }
         }
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        applicationScope.launch {
+        disconnectJob = applicationScope.launch {
+            delay(5.seconds) // same approach of the SharingStarted.WhileSubscribed(5000)
             disconnect()
         }
     }
@@ -119,6 +136,9 @@ internal class BillingFacade @Inject constructor(
 
     private val obfuscatedAccountId: String?
         get() = verifyPurchaseGateway.generateObfuscatedAccountId()
+
+    private val newObfuscatedAccountId: String?
+        get() = verifyPurchaseGateway.generateObfuscatedNewAccountId()
 
     private suspend fun disconnect() {
         mutex.withLock {
@@ -137,6 +157,7 @@ internal class BillingFacade @Inject constructor(
         activity: Activity,
         productId: String,
         offerId: String?,
+        currentAccountType: AccountType,
     ) {
         val oldSubscription = activeSubscription.get()
         Timber.d("old subscription is: $oldSubscription")
@@ -148,7 +169,7 @@ internal class BillingFacade @Inject constructor(
                 throw ProductNotFoundException()
             }
         Timber.d("oldSku is:%s, new sku is:%s", oldSku, skuDetails)
-        Timber.d("Obfuscated account id is:%s", obfuscatedAccountId)
+        Timber.d("Obfuscated account id is:%s", newObfuscatedAccountId)
         // if user upgrade to higher level, it takes effect immediately
         // if user downgrading to the same level from yearly to monthly, it also takes effect immediately
         // otherwise, it will take effect after current subscription period
@@ -157,10 +178,15 @@ internal class BillingFacade @Inject constructor(
         val newLevel = newMegaPurchase.level
         val isDowngradeSameLevel = oldLevel == newLevel && newMegaPurchase.isMonthly
         Timber.d("old level is: $oldLevel, new level is: $newLevel, isDowngradeSameLevel is: $isDowngradeSameLevel")
+        val isActiveSubscription = hasActiveSubscription(
+            oldSubscription = oldSubscription,
+            currentAccountType = currentAccountType,
+        )
+        Timber.d("isActiveSubscription: $isActiveSubscription, currentAccountType: $currentAccountType")
         val replacementMode = if (newLevel > oldLevel || isDowngradeSameLevel) {
-            SubscriptionUpdateParams.ReplacementMode.WITH_TIME_PRORATION
+            SubscriptionProductReplacementParams.ReplacementMode.WITH_TIME_PRORATION
         } else {
-            SubscriptionUpdateParams.ReplacementMode.DEFERRED
+            SubscriptionProductReplacementParams.ReplacementMode.DEFERRED
         }
         val productDetails: ProductDetails =
             productDetailsListCache.get().orEmpty().find { it.productId == productId }
@@ -172,28 +198,36 @@ internal class BillingFacade @Inject constructor(
                 (offerDetailsList.find { it.offerId == offerId } // try finding specific offer
                     ?: offerDetailsList.find { it.offerId.isNullOrEmpty() }) // fallback to base plan
                     ?.offerToken.orEmpty()
-            val productDetailsParams = listOf(
-                ProductDetailsParams.newBuilder()
-                    .setProductDetails(productDetails)
-                    .setOfferToken(offerToken)
-                    .build()
-            )
+            val productDetailsParamsBuilder = ProductDetailsParams.newBuilder()
+                .setProductDetails(productDetails)
+                .setOfferToken(offerToken)
+            if (isActiveSubscription) {
+                productDetailsParamsBuilder.setSubscriptionProductReplacementParams(
+                    SubscriptionProductReplacementParams.newBuilder()
+                        .setOldProductId(oldSku.orEmpty())
+                        .setReplacementMode(replacementMode)
+                        .build()
+                )
+            }
+            // Fix DEVELOPER_ERROR Account identifiers don't match the previous subscription,
+            val obfuscatedAccountIdForFlow = if (isActiveSubscription) {
+                oldSubscription?.obfuscatedAccountId?.takeUnless { it.isEmpty() }
+                    ?: newObfuscatedAccountId
+            } else {
+                newObfuscatedAccountId
+            }
+            Timber.d("Obfuscated account id used for flow is:%s", obfuscatedAccountIdForFlow)
             val purchaseParamsBuilder = BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(productDetailsParams)
-                .setObfuscatedAccountId(obfuscatedAccountId.orEmpty())
-
-            // setSubscriptionUpdateParams asks that have to include the old sku information,
-            // otherwise throw an exception
-            if (oldSku != null && purchaseToken != null) {
-                val builder =
-                    SubscriptionUpdateParams.newBuilder()
-                        .setSubscriptionReplacementMode(replacementMode)
-                        .setOldPurchaseToken(purchaseToken)
+                .setProductDetailsParamsList(listOf(productDetailsParamsBuilder.build()))
+                .setObfuscatedAccountId(obfuscatedAccountIdForFlow.orEmpty())
+            if (isActiveSubscription) {
+                val builder = SubscriptionUpdateParams.newBuilder()
+                    .setOldPurchaseToken(purchaseToken.orEmpty())
                 purchaseParamsBuilder.setSubscriptionUpdateParams(builder.build())
             }
 
             /*
-              If do a full login, ManagerActivity's mIntent will be set as null.
+              If do a full login, MegaActivity's mIntent will be set as null.
               Work around, check the intent's nullity first, if null, set an empty Intent, as we don't use "PROXY_PACKAGE",
               otherwise billing library crashes internally.
               @see com.android.billingclient.api.BillingClientImpl -> var1.getIntent().getStringExtra("PROXY_PACKAGE")
@@ -206,6 +240,28 @@ internal class BillingFacade @Inject constructor(
         }
     }
 
+    /**
+     * Checks if the old subscription is genuinely active and should be used for replacement.
+     *
+     * Google Play's device cache may return stale expired purchases from [queryPurchasesAsync].
+     * Passing a stale token to [SubscriptionUpdateParams.setOldPurchaseToken] causes Google
+     * to reject the purchase with USER_CANCELED (code 5).
+     *
+     * A subscription is considered active if it has a valid SKU and token, and either
+     * auto-renews or the MEGA account is still on a paid plan (covers auto-renew off but
+     * subscription period not yet ended).
+     */
+    private fun hasActiveSubscription(
+        oldSubscription: MegaPurchase?,
+        currentAccountType: AccountType,
+    ): Boolean {
+        val oldSku = oldSubscription?.sku
+        val purchaseToken = oldSubscription?.token
+        return !oldSku.isNullOrEmpty()
+                && !purchaseToken.isNullOrEmpty()
+                && (oldSubscription.isAutoRenewing || currentAccountType.isPaid)
+    }
+
     override fun onPurchasesUpdated(result: BillingResult, purchases: MutableList<Purchase>?) {
         applicationScope.launch(ioDispatcher + exceptionHandler) {
             if (result.responseCode == BillingClient.BillingResponseCode.OK
@@ -215,12 +271,13 @@ internal class BillingFacade @Inject constructor(
                 val validPurchases = processPurchase(client, purchases)
                 billingEvent.emit(
                     BillingEvent.OnPurchaseUpdate(
-                        validPurchases,
-                        activeSubscription.get()
+                        purchases = validPurchases,
+                        activeSubscription = activeSubscription.get(),
+                        upgradeSource = source.get() ?: UpgradeSource.Main
                     )
                 )
             } else {
-                Timber.w("onPurchasesUpdated failed, with result code: %s", result.responseCode)
+                Timber.w("onPurchasesUpdated failed, with result code: %s, debugMessage: %s", result.responseCode, result.debugMessage)
             }
         }
     }
@@ -267,6 +324,30 @@ internal class BillingFacade @Inject constructor(
         return@withContext megaSkus
     }
 
+    override suspend fun getCountryCode(): String? = withContext(ioDispatcher) {
+        val client = ensureConnect()
+        ensureActive()
+        suspendCancellableCoroutine { continuation ->
+            client.getBillingConfigAsync(
+                GetBillingConfigParams.newBuilder().build()
+            ) { result, config ->
+                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                    continuation.resumeWith(Result.success(config?.countryCode))
+                } else {
+                    Timber.w(
+                        "Failed to get billing config, error code is %s",
+                        result.responseCode
+                    )
+                    continuation.resumeWith(Result.success(null))
+                }
+            }
+        }
+    }
+
+    override suspend fun isSubscriptionFeatureAvailable(): Boolean = withContext(ioDispatcher) {
+        areSubscriptionsSupported(ensureConnect())
+    }
+
     override suspend fun queryPurchase(): List<MegaPurchase> = withContext(ioDispatcher) {
         val client = ensureConnect()
         // check the caller still observer, sometime it takes time to connect to BillingClient
@@ -299,13 +380,17 @@ internal class BillingFacade @Inject constructor(
     ): List<MegaPurchase> = proceedPurchaseMutex.withLock {
         // Verify all available purchases
         var printPurchaseList =
-            "obfuscated account ID is $obfuscatedAccountId, purchaseList size is ${purchaseList.size}, "
+            "old obfuscated account ID is $obfuscatedAccountId," +
+                    " new obfuscated account ID is $newObfuscatedAccountId," +
+                    " purchaseList size is ${purchaseList.size}, "
         val validPurchases = purchaseList.filterIndexed { index, purchase ->
             printPurchaseList += "purchase $index has "
             printPurchaseList += "purchase obfuscated id ${purchase.accountIdentifiers?.obfuscatedAccountId}, "
             printPurchaseList += "purchase original json ${purchase.originalJson}, "
             printPurchaseList += "purchase signature ${purchase.signature} /n"
-            purchase.accountIdentifiers?.obfuscatedAccountId == obfuscatedAccountId
+            (purchase.accountIdentifiers?.obfuscatedAccountId.isNullOrEmpty() ||
+                    purchase.accountIdentifiers?.obfuscatedAccountId == obfuscatedAccountId ||
+                    purchase.accountIdentifiers?.obfuscatedAccountId == newObfuscatedAccountId)
                     && verifyValidSignature(purchase.originalJson, purchase.signature)
         }
         Timber.d(printPurchaseList)
@@ -353,6 +438,7 @@ internal class BillingFacade @Inject constructor(
                 .enablePendingPurchases(
                     PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()
                 )
+                .enableBillingProgram(BillingClient.BillingProgram.EXTERNAL_CONTENT_LINK)
                 .enableAutoServiceReconnection()
                 .setListener(this)
                 .build()
@@ -397,12 +483,40 @@ internal class BillingFacade @Inject constructor(
         }
     }
 
-    private fun updateAccountInfo(purchases: List<MegaPurchase>) {
+    private suspend fun updateAccountInfo(purchases: List<MegaPurchase>) {
         val max =
             purchases.maxWithOrNull(compareBy<MegaPurchase> { it.level }.thenByDescending { it.time })
         Timber.d("List of purchases: ${purchases.size}")
         Timber.d("Max purchase: $max")
         activeSubscription.set(max)
-        accountInfoWrapper.updateActiveSubscription(max)
+        coroutineScope {
+            purchases.map { purchase ->
+                async { submitSubscriptions(purchase) }
+            }.awaitAll()
+        }
+    }
+
+    private suspend fun submitSubscriptions(purchase: MegaPurchase) {
+        Timber.d("submit subscription: $purchase")
+        val token = purchase.token
+        if (token in submittedPurchaseTokens) {
+            Timber.d("Purchase token already submitted, skipping: $token")
+            return
+        }
+        runCatching {
+            suspendCancellableCoroutine { continuation ->
+                val listener =
+                    continuation.getRequestListener("submitPurchaseReceipt") { }
+                megaApiGateway.submitPurchaseReceipt(
+                    MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET,
+                    purchase.receipt,
+                    listener,
+                )
+            }
+        }.onSuccess {
+            token?.let { submittedPurchaseTokens.add(it) }
+        }.onFailure { error ->
+            Timber.e("PURCHASE WRONG: ${error.message}")
+        }
     }
 }

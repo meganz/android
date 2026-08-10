@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.settings
 
-import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,14 +26,13 @@ import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
-import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
+import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -50,8 +50,8 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -87,7 +87,6 @@ class SettingsViewModelTest {
     private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView>()
     private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
-    private val monitorStartScreenPreference = mock<MonitorStartScreenPreference>()
     private val isMultiFactorAuthAvailable = mock<IsMultiFactorAuthAvailable>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val setSubFolderMediaDiscoveryEnabledUseCase =
@@ -100,6 +99,7 @@ class SettingsViewModelTest {
     private val setAudioBackgroundPlayEnabledUseCase = mock<SetAudioBackgroundPlayEnabledUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase>()
+    private val requestAccountDeletion = mock<RequestAccountDeletion>()
 
     private val startScreenSummaryMapper = mock<StartScreenSummaryMapper>()
 
@@ -109,7 +109,7 @@ class SettingsViewModelTest {
 
     private val screenPreferenceDestinationMapper = mock<ScreenPreferenceDestinationMapper>()
 
-    private val defaultStartScreen = mock<NavKey>()
+    private val defaultStartScreen = mock<MainNavItemNavKey>()
 
     @BeforeEach
     fun setUp() {
@@ -118,7 +118,7 @@ class SettingsViewModelTest {
         }
 
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(false)
+            on { invoke(any()) }.thenReturn(false)
         }
 
         monitorContactLinksOptionUseCase.stub {
@@ -148,28 +148,25 @@ class SettingsViewModelTest {
             }
         }
 
-        getAccountDetailsUseCase.stub { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
+        getAccountDetailsUseCase.stub { on { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
 
         monitorConnectivityUseCase.stub { on { invoke() }.thenReturn(MutableStateFlow(true)) }
 
-        monitorStartScreenPreference.stub {
-            on { invoke() }.thenReturn(StartScreen.Home.asHotFlow())
-        }
-
         isMultiFactorAuthAvailable.stub { on { invoke() }.thenReturn(true) }
 
-        isCameraUploadsEnabledUseCase.stub { onBlocking { invoke() }.thenReturn(false) }
+        isCameraUploadsEnabledUseCase.stub { on { invoke() }.thenReturn(false) }
 
-        getSessionTransferURLUseCase.stub { onBlocking { invoke(any()) }.thenReturn(null) }
+        getSessionTransferURLUseCase.stub { on { invoke(any()) }.thenReturn(null) }
 
-        monitorShowHiddenItemsUseCase.stub { onBlocking { invoke() }.thenReturn(emptyFlow()) }
+        monitorShowHiddenItemsUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
 
         monitorAccountDetailUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
+        monitorStartScreenPreferenceDestinationUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
         whenever(monitorMyAccountUpdateUseCase()).thenReturn(emptyFlow())
 
         whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(emptyFlow())
         isMultiFactorAuthEnabledUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
 
     }
@@ -179,18 +176,17 @@ class SettingsViewModelTest {
             getAccountDetailsUseCase = getAccountDetailsUseCase,
             canDeleteAccount = mock { on { invoke(TEST_USER_ACCOUNT) }.thenReturn(true) },
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
-            rootNodeExistsUseCase = mock { onBlocking { invoke() }.thenReturn(true) },
+            rootNodeExistsUseCase = mock { on { invoke() }.thenReturn(true) },
             isMultiFactorAuthAvailable = isMultiFactorAuthAvailable,
             monitorContactLinksOptionUseCase = monitorContactLinksOptionUseCase,
             isMultiFactorAuthEnabledUseCase = isMultiFactorAuthEnabledUseCase,
-            startScreen = monitorStartScreenPreference,
             monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
             setHideRecentActivityUseCase = setHideRecentActivityUseCase,
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
             setMediaDiscoveryView = setMediaDiscoveryView,
             toggleContactLinksOptionUseCase = toggleContactLinksOptionUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            requestAccountDeletion = mock(),
+            requestAccountDeletion = requestAccountDeletion,
             isChatLoggedIn = isChatLoggedIn,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorPasscodeLockPreferenceUseCase = monitorPasscodeLockPreferenceUseCase,
@@ -228,7 +224,6 @@ class SettingsViewModelTest {
             isCameraUploadsEnabledUseCase,
             monitorContactLinksOptionUseCase,
             isMultiFactorAuthEnabledUseCase,
-            monitorStartScreenPreference,
             monitorMediaDiscoveryView,
             toggleContactLinksOptionUseCase,
             monitorConnectivityUseCase,
@@ -238,8 +233,48 @@ class SettingsViewModelTest {
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase,
             monitorMyAccountUpdateUseCase,
+            requestAccountDeletion,
         )
     }
+
+    @Test
+    fun `test that deleteAccount triggers deleteAccountEvent with true when requestAccountDeletion succeeds`() =
+        runTest {
+            underTest.deleteAccount()
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val event = awaitItem().deleteAccountEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((event as StateEventWithContentTriggered).content).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that deleteAccount triggers deleteAccountEvent with false when requestAccountDeletion fails`() =
+        runTest {
+            requestAccountDeletion.stub {
+                on { invoke() }.thenThrow(RuntimeException())
+            }
+            underTest.deleteAccount()
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val event = awaitItem().deleteAccountEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((event as StateEventWithContentTriggered).content).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that deleteAccountEvent is consumed when onDeleteAccountEventConsumed is invoked`() =
+        runTest {
+            underTest.deleteAccount()
+            advanceUntilIdle()
+            underTest.onDeleteAccountEventConsumed()
+            underTest.uiState.test {
+                assertThat(awaitItem().deleteAccountEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
 
     @Test
     fun `test initial value for auto accept is false`() = runTest {
@@ -253,7 +288,7 @@ class SettingsViewModelTest {
     fun `test that the subsequent value auto accept is returned from the use case`() = runTest {
         whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(emptyFlow())
         isMultiFactorAuthEnabledUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
         monitorContactLinksOptionUseCase.stub {
             on { invoke() }.thenReturn(
@@ -278,7 +313,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that logging out of chat disables chat settings`() = runTest {
         isMultiFactorAuthEnabledUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
         monitorHideRecentActivityUseCase.stub {
             on { invoke() }.thenReturn(false.asHotFlow())
@@ -319,9 +354,7 @@ class SettingsViewModelTest {
         runTest {
             monitorContactLinksOptionUseCase.stub {
                 on { invoke() }.thenAnswer {
-                    throw SettingNotFoundException(
-                        -1
-                    )
+                    throw RuntimeException("Error fetching QR setting")
                 }
             }
 
@@ -345,7 +378,7 @@ class SettingsViewModelTest {
     fun `test that multi factor is enabled when fetching multi factor enabled returns true`() =
         runTest {
             isMultiFactorAuthEnabledUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
             underTest.refreshMultiFactorAuthSetting()
             underTest.uiState
@@ -361,7 +394,7 @@ class SettingsViewModelTest {
     fun `test that multi factor is disabled when fetching multi factor enabled returns false`() =
         runTest {
             isMultiFactorAuthEnabledUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             underTest.refreshMultiFactorAuthSetting()
@@ -389,7 +422,7 @@ class SettingsViewModelTest {
             }
 
             isMultiFactorAuthEnabledUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             initViewModel()
@@ -420,7 +453,7 @@ class SettingsViewModelTest {
                 on { invoke() }.thenReturn(false.asHotFlow())
             }
             isMultiFactorAuthEnabledUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             monitorSubFolderMediaDiscoverySettingsUseCase.stub {
@@ -446,7 +479,7 @@ class SettingsViewModelTest {
                 on { invoke() }.thenReturn(false.asHotFlow())
             }
             isMultiFactorAuthEnabledUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             monitorMediaDiscoveryView.stub {
@@ -492,7 +525,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that an exception from get account is not propagated`() = runTest {
         getAccountDetailsUseCase.stub {
-            onBlocking { invoke(any()) }.thenAnswer {
+            on { invoke(any()) }.thenAnswer {
                 throw MegaException(
                     1,
                     "It's broken"
@@ -544,7 +577,7 @@ class SettingsViewModelTest {
         initViewModel()
         whenever(getSessionTransferURLUseCase(any())).thenReturn(link)
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(isEnabled)
+            on { invoke(any()) }.thenReturn(isEnabled)
         }
         advanceUntilIdle()
         assertThat(underTest.getCookiePolicyLink()).isEqualTo(expected)
@@ -575,34 +608,8 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `test that start screen summary is correct when single activity flag is false`() = runTest {
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(false)
-        }
-
-        val expected = "Expected Start Screen"
-        startScreenSummaryMapper.stub {
-            on { invoke(any<StartScreen>()) } doReturn expected
-        }
-
-        initViewModel()
-
-        underTest.uiState.map { it.startScreenSummary }
-            .distinctUntilChanged()
-            .test {
-                assertThat(awaitItem()).isEmpty()
-                advanceUntilIdle()
-                assertThat(awaitItem()).isEqualTo(expected)
-            }
-    }
-
-    @Test
-    fun `test that start screen summary is correct when single activity flag is true and no value is set`() =
+    fun `test that start screen summary is the default when no destination preference is set`() =
         runTest {
-            getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(true)
-            }
-
             val expected = "Default Single activity Start Screen"
 
             monitorStartScreenPreferenceDestinationUseCase.stub {
@@ -618,10 +625,10 @@ class SettingsViewModelTest {
 
             val mainNavItems = setOf(
                 mock<MainNavItem> {
-                    on { destination } doReturn mock<NavKey>()
+                    on { destination } doReturn mock<MainNavItemNavKey>()
                 },
                 mock<MainNavItem> {
-                    on { destination } doReturn mock<NavKey>()
+                    on { destination } doReturn mock<MainNavItemNavKey>()
                 },
                 expectedMainNavItem,
             )
@@ -648,11 +655,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun `test that start screen summary is correct when single activity flag is true`() = runTest {
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(true)
-        }
-
+    fun `test that start screen summary reflects the selected destination preference`() = runTest {
         val expected = "Expected Single activity Start Screen"
 
         monitorStartScreenPreferenceDestinationUseCase.stub {
@@ -662,16 +665,16 @@ class SettingsViewModelTest {
             }
         }
 
-        val selectedOption = mock<NavKey>()
+        val selectedOption = mock<MainNavItemNavKey>()
         val expectedMainNavItem = mock<MainNavItem> {
             on { destination } doReturn selectedOption
         }
         val mainNavItems = setOf(
             mock<MainNavItem> {
-                on { destination } doReturn mock<NavKey>()
+                on { destination } doReturn mock<MainNavItemNavKey>()
             },
             mock<MainNavItem> {
-                on { destination } doReturn mock<NavKey>()
+                on { destination } doReturn mock<MainNavItemNavKey>()
             },
             expectedMainNavItem,
         )

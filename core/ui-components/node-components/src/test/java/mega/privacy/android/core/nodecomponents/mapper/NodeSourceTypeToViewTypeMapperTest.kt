@@ -1,8 +1,8 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -34,6 +34,18 @@ class NodeSourceTypeToViewTypeMapperTest {
         Arguments.of(NodeSourceType.FAVOURITES, NodeSourceTypeInt.FAVOURITES_ADAPTER),
         Arguments.of(NodeSourceType.DOCUMENTS, NodeSourceTypeInt.DOCUMENTS_BROWSE_ADAPTER),
         Arguments.of(NodeSourceType.AUDIO, NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER),
+        Arguments.of(NodeSourceType.VIDEOS, NodeSourceTypeInt.VIDEO_BROWSE_ADAPTER),
+        Arguments.of(NodeSourceType.SEARCH, NodeSourceTypeInt.SEARCH_BY_ADAPTER),
+        Arguments.of(NodeSourceType.VIDEO_PLAYLISTS, NodeSourceTypeInt.VIDEO_PLAYLISTS_ADAPTER),
+        Arguments.of(NodeSourceType.CHAT, NodeSourceTypeInt.CHAT_ADAPTER),
+        Arguments.of(
+            NodeSourceType.VIDEO_RECENTLY_WATCHED,
+            NodeSourceTypeInt.VIDEO_RECENTLY_WATCHED_ADAPTER
+        ),
+        Arguments.of(NodeSourceType.OFFLINE, null),
         Arguments.of(NodeSourceType.OTHER, null),
+        Arguments.of(NodeSourceType.MEDIA_PLAYER_DEFAULT, null),
+        Arguments.of(NodeSourceType.MEDIA_PLAYER_VERSIONS, null),
+        Arguments.of(NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER, null),
     )
 }

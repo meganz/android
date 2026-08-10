@@ -462,7 +462,9 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("updateRemoteBackupState") {
                 // Return the Backup State, represented as getAccess() in the SDK
-                backupStateMapper(it.access)
+                backupStateMapper(it.access).apply {
+                    Timber.d("Remote backup state updated for backupId: $backupId to $this")
+                }
             }
             // Any values that should not be changed should be marked as null, -1 or -1L
             megaApiGateway.updateBackup(
@@ -648,6 +650,11 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
                 inProgressTransfers.filterKeys { it !in uniqueIds }
             }
         }
+
+    override val monitorCameraUploadsEnabled: Flow<Boolean?> =
+        cameraUploadsSettingsPreferenceGateway
+            .monitorCameraUploadsEnabled
+            .flowOn(ioDispatcher)
 
     private companion object {
         private const val SUB_STATE_NO_CHANGE = -1

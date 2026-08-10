@@ -7,12 +7,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.extensions.isAlive
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.advertisements.SetGoogleConsentLoadedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.navigation.contract.dialog.AppDialogEvent
-import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.destination.AdConsentDialogNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -29,9 +31,13 @@ class AdConsentWrapper @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
 ) {
     fun getCanRequestConsentFlow(activity: Activity) = callbackFlow {
-        val params =
-            ConsentRequestParameters.Builder()
-                .build()
+        if (!activity.isAlive) {
+            Timber.w("Skip consent request: activity finishing or destroyed")
+            trySend(false)
+            close()
+            return@callbackFlow
+        }
+        val params = ConsentRequestParameters.Builder().build()
 
         consentInformation.requestConsentInfoUpdate(
             activity,
@@ -55,7 +61,7 @@ class AdConsentWrapper @Inject constructor(
                     if (consentInformation.canRequestAds()) {
                         setGoogleConsentLoadedUseCase(true)
                     } else {
-                        appDialogEventQueue.emit(AppDialogEvent(AdConsentDialog))
+                        appDialogEventQueue.emit(AppDialogEvent(AdConsentDialogNavKey))
                     }
                 }
             }.onFailure { Timber.e(it, "Error in refreshing ad consent") }

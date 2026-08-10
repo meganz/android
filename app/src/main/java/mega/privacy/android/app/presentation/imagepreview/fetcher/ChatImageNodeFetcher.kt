@@ -21,7 +21,8 @@ internal class ChatImageNodeFetcher @Inject constructor(
             chatRoomId = bundle.getLong(CHAT_ROOM_ID),
             messageIds = bundle.getLongArray(MESSAGE_IDS)?.distinct()?.map { it }.orEmpty(),
         ).mapLatest { imageNodes ->
-            imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
+            //imageNodes come from TypedMessageDao.getMessageIdsByType with "ORDER BY timestamp DESC"
+            imageNodes.reversed()
         }.flowOn(defaultDispatcher)
     }
 

@@ -44,10 +44,18 @@ class SortOrderIntMapperTest {
     }
 
     @Test
-    fun `test that sort order is mapped correctly for OutgoingShares source`() {
-        assertThat(underTest(SortOrder.ORDER_MODIFICATION_ASC, SortOrderSource.OutgoingShares))
+    fun `test that creation sort order is mapped to share creation for OutgoingShares source`() {
+        assertThat(underTest(SortOrder.ORDER_CREATION_ASC, SortOrderSource.OutgoingShares))
             .isEqualTo(MegaApiJava.ORDER_SHARE_CREATION_ASC)
-        assertThat(underTest(SortOrder.ORDER_MODIFICATION_DESC, SortOrderSource.OutgoingShares))
+        assertThat(underTest(SortOrder.ORDER_CREATION_DESC, SortOrderSource.OutgoingShares))
             .isEqualTo(MegaApiJava.ORDER_SHARE_CREATION_DESC)
+    }
+
+    @Test
+    fun `test that modification sort order is not remapped for OutgoingShares source`() {
+        assertThat(underTest(SortOrder.ORDER_MODIFICATION_ASC, SortOrderSource.OutgoingShares))
+            .isEqualTo(MegaApiJava.ORDER_MODIFICATION_ASC)
+        assertThat(underTest(SortOrder.ORDER_MODIFICATION_DESC, SortOrderSource.OutgoingShares))
+            .isEqualTo(MegaApiJava.ORDER_MODIFICATION_DESC)
     }
 }

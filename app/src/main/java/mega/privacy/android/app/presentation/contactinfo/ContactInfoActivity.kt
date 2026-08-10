@@ -37,13 +37,11 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
@@ -51,17 +49,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
-import mega.privacy.android.app.activities.contract.SelectFolderToShareActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
-import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
-import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -70,18 +64,16 @@ import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialo
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.OnSharedFolderUpdatedCallBack
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
-import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
+import mega.privacy.android.app.presentation.contactinfo.model.LegacyContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
+import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
-import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
@@ -103,6 +95,9 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialo
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.core.passcode.PasscodeCheck
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -110,11 +105,14 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava
@@ -137,6 +135,12 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     @Inject
     lateinit var passcodeCheck: PasscodeCheck
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
 
     /**
      * Get theme mode
@@ -161,12 +165,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private val collapsingAppBar get() = activityChatContactBinding.collapsingAppBar
 
     private val callInProgress get() = contentContactProperties.callInProgress
-    private val viewModel by viewModels<ContactInfoViewModel>()
+    private val viewModel by viewModels<LegacyContactInfoViewModel>()
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
     private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
     private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
 
-    private var permissionsDialog: AlertDialog? = null
     private var statusDialog: AlertDialog? = null
     private var setNicknameDialog: AlertDialog? = null
 
@@ -191,7 +194,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private var bottomSheetDialogFragment: ContactFileListBottomSheetDialogFragment? = null
     private var contactNicknameBottomSheetDialogFragment: ContactNicknameBottomSheetDialogFragment? =
         null
-    private lateinit var selectFolderResultLauncher: ActivityResultLauncher<String>
     private lateinit var selectFileResultLauncher: ActivityResultLauncher<String>
     private lateinit var selectFolderToCopyLauncher: ActivityResultLauncher<LongArray>
     private val nameCollisionActivityLauncher = registerForActivityResult(
@@ -284,9 +286,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         sharedFoldersFragment?.let {
             if (!it.isVisible) return
             val message = if (e.errorCode == MegaError.API_OK) {
-                getString(R.string.context_folder_created)
+                getString(sharedR.string.folder_created_success_message)
             } else {
-                getString(R.string.context_folder_no_created)
+                getString(sharedR.string.folder_not_created_error_message)
             }
             showSnackbar(Constants.SNACKBAR_TYPE, message, -1)
             it.setNodes()
@@ -357,7 +359,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
         configureActivityLaunchers()
@@ -378,7 +380,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     private fun configureActivityLaunchers() {
-        configureFolderToShareLauncher()
         configureFileToShareLauncher()
         configureFolderToCopyLauncher()
     }
@@ -403,56 +404,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                             email = email
                         )
                     }
-                }
-            }
-    }
-
-    private fun configureFolderToShareLauncher() {
-        selectFolderResultLauncher =
-            registerForActivityResult(SelectFolderToShareActivityContract()) { result ->
-                if (result == null) return@registerForActivityResult
-                if (viewModel.isOnline()) {
-                    val selectedContacts =
-                        result.getStringArrayListExtra(Constants.SELECTED_CONTACTS)
-                    val folderHandle =
-                        result.getLongExtra(FileExplorerActivity.EXTRA_SELECTED_FOLDER, 0)
-                    val parent = megaApi.getNodeByHandle(folderHandle)
-                    if (parent?.isFolder == true) {
-                        val dialogBuilder = MaterialAlertDialogBuilder(this)
-                        dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions))
-                        val items = arrayOf<CharSequence>(
-                            getString(R.string.file_properties_shared_folder_read_only),
-                            getString(
-                                R.string.file_properties_shared_folder_read_write
-                            ),
-                            getString(R.string.file_properties_shared_folder_full_access)
-                        )
-                        dialogBuilder.setSingleChoiceItems(items, -1) { _, item ->
-                            statusDialog = createProgressDialog(
-                                this, getString(
-                                    R.string.context_sharing_folder
-                                )
-                            )
-                            permissionsDialog?.dismiss()
-                            lifecycleScope.launch {
-                                statusDialog?.show()
-                                viewModel.initShareKey(parent)
-                                NodeController(this@ContactInfoActivity).shareFolder(
-                                    parent,
-                                    selectedContacts,
-                                    item
-                                )
-                            }
-                        }
-                        permissionsDialog = dialogBuilder.create()
-                        permissionsDialog?.show()
-                    }
-                } else {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.error_server_connection_problem),
-                        -1
-                    )
                 }
             }
     }
@@ -554,7 +505,16 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 activity = this,
                 viewModel = nodeAttachmentViewModel,
             ) { message, id ->
-                showSnackbarWithChat(message, id)
+                if (viewModel.uiState.value.navigateToChatOnAttachSuccess) {
+                    viewModel.onShareFilesToChatNavigated()
+                    navigator.openChat(
+                        context = this,
+                        chatId = id,
+                        action = Constants.ACTION_CHAT_SHOW_MESSAGES,
+                    )
+                } else {
+                    showSnackbarWithChat(message, id)
+                }
             }
         )
     }
@@ -639,10 +599,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     private fun contactPropertiesClicked() {
-        navigator.openManageChatHistoryActivity(
-            context = this,
-            email = viewModel.userEmail
-        )
+        // Do not use mega navigator as it removes the legacy stack
+        val intent = Intent(this, ManageChatHistoryActivity::class.java).apply {
+            viewModel.userEmail?.let { putExtra(Constants.EMAIL, it) }
+        }
+        startActivity(intent)
     }
 
     private fun sharedFilesClicked() {
@@ -840,7 +801,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         Timber.d("onOptionsItemSelected")
         when (item.itemId) {
             android.R.id.home -> finish()
-            R.id.cab_menu_share_folder -> pickFolderToShare()
             R.id.cab_menu_send_file -> {
                 if (!viewModel.isOnline()) {
                     showSnackbar(
@@ -867,15 +827,19 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             showOverDiskQuotaPaywallWarning()
             return
         }
-        viewModel.userEmail?.let { selectFileResultLauncher.launch(it) }
-            ?: run { Timber.w("Selected contact NULL") }
+        val email = viewModel.userEmail
+        if (email.isNullOrEmpty()) {
+            Timber.w("Selected contact NULL")
+            return
+        }
+        selectFileResultLauncher.launch(email)
     }
 
     /**
      * Collecting Flows from ViewModel
      */
     private fun collectFlows() {
-        collectFlow(viewModel.uiState) { contactInfoUiState: ContactInfoUiState ->
+        collectFlow(viewModel.uiState) { contactInfoUiState: LegacyContactInfoUiState ->
             if (contactInfoUiState.isUserRemoved) {
                 finish()
             }
@@ -1019,7 +983,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         startActivity(intent)
     }
 
-    private fun navigateToMeetingActivity(contactInfoUiState: ContactInfoUiState) {
+    private fun navigateToMeetingActivity(contactInfoUiState: LegacyContactInfoUiState) {
         val intentMeeting = Intent(this, MeetingActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             action = MeetingActivity.MEETING_ACTION_IN
@@ -1056,7 +1020,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         viewModel.joinCall(video)
     }
 
-    private fun handleOneOffEvents(contactInfoUiState: ContactInfoUiState) {
+    private fun handleOneOffEvents(contactInfoUiState: LegacyContactInfoUiState) {
         when {
             contactInfoUiState.shouldNavigateToChat -> {
                 viewModel.chatId?.let { navigateToChatActivity(it) }
@@ -1096,7 +1060,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    private fun updateBasicInfo(contactInfoUiState: ContactInfoUiState) = with(contactInfoUiState) {
+    private fun updateBasicInfo(contactInfoUiState: LegacyContactInfoUiState) = with(contactInfoUiState) {
         contentContactProperties.emailText.text = contactInfoUiState.contactItem?.email
         collapsingAppBar.firstLineToolbar.text = primaryDisplayName
         contentContactProperties.nameText.apply {
@@ -1108,7 +1072,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         updateAvatar(contactInfoUiState.avatar)
     }
 
-    private fun updateUserStatusChanges(contactInfoUiState: ContactInfoUiState) {
+    private fun updateUserStatusChanges(contactInfoUiState: LegacyContactInfoUiState) {
         contactStateIcon =
             contactInfoUiState.userChatStatus.iconRes(isLightTheme = !Util.isDarkMode(this))
         collapsingAppBar.secondLineToolbar.apply {
@@ -1144,20 +1108,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             }
 
             Constants.REQUEST_CAMERA -> verifyPermissionAndJoinCall()
-        }
-    }
-
-    private fun pickFolderToShare() {
-        Timber.d("pickFolderToShare")
-        viewModel.userEmail?.let {
-            selectFolderResultLauncher.launch(it)
-        } ?: run {
-            showSnackbar(
-                Constants.SNACKBAR_TYPE,
-                getString(R.string.error_sharing_folder),
-                -1
-            )
-            Timber.w("Error sharing folder")
         }
     }
 
@@ -1263,7 +1213,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 val name = emojiEditText.text.toString()
                 if (name.isEmpty()) {
                     Timber.w("Input is empty")
-                    emojiEditText.error = getString(R.string.invalid_string)
+                    emojiEditText.error = getString(sharedR.string.general_invalid_string)
                     emojiEditText.requestFocus()
                 } else {
                     viewModel.updateNickName(name)
@@ -1381,7 +1331,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             } else {
                 ChatUtil.updateRetentionTimeLayout(
                     retentionTimeText,
-                    ChatUtil.getUpdatedRetentionTimeFromAChat(chatId),
+                    ChatUtil.getUpdatedRetentionTimeFromAChat(
+                        chatId,
+                        megaChatApi
+                    ),
                     this@ContactInfoActivity
                 )
                 if (viewModel.isOnline()) {
@@ -1407,7 +1360,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun chatNotificationsChange() {
         val chatId = viewModel.chatId ?: return
         if (contentContactProperties.notificationSwitch.isChecked) {
-            ChatUtil.createMuteNotificationsAlertDialogOfAChat(this, chatId)
+            ChatUtil.createMuteNotificationsAlertDialogOfAChat(
+                this,
+                chatId,
+                megaChatApi
+            )
         } else {
             getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(
                 this,
@@ -1450,13 +1407,14 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Method responsible for copying files
      */
     fun showCopy(handleList: ArrayList<Long>) {
-        selectFolderToCopyLauncher.launch(handleList.toLongArray())
+        val handles = handleList.toLongArray()
+        selectFolderToCopyLauncher.launch(handles)
     }
 
     private fun setFoldersButtonText(nodes: List<UnTypedNode>) {
         contentContactProperties.apply {
             shareFoldersButton.text = resources.getQuantityString(
-                R.plurals.num_folders_with_parameter,
+                sharedR.plurals.num_of_folders_with_parameter,
                 nodes.size,
                 nodes.size
             )
@@ -1476,9 +1434,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     /**
      * Updates the "Verify credentials" view.
      *
-     * @param state [ContactInfoUiState].
+     * @param state [LegacyContactInfoUiState].
      */
-    private fun updateVerifyCredentialsLayout(state: ContactInfoUiState) {
+    private fun updateVerifyCredentialsLayout(state: LegacyContactInfoUiState) {
         contentContactProperties.apply {
             if (!state.contactItem?.email.isNullOrEmpty()) {
                 verifyCredentialsLayout.isVisible = true

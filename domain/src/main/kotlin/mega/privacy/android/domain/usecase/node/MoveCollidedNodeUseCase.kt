@@ -25,6 +25,13 @@ class MoveCollidedNodeUseCase @Inject constructor(
         nodeNameCollision: NodeNameCollision,
         rename: Boolean,
     ): MoveRequestResult.GeneralMovement {
+        // Moving a node to the folder it already lives in is a no-op: the
+        // colliding node is the node itself. Resolving such a collision by
+        // sending the collision node to the rubbish bin would delete the very
+        // node we are trying to move (see AND-23958).
+        if (nodeNameCollision.collisionHandle == nodeNameCollision.nodeHandle) {
+            return MoveRequestResult.GeneralMovement(count = 1, errorCount = 0)
+        }
         if (!rename && nodeNameCollision.isFile) {
             moveNodeToRubbishBinUseCase(NodeId(nodeNameCollision.collisionHandle))
         }

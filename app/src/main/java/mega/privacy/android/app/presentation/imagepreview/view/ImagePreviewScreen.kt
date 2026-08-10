@@ -66,8 +66,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import kotlinx.coroutines.CoroutineScope
@@ -96,6 +96,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.usecase.imagepreview.mapper.OfflineFileInformationToImageNodeMapper
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -116,7 +117,7 @@ internal fun ImagePreviewScreen(
     onClickSlideshow: () -> Unit,
     onClickInfo: (ImageNode) -> Unit,
     snackbarHostState: SnackbarHostState,
-    viewModel: ImagePreviewViewModel = viewModel(),
+    viewModel: ImagePreviewViewModel = hiltViewModel(),
     onClickFavourite: (ImageNode) -> Unit = {},
     onClickLabel: (ImageNode) -> Unit = {},
     onClickOpenWith: (ImageNode) -> Unit = {},
@@ -144,10 +145,6 @@ internal fun ImagePreviewScreen(
         LaunchedEffect(Unit) {
             onClickBack()
         }
-    }
-
-    val isHiddenNodesEnabled by produceState(initialValue = false) {
-        value = viewModel.isHiddenNodesActive()
     }
 
     val currentImageNodeIndex = viewState.currentImageNodeIndex
@@ -298,12 +295,14 @@ internal fun ImagePreviewScreen(
                                 showSaveToDeviceMenu = viewModel::isSaveToDeviceMenuVisible,
                                 showManageLinkMenu = viewModel::isGetLinkMenuVisible,
                                 showMoreMenu = viewModel::isMoreMenuVisible,
+                                showShareMenu = viewModel::isShareMenuVisibleInToolbar,
                                 onClickBack = onClickBack,
                                 onClickEdit = { onClickEdit(imageNode) },
                                 onClickSlideshow = onClickSlideshow,
                                 onClickForward = { onClickSendTo(imageNode) },
                                 onClickSaveToDevice = onClickSaveToDevice,
                                 onClickGetLink = { onClickGetLink(imageNode) },
+                                onClickShare = { onClickShare(imageNode) },
                                 onClickMore = {
                                     coroutineScope.launch {
                                         modalSheetState.show()
@@ -345,7 +344,6 @@ internal fun ImagePreviewScreen(
                             isAvailableOffline = isCurrentImageNodeAvailableOffline,
                             accountType = accountType,
                             isBusinessAccountExpired = isBusinessAccountExpired,
-                            isHiddenNodesEnabled = isHiddenNodesEnabled,
                             isHiddenNodesOnboarded = isHiddenNodesOnboarded,
                             showInfoMenu = viewModel::isInfoMenuVisible,
                             showFavouriteMenu = viewModel::isFavouriteMenuVisible,
@@ -362,6 +360,7 @@ internal fun ImagePreviewScreen(
                             showHideMenu = viewModel::isHideMenuVisible,
                             showUnhideMenu = viewModel::isUnhideMenuVisible,
                             forceHideHiddenMenus = viewModel::forceHideHiddenMenus,
+                            isNodeInBackups = viewModel::isNodeInBackups,
                             showMoveMenu = viewModel::isMoveMenuVisible,
                             showCopyMenu = viewModel::isCopyMenuVisible,
                             showRestoreMenu = viewModel::isRestoreMenuVisible,
@@ -518,14 +517,14 @@ private fun ImagePreviewContent(
             state = pagerState,
             beyondViewportPageCount = 1,
             key = {
-                imageNodes.getOrNull(it)?.id?.longValue ?: "${System.currentTimeMillis()}_$it"
+                imageNodes.getOrNull(it)?.id?.longValue?.toString() ?: "empty_$it"
             },
         ) { index ->
             val imageNode = imageNodes.getOrNull(index)
             if (imageNode != null) {
                 val imageResultTriple by produceState<Triple<Int, String?, String?>>(
                     initialValue = Triple(0, null, null),
-                    key1 = imageNode,
+                    key1 = imageNode.id,
                 ) {
                     downloadImage(imageNode).collectLatest { imageResult ->
                         value = Triple(
@@ -539,7 +538,7 @@ private fun ImagePreviewContent(
                 val (progress, imagePath, fallbackImagePath) = imageResultTriple
 
                 val zoomableState = rememberZoomableState(
-                    zoomSpec = ZoomSpec(maxZoomFactor = Int.MAX_VALUE.toFloat())
+                    zoomSpec = ZoomSpec(maxZoomFactor = 10.0f)
                 )
                 SideEffect {
                     if (index != pagerState.currentPage) {
@@ -636,21 +635,13 @@ private fun ImagePreviewContent(
             .fillMaxSize(),
     ) {
         val isVideo = imageNode.type is VideoFileTypeInfo
+        val localFilePath = imageNode.fullSizePath?.takeIf {
+            imageNode.serializedData?.contains("local") == true ||
+                    imageNode.serializedData == OfflineFileInformationToImageNodeMapper.OFFLINE_SERIALIZED_DATA_FLAG
+        }
         ImageContent(
-            fullSizePath = imageNode.run {
-                fullSizePath.takeIf {
-                    imageNode.serializedData?.contains(
-                        "local"
-                    ) == true
-                }
-            } ?: imagePath,
-            errorImagePath = imageNode.run {
-                fullSizePath.takeIf {
-                    imageNode.serializedData?.contains(
-                        "local"
-                    ) == true
-                }
-            } ?: errorImagePath,
+            fullSizePath = localFilePath ?: imagePath,
+            errorImagePath = localFilePath ?: errorImagePath,
             enableZoom = !isVideo,
             imageState = imageState ?: rememberZoomableImageState(),
             onImageTap = onImageTap,
@@ -739,6 +730,7 @@ private fun ImagePreviewTopBar(
     showForwardMenu: suspend (ImageNode) -> Boolean,
     showSaveToDeviceMenu: suspend (ImageNode) -> Boolean,
     showManageLinkMenu: suspend (ImageNode) -> Boolean,
+    showShareMenu: suspend (ImageNode) -> Boolean,
     showMoreMenu: suspend (ImageNode) -> Boolean,
     onClickBack: () -> Unit,
     onClickEdit: () -> Unit,
@@ -746,6 +738,7 @@ private fun ImagePreviewTopBar(
     onClickForward: () -> Unit,
     onClickSaveToDevice: () -> Unit,
     onClickGetLink: () -> Unit,
+    onClickShare: () -> Unit,
     onClickMore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -789,6 +782,10 @@ private fun ImagePreviewTopBar(
 
                 val isEditMenuVisible by produceState(false, imageNode) {
                     value = showEditMenu(imageNode)
+                }
+
+                val isShareMenuVisible by produceState(false, imageNode) {
+                    value = showShareMenu(imageNode)
                 }
 
                 if (isEditMenuVisible) {
@@ -844,6 +841,17 @@ private fun ImagePreviewTopBar(
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MANAGE_LINK),
+                        )
+                    }
+                }
+
+                if (isShareMenuVisible) {
+                    IconButton(onClick = onClickShare) {
+                        Icon(
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.black_white,
+                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SHARE),
                         )
                     }
                 }

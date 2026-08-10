@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter
 
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
     alias(plugin.plugins.mega.artifactory.publish.convention)
 }
 
@@ -20,11 +19,7 @@ android {
         val minSdkVersion: Int by rootProject.extra
         minSdk = minSdkVersion
 
-        val targetSdkVersion: Int by rootProject.extra
-        targetSdk = targetSdkVersion
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -37,22 +32,10 @@ android {
         }
     }
 
-    sourceSets.getByName("main") {
-        java.srcDirs(
-            "src/main/jni/mega/sdk/bindings/java",
-            "src/main/jni/megachat/sdk/bindings/java"
-        )
-        java.exclude("**/MegaApiSwing.java")
-    }
-
     compileOptions {
         val javaVersion: JavaVersion by rootProject.extra
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
-    }
-    kotlinOptions {
-        val jdk: String by rootProject.extra
-        jvmTarget = jdk
     }
 
     lint {
@@ -62,9 +45,31 @@ android {
     namespace = "nz.mega.sdk"
 }
 
+// Configure source sets via the new AGP 9 DSL extension type to avoid the legacy
+// `AndroidLibrarySourceSet` accessor, whose decorated impl no longer satisfies that
+// interface in AGP 9.2 — using it from inside the kotlin-dsl `android {}` block
+// triggers a ClassCastException.
+extensions.configure<com.android.build.api.dsl.LibraryExtension> {
+    sourceSets.getByName("main").java.srcDirs(
+        "src/main/jni/mega/sdk/bindings/java",
+        "src/main/jni/megachat/sdk/bindings/java",
+    )
+    sourceSets.getByName("main").kotlin.srcDirs(
+        "src/main/jni/mega/sdk/bindings/java",
+        "src/main/jni/megachat/sdk/bindings/java",
+    )
+}
+
+// AGP 9 removed PatternFilterable from AndroidSourceDirectorySet, so the previous
+// `java.exclude("**/MegaApiSwing.java")` no longer works. Excluding at compile time
+// preserves the original behavior of skipping MegaApiSwing.java from compilation.
+tasks.withType<JavaCompile>().configureEach {
+    exclude("**/MegaApiSwing.java")
+}
+
 dependencies {
     implementation(androidx.exifinterface)
-    implementation(files("src/main/jni/megachat/webrtc/libwebrtc.jar"))
+    implementation(files("libs/libwebrtc.jar"))
 
     testImplementation(testlib.junit)
     androidTestImplementation(testlib.junit.test.ktx)

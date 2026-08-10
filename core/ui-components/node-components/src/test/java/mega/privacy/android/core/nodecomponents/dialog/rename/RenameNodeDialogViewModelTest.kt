@@ -10,15 +10,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeNameErrorMessageMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.InvalidNameType
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
-import mega.privacy.android.domain.usecase.node.ValidNameType
+import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -43,17 +45,19 @@ class RenameNodeDialogViewModelTest {
     private val checkForValidNameUseCase: CheckForValidNameUseCase = mock()
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val renameNodeUseCase: RenameNodeUseCase = mock()
+    private val nodeNameErrorMessageMapper: NodeNameErrorMessageMapper = mock()
     private val snackBarHandler: SnackBarHandler = mock()
 
     @BeforeEach
     fun setup() {
         underTest = RenameNodeDialogViewModel(
-            context,
-            applicationScope,
-            getNodeByHandleUseCase,
-            checkForValidNameUseCase,
-            renameNodeUseCase,
-            snackBarHandler
+            context = context,
+            applicationScope = applicationScope,
+            getNodeByHandleUseCase = getNodeByHandleUseCase,
+            checkForValidNameUseCase = checkForValidNameUseCase,
+            renameNodeUseCase = renameNodeUseCase,
+            nodeNameErrorMessageMapper = nodeNameErrorMessageMapper,
+            snackBarHandler = snackBarHandler
         )
     }
 
@@ -64,6 +68,7 @@ class RenameNodeDialogViewModelTest {
             getNodeByHandleUseCase,
             checkForValidNameUseCase,
             renameNodeUseCase,
+            nodeNameErrorMessageMapper,
             snackBarHandler
         )
     }
@@ -80,6 +85,34 @@ class RenameNodeDialogViewModelTest {
         assertThat(nodeName).isEqualTo(underTest.state.value.nodeName)
     }
 
+    @Test
+    fun `test that OnLoadNodeName does not clear errorMessage when one is set`() = runTest {
+        val nodeId = NodeId(123L)
+        val newNodeName = "Bad?Name"
+        val node: FileNode = mock()
+        val errorRes = sharedR.string.general_invalid_characters_defined
+        whenever(node.name).thenReturn(newNodeName)
+        whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
+        whenever(
+            checkForValidNameUseCase(
+                newName = newNodeName,
+                node = node,
+                isRenameAction = true
+            )
+        ).thenReturn(InvalidNameType.INVALID_NAME)
+        whenever(nodeNameErrorMessageMapper(InvalidNameType.INVALID_NAME, false))
+            .thenReturn(errorRes)
+
+        underTest.handleAction(
+            RenameNodeDialogAction.OnRenameConfirmed(nodeId.longValue, newNodeName)
+        )
+        assertThat(underTest.state.value.errorMessage).isEqualTo(errorRes)
+
+        underTest.handleAction(RenameNodeDialogAction.OnLoadNodeName(nodeId.longValue))
+
+        assertThat(underTest.state.value.errorMessage).isEqualTo(errorRes)
+    }
+
 
     @Test
     fun `test that OnRenameConfirmed triggers success state when no validation error`() =
@@ -89,8 +122,16 @@ class RenameNodeDialogViewModelTest {
             val node: FileNode = mock()
             whenever(node.name).thenReturn(newNodeName)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
-            whenever(checkForValidNameUseCase(newNodeName, node)).thenReturn(ValidNameType.NO_ERROR)
+            whenever(
+                checkForValidNameUseCase(
+                    newName = newNodeName,
+                    node = node,
+                    isRenameAction = true
+                )
+            ).thenReturn(InvalidNameType.VALID)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
+            whenever(nodeNameErrorMessageMapper(InvalidNameType.VALID, false))
+                .thenReturn(null)
             whenever(context.getString(any())).thenReturn("")
 
             underTest.handleAction(
@@ -106,15 +147,23 @@ class RenameNodeDialogViewModelTest {
 
     @ParameterizedTest(name = "test {0} is mapped correctly")
     @MethodSource("provideValidationParameters")
-    fun `test that that validation errors are handled correctly`(validationTexts: Pair<ValidNameType, Int>) =
+    fun `test that that validation errors are handled correctly`(validationTexts: Pair<InvalidNameType, Int>) =
         runTest {
             val nodeId = NodeId(123L)
             val newNodeName = "New Node Name"
             val node: FileNode = mock()
             whenever(node.name).thenReturn(newNodeName)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
-            whenever(checkForValidNameUseCase(newNodeName, node)).thenReturn(validationTexts.first)
+            whenever(
+                checkForValidNameUseCase(
+                    newName = newNodeName,
+                    node = node,
+                    isRenameAction = true
+                )
+            ).thenReturn(validationTexts.first)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
+            whenever(nodeNameErrorMessageMapper(validationTexts.first, false))
+                .thenReturn(validationTexts.second)
 
             underTest.handleAction(
                 RenameNodeDialogAction.OnRenameConfirmed(
@@ -145,10 +194,11 @@ class RenameNodeDialogViewModelTest {
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
             whenever(
                 checkForValidNameUseCase(
-                    newNodeName,
-                    node
+                    newName = newNodeName,
+                    node = node,
+                    isRenameAction = true
                 )
-            ).thenReturn(ValidNameType.DIFFERENT_EXTENSION)
+            ).thenReturn(InvalidNameType.DIFFERENT_EXTENSION)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
 
             underTest.handleAction(
@@ -162,6 +212,34 @@ class RenameNodeDialogViewModelTest {
                 StateEventWithContentTriggered::class.java
             )
         }
+
+    @Test
+    fun `test that OnNodeNameChanged clears errorMessage`() = runTest {
+        val nodeId = NodeId(123L)
+        val invalidName = "Bad?Name"
+        val node: FileNode = mock()
+        val errorRes = sharedR.string.general_invalid_characters_defined
+        whenever(node.name).thenReturn(invalidName)
+        whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
+        whenever(
+            checkForValidNameUseCase(
+                newName = invalidName,
+                node = node,
+                isRenameAction = true
+            )
+        ).thenReturn(InvalidNameType.INVALID_NAME)
+        whenever(nodeNameErrorMessageMapper(InvalidNameType.INVALID_NAME, false))
+            .thenReturn(errorRes)
+
+        underTest.handleAction(
+            RenameNodeDialogAction.OnRenameConfirmed(nodeId.longValue, invalidName)
+        )
+        assertThat(underTest.state.value.errorMessage).isEqualTo(errorRes)
+
+        underTest.handleAction(RenameNodeDialogAction.OnNodeNameChanged)
+
+        assertThat(underTest.state.value.errorMessage).isNull()
+    }
 
     @Test
     fun `test that OnChangeNodeExtensionDialogShown updates showChangeNodeExtensionDialog to consumed`() =
@@ -186,10 +264,10 @@ class RenameNodeDialogViewModelTest {
         verify(snackBarHandler).postSnackbarMessage(mockMessage)
     }
 
-    private fun provideValidationParameters(): List<Pair<ValidNameType, Int>> = listOf(
-        ValidNameType.BLANK_NAME to R.string.invalid_string,
-        ValidNameType.INVALID_NAME to R.string.invalid_characters_defined,
-        ValidNameType.NAME_ALREADY_EXISTS to R.string.same_file_name_warning,
-        ValidNameType.NO_EXTENSION to R.string.file_without_extension_warning,
+    private fun provideValidationParameters(): List<Pair<InvalidNameType, Int>> = listOf(
+        InvalidNameType.BLANK_NAME to sharedR.string.general_invalid_string,
+        InvalidNameType.INVALID_NAME to sharedR.string.general_invalid_characters_defined,
+        InvalidNameType.NAME_ALREADY_EXISTS to NodesR.string.same_file_name_warning,
+        InvalidNameType.NO_EXTENSION to NodesR.string.file_without_extension_warning,
     )
 }

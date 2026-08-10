@@ -19,6 +19,27 @@ value class UriPath(val value: String) {
      */
     fun isPath() = value.startsWith(File.separator)
 
+    /**
+     * Checks if childPath is a subpath of parentPath.
+     *
+     * A path is considered a subpath if it starts with the parent path followed by a separator.
+     * This ensures we don't get false positives for paths that just start with similar text.
+     *
+     * Example:
+     * - parentPath = "/Cloud Drive/Documents"
+     * - childPath = "/Cloud Drive/Documents/Work" → true
+     * - childPath = "/Cloud Drive/DocumentsWork" → false
+     *
+     * this The potential child path
+     * @param parent The potential parent path
+     * @return true if childPath is a subpath of parentPath
+     */
+    fun isSubPathOf(parent: UriPath): Boolean {
+        val normalizedParent = parent.value.trimEnd('/', File.separatorChar)
+        return value.startsWith("$normalizedParent${File.separator}") ||
+                value.startsWith("$normalizedParent/")
+    }
+
     companion object {
         /**
          * Helper function to get a [UriPath] from a [File].

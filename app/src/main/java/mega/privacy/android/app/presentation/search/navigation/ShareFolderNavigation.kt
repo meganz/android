@@ -8,7 +8,6 @@ import androidx.navigation.navArgument
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning.ShareFolderDialog
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
-import mega.privacy.android.app.presentation.search.nodeListHandle
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 

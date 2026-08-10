@@ -3,23 +3,26 @@ package mega.privacy.android.app.namecollision
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import coil3.load
 import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.components.largebundle.largeBundleHolder
 import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
 import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
@@ -40,12 +43,15 @@ import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.core.sharedcomponents.parcelable
+import mega.privacy.android.core.sharedcomponents.parcelableArrayList
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 /**
@@ -59,30 +65,21 @@ class NameCollisionActivity : PasscodeActivity() {
 
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
 
+    private val isRefreshingSession by lazy(LazyThreadSafetyMode.NONE) {
+        shouldRefreshSessionDueToSDK(true)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) {
-            @Suppress("UNCHECKED_CAST")
-            val collisionsList = with(intent) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS, ArrayList::class.java)
-                } else {
-                    @Suppress("DEPRECATION")
-                    getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS)
-                } as ArrayList<NameCollisionUiEntity>?
-            }
+        if (isRefreshingSession) return
+        viewModel.isFolderUploadContext = UPLOAD_FOLDER_CONTEXT == intent.action
+        val singleCollision =
+            intent.parcelable<NameCollisionUiEntity>(INTENT_EXTRA_SINGLE_COLLISION_RESULT)
+        val collisionsKey = intent.getStringExtra(EXTRA_COLLISIONS_KEY)
 
-            val singleCollision = with(intent) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    getSerializableExtra(
-                        INTENT_EXTRA_SINGLE_COLLISION_RESULT,
-                        NameCollisionUiEntity::class.java
-                    )
-                } else {
-                    @Suppress("DEPRECATION")
-                    getSerializableExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT)
-                } as NameCollisionUiEntity?
-            }
+        lifecycleScope.launch {
+            val collisionsList = collisionsKey?.let { largeBundleHolder.get(it) }
+                ?.parcelableArrayList<NameCollisionUiEntity>(INTENT_EXTRA_COLLISION_RESULTS)
 
             when {
                 collisionsList != null -> viewModel.setData(
@@ -98,8 +95,6 @@ class NameCollisionActivity : PasscodeActivity() {
                     finish()
                 }
             }
-
-            viewModel.isFolderUploadContext = UPLOAD_FOLDER_CONTEXT == intent.action
         }
 
         if (!viewModel.isCopyToOrigin) {
@@ -158,7 +153,19 @@ class NameCollisionActivity : PasscodeActivity() {
                 onConsumeEvent = { },
             ) { transferEvent ->
                 ((transferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.CollidedFiles).let {
-                    setResult(NameCollisionActionResult(shouldFinish = viewModel.shouldFinish()))
+                    val uploadedFilesCount = viewModel.getUploadedFilesCount()
+                    // Set message based on uploaded files count
+                    val message = if (uploadedFilesCount > 0) {
+                        getString(sharedR.string.transfers_upload_started_snackbar)
+                    } else {
+                        null
+                    }
+                    setResult(
+                        NameCollisionActionResult(
+                            shouldFinish = viewModel.shouldFinish(),
+                            message = message
+                        )
+                    )
                     viewModel.consumeUploadEvent()
                 }
             }
@@ -197,8 +204,18 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun showCollision(nodeCollisionResult: NodeNameCollisionResult?) {
         val collisionResult = nodeCollisionResult?.toUiEntity()
         if (collisionResult == null) {
-            Timber.e("Cannot show any collision. Finishing...")
-            finish()
+            // All collisions have been processed
+            // Check if should finish (all collisions processed) and if any files were uploaded
+            if (viewModel.shouldFinish() && !isFinishing) {
+                val uploadedFilesCount = viewModel.getUploadedFilesCount()
+                val message = if (uploadedFilesCount > 0) {
+                    getString(sharedR.string.transfers_upload_started_snackbar)
+                } else {
+                    null
+                }
+                setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, message))
+                finish()
+            }
             return
         }
 
@@ -220,8 +237,11 @@ class NameCollisionActivity : PasscodeActivity() {
             .toSpannedHtmlText()
 
         binding.selectText.text = getString(
-            if (isFile) R.string.choose_file
-            else R.string.choose_folder
+            when {
+                isFile -> R.string.choose_file
+                collision is NameCollisionUiEntity.Upload -> sharedR.string.name_collision_choose_folder_header
+                else -> R.string.choose_folder
+            }
         )
 
         binding.replaceUpdateMergeView.apply {
@@ -274,7 +294,9 @@ class NameCollisionActivity : PasscodeActivity() {
         when (collision) {
             is NameCollisionUiEntity.Upload -> {
                 cancelButtonId = R.string.do_not_upload
-                renameInfoId = R.string.warning_upload_and_rename
+                renameInfoId =
+                    if (isFile) R.string.warning_upload_and_rename
+                    else sharedR.string.name_collision_folder_warning_upload_and_rename
                 renameButtonId = R.string.upload_and_rename
             }
 
@@ -329,15 +351,17 @@ class NameCollisionActivity : PasscodeActivity() {
 
         binding.cancelButton.text = getString(cancelButtonId)
 
-        binding.renameSeparator.isVisible = isFile
-        binding.renameInfo.isVisible = isFile
-        binding.renameView.optionView.isVisible = isFile
-        binding.renameButton.isVisible = isFile
+        val showRename = isFile || collision is NameCollisionUiEntity.Upload
 
-        if (isFile) {
+        binding.renameSeparator.isVisible = showRename
+        binding.renameInfo.isVisible = showRename
+        binding.renameView.optionView.isVisible = showRename
+        binding.renameButton.isVisible = showRename
+
+        if (showRename) {
             binding.renameInfo.text = getString(renameInfoId)
             binding.renameView.apply {
-                val hasThumbnail = collisionResult.thumbnail != null
+                val hasThumbnail = isFile && collisionResult.thumbnail != null
                 thumbnail.isVisible = hasThumbnail
                 thumbnailIcon.isVisible = !hasThumbnail
                 when {
@@ -348,9 +372,12 @@ class NameCollisionActivity : PasscodeActivity() {
                     }
 
                     else -> {
-                        thumbnailIcon.setImageResource(MimeTypeList.typeForName(name).iconResourceId)
+                        thumbnailIcon.setImageResource(
+                            if (isFile) MimeTypeList.typeForName(name).iconResourceId
+                            else IconPackR.drawable.ic_folder_medium_solid
+                        )
 
-                        if (collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
+                        if (isFile && collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
                             requestFileThumbnail(collisionResult.nameCollision.absolutePath)
                         }
                     }
@@ -513,14 +540,25 @@ class NameCollisionActivity : PasscodeActivity() {
     }
 
     private fun manageCollisionsResolution(collisionsResolution: ArrayList<NodeNameCollisionResult>) {
-        setResult(
-            Activity.RESULT_OK,
-            Intent().putParcelableArrayListExtra(
-                INTENT_EXTRA_COLLISION_RESULTS,
-                collisionsResolution.map { it.toUiEntity() }.toCollection(ArrayList())
+        val key = largeBundleHolder.put(
+            bundleOf(
+                INTENT_EXTRA_COLLISION_RESULTS to collisionsResolution
+                    .map { it.toUiEntity() }
+                    .toCollection(ArrayList())
             )
         )
+        setResult(
+            Activity.RESULT_OK,
+            Intent().putExtra(EXTRA_COLLISIONS_KEY, key)
+        )
         finish()
+    }
+
+    override fun onDestroy() {
+        if (isFinishing && !isRefreshingSession) {
+            intent.getStringExtra(EXTRA_COLLISIONS_KEY)?.let { largeBundleHolder.release(it) }
+        }
+        super.onDestroy()
     }
 
 
@@ -531,15 +569,24 @@ class NameCollisionActivity : PasscodeActivity() {
         private const val UPLOAD_FOLDER_CONTEXT = "UPLOAD_FOLDER_CONTEXT"
         const val MESSAGE_RESULT = "MESSAGE_RESULT"
 
+        /** Intent extra carrying the [largeBundleHolder] key for the collisions payload. */
+        const val EXTRA_COLLISIONS_KEY = "EXTRA_COLLISIONS_KEY"
+
         @JvmStatic
         fun getIntentForList(
             context: Context,
             collisions: ArrayList<NameCollision>,
-        ): Intent = Intent(context, NameCollisionActivity::class.java).apply {
-            putExtra(
-                INTENT_EXTRA_COLLISION_RESULTS,
-                collisions.map { it.toUiEntity() }.toCollection(ArrayList())
+        ): Intent {
+            val key = context.largeBundleHolder.put(
+                bundleOf(
+                    INTENT_EXTRA_COLLISION_RESULTS to collisions
+                        .map { it.toUiEntity() }
+                        .toCollection(ArrayList())
+                )
             )
+            return Intent(context, NameCollisionActivity::class.java).apply {
+                putExtra(EXTRA_COLLISIONS_KEY, key)
+            }
         }
 
         @JvmStatic

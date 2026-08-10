@@ -1,0 +1,848 @@
+package mega.privacy.android.feature.photos.presentation.albums.content
+
+import android.content.Context
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.sharedcomponents.extension.truncateMiddle
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.media.MediaAlbum
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.Album.FavouriteAlbum
+import mega.privacy.android.domain.entity.photos.Album.GifAlbum
+import mega.privacy.android.domain.entity.photos.Album.RawAlbum
+import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumPhotoId
+import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.exception.account.AlbumNameValidationException
+import mega.privacy.android.domain.extension.mapAsync
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
+import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
+import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
+import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.media.GetUserAlbumCoverPhotoUseCase
+import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
+import mega.privacy.android.domain.usecase.media.ValidateAndUpdateUserAlbumUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
+import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
+import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
+import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.core.sharedcomponents.mapper.AlbumNameValidationExceptionMessageMapper
+import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
+import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
+import mega.privacy.android.feature.photos.mapper.LegacyPhotosSortMapper
+import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
+import mega.privacy.android.feature.photos.model.PhotoUiState
+import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
+import mega.privacy.android.feature.photos.presentation.albums.model.FavouriteSystemAlbum
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
+import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
+import mega.privacy.mobile.analytics.event.MediaScreenAlbumAddItemsButtonPressedEvent
+import mega.privacy.mobile.analytics.event.PhotoItemSelected
+import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
+import timber.log.Timber
+
+@HiltViewModel(assistedFactory = AlbumContentViewModel.Factory::class)
+class AlbumContentViewModel @AssistedInject constructor(
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val savedStateHandle: SavedStateHandle,
+    private val getDefaultAlbumPhotos: GetDefaultAlbumPhotos,
+    private val getDefaultAlbumsMapUseCase: GetDefaultAlbumsMapUseCase,
+    private val getUserAlbum: MonitorUserAlbumByIdUseCase,
+    private val getAlbumPhotosUseCase: GetAlbumPhotosUseCase,
+    private val observeAlbumPhotosAddingProgress: ObserveAlbumPhotosAddingProgress,
+    private val albumUiStateMapper: AlbumUiStateMapper,
+    private val legacyMediaSystemAlbumMapper: LegacyMediaSystemAlbumMapper,
+    private val updateAlbumPhotosRemovingProgressCompleted: UpdateAlbumPhotosRemovingProgressCompleted,
+    private val disableExportAlbumsUseCase: DisableExportAlbumsUseCase,
+    private val removeFavouritesUseCase: RemoveFavouritesUseCase,
+    private val removePhotosFromAlbumUseCase: RemovePhotosFromAlbumUseCase,
+    private val getNodeListByIdsUseCase: GetNodeListByIdsUseCase,
+    private val updateAlbumNameUseCase: ValidateAndUpdateUserAlbumUseCase,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val photoUiStateMapper: PhotoUiStateMapper,
+    private val getUserAlbumCoverPhotoUseCase: GetUserAlbumCoverPhotoUseCase,
+    private val removeAlbumsUseCase: RemoveAlbumsUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
+    private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val legacyPhotosSortMapper: LegacyPhotosSortMapper,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    @ApplicationContext private val context: Context,
+    @Assisted private val navKey: AlbumContentNavKey?,
+) : ViewModel() {
+    private val _state = MutableStateFlow(AlbumContentUiState())
+    val state = _state.asStateFlow()
+
+    private var observeAlbumPhotosJob: Job? = null
+
+    var sourcePhotos: List<Photo>? = null
+        private set
+
+    private var showHiddenItems: Boolean? = null
+
+    private var awaitingInitialAlbumPhotos: Boolean = navKey?.isNewlyCreated == true
+
+    private val albumType: String?
+        get() = savedStateHandle["type"] ?: navKey?.type
+
+    private val albumId: AlbumId?
+        get() = (savedStateHandle["id"] ?: navKey?.id)
+            ?.let { AlbumId(it) }
+
+    private val photosFetchers: Map<String, () -> Unit> = mapOf(
+        "favourite" to { fetchSystemPhotos(systemAlbum = FavouriteAlbum) },
+        "gif" to { fetchSystemPhotos(systemAlbum = GifAlbum) },
+        "raw" to { fetchSystemPhotos(systemAlbum = RawAlbum) },
+        "custom" to { fetchAlbumPhotos() },
+    )
+
+    private val albumTitle
+        get() = state.value.uiAlbum?.title?.get(context).orEmpty()
+
+    init {
+        monitorThemeMode()
+        fetchPhotos()
+        fetchIsHiddenNodesOnboarded()
+
+        monitorShowHiddenItems()
+        monitorAccountDetail()
+    }
+
+    private fun monitorThemeMode() {
+        monitorThemeModeUseCase()
+            .catch {}
+            .onEach { mode ->
+                _state.update { it.copy(themeMode = mode) }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun fetchPhotos() {
+        val photosFetcher = photosFetchers[albumType] ?: return
+        photosFetcher()
+    }
+
+    private fun fetchIsHiddenNodesOnboarded() {
+        viewModelScope.launch {
+            runCatching {
+                isHiddenNodesOnboardedUseCase()
+            }.onSuccess { isOnboarded ->
+                _state.update {
+                    it.copy(isHiddenNodesOnboarded = isOnboarded)
+                }
+            }
+        }
+    }
+
+    private fun monitorShowHiddenItems() {
+        combine(
+            monitorHiddenNodesEnabledUseCase()
+                .catch { Timber.e(it) },
+            monitorShowHiddenItemsUseCase()
+                .catch { Timber.e(it) },
+            ::Pair
+        ).onEach { (enabled, show) ->
+            showHiddenItems = show && enabled
+            if (_state.value.isLoading) return@onEach
+
+            val filteredPhotos = filterNonSensitivePhotos(photos = sourcePhotos.orEmpty())
+            _state.update { state ->
+                state.copy(photos = filteredPhotos)
+            }
+
+            updateSelection(filteredPhotos)
+        }.launchIn(viewModelScope)
+    }
+
+    private fun monitorAccountDetail() {
+        monitorAccountDetailUseCase()
+            .catch { Timber.e(it) }
+            .onEach { accountDetail ->
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
+
+                _state.update {
+                    it.copy(
+                        accountType = accountType,
+                        isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
+                        hiddenNodeEnabled = true,
+                    )
+                }
+
+                if (_state.value.isLoading) return@onEach
+
+                val filteredPhotos = filterNonSensitivePhotos(photos = sourcePhotos.orEmpty())
+                _state.update { state ->
+                    state.copy(photos = filteredPhotos)
+                }
+
+                updateSelection(filteredPhotos)
+            }.launchIn(viewModelScope)
+    }
+
+    private fun updateSelection(photos: List<PhotoUiState>) {
+        val selectedPhotos = _state.value.selectedPhotos.filter { selectedPhoto ->
+            photos.any { it.id == selectedPhoto.id }
+        }.toSet()
+
+        _state.update {
+            it.copy(selectedPhotos = selectedPhotos.toImmutableSet())
+        }
+
+        updateBottomBarActionVisibility()
+    }
+
+    /**
+     * Updates the visibility of bottom bar actions based on:
+     * - Album type (FavouriteAlbum shows RemoveFavourites, UserAlbum shows Delete)
+     * - Selected photos' sensitive state (for Hide/Unhide actions)
+     * - Account type (paid/free)
+     * - Business account expired status
+     * - Hidden nodes onboarded status
+     */
+    private fun updateBottomBarActionVisibility() {
+        viewModelScope.launch(defaultDispatcher) {
+            val state = _state.value
+            val selectedPhotos = state.selectedPhotos
+
+            if (selectedPhotos.isEmpty()) {
+                _state.update {
+                    it.copy(visibleBottomBarActions = persistentListOf())
+                }
+                return@launch
+            }
+
+            val mediaAlbum = state.uiAlbum?.mediaAlbum
+            val isPaidAccount = state.accountType?.isPaid == true && !state.isBusinessAccountExpired
+            val showHide =
+                !isPaidAccount || selectedPhotos.all { !it.isSensitive && !it.isSensitiveInherited }
+            val showUnhide =
+                isPaidAccount && selectedPhotos.all { it.isSensitive && !it.isSensitiveInherited }
+            val showDelete = mediaAlbum is MediaAlbum.User
+            val showRemoveFavourites =
+                (mediaAlbum as? MediaAlbum.System)?.id is FavouriteSystemAlbum
+
+            val visibleActions = AlbumContentSelectionAction
+                .bottomBarItems
+                .filter { action ->
+                    when (action) {
+                        is AlbumContentSelectionAction.Hide -> showHide
+                        is AlbumContentSelectionAction.Unhide -> showUnhide
+                        is AlbumContentSelectionAction.RemoveFromAlbum -> showDelete
+                        is AlbumContentSelectionAction.RemoveFavourites -> showRemoveFavourites
+                        else -> true
+                    }
+                }
+
+            _state.update {
+                it.copy(visibleBottomBarActions = visibleActions.toImmutableList())
+            }
+        }
+    }
+
+    private fun fetchSystemPhotos(systemAlbum: Album) {
+        viewModelScope.launch {
+            val filter = getDefaultAlbumsMapUseCase()[systemAlbum] ?: return@launch
+            val isPaginationEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
+            }.getOrDefault(false)
+
+            runCatching {
+                // Will be refactored later in the next phase
+                val albumCover = albumId?.let { getUserAlbumCoverPhotoUseCase(it) }
+
+                getDefaultAlbumPhotos(isPaginationEnabled, listOf(filter))
+                    .onEach { sourcePhotos = it }
+                    .map(::filterNonSensitivePhotos)
+                    .onEach(::updateSelection)
+                    .collectLatest { photos ->
+                        val mediaSystemAlbum = legacyMediaSystemAlbumMapper(
+                            album = systemAlbum,
+                            cover = albumCover
+                        )
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                photos = photos,
+                                uiAlbum = mediaSystemAlbum?.let { album ->
+                                    albumUiStateMapper(album)
+                                }
+                            )
+                        }
+                    }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    private fun fetchAlbumPhotos() {
+        val albumId = albumId ?: return
+
+        observeAlbum(albumId)
+        observeAlbumPhotos(albumId, refresh = false)
+        observePhotosAddingProgress(albumId)
+    }
+
+    private fun observePhotosAddingProgress(albumId: AlbumId) {
+        observeAlbumPhotosAddingProgress(albumId)
+            .catch { Timber.e(it) }
+            .onEach { progress ->
+                when {
+                    progress?.isProgressing == true ->
+                        _state.update { it.copy(isAddingPhotos = true) }
+
+                    progress != null && progress.totalAddedPhotos == 0 -> {
+                        awaitingInitialAlbumPhotos = false
+                        _state.update { it.copy(isAddingPhotos = false, isLoading = false) }
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun observeAlbum(albumId: AlbumId) {
+        viewModelScope.launch {
+            runCatching {
+                getUserAlbum(albumId)
+                    .collectLatest { album ->
+                        val uiAlbum = album?.let(albumUiStateMapper::invoke)
+
+                        _state.update {
+                            it.copy(uiAlbum = uiAlbum)
+                        }
+                    }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    private fun observeAlbumPhotos(albumId: AlbumId, refresh: Boolean) {
+        observeAlbumPhotosJob?.cancel()
+        observeAlbumPhotosJob = viewModelScope.launch {
+            runCatching {
+                getAlbumPhotosUseCase(albumId, refresh)
+                    .onEach { sourcePhotos = it }
+                    .map(::filterNonSensitivePhotos)
+                    .onEach(::updateSelection)
+                    .collectLatest { photos ->
+                        sortPhotos(
+                            sortConfiguration = _state.value.albumSortConfiguration,
+                            photos = photos
+                        )
+                    }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    private fun filterNonSensitivePhotos(photos: List<Photo>): ImmutableList<PhotoUiState> {
+        val photosUiState = photos.map { photoUiStateMapper(it) }
+        val showHiddenItems = showHiddenItems ?: return photosUiState.toImmutableList()
+        val isPaid = _state.value.accountType?.isPaid ?: return photosUiState.toImmutableList()
+        val filteredPhotos =
+            if (showHiddenItems || !isPaid || _state.value.isBusinessAccountExpired) {
+                photosUiState
+            } else {
+                photosUiState.filter { !it.isSensitive && !it.isSensitiveInherited }
+            }
+
+        return filteredPhotos.toImmutableList()
+    }
+
+    fun updatePhotosRemovingProgressCompleted(albumId: AlbumId) {
+        viewModelScope.launch {
+            updateAlbumPhotosRemovingProgressCompleted(albumId)
+        }
+    }
+
+    internal fun deleteAlbum() {
+        viewModelScope.launch {
+            runCatching {
+                val albumIdToRemove = albumId
+                checkNotNull(albumIdToRemove)
+                removeAlbumsUseCase(listOf(albumIdToRemove))
+            }.onFailure {
+                Timber.e(it)
+            }.onSuccess {
+                snackbarEventQueue.queueMessage(
+                    sharedResR.string.delete_singular_album_confirmation_message,
+                    albumTitle.truncateMiddle()
+                )
+                _state.update {
+                    it.copy(deleteAlbumSuccessEvent = triggered)
+                }
+            }
+        }
+    }
+
+    internal fun resetDeleteAlbumSuccess() {
+        _state.update {
+            it.copy(deleteAlbumSuccessEvent = consumed)
+        }
+    }
+
+    internal fun resetShowDeleteConfirmation() {
+        _state.update {
+            it.copy(showDeleteAlbumConfirmation = consumed)
+        }
+    }
+
+    fun resetManageLink() {
+        _state.update {
+            it.copy(manageLinkEvent = consumed())
+        }
+    }
+
+    fun resetRemoveLinkConfirmation() {
+        _state.update {
+            it.copy(showRemoveLinkConfirmation = consumed)
+        }
+    }
+
+    fun disableExportAlbum() {
+        viewModelScope.launch {
+            runCatching {
+                val userAlbum = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)
+                checkNotNull(userAlbum)
+                disableExportAlbumsUseCase(albumIds = listOf(userAlbum.id))
+            }.onSuccess { linkRemoved ->
+                _state.update {
+                    it.copy(
+                        linkRemovedSuccessEvent = if (linkRemoved > 0) triggered else consumed
+                    )
+                }
+            }
+        }
+    }
+
+    fun resetLinkRemovedSuccess() {
+        _state.update {
+            it.copy(linkRemovedSuccessEvent = consumed)
+        }
+    }
+
+    fun sortPhotos(
+        sortConfiguration: AlbumSortConfiguration,
+        photos: List<PhotoUiState> = _state.value.photos,
+    ) {
+        viewModelScope.launch {
+            val sortedPhotosUiState = withContext(defaultDispatcher) {
+                val comparator = if (sortConfiguration.sortDirection == SortDirection.Ascending) {
+                    compareBy<PhotoUiState> { it.modificationTime }
+                } else {
+                    compareByDescending { it.modificationTime }
+                }.thenByDescending { it.id }
+
+                photos.sortedWith(comparator).toImmutableList()
+            }
+
+            val keepLoadingForNewAlbum = awaitingInitialAlbumPhotos && sortedPhotosUiState.isEmpty()
+            if (sortedPhotosUiState.isNotEmpty()) {
+                awaitingInitialAlbumPhotos = false
+            }
+
+            _state.update {
+                it.copy(
+                    albumSortConfiguration = sortConfiguration,
+                    photos = sortedPhotosUiState,
+                    isLoading = keepLoadingForNewAlbum,
+                    isAddingPhotos = false
+                )
+            }
+        }
+    }
+
+    fun previewPhoto(photo: PhotoUiState) {
+        viewModelScope.launch {
+            val args = AlbumContentPreviewNavKey(
+                albumId = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)?.id?.id,
+                photoId = photo.id,
+                albumType = albumType.orEmpty(),
+                sortType = legacyPhotosSortMapper(_state.value.albumSortConfiguration.sortDirection).name,
+                title = albumTitle
+            )
+
+            _state.update { it.copy(previewAlbumContentEvent = triggered(args)) }
+        }
+    }
+
+    fun resetPreviewPhoto() {
+        _state.update { it.copy(previewAlbumContentEvent = consumed()) }
+    }
+
+    fun removeFavourites() = viewModelScope.launch {
+        val selectedPhotoIds = _state.value.selectedPhotos.map { NodeId(it.id) }
+        removeFavouritesUseCase(selectedPhotoIds)
+
+        _state.update {
+            it.copy(selectedPhotos = persistentSetOf())
+        }
+    }
+
+    fun removePhotosFromAlbum() = viewModelScope.launch {
+        val album = _state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User ?: return@launch
+        _state.value.selectedPhotos.mapNotNull { photo ->
+            photo.albumPhotoId?.let {
+                AlbumPhotoId(
+                    id = it,
+                    nodeId = NodeId(photo.id),
+                    albumId = album.id,
+                )
+            }
+        }.also {
+            removePhotosFromAlbumUseCase(albumId = album.id, photoIds = it)
+        }
+    }
+
+    internal fun savePhotosToDevice() {
+        fetchNodesAndExecute { nodes ->
+            _state.update { it.copy(savePhotosToDeviceEvent = triggered(nodes)) }
+        }
+    }
+
+    internal fun resetSavePhotosToDevice() {
+        _state.update { it.copy(savePhotosToDeviceEvent = consumed()) }
+    }
+
+    internal fun sharePhotos() {
+        fetchNodesAndExecute { nodes ->
+            _state.update { it.copy(sharePhotosEvent = triggered(nodes)) }
+        }
+    }
+
+    internal fun resetSharePhotos() {
+        _state.update { it.copy(sharePhotosEvent = consumed()) }
+    }
+
+    internal fun sendPhotosToChat() {
+        fetchNodesAndExecute { nodes ->
+            _state.update { it.copy(sendPhotosToChatEvent = triggered(nodes)) }
+        }
+    }
+
+    internal fun resetSendPhotosToChat() {
+        _state.update { it.copy(sendPhotosToChatEvent = consumed()) }
+    }
+
+    private fun fetchNodesAndExecute(block: (List<TypedNode>) -> Unit) {
+        viewModelScope.launch {
+            runCatching {
+                val selectedPhotoIds = _state.value.selectedPhotos.map { NodeId(it.id) }
+                getNodeListByIdsUseCase(selectedPhotoIds)
+            }.onSuccess { nodes ->
+                if (nodes.isNotEmpty()) {
+                    block(nodes)
+                }
+            }
+        }
+    }
+
+    fun clearSelectedPhotos() {
+        _state.update {
+            it.copy(selectedPhotos = persistentSetOf())
+        }
+
+        updateBottomBarActionVisibility()
+    }
+
+    fun togglePhotoSelection(photo: PhotoUiState) {
+        val selectedPhotos = _state.value.selectedPhotos.toMutableSet()
+        if (photo in selectedPhotos) {
+            Analytics.tracker.trackEvent(
+                PhotoItemSelectedEvent(selectionType = PhotoItemSelected.SelectionType.MultiRemove)
+            )
+            selectedPhotos.remove(photo)
+        } else {
+            Analytics.tracker.trackEvent(
+                PhotoItemSelectedEvent(selectionType = PhotoItemSelected.SelectionType.MultiAdd)
+            )
+            selectedPhotos.add(photo)
+        }
+
+        _state.update {
+            it.copy(selectedPhotos = selectedPhotos.toImmutableSet())
+        }
+        updateBottomBarActionVisibility()
+    }
+
+    fun updateAlbumName(name: String) = viewModelScope.launch {
+        runCatching {
+            val albumId = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)?.id
+            albumId?.let { updateAlbumNameUseCase(it, name.trim()) }
+        }.onFailure { e ->
+            Timber.e(e)
+
+            if (e is AlbumNameValidationException) {
+                val message = albumNameValidationExceptionMessageMapper(e)
+                _state.update {
+                    it.copy(updateAlbumNameErrorMessage = triggered(message))
+                }
+            }
+        }.onSuccess {
+            resetShowUpdateAlbumName()
+        }
+    }
+
+    fun resetShowUpdateAlbumName() {
+        _state.update {
+            it.copy(showUpdateAlbumName = consumed)
+        }
+    }
+
+    fun resetUpdateAlbumNameErrorMessage() {
+        _state.update {
+            it.copy(updateAlbumNameErrorMessage = consumed())
+        }
+    }
+
+    fun hideNodes() {
+        val selectedPhotos = _state.value.selectedPhotos
+
+        viewModelScope.launch {
+            val isHiddenNodesOnboarded =
+                runCatching { isHiddenNodesOnboardedUseCase() }.getOrDefault(false)
+            val isPaid = _state.value.accountType?.isPaid ?: false
+            val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+
+            if (!isPaid || isBusinessAccountExpired) {
+                // Show onboarding for non-paid or expired accounts
+                _state.update {
+                    it.copy(showHiddenNodesOnboardingEvent = triggered(false))
+                }
+            } else if (isHiddenNodesOnboarded) {
+                // User is onboarded, proceed with hiding
+                updateNodeSensitivity(
+                    selectedPhotos = selectedPhotos,
+                    isSensitive = true
+                ) { count ->
+                    val message = LocalizedText.PluralsRes(
+                        resId = NodesR.plurals.hidden_nodes_result_message,
+                        quantity = count,
+                        formatArgs = listOf(count)
+                    )
+
+                    snackbarEventQueue.queueMessage(message.get(context))
+                }
+            } else {
+                // User is paid but not onboarded, show onboarding first
+                setHiddenNodesOnboarded()
+                _state.update {
+                    it.copy(showHiddenNodesOnboardingEvent = triggered(true))
+                }
+            }
+        }
+    }
+
+    fun unhideNodes() {
+        val selectedPhotos = _state.value.selectedPhotos
+
+        viewModelScope.launch {
+            val isPaid = _state.value.accountType?.isPaid ?: false
+            val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+
+            if (isPaid && !isBusinessAccountExpired) {
+                updateNodeSensitivity(
+                    selectedPhotos = selectedPhotos,
+                    isSensitive = false
+                ) { count ->
+                    val message = LocalizedText.PluralsRes(
+                        resId = sharedResR.plurals.unhidden_nodes_result_message,
+                        quantity = count,
+                        formatArgs = listOf(count)
+                    )
+
+                    snackbarEventQueue.queueMessage(message.get(context))
+                }
+            }
+        }
+    }
+
+    private suspend fun updateNodeSensitivity(
+        selectedPhotos: Set<PhotoUiState>,
+        isSensitive: Boolean,
+        action: suspend (Int) -> Unit,
+    ) {
+        val photoIds = selectedPhotos.map { it.id }
+        val count = photoIds.size
+        photoIds.mapAsync { id ->
+            runCatching {
+                updateNodeSensitiveUseCase(
+                    nodeId = NodeId(id),
+                    isSensitive = isSensitive
+                )
+            }
+        }
+
+        action(count)
+    }
+
+    fun setHiddenNodesOnboarded() {
+        _state.update {
+            it.copy(isHiddenNodesOnboarded = true)
+        }
+    }
+
+    fun resetShowHiddenNodesOnboardingEvent() {
+        _state.update {
+            it.copy(showHiddenNodesOnboardingEvent = consumed())
+        }
+    }
+
+    fun resetSelectAlbumCoverEvent() {
+        _state.update {
+            it.copy(selectAlbumCoverEvent = consumed())
+        }
+    }
+
+    fun handleAction(action: AlbumContentSelectionAction) {
+        viewModelScope.launch {
+            validateStorageState {
+                when (action) {
+                    is AlbumContentSelectionAction.Rename -> {
+                        _state.update {
+                            it.copy(showUpdateAlbumName = triggered)
+                        }
+                    }
+
+                    is AlbumContentSelectionAction.SelectAlbumCover -> {
+                        val userAlbum = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)
+                        _state.update {
+                            it.copy(selectAlbumCoverEvent = triggered(userAlbum?.id))
+                        }
+                    }
+
+                    is AlbumContentSelectionAction.ManageLink, is AlbumContentSelectionAction.ShareLink -> {
+                        _state.update {
+                            it.copy(
+                                manageLinkEvent = triggered(
+                                    _state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User
+                                )
+                            )
+                        }
+                    }
+
+                    is AlbumContentSelectionAction.RemoveLink -> {
+                        _state.update {
+                            it.copy(showRemoveLinkConfirmation = triggered)
+                        }
+                    }
+
+                    is AlbumContentSelectionAction.DeleteAlbum -> {
+                        if (_state.value.photos.isEmpty()) {
+                            Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
+                            deleteAlbum()
+                        } else {
+                            _state.update {
+                                it.copy(showDeleteAlbumConfirmation = triggered)
+                            }
+                        }
+                    }
+
+                    is AlbumContentSelectionAction.AddItems -> {
+                        Analytics.tracker.trackEvent(MediaScreenAlbumAddItemsButtonPressedEvent)
+                        _state.update {
+                            it.copy(addMoreItemsEvent = triggered)
+                        }
+                    }
+
+                    else -> {
+                        Timber.d("handleBottomSheetAction: Unknown action $action")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validateStorageState(block: () -> Unit) {
+        runCatching {
+            monitorStorageStateEventUseCase().value.storageState
+        }.onSuccess { storageState ->
+            if (storageState == StorageState.PayWall) {
+                _state.update { it.copy(paywallEvent = triggered) }
+            } else {
+                block()
+            }
+        }.onFailure {
+            Timber.e("validateStorageState: $it")
+        }
+    }
+
+    fun resetPaywallEvent() {
+        _state.update {
+            it.copy(paywallEvent = consumed)
+        }
+    }
+
+    fun resetAddMoreItems() {
+        _state.update {
+            it.copy(addMoreItemsEvent = consumed)
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: AlbumContentNavKey?): AlbumContentViewModel
+    }
+}

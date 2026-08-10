@@ -86,7 +86,9 @@ class HomePageViewModel @Inject constructor(
     fun getBanners() {
         viewModelScope.launch {
             runCatching {
-                getBannersUseCase()
+                getBannersUseCase().filter { it.variant == 0 }
+                // add variant filter because for Home Revamp banner the variant will be greater than 1
+                // and new format. we don't want to show new banner in legacy banner implementation
             }.onSuccess { banners ->
                 _banners.update { banners }
             }.onFailure {

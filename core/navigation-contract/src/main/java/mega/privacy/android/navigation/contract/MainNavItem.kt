@@ -4,10 +4,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 
 interface MainNavItem {
-    val destination: NavKey
+    val destination: MainNavItemNavKey
     val screen: EntryProviderScope<NavKey>.(navigationHandler: NavigationHandler, navigationUiController: NavigationUiController, transferHandler: TransferHandler) -> Unit
     val icon: ImageVector
     val selectedIcon: ImageVector?
@@ -50,3 +51,13 @@ data class DefaultIconBadge(
     override val count = 1
 }
 
+fun Iterable<MainNavItem>.sortedByPreferredSlot(): List<MainNavItem> {
+    return sortedWith(
+        compareBy { navItem ->
+            when (val slot = navItem.preferredSlot) {
+                is PreferredSlot.Ordered -> slot.slot
+                is PreferredSlot.Last -> Int.MAX_VALUE
+            }
+        }
+    )
+}

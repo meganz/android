@@ -20,7 +20,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.TwoLineCheckPreference
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.presentation.extensions.title
@@ -29,7 +28,6 @@ import mega.privacy.android.app.presentation.settings.chat.imagequality.Settings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApi
@@ -48,9 +46,6 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
 
     @Inject
     lateinit var megaChatApi: MegaChatApiAndroid
-
-    @Inject
-    lateinit var dbH: DatabaseHandler
 
     private val viewModel: SettingsChatViewModel by viewModels()
 
@@ -92,6 +87,15 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         statusChatListPreference =
             findPreference<ListPreference?>(SettingsConstants.KEY_CHAT_STATUS)?.apply {
                 onPreferenceChangeListener = this@SettingsChatFragment
+                // Set entries (display strings)
+                entries = arrayOf(
+                    getString(R.string.settings_chat_status_online),
+                    getString(R.string.settings_chat_status_away),
+                    getString(R.string.settings_chat_status_busy),
+                    getString(R.string.settings_chat_status_offline),
+                )
+                // Set entryValues (persisted values)
+                entryValues = resources.getStringArray(R.array.settings_chat_status_values)
             }
 
         autoAwaySwitch =
@@ -120,8 +124,15 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         chatAttachmentsChatListPreference =
             findPreference<ListPreference?>(SettingsConstants.KEY_CHAT_SEND_ORIGINALS)?.apply {
                 onPreferenceChangeListener = this@SettingsChatFragment
-                setValueIndex(dbH.chatVideoQuality)
-                summary = chatAttachmentsChatListPreference?.entry
+                // Set entries (display strings)
+                entries = arrayOf(
+                    getString(R.string.settings_chat_upload_quality_low),
+                    getString(R.string.settings_chat_upload_quality_medium),
+                    getString(R.string.settings_chat_upload_quality_high),
+                    getString(R.string.settings_chat_upload_quality_original),
+                )
+                // Set entryValues (numeric values for persistence)
+                entryValues = resources.getStringArray(R.array.settings_chat_upload_quality_values)
             }
 
         richLinksSwitch =
@@ -163,6 +174,13 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                         onPreferenceClickListener = null
                         isChecked = state.isRichLinkEnabled
                         onPreferenceClickListener = this@SettingsChatFragment
+                    }
+
+                    state.chatVideoQuality?.let { quality ->
+                        chatAttachmentsChatListPreference?.apply {
+                            setValueIndex(quality)
+                            summary = entry
+                        }
                     }
                 }
             }
@@ -264,7 +282,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
 
             SettingsConstants.KEY_CHAT_SEND_ORIGINALS -> {
                 val newStatus = (newValue as String).toInt()
-                dbH.chatVideoQuality = newStatus
+                viewModel.setChatVideoQuality(newStatus)
                 chatAttachmentsChatListPreference?.setValueIndex(newStatus)
                 chatAttachmentsChatListPreference?.summary =
                     chatAttachmentsChatListPreference?.entry

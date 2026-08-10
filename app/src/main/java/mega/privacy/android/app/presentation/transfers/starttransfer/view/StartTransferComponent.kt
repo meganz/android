@@ -25,9 +25,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -37,6 +38,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -63,7 +65,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeChatTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumePreviewTransfersDialog
-import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
 import mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog.TransferOverQuotaDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelPreviewDownloadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.LargeDownloadConfirmationDialog
@@ -76,6 +77,8 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.St
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
@@ -102,10 +105,10 @@ internal fun StartTransferComponent(
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     viewModel: StartTransfersComponentViewModel = hiltViewModel(),
     onCancelNotEnoughSpaceForUploadDialog: () -> Unit = {},
+    isPasscodeLocked: Boolean = false,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    var showFilesPermissionRequest by rememberSaveable { mutableStateOf(false) }
     var showStorageOverQuotaWarning by rememberSaveable { mutableStateOf(false) }
     val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) {
@@ -170,25 +173,29 @@ internal fun StartTransferComponent(
             }
         })
 
-    if (showFilesPermissionRequest) {
-        FilesPermissionDialog(
-            onDoNotShowAgainClick = { viewModel.setRequestFilesPermissionDenied() },
-            onStartTransferAndDismiss = {
-                viewModel.startTransferAfterPermissionRequest()
-                showFilesPermissionRequest = false
+    if (!isPasscodeLocked) {
+        if (showStorageOverQuotaWarning) {
+            if (uiState.isQuotaWarningUpsellEnabled) {
+                LaunchedEffect(Unit) {
+                    showStorageOverQuotaWarning = false
+                    onCancelNotEnoughSpaceForUploadDialog()
+                    context.megaNavigator.openQuotaWarningUpsell(
+                        context = context,
+                        type = QuotaWarningType.Storage,
+                        trigger = QuotaWarningTrigger.Upload,
+                    )
+                }
+            } else {
+                NotEnoughSpaceForUploadDialog(onCancel = {
+                    onCancelNotEnoughSpaceForUploadDialog()
+                    showStorageOverQuotaWarning = false
+                })
             }
-        )
-    }
+        }
 
-    if (showStorageOverQuotaWarning) {
-        NotEnoughSpaceForUploadDialog(onCancel = {
-            onCancelNotEnoughSpaceForUploadDialog()
-            showStorageOverQuotaWarning = false
-        })
-    }
-
-    if (areTransferOverQuotaWarningsAllowed) {
-        TransferOverQuotaDialog()
+        if (areTransferOverQuotaWarningsAllowed && !uiState.isQuotaWarningUpsellEnabled) {
+            TransferOverQuotaDialog()
+        }
     }
 
     StartTransferComponent(
@@ -196,22 +203,25 @@ internal fun StartTransferComponent(
         onOneOffEventConsumed = viewModel::consumeOneOffEvent,
         onCancelled = viewModel::cancelCurrentTransfersJob,
         onLargeDownloadAnswered = viewModel::largeDownloadAnswered,
-        onDestinationSet = viewModel::startDownloadWithDestination,
+        onDestinationSet = viewModel::checkSaveDestinationAndStartDownload,
+        onSaveDestinationFinished = viewModel::startDownloadingAfterCheckSaveDestination,
         onPromptSaveDestinationConsumed = viewModel::consumePromptSaveDestination,
         onSaveDestination = viewModel::saveDestination,
         onAlwaysAskForDestination = viewModel::alwaysAskForDestination,
         onResumeTransfers = viewModel::resumeTransfers,
         onAskedResumeTransfers = viewModel::setAskedResumeTransfers,
         snackBarHostState = snackBarHostState.orProvided(),
-        onScanningFinished = onScanningFinished,
         onPreviewFile = viewModel::previewFile,
         onPreviewOpened = viewModel::consumePreviewFileOpened,
         onCancelTransferConfirmed = viewModel::cancelTransferConfirmed,
         onCancelTransferCancelled = viewModel::cancelTransferCancelled,
         onConsumeCancelTransferResult = viewModel::onConsumeCancelTransferFailure,
+        isPasscodeLocked = isPasscodeLocked,
+        onScanningFinished = onScanningFinished,
         retryTransfers = {
             viewModel.startTransfer(it)
-        }
+        },
+        coroutineScope = coroutineScope,
     )
 }
 
@@ -252,10 +262,12 @@ internal fun createStartTransferView(
 @Composable
 private fun StartTransferComponent(
     uiState: StartTransferViewState,
+    coroutineScope: CoroutineScope,
     onOneOffEventConsumed: () -> Unit,
     onCancelled: () -> Unit,
     onLargeDownloadAnswered: (TransferTriggerEvent.DownloadTriggerEvent?, saveDoNotAskAgain: Boolean) -> Unit,
     onDestinationSet: (destination: Uri?) -> Unit,
+    onSaveDestinationFinished: (destination: String) -> Unit,
     onPromptSaveDestinationConsumed: () -> Unit,
     onSaveDestination: (String) -> Unit,
     onAlwaysAskForDestination: () -> Unit,
@@ -267,11 +279,12 @@ private fun StartTransferComponent(
     onCancelTransferConfirmed: () -> Unit,
     onCancelTransferCancelled: () -> Unit,
     onConsumeCancelTransferResult: () -> Unit,
+    isPasscodeLocked: Boolean,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     retryTransfers: (TransferTriggerEvent.RetryTransfers) -> Unit,
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
+    val resources = LocalResources.current
     var showOfflineAlertDialog by rememberSaveable { mutableStateOf(false) }
     var showResumeChatUploadsAlertDialog by rememberSaveable { mutableStateOf(false) }
     var showResumePreviewDownloadsAlertDialog by rememberSaveable { mutableStateOf<String?>(null) }
@@ -328,6 +341,9 @@ private fun StartTransferComponent(
                 }
 
                 is StartTransferEvent.FinishUploadProcessing -> {
+                    (event.triggerEvent as? StartUpload.Files)?.specificStartMessage?.let {
+                        snackBarHostState.showAutoDurationSnackbar(it)
+                    }
                     onScanningFinished(event)
                 }
 
@@ -362,7 +378,7 @@ private fun StartTransferComponent(
 
                 is StartTransferEvent.FinishCopyOffline -> {
                     snackBarHostState.showAutoDurationSnackbar(
-                        context.resources.getQuantityString(
+                        resources.getQuantityString(
                             R.plurals.download_complete,
                             event.totalFiles,
                             event.totalFiles,
@@ -399,129 +415,146 @@ private fun StartTransferComponent(
         }
     )
 
-    TransferInProgressDialog(
-        uiState.jobInProgressState,
-        onCancel = onCancelled,
-    )
+    if (!isPasscodeLocked) {
+        TransferInProgressDialog(
+            uiState.jobInProgressState,
+            onCancel = onCancelled,
+        )
 
-    if (showOfflineAlertDialog) {
-        MegaAlertDialog(
-            text = stringResource(id = R.string.error_server_connection_problem),
-            confirmButtonText = stringResource(id = sharedResR.string.general_ok),
-            cancelButtonText = null,
-            onConfirm = { showOfflineAlertDialog = false },
-            onDismiss = { showOfflineAlertDialog = false },
-        )
-    }
-    if (uiState.previewFileToOpen != null) {
-        HandleFileAction(
-            file = uiState.previewFileToOpen,
-            isOpenWith = uiState.isOpenWithAction,
-            snackBarHostState = snackBarHostState,
-            onActionHandled = onPreviewOpened,
-        )
-    }
-    showQuotaExceededDialog.value?.let {
-        StorageStatusDialogView(
-            storageState = it,
-            preWarning = it != StorageState.Red,
-            overQuotaAlert = true,
-            onUpgradeClick = {
-                context.megaNavigator.openUpgradeAccount(context = context)
-            },
-            onCustomizedPlanClick = { email, accountType ->
-                AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)
-            },
-            onAchievementsClick = {
-                context.startActivity(
-                    Intent(context, MyAccountActivity::class.java)
-                        .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
+        if (showOfflineAlertDialog) {
+            MegaAlertDialog(
+                text = stringResource(id = R.string.error_server_connection_problem),
+                confirmButtonText = stringResource(id = sharedResR.string.general_ok),
+                cancelButtonText = null,
+                onConfirm = { showOfflineAlertDialog = false },
+                onDismiss = { showOfflineAlertDialog = false },
+            )
+        }
+        if (uiState.previewFileToOpen != null) {
+            HandleFileAction(
+                file = uiState.previewFileToOpen,
+                isOpenWith = uiState.isOpenWithAction,
+                snackBarHostState = snackBarHostState,
+                onActionHandled = onPreviewOpened,
+                coroutineScope = coroutineScope,
+            )
+        }
+        showQuotaExceededDialog.value?.let {
+            if (uiState.isQuotaWarningUpsellEnabled) {
+                LaunchedEffect(Unit) {
+                    showQuotaExceededDialog.value = null
+                    context.megaNavigator.openQuotaWarningUpsell(
+                        context = context,
+                        type = QuotaWarningType.Transfer,
+                        trigger = QuotaWarningTrigger.Download,
+                    )
+                }
+            } else {
+                StorageStatusDialogView(
+                    storageState = it,
+                    preWarning = it != StorageState.Red,
+                    overQuotaAlert = true,
+                    onUpgradeClick = {
+                        context.megaNavigator.openUpgradeAccount(context = context)
+                    },
+                    onCustomizedPlanClick = { email, accountType ->
+                        AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)
+                    },
+                    onAchievementsClick = {
+                        context.startActivity(
+                            Intent(context, MyAccountActivity::class.java)
+                                .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
+                        )
+                    },
+                    onClose = { showQuotaExceededDialog.value = null },
                 )
-            },
-            onClose = { showQuotaExceededDialog.value = null },
-        )
-    }
-    uiState.confirmLargeDownload?.let {
-        val isPreview = it.transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview
-        LargeDownloadConfirmationDialog(
-            isPreviewDownload = isPreview,
-            sizeString = it.sizeString,
-            onAllow = {
-                onLargeDownloadAnswered(it.transferTriggerEvent, false)
-            },
-            onAlwaysAllow = {
-                onLargeDownloadAnswered(it.transferTriggerEvent, true)
-            },
-            onDismiss = { onLargeDownloadAnswered(null, false) },
-        )
-    }
-    if (launchFolderPickerForDownloadDestination) {
-        launchFolderPickerForDownloadDestination = false
-        runCatching {
-            folderPicker.launch(null)
-        }.onFailure {
-            coroutineScope.launch {
-                snackBarHostState.showAutoDurationSnackbar(context.getString(R.string.general_warning_no_picker))
             }
         }
-    }
-    showPromptSaveDestinationDialog?.let { saveDestinationInfo ->
-        //this dialog will be updated once we have a dialog defined for this case that follows our DS
-        ConfirmationDialog(
-            title = stringResource(
-                id = sharedR.string.transfers_dialog_save_download_location_title,
-                saveDestinationInfo.destinationName
-            ),
-            confirmButtonText = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_here_option),
-            cancelButtonText = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_ask_option),
-            onConfirm = {
-                onSaveDestination(saveDestinationInfo.destination)
-                showPromptSaveDestinationDialog = null
-            },
-            onDismiss = {
-                showPromptSaveDestinationDialog = null
-            },
-            onCancel = {
-                onAlwaysAskForDestination()
-                showPromptSaveDestinationDialog = null
-            },
-        )
-    }
-    if (showResumeChatUploadsAlertDialog) {
-        ResumeChatTransfersDialog(
-            onResume = {
-                onResumeTransfers()
-                showResumeChatUploadsAlertDialog = false
-            },
-            onDismiss = {
-                onAskedResumeTransfers()
-                showResumeChatUploadsAlertDialog = false
-            })
-    }
-    showResumePreviewDownloadsAlertDialog?.let { fileName ->
-        ResumePreviewTransfersDialog(
-            fileName = fileName,
-            onResume = {
-                onResumeTransfers()
-                showResumePreviewDownloadsAlertDialog = null
-            },
-            onDismiss = {
-                onAskedResumeTransfers()
-                showResumePreviewDownloadsAlertDialog = null
-            })
-    }
-    uiState.transferTagToCancel?.let {
-        CancelPreviewDownloadDialog(
-            onCancelTransfer = onCancelTransferConfirmed,
-            onDismiss = onCancelTransferCancelled
-        )
+        uiState.confirmLargeDownload?.let {
+            val isPreview = it.transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview
+            LargeDownloadConfirmationDialog(
+                isPreviewDownload = isPreview,
+                sizeString = it.sizeString,
+                onAllow = {
+                    onLargeDownloadAnswered(it.transferTriggerEvent, false)
+                },
+                onAlwaysAllow = {
+                    onLargeDownloadAnswered(it.transferTriggerEvent, true)
+                },
+                onDismiss = { onLargeDownloadAnswered(null, false) },
+            )
+        }
+        if (launchFolderPickerForDownloadDestination) {
+            launchFolderPickerForDownloadDestination = false
+            runCatching {
+                folderPicker.launch(null)
+            }.onFailure {
+                coroutineScope.launch {
+                    snackBarHostState.showAutoDurationSnackbar(resources.getString(R.string.general_warning_no_picker))
+                }
+            }
+        }
+        showPromptSaveDestinationDialog?.let { saveDestinationInfo ->
+            //this dialog will be updated once we have a dialog defined for this case that follows our DS
+            ConfirmationDialog(
+                title = stringResource(
+                    id = sharedR.string.transfers_dialog_save_download_location_title,
+                    saveDestinationInfo.destinationName
+                ),
+                confirmButtonText = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_here_option),
+                cancelButtonText = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_ask_option),
+                onConfirm = {
+                    onSaveDestination(saveDestinationInfo.destination)
+                    onSaveDestinationFinished(saveDestinationInfo.destination)
+                    showPromptSaveDestinationDialog = null
+                },
+                onDismiss = {
+                    onSaveDestinationFinished(saveDestinationInfo.destination)
+                    showPromptSaveDestinationDialog = null
+                },
+                onCancel = {
+                    onAlwaysAskForDestination()
+                    onSaveDestinationFinished(saveDestinationInfo.destination)
+                    showPromptSaveDestinationDialog = null
+                },
+            )
+        }
+        if (showResumeChatUploadsAlertDialog) {
+            ResumeChatTransfersDialog(
+                onResume = {
+                    onResumeTransfers()
+                    showResumeChatUploadsAlertDialog = false
+                },
+                onDismiss = {
+                    onAskedResumeTransfers()
+                    showResumeChatUploadsAlertDialog = false
+                })
+        }
+        showResumePreviewDownloadsAlertDialog?.let { fileName ->
+            ResumePreviewTransfersDialog(
+                fileName = fileName,
+                onResume = {
+                    onResumeTransfers()
+                    showResumePreviewDownloadsAlertDialog = null
+                },
+                onDismiss = {
+                    onAskedResumeTransfers()
+                    showResumePreviewDownloadsAlertDialog = null
+                })
+        }
+        uiState.transferTagToCancel?.let {
+            CancelPreviewDownloadDialog(
+                onCancelTransfer = onCancelTransferConfirmed,
+                onDismiss = onCancelTransferCancelled
+            )
+        }
     }
     EventEffect(
         event = uiState.cancelTransferFailure,
         onConsumed = onConsumeCancelTransferResult,
         action = {
             snackBarHostState.showAutoDurationSnackbar(
-                context.getString(sharedR.string.transfers_error_cancelling_preview_download)
+                resources.getString(sharedR.string.transfers_error_cancelling_preview_download)
             )
         }
     )

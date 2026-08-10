@@ -1,181 +1,103 @@
 package mega.privacy.android.data.preferences.security
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.data.cryptography.DecryptData
-import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.security.PasscodeStoreGateway
 import javax.inject.Inject
 import javax.inject.Named
 
-internal const val passcodeDatastoreName = "passcodeDataStore"
+internal const val passcodeDatastoreName = "passcodeDataStoreV2"
 
-internal class PasscodeDataStore(
-    private val getPreferenceFlow: () -> Flow<Preferences>,
-    private val editPreferences: suspend (suspend (MutablePreferences) -> Unit) -> Preferences,
-    private val encryptData: EncryptData,
-    private val decryptData: DecryptData,
+internal class PasscodeDataStore @Inject constructor(
+    @Named(passcodeDatastoreName) private val dataStore: DataStore<Preferences>,
 ) : PasscodeStoreGateway {
-    @Inject
-    constructor(
-        @Named(passcodeDatastoreName) dataStore: DataStore<Preferences>,
-        encryptData: EncryptData,
-        decryptData: DecryptData,
-    ) : this(
-        getPreferenceFlow = dataStore::data,
-        editPreferences = dataStore::edit,
-        encryptData = encryptData,
-        decryptData = decryptData,
-    )
 
-    constructor(
-        preferences: MutablePreferences,
-        encryptData: EncryptData,
-        decryptData: DecryptData,
-    ) : this(
-        getPreferenceFlow = { flowOf(preferences) },
-        editPreferences = { preferences.apply { it(this) } },
-        encryptData = encryptData,
-        decryptData = decryptData,
-    )
-
-    private val failedAttemptsKey = stringPreferencesKey("failedAttemptsKey")
-    private val passcodeKey = stringPreferencesKey("passcode")
-    private val lockedStateKey = stringPreferencesKey("lockedState")
-    private val passcodeEnabledKey = stringPreferencesKey("passcodeEnabled")
-    private val passcodeTimeOutKey = stringPreferencesKey("passcodeTimeOutKey")
-    private val passcodeLastBackgroundKey = stringPreferencesKey("passcodeLastBackgroundKey")
-    private val passcodeTypeKey = stringPreferencesKey("passcodeTypeKey")
-    private val biometricsEnabledKey = stringPreferencesKey("biometricsEnabledKey")
-    private val configurationChangeKey = stringPreferencesKey("configurationChangeKey")
-
-    override fun monitorFailedAttempts() =
-        getPreferenceFlow().monitor(failedAttemptsKey)
-            .map { decryptData(it)?.toIntOrNull() }
+    override fun monitorFailedAttempts() = dataStore.monitor(failedAttemptsKey)
 
     override suspend fun setFailedAttempts(attempts: Int) {
-        val encryptedValue = encryptData(attempts.toString()) ?: return
-        editPreferences {
-            it[failedAttemptsKey] = encryptedValue
-        }
+        dataStore.edit { it[failedAttemptsKey] = attempts }
     }
 
     override suspend fun setPasscode(passcode: String?) {
-        val encryptedValue = encryptData(passcode)
-        editPreferences {
-            if (encryptedValue == null) {
-                it.remove(passcodeKey)
-            } else {
-                it[passcodeKey] = encryptedValue
-            }
+        dataStore.edit {
+            if (passcode == null) it.remove(passcodeKey) else it[passcodeKey] = passcode
         }
     }
 
-    override suspend fun getPasscode() = getPreferenceFlow().monitor(passcodeKey)
-        .map { decryptData(it) }
-        .first()
+    override suspend fun getPasscode() = dataStore.data.map { it[passcodeKey] }.first()
 
     override suspend fun setLockedState(state: Boolean) {
-        val encryptedValue = encryptData(state.toString()) ?: return
-        editPreferences {
-            it[lockedStateKey] = encryptedValue
-        }
+        dataStore.edit { it[lockedStateKey] = state }
     }
 
-    override fun monitorLockState() =
-        getPreferenceFlow().monitor(lockedStateKey)
-            .map { decryptData(it)?.toBooleanStrictOrNull() }
+    override fun monitorLockState() = dataStore.monitor(lockedStateKey)
 
     override suspend fun setPasscodeEnabledState(enabled: Boolean) {
-        val encryptedValue = encryptData(enabled.toString()) ?: return
-        editPreferences {
-            it[passcodeEnabledKey] = encryptedValue
-        }
+        dataStore.edit { it[passcodeEnabledKey] = enabled }
     }
 
-    override fun monitorPasscodeEnabledState() =
-        getPreferenceFlow().monitor(passcodeEnabledKey)
-            .map { decryptData(it)?.toBooleanStrictOrNull() }
+    override fun monitorPasscodeEnabledState() = dataStore.monitor(passcodeEnabledKey)
 
     override suspend fun setPasscodeTimeout(timeOutMilliseconds: Long?) {
-        val encryptedValue = encryptData(timeOutMilliseconds?.toString())
-        editPreferences {
-            if (encryptedValue == null) {
-                it.remove(passcodeTimeOutKey)
-            } else {
-                it[passcodeTimeOutKey] = encryptedValue
-            }
+        dataStore.edit {
+            if (timeOutMilliseconds == null) it.remove(passcodeTimeOutKey)
+            else it[passcodeTimeOutKey] = timeOutMilliseconds
         }
     }
 
-    override fun monitorPasscodeTimeOut() = getPreferenceFlow().monitor(passcodeTimeOutKey)
-        .map { decryptData(it)?.toLongOrNull() }
+    override fun monitorPasscodeTimeOut() = dataStore.monitor(passcodeTimeOutKey)
 
     override suspend fun setLastBackgroundTime(backgroundUTC: Long?) {
-        val encryptedValue = encryptData(backgroundUTC?.toString())
-        editPreferences {
-            if (encryptedValue == null) {
-                it.remove(passcodeLastBackgroundKey)
-            } else {
-                it[passcodeLastBackgroundKey] = encryptedValue
-            }
+        dataStore.edit {
+            if (backgroundUTC == null) it.remove(passcodeLastBackgroundKey)
+            else it[passcodeLastBackgroundKey] = backgroundUTC
         }
     }
 
-    override fun monitorLastBackgroundTime() =
-        getPreferenceFlow().monitor(passcodeLastBackgroundKey)
-            .map { decryptData(it)?.toLongOrNull() }
+    override fun monitorLastBackgroundTime() = dataStore.monitor(passcodeLastBackgroundKey)
 
     override suspend fun setPasscodeType(passcodeType: String?) {
-        val encryptedValue = encryptData(passcodeType)
-        editPreferences {
-            if (encryptedValue == null) {
-                it.remove(passcodeTypeKey)
-            } else {
-                it[passcodeTypeKey] = encryptedValue
-            }
+        dataStore.edit {
+            if (passcodeType == null) it.remove(passcodeTypeKey)
+            else it[passcodeTypeKey] = passcodeType
         }
     }
 
-    override fun monitorPasscodeType() =
-        getPreferenceFlow().monitor(passcodeTypeKey)
-            .map { decryptData(it) }
+    override fun monitorPasscodeType() = dataStore.monitor(passcodeTypeKey)
 
     override suspend fun setBiometricsEnabled(enabled: Boolean?) {
-        val encryptedValue = encryptData(enabled?.toString())
-        editPreferences {
-            if (encryptedValue == null) {
-                it.remove(biometricsEnabledKey)
-            } else {
-                it[biometricsEnabledKey] = encryptedValue
-            }
+        dataStore.edit {
+            if (enabled == null) it.remove(biometricsEnabledKey)
+            else it[biometricsEnabledKey] = enabled
         }
     }
 
-    override fun monitorBiometricEnabledState() =
-        getPreferenceFlow().monitor(biometricsEnabledKey)
-            .map { decryptData(it)?.toBooleanStrictOrNull() }
+    override fun monitorBiometricEnabledState() = dataStore.monitor(biometricsEnabledKey)
 
     override suspend fun setConfigurationChangedStatus(isConfigurationChanged: Boolean) {
-        val encryptedValue = encryptData(isConfigurationChanged.toString())
-        editPreferences {
-            if (encryptedValue == null) {
-                it.remove(configurationChangeKey)
-            } else {
-                it[configurationChangeKey] = encryptedValue
-            }
-        }
+        dataStore.edit { it[configurationChangeKey] = isConfigurationChanged }
     }
 
     override fun monitorConfigurationChangedStatus() =
-        getPreferenceFlow().monitor(configurationChangeKey)
-            .map { decryptData(it)?.toBooleanStrictOrNull() ?: false }
+        dataStore.monitor(configurationChangeKey).map { it ?: false }
+
+    companion object {
+        val failedAttemptsKey = intPreferencesKey("failedAttemptsKey")
+        val passcodeKey = stringPreferencesKey("passcode")
+        val lockedStateKey = booleanPreferencesKey("lockedState")
+        val passcodeEnabledKey = booleanPreferencesKey("passcodeEnabled")
+        val passcodeTimeOutKey = longPreferencesKey("passcodeTimeOutKey")
+        val passcodeLastBackgroundKey = longPreferencesKey("passcodeLastBackgroundKey")
+        val passcodeTypeKey = stringPreferencesKey("passcodeTypeKey")
+        val biometricsEnabledKey = booleanPreferencesKey("biometricsEnabledKey")
+        val configurationChangeKey = booleanPreferencesKey("configurationChangeKey")
+    }
 }

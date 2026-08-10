@@ -7,25 +7,24 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.settings.model.qrTargetPreference
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.ContactUtil
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NameCollision
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
@@ -66,18 +65,6 @@ class QRCodeComposeActivity : PasscodeActivity() {
         }
     }
 
-    private val selectStorageDestinationLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            val data = result.data
-            if (result.resultCode == RESULT_OK) {
-                data?.getStringExtra(FileStorageActivity.EXTRA_PATH)?.let { parentPath ->
-                    viewModel.saveToFileSystem(parentPath)
-                }
-            }
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -90,6 +77,11 @@ class QRCodeComposeActivity : PasscodeActivity() {
         setContent {
             val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val viewState by viewModel.uiState.collectAsStateWithLifecycle()
+            val folderPicker = launchFolderPicker(
+                onFolderSelected = { uri ->
+                    viewModel.saveToFileSystem(UriPath(uri.toString()))
+                },
+            )
             OriginalTheme(isDark = mode.isDarkMode()) {
                 QRCodeView(
                     viewState = viewState,
@@ -107,7 +99,7 @@ class QRCodeComposeActivity : PasscodeActivity() {
                     onInviteResultDialogDismiss = viewModel::resetScannedContactEmail,
                     onInviteContactDialogDismiss = viewModel::resetScannedContactAvatar,
                     onCloudDriveClicked = viewModel::saveToCloudDrive,
-                    onFileSystemClicked = ::saveToFileSystem,
+                    onFileSystemClicked = { folderPicker.launch(null) },
                     onShowCollision = ::showCollision,
                     onShowCollisionConsumed = viewModel::resetShowCollision,
                     onUploadFile = {
@@ -135,19 +127,10 @@ class QRCodeComposeActivity : PasscodeActivity() {
     }
 
     private fun onViewContact(email: String) {
-        ContactUtil.openContactInfoActivity(this, email)
+        val i = Intent(this, ContactInfoActivity::class.java)
+        i.putExtra(Constants.NAME, email)
+        startActivity(i)
         finish()
-    }
-
-    private fun saveToFileSystem() {
-        val intent = Intent(this, FileStorageActivity::class.java).apply {
-            putExtra(
-                FileStorageActivity.PICK_FOLDER_TYPE,
-                FileStorageActivity.PickFolderType.DOWNLOAD_FOLDER.folderType
-            )
-            action = FileStorageActivity.Mode.PICK_FOLDER.action
-        }
-        selectStorageDestinationLauncher.launch(intent)
     }
 
     private fun showCollision(collision: NameCollision) {

@@ -1,101 +1,118 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.view
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.unit.dp
-import mega.android.core.ui.components.LinkSpannedText
-import mega.android.core.ui.model.MegaSpanStyle
-import mega.android.core.ui.model.SpanIndicator
-import mega.android.core.ui.model.SpanStyleWithAnnotation
+import androidx.compose.ui.tooling.preview.Preview
+import mega.android.core.ui.components.button.PrimaryFilledButton
+import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.android.core.ui.theme.AppTheme
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun CloudDriveEmptyView(
+    onAddItemsClicked: () -> Unit,
     modifier: Modifier = Modifier,
     isRootCloudDrive: Boolean = false,
+    showAddItems: Boolean = true,
 ) {
-    val imageDrawable = if (isRootCloudDrive) {
-        iconPackR.drawable.ic_empty_cloud_glass
+    val illustrationId = if (isRootCloudDrive) {
+        iconPackR.drawable.ic_usp_2
     } else {
-        iconPackR.drawable.ic_empty_folder_glass
-    }
-    val textId = if (isRootCloudDrive) {
-        R.string.context_empty_cloud_drive
-    } else {
-        R.string.file_browser_empty_folder_new
+        iconPackR.drawable.ic_empty_folder
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            modifier = Modifier.size(120.dp),
-            painter = painterResource(imageDrawable),
-            contentDescription = "Empty",
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-        LinkSpannedText(
-            value = stringResource(textId),
-            spanStyles = mapOf(
-                SpanIndicator('A') to SpanStyleWithAnnotation(
-                    megaSpanStyle = MegaSpanStyle.TextColorStyle(
-                        spanStyle = SpanStyle(),
-                        textColor = TextColor.Primary
-                    ),
-                    annotation = "A"
-                ),
-                SpanIndicator('B') to SpanStyleWithAnnotation(
-                    megaSpanStyle = MegaSpanStyle.TextColorStyle(
-                        spanStyle = SpanStyle(),
-                        textColor = TextColor.Secondary
-                    ),
-                    annotation = "B"
-                )
-            ),
-            baseStyle = AppTheme.typography.bodyLarge,
-            baseTextColor = TextColor.Secondary,
-            onAnnotationClick = {}
-        )
+    val titleId = if (isRootCloudDrive) {
+        sharedR.string.context_empty_cloud_drive_title
+    } else {
+        sharedR.string.context_empty_folder_title
     }
+
+    EmptyStateView(
+        imagePainter = painterResource(id = illustrationId),
+        title = stringResource(titleId),
+        modifier = modifier.testTag(EMPTY_VIEW_TAG),
+        description = if (showAddItems) {
+            SpannableText(stringResource(sharedR.string.context_empty_cloud_drive_description))
+        } else {
+            null
+        },
+        primaryAction = if (showAddItems) {
+            @Composable {
+                if (showAddItems) {
+                    PrimaryFilledButton(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .testTag(ADD_ITEMS_BUTTON_TAG),
+                        text = stringResource(sharedR.string.album_content_action_add_items),
+                        leadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
+                        onClick = onAddItemsClicked
+                    )
+                }
+            }
+        } else {
+            null
+        },
+    )
 }
 
+
 @CombinedThemePreviews
+@Preview(
+    name = "Landscape",
+    showBackground = true,
+    device = "spec:parent=pixel_5,orientation=landscape"
+)
 @Composable
 private fun CloudDriveEmptyViewPreview() {
     AndroidThemeForPreviews {
         CloudDriveEmptyView(
-            isRootCloudDrive = true
+            isRootCloudDrive = true,
+            onAddItemsClicked = { }
         )
     }
 }
 
 @CombinedThemePreviews
+@Preview(
+    name = "Landscape",
+    showBackground = true,
+    device = "spec:parent=pixel_5,orientation=landscape"
+)
 @Composable
 private fun FolderEmptyViewPreview() {
     AndroidThemeForPreviews {
         CloudDriveEmptyView(
-            isRootCloudDrive = false
+            isRootCloudDrive = false,
+            onAddItemsClicked = { }
         )
     }
 }
+
+@CombinedThemePreviews
+@Preview(
+    name = "Landscape",
+    showBackground = true,
+    device = "spec:parent=pixel_5,orientation=landscape"
+)
+@Composable
+private fun FolderEmptyNoWritePermissionViewPreview() {
+    AndroidThemeForPreviews {
+        CloudDriveEmptyView(
+            isRootCloudDrive = false,
+            showAddItems = false,
+            onAddItemsClicked = { }
+        )
+    }
+}
+
+internal const val EMPTY_VIEW_TAG = "cloud_drive_empty_view:empty_state"
+internal const val ADD_ITEMS_BUTTON_TAG = "cloud_drive_empty_view:add_items_button"

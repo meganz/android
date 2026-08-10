@@ -1,0 +1,347 @@
+package mega.privacy.android.domain.usecase.node.clouddrive
+
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodesLoadingState
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.search.SensitivityFilterOption
+import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.GetFolderTypeDataUseCase
+import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class FetchNodesByIdInChunkUseCaseTest {
+
+    private lateinit var underTest: FetchNodesByIdInChunkUseCase
+
+    private val nodeRepository = mock<NodeRepository>()
+    private val getFolderTypeDataUseCase = mock<GetFolderTypeDataUseCase>()
+    private val containsMediaItemUseCase = mock<ContainsMediaItemUseCase>()
+
+    private val sortOrder = SortOrder.ORDER_DEFAULT_ASC
+
+    @BeforeAll
+    fun setUp() {
+        underTest = FetchNodesByIdInChunkUseCase(
+            nodeRepository = nodeRepository,
+            getFolderTypeDataUseCase = getFolderTypeDataUseCase,
+            containsMediaItemUseCase = containsMediaItemUseCase,
+        )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            nodeRepository,
+            getFolderTypeDataUseCase,
+            containsMediaItemUseCase,
+        )
+    }
+
+    @Test
+    fun `test that invoke emits PartiallyLoaded state when repository emits hasMore true`() =
+        runTest {
+            val nodes = listOf(mock<TypedNode>())
+            whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+            whenever(containsMediaItemUseCase(any())).thenReturn(false)
+            whenever(
+                nodeRepository.getTypedNodesByIdInChunks(
+                    nodeId = any(),
+                    order = any(),
+                    initialBatchSize = any(),
+                    folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
+                )
+            ).thenReturn(flowOf(Pair(nodes, true)))
+
+            underTest(NodeId(1L), sortOrder = sortOrder).test {
+                val result = awaitItem()
+                assertThat(result.loadingState).isEqualTo(NodesLoadingState.PartiallyLoaded)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that invoke emits FullyLoaded state when repository emits hasMore false`() =
+        runTest {
+            val nodes = listOf(mock<TypedNode>())
+            whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+            whenever(containsMediaItemUseCase(any())).thenReturn(false)
+            whenever(
+                nodeRepository.getTypedNodesByIdInChunks(
+                    nodeId = any(),
+                    order = any(),
+                    initialBatchSize = any(),
+                    folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
+                )
+            ).thenReturn(flowOf(Pair(nodes, false)))
+
+            underTest(NodeId(1L), sortOrder = sortOrder).test {
+                val result = awaitItem()
+                assertThat(result.loadingState).isEqualTo(NodesLoadingState.FullyLoaded)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that invoke emits correct hasMediaItems from containsMediaItemUseCase`() =
+        runTest {
+            val nodes = listOf(mock<TypedNode>())
+            whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+            whenever(containsMediaItemUseCase(nodes)).thenReturn(true)
+            whenever(
+                nodeRepository.getTypedNodesByIdInChunks(
+                    nodeId = any(),
+                    order = any(),
+                    initialBatchSize = any(),
+                    folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
+                )
+            ).thenReturn(flowOf(Pair(nodes, false)))
+
+            underTest(NodeId(1L), sortOrder = sortOrder).test {
+                val result = awaitItem()
+                assertThat(result.hasMediaItems).isTrue()
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that invoke emits typed nodes from repository`() = runTest {
+        val nodes = listOf(mock<TypedNode>(), mock<TypedNode>())
+        whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+        whenever(containsMediaItemUseCase(any())).thenReturn(false)
+        whenever(
+            nodeRepository.getTypedNodesByIdInChunks(
+                nodeId = any(),
+                order = any(),
+                initialBatchSize = any(),
+                folderTypeData = any(),
+                sensitivityFilter = anyOrNull(),
+            )
+        ).thenReturn(flowOf(Pair(nodes, false)))
+
+        underTest(NodeId(1L), sortOrder = sortOrder).test {
+            val result = awaitItem()
+            assertThat(result.typedNodes).isEqualTo(nodes)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that invoke passes initialBatchSize to repository`() = runTest {
+        val batchSize = 200
+        whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+        whenever(containsMediaItemUseCase(any())).thenReturn(false)
+        whenever(
+            nodeRepository.getTypedNodesByIdInChunks(
+                nodeId = any(),
+                order = any(),
+                initialBatchSize = any(),
+                folderTypeData = any(),
+                sensitivityFilter = anyOrNull(),
+            )
+        ).thenReturn(flowOf(Pair(emptyList(), false)))
+
+        underTest(nodeId = NodeId(1L), initialBatchSize = batchSize, sortOrder = sortOrder).test {
+            awaitItem()
+            awaitComplete()
+        }
+
+        verify(nodeRepository).getTypedNodesByIdInChunks(
+            nodeId = any(),
+            order = anyOrNull(),
+            initialBatchSize = eq(batchSize),
+            folderTypeData = anyOrNull(),
+            sensitivityFilter = anyOrNull(),
+        )
+    }
+
+    @Test
+    fun `test that invoke passes the provided sort order to repository`() = runTest {
+        val expectedSortOrder = SortOrder.ORDER_SIZE_ASC
+        whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+        whenever(containsMediaItemUseCase(any())).thenReturn(false)
+        whenever(
+            nodeRepository.getTypedNodesByIdInChunks(
+                nodeId = any(),
+                order = any(),
+                initialBatchSize = any(),
+                folderTypeData = any(),
+                sensitivityFilter = anyOrNull(),
+            )
+        ).thenReturn(flowOf(Pair(emptyList(), false)))
+
+        underTest(NodeId(1L), sortOrder = expectedSortOrder).test {
+            awaitItem()
+            awaitComplete()
+        }
+
+        verify(nodeRepository).getTypedNodesByIdInChunks(
+            nodeId = any(),
+            order = eq(expectedSortOrder),
+            initialBatchSize = any(),
+            folderTypeData = anyOrNull(),
+            sensitivityFilter = anyOrNull(),
+        )
+    }
+
+    @Test
+    fun `test that invoke passes folder type data from getFolderTypeDataUseCase to repository`() =
+        runTest {
+            val folderTypeData = mock<mega.privacy.android.domain.entity.FolderTypeData>()
+            whenever(getFolderTypeDataUseCase()).thenReturn(folderTypeData)
+            whenever(containsMediaItemUseCase(any())).thenReturn(false)
+            whenever(
+                nodeRepository.getTypedNodesByIdInChunks(
+                    nodeId = any(),
+                    order = any(),
+                    initialBatchSize = any(),
+                    folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
+                )
+            ).thenReturn(flowOf(Pair(emptyList(), false)))
+
+            underTest(NodeId(1L), sortOrder = sortOrder).test {
+                awaitItem()
+                awaitComplete()
+            }
+
+            verify(nodeRepository).getTypedNodesByIdInChunks(
+                nodeId = any(),
+                order = anyOrNull(),
+                initialBatchSize = any(),
+                folderTypeData = eq(folderTypeData),
+                sensitivityFilter = anyOrNull(),
+            )
+        }
+
+    @Test
+    fun `test that invoke emits Failed state when repository throws exception`() = runTest {
+        whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+        whenever(
+            nodeRepository.getTypedNodesByIdInChunks(
+                nodeId = any(),
+                order = any(),
+                initialBatchSize = any(),
+                folderTypeData = any(),
+                sensitivityFilter = anyOrNull(),
+            )
+        ).thenReturn(flow { throw RuntimeException("error") })
+
+        underTest(NodeId(1L), sortOrder = sortOrder).test {
+            val result = awaitItem()
+            assertThat(result.loadingState).isEqualTo(NodesLoadingState.Failed)
+            assertThat(result.hasMediaItems).isFalse()
+            assertThat(result.typedNodes).isEmpty()
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that invoke uses default initialBatchSize of 500`() = runTest {
+        whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+        whenever(containsMediaItemUseCase(any())).thenReturn(false)
+        whenever(
+            nodeRepository.getTypedNodesByIdInChunks(
+                nodeId = any(),
+                order = any(),
+                initialBatchSize = any(),
+                folderTypeData = any(),
+                sensitivityFilter = anyOrNull(),
+            )
+        ).thenReturn(flowOf(Pair(emptyList(), false)))
+
+        underTest(NodeId(1L), sortOrder = sortOrder).test {
+            awaitItem()
+            awaitComplete()
+        }
+
+        verify(nodeRepository).getTypedNodesByIdInChunks(
+            nodeId = any(),
+            order = anyOrNull(),
+            initialBatchSize = eq(500),
+            folderTypeData = anyOrNull(),
+            sensitivityFilter = anyOrNull(),
+        )
+    }
+
+    @Test
+    fun `test that invoke forwards NonSensitiveOnly filter to repository when excludeSensitives is true`() =
+        runTest {
+            whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+            whenever(containsMediaItemUseCase(any())).thenReturn(false)
+            whenever(
+                nodeRepository.getTypedNodesByIdInChunks(
+                    nodeId = any(),
+                    order = any(),
+                    initialBatchSize = any(),
+                    folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
+                )
+            ).thenReturn(flowOf(Pair(emptyList(), false)))
+
+            underTest(
+                nodeId = NodeId(1L),
+                excludeSensitives = true,
+                sortOrder = sortOrder,
+            ).test {
+                awaitItem()
+                awaitComplete()
+            }
+
+            verify(nodeRepository).getTypedNodesByIdInChunks(
+                nodeId = any(),
+                order = anyOrNull(),
+                initialBatchSize = any(),
+                folderTypeData = anyOrNull(),
+                sensitivityFilter = eq(SensitivityFilterOption.NonSensitiveOnly),
+            )
+        }
+
+    @Test
+    fun `test that invoke passes null filter to repository when excludeSensitives defaults to false`() =
+        runTest {
+            whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+            whenever(containsMediaItemUseCase(any())).thenReturn(false)
+            whenever(
+                nodeRepository.getTypedNodesByIdInChunks(
+                    nodeId = any(),
+                    order = any(),
+                    initialBatchSize = any(),
+                    folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
+                )
+            ).thenReturn(flowOf(Pair(emptyList(), false)))
+
+            underTest(NodeId(1L), sortOrder = sortOrder).test {
+                awaitItem()
+                awaitComplete()
+            }
+
+            verify(nodeRepository).getTypedNodesByIdInChunks(
+                nodeId = any(),
+                order = anyOrNull(),
+                initialBatchSize = any(),
+                folderTypeData = anyOrNull(),
+                sensitivityFilter = eq(null),
+            )
+        }
+}

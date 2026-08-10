@@ -45,6 +45,7 @@ class MegaApiFolderInitializer : Initializer<Unit> {
      *
      */
     override fun create(context: Context) {
+        if (!context.canResolveHiltEntryPoints()) return
         val entryPoint =
             EntryPointAccessors.fromApplication(context,
                 MegaApiFolderInitializerEntryPoint::class.java)
@@ -66,7 +67,11 @@ class MegaApiFolderInitializer : Initializer<Unit> {
      *
      */
     override fun dependencies(): List<Class<out Initializer<*>>> =
-        listOf(LoggerInitializer::class.java, SetupMegaApiInitializer::class.java)
+        listOf(
+            LoggerInitializer::class.java,
+            SetupMegaApiInitializer::class.java,
+            NativeLibraryInitializer::class.java
+        )
 
     private fun isLoggedIn(megaApi: MegaApiAndroid): Boolean = megaApi.isLoggedIn != 0
 }

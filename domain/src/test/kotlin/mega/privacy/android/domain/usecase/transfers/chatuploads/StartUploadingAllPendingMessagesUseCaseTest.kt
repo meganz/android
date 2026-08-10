@@ -9,8 +9,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -21,9 +21,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
-import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class StartUploadingAllPendingMessagesUseCaseTest {
@@ -101,8 +99,9 @@ class StartUploadingAllPendingMessagesUseCaseTest {
             underTest().test { cancelAndConsumeRemainingEvents() }
 
             verify(startChatUploadAndWaitScanningFinishedUseCase).invoke(
-                pendingMessage.uriPath,
-                fileName,
+                uriPath = pendingMessage.uriPath,
+                fileName = fileName,
+                pitagTrigger = pendingMessage.pitagTrigger,
                 pendingMessageIds = listOf(pendingMessage.id)
             )
         }
@@ -137,8 +136,9 @@ class StartUploadingAllPendingMessagesUseCaseTest {
 
             pendingMessages.forEachIndexed { i, it ->
                 verify(startChatUploadAndWaitScanningFinishedUseCase)(
-                    it.uriPath,
-                    it.name,
+                    uriPath = it.uriPath,
+                    fileName = it.name,
+                    pitagTrigger = it.pitagTrigger,
                     pendingMessageIds = listOf(it.id)
                 )
             }
@@ -151,5 +151,6 @@ class StartUploadingAllPendingMessagesUseCaseTest {
         on { this.id } doReturn id
         on { this.name } doReturn "pendingMessage$id name"
         on { this.uriPath } doReturn UriPath("/path/$fileName")
+        on { this.pitagTrigger } doReturn PitagTrigger.Picker
     }
 }

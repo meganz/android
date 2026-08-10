@@ -1,0 +1,72 @@
+package mega.privacy.android.shared.search.presentation.component
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+
+/**
+ * Search top app bar with a query field and back navigation.
+ *
+ * Generic shell component reused across search consumers (nodes, chats, ...).
+ */
+@Composable
+fun SearchTopAppBar(
+    searchText: String,
+    placeholderText: String,
+    onSearchTextChanged: (String) -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    focusRequester: FocusRequester = remember { FocusRequester() },
+) {
+    var isExiting by remember { mutableStateOf(false) }
+    val localFocusManager = LocalFocusManager.current
+    val localKeyboardController = LocalSoftwareKeyboardController.current
+
+    MegaSearchTopAppBar(
+        modifier = modifier,
+        query = searchText,
+        title = "",
+        navigationType = AppBarNavigationType.Back(onBack),
+        searchPlaceholder = placeholderText,
+        onQueryChanged = {
+            if (!isExiting) {
+                onSearchTextChanged(it)
+            }
+        },
+        onSearchAction = {
+            localFocusManager.clearFocus()
+            localKeyboardController?.hide()
+        },
+        isSearchingMode = true,
+        onSearchingModeChanged = { isSearching ->
+            if (!isSearching) {
+                isExiting = true
+                onBack()
+            }
+        },
+        focusRequester = focusRequester
+    )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun PreviewSearchTopAppBar() {
+    AndroidThemeForPreviews {
+        SearchTopAppBar(
+            searchText = "",
+            placeholderText = "Search...",
+            onSearchTextChanged = {},
+            onBack = {}
+        )
+    }
+}

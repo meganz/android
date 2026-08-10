@@ -4,7 +4,6 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.hilt)
-    id("kotlin-android")
     alias(plugin.plugins.kotlin.serialisation)
 }
 
@@ -16,7 +15,7 @@ android {
     }
     sourceSets {
         // Adds exported schema location as test app assets.
-        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+        getByName("androidTest").assets.directories.add("$projectDir/schemas")
     }
     configurations {
         implementation {
@@ -31,13 +30,13 @@ android {
     namespace = "mega.privacy.android.data"
 }
 
-android.testVariants.all {
-    compileConfiguration.exclude(group = "com.google.guava", module = "listenablefuture")
-    runtimeConfiguration.exclude(group = "com.google.guava", module = "listenablefuture")
+configurations.matching { it.name.contains("AndroidTest") }.configureEach {
+    exclude(group = "com.google.guava", module = "listenablefuture")
 }
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":core:coroutine"))
     implementation(project(":shared:sync"))
     implementation(google.guava)
     api(project(":third-party-lib:pdfiumAndroid"))
@@ -50,10 +49,12 @@ dependencies {
     implementation(lib.coroutines.core)
     implementation(lib.kotlin.serialisation)
     implementation(google.gson)
+    implementation(google.play.age.signals)
     implementation(google.zxing)
     implementation(androidx.java.core)
     implementation(androidx.exifinterface)
     implementation(androidx.datastore.preferences)
+    implementation(androidx.datastore.preferences.proto)
     implementation(androidx.preferences)
     implementation(androidx.lifecycle.process)
     implementation(androidx.work.ktx)
@@ -65,7 +66,9 @@ dependencies {
     implementation(lib.billing.client.ktx)
 
     implementation(platform(google.firebase.bom))
-    implementation(google.firebase.perf.ktx)
+    implementation(google.firebase.perf)
+    implementation(google.firebase.config)
+    implementation(google.firebase.analytics)
 
     // Logging
     implementation(lib.bundles.logging)

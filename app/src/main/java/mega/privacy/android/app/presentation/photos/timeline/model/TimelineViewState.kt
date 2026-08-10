@@ -2,15 +2,17 @@ package mega.privacy.android.app.presentation.photos.timeline.model
 
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
+import mega.privacy.android.feature.photos.model.CameraUploadsStatus
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.feature.photos.model.TimelinePhotosSource
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 
 /**
  * View States for the Timeline View
@@ -37,6 +39,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  * @property enableZoomIn                               True if the Zoom In button is enabled
  * @property enableZoomOut                              True is the Zoom Out button is enabled
  * @property enableSortOption                           True is the Sort option menu is enabled
+ * @property enableFilterOption                         True is the Filter option menu is enabled
  * @property enableCameraUploadButtonShowing            True if we should show the Enable Camera Upload button
  * @property progressBarShowing                         True if we should show progress bar
  * @property progress                                   The current Camera Uploads progress
@@ -92,6 +95,7 @@ data class TimelineViewState(
     val enableZoomIn: Boolean = true,
     val enableZoomOut: Boolean = true,
     val enableSortOption: Boolean = true,
+    val enableFilterOption: Boolean = true,
     val enableCameraUploadButtonShowing: Boolean = true,
     val progressBarShowing: Boolean = false,
     val progress: Float = 0f,

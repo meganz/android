@@ -1,21 +1,31 @@
 package mega.privacy.android.core.nodecomponents.action
 
-import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
-import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
-
+import android.content.Context
+import android.net.Uri
+import androidx.core.content.FileProvider
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
+import mega.privacy.android.core.nodecomponents.action.eventhandler.NodeOptionsActionEventSender
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
+import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
@@ -25,12 +35,10 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
-import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
+import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
-import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
+import mega.privacy.android.core.nodecomponents.model.ZipFileTypedNode
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -45,18 +53,28 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeLocation
+import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
+import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -65,20 +83,37 @@ import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
+import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
+import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -88,13 +123,16 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -108,8 +146,12 @@ class NodeOptionsActionViewModelTest {
     private lateinit var viewModel: NodeOptionsActionViewModel
 
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
+    private val checkChatNodesNameCollisionAndCopyUseCase =
+        mock<CheckChatNodesNameCollisionAndCopyUseCase>()
     private val moveNodesUseCase = mock<MoveNodesUseCase>()
     private val copyNodesUseCase = mock<CopyNodesUseCase>()
+    private val restoreNodesUseCase = mock<RestoreNodesUseCase>()
+    private val restoreNodeResultMapper = mock<RestoreNodeResultMapper>()
     private val setCopyLatestTargetPathUseCase = mock<SetCopyLatestTargetPathUseCase>()
     private val setMoveLatestTargetPathUseCase = mock<SetMoveLatestTargetPathUseCase>()
     private val deleteNodeVersionsUseCase = mock<DeleteNodeVersionsUseCase>()
@@ -117,7 +159,7 @@ class NodeOptionsActionViewModelTest {
     private val nodeVersionHistoryRemoveMessageMapper =
         mock<NodeVersionHistoryRemoveMessageMapper>()
 
-    private val snackBarHandler = mock<SnackBarHandler>()
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase = mock()
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
     private val nodeSendToChatMessageMapper: NodeSendToChatMessageMapper = mock()
@@ -126,6 +168,7 @@ class NodeOptionsActionViewModelTest {
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase = mock()
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase = mock()
+    private val getFileTypeInfoByContentUseCase: GetFileTypeInfoByContentUseCase = mock()
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
@@ -136,6 +179,8 @@ class NodeOptionsActionViewModelTest {
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
     private val createShareKeyUseCase = mock<CreateShareKeyUseCase>()
+    private val getShareFolderSensitiveWarningUseCase =
+        mock<GetShareFolderSensitiveWarningUseCase>()
 
     // Mock action handlers for testing
     private val mockSingleNodeActionHandler = mock<SingleNodeAction>()
@@ -145,10 +190,21 @@ class NodeOptionsActionViewModelTest {
 
     private val nodeSelectionModeActionMapper = mock<NodeSelectionModeActionMapper>()
     private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
+    private val monitorUserCredentialsUseCase = mock<MonitorUserCredentialsUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val checkNodeCanBeMovedToTargetNode = mock<CheckNodeCanBeMovedToTargetNode>()
     private val nodeMenuProviderRegistry = mock<NodeMenuProviderRegistry>()
+    private val nodeOptionsActionEventSender = mock<NodeOptionsActionEventSender>()
+    private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
+    private val nodeDestinationMapper = mock<NodeDestinationMapper>()
+    private val navigationEventQueue = mock<NavigationEventQueue>()
+    private val removeRecentlyWatchedItemUseCase = mock<RemoveRecentlyWatchedItemUseCase>()
+    private val mapTypedNodeToPublicLinkUseCase = mock<MapTypedNodeToPublicLinkUseCase>()
+    private val copyPublicNodeUseCase = mock<CopyPublicNodeUseCase>()
+    private val checkPublicNodesNameCollisionUseCase =
+        mock<CheckPublicNodesNameCollisionUseCase>()
     private val mockRubbishNode = mock<TypedFileNode> {
         on { id } doReturn NodeId(999L)
     }
@@ -163,20 +219,32 @@ class NodeOptionsActionViewModelTest {
         on { isTakenDown } doReturn false
     }
 
+    private val fakeUserCredentials = UserCredentials(
+        email = "test@mega.io",
+        session = "session",
+        firstName = null,
+        lastName = null,
+        myHandle = null,
+    )
+
     private val mockNodeSelectionMenuItem = mock<NodeSelectionMenuItem<MenuActionWithIcon>>()
     private val mockNodeSelectionModeMenuItem = mock<NodeSelectionModeMenuItem>()
+    private val mockContext = mock<Context>()
 
-    private fun initViewModel() {
+    private fun initViewModel(nodeSourceType: NodeSourceType? = null) {
         viewModel = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            restoreNodesUseCase = restoreNodesUseCase,
+            restoreNodeResultMapper = restoreNodeResultMapper,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
             moveRequestMessageMapper = moveRequestMessageMapper,
             versionHistoryRemoveMessageMapper = nodeVersionHistoryRemoveMessageMapper,
-            snackBarHandler = snackBarHandler,
+            snackbarEventQueue = snackbarEventQueue,
             checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase,
             attachMultipleNodesUseCase = attachMultipleNodesUseCase,
             nodeSendToChatMessageMapper = nodeSendToChatMessageMapper,
@@ -185,6 +253,7 @@ class NodeOptionsActionViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             applicationScope = applicationScope,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
@@ -196,47 +265,77 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            nodeOptionsActionEventSender = nodeOptionsActionEventSender,
+            getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
+            navigationEventQueue = navigationEventQueue,
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            copyPublicNodeUseCase = copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
+            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            applicationContext = mockContext,
+            nodeSourceType = nodeSourceType
         )
     }
 
     @BeforeEach
     fun setUpNodeSelectionModeTests() {
-        whenever(nodeMenuProviderRegistry.getSelectionModeOptions(any())).thenReturn(setOf(mockNodeSelectionMenuItem))
+        whenever(nodeMenuProviderRegistry.getSelectionModeOptions(any())).thenReturn(
+            setOf(
+                mockNodeSelectionMenuItem
+            )
+        )
         getRubbishNodeUseCase.stub {
-            onBlocking { invoke() } doReturn mockRubbishNode
+            on { invoke() } doReturn mockRubbishNode
+        }
+        monitorUserCredentialsUseCase.stub {
+            on { invoke() } doReturn flowOf(fakeUserCredentials)
         }
         nodeSelectionModeActionMapper.stub {
-            onBlocking {
+            on {
                 invoke(
                     options = any(),
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             } doReturn listOf(mockNodeSelectionModeMenuItem)
         }
-        isNodeInBackupsUseCase.stub { onBlocking { invoke(any()) } doReturn false }
-        getNodeAccessPermission.stub { onBlocking { invoke(any()) } doReturn AccessPermission.FULL }
-        checkNodeCanBeMovedToTargetNode.stub { onBlocking { invoke(any(), any()) } doReturn true }
+        isNodeInBackupsUseCase.stub { on { invoke(any()) } doReturn false }
+        getNodeAccessPermission.stub { on { invoke(any()) } doReturn AccessPermission.FULL }
+        checkNodeCanBeMovedToTargetNode.stub { on { invoke(any(), any()) } doReturn true }
+        getShareFolderSensitiveWarningUseCase.stub {
+            on { invoke(any()) } doReturn SensitiveNodeShareWarning.None
+        }
+        getFeatureFlagValueUseCase.stub {
+            on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+        }
     }
 
     @AfterEach
     fun resetAllMocks() {
         reset(
             checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase,
             copyNodesUseCase,
+            restoreNodesUseCase,
+            restoreNodeResultMapper,
             setCopyLatestTargetPathUseCase,
             setMoveLatestTargetPathUseCase,
             deleteNodeVersionsUseCase,
             moveRequestMessageMapper,
             nodeVersionHistoryRemoveMessageMapper,
-            snackBarHandler,
+            snackbarEventQueue,
             checkBackupNodeTypeUseCase,
             attachMultipleNodesUseCase,
             nodeSendToChatMessageMapper,
@@ -245,24 +344,36 @@ class NodeOptionsActionViewModelTest {
             getNodeContentUriUseCase,
             getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase,
             updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase,
             get1On1ChatIdUseCase,
             getBusinessStatusUseCase,
             getFileTypeInfoByNameUseCase,
             createShareKeyUseCase,
+            getShareFolderSensitiveWarningUseCase,
+            getFeatureFlagValueUseCase,
             mockSingleNodeActionHandler,
             mockMultiNodeActionHandler,
             nodeSelectionModeActionMapper,
             getRubbishNodeUseCase,
+            monitorUserCredentialsUseCase,
             isNodeInBackupsUseCase,
             getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode,
+            nodeOptionsActionEventSender,
             mockRubbishNode,
             mockFileNode,
             mockFolderNode,
             mockNodeSelectionMenuItem,
             mockNodeSelectionModeMenuItem,
+            getNodeLocationUseCase,
+            nodeDestinationMapper,
+            navigationEventQueue,
+            removeRecentlyWatchedItemUseCase,
+            copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase,
+            mapTypedNodeToPublicLinkUseCase,
         )
     }
 
@@ -315,6 +426,558 @@ class NodeOptionsActionViewModelTest {
             )
         }
     }
+
+    @Test
+    fun `test that checkCopyNameCollision runs a COPY collision check for the supplied source handles`() =
+        runTest {
+            val targetHandle = 999L
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                    type = NodeNameCollisionType.COPY,
+                ),
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+
+            viewModel.checkCopyNameCollision(
+                nodeIds = listOf(sampleNode.id),
+                target = NodeId(targetHandle),
+            )
+
+            verify(checkNodesNameCollisionUseCase).invoke(
+                nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                type = NodeNameCollisionType.COPY,
+            )
+        }
+
+    @Test
+    fun `test that checkMoveNameCollision runs a MOVE collision check for the supplied node ids`() =
+        runTest {
+            val targetHandle = 999L
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                    type = NodeNameCollisionType.MOVE,
+                ),
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            )
+            initViewModel()
+
+            viewModel.checkMoveNameCollision(
+                nodeIds = listOf(sampleNode.id),
+                target = NodeId(targetHandle),
+            )
+
+            verify(checkNodesNameCollisionUseCase).invoke(
+                nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                type = NodeNameCollisionType.MOVE,
+            )
+        }
+
+    @Test
+    fun `test that checkMoveNameCollision is a no-op for an empty node id list`() =
+        runTest {
+            initViewModel()
+
+            viewModel.checkMoveNameCollision(nodeIds = emptyList(), target = NodeId(999L))
+
+            verifyNoInteractions(checkNodesNameCollisionUseCase)
+        }
+
+    private fun stubChatFile(
+        nodeHandle: Long = 321L,
+        chatId: Long = 100L,
+        messageId: Long = 200L,
+    ) = mock<ChatDefaultFile> {
+        on { id } doReturn NodeId(nodeHandle)
+        on { this.chatId } doReturn chatId
+        on { this.messageId } doReturn messageId
+    }
+
+    @Test
+    fun `test that checkImportNameCollision copies through the chat use case when the selected node is a chat file`() =
+        runTest {
+            val targetHandle = 999L
+            val chatFile = stubChatFile()
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = 100L,
+                    messageIds = listOf(200L),
+                    newNodeParent = NodeId(targetHandle),
+                )
+            ).thenReturn(
+                NodeNameCollisionWithActionResult(
+                    collisionResult = NodeNameCollisionsResult(
+                        noConflictNodes = mapOf(321L to targetHandle),
+                        conflictNodes = emptyMap(),
+                        type = NodeNameCollisionType.COPY,
+                    ),
+                    moveRequestResult = null,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(chatFile))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            verify(checkChatNodesNameCollisionAndCopyUseCase).invoke(
+                chatId = 100L,
+                messageIds = listOf(200L),
+                newNodeParent = NodeId(targetHandle),
+            )
+            verifyNoInteractions(checkNodesNameCollisionUseCase)
+        }
+
+    @Test
+    fun `test that checkNodesNameCollision copies through the chat use case when type is COPY and the selected node is the chat file`() =
+        runTest {
+            val targetHandle = 999L
+            val chatFile = stubChatFile()
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = 100L,
+                    messageIds = listOf(200L),
+                    newNodeParent = NodeId(targetHandle),
+                )
+            ).thenReturn(
+                NodeNameCollisionWithActionResult(
+                    collisionResult = NodeNameCollisionsResult(
+                        noConflictNodes = mapOf(321L to targetHandle),
+                        conflictNodes = emptyMap(),
+                        type = NodeNameCollisionType.COPY,
+                    ),
+                    moveRequestResult = null,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(chatFile))
+
+            viewModel.checkNodesNameCollision(
+                nodes = listOf(321L),
+                targetNode = targetHandle,
+                type = NodeNameCollisionType.COPY,
+            )
+
+            verify(checkChatNodesNameCollisionAndCopyUseCase).invoke(
+                chatId = 100L,
+                messageIds = listOf(200L),
+                newNodeParent = NodeId(targetHandle),
+            )
+            verifyNoInteractions(checkNodesNameCollisionUseCase)
+        }
+
+    @Test
+    fun `test that checkNodesNameCollision uses the generic use case when type is MOVE even if the selected node is a chat file`() =
+        runTest {
+            val targetHandle = 999L
+            val chatFile = stubChatFile()
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    nodes = mapOf(321L to targetHandle),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(chatFile))
+
+            viewModel.checkNodesNameCollision(
+                nodes = listOf(321L),
+                targetNode = targetHandle,
+                type = NodeNameCollisionType.MOVE,
+            )
+
+            verifyNoInteractions(checkChatNodesNameCollisionAndCopyUseCase)
+            verify(checkNodesNameCollisionUseCase).invoke(
+                nodes = mapOf(321L to targetHandle),
+                type = NodeNameCollisionType.MOVE,
+            )
+        }
+
+    @Test
+    fun `test that chat copy forwards only conflicts to nodeNameCollisionsResult when there are collisions`() =
+        runTest {
+            val targetHandle = 999L
+            val chatFile = stubChatFile()
+            val chatCollision = mock<NodeNameCollision.Chat>()
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = 100L,
+                    messageIds = listOf(200L),
+                    newNodeParent = NodeId(targetHandle),
+                )
+            ).thenReturn(
+                NodeNameCollisionWithActionResult(
+                    collisionResult = NodeNameCollisionsResult(
+                        noConflictNodes = mapOf(555L to targetHandle),
+                        conflictNodes = mapOf(321L to chatCollision),
+                        type = NodeNameCollisionType.COPY,
+                    ),
+                    moveRequestResult = null,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(chatFile))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val content =
+                    (state.nodeNameCollisionsResult as StateEventWithContentTriggered).content
+                assertThat(content.conflictNodes).containsExactly(321L, chatCollision)
+                assertThat(content.noConflictNodes).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that chat copy shows the copy result message when the use case copies the node`() =
+        runTest {
+            val targetHandle = 999L
+            val chatFile = stubChatFile()
+            val copyRequestResult = MoveRequestResult.GeneralMovement(1, 0)
+            whenever(moveRequestMessageMapper(copyRequestResult)).thenReturn("copied")
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = 100L,
+                    messageIds = listOf(200L),
+                    newNodeParent = NodeId(targetHandle),
+                )
+            ).thenReturn(
+                NodeNameCollisionWithActionResult(
+                    collisionResult = NodeNameCollisionsResult(
+                        noConflictNodes = mapOf(321L to targetHandle),
+                        conflictNodes = emptyMap(),
+                        type = NodeNameCollisionType.COPY,
+                    ),
+                    moveRequestResult = copyRequestResult,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(chatFile))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.infoToShowEvent)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat(state.nodeNameCollisionsResult)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+            verify(setCopyLatestTargetPathUseCase).invoke(targetHandle)
+        }
+
+    @Test
+    fun `test that checkPublicCopyCollision surfaces a no-conflict result through publicCopyCollisionsResult`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> {
+                on { id } doReturn NodeId(789L)
+            }
+            val targetHandle = sampleNode.id.longValue
+            whenever(
+                checkPublicNodesNameCollisionUseCase(
+                    listOf(publicNode),
+                    targetHandle,
+                    NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                PublicNodeNameCollisionResult(
+                    noConflictNodes = listOf(publicNode),
+                    conflictNodes = emptyList(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+
+            viewModel.checkPublicCopyCollision(targetHandle)
+
+            verify(checkPublicNodesNameCollisionUseCase).invoke(
+                listOf(publicNode),
+                targetHandle,
+                NodeNameCollisionType.COPY,
+            )
+            // checkPublicCopyCollision never copies directly; it always emits the
+            // event and the host's handlePublicCopyCollisionResult dispatches.
+            verify(copyPublicNodeUseCase, never()).invoke(any(), any(), anyOrNull())
+            verify(checkNodesNameCollisionUseCase, never()).invoke(any(), any())
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.publicCopyCollisionsResult)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that checkPublicCopyCollision surfaces conflicts via publicCopyCollisionsResult`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> {
+                on { id } doReturn NodeId(789L)
+            }
+            val targetHandle = sampleNode.id.longValue
+            val collision = NodeNameCollision.Default(
+                collisionHandle = 1L,
+                nodeHandle = 789L,
+                name = "name",
+                size = 0L,
+                childFolderCount = 0,
+                childFileCount = 0,
+                lastModified = 0L,
+                parentHandle = 0L,
+                isFile = true,
+            )
+            whenever(
+                checkPublicNodesNameCollisionUseCase(
+                    listOf(publicNode),
+                    targetHandle,
+                    NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                PublicNodeNameCollisionResult(
+                    noConflictNodes = emptyList(),
+                    conflictNodes = listOf(collision),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+
+            viewModel.checkPublicCopyCollision(targetHandle)
+
+            verify(checkPublicNodesNameCollisionUseCase).invoke(
+                listOf(publicNode),
+                targetHandle,
+                NodeNameCollisionType.COPY,
+            )
+            verify(copyPublicNodeUseCase, never()).invoke(any(), any(), anyOrNull())
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.publicCopyCollisionsResult)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat(state.nodeNameCollisionsResult)
+                    .isNotInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that copyPublicLinkFiles copies the single selected PublicLinkFile via copyPublicNodeUseCase`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> { on { id } doReturn NodeId(101L) }
+            val targetHandle = sampleNode.id.longValue
+            whenever(copyPublicNodeUseCase(publicNode, NodeId(targetHandle), null))
+                .thenReturn(NodeId(9001L))
+            whenever(moveRequestMessageMapper(any())).thenReturn("Item copied")
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+
+            viewModel.copyPublicLinkFile(targetHandle)
+
+            verify(copyPublicNodeUseCase).invoke(publicNode, NodeId(targetHandle), null)
+            verify(copyNodesUseCase, never()).invoke(any())
+            verify(setCopyLatestTargetPathUseCase).invoke(targetHandle)
+        }
+
+    @Test
+    fun `test that copyPublicLinkFiles is a no-op for a multi-node selection`() = runTest {
+        // Public-link copy is single-node only by design. A multi-node selection
+        // (even all-PublicLinkFile) must no-op so the click-handler-level
+        // invariant has a defensive backstop here in the VM.
+        val first = mock<PublicLinkFile> { on { id } doReturn NodeId(101L) }
+        val second = mock<PublicLinkFile> { on { id } doReturn NodeId(202L) }
+        val targetHandle = sampleNode.id.longValue
+        initViewModel()
+        viewModel.updateSelectedNodes(listOf(first, second))
+
+        viewModel.copyPublicLinkFile(targetHandle)
+
+        verify(copyPublicNodeUseCase, never()).invoke(any(), any(), anyOrNull())
+        verify(copyNodesUseCase, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that markHandlePublicCopyCollisionResult clears the public collision event`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> { on { id } doReturn NodeId(789L) }
+            val targetHandle = sampleNode.id.longValue
+            val collision = NodeNameCollision.Default(
+                collisionHandle = 1L,
+                nodeHandle = 789L,
+                name = "name",
+                size = 0L,
+                childFolderCount = 0,
+                childFileCount = 0,
+                lastModified = 0L,
+                parentHandle = 0L,
+                isFile = true,
+            )
+            whenever(
+                checkPublicNodesNameCollisionUseCase(
+                    listOf(publicNode),
+                    targetHandle,
+                    NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                PublicNodeNameCollisionResult(
+                    noConflictNodes = emptyList(),
+                    conflictNodes = listOf(collision),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+            viewModel.checkPublicCopyCollision(targetHandle)
+
+            viewModel.markHandlePublicCopyCollisionResult()
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.publicCopyCollisionsResult)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that checkNodesNameCollision still uses the regular handle-based flow when selection contains PublicLinkFile`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> { on { id } doReturn NodeId(789L) }
+            val targetHandle = sampleNode.id.longValue
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    mapOf(789L to targetHandle),
+                    NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+
+            // Regular checkNodesNameCollision is NOT supposed to be invoked for public-link
+            // selections — but if someone routes a public-link selection through it anyway,
+            // the method must remain unbranched and call the handle-based use case.
+            viewModel.checkNodesNameCollision(
+                nodes = listOf(789L),
+                targetNode = targetHandle,
+                type = NodeNameCollisionType.COPY,
+            )
+
+            verify(checkNodesNameCollisionUseCase).invoke(
+                mapOf(789L to targetHandle),
+                NodeNameCollisionType.COPY,
+            )
+            verify(checkPublicNodesNameCollisionUseCase, never()).invoke(any(), any(), any())
+            verify(copyPublicNodeUseCase, never()).invoke(any(), any(), anyOrNull())
+        }
+
+    @Test
+    fun `test that checkImportNameCollision uses the public copy flow for a single PublicLinkFile selection`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> { on { id } doReturn NodeId(789L) }
+            val targetHandle = sampleNode.id.longValue
+            whenever(
+                checkPublicNodesNameCollisionUseCase(
+                    listOf(publicNode),
+                    targetHandle,
+                    NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                PublicNodeNameCollisionResult(
+                    noConflictNodes = listOf(publicNode),
+                    conflictNodes = emptyList(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            verify(checkPublicNodesNameCollisionUseCase).invoke(
+                listOf(publicNode),
+                targetHandle,
+                NodeNameCollisionType.COPY,
+            )
+            verify(checkNodesNameCollisionUseCase, never()).invoke(any(), any())
+        }
+
+    @Test
+    fun `test that checkImportNameCollision uses the regular copy flow for a non-public selection`() =
+        runTest {
+            val targetHandle = 999L
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(sampleNode))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            verify(checkNodesNameCollisionUseCase).invoke(
+                nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                type = NodeNameCollisionType.COPY,
+            )
+            verify(checkPublicNodesNameCollisionUseCase, never()).invoke(any(), any(), any())
+        }
+
+    @Test
+    fun `test that checkImportNameCollision uses the regular copy flow for a multi-node selection`() =
+        runTest {
+            val first = mock<PublicLinkFile> { on { id } doReturn NodeId(101L) }
+            val second = mock<PublicLinkFile> { on { id } doReturn NodeId(202L) }
+            val targetHandle = 999L
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    nodes = mapOf(101L to targetHandle, 202L to targetHandle),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(first, second))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            verify(checkNodesNameCollisionUseCase).invoke(
+                nodes = mapOf(101L to targetHandle, 202L to targetHandle),
+                type = NodeNameCollisionType.COPY,
+            )
+            verify(checkPublicNodesNameCollisionUseCase, never()).invoke(any(), any(), any())
+        }
 
     @Test
     fun `test that setMoveTargetPath is called when move node is success`() = runTest {
@@ -374,6 +1037,27 @@ class NodeOptionsActionViewModelTest {
             viewModel.uiState.test {
                 val uiState = awaitItem()
                 assertThat(uiState.contactsData)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that contactSelectedForShareFolder pairs selected emails with the retained share handles`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(456L)
+            }
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode))
+                .thenReturn(BackupNodeType.NonBackupNode)
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+            viewModel.contactSelectedForShareFolder(listOf("sample@mega.co.nz"))
+
+            verify(nodeHandlesToJsonMapper).invoke(listOf(456L))
+            viewModel.uiState.test {
+                assertThat(awaitItem().contactsData)
                     .isInstanceOf(StateEventWithContentTriggered::class.java)
             }
         }
@@ -596,8 +1280,11 @@ class NodeOptionsActionViewModelTest {
         val multipleHandlers = setOf(mockHandler1, mockHandler2, mockHandler3)
         val viewModelWithMultipleHandlers = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            restoreNodesUseCase = restoreNodesUseCase,
+            restoreNodeResultMapper = restoreNodeResultMapper,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
@@ -611,6 +1298,7 @@ class NodeOptionsActionViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             applicationScope = applicationScope,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
@@ -622,11 +1310,24 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = multipleHandlers,
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
-            snackBarHandler = snackBarHandler,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
+            snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            nodeOptionsActionEventSender = nodeOptionsActionEventSender,
+            applicationContext = mockContext,
+            nodeSourceType = null,
+            getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
+            navigationEventQueue = navigationEventQueue,
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            copyPublicNodeUseCase = copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
+            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -654,8 +1355,11 @@ class NodeOptionsActionViewModelTest {
         val multipleHandlers = setOf(mockHandler1, mockHandler2, mockHandler3)
         val viewModelWithMultipleHandlers = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            restoreNodesUseCase = restoreNodesUseCase,
+            restoreNodeResultMapper = restoreNodeResultMapper,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
@@ -669,6 +1373,7 @@ class NodeOptionsActionViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             applicationScope = applicationScope,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
@@ -680,11 +1385,24 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = multipleHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
-            snackBarHandler = snackBarHandler,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
+            snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            nodeOptionsActionEventSender = nodeOptionsActionEventSender,
+            applicationContext = mockContext,
+            nodeSourceType = null,
+            getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
+            navigationEventQueue = navigationEventQueue,
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            copyPublicNodeUseCase = copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
+            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
 
         val mockAction = mock<MoveMenuAction>()
@@ -706,8 +1424,11 @@ class NodeOptionsActionViewModelTest {
     fun `test handleSingleNodeAction with empty handlers set throws exception`() = runTest {
         val viewModelWithEmptyHandlers = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            restoreNodesUseCase = restoreNodesUseCase,
+            restoreNodeResultMapper = restoreNodeResultMapper,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
@@ -721,6 +1442,7 @@ class NodeOptionsActionViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             applicationScope = applicationScope,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
@@ -732,11 +1454,24 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = emptySet(),
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
-            snackBarHandler = snackBarHandler,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
+            snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            nodeOptionsActionEventSender = nodeOptionsActionEventSender,
+            applicationContext = mockContext,
+            nodeSourceType = null,
+            getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
+            navigationEventQueue = navigationEventQueue,
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            copyPublicNodeUseCase = copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
+            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -750,8 +1485,11 @@ class NodeOptionsActionViewModelTest {
     fun `test handleMultipleNodesAction with empty handlers set throws exception`() = runTest {
         val viewModelWithEmptyHandlers = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            restoreNodesUseCase = restoreNodesUseCase,
+            restoreNodeResultMapper = restoreNodeResultMapper,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
@@ -765,6 +1503,7 @@ class NodeOptionsActionViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             applicationScope = applicationScope,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
@@ -776,11 +1515,24 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = emptySet(),
             createShareKeyUseCase = createShareKeyUseCase,
-            snackBarHandler = snackBarHandler,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
+            snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            nodeOptionsActionEventSender = nodeOptionsActionEventSender,
+            applicationContext = mockContext,
+            nodeSourceType = null,
+            getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
+            navigationEventQueue = navigationEventQueue,
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            copyPublicNodeUseCase = copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
+            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
 
         assertThrows<IllegalArgumentException> {
@@ -956,6 +1708,214 @@ class NodeOptionsActionViewModelTest {
         }
 
     @Test
+    fun `test verifyShareFolderAction triggers shareHiddenNodeWarningEvent and does not proceed when warning is Folder`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L)))
+            ).thenReturn(SensitiveNodeShareWarning.Folder)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.shareHiddenNodeWarningEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+                val content =
+                    (state.shareHiddenNodeWarningEvent as StateEventWithContentTriggered<Pair<List<Long>, Boolean>>).content
+                assertThat(content.first).isEqualTo(listOf(123L))
+                assertThat(content.second).isFalse()
+                assertThat(state.shareFolderEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+                assertThat(state.shareFolderDialogEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+            }
+
+            verifyNoInteractions(createShareKeyUseCase)
+            verifyNoInteractions(checkBackupNodeTypeUseCase)
+        }
+
+    @Test
+    fun `test verifyShareFolderAction reports sharingMultipleFolders when warning is Folders`() =
+        runTest {
+            val mockFolderNode1 = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+            val mockFolderNode2 = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(456L)
+            }
+
+            whenever(
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L), NodeId(456L)))
+            ).thenReturn(SensitiveNodeShareWarning.Folders)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(listOf(mockFolderNode1, mockFolderNode2))
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val content =
+                    (state.shareHiddenNodeWarningEvent as StateEventWithContentTriggered<Pair<List<Long>, Boolean>>).content
+                assertThat(content.first).isEqualTo(listOf(123L, 456L))
+                assertThat(content.second).isTrue()
+            }
+        }
+
+    @Test
+    fun `test verifyShareFolderAction proceeds without warning when warning is None`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L)))
+            ).thenReturn(SensitiveNodeShareWarning.None)
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode))
+                .thenReturn(BackupNodeType.NonBackupNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.shareHiddenNodeWarningEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+                assertThat(state.shareFolderEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+
+            verify(createShareKeyUseCase).invoke(mockFolderNode)
+            verify(checkBackupNodeTypeUseCase).invoke(mockFolderNode)
+        }
+
+    @Test
+    fun `test verifyShareFolderAction skips the sensitive-node warning and proceeds when ContactsComposeUI is off`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode))
+                .thenReturn(BackupNodeType.NonBackupNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.shareHiddenNodeWarningEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+                assertThat(state.shareFolderEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+
+            verify(getShareFolderSensitiveWarningUseCase, never()).invoke(any())
+            verify(createShareKeyUseCase).invoke(mockFolderNode)
+        }
+
+    @Test
+    fun `test onShareHiddenNodeWarningConfirmed proceeds with share after a warning was shown`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L)))
+            ).thenReturn(SensitiveNodeShareWarning.Folder)
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode))
+                .thenReturn(BackupNodeType.NonBackupNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+            viewModel.onShareHiddenNodeWarningConfirmed(listOf(123L))
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.shareHiddenNodeWarningEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+                assertThat(state.shareFolderEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+
+            verify(createShareKeyUseCase).invoke(mockFolderNode)
+            verify(checkBackupNodeTypeUseCase).invoke(mockFolderNode)
+        }
+
+    @Test
+    fun `test onShareHiddenNodeWarningConfirmed routes to backup dialog when confirmed node is a backup node`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L)))
+            ).thenReturn(SensitiveNodeShareWarning.Folder)
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode))
+                .thenReturn(BackupNodeType.RootNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+            viewModel.onShareHiddenNodeWarningConfirmed(listOf(123L))
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.shareFolderDialogEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+        }
+
+    @Test
+    fun `test resetShareHiddenNodeWarningEvent consumes the event`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L)))
+            ).thenReturn(SensitiveNodeShareWarning.Folder)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+            viewModel.resetShareHiddenNodeWarningEvent()
+
+            viewModel.uiState.test {
+                assertThat(awaitItem().shareHiddenNodeWarningEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+            }
+        }
+
+    @Test
     fun `test that view model initializes with empty state`() = runTest {
         initViewModel()
 
@@ -975,6 +1935,64 @@ class NodeOptionsActionViewModelTest {
             awaitItem()
         }
     }
+
+    @Test
+    fun `test that monitorIsLoggedIn updates isLoggedIn to true when credentials are present`() =
+        runTest {
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() } doReturn flowOf(fakeUserCredentials)
+            }
+            initViewModel()
+            advanceUntilIdle()
+
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.isLoggedIn).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that monitorIsLoggedIn updates isLoggedIn to false when credentials are null`() =
+        runTest {
+            monitorUserCredentialsUseCase.stub { on { invoke() } doReturn flowOf(null) }
+            initViewModel()
+            advanceUntilIdle()
+
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.isLoggedIn).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that monitorIsLoggedIn updates isLoggedIn to false when credentials become null after logout`() =
+        runTest {
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() } doReturn flowOf(fakeUserCredentials, null)
+            }
+            initViewModel()
+            advanceUntilIdle()
+
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.isLoggedIn).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that monitorIsLoggedIn handles monitorUserCredentialsUseCase failure gracefully`() =
+        runTest {
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() } doReturn flow { throw RuntimeException("test") }
+            }
+            initViewModel()
+            advanceUntilIdle()
+
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.isLoggedIn).isFalse()
+            }
+        }
 
     @Test
     fun `test updateSelectionModeAvailableActions when node cannot be moved to rubbish bin`() =
@@ -999,7 +2017,8 @@ class NodeOptionsActionViewModelTest {
                 hasNodeAccessPermission = true,
                 selectedNodes = selectedNodes.toList(),
                 allNodeCanBeMovedToTarget = false, // Should be false when node cannot be moved to rubbish bin
-                noNodeInBackups = true
+                noNodeInBackups = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
         }
 
@@ -1026,7 +2045,8 @@ class NodeOptionsActionViewModelTest {
                 hasNodeAccessPermission = true,
                 selectedNodes = selectedNodes.toList(),
                 allNodeCanBeMovedToTarget = true,
-                noNodeInBackups = false // Should be false when node is in backups
+                noNodeInBackups = false, // Should be false when node is in backups
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
         }
 
@@ -1045,8 +2065,8 @@ class NodeOptionsActionViewModelTest {
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
-
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             ).thenReturn(items)
 
@@ -1066,7 +2086,7 @@ class NodeOptionsActionViewModelTest {
                 assertThat(finalState.visibleActions[1]).isEqualTo(actions[1])
                 assertThat(finalState.visibleActions[2]).isEqualTo(actions[2])
                 assertThat(finalState.visibleActions[3]).isEqualTo(actions[3])
-                assertThat(finalState.visibleActions[4]).isEqualTo(NodeSelectionAction.More)
+                assertThat(finalState.visibleActions[4]).isEqualTo(CommonMenuAction.More)
             }
         }
 
@@ -1083,7 +2103,8 @@ class NodeOptionsActionViewModelTest {
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             ).thenReturn(items)
 
@@ -1103,7 +2124,7 @@ class NodeOptionsActionViewModelTest {
                 assertThat(finalState.visibleActions[1]).isEqualTo(actions[1])
                 assertThat(finalState.visibleActions[2]).isEqualTo(actions[2])
                 assertThat(finalState.visibleActions[3]).isEqualTo(actions[3])
-                assertThat(finalState.visibleActions).doesNotContain(NodeSelectionAction.More)
+                assertThat(finalState.visibleActions).doesNotContain(CommonMenuAction.More)
             }
         }
 
@@ -1121,7 +2142,8 @@ class NodeOptionsActionViewModelTest {
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             ).thenReturn(items)
 
@@ -1140,7 +2162,7 @@ class NodeOptionsActionViewModelTest {
                 assertThat(finalState.visibleActions[0]).isEqualTo(actions[0])
                 assertThat(finalState.visibleActions[1]).isEqualTo(actions[1])
                 assertThat(finalState.visibleActions[2]).isEqualTo(actions[2])
-                assertThat(finalState.visibleActions).doesNotContain(NodeSelectionAction.More)
+                assertThat(finalState.visibleActions).doesNotContain(CommonMenuAction.More)
             }
         }
 
@@ -1158,7 +2180,8 @@ class NodeOptionsActionViewModelTest {
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             ).thenReturn(items)
 
@@ -1181,7 +2204,7 @@ class NodeOptionsActionViewModelTest {
                     actions[3],
                     actions[4]
                 )
-                assertThat(finalState.availableActions).doesNotContain(NodeSelectionAction.More)
+                assertThat(finalState.availableActions).doesNotContain(CommonMenuAction.More)
 
                 // Verify visibleActions contains first 4 actions + More (since we have 5 > DEFAULT_MAX_VISIBLE_ITEMS)
                 assertThat(finalState.visibleActions).hasSize(5)
@@ -1190,7 +2213,7 @@ class NodeOptionsActionViewModelTest {
                     actions[1],
                     actions[2],
                     actions[3],
-                    NodeSelectionAction.More
+                    CommonMenuAction.More
                 )
             }
         }
@@ -1209,7 +2232,8 @@ class NodeOptionsActionViewModelTest {
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             ).thenReturn(items)
 
@@ -1238,12 +2262,85 @@ class NodeOptionsActionViewModelTest {
                     actions[1],
                     actions[2]
                 )
-                assertThat(finalState.visibleActions).doesNotContain(NodeSelectionAction.More)
+                assertThat(finalState.visibleActions).doesNotContain(CommonMenuAction.More)
 
                 // Verify both lists are equal
                 assertThat(finalState.visibleActions).isEqualTo(finalState.availableActions)
             }
         }
+
+    @Test
+    fun `test updateSelectionModeAvailableActions sets visibleActions is based on showAsActionOrder`() =
+        runTest {
+            val actions = listOf(
+                mock<MoveMenuAction>(),
+                mock<CopyMenuAction>(),
+                mock<DownloadMenuAction>(),
+                mock<TrashMenuAction>(),
+                mock<HideMenuAction>(),
+            )
+
+            val items = actions
+                .map { action ->
+                    mock<NodeSelectionModeMenuItem> {
+                        on { this.action } doReturn action
+                        when (action) {
+                            is TrashMenuAction -> on { showAsActionOrder }.then { 100 }
+                            is HideMenuAction -> on { showAsActionOrder }.then { 200 }
+                            else -> on { showAsActionOrder }.then { null }
+                        }
+                    }
+                }
+
+            initViewModel()
+
+            whenever(
+                nodeSelectionModeActionMapper(
+                    options = any(),
+                    hasNodeAccessPermission = any(),
+                    selectedNodes = any(),
+                    allNodeCanBeMovedToTarget = any(),
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
+                )
+            ).thenReturn(items)
+
+            val selectedNodes = setOf(mockFileNode)
+            val nodeSourceType = NodeSourceType.CLOUD_DRIVE
+
+            viewModel.uiState.test {
+                awaitItem()
+
+                viewModel.updateSelectionModeAvailableActions(selectedNodes, nodeSourceType)
+
+                val finalState = awaitItem()
+
+                assertThat(finalState.visibleActions).hasSize(5)
+                assertThat(finalState.visibleActions).containsExactly(
+                    actions[3],
+                    actions[4],
+                    actions[0],
+                    actions[1],
+                    CommonMenuAction.More
+                )
+            }
+        }
+
+    @Test
+    fun `test that addVideoToPlaylistResultEvent is updated as expected`() = runTest {
+        val result = AddVideoToPlaylistResult("", false, -1)
+        initViewModel()
+
+        viewModel.triggerAddVideoToPlaylistResultEvent(result)
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            assertThat(awaitItem().addVideoToPlaylistResultEvent).isEqualTo(triggered(result))
+
+            viewModel.resetAddVideoToPlaylistResultEvent()
+            assertThat(awaitItem().addVideoToPlaylistResultEvent).isEqualTo(consumed())
+        }
+    }
 
     /**
      * Creates mock actions and their corresponding menu items for testing
@@ -1343,4 +2440,215 @@ class NodeOptionsActionViewModelTest {
             mock<FileNodeContent.UrlContent>()
         )
     )
+
+    @Test
+    fun `test that removeRecentlyWatchedItem invokes removeRecentlyWatchedItemUseCase with the given handle`() =
+        runTest {
+            val handle = 12345L
+            whenever(removeRecentlyWatchedItemUseCase(handle)).thenReturn(Unit)
+
+            initViewModel()
+
+            viewModel.removeRecentlyWatchedItem(handle)
+            advanceUntilIdle()
+
+            verify(removeRecentlyWatchedItemUseCase).invoke(handle)
+        }
+
+    @Test
+    fun `test that removeRecentlyWatchedItem on success queues snackbar message and triggers dismiss`() =
+        runTest {
+            val handle = 999L
+            whenever(removeRecentlyWatchedItemUseCase(handle)).thenReturn(Unit)
+
+            initViewModel()
+
+            viewModel.removeRecentlyWatchedItem(handle)
+            advanceUntilIdle()
+
+            verify(removeRecentlyWatchedItemUseCase).invoke(handle)
+            verify(snackbarEventQueue).queueMessage(any(), any())
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.dismissEvent).isInstanceOf(StateEvent.Triggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that removeRecentlyWatchedItem on failure still triggers dismiss`() =
+        runTest {
+            val handle = 888L
+            whenever(removeRecentlyWatchedItemUseCase(handle)).thenThrow(RuntimeException("test failure"))
+
+            initViewModel()
+
+            viewModel.removeRecentlyWatchedItem(handle)
+            advanceUntilIdle()
+
+            verify(removeRecentlyWatchedItemUseCase).invoke(handle)
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.dismissEvent).isInstanceOf(StateEvent.Triggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test viewFileInFolder calls getNodeLocationUseCase and emits navigation destinations`() =
+        runTest {
+            initViewModel()
+            val testNode = mockFileNode
+            val nodeLocation = NodeLocation(
+                node = testNode,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                ancestorIds = listOf(NodeId(100L), NodeId(200L))
+            )
+            val destinations = listOf(
+                HomeScreensNavKey(
+                    root = DriveSyncNavKey(),
+                    destinations = emptyList(),
+                    timestamp = System.currentTimeMillis()
+                )
+            )
+
+            whenever(getNodeLocationUseCase(testNode)).thenReturn(nodeLocation)
+            whenever(nodeDestinationMapper(nodeLocation)).thenReturn(destinations)
+
+            viewModel.viewFileInFolder(testNode)
+            advanceUntilIdle()
+
+            verify(getNodeLocationUseCase).invoke(testNode)
+            verify(nodeDestinationMapper).invoke(nodeLocation)
+            verify(navigationEventQueue).emit(destinations)
+
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.dismissEvent).isInstanceOf(StateEvent.Triggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that downloadNode triggers StartDownloadNode with original nodes when source type is neither FOLDER_LINK nor FILE_LINK`() =
+        runTest {
+            initViewModel(nodeSourceType = NodeSourceType.CLOUD_DRIVE)
+            viewModel.updateSelectedNodes(listOf(mockFileNode))
+
+            viewModel.downloadNode(withStartMessage = false)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val event = state.downloadEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val trigger =
+                    (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
+                assertThat(trigger.nodes).containsExactly(mockFileNode)
+            }
+        }
+
+    @Test
+    fun `test that downloadNode maps nodes to public link types when source type is FOLDER_LINK`() =
+        runTest {
+            initViewModel(nodeSourceType = NodeSourceType.FOLDER_LINK)
+            val publicLinkFile = mock<PublicLinkFile>()
+            whenever(mapTypedNodeToPublicLinkUseCase(mockFileNode)).thenReturn(publicLinkFile)
+            viewModel.updateSelectedNodes(listOf(mockFileNode))
+
+            viewModel.downloadNode(withStartMessage = false)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val event = state.downloadEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val trigger =
+                    (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
+                assertThat(trigger.nodes).containsExactly(publicLinkFile)
+            }
+        }
+
+    @Test
+    fun `test that downloadNode maps nodes to public link types when source type is FILE_LINK`() =
+        runTest {
+            initViewModel(nodeSourceType = NodeSourceType.FILE_LINK)
+            val publicLinkFile = mock<PublicLinkFile>()
+            whenever(mapTypedNodeToPublicLinkUseCase(mockFileNode)).thenReturn(publicLinkFile)
+            viewModel.updateSelectedNodes(listOf(mockFileNode))
+
+            viewModel.downloadNode(withStartMessage = false)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val event = state.downloadEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val trigger =
+                    (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
+                assertThat(trigger.nodes).containsExactly(publicLinkFile)
+            }
+        }
+
+    @Test
+    fun `test that downloadNode falls back to original nodes when mapTypedNodeToPublicLinkUseCase throws for FILE_LINK`() =
+        runTest {
+            initViewModel(nodeSourceType = NodeSourceType.FILE_LINK)
+            whenever(mapTypedNodeToPublicLinkUseCase(mockFileNode))
+                .thenThrow(RuntimeException("mapping failed"))
+            viewModel.updateSelectedNodes(listOf(mockFileNode))
+
+            viewModel.downloadNode(withStartMessage = false)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val event = state.downloadEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val trigger =
+                    (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
+                assertThat(trigger.nodes).containsExactly(mockFileNode)
+            }
+        }
+
+    @Test
+    fun `test that downloadZipFile triggers CopyUri event with correct name and uri path`() =
+        runTest {
+            initViewModel()
+            val mockFile = File("/path/to/video.mp4")
+            val zipNode = ZipFileTypedNode(file = mockFile)
+            val mockUri = mock<Uri>()
+            whenever(mockUri.toString()).thenReturn("content://authority/video.mp4")
+
+            Mockito.mockStatic(FileProvider::class.java).use { mockedProvider ->
+                mockedProvider.`when`<Uri> {
+                    FileProvider.getUriForFile(any(), any(), any())
+                }.thenReturn(mockUri)
+
+                viewModel.downloadZipFile(node = zipNode, withStartMessage = false)
+            }
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val event = state.downloadEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val trigger =
+                    (event as StateEventWithContentTriggered).content as TransferTriggerEvent.CopyUri
+                assertThat(trigger.name).isEqualTo("video.mp4")
+                assertThat(trigger.withStartMessage).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that downloadZipFile does not update downloadEvent when FileProvider throws`() =
+        runTest {
+            initViewModel()
+            val zipNode = ZipFileTypedNode(file = File("/path/to/video.mp4"))
+
+            Mockito.mockStatic(FileProvider::class.java).use { mockedProvider ->
+                mockedProvider.`when`<Uri> {
+                    FileProvider.getUriForFile(any(), any(), any())
+                }.thenThrow(IllegalArgumentException("test failure"))
+
+                viewModel.downloadZipFile(node = zipNode, withStartMessage = false)
+            }
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
 } 

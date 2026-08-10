@@ -8,7 +8,8 @@ import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -40,13 +41,13 @@ import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUse
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.ImportTypedNodesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
-import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -77,6 +78,7 @@ class NodeAttachmentMessageViewModelTest {
     private val getMessageIdsByTypeUseCase = mock<GetMessageIdsByTypeUseCase>()
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val getNodePreviewFileUseCase = mock<GetNodePreviewFileUseCase>()
+    private val getFileTypeInfoByContentUseCase = mock<GetFileTypeInfoByContentUseCase>()
     private val getCachedOriginalPathUseCase = mock<GetCachedOriginalPathUseCase>()
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
@@ -98,6 +100,7 @@ class NodeAttachmentMessageViewModelTest {
             getMessageIdsByTypeUseCase = getMessageIdsByTypeUseCase,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             getCachedOriginalPathUseCase = getCachedOriginalPathUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
@@ -119,6 +122,7 @@ class NodeAttachmentMessageViewModelTest {
             getMessageIdsByTypeUseCase,
             getNodeContentUriUseCase,
             getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase,
             getCachedOriginalPathUseCase,
             isAvailableOfflineUseCase,
             removeOfflineNodeUseCase,

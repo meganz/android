@@ -1,45 +1,43 @@
 [versions]
-accompanist = "0.32.0"
-accompanist-pager = "0.30.1"
-accompanist-systemui = "0.23.1"
-firebase = "33.1.1"
-firebase-app-distribution = "16.0.0-beta13"
+accompanist = "0.37.3"
+accompanist-systemui = "0.36.0"
+firebase = "34.13.0"
+firebase-app-distribution = "16.0.0-beta19"
 flexbox = "3.0.0"
-gson = "2.10.1"
-hilt = "2.56.1"
-material = "1.12.0"
+gson = "2.14.0"
+hilt = "2.59.2"
+material = "1.14.0"
 maps-utils = "0.5"
 maps-compose = "6.1.0"
+play-age-signals = "0.0.3"
 play-review = "2.0.2"
 play-update = "2.1.0"
-protobuff = "3.22.3"
-services-ads = "24.4.0"
+protobuff = "4.34.1"
+ads-mobile-sdk = "1.2.1"
 services-location = "21.3.0"
 services-maps = "18.2.0"
-services-mlkit-document-scanner = "16.0.0-beta1"
-zxing = "3.4.1"
+services-mlkit-document-scanner = "16.0.0"
+zxing = "3.5.4"
 code-scanner = "16.1.0"
-media3 = "1.3.1"
+media3 = "1.10.1"
 install-referrer = "2.2"
-tink = "1.8.0"
-guava = "33.0.0-jre"
-ump = "3.1.0"
+tink = "1.21.0"
+guava = "33.6.0-jre"
+ump = "4.0.0"
+googleid = "1.2.0"
 
 [libraries]
-accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist-pager" }
-accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
-accompanist-placeholder = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanist" }
+accompanist-placeholder = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanist-systemui" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
-accompanist-navigationmaterial = { module = "com.google.accompanist:accompanist-navigation-material", version.ref = "accompanist" }
-accompanist-navigationanimation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanist" }
 accompanist-systemui = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist-systemui" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics"}
 firebase-app-distribution = { module = "com.google.firebase:firebase-appdistribution", version.ref = "firebase-app-distribution" }
 firebase-crashlytics-ndk = { group = "com.google.firebase", name = "firebase-crashlytics-ndk" }
-firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
-firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
-firebase-perf-ktx = { group = "com.google.firebase", name = "firebase-perf-ktx" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+firebase-config = { group = "com.google.firebase", name = "firebase-config" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
+firebase-perf = { group = "com.google.firebase", name = "firebase-perf" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt" }
@@ -49,23 +47,33 @@ hilt-android-test = { module = "com.google.dagger:hilt-android-testing", version
 maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "maps-utils" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
+play-age-signals = { module = "com.google.android.play:age-signals", version.ref = "play-age-signals" }
 play-review = { module = "com.google.android.play:review", version.ref = "play-review" }
 play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "play-review" }
 play-update = { module = "com.google.android.play:app-update", version.ref = "play-update" }
 play-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "play-update" }
 protobuff = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuff" }
-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "services-ads" }
+ads-mobile-sdk = { module = "com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk", version.ref = "ads-mobile-sdk" }
 services-location = { module = "com.google.android.gms:play-services-location", version.ref = "services-location" }
 services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "services-maps" }
 services-mlkit-document-scanner = { module = "com.google.android.gms:play-services-mlkit-document-scanner", version.ref = "services-mlkit-document-scanner"}
 zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
 code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "code-scanner" }
 media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
+media3-session = { module = "androidx.media3:media3-session", version.ref = "media3" }
 media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
+media3-ui-compose = { module = "androidx.media3:media3-ui-compose", version.ref = "media3" }
+media3-transformer = { module = "androidx.media3:media3-transformer", version.ref = "media3" }
+media3-effect = { module = "androidx.media3:media3-effect", version.ref = "media3" }
+media3-common = { module = "androidx.media3:media3-common", version.ref = "media3" }
+media3-muxer = { module = "androidx.media3:media3-muxer", version.ref = "media3" }
+media3-container = { module = "androidx.media3:media3-container", version.ref = "media3" }
 install-referrer = { module = "com.android.installreferrer:installreferrer", version.ref = "install-referrer" }
 tink = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 ump = { module = "com.google.android.ump:user-messaging-platform", version.ref = "ump" }
+identity-googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 [bundles]
-firebase-bom = ["firebase-crashlytics-ndk", "firebase-crashlytics-ktx", "firebase-messaging-ktx", "firebase-perf-ktx"]
+firebase-bom = ["firebase-crashlytics-ndk", "firebase-crashlytics", "firebase-messaging", "firebase-perf"]
+media3 = ["media3-exoplayer", "media3-ui", "media3-ui-compose", "media3-transformer", "media3-effect", "media3-common", "media3-muxer", "media3-container"]

@@ -14,14 +14,15 @@ class LocalisedSubscriptionMapper @Inject constructor(
 ) {
     /**
      * Invoke
-     * Convert Subscription to LocalisedSubscription
-     * @param monthlySubscription [mega.privacy.android.domain.entity.Subscription]
-     * @param yearlySubscription [mega.privacy.android.domain.entity.Subscription]
+     * Convert Subscription to LocalisedSubscription. At least one of monthly or yearly must be non-null.
+     *
+     * @param monthlySubscription [mega.privacy.android.domain.entity.Subscription] or null if only yearly available
+     * @param yearlySubscription [mega.privacy.android.domain.entity.Subscription] or null if only monthly available
      * @return [mega.privacy.android.feature.payment.model.LocalisedSubscription]
      */
     operator fun invoke(
-        monthlySubscription: Subscription,
-        yearlySubscription: Subscription,
+        monthlySubscription: Subscription?,
+        yearlySubscription: Subscription?,
     ) = LocalisedSubscription(
         monthlySubscription = monthlySubscription,
         yearlySubscription = yearlySubscription,

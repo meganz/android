@@ -14,8 +14,6 @@
     <string name="general_select">เลือก</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">เลือกโฟลเดอร์</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">สร้าง</string>
     <!-- button -->
     <string name="general_add">เพิ่ม</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -61,10 +59,6 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">อัปโหลด</string>
     <!-- Menu item -->
-    <string name="action_create_folder">โฟลเดอร์ใหม่</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">ไฟล์ข้อความใหม่</string>
-    <!-- Menu item -->
     <string name="action_settings">ตั้งค่า</string>
     <!-- Search button -->
     <string name="action_search">ค้นหา</string>
@@ -93,7 +87,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">การสมัครใช้งานได้ถูกยกเลิกแล้ว</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">เราไม่สามารถยกเลิกการสมัครใช้งานของคุณได้ กรุณาติดต่อ support&#64;mega.io เพื่อขอความช่วยเหลือ</string>
+    <string name="cancel_subscription_error">ระบบไม่สามารถยกเลิกการสมัครใช้งานของคุณได้ กรุณาติดต่อฝ่ายสนับสนุนที่ https://mega.nz/support เพื่อรับความช่วยเหลือ</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">ปิดเซสชั่นอื่น ๆ</string>
     <!-- Message after kill all opened sessions -->
@@ -150,10 +144,6 @@
     <string name="login_before_share">ลงชื่อเข้าใช้เพื่อแชร์กับ MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">ลิงก์ยืนยันของคุณไม่สามารถใช้งานได้อีกต่อไป บัญชีของคุณอาจถูกเปิดใช้งานแล้ว หรือคุณอาจยกเลิกการสมัครใช้งานของคุณ</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">ชื่อ</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">สกุล</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">ฉันเข้าใจว่า[B]ถ้าฉันทำรหัสผ่านหาย[/B] ฉันอาจสูญเสียข้อมูลของฉันได้ อ่านเพิ่มเติมเกี่ยวกับ[A]การเข้ารหัสลับแบบต้นทางถึงปลายทาง MEGA[/A] ได้</string>
     <!-- warning dialog -->
@@ -273,8 +263,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">ลิงก์นี้จะไม่เปิดเผยต่อสาธารณะอีกต่อไป</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">เปลี่ยนชื่อ</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">เปิด</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">กำลังจัดเตรียมไฟล์</string>
@@ -294,8 +282,6 @@
     <string name="context_move_to_trash">ย้ายไปที่ถังขยะ</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">นำออกจาก MEGA</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">ชื่อโฟล์เดอร์</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">กำลังสร้างโฟลเดอร์</string>
     <!-- Menu option title -->
@@ -384,8 +370,6 @@
     <string name="subscription_type_monthly">รายเดือน</string>
     <!--  -->
     <string name="subscription_type_yearly">รายปี</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">โฟลเดอร์ใหม่</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">เพิ่มผู้ติดต่อ</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -675,9 +659,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">ขอแสดงความยินดี อีเมลใหม่ของคุณสำหรับบัญชี MEGA นี้คือ: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Cannot be empty</string>
+    <string name="invalid_string">ห้ามเว้นว่าง</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
+    <string name="invalid_input">ข้อมูลที่กรอกไม่ถูกต้อง</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">รีเซ็ตรหัสผ่าน</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -729,7 +713,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">บัญชีของคุณถูกระงับ เนื่องจากละเมิดเงื่อนไขการให้บริการกรุณาติดต่อ support&#64;mega.io</string>
+    <string name="error_account_suspended">ระบบได้ระงับบัญชีของคุณเนื่องจากมีการละเมิดเงื่อนไขการให้บริการ กรุณาติดต่อฝ่ายสนับสนุนที่ https://mega.nz/support</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">มีการเข้าสู่ระบบไม่สำเร็จหลายครั้งเกินไป กรุณารอประมาณหนึ่งชั่วโมง</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -989,12 +973,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">นาที</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>ออนไลน์</item>
-        <item>ว่าง</item>
-        <item>ไม่ว่าง</item>
-        <item>ออฟไลน์</item>
-    </string-array>
+    <string name="settings_chat_status_online">ออนไลน์</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">ว่าง</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">ไม่ว่าง</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">ออฟไลน์</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">เปิดการใช้งาน</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1229,8 +1214,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">ช่วยเหลือ</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">ส่งคำติชม</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">คำติชมเกี่ยวกับ Android</string>
     <!-- mail body -->
@@ -1239,8 +1222,6 @@
     <string name="settings_feedback_body_device_model">รูปแบบอุปกรณ์</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">เวอร์ชัน Android</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">ไฟล์ข้อความใหม่</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">ชื่อไฟล์</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1259,8 +1240,6 @@
     <string name="general_incorrect_names">กรุณาแก้ไขชื่อไฟล์ของคุณก่อนดำเนินการต่อ</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">ไม่ได้อนุญาตให้ใช้อักขระนี้</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">ไม่อนุญาตให้ใช้อักขระต่อไปนี้: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">ชื่อไฟล์ต้องไม่ว่างเปล่า</item>
@@ -1277,12 +1256,6 @@
     <string name="invalid_connection_state">เชื่อมต่อกับการแชทอีกครั้ง</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">พบข้อผิดพลาดและไม่สามารถเชื่อมต่อการโทรได้</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">ถูกใจใช่เลย แอปมือถือ MEGA หรือไม่</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">ใช่ ให้คะแนนแอปนี้</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">ไม่ ส่งคำติชม</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">ไม่มีผู้ติดต่อที่ได้รับ</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1363,8 +1336,6 @@
     <string name="tab_received_requests">รับคำขอ</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">เกินโควต้าพื้นที่จัดเก็บ</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">ลิงก์ไม่ถูกต้อง กรุณาขอลิงก์ที่ถูกต้องใหม่อีกครั้ง</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">รหัสผ่านลิงก์ไม่ถูกต้อง</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1446,12 +1417,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">คุณภาพวีดีโอ</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>ต่ำ</item>
-        <item>ปานกลาง</item>
-        <item>สูง</item>
-        <item>ต้นฉบับ</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">ต่ำ</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">ปานกลาง</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">สูง</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">ต้นฉบับ</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">สายที่ไม่ได้รับ</string>
     <!-- Refers to a location of file -->
@@ -1867,7 +1839,7 @@
     <!-- General label for files -->
     <string name="general_files">ไฟล์</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">บันทึกลงในอุปกรณ์</string>
+    <string name="general_save_to_device">ดาวน์โหลด</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">อัปโหลดไปยัง MEGA</string>
     <!-- Label choose destination -->
@@ -2145,7 +2117,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">ละเว้น</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s ปิดเสียงการโทรนี้</string>
+    <string name="muted_contact_micro">%s ปิดเสียงแล้ว</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">ปิดเสียง</string>
     <!-- Subtitle of the call screen when the call is on hold -->
@@ -3199,7 +3171,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]ไม่มีรายการใน[/B][A]สำรองข้อมูล[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">นี่คือที่จัดเก็บไฟล์และโฟลเดอร์สำหรับสำรองข้อมูล รายการที่สำรองไว้ของคุณเป็นแบบ “อ่านอย่างเดียว” เพื่อป้องกันไม่ให้ถูกแก้ไขโดยไม่ได้ตั้งใจในไดรฟ์ระบบคลาวด์ของคุณ\nคุณสามารถสำรองข้อมูลไฟล์ต่าง ๆ ได้จากคอมพิวเตอร์ของคุณไปยัง MEGA โดยใช้แอปเดสก์ท็อปของเรา</string>
+    <string name="backups_empty_state_body">นี่คือที่จัดเก็บไฟล์และโฟลเดอร์สำหรับสำรองข้อมูล รายการที่สำรองไว้ของคุณเป็นแบบ \“อ่านอย่างเดียว\“ เพื่อป้องกันไม่ให้ถูกแก้ไขโดยไม่ได้ตั้งใจในไดรฟ์ระบบคลาวด์ของคุณ\nคุณสามารถสำรองข้อมูลไฟล์ต่าง ๆ ได้จากคอมพิวเตอร์ของคุณไปยัง MEGA โดยใช้แอปเดสก์ท็อปของเรา</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">บัญชี MEGA ของคุณถูกระงับชั่วคราว เนื่องจากมีการร้องเรียนเรื่องการละเมิดลิขสิทธิ์ซ้ำหลายครั้ง หมายความว่าคุณไม่สามารถเข้าถึงบัญชีหรือข้อมูลใด ๆ ภายในบัญชีของคุณได้\nตรวจสอบกล่องจดหมายอีเมลของคุณเพื่อดูข้อมูลเพิ่มเติมเกี่ยวกับวิธีการยื่นเรื่องโต้แย้ง</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -3768,11 +3740,17 @@
     <plurals name="general_copy_snackbar_fail">
         <item quantity="other">มี %1$d รายการที่คัดลอกไม่ได้</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="other">คัดลอก %1$d รายการแล้ว&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="other">และมีอีก %1$d รายการที่คัดลอกไม่ได้</item>
     </plurals>
@@ -3948,10 +3926,6 @@
     <string name="dialog_taken_down_folder_title">ไม่สามารถเปิดโฟลเดอร์ได้</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">ไม่สามารถเปิดไฟล์ได้</string>
-    <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
-    <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Pro เท่านั้น</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -4342,16 +4316,6 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s กำลังนำเสนออยู่</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">บุคคลนี้กำลังแชร์หน้าจออยู่</string>
-    <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">การสนทนานี้กำลังถูกบันทึก</string>
-    <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">หากคุณอยู่ในการสนทนานี้ต่อ แสดงว่าคุณยินยอมให้บันทึกเสียงการสนทนา ซึ่งการบันทึกเสียงจะถูกเก็บไว้เฉพาะในอุปกรณ์ของผู้บันทึกเท่านั้น</string>
-    <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">โอเค เข้าใจแล้ว</string>
-    <!-- Label for the negative or cancel button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_negative_button">วางสาย</string>
-    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]เรียนรู้เพิ่มเติม[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">%1$s เริ่มบันทึกการสนทนาแล้ว</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
@@ -4435,7 +4399,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">การอัปโหลดถูกหยุดชั่วคราว เนื่องจากแบตเตอรี่เหลือต่ำกว่า %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">การอัปโหลดจากกล้องหยุดทำงานแล้ว ลองเปิดใช้งานการอัปโหลดนี้ใหม่อีกครั้ง หากยังประสบปัญหาอยู่ ให้ติดต่อ support&#64;mega.io</string>
+    <string name="photos_camera_uploads_general_issue">ระบบอัปโหลดจากกล้องหยุดทำงาน กรุณาลองเปิดใช้งานฟีเจอร์นี้ใหม่อีกครั้งเพื่อแก้ไขปัญหา หากยังคงพบปัญหาอยู่ กรุณาติดต่อฝ่ายสนับสนุนที่ https://mega.nz/support</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">การอัปโหลดจากกล้องกำลังอยู่ในระหว่างดำเนินการ มี %1$d ไฟล์รอดำเนินการ</item>
@@ -4541,7 +4505,7 @@
     <!-- Hidden nodes show items -->
     <string name="hidden_nodes_show_items">แสดงรายการที่ถูกซ่อนไว้</string>
     <!-- Hidden nodes show items description -->
-    <string name="hidden_nodes_show_items_description">รายการที่ซ่อนอยู่ทั้งหมดจะแสดงเป็นภาพเบลอเพื่อแสดงสถานะ “ซ่อนอยู่“</string>
+    <string name="hidden_nodes_show_items_description">รายการที่ซ่อนอยู่ทั้งหมดจะแสดงเป็นภาพเบลอเพื่อแสดงสถานะ \“ซ่อนอยู่\“</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">รูปภาพ</string>
     <!--  -->
@@ -4600,4 +4564,7 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">เปิดใช้งานอัปโหลดจากกล้อง</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">ตำแหน่งที่ตั้งนี้ไม่มีอยู่แล้ว</string>
+    <string name="invalid_link">ลิงก์ไม่ถูกต้อง กรุณาลองใหม่อีกครั้งหรือขอรับลิงก์ใหม่</string>
+    <string name="dialog_taken_down_folder_description">โฟลเดอร์นี้ถูกลบเนื้อหาตาม[A]นโยบายแนวทางการลบเนื้อหา[/A]ของเรา หากคุณเชื่อว่าเป็นข้อผิดพลาด คุณสามารถยื่นคำโต้แย้งได้</string>
+    <string name="dialog_taken_down_file_description">ไฟล์นี้ถูกลบเนื้อหาตาม[A]นโยบายแนวทางการลบเนื้อหา[/A]ของเรา หากคุณเชื่อว่าเป็นข้อผิดพลาด คุณสามารถยื่นคำโต้แย้งได้</string>
 </resources>

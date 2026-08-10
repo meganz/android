@@ -18,7 +18,7 @@
 <!-- This file is copied from Android progress_indeterminate_anim_large_material.xml,
 because we need change the thickness of the progress and it's private. -->
 <objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="4444"
+    android:duration="3000"
     android:interpolator="@android:anim/linear_interpolator"
     android:propertyName="rotation"
     android:repeatCount="-1"

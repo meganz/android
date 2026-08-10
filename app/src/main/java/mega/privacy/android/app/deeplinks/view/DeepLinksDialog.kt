@@ -1,0 +1,60 @@
+package mega.privacy.android.app.deeplinks.view
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.navigation3.runtime.NavKey
+import mega.android.core.ui.components.dialogs.BasicSpinnerDialog
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.app.R
+import mega.privacy.android.app.deeplinks.model.DeepLinksUIState
+import mega.privacy.android.navigation.contract.NavOptions
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
+
+@Composable
+internal fun DeepLinksDialog(
+    uiState: DeepLinksUIState,
+    onNavigate: (List<NavKey>, NavOptions?) -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val navKeys = uiState.navKeys
+    val navOptions = uiState.navOptions
+
+    if (navKeys == null) {
+        BasicSpinnerDialog(
+            modifier = modifier.testTag(DEEP_LINK_DIALOG_TEST_TAG),
+            contentText = stringResource(R.string.processing_link),
+            onDismiss = onDismiss
+        )
+    }
+
+    LaunchedEffect(navKeys) {
+        if (navKeys != null) {
+            onDismiss()
+            if (navKeys.isNotEmpty()) {
+                onNavigate(navKeys, navOptions)
+            }
+        }
+    }
+}
+
+@CombinedThemeRtlPreviews
+@Composable
+private fun DeepLinksDialogPreview() {
+    AndroidThemeForPreviews {
+        Box(modifier = Modifier.fillMaxSize()) {
+            DeepLinksDialog(
+                uiState = DeepLinksUIState(),
+                onNavigate = { _, _ -> },
+                onDismiss = {},
+            )
+        }
+    }
+}
+
+internal const val DEEP_LINK_DIALOG_TEST_TAG = "deep_link_dialog"

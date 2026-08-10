@@ -15,6 +15,9 @@ import mega.privacy.android.domain.entity.account.OfferPeriod
  * @property discountedPercentage  Discount percentage for the subscription option
  * @property offerId         Unique identifier for the offer
  * @property offerPeriod     Period of the offer (Day, Month, or Year)
+ * @property discountName    Localised campaign name from the SDK, or null/empty when none
+ * @property offerValidUntil Mobile offer expiry timestamp in seconds (utqa "mo.e"), or null when the offer has no expiry
+ * @property offerFlags      Mobile offer flags bitmask from the SDK, or null when the offer carries no flags
  */
 data class Subscription(
     val sku: String,
@@ -27,4 +30,13 @@ data class Subscription(
     val discountedAmountMonthly: CurrencyAmount? = null,
     val discountedPercentage: Int? = null,
     val offerPeriod: OfferPeriod? = null,
-)
+    val discountName: String? = null,
+    val offerValidUntil: Long? = null,
+    val offerFlags: Long? = null,
+) {
+    /**
+     * Has offer
+     */
+    val hasOffer: Boolean
+        get() = discountedAmountMonthly != null
+}

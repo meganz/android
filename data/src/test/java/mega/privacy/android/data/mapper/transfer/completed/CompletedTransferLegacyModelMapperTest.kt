@@ -74,7 +74,9 @@ internal class CompletedTransferLegacyModelMapperTest {
                 errorCode = null,
                 originalPath = originalPath.orEmpty(),
                 parentHandle = parentHandle?.toLongOrNull() ?: -1,
-                appData = appData
+                appData = appData,
+                uniqueId = 0L,
+                totalBytes = 0L,
             )
         }
         val expected = CompletedTransfer(
@@ -90,9 +92,11 @@ internal class CompletedTransferLegacyModelMapperTest {
             error = "No error",
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = 11622336899311L,
-            appData = null,
+            appData = emptyList(),
             displayPath = null,
             errorCode = null,
+            uniqueId = 0L,
+            totalBytes = 0L,
         )
 
         whenever(completedTransferModelMapper(entity)) doReturn expected

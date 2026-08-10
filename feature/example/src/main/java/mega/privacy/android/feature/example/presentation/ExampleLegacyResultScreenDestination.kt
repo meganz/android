@@ -4,6 +4,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+:import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.navigation.destination.ExampleLegacyResultScreen
 
 
@@ -21,7 +22,7 @@ fun EntryProviderScope<NavKey>.exampleLegacyResultScreen(
             returnResult(ExampleLegacyResultScreen.RESULT_KEY, result)
         }
 
-        LaunchedEffect(Unit) {
+        LaunchedOnceEffect {
             legacyActivityLauncher.launch(Unit)
         }
     }

@@ -21,7 +21,7 @@ fun getMonitorStorageStateEvent(): MonitorStorageStateEventUseCase = fromApplica
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface StorageStateEventMonitorEntryPoint {
-    var monitorStorageStateEvent: MonitorStorageStateEventUseCase
+    val monitorStorageStateEvent: MonitorStorageStateEventUseCase
 }
 
 

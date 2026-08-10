@@ -29,7 +29,7 @@ class MonitorStorageOverQuotaUseCaseTest {
         on { storageState }.thenReturn(StorageState.Unknown)
     }
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase> {
-        onBlocking { invoke() }.thenReturn(
+        on { invoke() }.thenReturn(
             MutableStateFlow(storageStateEvent)
         )
     }

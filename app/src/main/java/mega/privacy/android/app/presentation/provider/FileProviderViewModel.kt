@@ -15,9 +15,11 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,6 +32,7 @@ class FileProviderViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileProviderUiState())
@@ -38,6 +41,20 @@ class FileProviderViewModel @Inject constructor(
      * Ui state flow
      */
     val uiState = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            runCatching { getRootNodeIdUseCase()?.longValue ?: INVALID_HANDLE }
+                .onSuccess { handle -> _uiState.update { it.copy(cloudRootHandle = handle) } }
+                .onFailure { Timber.e(it, "Failed to fetch cloud root handle") }
+        }
+    }
+
+    /**
+     * Returns the cached cloud drive root handle, or [INVALID_HANDLE] if it has not yet been
+     * initialised.
+     */
+    fun getCloudRootHandle(): Long = _uiState.value.cloudRootHandle
 
     /**
      * Get latest value of [StorageState]

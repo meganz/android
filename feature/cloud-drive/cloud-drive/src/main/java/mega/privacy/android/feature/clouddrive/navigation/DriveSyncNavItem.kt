@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
@@ -13,29 +14,27 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
-import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
 
 class DriveSyncNavItem : MainNavItem {
-    override val destination: NavKey = DriveSyncNavKey()
+    override val destination: MainNavItemNavKey = DriveSyncNavKey()
     override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationController, transferHandler ->
             driveSyncScreen(
                 navigationHandler = navigationHandler,
                 setNavigationVisibility = navigationController::showNavigation,
                 onTransfer = transferHandler::setTransferEvent,
-                openSearch = { isFirstNavigationLevel, parentHandle, nodeSourceType ->
-                    navigationHandler.navigate(
-                        SearchNodeNavKey(
-                            isFirstNavigationLevel = isFirstNavigationLevel,
-                            nodeSourceType = nodeSourceType,
-                            parentHandle = parentHandle
-                        )
-                    )
-                }
+            )
+
+            cloudDriveScreen(
+                navigationHandler = navigationHandler,
+                onBack = navigationHandler::back,
+                onTransfer = transferHandler::setTransferEvent,
+                setNavigationBarVisibility = navigationController::showNavigation,
             )
         }
 
@@ -44,7 +43,7 @@ class DriveSyncNavItem : MainNavItem {
     override val badge: Flow<MainNavItemBadge?>? = null
 
     @StringRes
-    override val label: Int = sharedR.string.general_section_cloud_drive
+    override val label: Int = sharedR.string.general_drive
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(1)
     override val availableOffline: Boolean = false
     override val analyticsEventIdentifier: NavigationEventIdentifier =

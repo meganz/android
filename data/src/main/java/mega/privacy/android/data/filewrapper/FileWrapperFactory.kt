@@ -37,11 +37,6 @@ internal class FileWrapperFactory(
                     getPathFunction = {
                         fileGateway.getExternalPathByUriSync(uriPath.value)
                     },
-                    getParentUriFunction = {
-                        fileGateway.getParentSync(uriPath)?.let {
-                            invoke(it)
-                        }
-                    },
                     deleteFileFunction = {
                         fileGateway.deleteIfItIsAFileSync(uriPath)
                     },
@@ -55,6 +50,21 @@ internal class FileWrapperFactory(
                         fileGateway.renameFileSync(uriPath, it)?.let {
                             invoke(it)
                         }
+                    },
+                    renameOverwriteFunction = { parentUriString, newName, overwrite ->
+                        fileGateway.renameFileOverwriteSync(
+                            uriPath = uriPath,
+                            parentUriPath = UriPath(parentUriString),
+                            newName = newName,
+                            overwrite = overwrite
+                        )?.let { invoke(it) }
+                    },
+                    moveDocumentFunction = { sourceParentUriString, targetParentUriString ->
+                        fileGateway.moveDocumentSync(
+                            uriPath = uriPath,
+                            sourceParentUriPath = UriPath(sourceParentUriString),
+                            targetParentUriPath = UriPath(targetParentUriString),
+                        )?.let { invoke(it) }
                     },
                     getChildByNameFunction = { name ->
                         fileGateway.getChildByName(uriPath, name)?.value
@@ -70,6 +80,16 @@ internal class FileWrapperFactory(
                             createIfMissing = createIfMissing,
                             lastAsFolder = lastAsFolder
                         )?.value
+                    },
+                    getChildrenWithMetadataFunction = {
+                        // For non-folders the empty list is a deterministic answer, not a
+                        // failure — return empty rather than null so the C++ side does not
+                        // see SCAN_INACCESSIBLE for a regular file.
+                        if (isFolder) {
+                            fileGateway.getChildrenWithMetadataSync(uriPath.toUri())
+                        } else {
+                            emptyList()
+                        }
                     }
                 )
             }

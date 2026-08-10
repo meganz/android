@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.logout
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -8,8 +9,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.indicators.LargeHUD
-import mega.android.core.ui.components.surface.BoxSurface
-import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.app.R
@@ -41,9 +40,8 @@ internal fun LogoutConfirmationDialogM3(
         }
 
         LogoutState.Loading -> {
-            BoxSurface(
-                modifier = Modifier.fillMaxSize(),
-                surfaceColor = SurfaceColor.Blur
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
                 LargeHUD(
                     modifier = Modifier

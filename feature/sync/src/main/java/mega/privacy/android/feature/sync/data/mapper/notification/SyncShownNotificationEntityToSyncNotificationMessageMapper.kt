@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.data.mapper.notification
 
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
 import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
@@ -30,7 +29,8 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapper @Injec
                 genericErrorToNotificationMessageMapper(
                     SyncNotificationType.valueOf(dbEntity.notificationType),
                     notificationDetails?.path ?: "",
-                    notificationDetails?.errorCode ?: 0
+                    notificationDetails?.errorCode ?: 0,
+                    notificationDetails?.formattedConflictBody,
                 )
             }
         }
@@ -52,6 +52,10 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapper @Injec
             SyncNotificationType.STALLED_ISSUE,
             SyncNotificationType.ERROR,
                 -> {
+                json.encodeToString(domainModel.notificationDetails)
+            }
+
+            SyncNotificationType.CROSS_DEVICE_CONFLICT -> {
                 json.encodeToString(domainModel.notificationDetails)
             }
 

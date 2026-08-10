@@ -1,6 +1,8 @@
 package mega.privacy.android.app.main
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -8,9 +10,11 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,20 +24,31 @@ import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.appcompat.widget.SearchView
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation3.runtime.NavKey
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -46,6 +61,10 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher
+import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
@@ -64,62 +83,81 @@ import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT_CAMER
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.SHARE_LINK
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.UPLOAD
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter
-import mega.privacy.android.app.main.legacycontact.AddContactActivity
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.ALLOW_ADD_PARTICIPANTS
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_CHAT_LINK
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_CHAT_TITLE
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_CONTACTS
-import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_CONTACT_TYPE
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_EKR
-import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_ONLY_CREATE_GROUP
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
+import mega.privacy.android.app.menu.presentation.MenuHomeScreen
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
-import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanUploadingWarningDialog
+import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
-import mega.privacy.android.app.presentation.upload.UploadDestinationActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
-import mega.privacy.android.app.utils.MegaNodeUtil.cloudRootHandle
-import mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder
-import mega.privacy.android.app.utils.MegaNodeUtil.myChatFilesFolder
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
+import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.destination.ChatListNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.CopyResult
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.navigation.destination.ImportNavKey
+import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.MoveResult
+import mega.privacy.android.navigation.destination.SelectCUFolderNavKey
+import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
+import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
+import mega.privacy.android.shared.nodes.dialog.DiscardScanWarningDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToCloudDriveEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
@@ -133,22 +171,15 @@ import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaEvent
-import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
-import nz.mega.sdk.MegaSet
-import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
-import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedR
 
 
 /**
@@ -170,7 +201,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  */
 @AndroidEntryPoint
 class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
-    MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener,
+    MegaChatRequestListenerInterface, View.OnClickListener,
     ActionNodeCallback, SnackbarShower {
 
     /**
@@ -189,6 +220,16 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     lateinit var copyNodeUseCase: CopyNodeUseCase
 
     @Inject
+    lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var navigationEventQueue: NavigationEventQueue
+
+    @Inject
+    @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
+
+    @Inject
     @LoginMutex
     lateinit var loginMutex: Mutex
 
@@ -196,12 +237,30 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
+
+    @Inject
+    lateinit var getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase
+
+    @Inject
+    lateinit var chatController: ChatController
+
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    @Inject
+    lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
+
+    @Inject
+    lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
+
     private val viewModel by viewModels<FileExplorerViewModel>()
 
     private lateinit var binding: ActivityFileExplorerBinding
-    private val isFromUploadDestinationActivity by lazy {
-        intent.hasExtra(UploadDestinationActivity.EXTRA_NAVIGATION)
-    }
 
     var isList = true
         private set
@@ -242,7 +301,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var importFileF = false
     private var importFragmentSelected = -1
     private var action: String? = null
-    private var myChatFilesNode: MegaNode? = null
+    private var myChatFilesFolderHandle: Long? = null
     private val attachNodes: ArrayList<MegaNode> = ArrayList()
     private val uploadDocuments: ArrayList<DocumentEntity> = ArrayList()
     private var filesChecked = 0
@@ -258,14 +317,29 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var currentAction: String? = null
     private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null
     private var parentHandle: Long = 0
+    private var shouldLeaveApp = false
 
     private val nameCollisionActivityLauncher = registerForActivityResult(
         NameCollisionActivityContract()
     ) { result ->
         viewModel.setIsAskingForCollisionsResolution(isAskingForCollisionsResolution = false)
-        backToCloud(
-            if (result != null) parentHandle else INVALID_HANDLE,
-            result
+
+        // Get count of non-collided files that were uploaded
+        val nonCollidedFilesUploadedCount = viewModel.getAndClearNonCollidedFilesUploadedCount()
+
+        // Determine the final message to show:
+        // 1. Priority: collision resolution result message (if files were uploaded via collision resolution)
+        // 2. Fallback: show message if non-collided files were uploaded
+        val finalMessage = when {
+            result != null -> result  // NameCollisionActivity already set message if files were uploaded
+            nonCollidedFilesUploadedCount > 0 -> getString(sharedR.string.transfers_upload_started_snackbar)
+            else -> null
+        }
+
+        // If got message, show message. If got parentHandle, navigate to the destination folder
+        finishShareAndBack(
+            if (parentHandle != 0L) parentHandle else INVALID_HANDLE,
+            finalMessage
         )
     }
 
@@ -282,7 +356,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             if (importFileF && importFragmentSelected != CLOUD_FRAGMENT) {
                 when (importFragmentSelected) {
                     CHAT_FRAGMENT -> {
-                        if (ACTION_UPLOAD_TO_CHAT == action) {
+                        if (ACTION_UPLOAD_SCAN_TO_CHAT == action) {
                             if (chatExplorer != null && chatExplorer?.isSelectMode == true) {
                                 chatExplorer?.clearSelections()
                             } else {
@@ -294,11 +368,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             if (chatExplorer != null) {
                                 chatExplorer?.clearSelections()
                                 showFabButton(false)
-                                if (isFromUploadDestinationActivity) {
-                                    finishAndRemoveTask()
-                                } else {
-                                    chooseFragment(IMPORT_FRAGMENT)
-                                }
+                                chooseFragment(IMPORT_FRAGMENT)
                             }
                         }
                     }
@@ -344,13 +414,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 if (totalAttached + totalErrors == pendingToAttach) {
                     finishFileExplorer()
                     if (totalErrors == 0 || totalAttached > 0) {
-                        val intent = Intent(this, ManagerActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        intent.action = Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE
-                        if (chatListItems.size == 1) {
-                            intent.putExtra(Constants.CHAT_ID, chatListItems[0].chatId)
-                        }
-                        startActivity(intent)
+                        navigateToChat()
                     } else {
                         showSnackbar(getString(R.string.files_send_to_chat_error))
                     }
@@ -367,7 +431,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
-        showSnackbar(type, binding.fragmentContainerFileExplorer, content, chatId)
+        // Method might be called from other activity, and there's a possibility that the view
+        // might be null
+        if (::binding.isInitialized) {
+            showSnackbar(type, binding.fragmentContainerFileExplorer, content, chatId)
+        }
     }
 
     private fun onProcessAsyncInfo(documents: List<DocumentEntity>?) {
@@ -377,14 +445,16 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         if (needLogin) {
-            val loginIntent = intent.setClass(this@FileExplorerActivity, LoginActivity::class.java)
-                .apply {
-                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                    putExtra(EXTRA_FROM_SHARE, true)
-                    // close previous login page
-                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    action = Constants.ACTION_FILE_EXPLORER_UPLOAD
-                }
+            val targetIntent = Intent(intent).apply {
+                setClass(this@FileExplorerActivity, FileExplorerActivity::class.java)
+            }
+            val loginIntent = MegaActivityInternalLauncher.getIntent(
+                context = this@FileExplorerActivity,
+                warningMessage = getString(R.string.login_before_share),
+            ).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                putExtra(MegaActivityInternalLauncher.LAUNCH_INTENT, targetIntent)
+            }
 
             needLogin = false
             startActivity(loginIntent)
@@ -401,7 +471,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         } else if (importFileF) {
             when {
                 importFragmentSelected != -1 -> chooseFragment(importFragmentSelected)
-                ACTION_UPLOAD_TO_CHAT == action -> chooseFragment(CHAT_FRAGMENT)
+                ACTION_UPLOAD_SCAN_TO_CHAT == action -> chooseFragment(CHAT_FRAGMENT)
                 else -> chooseFragment(IMPORT_FRAGMENT)
             }
 
@@ -417,17 +487,40 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             else -> super.onKeyDown(keyCode, event)
         }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        Timber.d("onNewIntent: action=%s", intent.action)
+        shouldLeaveApp =
+            intent.action == Intent.ACTION_SEND || intent.action == Intent.ACTION_SEND_MULTIPLE
+        setIntent(intent)
+        importFileFragment = null
+        chatExplorer = null
+        importFragmentSelected = -1
+        viewModel.resetForNewIntent()
+        observeAsyncDocuments()
+        viewModel.ownFilePrepareTask(this, intent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         Timber.d("onCreate first")
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        shouldLeaveApp =
+            intent?.action == Intent.ACTION_SEND || intent?.action == Intent.ACTION_SEND_MULTIPLE
+        binding = ActivityFileExplorerBinding.inflate(layoutInflater)
+        consumeInsetsWithToolbar(
+            type = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            customToolbar = binding.appBarLayoutExplorer
+        )
+        setContentView(binding.root)
+        viewModel.initCloudExplorerState(intent.getLongArrayExtra("MOVE_FROM"))
         credentials = runBlocking {
             runCatching {
                 getAccountCredentialsUseCase()
             }.getOrNull()
         }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-        megaApi.addGlobalListener(this)
 
         createChatLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -508,8 +601,15 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
             }
 
-        setupObservers()
+        setupObservers(savedInstanceState)
+    }
 
+    override fun onStop() {
+        super.onStop()
+        shouldLeaveApp = false
+    }
+
+    private fun proceedWithInitialization(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
             with(savedInstanceState) {
                 Timber.d("Bundle is NOT NULL")
@@ -542,8 +642,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 if (getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
                     newFolderDialog =
                         showNewFolderDialog(
-                            this@FileExplorerActivity, this@FileExplorerActivity,
-                            currentParentNode, savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT)
+                            context = this@FileExplorerActivity,
+                            actionNodeCallback = this@FileExplorerActivity,
+                            parentNode = currentParentNode,
+                            typedText = savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT),
+                            getRootNodeUseCase = getRootNodeUseCase,
+                            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                         )
                 }
             }
@@ -571,15 +675,20 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         if (credentials == null) {
             Timber.w("User credentials NULL")
             if (viewModel.isImportingText(intent)) {
+                val targetIntent = Intent(this, FileExplorerActivity::class.java)
+                    .putExtra(Intent.EXTRA_TEXT, intent.getStringExtra(Intent.EXTRA_TEXT))
+                    .putExtra(Intent.EXTRA_SUBJECT, intent.getStringExtra(Intent.EXTRA_SUBJECT))
+                    .putExtra(Intent.EXTRA_EMAIL, intent.getStringExtra(Intent.EXTRA_EMAIL))
+                    .setAction(intent.action)
+                    .setType(Constants.TYPE_TEXT_PLAIN)
                 startActivity(
-                    Intent(this, LoginActivity::class.java)
-                        .putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                        .putExtra(Intent.EXTRA_TEXT, intent.getStringExtra(Intent.EXTRA_TEXT))
-                        .putExtra(Intent.EXTRA_SUBJECT, intent.getStringExtra(Intent.EXTRA_SUBJECT))
-                        .putExtra(Intent.EXTRA_EMAIL, intent.getStringExtra(Intent.EXTRA_EMAIL))
-                        .setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD)
-                        .setType(Constants.TYPE_TEXT_PLAIN)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    MegaActivityInternalLauncher.getIntent(
+                        context = this,
+                        warningMessage = getString(R.string.login_before_share),
+                    ).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        putExtra(MegaActivityInternalLauncher.LAUNCH_INTENT, targetIntent)
+                    }
                 )
 
                 finish()
@@ -599,10 +708,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         if (savedInstanceState != null) {
             folderSelected = savedInstanceState.getBoolean("folderSelected", false)
         }
-        enableEdgeToEdge()
-        binding = ActivityFileExplorerBinding.inflate(layoutInflater)
-        consumeInsetsWithToolbar(customToolbar = binding.appBarLayoutExplorer)
-        setContentView(binding.root)
         addStartUploadTransferView()
 
         setSupportActionBar(binding.toolbarExplorer)
@@ -632,7 +737,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 val gSession = credentials?.session
                 lifecycleScope.launch {
                     loginMutex.lock()
-                    ChatUtil.initMegaChatApi(gSession, this@FileExplorerActivity)
+                    ChatUtil.initMegaChatApi(
+                        gSession,
+                        this@FileExplorerActivity,
+                        megaChatApi
+                    )
                     megaApi.fastLogin(gSession, this@FileExplorerActivity)
                 }
             } else {
@@ -644,7 +753,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             afterLoginAndFetch()
         }
 
-        handleImportFromUploadDestination()
         window.setFlags(
             WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
             WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
@@ -660,14 +768,43 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             val state by viewModel.uiState.collectAsStateWithLifecycle()
 
             OriginalTheme(isDark = isDark) {
+                EventEffect(
+                    event = state.nodeUpdatedEvent,
+                    onConsumed = viewModel::consumeNodeUpdate
+                ) {
+                    handleNodeUpdates()
+                }
+
+                EventEffect(
+                    event = state.navigateToCloud,
+                    onConsumed = viewModel::consumeFolderDestinations
+                ) {
+                    navigateToCloud(
+                        nodeId = it.nodeId,
+                        folderDestinations = it.folderDestinations,
+                        message = it.message
+                    )
+                }
+
+                EventEffect(
+                    event = state.noFilesToUploadEvent,
+                    onConsumed = viewModel::onConsumeNoFilesToUploadEvent
+                ) {
+                    dismissAlertDialogIfExists(statusDialog)
+                    finishShareAndBack(
+                        INVALID_HANDLE,
+                        getString(sharedR.string.unable_to_open_selected_file_message)
+                    )
+                }
+
                 if (state.isUploadingScans && state.isScanUploadingAborted) {
-                    DiscardScanUploadingWarningDialog(
+                    DiscardScanWarningDialog(
                         hasMultipleScans = state.hasMultipleScans,
-                        onWarningAcknowledged = {
+                        onDiscard = {
                             viewModel.setIsScanUploadingAborted(false)
                             viewModel.setShouldFinishScreen(true)
                         },
-                        onWarningDismissed = {
+                        onCancel = {
                             viewModel.setIsScanUploadingAborted(false)
                         },
                     )
@@ -676,23 +813,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    private fun handleImportFromUploadDestination() {
-        if (isFromUploadDestinationActivity) {
-            val fragment =
-                intent.getIntExtra(UploadDestinationActivity.EXTRA_NAVIGATION, CLOUD_FRAGMENT)
-            importFileF = true
-            importFragmentSelected = fragment
-            chooseFragment(fragment)
-            viewModel.ownFilePrepareTask(this, intent)
-            createAndShowProgressDialog(
-                false,
-                resources.getQuantityString(R.plurals.upload_prepare, 1)
-            )
-        }
-    }
-
-    private fun setupObservers() {
-        this.lifecycleScope.launch {
+    /**
+     * Wait for the next non-empty `documents` emission and forward it to
+     * [onProcessAsyncInfo]. Re-launched on each new intent because it terminates after
+     * the first emission via `firstOrNull`.
+     */
+    private fun observeAsyncDocuments() {
+        lifecycleScope.launch {
             val documents = viewModel.uiState
                 .mapNotNull { it.documents.takeIf { it.isNotEmpty() } }
                 .flowWithLifecycle(this@FileExplorerActivity.lifecycle, Lifecycle.State.STARTED)
@@ -701,12 +828,62 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }.firstOrNull()
             onProcessAsyncInfo(documents)
         }
+    }
+
+    @SuppressLint("UnsafeIntentLaunch")
+    private fun setupObservers(savedInstanceState: Bundle?) {
+        observeAsyncDocuments()
         viewModel.textInfo.observe(this) { dismissAlertDialogIfExists(statusDialog) }
 
         collectFlow(viewModel.uiState) { fileExplorerState ->
             if (fileExplorerState.shouldFinishScreen) {
-                finishAndRemoveTask()
+                if (mode == UPLOAD) {
+                    if (shouldLeaveApp) {
+                        moveTaskToBack(true)
+                    }
+                    finishAndRemoveTask()
+                } else {
+                    finish()
+                }
                 viewModel.setShouldFinishScreen(false)
+            }
+        }
+
+        collectFlow(viewModel.uiState.map { it.isFeatureFlagEnabled }
+            .distinctUntilChanged()) { isEnabled ->
+            isEnabled?.let {
+                if (isEnabled) {
+                    val cloudExplorerKey = cloudExplorerInitialKey(
+                        disabledTargetId = viewModel.uiState.value.disabledTargetId
+                    )
+
+                    when {
+                        intent.action == Intent.ACTION_SEND ||
+                                intent.action == Intent.ACTION_SEND_MULTIPLE -> {
+                            intent.setClass(
+                                this@FileExplorerActivity,
+                                MegaActivity::class.java
+                            ).also {
+                                if (credentials == null) {
+                                    it.putExtra(
+                                        Constants.INTENT_EXTRA_WARNING_MESSAGE,
+                                        getString(R.string.login_before_share)
+                                    )
+                                }
+                                it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                startActivity(it)
+                            }
+                            finish()
+                        }
+
+                        cloudExplorerKey != null -> showCloudExplorer(cloudExplorerKey)
+
+                        else -> proceedWithInitialization(savedInstanceState)
+                    }
+                } else {
+                    proceedWithInitialization(savedInstanceState)
+                }
+                viewModel.consumeFeatureFlag()
             }
         }
 
@@ -725,12 +902,151 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
+    /**
+     * Maps the launching intent action to the matching `:feature:cloudexplorer` destination, or null
+     * when the action has no compose destination (then the legacy fragment UI is used).
+     */
+    private fun cloudExplorerInitialKey(disabledTargetId: NodeId?): NavKey? = when (intent.action) {
+        ACTION_PICK_COPY_FOLDER ->
+            CopyNavKey(nodeIds = intent.getLongArrayExtra("COPY_FROM")?.map { NodeId(it) }
+                .orEmpty())
+
+        ACTION_PICK_MOVE_FOLDER -> {
+            val moveFromHandles = intent.getLongArrayExtra("MOVE_FROM")
+            MoveNavKey(
+                nodeIds = moveFromHandles?.map { NodeId(it) }.orEmpty(),
+                disabledTargetId = disabledTargetId ?: NodeId(-1),
+            )
+        }
+
+        ACTION_CHOOSE_MEGA_FOLDER_SYNC -> SelectCUFolderNavKey
+
+        ACTION_PICK_IMPORT_FOLDER -> ImportNavKey
+
+        ACTION_MULTISELECT_FILE ->
+            ShareFilesToChatNavKey(chatId = MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+
+        ACTION_UPLOAD_SCAN_TO_CLOUD ->
+            IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
+                ?.let { uri ->
+                    UploadScannedDocumentNavKey(
+                        uriPath = uri.toUriPath(),
+                        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                        hasMultipleScans = intent.getBooleanExtra(EXTRA_HAS_MULTIPLE_SCANS, false),
+                    )
+                }
+
+        else -> null
+    }
+
+    /**
+     * Hosts the new `:feature:cloudexplorer` flow rooted at [initialKey] and bridges its result back to
+     * the legacy `setResult` contract that callers expect, then finishes.
+     */
+    private fun showCloudExplorer(initialKey: NavKey) {
+        // onCreate's consumeInsetsWithToolbar (for the legacy XML layout) consumes window insets and
+        // margins the content view, which clips the compose explorer under the status bar and short
+        // of the navigation bar. Pass insets through untouched (clearing the stale margins) so the
+        // explorer's MegaScaffold handles edge-to-edge exactly like in MegaActivity.
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = 0
+                topMargin = 0
+                rightMargin = 0
+                bottomMargin = 0
+            }
+            insets
+        }
+        collectCloudExplorerResults()
+        setContent {
+            val themeMode by monitorThemeModeUseCase()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            LegacyActivityScaffold(
+                container = { content ->
+                    MegaAppContainer(
+                        themeMode = themeMode,
+                        content = content
+                    )
+                },
+                initialKey = initialKey,
+                navigationResultManager = navigationResultManager,
+                featureDestinations = featureDestinations,
+                appDialogDestinations = appDialogDestinations,
+                onEmptyBackStack = {
+                    if (!isFinishing) {
+                        setResult(RESULT_CANCELED)
+                        finishAndRemoveTask()
+                    }
+                },
+            ) { _, _ -> }
+        }
+    }
+
+    private fun collectCloudExplorerResults() {
+        collectCloudExplorerResult<CopyResult>(CopyNavKey.RESULT) { result ->
+            setResult(RESULT_OK, Intent().apply {
+                putExtra("COPY_TO", result.target.longValue)
+                putExtra("COPY_HANDLES", result.nodeIds.map { it.longValue }.toLongArray())
+            })
+            finishAndRemoveTask()
+        }
+        collectCloudExplorerResult<MoveResult>(MoveNavKey.RESULT) { result ->
+            setResult(RESULT_OK, Intent().apply {
+                putExtra("MOVE_TO", result.target.longValue)
+                putExtra("MOVE_HANDLES", result.nodeIds.map { it.longValue }.toLongArray())
+            })
+            finishAndRemoveTask()
+        }
+        collectCloudExplorerResult<NodeId>(SelectCUFolderNavKey.RESULT) { nodeId ->
+            setResult(RESULT_OK, Intent().apply {
+                putExtra(EXTRA_MEGA_SELECTED_FOLDER, nodeId.longValue)
+                putExtra(EXTRA_IS_FOLDER_FROM_INCOMING, false)
+            })
+            finishAndRemoveTask()
+        }
+        collectCloudExplorerResult<NodeId>(ImportNavKey.RESULT) { nodeId ->
+            setResult(RESULT_OK, Intent().apply {
+                putExtra(INTENT_EXTRA_KEY_IMPORT_TO, nodeId.longValue)
+                intent.getLongArrayExtra(INTENT_EXTRA_KEY_IMPORT_CHAT)?.let {
+                    putExtra(INTENT_EXTRA_KEY_IMPORT_CHAT, it)
+                }
+            })
+            finishAndRemoveTask()
+        }
+        collectCloudExplorerResult<List<NodeId>>(ShareFilesToChatNavKey.RESULT) { nodeIds ->
+            setResult(RESULT_OK, Intent().apply {
+                putExtra(Constants.NODE_HANDLES, nodeIds.map { it.longValue }.toLongArray())
+                putStringArrayListExtra(
+                    Constants.SELECTED_CONTACTS,
+                    intent.getStringArrayListExtra(Constants.SELECTED_CONTACTS),
+                )
+            })
+            finishAndRemoveTask()
+        }
+    }
+
+    private inline fun <reified T> collectCloudExplorerResult(
+        resultKey: String,
+        crossinline onResult: (T) -> Unit,
+    ) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                navigationResultManager.monitorResult<T>(resultKey)
+                    .filterNotNull()
+                    .collect { result ->
+                        navigationResultManager.clearResult(resultKey)
+                        onResult(result)
+                    }
+            }
+        }
+    }
+
     private fun afterLoginAndFetch() {
         handler = Handler(Looper.getMainLooper())
         Timber.d("SHOW action bar")
 
         val upButtonRes =
-            if (intent.action == ACTION_SAVE_TO_CLOUD || intent.action == ACTION_UPLOAD_TO_CHAT) {
+            if (isDocumentScannerAction()) {
                 // Use the "X" Button when accessing this Activity from Document Scanner
                 R.drawable.ic_close_white
             } else {
@@ -752,15 +1068,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             val title: String?
 
             when (intent.action) {
-                ACTION_SELECT_FOLDER_TO_SHARE -> {
-                    Timber.d("action = ACTION_SELECT_FOLDER_TO_SHARE")
-                    //Just show Cloud Drive, no INCOMING tab , no need of tabhost
-                    mode = SELECT
-                    title = getString(R.string.title_share_folder_explorer)
-                    setView(CLOUD_TAB, false)
-                    tabShown = NO_TABS
-                }
-
                 ACTION_MULTISELECT_FILE -> {
                     Timber.d("action = ACTION_MULTISELECT_FILE")
                     //Just show Cloud Drive, no INCOMING tab , no need of tabhost
@@ -794,8 +1101,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                     viewModel.getCopyTargetPath()
                     copyFromHandles?.let { handles ->
-                        parentMoveCopy =
-                            megaApi.getParentNode(megaApi.getNodeByHandle(handles[0]))
+                        if (handles.isNotEmpty()) {
+                            parentMoveCopy =
+                                megaApi.getParentNode(megaApi.getNodeByHandle(handles[0]))
+                        }
                     }
 
                     title = getString(R.string.title_share_folder_explorer)
@@ -815,7 +1124,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     setView(SHOW_TABS, true)
                 }
 
-                ACTION_SAVE_TO_CLOUD -> {
+                ACTION_UPLOAD_SCAN_TO_CLOUD -> {
                     Timber.d("action = SAVE to Cloud Drive")
                     mode = SAVE
                     isSelectFile = false
@@ -843,7 +1152,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     importFileF = true
                     viewModel.ownFilePrepareTask(this, intent)
                     chooseFragment(
-                        if (intent.action == ACTION_UPLOAD_TO_CHAT) {
+                        if (intent.action == ACTION_UPLOAD_SCAN_TO_CHAT) {
                             CHAT_FRAGMENT
                         } else {
                             IMPORT_FRAGMENT
@@ -862,10 +1171,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("action = UPLOAD")
         mode = UPLOAD
         action = intent.action
-        createAndShowProgressDialog(
-            false,
-            resources.getQuantityString(R.plurals.upload_prepare, 1)
-        )
+
+        if (viewModel.uiState.value.documents.isEmpty()) {
+            createAndShowProgressDialog(
+                false,
+                resources.getQuantityString(R.plurals.upload_prepare, 1)
+            )
+        }
 
         with(binding) {
             cloudDriveFrameLayout.isVisible = true
@@ -904,7 +1216,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 explorerTabsPager
             ) { tab: TabLayout.Tab, tabPosition: Int ->
                 tab.text = when (tabPosition) {
-                    1 -> getString(R.string.tab_incoming_shares)
+                    1 -> getString(sharedR.string.shares_screen_incoming_shares_tab_title)
                     2 -> getString(sharedR.string.general_chat)
                     0 -> getString(R.string.section_cloud_drive)
                     else -> getString(R.string.section_cloud_drive)
@@ -1216,8 +1528,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     setCreateFolderVisibility()
                     newChatMenuItem?.isVisible = false
 
+                    cDriveExplorer = cloudExplorerFragment
+                    // Show search menu if folder is not empty and in file selector mode
                     if (isMultiselect) {
-                        cDriveExplorer = cloudExplorerFragment
                         searchMenuItem?.isVisible =
                             cDriveExplorer != null && cDriveExplorer?.isFolderEmpty() == false
                     }
@@ -1246,6 +1559,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                     newChatMenuItem?.isVisible = false
 
+                    // Show search menu if folder is not empty and in file selector mode
                     if (isMultiselect) {
                         searchMenuItem?.isVisible = iSharesExplorer?.isFolderEmpty() == false
                     }
@@ -1477,9 +1791,34 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
+    /**
+     * Recursively clear large data from Bundle and its nested Bundles
+     */
+    private fun clearLargeDataFromBundle(bundle: Bundle) {
+        // Clear large data from current Bundle
+        bundle.remove(Intent.EXTRA_STREAM)
+        bundle.remove(Intent.EXTRA_TEXT)
+
+        // Recursively process all nested Bundles
+        bundle.keySet().forEach { key ->
+            bundle.getBundle(key)?.let { nestedBundle ->
+                clearLargeDataFromBundle(nestedBundle)
+            }
+        }
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         Timber.d("onSaveInstanceState")
         super.onSaveInstanceState(outState)
+
+        // Clear large data from all ViewModels' SavedStateHandle
+        // This is the key to solving TransactionTooLargeException，e.g., share 200+ files from File
+        runCatching {
+            clearLargeDataFromBundle(outState)
+            Timber.d("Cleared large data from all ViewModels")
+        }.onFailure {
+            Timber.e(it, "Failed to clear large data from ViewModels")
+        }
 
         with(outState) {
             putBoolean("folderSelected", folderSelected)
@@ -1494,7 +1833,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             putBoolean("importFileF", importFileF)
             putInt("importFragmentSelected", importFragmentSelected)
             putString("action", action)
-            chatExplorerFragment?.let {
+            chatExplorerFragment?.takeIf { it.isAdded }?.let {
                 supportFragmentManager.putFragment(this, "chatExplorerFragment", it)
             }
             putString("querySearch", querySearch)
@@ -1511,11 +1850,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun performImportFileBack() {
         if (importFileF) {
-            if (isFromUploadDestinationActivity) {
-                finishAndRemoveTask()
-            } else {
-                chooseFragment(IMPORT_FRAGMENT)
-            }
+            chooseFragment(IMPORT_FRAGMENT)
         } else {
             viewModel.handleBackNavigation()
         }
@@ -1545,7 +1880,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun startChatUploadService() {
         if (chatListItems.isEmpty()) {
             Timber.w("ERROR null chats to upload")
-            openManagerAndFinish()
+            openMainActivityAndFinish()
             return
         }
 
@@ -1575,24 +1910,36 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         val nodeIds = nodeHandles.map { NodeId(it) }
         checkNotificationsPermission(this)
         viewModel.uploadFilesToChat(
-            chatIds, documentsToShare ?: emptyList(), nodeIds,
+            chatIds, documentsToShare, nodeIds, getPitagTrigger(),
             toDoAfter = {
-                openManagerAndFinish()
+                navigateToChat()
             }
         )
     }
 
-    private fun openManagerAndFinish() {
-        val intent = Intent(this, ManagerActivity::class.java).apply {
-            if (isFromUploadDestinationActivity) {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            } else {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    private fun openMainActivityAndFinish() {
+        startActivity(MegaActivity.getIntent(this).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+        finish()
+    }
+
+    /**
+     * Starts [MegaActivity] and queues the provided [destinations] so they are consumed
+     * after the activity is created. Uses an application-scoped coroutine because this
+     * activity is typically finishing immediately after the call.
+     */
+    private fun launchMegaActivityWithDestinations(
+        destinations: List<NavKey>,
+        warningMessage: String? = null,
+    ) {
+        startActivity(
+            MegaActivity.getIntent(this, warningMessage = warningMessage)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        )
+        if (destinations.isNotEmpty()) {
+            applicationScope.launch {
+                navigationEventQueue.emit(destinations)
             }
         }
-        startActivity(intent)
-        finish()
     }
 
     private fun finishFileExplorer() {
@@ -1610,7 +1957,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             val fingerprint = megaApi.getFingerprint(info.uri.value)
             val node = megaApi.getNodeByFingerprint(fingerprint)
             if (node != null) {
-                if (node.parentHandle == myChatFilesNode?.handle) {
+                if (node.parentHandle == myChatFilesFolderHandle) {
                     //	File is in My Chat Files --> Add to attach
                     attachNodes.add(node)
                     filesChecked++
@@ -1619,7 +1966,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     // Note: This block is executed when a file is first uploaded to a cloud drive,
                     //       and then sent to chat again via the Share Intent from another app.
                     lifecycleScope.launch {
-                        val newParentNodeHandle = myChatFilesNode?.handle
+                        val newParentNodeHandle = myChatFilesFolderHandle
                         runCatching {
                             requireNotNull(newParentNodeHandle)
                             copyNodeUseCase(
@@ -1665,19 +2012,21 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             intent.action = ACTION_PROCESSED
         }
 
-        when {
-            infos == null -> {
-                dismissAlertDialogIfExists(statusDialog)
-                showSnackbar(getString(R.string.upload_can_not_open))
-            }
+        if (infos == null) {
+            dismissAlertDialogIfExists(statusDialog)
+            showSnackbar(getString(sharedR.string.unable_to_open_selected_file_message))
+            return
+        }
 
-            existsMyChatFilesFolder() -> {
-                setMyChatFilesFolder(myChatFilesFolder)
+        lifecycleScope.launch {
+            val chatFilesFolderId = runCatching { getMyChatsFilesFolderIdUseCase() }
+                .onFailure { Timber.e(it, "Error getting my chat files folder id") }
+                .getOrNull()
+            if (chatFilesFolderId != null) {
+                setMyChatFilesFolderHandle(chatFilesFolderId.longValue)
                 checkIfFilesExistsInMEGA()
-            }
-
-            else -> {
-                megaApi.getMyChatFilesFolder(GetAttrUserListener(this))
+            } else {
+                megaApi.getMyChatFilesFolder(GetAttrUserListener(this@FileExplorerActivity))
             }
         }
     }
@@ -1694,7 +2043,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         if (folderSelected) {
             if (documents.isEmpty()) {
                 dismissAlertDialogIfExists(statusDialog)
-                showSnackbar(getString(R.string.upload_can_not_open))
+                showSnackbar(getString(sharedR.string.unable_to_open_selected_file_message))
                 return
             }
 
@@ -1720,7 +2069,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 runCatching {
                     checkFileNameCollisionsUseCase(
                         files = documents,
-                        parentNodeId = NodeId(parentHandle)
+                        parentNodeId = NodeId(parentHandle),
+                        pitagTrigger = getPitagTrigger(),
                     )
                 }.onSuccess { collisions ->
                     dismissAlertDialogIfExists(statusDialog)
@@ -1730,7 +2080,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
                     collisions.map { it.path.value }.let { collidedPaths ->
                         if (collidedPaths.size < documents.size) {
-                            viewModel.uploadFiles(parentHandle, collidedPaths)
+                            viewModel.uploadFiles(parentHandle, collidedPaths, getPitagTrigger())
                         }
                     }
                 }.onFailure {
@@ -1839,7 +2189,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                 UPLOAD, SAVE -> {
                     Timber.d("mode UPLOAD")
-                    if (intent.action == ACTION_SAVE_TO_CLOUD) {
+                    if (intent.action == ACTION_UPLOAD_SCAN_TO_CLOUD) {
                         logDocumentScanEvent(isCloudDrive = true)
                     }
                     if (viewModel.isImportingText(intent)) {
@@ -1898,13 +2248,19 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (isSelectFile) {
                         val intent = Intent()
                         intent.putExtra(EXTRA_SELECTED_FOLDER, handle)
-                        intent.putStringArrayListExtra(Constants.SELECTED_CONTACTS, selectedContacts)
+                        intent.putStringArrayListExtra(
+                            Constants.SELECTED_CONTACTS,
+                            selectedContacts
+                        )
                         setResult(RESULT_OK, intent)
                         finishAndRemoveTask()
                     } else {
                         val intent = Intent()
                         intent.putExtra(EXTRA_SELECTED_FOLDER, parentNode.handle)
-                        intent.putStringArrayListExtra(Constants.SELECTED_CONTACTS, selectedContacts)
+                        intent.putStringArrayListExtra(
+                            Constants.SELECTED_CONTACTS,
+                            selectedContacts
+                        )
                         setResult(RESULT_OK, intent)
                         finishAndRemoveTask()
                     }
@@ -1918,6 +2274,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
                     val intent = Intent()
                     intent.putExtra(EXTRA_MEGA_SELECTED_FOLDER, parentNode.handle)
+                    intent.putExtra(EXTRA_IS_FOLDER_FROM_INCOMING, tabShown == INCOMING_TAB)
                     setResult(RESULT_OK, intent)
                     finishAndRemoveTask()
                 }
@@ -1944,36 +2301,36 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     /**
-     * Goes back to Cloud.
+     * Back after uploading files
      *
      * @param handle        Parent handle of the folder to open.
      * @param message       Message to show.
      */
-    private fun backToCloud(handle: Long, message: String?) = lifecycleScope.launch {
-        Timber.d("handle: %s", handle)
-        val isSingleActivity = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
-        if (isSingleActivity) {
-            finish()
-            return@launch
+    private fun finishShareAndBack(handle: Long, message: String?) = lifecycleScope.launch {
+        Timber.d("finishShareAndBack handle: %s", handle)
+        if (message != null) {
+            // Show snackbar while got message
+            showSnackbar(message)
+            delay(3000)
         }
 
-        val startIntent = Intent(this@FileExplorerActivity, ManagerActivity::class.java).apply {
-            if (isFromUploadDestinationActivity) {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            } else {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            }
-        }
+        viewModel.finishShareAndBack(handle, null, shouldLeaveApp)
+    }
 
-        if (handle != INVALID_HANDLE) {
-            startIntent.action = Constants.ACTION_OPEN_FOLDER
-            startIntent.putExtra(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, handle)
-        }
-
-        startIntent.putExtra(Constants.EXTRA_MESSAGE, message)
-
-        startActivity(startIntent)
+    private fun navigateToCloud(
+        nodeId: NodeId?,
+        folderDestinations: List<CloudDriveNavKey>?,
+        message: String?,
+    ) {
+        launchMegaActivityWithDestinations(
+            destinations = listOf(
+                HomeScreensNavKey(
+                    root = DriveSyncNavKey(),
+                    destinations = folderDestinations,
+                )
+            ),
+            warningMessage = message,
+        )
         finish()
     }
 
@@ -2007,7 +2364,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         if (file == null) {
-            showSnackbar(getString(R.string.general_text_error))
+            showSnackbar(getString(sharedR.string.general_text_error))
             return
         }
 
@@ -2023,15 +2380,16 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             uri = UriPath(it.toUri().toString()),
                         )
                     }),
-                    parentNodeId = NodeId(parentHandle)
+                    parentNodeId = NodeId(parentHandle),
+                    getPitagTrigger(),
                 )
             }.onSuccess { collisions ->
                 collisions.firstOrNull()?.let {
                     nameCollisionActivityLauncher.launch(arrayListOf(it))
-                } ?: viewModel.uploadFile(file, parentHandle)
+                } ?: viewModel.uploadFile(file, parentHandle, getPitagTrigger())
             }.onFailure {
                 Timber.e(it, "Cannot check name collisions")
-                showSnackbar(getString(R.string.general_text_error))
+                showSnackbar(getString(sharedR.string.general_text_error))
             }
         }
     }
@@ -2196,70 +2554,39 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     }
 
-    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
-
-    }
-
-    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
-        Timber.d("onUserAlertsUpdate")
-    }
-
-    override fun onEvent(api: MegaApiJava, event: MegaEvent?) {}
-
-    override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {
-    }
-
-    override fun onSetElementsUpdate(
-        api: MegaApiJava,
-        elements: ArrayList<MegaSetElement>?,
-    ) {
-    }
-
-    override fun onGlobalSyncStateChanged(api: MegaApiJava) {}
-
-    override fun onNodesUpdate(api: MegaApiJava, updatedNodes: ArrayList<MegaNode>?) {
-        Timber.d("onNodesUpdate")
-        cDriveExplorer?.let { cDriveExplorer ->
-            if (cloudExplorerFragment != null) {
-                cDriveExplorer.lifecycleScope.launch {
-                    nodes = withContext(ioDispatcher) {
-                        if (megaApi.getNodeByHandle(cDriveExplorer.parentHandle) != null) {
-                            megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.parentHandle))
-                        } else {
-                            megaApi.rootNode?.let { rootNode ->
-                                parentHandle = rootNode.handle ?: INVALID_HANDLE
-                                megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.parentHandle))
-                            }
+    private fun handleNodeUpdates() {
+        Timber.d("handleNodeUpdates")
+        val cDriveFragment = cDriveExplorer ?: return
+        if (cloudExplorerFragment != null) {
+            lifecycleScope.launch {
+                nodes = withContext(ioDispatcher) {
+                    if (megaApi.getNodeByHandle(cDriveFragment.parentHandle) != null) {
+                        megaApi.getChildren(megaApi.getNodeByHandle(cDriveFragment.parentHandle))
+                    } else {
+                        megaApi.rootNode?.let { rootNode ->
+                            parentHandle = rootNode.handle ?: INVALID_HANDLE
+                            megaApi.getChildren(megaApi.getNodeByHandle(cDriveFragment.parentHandle))
                         }
                     }
-
-                    nodes?.let {
-                        cDriveExplorer.updateNodesByAdapter(it)
-                    }
-                    cDriveExplorer.recyclerView.invalidate()
                 }
+
+                // Make sure that fragment is attached before calling its method
+                if (!cDriveFragment.isAdded) return@launch
+
+                nodes?.let {
+                    cDriveFragment.updateNodesByAdapter(it)
+                }
+                cDriveFragment.recyclerView.invalidate()
             }
         }
     }
 
     public override fun onDestroy() {
-        megaApi.removeGlobalListener(this)
         megaApi.removeRequestListener(this)
         megaChatApi.removeChatRequestListener(this)
         dismissAlertDialogIfExists(statusDialog)
         dismissAlertDialogIfExists(newFolderDialog)
         super.onDestroy()
-    }
-
-    override fun onAccountUpdate(api: MegaApiJava) {
-
-    }
-
-    override fun onContactRequestsUpdate(
-        api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>?,
-    ) {
-
     }
 
     /**
@@ -2280,10 +2607,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             R.id.cab_menu_create_folder -> {
                 newFolderDialog = showNewFolderDialog(
-                    this,
-                    this,
-                    currentParentNode,
-                    null
+                    context = this,
+                    actionNodeCallback = this,
+                    parentNode = currentParentNode,
+                    typedText = null,
+                    getRootNodeUseCase = getRootNodeUseCase,
+                    nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                 )
             }
 
@@ -2296,9 +2625,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         if (contacts.isEmpty()) {
                             showSnackbar(getString(R.string.no_contacts_invite))
                         } else {
-                            createChatLauncher.launch(
-                                Intent(this, AddContactActivity::class.java)
-                                    .putExtra(EXTRA_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                            megaNavigator.openNewChatForResult(
+                                context = this,
+                                launcher = createChatLauncher,
                             )
                         }
                     }
@@ -2370,8 +2699,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 chats = chats,
                 usersNoChatSize = users.size,
                 context = this,
-                snackbarShower = this
-            ) { resultChats: List<MegaChatRoom> -> sendToChats(resultChats) }
+                snackbarShower = this,
+                onChatsCreated = { resultChats: List<MegaChatRoom> -> sendToChats(resultChats) },
+                chatController = chatController,
+            )
 
             for (user in users) {
                 val peers = MegaChatPeerList.createInstance()
@@ -2388,7 +2719,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
         when (v.id) {
             R.id.fab_file_explorer -> {
-                if (intent.action == ACTION_UPLOAD_TO_CHAT) {
+                if (intent.action == ACTION_UPLOAD_SCAN_TO_CHAT) {
                     logDocumentScanEvent(isCloudDrive = false)
                 }
                 v.isEnabled = false
@@ -2405,10 +2736,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         if (contacts.isEmpty()) {
                             showSnackbar(getString(R.string.no_contacts_invite))
                         } else {
-                            createChatLauncher.launch(
-                                Intent(this, AddContactActivity::class.java)
-                                    .putExtra(EXTRA_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-                                    .putExtra(EXTRA_ONLY_CREATE_GROUP, true)
+                            megaNavigator.openCreateGroupChatForResult(
+                                context = this,
+                                launcher = createChatLauncher,
+                                allowEmptyGroup = false,
                             )
                         }
                     }
@@ -2436,19 +2767,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     megaChatApi.sendMessage(chatListItems[i].chatId, message)
                 }
 
-                if (chatListItems.size == 1) {
-                    val chatItem = chatListItems[0]
-                    val idChat = chatItem.chatId
-                    val intent = Intent(this, ManagerActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    intent.action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-                    intent.putExtra(Constants.CHAT_ID, idChat)
-                    startActivity(intent)
-                } else {
-                    val chatIntent = Intent(this, ManagerActivity::class.java)
-                    chatIntent.action = Constants.ACTION_CHAT_SUMMARY
-                    startActivity(chatIntent)
-                }
+                navigateToChat()
             }
 
             return
@@ -2467,6 +2786,20 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             onIntentProcessed(filePreparedDocuments)
         }
         return
+    }
+
+    private fun navigateToChat() {
+        val singleChatId = chatListItems.singleOrNull()?.chatId
+        launchMegaActivityWithDestinations(
+            destinations = listOfNotNull(
+                HomeScreensNavKey(MenuHomeScreen),
+                ChatListNavKey(),
+                singleChatId?.let {
+                    ChatNavKey(chatId = singleChatId, action = null)
+                },
+            ),
+        )
+        finish()
     }
 
     private fun onChatPresenceLastGreen(userhandle: Long, lastGreen: Int) {
@@ -2488,15 +2821,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 return supportFragmentManager.findFragmentByTag("chatExplorer") as ChatExplorerFragment?
             }
             mTabsAdapterExplorer?.getFragment(2)?.let {
-                val c = it as ChatExplorerFragment
-                return if (c.isAdded) c else null
+                return it as ChatExplorerFragment
             } ?: return null
         }
     private val incomingExplorerFragment: IncomingSharesExplorerFragment?
         get() {
             mTabsAdapterExplorer?.getFragment(1)?.let {
-                val iS = it as IncomingSharesExplorerFragment
-                return if (iS.isAdded) iS else null
+                return it as IncomingSharesExplorerFragment
             } ?: return null
         }
     private val cloudExplorerFragment: CloudDriveExplorerFragment?
@@ -2505,8 +2836,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 return supportFragmentManager.findFragmentByTag("cDriveExplorer") as CloudDriveExplorerFragment?
             }
             mTabsAdapterExplorer?.getFragment(0)?.let {
-                val cD = it as CloudDriveExplorerFragment
-                return if (cD.isAdded) cD else null
+                return it as CloudDriveExplorerFragment
             } ?: return null
         }
 
@@ -2592,7 +2922,16 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * @param myChatFilesNode The node to set.
      */
     fun setMyChatFilesFolder(myChatFilesNode: MegaNode?) {
-        this.myChatFilesNode = myChatFilesNode
+        this.myChatFilesFolderHandle = myChatFilesNode?.handle
+    }
+
+    /**
+     * Sets the handle of the "My chat files" folder.
+     *
+     * @param handle The handle to set.
+     */
+    fun setMyChatFilesFolderHandle(handle: Long) {
+        this.myChatFilesFolderHandle = handle
     }
 
     /**
@@ -2660,7 +2999,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
         when (currentTab) {
             CLOUD_FRAGMENT -> if (cloudExplorerFragment == null
-                || !hide && parentHandleCloud != cloudRootHandle && parentHandleCloud != INVALID_HANDLE
+                || !hide && parentHandleCloud != viewModel.getCloudRootHandle() && parentHandleCloud != INVALID_HANDLE
             ) {
                 return
             }
@@ -2716,13 +3055,19 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 transferEventState = viewModel.uiState.map { it.uploadEvent },
                 onConsumeEvent = viewModel::consumeUploadEvent,
             ) { startTransferEvent ->
-                if (viewModel.isAskingForCollisionsResolution()) {
-                    //Not ready to finish yet
-                    return@createStartTransferView
-                }
+                ((startTransferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.Files).let { uploadEvent ->
+                    if (viewModel.isAskingForCollisionsResolution()) {
+                        // Collision resolution is in progress, track the number of non-collided files uploaded
+                        val uploadedCount = uploadEvent.pathsAndNames.size
+                        viewModel.setNonCollidedFilesUploadedCount(uploadedCount)
+                        return@createStartTransferView
+                    }
 
-                ((startTransferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.Files).let {
-                    backToCloud(it.destinationId.longValue, null)
+                    // No collision resolution in progress, finish normally
+                    finishShareAndBack(
+                        uploadEvent.destinationId.longValue,
+                        getString(sharedR.string.transfers_upload_started_snackbar)
+                    )
                 }
             }
         )
@@ -2734,6 +3079,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             binding.explorerTabsPager.setCurrentItem(position, false)
         }
     }
+
+    private fun isDocumentScannerAction() =
+        intent.action == ACTION_UPLOAD_SCAN_TO_CLOUD || intent.action == ACTION_UPLOAD_SCAN_TO_CHAT
+
+    private fun getPitagTrigger() =
+        if (isDocumentScannerAction()) PitagTrigger.Scanner else PitagTrigger.ShareFromApp
 
     companion object {
         private const val SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH"
@@ -2781,6 +3132,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         const val EXTRA_MEGA_SELECTED_FOLDER = "EXTRA_MEGA_SELECTED_FOLDER"
 
         /**
+         * Intent extra for the folder whether it is selected from incoming share.
+         */
+        const val EXTRA_IS_FOLDER_FROM_INCOMING = "EXTRA_IS_FOLDER_FROM_INCOMING"
+
+        /**
          * Intent extra for the scan file type
          */
         const val EXTRA_SCAN_FILE_TYPE = "scan_file_type"
@@ -2815,12 +3171,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         var ACTION_PICK_IMPORT_FOLDER = "ACTION_PICK_IMPORT_FOLDER"
 
         /**
-         * Intent action for selecting a folder to share.
-         */
-        @JvmField
-        var ACTION_SELECT_FOLDER_TO_SHARE = "ACTION_SELECT_FOLDER_TO_SHARE"
-
-        /**
          * Intent action for choosing a folder to sync.
          */
         @JvmField
@@ -2836,13 +3186,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
          * Intent action for uploading to chat.
          */
         @JvmField
-        var ACTION_UPLOAD_TO_CHAT = "ACTION_UPLOAD_TO_CHAT"
+        var ACTION_UPLOAD_SCAN_TO_CHAT = "ACTION_UPLOAD_SCAN_TO_CHAT"
 
         /**
          * Intent action for saving to cloud.
          */
         @JvmField
-        var ACTION_SAVE_TO_CLOUD = "ACTION_SAVE_TO_CLOUD"
+        var ACTION_UPLOAD_SCAN_TO_CLOUD = "ACTION_UPLOAD_SCAN_TO_CLOUD"
 
         /**
          * Intent action for importing an album.

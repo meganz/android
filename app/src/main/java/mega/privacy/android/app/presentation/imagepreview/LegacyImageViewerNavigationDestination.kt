@@ -1,0 +1,83 @@
+package mega.privacy.android.app.presentation.imagepreview
+
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
+
+fun EntryProviderScope<NavKey>.legacyImageViewerScreen(
+    removeDestination: () -> Unit,
+) {
+    entry<LegacyImageViewerNavKey>(
+        metadata = transparentMetadata()
+    ) { key ->
+        val context = LocalContext.current
+        LaunchedEffect(Unit) {
+            val intent = when (key.nodeSourceType) {
+                NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER -> ImagePreviewActivity.createIntent(
+                    context = context,
+                    imageSource = ImagePreviewFetcherSource.DEFAULT,
+                    menuOptionsSource = if (key.isInShare) ImagePreviewMenuSource.SHARED_ITEMS else ImagePreviewMenuSource.DEFAULT,
+                    anchorImageNodeId = NodeId(key.nodeHandle),
+                    params = key.nodeIds?.let { nodeIds ->
+                        mapOf(DefaultImageNodeFetcher.NODE_IDS to nodeIds.toLongArray())
+                    } ?: emptyMap(),
+                    enableAddToAlbum = true,
+                )
+
+                NodeSourceTypeInt.FOLDER_LINK_ADAPTER -> ImagePreviewActivity.createIntent(
+                    context = context,
+                    imageSource = ImagePreviewFetcherSource.FOLDER_LINK,
+                    menuOptionsSource = ImagePreviewMenuSource.FOLDER_LINK,
+                    anchorImageNodeId = NodeId(key.nodeHandle),
+                    isForeign = true,
+                    params = mapOf(FolderLinkImageNodeFetcher.PARENT_ID to key.parentNodeHandle),
+                )
+
+                NodeSourceTypeInt.FILE_LINK_ADAPTER -> ImagePreviewActivity.createIntent(
+                    context = context,
+                    imageSource = ImagePreviewFetcherSource.PUBLIC_FILE,
+                    menuOptionsSource = ImagePreviewMenuSource.PUBLIC_FILE,
+                    anchorImageNodeId = NodeId(key.nodeHandle),
+                    params = mapOf(PublicFileImageNodeFetcher.URL to (key.url ?: "")),
+                )
+
+                else -> {
+                    val nodeIds = key.nodeIds
+                    if (nodeIds != null) {
+                        ImagePreviewActivity.createIntent(
+                            context = context,
+                            imageSource = ImagePreviewFetcherSource.DEFAULT,
+                            menuOptionsSource = ImagePreviewMenuSource.DEFAULT,
+                            anchorImageNodeId = NodeId(key.nodeHandle),
+                            params = mapOf(DefaultImageNodeFetcher.NODE_IDS to nodeIds.toLongArray()),
+                        )
+                    } else {
+                        ImagePreviewActivity.createIntent(
+                            context = context,
+                            fileNodeId = key.nodeHandle,
+                            parentNodeId = key.parentNodeHandle,
+                            nodeSourceType = key.nodeSourceType
+                        )
+                    }
+                }
+            }
+            intent?.let {
+                context.startActivity(it)
+            }
+
+            // Immediately pop this destination from the back stack
+            removeDestination()
+        }
+    }
+}
+

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.dialog.contactlink
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,12 +17,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.extensions.contacts.getMessage
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ContactUtil
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -35,6 +37,9 @@ internal class ContactLinkDialogFragment : DialogFragment() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,7 +51,7 @@ internal class ContactLinkDialogFragment : DialogFragment() {
                 val state by viewModel.state.collectAsStateWithLifecycle()
                 val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-                state.contactLinkResult?.let { result ->
+                state.contactLinkQueryResult?.let { result ->
                     if (result.isSuccess) {
                         val contactLink = result.getOrThrow()
                         val contactLinkHandle = contactLink.contactLinkHandle
@@ -71,10 +76,9 @@ internal class ContactLinkDialogFragment : DialogFragment() {
                                     cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                                     onConfirm = {
                                         if (contactLink.isContact) {
-                                            ContactUtil.openContactInfoActivity(
-                                                requireContext(),
-                                                email
-                                            )
+                                            val i = Intent(context, ContactInfoActivity::class.java)
+                                            i.putExtra(Constants.NAME, email)
+                                            context.startActivity(i)
                                             dismissAllowingStateLoss()
                                         } else {
                                             viewModel.sendContactInvitation(
@@ -100,7 +104,7 @@ internal class ContactLinkDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.collectFlow(viewModel.state) {
             val sentInviteResult = it.sentInviteResult
-            val contactLinkResult = it.contactLinkResult
+            val contactLinkResult = it.contactLinkQueryResult
             if (sentInviteResult != null) {
                 if (sentInviteResult.isSuccess) {
                     showMessage(

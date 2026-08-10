@@ -1,0 +1,91 @@
+package mega.privacy.android.app.deeplinks
+
+import androidx.compose.runtime.getValue
+import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
+import mega.privacy.android.app.deeplinks.view.DeepLinksDialog
+import mega.privacy.android.navigation.contract.NavOptions
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
+import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
+import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
+
+data object DeepLinksDialogDestinations : AppDialogDestinations {
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+        { navigationHandler, onHandled ->
+            deepLinkDialogDestination(
+                remove = navigationHandler::remove,
+                navigate = { destinations, navOptions ->
+                    navigationHandler.navigate(
+                        destinations = destinations,
+                        navOptions = navOptions
+                    )
+                },
+                onDialogHandled = onHandled
+            )
+            deepLinkAfterFetchNodesDialogDestination(
+                remove = navigationHandler::remove,
+                navigate = navigationHandler::navigate,
+                onDialogHandled = onHandled
+            )
+        }
+}
+
+fun EntryProviderScope<in DialogNavKey>.deepLinkDialogDestination(
+    remove: (NavKey) -> Unit,
+    navigate: (List<NavKey>, NavOptions?) -> Unit,
+    onDialogHandled: () -> Unit,
+) {
+    entry<DeepLinksDialogNavKey>(
+        metadata = DialogSceneStrategy.dialog()
+    ) { key ->
+        val viewModel = hiltViewModel<DeepLinksViewModel, DeepLinksViewModel.Factory> { factory ->
+            factory.create(args = DeepLinksViewModel.Args(uri = key.deepLink.toUri()))
+        }
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        DeepLinksDialog(
+            uiState = uiState,
+            onNavigate = { destinations, navOptions -> navigate(destinations, navOptions) },
+            onDismiss = {
+                remove(key)
+                onDialogHandled()
+            }
+        )
+    }
+}
+
+fun EntryProviderScope<in DialogNavKey>.deepLinkAfterFetchNodesDialogDestination(
+    remove: (NavKey) -> Unit,
+    navigate: (List<NavKey>, NavOptions?) -> Unit,
+    onDialogHandled: () -> Unit,
+) {
+    entry<DeepLinksAfterFetchNodesDialogNavKey>(
+        metadata = DialogSceneStrategy.dialog()
+    ) { key ->
+        val viewModel = hiltViewModel<DeepLinksViewModel, DeepLinksViewModel.Factory> { factory ->
+            factory.create(
+                DeepLinksViewModel.Args(
+                    uri = key.deepLink.toUri(),
+                    regexPatternType = key.regexPatternType
+                )
+            )
+        }
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        DeepLinksDialog(
+            uiState = uiState,
+            onNavigate = { destinations, navOptions -> navigate(destinations, navOptions) },
+            onDismiss = {
+                remove(key)
+                onDialogHandled()
+            }
+        )
+    }
+}
+

@@ -2,6 +2,7 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.utils.Constants
@@ -80,7 +81,7 @@ class CreateFolderListener @JvmOverloads constructor(
                         }
                     } else {
                         if (extraAction == ExtraAction.MY_CHAT_FILES) {
-                            context.showSnackbar(context.getString(R.string.general_text_error))
+                            context.showSnackbar(context.getString(sharedR.string.general_text_error))
                         } else {
                             context.finishCreateFolder(false, handle)
                             context.showSnackbar(context.getString(R.string.error_creating_folder,
@@ -96,7 +97,7 @@ class CreateFolderListener @JvmOverloads constructor(
                         context.handleStoredData()
                     } else {
                         context.showSnackbar(Constants.SNACKBAR_TYPE,
-                            context.getString(R.string.general_text_error))
+                            context.getString(sharedR.string.general_text_error))
                     }
                 }
 

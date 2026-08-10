@@ -31,6 +31,8 @@ import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
@@ -42,6 +44,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
@@ -51,11 +54,11 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUs
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
-import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
@@ -77,6 +80,8 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.navigation.MegaNavigator
@@ -89,6 +94,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
+import org.mockito.Mockito.never
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -112,7 +118,6 @@ class FolderLinkViewModelTest {
     private val copyNodesUseCase: CopyNodesUseCase = mock()
     private val copyRequestMessageMapper: CopyRequestMessageMapper = mock()
     private val hasCredentialsUseCase: HasCredentialsUseCase = mock()
-    private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val setViewType: SetViewType = mock()
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase = mock()
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
@@ -147,6 +152,9 @@ class FolderLinkViewModelTest {
     private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase = mock()
     private val queryAdsUseCase: QueryAdsUseCase = mock()
     private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
+    private val saveViewedLinkUseCase: SaveViewedLinkUseCase = mock()
+    private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     @BeforeEach
     fun setup() {
@@ -163,7 +171,6 @@ class FolderLinkViewModelTest {
             copyNodesUseCase,
             copyRequestMessageMapper,
             hasCredentialsUseCase,
-            rootNodeExistsUseCase,
             setViewType,
             fetchFolderNodesUseCase,
             getFolderParentNodeUseCase,
@@ -193,7 +200,10 @@ class FolderLinkViewModelTest {
             isUserLoggedInUseCase,
             stopAudioService,
             getPublicLinkInformationUseCase,
-            queryAdsUseCase
+            queryAdsUseCase,
+            saveViewedLinkUseCase,
+            removeViewedLinkByUrlUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 
@@ -205,7 +215,6 @@ class FolderLinkViewModelTest {
             copyNodesUseCase = copyNodesUseCase,
             copyRequestMessageMapper = copyRequestMessageMapper,
             hasCredentialsUseCase = hasCredentialsUseCase,
-            rootNodeExistsUseCase = rootNodeExistsUseCase,
             setViewType = setViewType,
             fetchFolderNodesUseCase = fetchFolderNodesUseCase,
             getFolderParentNodeUseCase = getFolderParentNodeUseCase,
@@ -238,7 +247,10 @@ class FolderLinkViewModelTest {
             monitorMiscLoadedUseCase = mock(),
             getPublicLinkInformationUseCase = getPublicLinkInformationUseCase,
             queryAdsUseCase = queryAdsUseCase,
-            getCookieSettingsUseCase = getCookieSettingsUseCase
+            getCookieSettingsUseCase = getCookieSettingsUseCase,
+            saveViewedLinkUseCase = saveViewedLinkUseCase,
+            removeViewedLinkByUrlUseCase = removeViewedLinkByUrlUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -278,7 +290,7 @@ class FolderLinkViewModelTest {
             on { this.childrenNodes }.thenReturn(childrenNodes)
         }
         whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull())).thenReturn(fetchFolderNodeResult)
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(fetchFolderNodeResult)
         val folderInfo = mock<FolderInfo> {
             on { id }.thenReturn(NodeId(1234L))
         }
@@ -322,6 +334,177 @@ class FolderLinkViewModelTest {
             assertThat(newValue.errorState).isEqualTo(LinkErrorState.Unavailable)
         }
     }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is called after successful fetchNodes when feature is enabled`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val rootNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(999L))
+                on { name }.thenReturn("shared-folder")
+            }
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.childrenNodes }.thenReturn(emptyList())
+                on { this.rootNode }.thenReturn(rootNode)
+            }
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                fetchFolderNodeResult
+            )
+            val folderInfo = mock<FolderInfo> {
+                on { id }.thenReturn(NodeId(999L))
+            }
+            whenever(getPublicLinkInformationUseCase(folderLink)).thenReturn(folderInfo)
+            whenever(queryAdsUseCase(folderInfo.id.longValue)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+            underTest.folderLogin(folderLink)
+
+            verify(saveViewedLinkUseCase).invoke(
+                ViewedLink(
+                    nodeHandle = 999L,
+                    name = "shared-folder",
+                    linkUrl = folderLink,
+                    type = RecentlyViewedLinkType.FolderLink,
+                    accessedTimestamp = null
+                )
+            )
+        }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is not called when feature is disabled`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val rootNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(999L))
+                on { name }.thenReturn("shared-folder")
+            }
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.childrenNodes }.thenReturn(emptyList())
+                on { this.rootNode }.thenReturn(rootNode)
+            }
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                fetchFolderNodeResult
+            )
+            val folderInfo = mock<FolderInfo> {
+                on { id }.thenReturn(NodeId(999L))
+            }
+            whenever(getPublicLinkInformationUseCase(folderLink)).thenReturn(folderInfo)
+            whenever(queryAdsUseCase(folderInfo.id.longValue)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+            underTest.folderLogin(folderLink)
+
+            verify(saveViewedLinkUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is not called when fetchNodes fails`() =
+        runTest {
+            val base64Handle = "1234"
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+                FetchFolderNodesException.LinkRemoved()
+            )
+
+            underTest.fetchNodes(base64Handle)
+
+            verify(saveViewedLinkUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that removeViewedLinkByUrlUseCase is called when fetchNodes fails with LinkRemoved`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val base64Handle = "1234"
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+                FetchFolderNodesException.LinkRemoved()
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+
+            underTest.fetchNodes(base64Handle)
+
+            verify(removeViewedLinkByUrlUseCase).invoke(folderLink)
+        }
+
+    @Test
+    fun `test that removeViewedLinkByUrlUseCase is called when fetchNodes fails with Expired`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val base64Handle = "1234"
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+                FetchFolderNodesException.Expired()
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+
+            underTest.fetchNodes(base64Handle)
+
+            verify(removeViewedLinkByUrlUseCase).invoke(folderLink)
+        }
+
+    @Test
+    fun `test that removeViewedLinkByUrlUseCase is not called when fetchNodes fails with GenericError`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val base64Handle = "1234"
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+                FetchFolderNodesException.GenericError()
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+
+            underTest.fetchNodes(base64Handle)
+
+            verify(removeViewedLinkByUrlUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that removeViewedLinkByUrlUseCase is not called when fetchNodes fails but feature flag is disabled`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val base64Handle = "1234"
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+                FetchFolderNodesException.LinkRemoved()
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+
+            underTest.fetchNodes(base64Handle)
+
+            verify(removeViewedLinkByUrlUseCase, never()).invoke(any())
+        }
 
     @Test
     fun `test that on login into folder and on result API_INCOMPLETE values are updated correctly`() =
@@ -382,28 +565,26 @@ class FolderLinkViewModelTest {
         }
 
     @Test
-    fun `test that on valid credentials and no root node shouldShowLogin is returned true`() =
+    fun `test that hasDbCredentials is updated when checkLoginRequired is invoked with valid credentials`() =
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(true)
-            whenever(rootNodeExistsUseCase()).thenReturn(false)
+
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val value = expectMostRecentItem()
-                assertThat(value.showLoginEvent).isEqualTo(triggered)
                 assertThat(value.hasDbCredentials).isTrue()
             }
         }
 
     @Test
-    fun `test that on valid credentials and root node shouldShowLogin is returned false`() =
+    fun `test that hasDbCredentials is false when checkLoginRequired is invoked without credentials`() =
         runTest {
-            whenever(hasCredentialsUseCase()).thenReturn(true)
-            whenever(rootNodeExistsUseCase()).thenReturn(true)
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val value = expectMostRecentItem()
-                assertThat(value.showLoginEvent).isEqualTo(consumed)
-                assertThat(value.hasDbCredentials).isTrue()
+                assertThat(value.hasDbCredentials).isFalse()
             }
         }
 
@@ -683,41 +864,27 @@ class FolderLinkViewModelTest {
     @Test
     fun `test that openFile is triggered with correct pdf intent when updatePdfIntent is invoked`() =
         runTest {
-            val uriMock = Mockito.mockStatic(Uri::class.java)
-            val intent = mock<Intent>()
-            val contentUriMock: Uri = mock()
-            val path = "/path"
-            val handle = 1234L
-            val fileNode = mock<FileNode> {
-                on { id.longValue }.thenReturn(handle)
+            Mockito.mockStatic(Uri::class.java).use { _ ->
+                val intent = mock<Intent>()
+                val contentUriMock: Uri = mock()
+                val path = "/path"
+                val handle = 1234L
+                val fileNode = mock<FileNode> {
+                    on { id.longValue }.thenReturn(handle)
+                }
+
+                whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(0)
+                whenever(getLocalFileForNodeUseCase(any())).thenReturn(null)
+                whenever(getLocalFolderLinkFromMegaApiFolderUseCase(handle)).thenReturn(path)
+                whenever(Uri.parse(path)).thenReturn(contentUriMock)
+
+                underTest.updatePdfIntent(intent, fileNode, "pdf")
+                underTest.state.test {
+                    val res = awaitItem()
+                    assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
+                }
             }
-
-            whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(0)
-            whenever(getLocalFileForNodeUseCase(any())).thenReturn(null)
-            whenever(getLocalFolderLinkFromMegaApiFolderUseCase(handle)).thenReturn(path)
-            whenever(Uri.parse(path)).thenReturn(contentUriMock)
-
-            underTest.updatePdfIntent(intent, fileNode, "pdf")
-            underTest.state.test {
-                val res = awaitItem()
-                assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
-            }
-            uriMock.close()
         }
-
-    @Test
-    fun `test that openFile is triggered when updateTextEditorIntent is invoked`() = runTest {
-        val intent = mock<Intent>()
-        val fileNode = mock<FileNode> {
-            on { id.longValue }.thenReturn(1234L)
-        }
-
-        underTest.updateTextEditorIntent(intent, fileNode)
-        underTest.state.test {
-            val res = awaitItem()
-            assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
-        }
-    }
 
     @Test
     fun `test that node handle is extracted from importNode when multiple node is not selected`() =
@@ -882,7 +1049,7 @@ class FolderLinkViewModelTest {
     fun `test that stopAudioService is not invoked when the user is logged in`() = runTest {
         whenever(isUserLoggedInUseCase()).thenReturn(true)
         underTest.stopAudioPlayerServiceWithoutLogin()
-        verify(stopAudioService, times(0)).invoke()
+        verify(stopAudioService, never()).invoke()
     }
 
     @ParameterizedTest
@@ -896,7 +1063,7 @@ class FolderLinkViewModelTest {
                 on { this.childrenNodes }.thenReturn(childrenNodes)
             }
             whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(anyOrNull())).thenReturn(fetchFolderNodeResult)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(fetchFolderNodeResult)
             val folderInfo = mock<FolderInfo> {
                 on { id }.thenReturn(NodeId(1234L))
             }

@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -29,6 +27,8 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -142,8 +142,8 @@ internal class UserInfoViewModel @Inject constructor(
         runCatching {
             getCurrentUserFullName(
                 forceRefresh = isForceRefresh,
-                defaultFirstName = context.getString(R.string.first_name_text),
-                defaultLastName = context.getString(R.string.lastname_text),
+                defaultFirstName = context.getString(sharedR.string.general_first_name),
+                defaultLastName = context.getString(sharedR.string.general_last_name),
             )
         }.onSuccess { fullName ->
             _state.update { it.copy(fullName = fullName) }

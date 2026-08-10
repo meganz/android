@@ -1,7 +1,10 @@
 package mega.privacy.android.navigation.contract.home
 
-import kotlinx.coroutines.flow.Flow
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.TransferHandler
 
 /**
  * Home widget
@@ -12,8 +15,16 @@ import mega.android.core.ui.model.LocalizedText
  */
 interface HomeWidget {
     val identifier: String
-    val defaultOrder: Int
+    val defaultOrder: HomeWidgetOrder
     val canDelete: Boolean
+    val isConfigurable: Boolean
+    val isDraggable: Boolean
     suspend fun getWidgetName(): LocalizedText
-    fun getWidget(): Flow<HomeWidgetViewHolder>
+
+    @Composable
+    fun DisplayWidget(
+        modifier: Modifier,
+        navigationHandler: NavigationHandler,
+        transferHandler: TransferHandler,
+    )
 }

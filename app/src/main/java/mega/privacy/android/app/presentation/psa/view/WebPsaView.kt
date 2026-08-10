@@ -11,6 +11,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,8 +39,13 @@ fun WebPsaView(
     javascriptInterfaceFactory: (
         onShowPsa: () -> Unit,
         onHidePsa: () -> Unit,
-    ) -> PsaJavascriptInterface = ::PsaJavascriptInterface
+    ) -> PsaJavascriptInterface = ::PsaJavascriptInterface,
+    onDisplay: suspend () -> Unit,
 ) {
+    LaunchedEffect(Unit) {
+        onDisplay()
+    }
+
     var webViewVisible by remember { mutableStateOf(false) }
 
     val onShowPsa = {

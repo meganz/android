@@ -6,11 +6,9 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.ParentNotAFolderException
 import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
@@ -21,7 +19,6 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 class GetTypedNodesFromFolderUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
-    private val addNodeType: AddNodeType,
 ) {
 
     /**
@@ -34,14 +31,11 @@ class GetTypedNodesFromFolderUseCase @Inject constructor(
         emit(nodes)
         val nodeIds = nodes.map { it.id } + folderId
         emitAll(getMonitoredList(folderId, nodeIds))
-    }.mapLatest { nodeList ->
-        nodeList.map { addNodeType(it) }
     }
-
-    private suspend fun getChildren(folderId: NodeId): List<UnTypedNode> {
+    private suspend fun getChildren(folderId: NodeId): List<TypedNode> {
         val folder = nodeRepository.getNodeById(folderId) as? FolderNode
             ?: throw ParentNotAFolderException("Attempted to fetch folder node: $folderId")
-        return nodeRepository.getNodeChildren(folder.id)
+        return nodeRepository.getTypedNodesById(folder.id)
 
     }
 

@@ -19,6 +19,24 @@ enum class ABTestFeatures(
     private val defaultValue: Boolean,
     override val checkRemote: Boolean = true,
 ) : ABTestFeature {
+
+
+    /**
+     * [A/B Test] ab_ande - External Checkout Experiment
+     *
+     * This flag is for the "ab_ande" test.
+     * Context: We're running an experiment to compare payment flows for US users.
+     * The two variants are:
+     *   - External checkout as default
+     *   - In-app checkout as default
+     * The goal is to determine which flow leads to a higher conversion rate.
+     */
+    ande(
+        experimentName = "ande",
+        description = "Use external checkout if true, otherwise false",
+        defaultValue = false
+    ),
+
     /**
      * To use remote feature flag 'ab_devtest' from API
      * this flag can be used to test the SDK methods getABTestValue() and sendABTestActive()

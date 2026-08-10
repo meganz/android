@@ -2,32 +2,188 @@ package mega.privacy.android.app.activities.destinations
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import dagger.Lazy
+import leftMeetingDestination
+import mega.privacy.android.app.activities.navigation.fileInfoScreen
+import mega.privacy.android.app.businessExpiredAlertLegacyDestination
+import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.getLink.navigation.getLinkLegacyDestination
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.mediaplayer.Nav3AudioPlayerRouteLauncher
+import mega.privacy.android.app.mediaplayer.legacyMediaPlayerScreen
+import mega.privacy.android.app.meeting.activity.createScheduledMeetingScreen
+import mega.privacy.android.app.meeting.activity.legacyMeetingScreen
+import mega.privacy.android.app.meeting.activity.legacyWaitingRoomScreen
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.nav.MediaPlayerIntentMapper
+import mega.privacy.android.app.presentation.audiosection.audioSectionDestination
+import mega.privacy.android.app.presentation.changepassword.navigation.parkAccountDestination
 import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestination
-import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
-import mega.privacy.android.app.presentation.search.navigation.searchLegacyDestination
+import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDestination
+import mega.privacy.android.app.presentation.chat.navigation.showChatMessagesDestination
+import mega.privacy.android.app.presentation.contact.authenticitycredendials.navigation.authenticityCredentialsLegacyDestination
+import mega.privacy.android.app.presentation.contact.invite.navigation.inviteContactLegacyDestination
+import mega.privacy.android.app.presentation.contact.navigation.addChatParticipantsDestination
+import mega.privacy.android.app.presentation.contact.navigation.addContactsDestination
+import mega.privacy.android.app.presentation.contact.navigation.addMeetingParticipantsDestination
+import mega.privacy.android.app.presentation.contact.navigation.contactAttachmentLegacyDestination
+import mega.privacy.android.app.presentation.contact.navigation.contactsListDestination
+import mega.privacy.android.app.presentation.contact.navigation.contactsRequestLegacyDestination
+import mega.privacy.android.app.presentation.contact.navigation.createGroupChatLegacyDestination
+import mega.privacy.android.app.presentation.contact.navigation.newChatLegacyDestination
+import mega.privacy.android.app.presentation.fileexplorer.fileExplorer
+import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
+import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
+import mega.privacy.android.app.presentation.imagepreview.legacyImageViewerScreen
+import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.manageChatHistoryLegacyDestination
+import mega.privacy.android.app.presentation.pdfviewer.legacyPdfViewerScreen
+import mega.privacy.android.app.presentation.photos.mediadiscovery.navigation.mediaDiscoveryLegacyDestination
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
-import mega.privacy.android.app.presentation.settings.settingsCameraUploadsNavigationDestination
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.legacyExportRecoveryKeyScreen
+import mega.privacy.android.app.presentation.settings.startscreen.startScreenPreferenceScreen
+import mega.privacy.android.app.main.versionsFileScreen
+import mega.privacy.android.app.presentation.tags.tagsScreen
 import mega.privacy.android.app.presentation.testpassword.navigation.testPasswordLegacyDestination
+import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
+import mega.privacy.android.app.presentation.videosection.legacyVideoToPlaylistDestination
+import mega.privacy.android.app.presentation.videosection.videoSectionLegacyDestination
+import mega.privacy.android.app.textEditor.legacyTextEditorScreen
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navOptions
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.ChatListNavKey
+import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey
+import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 
-class LegacyCoreActivityFeatureGraph : FeatureDestination {
+class LegacyCoreActivityFeatureGraph(
+    nodeContentUriIntentMapper: NodeContentUriIntentMapper,
+    mediaPlayerIntentMapper: MediaPlayerIntentMapper,
+    nav3VideoPlayerRouteLauncher: Nav3VideoPlayerRouteLauncher,
+    nav3AudioPlayerRouteLauncher: Nav3AudioPlayerRouteLauncher,
+    megaChatRequestHandler: Lazy<MegaChatRequestHandler>,
+    chatManagement: Lazy<ChatManagement>,
+    setChatVideoInDeviceUseCase: Lazy<SetChatVideoInDeviceUseCase>,
+    rtcAudioManagerGateway: Lazy<RTCAudioManagerGateway>,
+    private val viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
+    snackbarEventQueue: SnackbarEventQueue,
+) : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             overDiskQuotaPaywallWarning(navigationHandler::back)
-            upgradeAccount(navigationHandler::back)
             myAccount(navigationHandler::back)
             achievement(navigationHandler::back)
             webDestinations(navigationHandler::back)
             cookieSettingsNavigationDestination(navigationHandler::back)
-            settingsCameraUploadsNavigationDestination(navigationHandler::back)
-            searchLegacyDestination(navigationHandler::back)
-            contactsLegacyDestination(navigationHandler::back)
+            startScreenPreferenceScreen(navigationHandler::back)
+            contactsListDestination(navigationHandler)
+            addContactsDestination(navigationHandler)
+            addChatParticipantsDestination(navigationHandler)
+            addMeetingParticipantsDestination(navigationHandler)
+            contactsRequestLegacyDestination(navigationHandler::back)
+            inviteContactLegacyDestination(navigationHandler::back)
+            authenticityCredentialsLegacyDestination(navigationHandler::back)
             chatLegacyDestination(navigationHandler::back)
+            showChatMessagesDestination(navigationHandler)
+            manageChatHistoryLegacyDestination(navigationHandler::remove)
             testPasswordLegacyDestination(navigationHandler::back)
-            syncListDestination(navigationHandler::back)
-            syncNewFolderDestination(navigationHandler::back)
-            syncSelectStopBackupDestinationDestination(navigationHandler::back)
+            parkAccountDestination(navigationHandler::back)
+            legacyFileLinkScreen(navigationHandler::back)
+            legacyExportRecoveryKeyScreen(navigationHandler::back)
+            legacyFolderLinkScreen(navigationHandler::back)
+            getLinkLegacyDestination(navigationHandler::back)
+            chatListLegacyDestination(navigationHandler::back)
+            legacyPdfViewerScreen(navigationHandler::back, nodeContentUriIntentMapper)
+            legacyImageViewerScreen(navigationHandler::back)
+            legacyTextEditorScreen(
+                navigationHandler,
+                viewTypeToNodeSourceTypeMapper,
+                transferHandler
+            )
+            legacyMediaPlayerScreen(
+                removeDestination = navigationHandler::back,
+                navigateToVideoRoute = { key ->
+                    navigationHandler.navigate(
+                        destination = key,
+                        navOptions = navOptions {
+                            popUpTo<LegacyMediaPlayerNavKey> {
+                                inclusive = true
+                            }
+                        },
+                    )
+                },
+                navigateToAudioRoute = { key ->
+                    navigationHandler.navigate(
+                        destination = key,
+                        navOptions = navOptions {
+                            popUpTo<LegacyMediaPlayerNavKey> {
+                                inclusive = true
+                            }
+                        },
+                    )
+                },
+                nav3VideoPlayerRouteLauncher = nav3VideoPlayerRouteLauncher,
+                nav3AudioPlayerRouteLauncher = nav3AudioPlayerRouteLauncher,
+                mediaPlayerIntentMapper = mediaPlayerIntentMapper,
+                snackbarEventQueue = snackbarEventQueue,
+            )
+            videoSectionLegacyDestination(navigationHandler::back)
+            legacyAlbumContentPreview(navigationHandler::back)
+            legacyAlbumImportPreview(navigationHandler::back)
+            legacyMediaTimelinePhotoPreview(navigationHandler::back)
+            legacyAddToAlbumActivityNavKey(navigationHandler::returnResult)
+            legacyMeetingScreen(
+                navigationHandler::back,
+                megaChatRequestHandler,
+                chatManagement,
+                setChatVideoInDeviceUseCase,
+                rtcAudioManagerGateway
+            )
+            legacyWaitingRoomScreen(navigationHandler::back, megaChatRequestHandler, chatManagement)
+            createScheduledMeetingScreen(
+                removeDestination = navigationHandler::back,
+                navigateToMeetingsTab = {
+                    navigationHandler.navigate(
+                        destination = ChatListNavKey(showMeetingTab = true),
+                        navOptions = navOptions {
+                            popUpTo<CreateScheduledMeetingNavKey> {
+                                inclusive = true
+                            }
+                        },
+                    )
+                },
+            )
+            legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
+            cameraBackupPermissionsScreen(navigationHandler)
+            fileInfoScreen(navigationHandler::back)
+            tagsScreen(navigationHandler::back)
+            versionsFileScreen(navigationHandler::back)
+            mediaDiscoveryLegacyDestination(navigationHandler::back)
+            legacyVideoToPlaylistDestination(
+                navigationHandler::back,
+                navigationHandler::returnResult
+            )
+            contactAttachmentLegacyDestination(navigationHandler::remove)
+            businessExpiredAlertLegacyDestination(navigationHandler::back)
+            leftMeetingDestination(navigationHandler::remove)
+            fileExplorer(
+                removeDestination = navigationHandler::remove,
+                returnResult = navigationHandler::returnResult,
+                navigationHandler = navigationHandler,
+            )
+            audioSectionDestination(
+                removeDestination = navigationHandler::back,
+                navigationHandler = navigationHandler,
+            )
+            createGroupChatLegacyDestination(
+                navigationHandler = navigationHandler,
+            )
+            newChatLegacyDestination(
+                navigationHandler = navigationHandler,
+            )
         }
 }

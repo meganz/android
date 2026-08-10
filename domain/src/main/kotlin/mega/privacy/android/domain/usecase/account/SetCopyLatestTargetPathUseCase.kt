@@ -13,5 +13,5 @@ class SetCopyLatestTargetPathUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(path: Long) =
-        accountRepository.setLatestTargetPathCopyPreference(path)
+        accountRepository.setLatestTargetCopyPreference(path)
 }

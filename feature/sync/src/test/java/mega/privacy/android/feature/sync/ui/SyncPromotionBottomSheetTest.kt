@@ -156,7 +156,7 @@ internal class SyncPromotionBottomSheetTest {
                     SyncPromotionBottomSheet(
                         onSyncFoldersClicked = {},
                         onBackUpFoldersClicked = {},
-                        onLearnMoreClicked = {},
+                        onLearnMoreClicked = { _ -> },
                     )
                 },
                 expandedRoundedCorners = true,

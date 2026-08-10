@@ -32,21 +32,24 @@ internal class FileAttributeFacade @Inject constructor(
 
     private suspend fun getVideoGPSCoordinates(setDataSource: (MediaMetadataRetriever) -> Unit): Pair<Double, Double>? {
         val retriever = MediaMetadataRetriever()
-        setDataSource(retriever)
-        val location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
-        //MediaMetadataRetriever directly cannot access GPS coordinates.
-        // You need to look for dedicated methods or utilize additional libraries
-        // based on the file format's specifications.
-        // For advanced needs, you can explore lower-level APIs like MediaCodec and MediaExtractor
-        // to access raw data and extract specific information through custom parsing techniques.
-        //some video formats may store location data in custom boxes not accessible by MediaMetadataRetriever.
-        // Consider specialized parsers or tools based on the file format.
-        retriever.release()
-        return location?.let {
-            locationMapper(it)
-        } ?: run {
-            Timber.w("No Video GPS coordinates found")
-            null
+        return try {
+            setDataSource(retriever)
+            val location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
+            //MediaMetadataRetriever directly cannot access GPS coordinates.
+            // You need to look for dedicated methods or utilize additional libraries
+            // based on the file format's specifications.
+            // For advanced needs, you can explore lower-level APIs like MediaCodec and MediaExtractor
+            // to access raw data and extract specific information through custom parsing techniques.
+            //some video formats may store location data in custom boxes not accessible by MediaMetadataRetriever.
+            // Consider specialized parsers or tools based on the file format.
+            location?.let {
+                locationMapper(it)
+            } ?: run {
+                Timber.w("No Video GPS coordinates found")
+                null
+            }
+        } finally {
+            retriever.release()
         }
     }
 
@@ -79,10 +82,12 @@ internal class FileAttributeFacade @Inject constructor(
     override suspend fun getVideoDuration(filePathOrUri: String): Duration? =
         runCatching {
             val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(filePathOrUri)
-            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                ?.toLongOrNull()?.milliseconds
-            retriever.release()
-            duration
+            try {
+                retriever.setDataSource(filePathOrUri)
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    ?.toLongOrNull()?.milliseconds
+            } finally {
+                retriever.release()
+            }
         }.getOrNull()
 }

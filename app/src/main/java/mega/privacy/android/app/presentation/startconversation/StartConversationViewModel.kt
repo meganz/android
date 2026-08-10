@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.data.extensions.findItemByHandle
 import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
@@ -35,6 +36,8 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenU
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
+import mega.privacy.android.shared.contact.model.ContactItemUiState
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -52,6 +55,7 @@ import javax.inject.Inject
  * @property addNewContactsUseCase                          [AddNewContactsUseCase]
  * @property requestUserLastGreenUseCase                    [RequestUserLastGreenUseCase]
  * @property getNoteToSelfChatUseCase                       [GetNoteToSelfChatUseCase]
+ * @property contactItemUiStateMapper                       Maps [ContactItem] to [ContactItemUiState].
  * @property state                    Current view state as [StartConversationState]
  */
 @HiltViewModel
@@ -68,12 +72,15 @@ class StartConversationViewModel @Inject constructor(
     private val addNewContactsUseCase: AddNewContactsUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
+    private val contactItemUiStateMapper: ContactItemUiStateMapper,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(StartConversationState())
     val state: StateFlow<StartConversationState> = _state
+
+    private val sourceContacts = MutableStateFlow<List<ContactItem>>(emptyList())
 
     private val isConnected =
         monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
@@ -131,23 +138,37 @@ class StartConversationViewModel @Inject constructor(
                     { state: StartConversationState ->
                         state.copy(
                             typedSearch = typed,
-                            filteredContactList = getFilteredContactList(
-                                contactList = state.contactItemList,
-                                typedSearch = typed
-                            )
+                            filteredContactList = filterAndMap(sourceContacts.value, typed),
                         )
                     }
                 },
                 fromChat.map { isFromChat ->
                     { state: StartConversationState -> state.copy(fromChat = isFromChat) }
-                }
+                },
+                sourceContacts.map { contacts ->
+                    { state: StartConversationState ->
+                        val uiList = contacts.map(contactItemUiStateMapper::invoke)
+                        state.copy(
+                            contactItemList = uiList,
+                            filteredContactList = filterAndMap(contacts, state.typedSearch),
+                            emptyViewVisible = uiList.isEmpty(),
+                            searchAvailable = uiList.isNotEmpty(),
+                        )
+                    }
+                },
             ).collect {
                 _state.update(it)
             }
         }
     }
 
-    private fun getFilteredContactList(
+    private fun filterAndMap(
+        contacts: List<ContactItem>,
+        typedSearch: String,
+    ): List<ContactItemUiState>? =
+        filterContacts(contacts, typedSearch)?.map(contactItemUiStateMapper::invoke)
+
+    private fun filterContacts(
         contactList: List<ContactItem>,
         typedSearch: String,
     ): List<ContactItem>? =
@@ -163,17 +184,7 @@ class StartConversationViewModel @Inject constructor(
     private fun getContacts() {
         viewModelScope.launch {
             val contactList = getVisibleContactsUseCase()
-            _state.update {
-                it.copy(
-                    contactItemList = contactList.sortList(),
-                    emptyViewVisible = contactList.isEmpty(),
-                    searchAvailable = contactList.isNotEmpty(),
-                    filteredContactList = getFilteredContactList(
-                        contactList = contactList,
-                        typedSearch = typedSearch.value
-                    )
-                )
-            }
+            sourceContacts.update { contactList.sortList() }
             getContactsData(contactList)
         }
     }
@@ -181,13 +192,11 @@ class StartConversationViewModel @Inject constructor(
     private suspend fun getContactsData(contactList: List<ContactItem>) {
         contactList.forEach { contactItem ->
             val contactData = getContactDataUseCase(contactItem)
-            _state.value.contactItemList.apply {
-                findItemByHandle(contactItem.handle)?.apply {
-                    toMutableList().apply {
-                        replaceIfExists(copy(contactData = contactData))
-                        _state.update { it.copy(contactItemList = this.sortList()) }
-                    }
-                }
+            sourceContacts.update { current ->
+                val found = current.findItemByHandle(contactItem.handle) ?: return@update current
+                current.toMutableList().apply {
+                    replaceIfExists(found.copy(contactData = contactData))
+                }.sortList()
             }
         }
     }
@@ -195,8 +204,9 @@ class StartConversationViewModel @Inject constructor(
     private fun observeContactUpdates() {
         viewModelScope.launch {
             monitorContactUpdates().collectLatest { userUpdates ->
-                val contactList = applyContactUpdates(_state.value.contactItemList, userUpdates)
-                _state.update { it.copy(contactItemList = contactList.sortList()) }
+                sourceContacts.update {
+                    applyContactUpdates(it, userUpdates).sortList()
+                }
             }
         }
     }
@@ -204,13 +214,11 @@ class StartConversationViewModel @Inject constructor(
     private fun observeLastGreenUpdates() {
         viewModelScope.launch {
             monitorChatPresenceLastGreenUpdatesUseCase().collectLatest { (handle, lastGreen) ->
-                _state.value.contactItemList.apply {
-                    findItemByHandle(handle)?.apply {
-                        toMutableList().apply {
-                            replaceIfExists(copy(lastSeen = lastGreen))
-                            _state.update { it.copy(contactItemList = this.sortList()) }
-                        }
-                    }
+                sourceContacts.update { current ->
+                    val found = current.findItemByHandle(handle) ?: return@update current
+                    current.toMutableList().apply {
+                        replaceIfExists(found.copy(lastSeen = lastGreen))
+                    }.sortList()
                 }
             }
         }
@@ -222,14 +230,11 @@ class StartConversationViewModel @Inject constructor(
                 if (status != UserChatStatus.Online) {
                     requestUserLastGreenUseCase(userHandle)
                 }
-
-                _state.value.contactItemList.apply {
-                    findItemByHandle(userHandle)?.apply {
-                        toMutableList().apply {
-                            replaceIfExists(copy(status = status))
-                            _state.update { it.copy(contactItemList = this.sortList()) }
-                        }
-                    }
+                sourceContacts.update { current ->
+                    val found = current.findItemByHandle(userHandle) ?: return@update current
+                    current.toMutableList().apply {
+                        replaceIfExists(found.copy(status = status))
+                    }.sortList()
                 }
             }
         }
@@ -238,8 +243,9 @@ class StartConversationViewModel @Inject constructor(
     private fun observeNewContacts() {
         viewModelScope.launch {
             monitorContactRequestUpdatesUseCase().collectLatest { newContacts ->
-                val contactList = addNewContactsUseCase(_state.value.contactItemList, newContacts)
-                _state.update { it.copy(contactItemList = contactList.sortList()) }
+                sourceContacts.update {
+                    addNewContactsUseCase(it, newContacts).sortList()
+                }
             }
         }
     }
@@ -265,17 +271,17 @@ class StartConversationViewModel @Inject constructor(
     /**
      * Starts a conversation if there is internet connection, shows an error if not.
      */
-    fun onContactTap(contactItem: ContactItem) {
+    fun onContactTap(handle: Long) {
         if (isConnected.value) {
             viewModelScope.launch {
                 runCatching {
                     startConversationUseCase(
                         isGroup = false,
-                        userHandles = listOf(contactItem.handle)
+                        userHandles = listOf(handle)
                     )
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    _state.update { it.copy(result = -1L, error = R.string.general_text_error) }
+                    _state.update { it.copy(result = -1L, error = sharedR.string.general_text_error) }
                 }.onSuccess { chatHandle -> _state.update { it.copy(result = chatHandle) } }
             }
         } else {
@@ -294,7 +300,7 @@ class StartConversationViewModel @Inject constructor(
                     getNoteToSelfChatUseCase()
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    _state.update { it.copy(error = R.string.general_text_error) }
+                    _state.update { it.copy(error = sharedR.string.general_text_error) }
                 }.onSuccess { noteToSelfChatRoom ->
                     noteToSelfChatRoom?.let {
                         Timber.d("Note to self chat found: ${noteToSelfChatRoom.chatId}")

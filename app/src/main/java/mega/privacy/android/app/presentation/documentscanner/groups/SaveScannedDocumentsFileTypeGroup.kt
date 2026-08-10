@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.documentscanner.groups
 
-import mega.privacy.android.core.R as CoreR
-import mega.privacy.android.shared.resources.R as SharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,15 +14,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.R
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.shared.original.core.ui.controls.chip.DefaultChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.resources.R as SharedR
 
 /**
  * A Composable Group allowing Users to select the resulting File Type of the Scanned Document. This
@@ -45,7 +44,7 @@ internal fun SaveScannedDocumentsFileTypeGroup(
             modifier = Modifier
                 .padding(top = 16.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
                 .testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_GROUP_HEADER),
-            text = stringResource(R.string.scan_file_type),
+            text = stringResource(SharedR.string.general_file_type),
             textColor = TextColor.Secondary,
         )
         Row(

@@ -9,6 +9,11 @@ import kotlinx.coroutines.flow.Flow
 interface CameraUploadsSettingsPreferenceGateway {
 
     /**
+     * Monitor the Camera Uploads enabled status
+     */
+    val monitorCameraUploadsEnabled: Flow<Boolean?>
+
+    /**
      * Is camera uploads enabled
      */
     suspend fun isCameraUploadsEnabled(): Boolean?

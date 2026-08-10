@@ -1,0 +1,86 @@
+package mega.privacy.android.core.sharedcomponents.dialog
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.TextFieldValue
+import mega.android.core.ui.components.dialogs.BasicInputDialog
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.shared.resources.R as sharedResR
+
+/**
+ * Dialog prompting the user for an album name. Shared across features that create albums
+ * (e.g. the Photos albums screen and the Home "Do more with MEGA" widget).
+ */
+@Composable
+fun EnterAlbumNameDialog(
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+    resetErrorMessage: () -> Unit,
+    positiveButtonText: String,
+    modifier: Modifier = Modifier,
+    name: String = "",
+    errorText: String? = null,
+    defaultSuggestion: () -> String = { "" },
+) {
+    // Saves the input across configuration changes
+    var albumName by rememberSaveable(
+        inputs = arrayOf(name),
+        stateSaver = TextFieldValue.Saver
+    ) {
+        mutableStateOf(
+            TextFieldValue(
+                name,
+                TextRange(name.length)
+            )
+        )
+    }
+
+    BasicInputDialog(
+        modifier = modifier,
+        title = stringResource(sharedResR.string.media_add_new_album_dialog_title),
+        positiveButtonText = positiveButtonText,
+        negativeButtonText = stringResource(sharedResR.string.general_dialog_cancel_button),
+        inputValue = albumName,
+        onPositiveButtonClicked = {
+            resetErrorMessage()
+            val finalName = albumName.text.trim().ifBlank { defaultSuggestion().trim() }
+            onConfirm(finalName)
+        },
+        onNegativeButtonClicked = {
+            resetErrorMessage()
+            onDismiss()
+        },
+        onValueChange = {
+            resetErrorMessage()
+            albumName = it
+        },
+        onDismiss = {
+            resetErrorMessage()
+            onDismiss()
+        },
+        errorText = errorText,
+        placeholder = defaultSuggestion(),
+        capitalization = KeyboardCapitalization.Sentences,
+    )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun EnterAlbumNameDialogPreview() {
+    AndroidThemeForPreviews {
+        EnterAlbumNameDialog(
+            onConfirm = {},
+            onDismiss = {},
+            resetErrorMessage = {},
+            positiveButtonText = ""
+        )
+    }
+}

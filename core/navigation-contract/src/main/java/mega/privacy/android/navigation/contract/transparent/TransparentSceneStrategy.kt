@@ -13,7 +13,7 @@ import androidx.navigation3.scene.SceneStrategyScope
 class TransparentSceneStrategy<T : Any> : SceneStrategy<T> {
 
     override fun SceneStrategyScope<T>.calculateScene(entries: List<NavEntry<T>>): Scene<T>? {
-        if (entries.isEmpty()) return null
+        if (entries.size < 2) return null
 
         val current = entries.last()
         if (current.isTransparent().not()) return null

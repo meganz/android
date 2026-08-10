@@ -6,6 +6,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
@@ -94,6 +95,7 @@ class MonitorPendingTransfersUntilResolvedUseCaseTest {
         uriPath = UriPath(""),
         transferType = type,
         state = pendingTransferState,
-        fileName = null
+        fileName = null,
+        pitagTrigger = PitagTrigger.Picker,
     )
 }

@@ -4,14 +4,12 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel
-import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
@@ -125,25 +123,6 @@ class TransfersWidgetViewModelTest {
                 monitorTransfersStatusFlow.emit(transfersStatusInfo)
                 val actual = awaitItem().transfersInfo
                 assertThat(actual).isEqualTo(expected)
-            }
-        }
-
-    @Test
-    fun `test that isOnline ui state is updated when monitorConnectivityUseCase emits, skipping unstable offline`() =
-        runTest {
-            initTest()
-            underTest.state.test {
-                monitorConnectivityUseCaseFlow.emit(true)
-                assertThat(awaitItem().isOnline).isTrue()
-                monitorConnectivityUseCaseFlow.emit(false)
-                delay(waitTimeToShowOffline / 2)
-                monitorConnectivityUseCaseFlow.emit(true)
-                expectNoEvents() //short offline is skipped
-                monitorConnectivityUseCaseFlow.emit(false)
-                delay(waitTimeToShowOffline * 1.1)
-                assertThat(awaitItem().isOnline).isFalse() // long offline is not skipped
-                monitorConnectivityUseCaseFlow.emit(true)
-                assertThat(awaitItem().isOnline).isTrue() // online is updated immediately
             }
         }
 

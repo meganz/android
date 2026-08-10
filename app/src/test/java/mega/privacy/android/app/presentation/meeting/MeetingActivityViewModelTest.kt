@@ -279,6 +279,7 @@ class MeetingActivityViewModelTest {
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
             getUserAvatarUseCase = getUserAvatarUseCase,
             megaChatRequestHandler = mock(),
+            megaChatApi = mock(),
         )
     }
 

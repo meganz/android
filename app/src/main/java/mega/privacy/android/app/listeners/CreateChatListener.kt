@@ -4,6 +4,7 @@ import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
@@ -32,6 +33,7 @@ class CreateChatListener(
     private val snackbarShower: SnackbarShower? = null,
     private val onChatsCreated: ((List<MegaChatRoom>) -> Unit)? = null,
     private val callback: ((List<Long>, Int) -> Unit)?,
+    private val chatController: ChatController,
 ) : ChatBaseListener(context) {
 
     private var successChats = ArrayList<Long>()
@@ -58,7 +60,16 @@ class CreateChatListener(
         context: Context,
         snackbarShower: SnackbarShower,
         onChatsCreated: (List<MegaChatRoom>) -> Unit,
-    ) : this(context, action, usersNoChatSize + chats.size, snackbarShower, onChatsCreated, null) {
+        chatController: ChatController,
+    ) : this(
+        context,
+        action,
+        usersNoChatSize + chats.size,
+        snackbarShower,
+        onChatsCreated,
+        null,
+        chatController
+    ) {
         this.chats.addAll(chats)
         this.usersNoChatSize = usersNoChatSize
 
@@ -73,7 +84,16 @@ class CreateChatListener(
         snackbarShower: SnackbarShower,
         messageHandles: LongArray,
         chatId: Long,
-    ) : this(context, action, usersNoChat.size + chats.size, snackbarShower, null, null) {
+        chatController: ChatController,
+    ) : this(
+        context,
+        action,
+        usersNoChat.size + chats.size,
+        snackbarShower,
+        null,
+        null,
+        chatController
+    ) {
         initFields(chats, usersNoChat)
 
         this.messageHandles = messageHandles
@@ -147,7 +167,13 @@ class CreateChatListener(
                     }
 
                     val forwardChatProcessor =
-                        MultipleForwardChatProcessor(context, chatHandles, handles, chatId)
+                        MultipleForwardChatProcessor(
+                            context,
+                            chatHandles,
+                            handles,
+                            chatId,
+                            chatController
+                        )
                     forwardChatProcessor.forward(api.getChatRoom(chatId))
                 }
             }

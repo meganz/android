@@ -69,12 +69,25 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     NodeSourceType.BACKUPS,
                     NodeSourceType.DOCUMENTS,
                     NodeSourceType.AUDIO,
+                    NodeSourceType.VIDEOS,
+                    NodeSourceType.SEARCH,
+                    NodeSourceType.VIDEO_PLAYLISTS,
+                    NodeSourceType.RECENTS_BUCKET,
+                    NodeSourceType.VIDEO_RECENTLY_WATCHED,
+                    NodeSourceType.FOLDER_LINK,
+                    NodeSourceType.FILE_LINK,
+                    NodeSourceType.CHAT,
+                    NodeSourceType.MEDIA_PLAYER_DEFAULT,
+                    NodeSourceType.MEDIA_PLAYER_VERSIONS,
+                    NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER,
+                    NodeSourceType.MEDIA_PLAYER_ZIP_FILE,
                         -> ORDER_CLOUD
 
                     NodeSourceType.FAVOURITES -> ORDER_FAVOURITES
                     NodeSourceType.OUTGOING_SHARES -> ORDER_OUTGOING_SHARES
                     NodeSourceType.INCOMING_SHARES,
-                    NodeSourceType.OTHER, NodeSourceType.OFFLINE
+                    NodeSourceType.OTHER, NodeSourceType.OFFLINE, NodeSourceType.TIMELINE,
+                    NodeSourceType.CONTINUE_WHERE_LEFT_OFF,
                         -> ORDER_OTHERS
                 }
             )

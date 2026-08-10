@@ -4,7 +4,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import org.junit.jupiter.api.Assertions.*
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.doReturn
@@ -19,6 +19,7 @@ class DownloadBottomSheetMenuItemTest {
         runTest {
             val node = mock<TypedFileNode> {
                 on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
             }
             val result = underTest.shouldDisplay(
                 isNodeInRubbish = false,
@@ -79,6 +80,7 @@ class DownloadBottomSheetMenuItemTest {
     fun `test that shouldDisplay returns true when node is in backups`() = runTest {
         val node = mock<TypedFileNode> {
             on { isTakenDown } doReturn false
+            on { isNodeKeyDecrypted } doReturn true
         }
         val result = underTest.shouldDisplay(
             isNodeInRubbish = false,
@@ -88,6 +90,38 @@ class DownloadBottomSheetMenuItemTest {
             isConnected = true
         )
         Truth.assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `test that shouldDisplay returns false when node is S4 container`() = runTest {
+        val folderNode = mock<TypedFolderNode> {
+            on { isTakenDown } doReturn false
+            on { isS4Container } doReturn true
+        }
+        val result = underTest.shouldDisplay(
+            isNodeInRubbish = false,
+            accessPermission = null,
+            isInBackups = false,
+            node = folderNode,
+            isConnected = true
+        )
+        Truth.assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `test that shouldDisplay returns false when node key is not decrypted`() = runTest {
+        val node = mock<TypedFileNode> {
+            on { isTakenDown } doReturn false
+            on { isNodeKeyDecrypted } doReturn false
+        }
+        val result = underTest.shouldDisplay(
+            isNodeInRubbish = false,
+            accessPermission = null,
+            isInBackups = false,
+            node = node,
+            isConnected = true
+        )
+        Truth.assertThat(result).isFalse()
     }
 
 

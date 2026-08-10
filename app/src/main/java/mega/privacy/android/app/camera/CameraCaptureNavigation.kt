@@ -4,15 +4,13 @@ import android.net.Uri
 import androidx.compose.material.ScaffoldState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import androidx.compose.material.navigation.BottomSheetNavigator
 
 /**
  * Camera capture screen
  *
  * @param onFinish Callback to be called when the screen finishes
  */
-@OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.cameraCaptureScreen(
     scaffoldState: ScaffoldState,
     bottomSheetNavigator: BottomSheetNavigator,

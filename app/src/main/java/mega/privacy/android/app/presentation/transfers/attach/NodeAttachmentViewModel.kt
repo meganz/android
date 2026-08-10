@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.attach
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.StorageStatePayWallException
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
@@ -14,6 +16,7 @@ import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.GetNodesToAttachUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
+import mega.privacy.android.navigation.destination.ChatNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -164,5 +167,14 @@ class NodeAttachmentViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(event = null)
         }
+    }
+
+    fun navigateToChat(chatId: Long, context: Context) {
+        context.startActivity(
+            MegaActivity.getIntentWithExtraDestinations(
+                context,
+                listOf(ChatNavKey(chatId = chatId, action = null)),
+            )
+        )
     }
 }

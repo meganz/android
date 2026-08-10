@@ -14,8 +14,6 @@
     <string name="general_select">Seleziona</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Seleziona cartelle</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Crea</string>
     <!-- button -->
     <string name="general_add">Aggiungi</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -43,7 +41,7 @@
     <!-- state while importing the file -->
     <string name="general_importing">Aggiungendo&#8230;</string>
     <!-- state while importing the file -->
-    <string name="general_forwarding">Inoltro in corso</string>
+    <string name="general_forwarding">Inoltro</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="general_import">Aggiungi al Cloud drive</string>
     <!-- It will be followed by the error message -->
@@ -60,10 +58,6 @@
     <string name="action_logout">Esci</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Carica</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">Nuova cartella</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Nuovo file di testo</string>
     <!-- Menu item -->
     <string name="action_settings">Impostazioni</string>
     <!-- Search button -->
@@ -127,7 +121,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Nuovo su MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Crea un account MEGA</string>
+    <string name="create_account">Registrati</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Inserisci la tua email</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -154,12 +148,8 @@
     <string name="login_before_share">Accedi per condividere con MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Il tuo link di conferma non è più valido. Il tuo account potrebbe essere stato già attivato o potresti aver annullato la tua registrazione.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Nome</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Cognome</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
-    <string name="top">Capisco che [B]se perdo la mia password, potrei perdere i miei dati[/B]. Leggi di più riguardo la [A]criptazione end-to-end di MEGA[/A]</string>
+    <string name="top">Capisco che [B]se perdo la mia password, potrei perdere i miei dati[/B]. Leggi di più riguardo la [A]criptazione end-to-end di MEGA[/A].</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">Per continuare devi accettare i nostri Termini di servizio</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
@@ -187,7 +177,7 @@
     <!-- Label to reference a recents section -->
     <string name="section_recents">Recenti</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
-    <string name="section_secondary_media_uploads">Media caricati</string>
+    <string name="section_secondary_media_uploads">Caricamenti dei media</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -257,7 +247,7 @@
     <!-- Alert Dialog to get link -->
     <string name="option_decryption_key">Chiave di decrittazione</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
-    <string name="download_preparing_files">In corso</string>
+    <string name="download_preparing_files">Preparazione dei file</string>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Vedi trasferimenti</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -279,11 +269,9 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Questo link non sarà più disponibile pubblicamente.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Rinomina</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Apri</string>
     <!-- while file provider is downloading a file -->
-    <string name="context_preparing_provider">Preparazione del file in corso</string>
+    <string name="context_preparing_provider">Preparazione del file</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_download">Scarica</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -300,8 +288,6 @@
     <string name="context_move_to_trash">Sposta nel Cestino</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Rimuovi da MEGA</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Nome cartella</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Creazione della cartella</string>
     <!-- Menu option title -->
@@ -390,8 +376,6 @@
     <string name="subscription_type_monthly">Mensilmente</string>
     <!--  -->
     <string name="subscription_type_yearly">Annuale</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Nuova cartella</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Aggiungi contatto</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -419,7 +403,7 @@
     <!-- menu item -->
     <string name="my_account_change_password">Modifica password</string>
     <!-- Dialog text overquota error -->
-    <string name="overquota_alert_text">Hai superato il limite del tuo spazio di archiviazione. Vuoi fare l’upgrade ad un account PRO?</string>
+    <string name="overquota_alert_text">Hai superato il limite del tuo spazio di archiviazione. Vuoi effettuare l’upgrade del tuo account?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Ultima sessione</string>
     <!-- message displayed while the app is changing the password -->
@@ -441,13 +425,13 @@
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi o connessione dati</string>
     <!-- title of the notification when camera upload is checking files -->
-    <string name="settings_camera_notif_checking_title">Controllo di file da caricare in corso</string>
+    <string name="settings_camera_notif_checking_title">Controllo della presenza di file da caricare</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Inizializzazione dei Caricamenti da fotocamera in corso</string>
+    <string name="settings_camera_notif_initializing_title">Inizializzazione dei Caricamenti da fotocamera</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">I Caricamenti da fotocamera sono stati disattivati. La tua cartella locale non è disponibile.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">I caricamenti dei media sono stati disattivati. La tua cartella locale non è disponibile.</string>
+    <string name="camera_notif_secondary_local_unavailable">I Caricamenti dei media sono stati disattivati. La tua cartella locale non è disponibile.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Apparenza</string>
     <!-- settings of the Features section -->
@@ -473,7 +457,7 @@
     <!-- Size of files in offline or cache folders -->
     <string name="settings_advanced_features_size">Attualmente %s usati</string>
     <!-- Calculating Size of files in offline or cache folders -->
-    <string name="settings_advanced_features_calculating">Calcolo in corso</string>
+    <string name="settings_advanced_features_calculating">Calcolo</string>
     <!-- title of the setting to set the default download location -->
     <string name="settings_storage_download_location">Cartella di download default</string>
     <!-- Whether to always ask the user each time. -->
@@ -525,9 +509,9 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Come caricare</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Attiva i caricamenti secondari dei media</string>
+    <string name="settings_secondary_upload_on">Attiva i Caricamenti dei media</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Disattiva i caricamenti secondari dei media</string>
+    <string name="settings_secondary_upload_off">Disattiva i Caricamenti dei media</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Scegli cartella</string>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
@@ -685,9 +669,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Congratulazioni, il tuo nuovo indirizzo e-mail per questo account MEGA è: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Cannot be empty</string>
+    <string name="invalid_string">Non può essere vuoto</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
+    <string name="invalid_input">Inserimento non valido</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Reset della password</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -717,7 +701,7 @@
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Cancella immagine</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
-    <string name="recovering_info">Acquisizione delle informazioni in corso&#8230;</string>
+    <string name="recovering_info">Acquisizione delle informazioni&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
     <string name="email_verification_text_change_mail">Il tuo nuovo indirizzo email deve essere verificato. Controlla la casella di posta elettronica del nuovo indirizzo email per procedere.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
@@ -731,7 +715,7 @@
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="hint_confirm_password_protection_dialog">Conferma password</string>
     <!-- Status text at the beginning of getting a link -->
-    <string name="link_request_status">In corso&#8230;</string>
+    <string name="link_request_status">Lavorazione&#8230;</string>
     <!-- Option of the sliding panel to edit the link of a node -->
     <string name="edit_link_option">Gestisci link</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
@@ -816,15 +800,15 @@
     <string name="success_muting_a_chat_for_specific_time">Le notifiche delle chat saranno mutate per %s</string>
     <!-- Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15 -->
     <plurals name="success_muting_chat_until_specific_time">
-        <item quantity="one">Le notifiche delle chat saranno mutate fino alle %1$s</item>
-        <item quantity="many">Le notifiche delle chat saranno mutate fino alle %1$s</item>
-        <item quantity="other">Le notifiche delle chat saranno mutate fino alle %1$s</item>
+        <item quantity="one">Le notifiche delle chat saranno mutate fino alle ore %1$s</item>
+        <item quantity="many">Le notifiche delle chat saranno mutate fino alle ore %1$s</item>
+        <item quantity="other">Le notifiche delle chat saranno mutate fino alle ore %1$s</item>
     </plurals>
     <!-- Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00 -->
     <plurals name="success_muting_chat_until_specific_date_and_time">
-        <item quantity="one">Le notifiche delle chat saranno mutate fino a %1$s alle %2$s</item>
-        <item quantity="many">Le notifiche delle chat saranno mutate fino a %1$s alle %2$s</item>
-        <item quantity="other">Le notifiche delle chat saranno mutate fino a %1$s alle %2$s</item>
+        <item quantity="one">Le notifiche delle chat saranno mutate fino a %1$s alle ore %2$s</item>
+        <item quantity="many">Le notifiche delle chat saranno mutate fino a %1$s alle ore %2$s</item>
+        <item quantity="other">Le notifiche delle chat saranno mutate fino a %1$s alle ore %2$s</item>
     </plurals>
     <!-- Message when select the option Do not disturb but the notifications are already muted -->
     <string name="notifications_are_already_muted">Le notifiche delle chat sono mutate</string>
@@ -832,9 +816,9 @@
     <string name="success_unmuting_a_chat">Le notifiche delle chat sono attive</string>
     <!-- String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15 -->
     <plurals name="chat_notifications_muted_until_specific_time">
-        <item quantity="one">Mutata fino alle %1$s</item>
-        <item quantity="many">Mutata fino alle %1$s</item>
-        <item quantity="other">Mutata fino alle %1$s</item>
+        <item quantity="one">Mutata fino alle ore %1$s</item>
+        <item quantity="many">Mutata fino alle ore %1$s</item>
+        <item quantity="other">Mutata fino alle ore %1$s</item>
     </plurals>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_chat_contact_notifications">Notifiche</string>
@@ -1019,12 +1003,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">minuti</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Online</item>
-        <item>Assente</item>
-        <item>Occupato</item>
-        <item>Offline</item>
-    </string-array>
+    <string name="settings_chat_status_online">Online</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Assente</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Occupato</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Offline</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Attiva</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1086,7 +1071,7 @@
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
         <item quantity="one">Download terminato di %1$d file su %2$d</item>
-        <item quantity="many">Download terminato di %1$d file su %2$d</item>
+        <item quantity="many">Download terminato di %1$d di file su %2$d</item>
         <item quantity="other">Download terminato di %1$d file su %2$d</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
@@ -1116,7 +1101,7 @@
     <!-- Menu option -->
     <string name="import_success_error">Errore. Non aggiunto al Cloud drive</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
-    <string name="chat_connecting">Connessione in corso&#8230;</string>
+    <string name="chat_connecting">Connessione&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s ha già ricevuto un tuo invito. Consulta le tue richieste in sospeso.</string>
     <!-- text_copyright_alert_title -->
@@ -1240,11 +1225,11 @@
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Invita persone a MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">Installa la nostra app</string>
+    <string name="title_install_app">Installa la nostra app per mobile</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bonus di registrazione</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Installa la nostra app desktop</string>
+    <string name="title_install_desktop">Installa la nostra app per desktop</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d giorni rimanenti</string>
     <!-- State to indicate an achievement has expired -->
@@ -1264,9 +1249,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Indirizzo email scritto erroneamente</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Hai ricevuto %1$s spazio di archiviazione aggiuntivo per l\’installazione della nostra app desktop</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Hai ricevuto %1$s di spazio di archiviazione aggiuntivo per l\’installazione della nostra app per desktop</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Hai ricevuto %1$s spazio di archiviazione aggiuntivo per l\’installazione della nostra app mobile</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Hai ricevuto %1$s di spazio di archiviazione aggiuntivo per l\’installazione della nostra app per mobile</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Hai ricevuto %1$s di spazio di archiviazione gratuito come bonus per la tua registrazione.</string>
     <!-- menu items -->
@@ -1277,8 +1262,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Aiuto</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Invia feedback</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Feedback Android</string>
     <!-- mail body -->
@@ -1287,8 +1270,6 @@
     <string name="settings_feedback_body_device_model">Modello del dispositivo</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Versione di Android</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">Nuovo file di testo</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Nome del file</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1307,8 +1288,6 @@
     <string name="general_incorrect_names">Per favore, correggi i nomi dei tuoi file prima di procedere</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caratteri non ammessi</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">I seguenti caratteri non sono ammessi: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Il nome del file non può essere vuoto.</item>
@@ -1327,12 +1306,6 @@
     <string name="invalid_connection_state">Riconnessione alla chat</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">È stato riscontrato un errore e non è stato possibile connettere la chiamata.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Ti piace l\’app per mobile di MEGA?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Sì, vota l’app</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">No, invia un feedback</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Nessun permesso garantito al contatto</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1380,7 +1353,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">Un errore è stato riscontrato e l\’invito non è stato spedito.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Generazione del codice QR in corso&#8230;</string>
+    <string name="generatin_qr">Generazione del codice QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Scansiona il codice QR</string>
     <!-- get the contact link and copy it -->
@@ -1413,8 +1386,6 @@
     <string name="tab_received_requests">Richieste ricevute</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Quota di archiviazione superata</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Link non valido, per favore chiedi un nuovo link valido</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Password del link non valida</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1422,7 +1393,7 @@
     <!-- Message shown when a link is being processing -->
     <string name="processing_link">Processando il link&#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
-    <string name="passwd_weak">La tua password è facilmente intuibile. Rendi la tua password più lunga. Combina lettere maiuscole e minuscole. Aggiungi caratteri speciali. Non utilizzare nomi o parole del dizionario</string>
+    <string name="passwd_weak">La tua password è facilmente intuibile. Rendi la tua password più lunga. Combina lettere maiuscole e minuscole. Aggiungi caratteri speciali. Non utilizzare nomi o parole del dizionario.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
     <string name="passwd_medium">La tua password è abbastanza sicura per procedere, ma ti raccomandiamo di rafforzarla ulteriormente in futuro.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a good password -->
@@ -1502,12 +1473,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Qualità dei video</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Bassa</item>
-        <item>Media</item>
-        <item>Alta</item>
-        <item>Originale</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Bassa</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Media</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Alta</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Originale</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Chiamata persa</string>
     <!-- Refers to a location of file -->
@@ -1519,7 +1491,7 @@
     <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
     <plurals name="number_of_versions_inside_folder">
         <item quantity="one">%1$d file con versione</item>
-        <item quantity="many">%1$d file con versione</item>
+        <item quantity="many">%1$d di file con versione</item>
         <item quantity="other">%1$d file con versione</item>
     </plurals>
     <!-- Error message if any of the forwarded messages fails, message items -->
@@ -1681,7 +1653,7 @@
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
     <string name="error_enable_2fa">Un errore è stato riscontrato durante l’abilitazione dell’autenticazione a due fattori. Per favore, riprova.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
-    <string name="title_enable_2fa">Attiva autenticazione a due fattori (2FA)</string>
+    <string name="title_enable_2fa">Attiva l\’autenticazione a due fattori</string>
     <!-- Label shown when it disables the Two-Factor Authentication -->
     <string name="label_2fa_disabled">Autenticazione a due fattori disabilitata</string>
     <!-- Text of the button which action is to show the authentication apps -->
@@ -1737,7 +1709,7 @@
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Invia messaggio</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
-    <string name="pre_overquota_alert_text">Questa azione non può essere completata in quanto ti porterebbe oltre il tuo limite corrente di spazio di archiviazione. Vuoi fare l’upgrade a PRO?</string>
+    <string name="pre_overquota_alert_text">Questa azione non può essere completata in quanto ti porterebbe oltre il tuo limite corrente di spazio di archiviazione. Vuoi effettuare l’upgrade del tuo account?</string>
     <!-- Title of the section Archived chats -->
     <string name="archived_chats_title_section">Archiviate</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
@@ -1941,7 +1913,7 @@
     <!-- General label for files -->
     <string name="general_files">File</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Salva nel dispositivo</string>
+    <string name="general_save_to_device">Scarica</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Upload</string>
     <!-- Label choose destination -->
@@ -2058,9 +2030,9 @@
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A] [B]ha aggiunto %2$s e %3$s[/B]</string>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files -->
     <plurals name="subtitle_notification_added_files">
-        <item quantity="one">[A]%1$s[/A] [B]ha aggiunto %2$d file.[/B]</item>
-        <item quantity="many">[A]%1$s[/A] [B]ha aggiunto %2$d file.[/B]</item>
-        <item quantity="other">[A]%1$s[/A] [B]ha aggiunto %2$d file.[/B]</item>
+        <item quantity="one">[A]%1$s [/A][B]ha aggiunto %2$d file.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]ha aggiunto %2$d di file.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]ha aggiunto %2$d file.[/B]</item>
     </plurals>
     <!-- Subtitle of the historic notification for deletions inside an existing shared folder, Plural of item. 2 items -->
     <plurals name="subtitle_notification_deleted_items">
@@ -2149,7 +2121,7 @@
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">È stato riscontrato un errore e non è stato possibile aprire il file con questa app.</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
-    <string name="outgoing_call_starting">Chiamata in corso&#8230;</string>
+    <string name="outgoing_call_starting">Chiamando&#8230;</string>
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">Il messaggio contiene metadati invalidi</string>
     <!-- Title of the activity that sends a location -->
@@ -2173,8 +2145,8 @@
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="one">Messaggio inoltrato</item>
-        <item quantity="many">Messaggio inoltrato</item>
-        <item quantity="other">Messaggio inoltrato</item>
+        <item quantity="many">Messaggi inoltrati</item>
+        <item quantity="other">Messaggi inoltrati</item>
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Posizione fissata</string>
@@ -2189,7 +2161,7 @@
     <!-- Label shown when a new group chat has been created correctly -->
     <string name="new_group_chat_created">Nuova chat di gruppo creata</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
-    <string name="preparing_chats">In corso</string>
+    <string name="preparing_chats">Preparazione dei file</string>
     <!-- Label indicating some content has been sent as message -->
     <string name="sent_as_message">Inviato come messaggio.</string>
     <!-- Action delete all file versions -->
@@ -2247,7 +2219,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Ignora</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s ha mutato questa chiamata</string>
+    <string name="muted_contact_micro">%s ha disattivato il microfono</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">Mutata</string>
     <!-- Subtitle of the call screen when the call is on hold -->
@@ -2407,7 +2379,7 @@
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">Numero di telefono</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
-    <string name="reconnecting_message">Riconnessione in corso</string>
+    <string name="reconnecting_message">Riconnessione</string>
     <!-- Text shown for the action create new file -->
     <string name="create_new_file_action">Crea un nuovo file</string>
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
@@ -2931,7 +2903,7 @@
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Registrati ora ed utilizza la collaborazione avanzata gratuitamente.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
-    <string name="ongoing_call_content">Un\’altra chiamata in corso. Per favore, termina la chiamata corrente prima di iniziarne un\’altra.</string>
+    <string name="ongoing_call_content">Un\’altra chiamata è in corso. Per favore, termina la chiamata corrente prima di iniziarne un\’altra.</string>
     <!-- The hint text when changing meeting name-->
     <string name="new_meeting_name">Nuovo nome del meeting</string>
     <!-- The content of dialog when failed for creating meeting-->
@@ -3133,7 +3105,7 @@
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Inserisci la tua password</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
-    <string name="scanning_transfers">Scansione in corso&#8230;</string>
+    <string name="scanning_transfers">Scansione&#8230;</string>
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">Annulla trasferimenti</string>
     <!-- Warning informing transfers were cancelled. -->
@@ -3239,7 +3211,7 @@
     <!-- Success message when submit issue succeeded-->
     <string name="settings_help_report_issue_success">Abbiamo ricevuto il tuo report. Controlleremo il problema e torneremo da te.</string>
     <!-- Message shown during log file upload-->
-    <string name="settings_help_report_issue_uploading_log_file">Upload del file log in corso</string>
+    <string name="settings_help_report_issue_uploading_log_file">Upload del file log</string>
     <!-- Message shown if user tries to leave report screen without submitting their report-->
     <string name="settings_help_report_issue_discard_dialog_title">Annullare il report?</string>
     <!-- Button text for discard dialog option-->
@@ -3265,7 +3237,7 @@
     <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_title_end_call_for_all">Terminare la chiamata per tutti i partecipanti?</string>
     <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
-    <string name="meetings_chat_screen_dialog_description_end_call_for_all">Questo terminerà la chiamata per tutti i partecipanti</string>
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">Questo terminerà la chiamata per tutti i partecipanti.</string>
     <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">Si</string>
     <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
@@ -3301,13 +3273,13 @@
         <item quantity="other">Partecipanti: %s</item>
     </plurals>
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
-    <string name="chat_chat_room_message_permissions_changed_to_read_only">L\’utente [A]%1$s[/A][B] è stato impostato come “di sola lettura” da [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">L\’utente [A]%1$s[/A][B] è stato impostato come \“di sola lettura\“ da [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
     <string name="chat_chat_room_message_permissions_changed_to_standard">[/B][A]%2$s[/A] ha impostato [A]%1$s[/A][B] come partecipante standard</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">L\’utente [A]%1$s[/A][B] è stato impostato come host da [/B][A]%2$s[/A]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">L\’utente %1$s  è stato impostato come “di sola lettura” da %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">L\’utente %1$s  è stato impostato come \“di sola lettura\“ da %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s ha impostato %1$s come partecipante standard</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
@@ -3385,7 +3357,7 @@
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Permetti a chi non è host di aggiungere partecipanti</string>
     <!-- Title of gif album. -->
-    <string name="photos_album_title_gif">GIFs</string>
+    <string name="photos_album_title_gif">GIF</string>
     <!-- Title of raw album. -->
     <string name="photos_album_title_raw">RAW</string>
     <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
@@ -4096,13 +4068,19 @@
         <item quantity="many">Impossibile copiare %1$d di oggetti</item>
         <item quantity="other">Impossibile copiare %1$d oggetti</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">%1$d oggetto copiato,&#160;</item>
         <item quantity="many">%1$d di oggetti copiati,&#160;</item>
         <item quantity="other">%1$d oggetti copiati,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">impossibile copiare %1$d oggetto</item>
         <item quantity="many">impossibile copiare %1$d oggetti</item>
@@ -4312,7 +4290,7 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Mensilmente</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Alcuni mesi non hanno %1$dgiorno. Per questi mesi, l\’evento verrà programmato per l\’ultimo giorno del mese.</item>
+        <item quantity="one">Alcuni mesi non hanno %1$d giorno. Per questi mesi, l\’evento verrà programmato per l\’ultimo giorno del mese.</item>
         <item quantity="many">Alcuni mesi non hanno %1$d giorni. Per questi mesi, l\’evento verrà programmato per l\’ultimo giorno del mese.</item>
         <item quantity="other">Alcuni mesi non hanno %1$d giorni. Per questi mesi, l\’evento verrà programmato per l\’ultimo giorno del mese.</item>
     </plurals>
@@ -4750,16 +4728,6 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s sta presentando</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Questa persona sta condividendo lo schermo</string>
-    <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">La registrazione di questa chiamata è in corso</string>
-    <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">Rimanendo all\’interno della chiamata dai il permesso ad essere presente nella registrazione. La registrazione è archiviata solo sul dispositivo della persona che sta registrando.</string>
-    <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">OK, capito</string>
-    <!-- Label for the negative or cancel button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_negative_button">Lascia la chiamata</string>
-    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Scopri di più[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">%1$s ha fatto partire la registrazione</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
@@ -4785,7 +4753,7 @@
     <!-- Default status label for an absent participant at the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">Non nella chiamata</string>
     <!-- Status label when calling an absent participant from the not in call participants list -->
-    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Chiamata in corso&#8230;</string>
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Chiamata&#8230;</string>
     <!-- Status label after call an absent participant from the not in call participants list and get no response -->
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Nessuna risposta</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
@@ -5024,4 +4992,5 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Caricamenti da fotocamera attivati</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Questa posizione non esiste più.</string>
+    <string name="invalid_link">Link non valido. Per favore, riprova o richiedine un altro.</string>
 </resources>

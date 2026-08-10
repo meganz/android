@@ -1,0 +1,331 @@
+package mega.privacy.android.feature.myaccount.presentation.widget
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.surface.CardSurface
+import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.modifiers.shimmerEffect
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.core.formatter.stripLinkAnnotations
+import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
+import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
+import mega.privacy.android.feature.myaccount.presentation.widget.view.MyAccountHorizontalProgressBar
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
+
+/**
+ * Shimmer view that mimics the MyAccount widget layout
+ */
+@Composable
+private fun MyAccountWidgetShimmerView() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 12.dp) // Match the actual widget padding
+            .testTag(MY_ACCOUNT_WIDGET_SHIMMER_TEST_TAG),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Avatar shimmer
+        Spacer(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .shimmerEffect()
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            // User name shimmer
+            Box(
+                contentAlignment = Alignment.CenterStart
+            ) {
+                MegaText(
+                    text = " ",
+                    style = AppTheme.typography.titleMedium,
+                    modifier = Modifier.heightIn(min = 24.dp)
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(18.dp)
+                        .shimmerEffect()
+                )
+            }
+
+            // Account type shimmer
+            Box(
+                contentAlignment = Alignment.CenterStart
+            ) {
+                MegaText(
+                    text = " ",
+                    style = AppTheme.typography.bodyMedium,
+                    modifier = Modifier.heightIn(min = 20.dp)
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(16.dp)
+                        .shimmerEffect()
+                )
+            }
+
+            // Storage usage shimmer
+            Box(
+                contentAlignment = Alignment.CenterStart
+            ) {
+                MegaText(
+                    text = " ",
+                    style = AppTheme.typography.bodySmall,
+                    modifier = Modifier.heightIn(min = 20.dp)
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(14.dp)
+                        .shimmerEffect()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            // Progress bar shimmer
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .shimmerEffect(RoundedCornerShape(2.dp))
+            )
+        }
+
+        Spacer(modifier = Modifier.width(24.dp))
+    }
+}
+
+/**
+ * MyAccount widget composable
+ *
+ * @param state Widget UI state
+ * @param modifier Modifier
+ * @param onClick Click handler
+ */
+@Composable
+internal fun MyAccountWidget(
+    state: MyAccountWidgetUiState,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    val context = LocalContext.current
+    val density = LocalDensity.current
+    val titleStyle = AppTheme.typography.titleMedium
+    val bodyStyle = AppTheme.typography.bodyMedium
+    val bodySmallStyle = AppTheme.typography.bodySmall
+    val minTitleHeight = with(density) {
+        titleStyle.lineHeight.toDp().coerceAtLeast(24.dp)
+    }
+    val minBodyHeight = with(density) {
+        bodyStyle.lineHeight.toDp().coerceAtLeast(20.dp)
+    }
+    val minBodySmallHeight = with(density) {
+        bodySmallStyle.lineHeight.toDp().coerceAtLeast(20.dp)
+    }
+
+    CardSurface(
+        modifier = modifier
+            .padding(horizontal = 16.dp)
+            .testTag(MY_ACCOUNT_WIDGET_TEST_TAG)
+            .clickable { onClick() },
+        surfaceColor = SurfaceColor.Surface1
+    ) {
+        if (state.isLoading) {
+            MyAccountWidgetShimmerView()
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                val emojifiedName = remember(state.name) {
+                    state.name?.let { EmojiUtilsShortcodes.emojify(it) }.orEmpty()
+                }
+                // Avatar
+                Avatar(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .testTag(MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG),
+                    content = state.avatarContent ?: TextAvatarContent(
+                        avatarText = state.name?.trim()?.firstOrNull()?.uppercaseChar()
+                            ?.toString()
+                            ?: "?",
+                        backgroundColor = 0,
+                        showBorder = false,
+                        textSize = 18.sp,
+                    )
+                )
+
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    // User name - allow 1 lines with ellipsis so large font doesn't clip
+                    MegaText(
+                        text = "${stringResource(R.string.general_hi)} $emojifiedName!",
+                        style = titleStyle,
+                        modifier = Modifier
+                            .heightIn(min = minTitleHeight)
+                            .testTag(MY_ACCOUNT_WIDGET_USER_NAME_TEST_TAG),
+                        maxLines = 1,
+                        overflow = TextOverflow.MiddleEllipsis
+                    )
+
+                    // Account type
+                    if (state.accountTypeNameResource != 0) {
+                        MegaText(
+                            text = stringResource(state.accountTypeNameResource),
+                            style = bodyStyle,
+                            modifier = Modifier
+                                .heightIn(min = minBodyHeight)
+                                .testTag(MY_ACCOUNT_WIDGET_ACCOUNT_TYPE_TEST_TAG)
+                        )
+                    }
+
+                    // Storage usage (formatted)
+                    val storageText = if (state.isBusinessAccount) {
+                        stringResource(
+                            R.string.navigation_drawer_used_space_only,
+                            formatFileSize(state.usedStorage, context)
+                        ).stripLinkAnnotations()
+                    } else {
+                        stringResource(
+                            R.string.storage_usage_format,
+                            formatFileSize(state.usedStorage, context),
+                            formatFileSize(state.totalStorage, context)
+                        )
+                    }
+                    MegaText(
+                        text = storageText,
+                        textColor = TextColor.Secondary,
+                        style = bodySmallStyle,
+                        modifier = Modifier
+                            .heightIn(min = minBodySmallHeight)
+                            .testTag(MY_ACCOUNT_WIDGET_STORAGE_USAGE_TEST_TAG)
+                    )
+
+                    if (!state.isBusinessAccount) {
+                        Spacer(modifier = Modifier.height(2.dp))
+
+                        // Horizontal progress bar
+                        MyAccountHorizontalProgressBar(
+                            modifier = Modifier.testTag(MY_ACCOUNT_WIDGET_PROGRESS_BAR_TEST_TAG),
+                            level = state.storageQuotaLevel,
+                            progress = state.usedStoragePercentage.toFloat()
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Chevron arrow
+                MegaIcon(
+                    modifier = Modifier.testTag(MY_ACCOUNT_WIDGET_CHEVRON_TEST_TAG),
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
+                    tint = IconColor.Secondary,
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
+
+internal const val MY_ACCOUNT_WIDGET_TEST_TAG = "my_account_widget"
+internal const val MY_ACCOUNT_WIDGET_SHIMMER_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:shimmer"
+internal const val MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:avatar"
+internal const val MY_ACCOUNT_WIDGET_USER_NAME_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:user_name"
+internal const val MY_ACCOUNT_WIDGET_ACCOUNT_TYPE_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:account_type"
+internal const val MY_ACCOUNT_WIDGET_STORAGE_USAGE_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:storage_usage"
+internal const val MY_ACCOUNT_WIDGET_PROGRESS_BAR_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:progress_bar"
+internal const val MY_ACCOUNT_WIDGET_CHEVRON_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:chevron"
+
+@CombinedThemePreviews
+@Composable
+private fun MyAccountWidgetLoadingPreview() {
+    AndroidThemeForPreviews {
+        MyAccountWidget(
+            state = MyAccountWidgetUiState(isLoading = true),
+            onClick = {}
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun MyAccountWidgetShimmerLoadedPreview() {
+    AndroidThemeForPreviews {
+        Box(
+        ) {
+            MyAccountWidget(
+                state = MyAccountWidgetUiState(
+                    name = "John Doe",
+                    accountTypeNameResource = android.R.string.ok, // Placeholder
+                    usedStorage = 124470000000L,  // ~116 GB
+                    totalStorage = 750000000000L,  // ~698 GB
+                    usedStoragePercentage = 50,
+                    storageQuotaLevel = QuotaLevel.Success,
+                    isLoading = true
+                ),
+                onClick = {}
+            )
+            MyAccountWidget(
+                state = MyAccountWidgetUiState(
+                    name = "John Doe",
+                    accountTypeNameResource = android.R.string.ok, // Placeholder
+                    usedStorage = 124470000000L,  // ~116 GB
+                    totalStorage = 750000000000L,  // ~698 GB
+                    usedStoragePercentage = 50,
+                    storageQuotaLevel = QuotaLevel.Success,
+                    isLoading = false
+                ),
+                onClick = {},
+            )
+        }
+    }
+}

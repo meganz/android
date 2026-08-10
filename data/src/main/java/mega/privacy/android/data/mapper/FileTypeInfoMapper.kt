@@ -125,6 +125,7 @@ internal fun getFileTypeInfoForExtension(
 }
 
 private fun String.isZipMimeType() = startsWith("multipart/x-zip") || startsWith("application/zip")
+
 private fun String.isAudioMimeType(extension: String) =
     startsWith("audio/") || extension == "opus" || extension == "weba"
 

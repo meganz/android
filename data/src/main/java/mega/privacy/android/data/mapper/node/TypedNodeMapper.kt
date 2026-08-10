@@ -35,14 +35,14 @@ internal class TypedNodeMapper @Inject constructor(
         offline: Offline? = null,
         fromFolderLink: Boolean = false,
         requireSerializedData: Boolean = false,
-    ): TypedNode {
+    ): TypedNode? {
         val unTypedNode = nodeMapper(
             megaNode = megaNode,
             fromFolderLink = fromFolderLink,
             requireSerializedData = requireSerializedData,
             offline = offline,
             syncedNodeIds = folderTypeData?.syncedNodeIds
-        )
+        ) ?: return null
         return when (unTypedNode) {
             is TypedNode -> unTypedNode
             is FileNode -> DefaultTypedFileNode(fileNode = unTypedNode)

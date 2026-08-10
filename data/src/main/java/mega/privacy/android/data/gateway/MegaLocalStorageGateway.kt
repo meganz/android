@@ -3,7 +3,6 @@ package mega.privacy.android.data.gateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.settings.ChatSettings
 
 /**
  * Mega local storage gateway
@@ -34,7 +33,7 @@ interface MegaLocalStorageGateway {
      * Get links sort order
      * @return links sort order
      */
-    suspend fun getLinksSortOrder(isSingleActivityEnabled: Boolean): Int
+    suspend fun getLinksSortOrder(): Int
 
     /**
      * Get offline sort order
@@ -86,6 +85,21 @@ interface MegaLocalStorageGateway {
      */
     suspend fun setNonContactEmail(userHandle: Long, email: String)
 
+    /**
+     * Set non contact first name
+     *
+     * @param userHandle
+     * @param firstName
+     */
+    suspend fun setNonContactFirstName(userHandle: Long, firstName: String?)
+
+    /**
+     * Set non contact last name
+     *
+     * @param userHandle
+     * @param lastName
+     */
+    suspend fun setNonContactLastName(userHandle: Long, lastName: String?)
 
     /**
      * Get contact by email
@@ -162,6 +176,16 @@ interface MegaLocalStorageGateway {
     suspend fun getAttributes(): MegaAttributes?
 
     /**
+     * Reset account details time stamp
+     */
+    suspend fun resetAccountDetailsTimeStamp()
+
+    /**
+     * Reset extended account details time stamp
+     */
+    suspend fun resetExtendedAccountDetailsTimestamp()
+
+    /**
      * Get chat files folder handle
      */
     suspend fun getChatFilesFolderHandle(): Long?
@@ -184,18 +208,6 @@ interface MegaLocalStorageGateway {
      * @param type
      */
     suspend fun setLastPublicHandleType(type: Int)
-
-    /**
-     * Gets chat settings.
-     */
-    suspend fun getChatSettings(): ChatSettings?
-
-    /**
-     * Sets chat settings.
-     *
-     * @param chatSettings [ChatSettings]
-     */
-    suspend fun setChatSettings(chatSettings: ChatSettings)
 
     /**
      * Clear preferences
@@ -233,11 +245,6 @@ interface MegaLocalStorageGateway {
     suspend fun clearAttributes()
 
     /**
-     * Clears chat settings.
-     */
-    suspend fun clearChatSettings()
-
-    /**
      * Set transfer queue status
      *
      * @param isPause
@@ -254,5 +261,5 @@ interface MegaLocalStorageGateway {
     /**
      * Should show copyright
      */
-    fun shouldShowCopyright(): Boolean
+    suspend fun shouldShowCopyright(): Boolean
 }

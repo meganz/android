@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import androidx.work.WorkInfo
-import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -13,10 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -26,13 +22,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.cache.MapCache
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -47,9 +43,15 @@ import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
+import mega.privacy.android.data.mapper.transfer.upload.MegaUploadOptionsMapper
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
+import mega.privacy.android.data.qualifier.ParentNodeCache
+import mega.privacy.android.data.qualifier.TransferPathCache
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.times
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
@@ -59,6 +61,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -70,7 +73,9 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.logout.LogoutTask
 import nz.mega.sdk.MegaError.API_OK
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
@@ -79,7 +84,6 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -93,7 +97,6 @@ import kotlin.time.Instant
  * @param transferMapper [TransferEventMapper]
  * @param appEventGateway [AppEventGateway]
  * @param localStorageGateway [MegaLocalStorageGateway]
- * @param parentRecursiveAppDataCache cache to store transfer app data that needs to be used recursively in children
  */
 @OptIn(ExperimentalTime::class)
 @Singleton
@@ -117,8 +120,11 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val inProgressTransferMapper: InProgressTransferMapper,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
-    private val transfersPreferencesGateway: Lazy<TransfersPreferencesGateway>,
-) : TransferRepository {
+    private val megaUploadOptionsMapper: MegaUploadOptionsMapper,
+    @DisplayPathFromUriCache private val displayPathFromUriCache: MapCache<String, String>,
+    @ParentNodeCache private val parentNodeCache: MapCache<Long, MegaNode?>,
+    @TransferPathCache private val transferPathCache: MapCache<Pair<Long, TransferType>, String>,
+) : TransferRepository, LogoutTask {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
 
@@ -137,7 +143,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     /**
      * to store current transferred bytes in memory instead of in database
      */
-    private val transferredBytesFlows: Map<TransferType, MutableStateFlow<Map<Long, Long>>> =
+    private val activeTransfersFlows: Map<TransferType, MutableStateFlow<Map<Long, ActiveTransfer>>> =
         TransferType.entries.associateWith { MutableStateFlow(mapOf()) }
 
     override var transferOverQuotaTimestamp = AtomicLong()
@@ -153,6 +159,26 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
     }
 
+    override suspend fun onLogoutSuccess() {
+        resetCachedValues()
+    }
+
+    private suspend fun resetCachedValues() {
+        monitorPausedTransfers.emit(false)
+        monitorAskedResumeTransfers.emit(false)
+        monitorTransferOverQuotaErrorTimestamp.emit(null)
+        monitorTransferInErrorStatus.emit(false)
+        inProgressTransfersFlow.emit(emptyMap())
+        activeTransfersFlows.forEach { (_, flow) ->
+            flow.emit(emptyMap())
+        }
+        transferOverQuotaTimestamp = AtomicLong()
+        broadcastTransferOverQuota(false)
+        broadcastStorageOverQuota(false)
+        clearCompletedTransfersCache()
+        Timber.d("Reset default transfers repository cached values")
+    }
+
     override fun startUpload(
         localPath: String,
         parentNodeId: NodeId,
@@ -161,22 +187,46 @@ internal class DefaultTransfersRepository @Inject constructor(
         appData: List<TransferAppData>?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
+        pitagTrigger: PitagTrigger,
+        pitagTarget: PitagTarget,
     ) = callbackFlow {
         val parentNode = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
         requireNotNull(parentNode)
         val listener = transferListener(channel)
 
-        megaApiGateway.startUpload(
-            localPath = localPath,
-            parentNode = parentNode,
-            fileName = fileName,
-            modificationTime = modificationTime,
-            appData = transferAppDataStringMapper(appData),
-            isSourceTemporary = isSourceTemporary,
-            shouldStartFirst = shouldStartFirst,
-            cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
-            listener = listener,
-        )
+        runCatching {
+            megaUploadOptionsMapper(
+                fileName = fileName,
+                mtime = modificationTime,
+                appData = appData,
+                isSourceTemporary = isSourceTemporary,
+                startFirst = shouldStartFirst,
+                pitagTrigger = pitagTrigger,
+                pitagTarget = pitagTarget,
+            )
+        }.onFailure { Timber.e(it) }.getOrNull()?.let { options ->
+            Timber.d("Using startUpload with MegaUploadOptions")
+            megaApiGateway.startUpload(
+                localPath = localPath,
+                parent = parentNode,
+                cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+                options = options,
+                listener = listener,
+            )
+        } ?: run {
+            Timber.d("Using deprecated startUpload as MegaUploadOptions is null")
+            megaApiGateway.startUpload(
+                localPath = localPath,
+                parent = parentNode,
+                fileName = fileName,
+                mtime = modificationTime,
+                appData = transferAppDataStringMapper(appData),
+                isSourceTemporary = isSourceTemporary,
+                startFirst = shouldStartFirst,
+                cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+                listener = listener,
+            )
+        }
         awaitClose()
     }
         .flowOn(ioDispatcher)
@@ -352,6 +402,13 @@ internal class DefaultTransfersRepository @Inject constructor(
         appEventGateway.broadcastTransferOverQuota(isCurrentOverQuota)
     }
 
+    override fun monitorTransferOverQuotaEvent(): Flow<TransferOverQuotaStatus> =
+        appEventGateway.monitorTransferOverQuotaEvent()
+
+    override suspend fun broadcastTransferOverQuotaEvent(status: TransferOverQuotaStatus) {
+        appEventGateway.broadcastTransferOverQuotaEvent(status)
+    }
+
     override fun monitorStorageOverQuota(): Flow<Boolean> =
         appEventGateway.monitorStorageOverQuota()
 
@@ -408,25 +465,23 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaApiGateway.resumeTransfersForNotLoggedInInstance()
     }
 
-    override suspend fun getInProgressTransfers(): List<Transfer> = withContext(ioDispatcher) {
-        val transfers = mutableListOf<Transfer>()
-        megaApiGateway.getTransferData()?.let { data ->
-            transfers.addAll(
-                (0 until data.numDownloads)
-                    .mapNotNull { getTransferByTag(data.getDownloadTag(it)) })
-            transfers.addAll(
-                (0 until data.numUploads)
-                    .mapNotNull { getTransferByTag(data.getUploadTag(it)) })
+    override suspend fun getInProgressTransfersFromSdk(): List<Transfer> =
+        withContext(ioDispatcher) {
+            (megaApiGateway.getTransfers(MegaTransfer.TYPE_UPLOAD)
+                    + megaApiGateway.getTransfers(MegaTransfer.TYPE_DOWNLOAD))
+                .map { transferMapper(it) }
+                .sortedBy { it.priority }
         }
-        transfers.sortedBy { it.priority }
-    }
 
     override fun monitorCompletedTransfersByStateWithLimit(
         limit: Int,
         vararg states: TransferState,
     ): Flow<List<CompletedTransfer>> =
-        megaLocalRoomGateway.getCompletedTransfersByStateWithLimit(limit, *states)
+        megaLocalRoomGateway.monitorCompletedTransfersByStateWithLimit(limit, *states)
             .flowOn(ioDispatcher)
+
+    override suspend fun getCompletedTransfers() =
+        megaLocalRoomGateway.getCompletedTransfers()
 
     override suspend fun addCompletedTransfers(finishEvents: List<TransferEvent.TransferFinishEvent>) {
         withContext(ioDispatcher) {
@@ -434,7 +489,7 @@ internal class DefaultTransfersRepository @Inject constructor(
                 if (event.transfer.state == TransferState.STATE_FAILED) {
                     monitorTransferInErrorStatus.update { true }
                 }
-                completedTransferMapper(event.transfer, event.error)
+                completedTransferMapper(event)
             }
             megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
         }
@@ -500,47 +555,53 @@ internal class DefaultTransfersRepository @Inject constructor(
             workInfos.any { it.state.isFinished }
         }
 
-    override suspend fun getActiveTransferByUniqueId(uniqueId: Long) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.getActiveTransferByUniqueId(uniqueId)
+    override fun monitorActiveTransfersByType(transferType: TransferType) =
+        activeTransfersFlow(transferType).map { it.values.toList() }.flowOn(ioDispatcher)
+
+
+    override suspend fun getActiveTransfersByType(transferType: TransferType) =
+        activeTransfersFlow(transferType).value.values.filter { it.transferType == transferType }
+
+    override suspend fun getActiveTransfers() =
+        activeTransfersFlows.values.flatMap { it.value.values }
+
+    override suspend fun putActiveTransfer(activeTransfer: Transfer) {
+        putActiveTransfers(listOf(activeTransfer))
     }
 
-    override suspend fun getActiveTransferByTag(tag: Int) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.getActiveTransferByTag(tag)
+    override suspend fun putActiveTransfers(activeTransfers: List<ActiveTransfer>) {
+        activeTransfers
+            .groupBy { it.transferType }
+            .mapValues { (transferType, activeTransfers) ->
+                val finishedUniqueIds = activeTransfersFlow(transferType).value.values
+                    .filter { it.isFinished }
+                    .map { it.uniqueId }
+                activeTransfers.filter { it.uniqueId !in finishedUniqueIds }
+            }
+            .filter { (_, activeTransfers) ->
+                activeTransfers.isNotEmpty()
+            }
+            .forEach { (transferType, activeTransfers) ->
+                activeTransfersFlow(transferType).update { map ->
+                    map + activeTransfers.associateBy { it.uniqueId }
+                }
+            }
     }
 
-    override fun getActiveTransfersByType(transferType: TransferType) =
-        megaLocalRoomGateway
-            .getActiveTransfersByType(transferType)
-            .flowOn(ioDispatcher)
-            .cancellable()
-
-    override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
+    override suspend fun deleteAllActiveTransfers() =
         withContext(ioDispatcher) {
-            megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType)
+            TransferType.entries.forEach {
+                activeTransfersFlow(it).value = mapOf()
+            }
         }
 
-    override suspend fun getCurrentActiveTransfers(): List<ActiveTransfer> =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getCurrentActiveTransfers()
-        }
-
-    override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.insertOrUpdateActiveTransfer(activeTransfer)
-        }
-
-    override suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.insertOrUpdateActiveTransfers(activeTransfers)
-        }
-
-    override suspend fun updateTransferredBytes(transfers: List<Transfer>) =
+    override suspend fun updateActiveTransfersBytes(transfers: List<Transfer>) =
         withContext(ioDispatcher) {
             val grouped = transfers
                 .filterNot { it.transferredBytes == 0L }
                 .groupBy { it.transferType }
             grouped.forEach { (transferType, transfersOfThisType) ->
-                transferredBytesFlow(transferType).update { map ->
+                activeTransfersFlow(transferType).update { map ->
                     map.updateTransferredBytesKeepingConsistentProgress(transfersOfThisType)
                 }
             }
@@ -551,19 +612,25 @@ internal class DefaultTransfersRepository @Inject constructor(
      * @param updatedTransfers new and updated transfers
      * @param getMaxValue lambda to get a value with maximum transfer progress given the current value and the updated transfer
      */
-    private fun <T> Map<Long, T>.updateTransfersKeepingConsistentProgress(
-        updatedTransfers: List<Transfer>,
-        getMaxValue: (T?, Transfer) -> T,
-    ): Map<Long, T> {
+    private fun <T, R> Map<Long, T>.updateTransfersKeepingConsistentProgress(
+        updatedTransfers: List<R>,
+        getMaxValue: (T?, R) -> T,
+    ): Map<Long, T> where R : ActiveTransfer {
         val updated: List<Pair<Long, T>> = updatedTransfers.map {
             it.uniqueId to getMaxValue(this[it.uniqueId], it)
         }
         return this + updated
     }
 
-    private fun Map<Long, Long>.updateTransferredBytesKeepingConsistentProgress(updatedTransfers: List<Transfer>) =
-        this.updateTransfersKeepingConsistentProgress(updatedTransfers) { previousBytes, newTransfer ->
-            max(previousBytes ?: 0L, newTransfer.transferredBytes)
+    private fun Map<Long, ActiveTransfer>.updateTransferredBytesKeepingConsistentProgress(
+        updatedTransfers: List<ActiveTransfer>,
+    ) =
+        this.updateTransfersKeepingConsistentProgress(updatedTransfers) { previousTransfer, newTransfer ->
+            if (previousTransfer == null || previousTransfer.transferredBytes < newTransfer.transferredBytes) {
+                newTransfer
+            } else {
+                previousTransfer
+            }
         }
 
     private fun Map<Long, InProgressTransfer>.updateInProgressTransfersKeepingConsistentProgress(
@@ -581,52 +648,21 @@ internal class DefaultTransfersRepository @Inject constructor(
             )
         }
 
-    override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.deleteAllActiveTransfersByType(transferType)
-            transferredBytesFlow(transferType).value = mapOf()
-        }
-
-    override suspend fun deleteAllActiveTransfers() =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.deleteAllActiveTransfers()
-            TransferType.entries.forEach {
-                transferredBytesFlow(it).value = mapOf()
-            }
-        }
-
-    override suspend fun setActiveTransfersAsFinishedByUniqueId(
-        uniqueIds: List<Long>,
-        cancelled: Boolean,
-    ) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.setActiveTransfersAsFinishedByUniqueId(uniqueIds, cancelled)
-    }
-
-    override fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals> =
-        flow {
-            val transferredBytesFlow = transferredBytesFlow(transferType)
-            emitAll(
-                megaLocalRoomGateway.getActiveTransfersByType(transferType).flowOn(ioDispatcher)
-                    .combine(transferredBytesFlow) { activeTransfers, transferredBytes ->
-                        activeTransfers to transferredBytes
-                    }
-                    .scan(null as ActiveTransferTotals?) { previousTotals, (activeTransfers, transferredBytes) ->
-                        activeTransferTotalsMapper(
-                            type = transferType,
-                            list = activeTransfers,
-                            transferredBytes = transferredBytes,
-                            previousActionGroups = previousTotals?.actionGroups
-                        )
-                    }.filterNotNull() //skip first null value
-            )
-        }.cancellable()
+    override fun monitorActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals> =
+        activeTransfersFlow(transferType)
+            .scan(null as ActiveTransferTotals?) { previousTotals, activeTransfers ->
+                activeTransferTotalsMapper(
+                    type = transferType,
+                    transfers = activeTransfers.values,
+                    previousActionGroups = previousTotals?.actionGroups
+                )
+            }.filterNotNull() //skip first null value
 
     override suspend fun getCurrentActiveTransferTotalsByType(transferType: TransferType): ActiveTransferTotals =
         withContext(ioDispatcher) {
             activeTransferTotalsMapper(
                 type = transferType,
-                list = megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType),
-                transferredBytes = transferredBytesFlow(transferType).value,
+                transfers = getActiveTransfersByType(transferType),
             )
         }
 
@@ -708,8 +744,8 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaApiGateway.currentDownloadSpeed
     }
 
-    private fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Long, Long>> =
-        transferredBytesFlows[transferType] ?: error("Unknown transfer type: $transferType")
+    private fun activeTransfersFlow(transferType: TransferType): MutableStateFlow<Map<Long, ActiveTransfer>> =
+        activeTransfersFlows[transferType] ?: error("Unknown transfer type: $transferType")
 
     override fun monitorAskedResumeTransfers() = monitorAskedResumeTransfers.asStateFlow()
 
@@ -754,14 +790,7 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override fun monitorInProgressTransfers() = inProgressTransfersFlow
 
-    override suspend fun removeInProgressTransfer(uniqueId: Long) {
-        if (!inProgressTransfersFlow.value.containsKey(uniqueId)) return
-        inProgressTransfersFlow.update { inProgressTransfers ->
-            inProgressTransfers.toMutableMap().also {
-                it.remove(uniqueId)
-            }
-        }
-    }
+    override suspend fun getInProgressTransfers() = inProgressTransfersFlow.value.values.toList()
 
     override suspend fun removeInProgressTransfers(uniqueIds: Set<Long>) {
         if (uniqueIds.isEmpty()) return
@@ -821,18 +850,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         updatePendingTransferRequest: UpdatePendingTransferRequest,
     ) = megaLocalRoomGateway.updatePendingTransfers(updatePendingTransferRequest)
 
-    override suspend fun setRequestFilesPermissionDenied() = withContext(ioDispatcher) {
-        transfersPreferencesGateway.get().setRequestFilesPermissionDenied()
-    }
-
-    override fun monitorRequestFilesPermissionDenied() = flow {
-        emitAll(transfersPreferencesGateway.get().monitorRequestFilesPermissionDenied())
-    }.flowOn(ioDispatcher)
-
-    override suspend fun clearPreferences() = withContext(ioDispatcher) {
-        transfersPreferencesGateway.get().clearPreferences()
-    }
-
     override suspend fun getBandwidthOverQuotaDelay() = withContext(ioDispatcher) {
         megaApiGateway.getBandwidthOverQuotaDelay().seconds
     }
@@ -846,6 +863,14 @@ internal class DefaultTransfersRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getActiveTransferGroup(id)
         }
+
+    override suspend fun getActiveTransferGroups() =
+        megaLocalRoomGateway.getActiveTransferGroups()
+
+    override suspend fun deleteActiveTransferGroup(id: Int) {
+        megaLocalRoomGateway.deleteActiveTransferGroup(id)
+    }
+
 
     override suspend fun broadcastTransferTagToCancel(transferTag: Int?) {
         withContext(ioDispatcher) {
@@ -876,4 +901,47 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     private fun MegaTransfer.isCUUpload() =
         appData?.contains(AppDataTypeConstants.CameraUpload.sdkTypeValue) == true
+
+    override fun clearCompletedTransfersCache() {
+        displayPathFromUriCache.clear()
+        parentNodeCache.clear()
+        transferPathCache.clear()
+    }
+
+    override suspend fun getMaxDownloadConnections(): Int =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener =
+                    continuation.getRequestListener("getMaxDownloadConnections") { it.number.toInt() }
+                megaApiGateway.getMaxDownloadConnections(listener)
+            }
+        }
+
+    override suspend fun getMaxUploadConnections(): Int =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener =
+                    continuation.getRequestListener("getMaxUploadConnections") { it.number.toInt() }
+                megaApiGateway.getMaxUploadConnections(listener)
+            }
+        }
+
+    override suspend fun setMaxDownloadConnections(connections: Int) =
+        setMaxConnections(MegaTransfer.TYPE_DOWNLOAD, connections)
+
+    override suspend fun setMaxUploadConnections(connections: Int) =
+        setMaxConnections(MegaTransfer.TYPE_UPLOAD, connections)
+
+    private suspend fun setMaxConnections(direction: Int, connections: Int) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener =
+                    continuation.getRequestListener("setMaxConnections direction: $direction") { }
+                megaApiGateway.setMaxConnections(
+                    direction,
+                    connections,
+                    listener,
+                )
+            }
+        }
 }

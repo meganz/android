@@ -32,7 +32,6 @@ import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
@@ -46,6 +45,7 @@ import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
@@ -54,14 +54,18 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -143,6 +147,9 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import mega.privacy.android.feature.chat.meeting.call.isJoined
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
@@ -293,6 +300,7 @@ class ChatViewModel @Inject constructor(
 
     init {
         getApiFeatureFlag()
+        getCloudExplorerFeatureFlag()
         checkUsersCallLimitReminders()
         getMyUserHandle()
         checkGeolocation()
@@ -323,6 +331,15 @@ class ChatViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun getCloudExplorerFeatureFlag() {
+        viewModelScope.launch {
+            val enabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.onFailure { Timber.e(it) }.getOrDefault(false)
+            _state.update { state -> state.copy(isCloudExplorerAvailable = enabled) }
         }
     }
 
@@ -377,7 +394,7 @@ class ChatViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e(it)
                     val infoToShow = if (it is ResourceDoesNotExistChatException) {
-                        InfoToShow.SimpleString(stringId = R.string.invalid_chat_link)
+                        InfoToShow.SimpleString(stringId = sharedR.string.invalid_chat_link_error_message)
                     } else {
                         InfoToShow.SimpleString(stringId = R.string.error_general_nodes)
                     }
@@ -1209,11 +1226,18 @@ class ChatViewModel @Inject constructor(
     /**
      * Attaches files.
      */
-    fun onAttachFiles(files: List<UriPath>) {
+    fun onAttachFiles(
+        files: List<UriPath>,
+        pitagTrigger: PitagTrigger,
+    ) {
         _state.update {
             it.copy(
                 downloadEvent = triggered(
-                    TransferTriggerEvent.StartChatUpload.Files(chatId, files)
+                    TransferTriggerEvent.StartChatUpload.Files(
+                        chatIds = listOf(chatId),
+                        uris = files,
+                        pitagTrigger = pitagTrigger,
+                    )
                 )
             )
         }
@@ -1625,6 +1649,58 @@ class ChatViewModel @Inject constructor(
      */
     fun onActionToManageEventConsumed() {
         _state.update { state -> state.copy(actionToManageEvent = consumed()) }
+    }
+
+    /**
+     * Handle a click on a PDF attachment. Decides between the Compose PDF viewer (in-place
+     * navigation handled by the host) and the legacy activity, then exposes the result as an event
+     * so the view can route it without the business layer touching the NavigationHandler.
+     *
+     * @param message the PDF [NodeAttachmentMessage] being opened.
+     * @param content the resolved [NodeContentUri] of the PDF.
+     */
+    fun onOpenPdfMessage(message: NodeAttachmentMessage, content: NodeContentUri) {
+        viewModelScope.launch {
+            val isComposePdfViewerEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
+            }.getOrDefault(false)
+            val navigation = if (isComposePdfViewerEnabled) {
+                val (contentUri, isLocal, shouldStop) = when (content) {
+                    is NodeContentUri.LocalContentUri -> Triple(content.file.path, true, false)
+                    is NodeContentUri.RemoteContentUri -> Triple(
+                        content.url,
+                        false,
+                        content.shouldStopHttpSever
+                    )
+                }
+                ChatPdfNavigation.InPlace(
+                    PdfViewerNavKey(
+                        nodeHandle = message.fileNode.id.longValue,
+                        contentUri = contentUri,
+                        isLocalContent = isLocal,
+                        shouldStopHttpServer = shouldStop,
+                        nodeSourceType = NodeSourceType.CHAT,
+                        mimeType = PdfFileTypeInfo.mimeType,
+                        chatId = message.chatId,
+                        messageId = message.msgId,
+                        title = message.fileNode.name,
+                    )
+                )
+            } else {
+                ChatPdfNavigation.Legacy(
+                    content = content,
+                    nodeHandle = message.fileNode.id.longValue,
+                    chatId = message.chatId,
+                    messageId = message.msgId,
+                    mimeType = PdfFileTypeInfo.mimeType,
+                )
+            }
+            _state.update { state -> state.copy(openPdfEvent = triggered(navigation)) }
+        }
+    }
+
+    fun onOpenPdfEventConsumed() {
+        _state.update { state -> state.copy(openPdfEvent = consumed()) }
     }
 
     private fun messageCannotBeEdited() {

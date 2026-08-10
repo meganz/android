@@ -53,6 +53,7 @@ internal class AccountDetailMapper @Inject constructor(
                 planDetail = megaAccountProPlan?.takeIf { details.numPlans > 0 }
                     ?.let { proPlan -> accountPlanDetailMapper(proPlan) },
                 subscriptionListDetail = accountSubscriptionDetailListMapper(details),
+                subscriptionMethodId = it.subscriptionMethodId,
             )
         },
         storageDetail = details.takeIf { numDetails and HAS_STORAGE_DETAILS != 0 }?.let {
@@ -63,7 +64,6 @@ internal class AccountDetailMapper @Inject constructor(
                 inShares,
                 details.storageMax,
                 details.storageUsed,
-                details.subscriptionMethodId,
             )
         },
     )

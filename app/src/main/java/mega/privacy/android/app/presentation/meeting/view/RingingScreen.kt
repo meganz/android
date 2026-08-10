@@ -32,11 +32,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.meeting.RingingViewModel
 import mega.privacy.android.app.presentation.meeting.model.RingingUIState
@@ -97,6 +98,7 @@ internal fun RingingScreen(
         onVideoClicked = onVideoClicked,
         onHangUpClicked = {
             viewModel.onHangUpClicked()
+            resumeAudioPlayerIfNotInCall(context)
         }
     )
 }

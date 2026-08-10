@@ -3,6 +3,8 @@ package mega.privacy.android.domain.usecase.documentscanner
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -86,7 +88,14 @@ internal class ValidateScanFilenameUseCaseTest {
                 filename = filename,
                 fileExtension = ".jpg",
             )
-        ).isEqualTo(ScanFilenameValidationStatus.MissingFilenameExtension)
+        ).isEqualTo(
+            when {
+                filename.isInvalidDotName() -> ScanFilenameValidationStatus.DotFileName
+                filename.isInvalidDoubleDotName() -> ScanFilenameValidationStatus.DoubleDotFileName
+                else -> ScanFilenameValidationStatus.MissingFilenameExtension
+
+            }
+        )
     }
 
     @ParameterizedTest(name = "invalid character: {0}")

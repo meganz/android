@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.newfolderpair
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
@@ -32,6 +33,7 @@ internal data class SyncNewFolderState(
     val isStorageOverQuota: Boolean = false,
     val showStorageOverQuota: Boolean = false,
     val openSyncListScreen: StateEvent = consumed,
-    val showSnackbar: StateEventWithContent<Int?> = consumed(),
+    val showSnackbar: StateEventWithContent<LocalizedText?> = consumed(),
     val showRenameAndCreateBackupDialog: String? = null,
+    val isLoading: Boolean = false,
 )

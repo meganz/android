@@ -18,6 +18,13 @@ fun UriPath.toUri(): Uri {
  */
 fun UriPath.isFile() = toUri().scheme == "file"
 
-fun UriPath.isPath(): Boolean = value.startsWith("file").not() && isFile()
+/**
+ * Creates a [UriPath] from a [Uri].
+ *
+ */
+fun Uri.toUriPath() = UriPath(toString())
 
-fun UriPath.fromUri(uri: Uri) = UriPath(uri.toString())
+/**
+ * Creates a [UriPath] from a [String], it will add file scheme in case of file path
+ */
+fun String.toUriPath() = UriPath(this).toUri().toUriPath()

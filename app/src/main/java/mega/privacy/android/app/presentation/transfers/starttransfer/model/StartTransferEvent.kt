@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
 import android.content.Context
-import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -100,21 +99,6 @@ sealed interface StartTransferEvent {
         }
 
         /**
-         * @param pluralRes the [StringRes] of the message to be shown
-         * @param messageArgs arguments to build the message, if needed
-         */
-        sealed class MessagePluralRes(
-            @PluralsRes val pluralRes: Int,
-            val amount: Int,
-            @StringRes override val action: Int? = null,
-            override val actionEvent: ActionEvent? = null,
-            private vararg val messageArgs: String,
-        ) : Message {
-            override fun getMessage(context: Context) =
-                context.resources.getQuantityString(pluralRes, amount, *messageArgs)
-        }
-
-        /**
          * The one off event to be triggered with the [action], if [action] is null this parameter will be ignored
          */
         sealed interface ActionEvent {
@@ -142,6 +126,11 @@ sealed interface StartTransferEvent {
          * Copy uri has finished
          */
         data object FinishCopyUri : MessageStringRes(R.string.copy_already_downloaded)
+
+        /**
+         * No installed app can open the file requested for preview
+         */
+        data object NoAppToOpenFile : MessageStringRes(sharedR.string.intent_not_available)
 
         /**
          * Text file upload has finished

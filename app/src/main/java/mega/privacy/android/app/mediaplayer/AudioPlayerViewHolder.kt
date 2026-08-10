@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.compose.ui.platform.ComposeView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.media3.common.Player
 import mega.privacy.android.analytics.Analytics
@@ -21,6 +22,7 @@ import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.SimpleAnimatorListener
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.mobile.analytics.event.AudioPlayerQueueButtonPressedEvent
 
 /**
@@ -40,25 +42,14 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
         binding.root.findViewById<ComposeView>(R.id.speed_playback_popup)
     internal val playbackPositionDialog =
         binding.root.findViewById<ComposeView>(R.id.playback_position_dialog)
+    internal val moveToTrashDialog =
+        binding.root.findViewById<ComposeView>(R.id.move_to_trash_dialog)
 
     /**
      * Update the layout param of artwork of player view.
      */
     fun layoutArtwork() {
         post {
-            val resources = binding.root.resources
-
-            val artworkWidth = resources.displayMetrics.widthPixels / 3 * 2
-            val controllerHeight =
-                resources.getDimensionPixelSize(R.dimen.audio_player_main_controller_height)
-
-            val layoutParams = artworkContainer.layoutParams as FrameLayout.LayoutParams
-            layoutParams.width = artworkWidth
-            layoutParams.height = artworkWidth
-            layoutParams.topMargin =
-                (binding.playerView.measuredHeight - artworkWidth - controllerHeight) / 2
-            artworkContainer.layoutParams = layoutParams
-
             artworkContainer.isVisible = true
         }
     }
@@ -221,5 +212,32 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      */
     fun updateSpeedPlaybackText(speedPlaybackItem: SpeedPlaybackItem) {
         speedPlaybackButton.text = speedPlaybackItem.text
+    }
+
+    /**
+     * Re-apply control icons after Media3 PlayerView initialization, which may override
+     * the drawables set in XML.
+     *
+     * @param context Context
+     */
+    fun applyControlIcons(context: Context) {
+        binding.root.findViewById<ImageButton>(R.id.exo_prev)
+            ?.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    iconPackR.drawable.ic_prev_audio_player
+                )
+            )
+        binding.root.findViewById<ImageButton>(R.id.exo_rew)
+            ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_15_minus))
+        binding.root.findViewById<ImageButton>(R.id.exo_next)
+            ?.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    iconPackR.drawable.ic_next_audio_player
+                )
+            )
+        binding.root.findViewById<ImageButton>(R.id.exo_ffwd)
+            ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_15_plus))
     }
 }

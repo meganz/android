@@ -2,6 +2,9 @@ package mega.privacy.android.app.presentation.chat.list
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -27,6 +30,7 @@ import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
@@ -79,6 +83,9 @@ internal class ChatTabsViewModelTest {
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase = mock()
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase = mock()
+    private val monitorChatArchivedUseCase = mock<MonitorChatArchivedUseCase> {
+        on { invoke() }.thenReturn(flowOf("Chat Title"))
+    }
 
     @BeforeEach
     fun resetMocks() {
@@ -107,37 +114,40 @@ internal class ChatTabsViewModelTest {
             getChatsUnreadStatusUseCase,
             startMeetingInWaitingRoomChatUseCase,
             monitorChatCallUpdatesUseCase,
-            getStringFromStringResMapper
+            getStringFromStringResMapper,
+            monitorChatArchivedUseCase,
         )
+        whenever(monitorChatArchivedUseCase()).thenReturn(flowOf("Chat Title"))
     }
 
     private fun initTestClass() {
         underTest = ChatTabsViewModel(
-            archiveChatUseCase,
-            leaveChatUseCase,
-            signalChatPresenceUseCase,
-            getChatsUseCase,
-            getLastMessageUseCase,
-            chatRoomTimestampMapper,
-            startChatCallNoRingingUseCase,
-            openOrStartCallUseCase,
-            answerChatCallUseCase,
-            chatManagement,
-            megaChatApiGateway,
-            rtcAudioManagerGateway,
-            getCurrentChatStatusUseCase,
-            clearChatHistoryUseCase,
-            isParticipatingInChatCallUseCase,
-            getMeetingTooltipsUseCase,
-            setNextMeetingTooltipUseCase,
-            monitorScheduledMeetingCanceledUseCase,
-            getChatsUnreadStatusUseCase,
-            startMeetingInWaitingRoomChatUseCase,
-            monitorLeaveChatUseCase,
-            monitorChatCallUpdatesUseCase,
-            hasArchivedChatsUseCase,
-            monitorHasAnyContactUseCase,
-            getStringFromStringResMapper
+            archiveChatUseCase = archiveChatUseCase,
+            leaveChatUseCase = leaveChatUseCase,
+            signalChatPresenceUseCase = signalChatPresenceUseCase,
+            getChatsUseCase = getChatsUseCase,
+            getLastMessageUseCase = getLastMessageUseCase,
+            chatRoomTimestampMapper = chatRoomTimestampMapper,
+            startChatCallNoRingingUseCase = startChatCallNoRingingUseCase,
+            openOrStartCallUseCase = openOrStartCallUseCase,
+            answerChatCallUseCase = answerChatCallUseCase,
+            chatManagement = chatManagement,
+            megaChatApiGateway = megaChatApiGateway,
+            rtcAudioManagerGateway = rtcAudioManagerGateway,
+            getCurrentChatStatusUseCase = getCurrentChatStatusUseCase,
+            clearChatHistoryUseCase = clearChatHistoryUseCase,
+            isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
+            getMeetingTooltipsUseCase = getMeetingTooltipsUseCase,
+            setNextMeetingTooltipUseCase = setNextMeetingTooltipUseCase,
+            monitorScheduledMeetingCanceledUseCase = monitorScheduledMeetingCanceledUseCase,
+            getChatsUnreadStatusUseCase = getChatsUnreadStatusUseCase,
+            startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
+            monitorLeaveChatUseCase = monitorLeaveChatUseCase,
+            monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
+            hasArchivedChatsUseCase = hasArchivedChatsUseCase,
+            monitorHasAnyContactUseCase = monitorHasAnyContactUseCase,
+            getStringFromStringResMapper = getStringFromStringResMapper,
+            monitorChatArchivedUseCase = monitorChatArchivedUseCase,
         )
     }
 
@@ -196,4 +206,31 @@ internal class ChatTabsViewModelTest {
             Truth.assertThat(updatedState.hasArchivedChats).isTrue()
         }
     }
+
+    @Test
+    fun `test that when a chat is archived state is updated`() =
+        runTest {
+            initTestClass()
+            testScheduler.advanceUntilIdle()
+            verify(monitorChatArchivedUseCase).invoke()
+            underTest.getState().test {
+                val state = awaitItem()
+                assertThat(state.titleChatArchivedEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that when onChatArchivedEventConsumed is called then state is also updated`() =
+        runTest {
+            initTestClass()
+            testScheduler.advanceUntilIdle()
+            verify(monitorChatArchivedUseCase).invoke()
+            underTest.getState().test {
+                val state = awaitItem()
+                assertThat(state.titleChatArchivedEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                underTest.onTitleChatArchivedEventConsumed()
+                val updatedState = awaitItem()
+                assertThat(updatedState.titleChatArchivedEvent).isEqualTo(consumed())
+            }
+        }
 }

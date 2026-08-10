@@ -63,7 +63,7 @@
                     android:gravity="center_vertical"
                     android:orientation="vertical">
 
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
+                    <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
                         android:id="@+id/navigation_drawer_account_information_display_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

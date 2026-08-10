@@ -83,6 +83,32 @@ internal class RenameAndCreateBackupViewModelTest {
             }
         }
 
+    @Test
+    fun `test that rename and create the backup fails when the new backup name is a dot`() =
+        runTest {
+            underTest.renameAndCreateBackup(
+                newBackupName = ".",
+                localPath = "Local Path",
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.errorMessage).isEqualTo(sharedR.string.general_invalid_dot_name_warning)
+            }
+        }
+
+    @Test
+    fun `test that rename and create the backup fails when the new backup name is a double dot`() =
+        runTest {
+            underTest.renameAndCreateBackup(
+                newBackupName = "..",
+                localPath = "Local Path",
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.errorMessage).isEqualTo(sharedR.string.general_invalid_double_dot_name_warning)
+            }
+        }
+
     @ParameterizedTest(name = "new backup name: {0}")
     @ValueSource(
         strings = [

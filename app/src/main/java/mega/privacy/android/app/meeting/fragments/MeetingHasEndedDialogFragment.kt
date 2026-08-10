@@ -1,12 +1,10 @@
 package mega.privacy.android.app.meeting.fragments
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import mega.privacy.android.app.R
 import mega.privacy.android.shared.resources.R as sharedResR
 
 class MeetingHasEndedDialogFragment(
@@ -24,13 +22,13 @@ class MeetingHasEndedDialogFragment(
         val builder = MaterialAlertDialogBuilder(requireContext())
 
         if (isFromGuest) {
-            builder.setMessage(getString(R.string.meeting_has_ended))
+            builder.setMessage(getString(sharedResR.string.meeting_has_ended_dialog_title))
                 .setPositiveButton(sharedResR.string.general_ok, null)
 
         } else {
-            builder.setMessage(getString(R.string.meeting_has_ended))
-                .setPositiveButton(sharedR.string.general_dialog_cancel_button, null)
-                .setNegativeButton(R.string.view_meeting_chat, null)
+            builder.setMessage(getString(sharedResR.string.meeting_has_ended_dialog_title))
+                .setPositiveButton(sharedResR.string.general_dialog_cancel_button, null)
+                .setNegativeButton(sharedResR.string.meeting_has_ended_dialog_view_chat_option, null)
         }
 
         val dialog = builder.create()

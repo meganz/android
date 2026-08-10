@@ -25,6 +25,7 @@ import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.mode
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
+import mega.privacy.android.feature.clouddrive.presentation.offline.thumbnailData
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
@@ -51,18 +52,16 @@ internal fun OfflineFileInfoScreen(
     if (!uiState.isLoading && uiState.offlineFileInformation != null) {
         with(uiState.offlineFileInformation) {
             val iconResource = when {
-                thumbnail != null -> null
+                thumbnailData != null -> null
                 isFolder -> IconPackR.drawable.ic_folder_medium_solid
                 else -> MimeTypeThumbnail.typeForName(name).iconResourceId
             }
 
             ScaffoldWithCollapsibleHeader(
                 modifier = modifier,
-                headerIncludingSystemBar = thumbnail?.let { previewUri ->
+                headerIncludingSystemBar = thumbnailData?.let { data ->
                     {
-                        PreviewWithShadow(
-                            previewUri = previewUri,
-                        )
+                        PreviewWithShadow(model = data)
                     }
                 },
                 topBar = {
@@ -92,7 +91,7 @@ internal fun OfflineFileInfoScreen(
 
     if (showRemoveFromOfflineDialog) {
         MegaAlertDialog(
-            text = stringResource(id = R.string.confirmation_delete_from_save_for_offline),
+            text = stringResource(id = sharedR.string.offline_item_deletion_confirmation_title),
             confirmButtonText = stringResource(id = R.string.general_remove),
             cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onConfirm = onRemoveFromOffline,

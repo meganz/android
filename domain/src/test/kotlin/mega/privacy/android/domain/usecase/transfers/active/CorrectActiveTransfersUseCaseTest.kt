@@ -4,7 +4,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -17,7 +17,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
-import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersFromSdkUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransferStateUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -31,6 +31,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -44,25 +45,29 @@ internal class CorrectActiveTransfersUseCaseTest {
     private lateinit var underTest: CorrectActiveTransfersUseCase
 
     private val transferRepository = mock<TransferRepository>()
-    private val getInProgressTransfersUseCase = mock<GetInProgressTransfersUseCase>()
+    private val getInProgressTransfersFromSdkUseCase = mock<GetInProgressTransfersFromSdkUseCase>()
     private val updatePendingTransferStateUseCase = mock<UpdatePendingTransferStateUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val isUserLoggedInUseCase = mock<IsUserLoggedInUseCase>()
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
+    private val updateActiveTransfersUseCase =
+        mock<UpdateActiveTransfersUseCase>()
+    private val setActiveTransfersAsFinishedUseCase = mock<SetActiveTransfersAsFinishedUseCase>()
 
-
-    private val mockedActiveTransfers = (0L..10L).map { mock<ActiveTransfer>() }
+    private val mockedActiveTransfers = (0L..10L).map { mock<Transfer>() }
     private val mockedTransfers = (0L..10L).map { mock<Transfer>() }
 
     @BeforeAll
     fun setUp() {
         underTest = CorrectActiveTransfersUseCase(
-            getInProgressTransfersUseCase = getInProgressTransfersUseCase,
+            getInProgressTransfersFromSdkUseCase = getInProgressTransfersFromSdkUseCase,
             transferRepository = transferRepository,
             updatePendingTransferStateUseCase = updatePendingTransferStateUseCase,
             fileSystemRepository = fileSystemRepository,
             isUserLoggedInUseCase = isUserLoggedInUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
+            updateActiveTransfersUseCase = updateActiveTransfersUseCase,
+            setActiveTransfersAsFinishedUseCase = setActiveTransfersAsFinishedUseCase,
         )
     }
 
@@ -70,13 +75,15 @@ internal class CorrectActiveTransfersUseCaseTest {
     fun cleanUp() = runTest {
         reset(
             transferRepository,
-            getInProgressTransfersUseCase,
+            getInProgressTransfersFromSdkUseCase,
             updatePendingTransferStateUseCase,
             fileSystemRepository,
             isUserLoggedInUseCase,
             rootNodeExistsUseCase,
             *mockedActiveTransfers.toTypedArray(),
             *mockedTransfers.toTypedArray(),
+            updateActiveTransfersUseCase,
+            setActiveTransfersAsFinishedUseCase,
         )
         whenever(
             transferRepository.monitorPendingTransfersByTypeAndState(
@@ -84,14 +91,15 @@ internal class CorrectActiveTransfersUseCaseTest {
                 any()
             )
         ) doReturn flowOf(emptyList())
-        whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+        whenever(transferRepository.getActiveTransfersByType(any()))
             .thenReturn(emptyList())
-        whenever(transferRepository.getCurrentActiveTransfers())
+        whenever(transferRepository.getActiveTransfers())
             .thenReturn(emptyList())
         whenever(transferRepository.getPendingTransfersByTypeAndState(any(), any()))
             .thenReturn(emptyList())
         whenever(transferRepository.getPendingTransfersByState(any()))
             .thenReturn(emptyList())
+        whenever(transferRepository.getInProgressTransfers()).thenReturn(emptyList())
         whenever(isUserLoggedInUseCase()).thenReturn(true)
         whenever(rootNodeExistsUseCase()).thenReturn(true)
     }
@@ -118,10 +126,10 @@ internal class CorrectActiveTransfersUseCaseTest {
         runTest {
             stubActiveTransfers(false)
             stubTransfers()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(mockedActiveTransfers)
             val inProgress = subSetTransfers()
-            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
             val expected = mockedActiveTransfers.filter { activeTransfer ->
                 inProgress.map { it.uniqueId }.contains(activeTransfer.uniqueId).not()
             }
@@ -130,8 +138,8 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository).setActiveTransfersAsFinishedByUniqueId(
-                expected.map { it.uniqueId },
+            verify(setActiveTransfersAsFinishedUseCase).invoke(
+                expected,
                 false
             )
         }
@@ -141,10 +149,10 @@ internal class CorrectActiveTransfersUseCaseTest {
         runTest {
             stubActiveTransfers(false)
             stubTransfers()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(mockedActiveTransfers)
             val inProgress = subSetTransfers()
-            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
             val expected = mockedActiveTransfers.filter { activeTransfer ->
                 inProgress.map { it.uniqueId }.contains(activeTransfer.uniqueId).not()
             }
@@ -153,10 +161,38 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository).setActiveTransfersAsFinishedByUniqueId(
-                expected.map { it.uniqueId },
+            verify(setActiveTransfersAsFinishedUseCase).invoke(
+                expected,
                 true
             )
+        }
+
+    @Test
+    fun `test that active transfers not in progress are partitioned into finished and cancelled by file existence`() =
+        runTest {
+            stubActiveTransfers(false)
+            stubTransfers()
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(mockedActiveTransfers)
+            val inProgress = subSetTransfers()
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
+            val expected = mockedActiveTransfers.filter { activeTransfer ->
+                inProgress.map { it.uniqueId }.contains(activeTransfer.uniqueId).not()
+            }
+            Truth.assertThat(expected.size).isGreaterThan(1)
+            val existing = expected.take(expected.size / 2)
+            val missing = expected - existing.toSet()
+            Truth.assertThat(existing).isNotEmpty()
+            Truth.assertThat(missing).isNotEmpty()
+            existing.forEach {
+                whenever(fileSystemRepository.doesUriPathExist(UriPath(it.localPath))) doReturn true
+            }
+            missing.forEach {
+                whenever(fileSystemRepository.doesUriPathExist(UriPath(it.localPath))) doReturn false
+            }
+            underTest(TransferType.GENERAL_UPLOAD)
+            verify(setActiveTransfersAsFinishedUseCase).invoke(existing, false)
+            verify(setActiveTransfersAsFinishedUseCase).invoke(missing, true)
         }
 
     @Test
@@ -165,12 +201,12 @@ internal class CorrectActiveTransfersUseCaseTest {
             stubActiveTransfers(true)
             stubTransfers()
             val inProgress = subSetTransfers()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(mockedActiveTransfers)
-            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository, never()).setActiveTransfersAsFinishedByUniqueId(
-                uniqueIds = anyOrNull(),
+            verify(setActiveTransfersAsFinishedUseCase, never()).invoke(
+                transfers = anyOrNull(),
                 cancelled = eq(true)
             )
         }
@@ -182,11 +218,11 @@ internal class CorrectActiveTransfersUseCaseTest {
             stubTransfers()
             val alreadyInDataBase = subSetActiveTransfers()
             val notInDataBase = mockedActiveTransfers - alreadyInDataBase.toSet()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(alreadyInDataBase)
-            whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(mockedTransfers)
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository).insertOrUpdateActiveTransfers(argThat { it ->
+            verify(transferRepository).putActiveTransfers(argThat { it ->
                 it.map { it.tag } == notInDataBase.map { it.tag }
             })
         }
@@ -196,10 +232,10 @@ internal class CorrectActiveTransfersUseCaseTest {
         runTest {
             stubActiveTransfers(false)
             stubTransfers()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(mockedActiveTransfers)
             val inProgress = subSetTransfers()
-            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
             val expected = mockedActiveTransfers.filter { transfer ->
                 !inProgress.map { it.uniqueId }.contains(transfer.uniqueId)
             }
@@ -214,15 +250,68 @@ internal class CorrectActiveTransfersUseCaseTest {
         }
 
     @Test
+    fun `test that in progress transfers not in SDK are removed from in progress transfers`() =
+        runTest {
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            val inSdkTransfer = mock<Transfer> { on { uniqueId } doReturn 100L }
+            val notInSdkTransfer1 = mock<InProgressTransfer.Download> {
+                on { uniqueId } doReturn 200L
+            }
+            val notInSdkTransfer2 = mock<InProgressTransfer.Download> {
+                on { uniqueId } doReturn 300L
+            }
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(listOf(inSdkTransfer))
+            whenever(transferRepository.getInProgressTransfers()).thenReturn(
+                listOf(notInSdkTransfer1, notInSdkTransfer2)
+            )
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).removeInProgressTransfers(setOf(200L, 300L))
+        }
+
+    @Test
+    fun `test that in progress transfers not in SDK are not removed when list is empty`() =
+        runTest {
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(emptyList())
+            whenever(transferRepository.getInProgressTransfers()).thenReturn(emptyList())
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository, never()).removeInProgressTransfers(any())
+        }
+
+    @Test
+    fun `test that in progress transfers all in SDK are not removed`() =
+        runTest {
+            val inProgressTransfer = mock<InProgressTransfer.Download> {
+                on { uniqueId } doReturn 100L
+            }
+            val sdkTransfer = mock<Transfer> { on { uniqueId } doReturn 100L }
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(listOf(sdkTransfer))
+            whenever(transferRepository.getInProgressTransfers())
+                .thenReturn(listOf(inProgressTransfer))
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository, never()).removeInProgressTransfers(any())
+        }
+
+    @Test
     fun `test that in progress transfers not in active transfers are updated in in progress transfers`() =
         runTest {
             stubActiveTransfers(false)
             stubTransfers()
             val alreadyInDataBase = subSetActiveTransfers()
             val notInDataBase = mockedActiveTransfers - alreadyInDataBase.toSet()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(alreadyInDataBase)
-            whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(mockedTransfers)
             underTest(TransferType.GENERAL_UPLOAD)
 
             verify(transferRepository).updateInProgressTransfers(
@@ -246,9 +335,9 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             val notInDataBase = mockedTransfers.filterNot { it.isStreamingTransfer }
 
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(emptyList())
-            whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(mockedTransfers)
 
             underTest(TransferType.GENERAL_UPLOAD)
 
@@ -271,9 +360,9 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             val notInDataBase = mockedTransfers.filterNot { it.isFolderTransfer }
 
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(emptyList())
-            whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(mockedTransfers)
 
             underTest(TransferType.GENERAL_UPLOAD)
 
@@ -296,9 +385,9 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             val notInDataBase = mockedTransfers.filterNot { it.isBackgroundTransfer() }
 
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(emptyList())
-            whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(mockedTransfers)
 
             underTest(TransferType.GENERAL_UPLOAD)
 
@@ -321,9 +410,9 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             val notInDataBase = mockedTransfers.filterNot { it.isPreviewDownload() }
 
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(emptyList())
-            whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(mockedTransfers)
 
             underTest(TransferType.GENERAL_UPLOAD)
 
@@ -358,7 +447,7 @@ internal class CorrectActiveTransfersUseCaseTest {
                     )
             ) doReturn pendingTransfers
         }
-        whenever(getInProgressTransfersUseCase()) doReturn listOf(transfer2)
+        whenever(getInProgressTransfersFromSdkUseCase()) doReturn listOf(transfer2)
 
         underTest(transferType)
 
@@ -381,7 +470,7 @@ internal class CorrectActiveTransfersUseCaseTest {
                     PendingTransferState.SdkScanning
                 )
         ) doReturn flowOf(pendingTransfers)
-        whenever(getInProgressTransfersUseCase()) doReturn listOf(transfer)
+        whenever(getInProgressTransfersFromSdkUseCase()) doReturn listOf(transfer)
 
         underTest(transferType)
 
@@ -408,7 +497,7 @@ internal class CorrectActiveTransfersUseCaseTest {
                         PendingTransferState.SdkScanning
                     )
             ) doReturn pendingTransfers
-            whenever(getInProgressTransfersUseCase()) doReturn emptyList()
+            whenever(getInProgressTransfersFromSdkUseCase()) doReturn emptyList()
 
             underTest(TransferType.DOWNLOAD)
 
@@ -435,11 +524,11 @@ internal class CorrectActiveTransfersUseCaseTest {
                 add(transfer)
             }
 
-            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
 
             underTest.invoke(TransferType.CHAT_UPLOAD)
 
-            verify(transferRepository).updateTransferredBytes(eq(transfers))
+            verify(transferRepository).updateActiveTransfersBytes(eq(transfers))
         }
 
     @Test
@@ -455,11 +544,11 @@ internal class CorrectActiveTransfersUseCaseTest {
                 add(transfer)
             }
 
-            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
 
             underTest.invoke(TransferType.DOWNLOAD)
 
-            verify(transferRepository).updateTransferredBytes(eq(transfers))
+            verify(transferRepository).updateActiveTransfersBytes(eq(transfers))
         }
 
     @Test
@@ -475,11 +564,99 @@ internal class CorrectActiveTransfersUseCaseTest {
                 add(transfer)
             }
 
-            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
 
             underTest.invoke(TransferType.DOWNLOAD)
 
-            verify(transferRepository).updateTransferredBytes(eq(transfers))
+            verify(transferRepository).updateActiveTransfersBytes(eq(transfers))
+        }
+
+    @Test
+    fun `test that sync transfers are filtered`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn TransferType.GENERAL_UPLOAD
+                on { this.isSyncTransfer } doReturn true
+            }
+            val transfers = subSetTransfers()
+            val inProgress = buildList {
+                addAll(transfers)
+                add(transfer)
+            }
+
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
+
+            underTest.invoke(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).updateActiveTransfersBytes(eq(transfers))
+        }
+
+    @Test
+    fun `test that sync transfers not in active transfers are not added`() =
+        runTest {
+            stubTransfers()
+            val syncTransfer = mock<Transfer> {
+                on { this.uniqueId } doReturn 100L
+                on { this.transferType } doReturn TransferType.GENERAL_UPLOAD
+                on { this.isSyncTransfer } doReturn true
+            }
+            val inProgress = buildList {
+                addAll(mockedTransfers)
+                add(syncTransfer)
+            }
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).putActiveTransfers(argThat { transfers ->
+                transfers.none { it.uniqueId == 100L }
+            })
+        }
+
+    @Test
+    fun `test that backup transfers are filtered`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn TransferType.GENERAL_UPLOAD
+                on { this.isBackupTransfer } doReturn true
+            }
+            val transfers = subSetTransfers()
+            val inProgress = buildList {
+                addAll(transfers)
+                add(transfer)
+            }
+
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
+
+            underTest.invoke(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).updateActiveTransfersBytes(eq(transfers))
+        }
+
+    @Test
+    fun `test that backup transfers not in active transfers are not added`() =
+        runTest {
+            stubTransfers()
+            val backupTransfer = mock<Transfer> {
+                on { this.uniqueId } doReturn 100L
+                on { this.transferType } doReturn TransferType.GENERAL_UPLOAD
+                on { this.isBackupTransfer } doReturn true
+            }
+            val inProgress = buildList {
+                addAll(mockedTransfers)
+                add(backupTransfer)
+            }
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).putActiveTransfers(argThat { transfers ->
+                transfers.none { it.uniqueId == 100L }
+            })
         }
 
     @ParameterizedTest
@@ -492,7 +669,7 @@ internal class CorrectActiveTransfersUseCaseTest {
         underTest(transferType)
         verifyNoInteractions(transferRepository)
         verifyNoInteractions(fileSystemRepository)
-        verifyNoInteractions(getInProgressTransfersUseCase)
+        verifyNoInteractions(getInProgressTransfersFromSdkUseCase)
         verifyNoInteractions(updatePendingTransferStateUseCase)
     }
 
@@ -506,7 +683,26 @@ internal class CorrectActiveTransfersUseCaseTest {
         underTest(transferType)
         verifyNoInteractions(transferRepository)
         verifyNoInteractions(fileSystemRepository)
-        verifyNoInteractions(getInProgressTransfersUseCase)
+        verifyNoInteractions(getInProgressTransfersFromSdkUseCase)
         verifyNoInteractions(updatePendingTransferStateUseCase)
+    }
+
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    @NullSource
+    fun `test that updateActiveTransfersUseCase is called before getActiveTransfers`(
+        transferType: TransferType?,
+    ) = runTest {
+        whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(emptyList())
+
+        underTest(transferType)
+
+        val inOrder = inOrder(updateActiveTransfersUseCase, transferRepository)
+        inOrder.verify(updateActiveTransfersUseCase).invoke()
+        if (transferType == null) {
+            inOrder.verify(transferRepository).getActiveTransfers()
+        } else {
+            inOrder.verify(transferRepository).getActiveTransfersByType(transferType)
+        }
     }
 }

@@ -13,28 +13,29 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.view.extension.fileInfo
 import mega.privacy.android.app.presentation.view.extension.folderInfo
-import mega.privacy.android.core.nodecomponents.extension.getIcon
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.app.presentation.view.extension.getNodeTitle
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.nodes.extension.getIcon
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.resources.R as SharedR
 import timber.log.Timber
 
 
@@ -75,7 +76,7 @@ internal fun NodeOptionsBottomSheetContent(
         uiState.outgoingShares.isEmpty() -> null
         uiState.outgoingShares.size == 1 -> uiState.outgoingShares[0].user
         else -> pluralStringResource(
-            R.plurals.general_num_shared_with,
+            SharedR.plurals.general_num_shared_with_count,
             uiState.outgoingShares.size,
             uiState.outgoingShares.size,
         )
@@ -84,7 +85,7 @@ internal fun NodeOptionsBottomSheetContent(
     if (uiState.node != null) {
         NodeListViewItem(
             modifier = Modifier.semantics { testTagsAsResourceId = true },
-            title = node?.name.orEmpty(),
+            title = node?.getNodeTitle() ?: "",
             titleColor = if (node?.isTakenDown == true) TextColor.Error else TextColor.Primary,
             titleOverflow = LongTextBehaviour.MiddleEllipsis,
             subtitle = uiState.shareInfo ?: getOutShareInfo() ?: when (node) {

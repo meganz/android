@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import mega.privacy.android.data.constant.HttpServerConstant
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.IgnoredRequestListener
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -26,9 +27,12 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaEvent
+import nz.mega.sdk.MegaFileServiceReclaimOptions
 import nz.mega.sdk.MegaFlag
 import nz.mega.sdk.MegaGlobalListenerInterface
+import nz.mega.sdk.MegaGroupNodesByDateFilter
 import nz.mega.sdk.MegaHandleList
+import nz.mega.sdk.MegaListAllNodesFilter
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -52,6 +56,7 @@ import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
+import nz.mega.sdk.MegaUploadOptions
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -100,29 +105,42 @@ internal class MegaApiFacade @Inject constructor(
     override fun getNodesFromMegaNodeList(nodeList: MegaNodeList): List<MegaNode> =
         MegaApiJava.nodeListToArray(nodeList)?.toList() ?: emptyList()
 
+    @Deprecated(message = "This will be removed soon. Use startUpload with MegaUploadOptions param instead.")
     override fun startUpload(
         localPath: String,
-        parentNode: MegaNode,
+        parent: MegaNode,
         fileName: String?,
-        modificationTime: Long?,
+        mtime: Long?,
         appData: String?,
         isSourceTemporary: Boolean,
-        shouldStartFirst: Boolean,
+        startFirst: Boolean,
         cancelToken: MegaCancelToken?,
         listener: MegaTransferListenerInterface,
-    ) {
-        megaApi.startUpload(
-            localPath,
-            parentNode,
-            fileName,
-            modificationTime ?: INVALID_CUSTOM_MOD_TIME,
-            appData,
-            isSourceTemporary,
-            shouldStartFirst,
-            cancelToken,
-            listener,
-        )
-    }
+    ) = megaApi.startUpload(
+        localPath,
+        parent,
+        fileName,
+        mtime ?: INVALID_CUSTOM_MOD_TIME,
+        appData,
+        isSourceTemporary,
+        startFirst,
+        cancelToken,
+        listener,
+    )
+
+    override fun startUpload(
+        localPath: String,
+        parent: MegaNode,
+        cancelToken: MegaCancelToken?,
+        options: MegaUploadOptions,
+        listener: MegaTransferListenerInterface,
+    ) = megaApi.startUpload(
+        localPath,
+        parent,
+        cancelToken,
+        options,
+        listener,
+    )
 
     override fun addTransferListener(listener: MegaTransferListenerInterface) =
         megaApi.addTransferListener(listener)
@@ -172,6 +190,13 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getRootNode(): MegaNode? = megaApi.rootNode
 
     override suspend fun getRubbishBinNode(): MegaNode? = megaApi.rubbishNode
+
+    override suspend fun isNodeS4Container(nodeHandle: Long): Boolean {
+        return if (megaApi.isS4Enabled && nodeHandle != MegaApiAndroid.INVALID_HANDLE) {
+            val s4Handle = megaApi.s4Container
+            s4Handle != MegaApiAndroid.INVALID_HANDLE && s4Handle == nodeHandle
+        } else false
+    }
 
     override fun getSdkVersion(): String? = megaApi.version
 
@@ -245,7 +270,7 @@ internal class MegaApiFacade @Inject constructor(
             }
 
             override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
-                Timber.d("Global update onEvent")
+                Timber.d("Global update onEvent: ${event?.type}")
                 if (event?.type == MegaEvent.EVENT_RELOADING) {
                     trySend(GlobalUpdate.OnReloadNeeded)
                 }
@@ -325,14 +350,6 @@ internal class MegaApiFacade @Inject constructor(
             removeTransferListener(listener)
         }
     }.buffer(Channel.Factory.UNLIMITED).shareIn(sharingScope, SharingStarted.WhileSubscribed())
-
-    override fun getFavourites(
-        node: MegaNode?,
-        count: Int,
-        listener: MegaRequestListenerInterface?,
-    ) {
-        megaApi.getFavourites(node, count, listener)
-    }
 
     override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode? =
         megaApi.getNodeByHandle(nodeHandle)
@@ -447,8 +464,6 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun setLogLevel(logLevel: Int) = MegaApiAndroid.setLogLevel(logLevel)
 
-    override fun setUseHttpsOnly(enabled: Boolean) = megaApi.useHttpsOnly(enabled)
-
     override suspend fun getLoggedInUser(): MegaUser? = megaApi.myUser
 
     override fun getThumbnail(
@@ -495,6 +510,18 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.fetchNodes(listener)
 
     override fun retryPendingConnections() = megaApi.retryPendingConnections()
+
+    override fun setMaxConnections(
+        direction: Int,
+        connections: Int,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.setMaxConnections(direction, connections, listener)
+
+    override fun getMaxUploadConnections(listener: MegaRequestListenerInterface) =
+        megaApi.getMaxUploadConnections(listener)
+
+    override fun getMaxDownloadConnections(listener: MegaRequestListenerInterface) =
+        megaApi.getMaxDownloadConnections(listener)
 
     override suspend fun getTransfers(type: Int): List<MegaTransfer> =
         megaApi.getTransfers(type) ?: emptyList()
@@ -553,6 +580,9 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getUserAvatarColor(userHandle: Long): String? =
         megaApi.getUserAvatarColor(userHandleToBase64(userHandle))
+
+    override suspend fun getUserAvatarSecondaryColor(userHandle: Long): String? =
+        megaApi.getUserAvatarSecondaryColor(userHandleToBase64(userHandle))
 
     override fun getUserAvatar(
         user: MegaUser,
@@ -691,6 +721,16 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.getRecentActionsAsync(days, maxNodes, excludeSensitives, listener)
 
+    override fun getRecentBucketById(
+        id: String,
+        excludeSensitives: Boolean,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getRecentActionById(id, excludeSensitives, listener)
+
+    override fun clearRecentActions(until: Long, listener: MegaRequestListenerInterface) {
+        megaApi.clearRecentActionHistory(until, listener)
+    }
+
     override fun copyNode(
         nodeToCopy: MegaNode,
         newNodeParent: MegaNode,
@@ -808,7 +848,10 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun httpServerIsRunning() = megaApi.httpServerIsRunning()
 
-    override suspend fun httpServerStart() = megaApi.httpServerStart()
+    override suspend fun httpServerStart() = megaApi.httpServerStart(
+        HttpServerConstant.HTTP_SERVER_LOCAL_ONLY,
+        HttpServerConstant.API_HTTP_SERVER_PORT,
+    )
 
     override suspend fun httpServerStop() = megaApi.httpServerStop()
 
@@ -917,6 +960,34 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun enableMultiFactorAuth(pin: String, listener: MegaRequestListenerInterface?) {
         megaApi.multiFactorAuthEnable(pin, listener)
+    }
+
+    override fun multiFactorAuthDisable(pin: String, listener: MegaRequestListenerInterface?) {
+        megaApi.multiFactorAuthDisable(pin, listener)
+    }
+
+    override fun multiFactorAuthCancelAccount(
+        pin: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.multiFactorAuthCancelAccount(pin, listener)
+    }
+
+    override fun multiFactorAuthChangeEmail(
+        newEmail: String,
+        pin: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.multiFactorAuthChangeEmail(newEmail, pin, listener)
+    }
+
+    override fun multiFactorAuthChangePassword(
+        currentPassword: String?,
+        newPassword: String,
+        pin: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.multiFactorAuthChangePassword(currentPassword, newPassword, pin, listener)
     }
 
     override fun isMasterKeyExported(listener: MegaRequestListenerInterface?) {
@@ -1058,7 +1129,7 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.cancelTransferByTag(transferTag, listener)
     }
 
-    override fun getContactLink(handle: Long, listener: MegaRequestListenerInterface) {
+    override fun contactLinkQuery(handle: Long, listener: MegaRequestListenerInterface) {
         megaApi.contactLinkQuery(handle, listener)
     }
 
@@ -1085,6 +1156,9 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.setUserAttribute(type, value, listener)
 
+    override fun setLastPurgeAcknowledged(ts: Long, listener: MegaRequestListenerInterface) =
+        megaApi.setLastPurgeAcknowledged(ts, listener)
+
     override fun querySignupLink(link: String, listener: MegaRequestListenerInterface) =
         megaApi.querySignupLink(link, listener)
 
@@ -1110,7 +1184,7 @@ internal class MegaApiFacade @Inject constructor(
         filter: MegaSearchFilter,
         order: Int,
         megaCancelToken: MegaCancelToken,
-        megaSearchPage: MegaSearchPage?
+        megaSearchPage: MegaSearchPage?,
     ): List<MegaNode> = megaApi.search(
         filter,
         order,
@@ -1283,6 +1357,11 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.exportNode(node, expireTime?.toInt() ?: 0, listener)
 
+    override fun getDownloadUrl(
+        node: MegaNode,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getDownloadUrl(node, false, true, listener)
+
     override fun getDeviceName(deviceId: String, listener: MegaRequestListenerInterface?) =
         megaApi.getDeviceName(deviceId, listener)
 
@@ -1297,6 +1376,15 @@ internal class MegaApiFacade @Inject constructor(
     override fun getABTestValue(flag: String): Long = megaApi.getABTestValue(flag)
 
     override suspend fun getBandwidthOverQuotaDelay() = megaApi.bandwidthOverquotaDelay
+
+    override suspend fun getNumNodes(): Long = megaApi.numNodes.toLong()
+
+    override suspend fun getOverquotaDeadlineTs(): Long = megaApi.overquotaDeadlineTs
+
+    override suspend fun getOverquotaWarningsTs(): List<Long> =
+        megaApi.overquotaWarningsTs?.let { list ->
+            (0 until list.size()).map { list.get(it) }
+        }.orEmpty()
 
     override fun disableExport(node: MegaNode, listener: MegaRequestListenerInterface) =
         megaApi.disableExport(node, listener)
@@ -1598,4 +1686,40 @@ internal class MegaApiFacade @Inject constructor(
     override fun addRequestListener(listener: MegaRequestListenerInterface) {
         megaApi.addRequestListener(listener)
     }
+
+    override fun decryptPasswordProtectedLink(
+        passwordProtectedLink: String,
+        password: String,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.decryptPasswordProtectedLink(passwordProtectedLink, password, listener)
+    }
+
+    override fun fileServiceGetReclaimOptions(): MegaFileServiceReclaimOptions? =
+        megaApi.fileServiceGetReclaimOptions()
+
+    override fun fileServiceSetReclaimOptions(options: MegaFileServiceReclaimOptions?) {
+        megaApi.fileServiceSetReclaimOptions(options)
+    }
+
+    override fun fileServiceReclaim(
+        options: MegaFileServiceReclaimOptions?,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.fileServiceReclaim(options, listener)
+    }
+
+    override suspend fun groupAllNodesByDate(
+        filter: MegaGroupNodesByDateFilter,
+        order: Int,
+        cancelToken: MegaCancelToken?,
+    ) = megaApi.groupAllNodesByDate(filter, order, cancelToken)
+
+    override suspend fun listAllNodesByPageAtOffset(
+        filter: MegaListAllNodesFilter,
+        order: Int,
+        cancelToken: MegaCancelToken?,
+        maxElements: Int,
+        offset: Long,
+    ) = megaApi.listAllNodesByPageAtOffset(filter, order, maxElements, cancelToken, offset)
 }

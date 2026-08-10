@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
@@ -24,13 +24,14 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.R
-import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.model.label.ChangeLabelState
 import mega.privacy.android.core.nodecomponents.model.label.Label
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.components.NodeLabelCircle
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun ChangeLabelBottomSheetContentM3(
@@ -56,6 +57,29 @@ internal fun ChangeLabelBottomSheetContentM3(
 }
 
 @Composable
+internal fun ChangeLabelBottomSheetContentM3(
+    nodeIds: List<NodeId>,
+    viewModel: ChangeLabelBottomSheetViewModel = hiltViewModel(),
+    onDismiss: () -> Unit,
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(nodeIds) {
+        viewModel.loadLabelInfo(nodeIds)
+    }
+    ChangeLabelBottomSheetContentM3(
+        state = state,
+        onLabelSelected = { label ->
+            viewModel.onLabelSelected(label)
+            onDismiss()
+        },
+        onLabelRemoved = {
+            viewModel.onLabelSelected(null)
+            onDismiss()
+        },
+    )
+}
+
+@Composable
 private fun ChangeLabelBottomSheetContentM3(
     state: ChangeLabelState,
     onLabelSelected: (NodeLabel) -> Unit,
@@ -65,7 +89,7 @@ private fun ChangeLabelBottomSheetContentM3(
         MegaText(
             modifier = Modifier
                 .padding(horizontal = 16.dp),
-            text = stringResource(id = R.string.title_label),
+            text = stringResource(id = NodesR.string.title_label),
             textColor = TextColor.Secondary,
             style = AppTheme.typography.titleMedium
         )
@@ -99,22 +123,25 @@ private fun ChangeLabelBottomSheetContentM3(
                     onClickListener = { onLabelSelected(label.label) }
                 )
             }
-            item {
-                FlexibleLineListItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = stringResource(id = R.string.action_remove_label),
-                    leadingElement = {
-                        MegaIcon(
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .size(24.dp),
-                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
-                            textColorTint = TextColor.Error
-                        )
-                    },
-                    onClickListener = onLabelRemoved,
-                    titleTextColor = TextColor.Error
-                )
+
+            if (state.isRemoveEnabled) {
+                item {
+                    FlexibleLineListItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        title = stringResource(id = NodesR.string.action_remove_label),
+                        leadingElement = {
+                            MegaIcon(
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .size(24.dp),
+                                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
+                                textColorTint = TextColor.Error
+                            )
+                        },
+                        onClickListener = onLabelRemoved,
+                        titleTextColor = TextColor.Error
+                    )
+                }
             }
         }
     }
@@ -128,37 +155,37 @@ private fun ChangeLabelBottomSheetPreview() {
         labelList = listOf(
             Label(
                 label = NodeLabel.RED,
-                labelName = sharedResR.string.label_red,
+                labelName = sharedR.string.label_red,
                 labelColor = R.color.label_red,
                 isSelected = false
             ),
             Label(
                 label = NodeLabel.ORANGE,
-                labelName = sharedResR.string.label_orange,
+                labelName = sharedR.string.label_orange,
                 labelColor = R.color.label_orange,
                 isSelected = true
             ),
             Label(
                 label = NodeLabel.YELLOW,
-                labelName = sharedResR.string.label_yellow,
+                labelName = sharedR.string.label_yellow,
                 labelColor = R.color.label_yellow,
                 isSelected = false
             ),
             Label(
                 label = NodeLabel.GREEN,
-                labelName = sharedResR.string.label_green,
+                labelName = sharedR.string.label_green,
                 labelColor = R.color.label_green,
                 isSelected = false
             ),
             Label(
                 label = NodeLabel.BLUE,
-                labelName = sharedResR.string.label_blue,
+                labelName = sharedR.string.label_blue,
                 labelColor = R.color.label_blue,
                 isSelected = false
             ),
             Label(
                 label = NodeLabel.PURPLE,
-                labelName = sharedResR.string.label_purple,
+                labelName = sharedR.string.label_purple,
                 labelColor = R.color.label_purple,
                 isSelected = false
             ),

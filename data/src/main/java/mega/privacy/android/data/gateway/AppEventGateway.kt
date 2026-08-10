@@ -6,7 +6,9 @@ import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
 
 internal interface AppEventGateway {
 
@@ -66,6 +68,17 @@ internal interface AppEventGateway {
      *
      */
     suspend fun broadcastTransferOverQuota(isCurrentOverQuota: Boolean)
+
+    /**
+     * Monitor transfer over quota events (over quota and almost over quota)
+     */
+    fun monitorTransferOverQuotaEvent(): Flow<TransferOverQuotaStatus>
+
+    /**
+     * Broadcast a transfer over quota event
+     * @param status the [TransferOverQuotaStatus] to broadcast
+     */
+    suspend fun broadcastTransferOverQuotaEvent(status: TransferOverQuotaStatus)
 
     /**
      * Broadcast storage over quota
@@ -364,19 +377,23 @@ internal interface AppEventGateway {
     suspend fun broadcastUpgradeDialogClosed()
 
     /**
-     * Monitor misc loaded
+     * Monitor misc state
      */
-    fun monitorMiscLoaded(): Flow<Boolean>
+    fun monitorMiscState(): Flow<MiscLoadedState>
 
     /**
-     * Broadcast misc loaded
+     * Get current misc state
+     *
+     * @return The current misc state
      */
-    suspend fun broadcastMiscLoaded()
+    fun getCurrentMiscState(): MiscLoadedState
 
     /**
-     * Broadcast misc unloaded
+     * Broadcast misc state
+     *
+     * @param state The misc state to broadcast
      */
-    suspend fun broadcastMiscUnloaded()
+    suspend fun broadcastMiscState(state: MiscLoadedState)
 
     /**
      * Broadcast SSL verification failed

@@ -3,30 +3,33 @@ package mega.privacy.android.app.fragments.settingsFragments
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_DND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_NOTIFICATIONS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_SOUND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_VIBRATE
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.domain.entity.settings.ChatSettings
-import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_OFF
-import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_ON
 import timber.log.Timber
 
 /**
  * The fragment for chat notifications of settings
  */
+@AndroidEntryPoint
 class SettingsChatNotificationsFragment : SettingsBaseFragment(),
     Preference.OnPreferenceClickListener {
-    private var chatSettings: ChatSettings?
+
+    private val viewModel by viewModels<SettingsChatNotificationsViewModel>()
+
     private var chatNotificationsSwitch: SwitchPreferenceCompat? = null
     private var chatSoundPreference: Preference? = null
     private var chatVibrateSwitch: SwitchPreferenceCompat? = null
@@ -67,7 +70,7 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
                         )
                     } else {
                         ChatUtil.createMuteNotificationsChatAlertDialog(
-                            context as ChatNotificationsPreferencesActivity, null
+                            requireActivity() as ChatNotificationsPreferencesActivity, null
                         )
                     }
                     false
@@ -76,6 +79,14 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
 
         updateSwitch()
         megaChatApi.signalPresenceActivity()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewLifecycleOwner.collectFlow(viewModel.uiState) { state ->
+            chatVibrateSwitch?.isChecked = state.isVibrationEnabled
+            renderSoundSummary(state.notificationsSound)
+        }
     }
 
     /**
@@ -109,50 +120,45 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
                 }
             }
         }
+    }
 
-        if (chatSettings == null) {
-            chatSettings = dbH.chatSettings
-        }
-        val isVibrationEnabled =
-            chatSettings?.vibrationEnabled == null || chatSettings?.vibrationEnabled.toBoolean()
-        dbH.setVibrationEnabledChat(isVibrationEnabled.toString())
-        chatSettings = chatSettings?.copy(vibrationEnabled = isVibrationEnabled.toString())
-        chatVibrateSwitch?.isChecked = isVibrationEnabled
-        if (TextUtil.isTextEmpty(chatSettings?.notificationsSound)) {
-            val defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(
-                context,
-                RingtoneManager.TYPE_NOTIFICATION
-            )
-            val defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri)
-            chatSoundPreference?.summary =
-                if (defaultSound == null) getString(R.string.settings_chat_silent_sound_not) else defaultSound.getTitle(
-                    context
+    /**
+     * Updates the chat sound preference summary based on the stored notification sound.
+     *
+     * @param notificationsSound the raw notification sound value from the UI state.
+     */
+    private fun renderSoundSummary(notificationsSound: String?) {
+        when {
+            notificationsSound.isNullOrBlank() -> {
+                val defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(
+                    context,
+                    RingtoneManager.TYPE_NOTIFICATION
                 )
-        } else if (chatSettings?.notificationsSound == Constants.INVALID_OPTION) {
-            chatSoundPreference?.summary = getString(R.string.settings_chat_silent_sound_not)
-        } else {
-            val soundString = chatSettings?.notificationsSound
-            if (soundString == "true") {
-                val defaultSoundUri2 =
-                    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                val defaultSound2 = RingtoneManager.getRingtone(context, defaultSoundUri2)
-                chatSoundPreference?.summary = defaultSound2.getTitle(context)
-                dbH.setNotificationSoundChat(defaultSoundUri2.toString())
-            } else {
-                val sound = RingtoneManager.getRingtone(context, Uri.parse(soundString))
+                val defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri)
+                chatSoundPreference?.summary =
+                    if (defaultSound == null) getString(R.string.settings_chat_silent_sound_not)
+                    else defaultSound.getTitle(context)
+            }
+
+            notificationsSound == Constants.INVALID_OPTION -> {
+                chatSoundPreference?.summary = getString(R.string.settings_chat_silent_sound_not)
+            }
+
+            notificationsSound == "true" -> {
+                val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                val defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri)
+                chatSoundPreference?.summary = defaultSound.getTitle(context)
+                viewModel.setNotificationSound(defaultSoundUri.toString())
+            }
+
+            else -> {
+                val sound = RingtoneManager.getRingtone(context, Uri.parse(notificationsSound))
                 if (sound != null) {
                     chatSoundPreference?.summary = sound.getTitle(context)
                 } else {
                     Timber.w("Sound is null")
                 }
             }
-        }
-
-        chatSoundPreference?.let {
-            preferenceScreen.addPreference(it)
-        }
-        chatVibrateSwitch?.let {
-            preferenceScreen.addPreference(it)
         }
     }
 
@@ -171,20 +177,11 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
                     )
                 }
 
-            KEY_CHAT_VIBRATE ->
-                if (chatSettings?.vibrationEnabled == null
-                    || chatSettings?.vibrationEnabled.toBoolean()
-                ) {
-                    dbH.setVibrationEnabledChat(VIBRATION_OFF)
-                    chatSettings = chatSettings?.copy(vibrationEnabled = VIBRATION_OFF)
-                } else {
-                    dbH.setVibrationEnabledChat(VIBRATION_ON)
-                    chatSettings = chatSettings?.copy(vibrationEnabled = VIBRATION_ON)
-                }
+            KEY_CHAT_VIBRATE -> viewModel.toggleVibration()
 
             KEY_CHAT_SOUND ->
-                (context as? ChatNotificationsPreferencesActivity)
-                    ?.changeSound(chatSettings?.notificationsSound)
+                (activity as? ChatNotificationsPreferencesActivity)
+                    ?.changeSound(viewModel.uiState.value.notificationsSound)
         }
         return true
     }
@@ -207,17 +204,6 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
         } else {
             chatSoundPreference?.summary = getString(R.string.settings_chat_silent_sound_not)
         }
-        if (chatSettings == null) {
-            chatSettings = ChatSettings()
-            chatSettings = chatSettings?.copy(notificationsSound = chosenSound)
-            dbH.chatSettings = chatSettings
-        } else {
-            chatSettings = chatSettings?.copy(notificationsSound = chosenSound)
-            dbH.setNotificationSoundChat(chosenSound)
-        }
-    }
-
-    init {
-        chatSettings = dbH.chatSettings
+        viewModel.setNotificationSound(chosenSound)
     }
 }

@@ -44,6 +44,7 @@
 -dontnote **ILicensingService
 -dontnote com.google.android.gms.**
 -dontwarn com.google.android.gms.ads.**
+-dontwarn com.google.android.libraries.ads.mobile.sdk.**
 
 ########################
 # Firebase Crashlytics #
@@ -68,9 +69,12 @@
 -keep class * implements com.google.gson.TypeAdapterFactory
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
-# Prevent R8 from leaving Data object members always null
--keepclassmembers,allowobfuscation class * {
+# General Gson rule for R8 full mode: keep classes with @SerializedName (not just members).
+# keepclasseswithmembers preserves the class itself when only used via reflection/Retrofit,
+# preventing ClassCastException from generic type corruption. See Gson gson.pro and #2401.
+-keepclasseswithmembers,allowobfuscation class * {
   @com.google.gson.annotations.SerializedName <fields>;
+  <init>(...);
 }
 # Retain generic signatures of TypeToken and its subclasses with R8 version 3.0 and higher.
 -keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
@@ -107,6 +111,8 @@
 # Protobuf Library #
 #####################
 -keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
+-keep class * extends com.google.protobuf.GeneratedMessageV3 { *; }
+-keep class * extends com.google.protobuf.GeneratedMessageV3$Builder { *; }
 -keep class com.google.protobuf.** { *; }
 
 #####################
@@ -118,6 +124,17 @@
 -keep public class androidx.compose.ui.platform.AndroidCompositionLocals_androidKt {
     public static *** getLocalLifecycleOwner();
 }
+
+#####################
+# MegaRequestListenerInterface implementations #
+# R8 full mode incorrectly propagates default field values in classes with
+# Kotlin secondary constructors, causing fields set in secondary constructors
+# to read as their default values in callback methods invoked from JNI.
+#####################
+-keep class * implements nz.mega.sdk.MegaRequestListenerInterface { *; }
+-keep class * implements nz.mega.sdk.MegaTransferListenerInterface { *; }
+-keep class * implements nz.mega.sdk.MegaChatRequestListenerInterface { *; }
+-keep class * implements nz.mega.sdk.MegaListenerInterface { *; }
 
 #####################
 # Keep Fragment classes #
@@ -159,6 +176,8 @@
 -keep public class com.google.ads.** {
     public *;
 }
+
+-keep class com.google.android.libraries.ads.mobile.sdk.** { *; }
 
 # For mediation
 -keepattributes *Annotation*

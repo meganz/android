@@ -88,7 +88,7 @@ internal fun VideoToPlaylistView(
             CreateVideoPlaylistDialog(
                 modifier = Modifier.testTag(VIDEO_TO_PLAYLIST_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
                 title = stringResource(id = sharedR.string.video_section_playlists_create_playlist_dialog_title),
-                positiveButtonText = stringResource(id = R.string.general_create),
+                positiveButtonText = stringResource(id = sharedR.string.general_create_label),
                 inputPlaceHolderText = { inputPlaceHolderText },
                 errorMessage = errorMessage,
                 onDialogInputChange = setInputValidity,

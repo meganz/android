@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenOption
 import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenSettingsState
 import mega.privacy.android.app.presentation.settings.startscreen.view.StartScreenOptionView

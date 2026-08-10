@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.call
 
+import mega.privacy.android.domain.entity.call.CallRecordingConsentStatus
 import mega.privacy.android.domain.repository.CallRepository
 import javax.inject.Inject
 
@@ -12,8 +13,9 @@ class BroadcastCallRecordingConsentEventUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param isRecordingConsentAccepted True if recording consent has been accepted or False otherwise.
+     * @param consentStatus True if recording consent has been accepted or False otherwise.
      */
-    suspend operator fun invoke(isRecordingConsentAccepted: Boolean?) =
-        callRepository.broadcastCallRecordingConsentEvent(isRecordingConsentAccepted)
+    suspend operator fun invoke(consentStatus: CallRecordingConsentStatus) =
+        callRepository.broadcastCallRecordingConsentEvent(consentStatus)
 }
+

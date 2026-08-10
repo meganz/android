@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
-import mega.privacy.android.navigation.destination.ContactsNavKey
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 
@@ -33,9 +33,9 @@ import mega.privacy.android.navigation.destination.RubbishBinNavKey
  */
 internal fun UserAlert.destination(): NavKey? {
     return when (this) {
-        is PaymentFailedAlert -> MyAccountNavKey
-        is PaymentReminderAlert -> MyAccountNavKey
-        is PaymentSucceededAlert -> MyAccountNavKey
+        is PaymentFailedAlert -> MyAccountNavKey()
+        is PaymentReminderAlert -> MyAccountNavKey()
+        is PaymentSucceededAlert -> MyAccountNavKey()
         is TakeDownAlert -> when (destination) {
             UserAlertDestination.CloudDrive -> rootNodeId?.let { CloudDriveNavKey(it) }
             UserAlertDestination.RubbishBin -> rootNodeId?.let { RubbishBinNavKey(it) }
@@ -69,18 +69,25 @@ internal fun UserAlert.destination(): NavKey? {
         is UpdatedPendingContactIncomingDeniedAlert -> null
         is UpdatedPendingContactIncomingIgnoredAlert -> null
         is UpdatedPendingContactOutgoingDeniedAlert -> null
-        is IncomingShareAlert -> nodeId?.let {
-            CloudDriveNavKey(
-                nodeHandle = it,
-                nodeSourceType = NodeSourceType.INCOMING_SHARES
-            )
-        }
+        is IncomingShareAlert ->
+            when (destination) {
+                UserAlertDestination.CloudDrive -> nodeId?.let { CloudDriveNavKey(it) }
+                UserAlertDestination.RubbishBin -> nodeId?.let { RubbishBinNavKey(it) }
+                UserAlertDestination.IncomingShares -> nodeId?.let {
+                    CloudDriveNavKey(
+                        nodeHandle = it,
+                        nodeSourceType = NodeSourceType.INCOMING_SHARES
+                    )
+                }
+
+                else -> null
+            }
 
         is ContactAlert ->
             if (contact.isVisible) {
                 contact.email?.let { ContactInfoNavKey(it) }
             } else if (contact.hasPendingRequest) {
-                ContactsNavKey(ContactsNavKey.NavType.ReceivedRequests)
+                ContactRequestsNavKey(ContactRequestsNavKey.NavType.ReceivedRequests)
             } else null
 
         is ScheduledMeetingAlert -> ChatNavKey(chatId, Constants.ACTION_CHAT_SHOW_MESSAGES)

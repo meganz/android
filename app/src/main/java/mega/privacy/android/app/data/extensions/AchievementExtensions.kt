@@ -3,6 +3,7 @@ package mega.privacy.android.app.data.extensions
 import android.content.Context
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
+import mega.privacy.android.core.formatter.formatFileSize
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
 
@@ -100,54 +101,7 @@ fun Long.toStorageString(context: Context): String {
  *
  * @deprecated Use [mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper] instead
  */
-fun Long.toUnitString(context: Context): String {
-    val formatter = DecimalFormat("#.##")
-
-    return when {
-        this < kilobyte -> {
-            context.getString(R.string.label_file_size_byte, this.toString())
-        }
-
-        this < megabyte -> {
-            context.getString(
-                R.string.label_file_size_kilo_byte,
-                formatter.format(this / kilobyte)
-            )
-        }
-
-        this < gigabyte -> {
-            context.getString(
-                R.string.label_file_size_mega_byte,
-                formatter.format(this / megabyte)
-            )
-        }
-
-        this < terabyte -> {
-            context.getString(
-                R.string.label_file_size_giga_byte,
-                formatter.format(this / gigabyte)
-            )
-        }
-
-        this < petabyte -> {
-            context.getString(
-                R.string.label_file_size_tera_byte,
-                formatter.format(this / terabyte)
-            )
-        }
-
-        this < exabyte -> {
-            context.getString(
-                R.string.label_file_size_peta_byte,
-                formatter.format(this / petabyte)
-            )
-        }
-
-        else -> {
-            context.getString(R.string.label_file_size_exa_byte, formatter.format(this / exabyte))
-        }
-    }
-}
+fun Long.toUnitString(context: Context): String = formatFileSize(this, context)
 
 internal fun Long.toMillis() = TimeUnit.SECONDS.toMillis(this)
 

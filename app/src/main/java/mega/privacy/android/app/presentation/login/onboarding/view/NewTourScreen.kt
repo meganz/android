@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -34,6 +34,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.TextOnlyButton
@@ -101,48 +102,56 @@ internal fun NewTourScreen(
         TourCarouselPagerItem.Third,
         TourCarouselPagerItem.Fourth
     )
-
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { Int.MAX_VALUE })
-    Column(
-        modifier = modifier
-            .systemBarsPadding()
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
-            HorizontalPager(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                state = pagerState,
-            ) { pageIndex ->
-                val pageItem = pagerItems[pageIndex % pagerItems.size]
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = if (isTabletPortrait) Alignment.Center else Alignment.TopCenter
-                ) {
-                    OnboardingPageContent(
-                        pageIndex = pageIndex,
-                        pageItem = pageItem,
-                        isTablet = isTablet,
-                        isPhoneLandscape = isPhoneLandscape
-                    )
+    MegaScaffold(
+        modifier = modifier,
+        bottomBar = {
+            Column(
+                modifier = Modifier.navigationBarsPadding().fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                PageControlsIndicator(
+                    modifier = Modifier.testTag(PAGER_INDICATOR),
+                    pagerState = pagerState,
+                    itemCount = pagerItems.size,
+                    onClick = {}
+                )
+                if (isPhoneLandscape) {
+                    ButtonsRow(onCreateAccountClick, onLoginClick)
+                } else {
+                    ButtonsColumn(onCreateAccountClick, onLoginClick, isTablet)
                 }
             }
         }
-
-        PageControlsIndicator(
-            modifier = Modifier.testTag(PAGER_INDICATOR),
-            pagerState = pagerState,
-            itemCount = pagerItems.size,
-            onClick = {}
-        )
-
-        if (isPhoneLandscape) {
-            ButtonsRow(onCreateAccountClick, onLoginClick)
-        } else {
-            ButtonsColumn(onCreateAccountClick, onLoginClick, isTablet)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
+                HorizontalPager(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    state = pagerState,
+                ) { pageIndex ->
+                    val pageItem = pagerItems[pageIndex % pagerItems.size]
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = if (isTabletPortrait) Alignment.Center else Alignment.TopCenter
+                    ) {
+                        OnboardingPageContent(
+                            pageIndex = pageIndex,
+                            pageItem = pageItem,
+                            isTablet = isTablet,
+                            isPhoneLandscape = isPhoneLandscape
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -287,15 +296,6 @@ private fun ButtonsRow(
             .padding(start = spacing.x16, end = spacing.x16, bottom = spacing.x20),
         horizontalArrangement = Arrangement.spacedBy(spacing.x16)
     ) {
-        PrimaryFilledButton(
-            modifier = Modifier
-                .testTag(CREATE_ACCOUNT_BUTTON)
-                .height(spacing.x48)
-                .weight(1f),
-            text = stringResource(id = sharedR.string.general_label_create_account),
-            onClick = onCreateAccountClick,
-        )
-
         TextOnlyButton(
             modifier = Modifier
                 .testTag(LOG_IN_BUTTON)
@@ -303,6 +303,14 @@ private fun ButtonsRow(
                 .weight(1f),
             text = stringResource(id = sharedR.string.login_text),
             onClick = onLoginClick
+        )
+        PrimaryFilledButton(
+            modifier = Modifier
+                .testTag(CREATE_ACCOUNT_BUTTON)
+                .height(spacing.x48)
+                .weight(1f),
+            text = stringResource(id = sharedR.string.general_label_create_account),
+            onClick = onCreateAccountClick,
         )
     }
 }

@@ -1,6 +1,8 @@
 package mega.privacy.android.app.components.session
 
+import android.app.Activity
 import android.content.Intent
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -11,16 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.qrcode.findActivity
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -31,6 +31,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  * If not, navigate to login page.
  *
  * @param isSessionRequired If false, it will not check the session and always show the content. Used for pages that do not require a session, such as Preview Chat.
+ * @param finishOnSessionRefresh When the SDK session needs refreshing (root node missing) activity finish or not
  * @param optimistic If true, assumes that the SDK session exists while waiting for a response. That way it starts showing the content immediately
  * @param loadingView Composable function that will be shown while waiting for the check session result. Use { DefaultLoadingSessionView() } for basic implementation.
  * @param content
@@ -38,7 +39,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 @Composable
 internal fun SessionContainer(
     isSessionRequired: Boolean = true,
-    shouldFinish: Boolean = true,
+    finishOnSessionRefresh: Boolean = true,
     optimistic: Boolean = false,
     viewModel: SessionViewModel = hiltViewModel(),
     loadingView: @Composable () -> Unit = {},
@@ -64,29 +65,39 @@ internal fun SessionContainer(
                 content()
             }
 
-        state.doesRootNodeExist == false -> navigateToLogin(shouldFinish)
+        state.doesRootNodeExist == false -> navigateToRefreshSession(
+            LocalActivity.current,
+            finishOnSessionRefresh,
+        )
+
         state.doesRootNodeExist == null -> loadingView()
     }
 }
 
-@Composable
-private fun navigateToLogin(shouldFinish: Boolean) {
-    val context = LocalContext.current
-    context.findActivity()?.let { activity ->
-        val intent = Intent(context, LoginActivity::class.java).apply {
-            if (shouldFinish) {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            }
-            putExtra(
-                Constants.LAUNCH_INTENT,
+internal fun navigateToRefreshSession(
+    activity: Activity?,
+    finishOnSessionRefresh: Boolean = true,
+) {
+    activity?.let {
+        val intent = MegaActivityInternalLauncher.getIntent(
+            context = activity,
+            action = RefreshEvent.SdkReload.name,
+        ).apply {
+            val intent = if (finishOnSessionRefresh) {
                 activity.intent.apply {
                     // remove flags that may cause issues when navigate from notification
                     flags = 0
                 }
+            } else {
+                Intent()
+            }
+            putExtra(
+                MegaActivityInternalLauncher.LAUNCH_INTENT,
+                intent
             )
         }
-        context.startActivity(intent)
-        if (shouldFinish) {
+        activity.startActivity(intent)
+        if (finishOnSessionRefresh) {
             activity.finish()
         }
     }

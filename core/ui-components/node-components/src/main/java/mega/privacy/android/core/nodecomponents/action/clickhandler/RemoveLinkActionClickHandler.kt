@@ -4,15 +4,12 @@ import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.action.MultipleNodesActionProvider
 import mega.privacy.android.core.nodecomponents.action.NodeActionProvider
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionProvider
-import mega.privacy.android.core.nodecomponents.dialog.removelink.RemoveNodeLinkDialogNavKey
-import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.nodes.dialog.removelink.RemoveNodeLinkDialogNavKey
 import javax.inject.Inject
 
-class RemoveLinkActionClickHandler @Inject constructor(
-    private val nodeHandlesToJsonMapper: NodeHandlesToJsonMapper,
-) : SingleNodeAction, MultiNodeAction {
+class RemoveLinkActionClickHandler @Inject constructor() : SingleNodeAction, MultiNodeAction {
     override fun canHandle(action: MenuAction): Boolean = action is RemoveLinkMenuAction
 
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
@@ -28,10 +25,8 @@ class RemoveLinkActionClickHandler @Inject constructor(
     }
 
     private fun removeLinks(nodes: List<Long>, provider: NodeActionProvider) {
-        provider.navigationHandler?.navigate(
-            RemoveNodeLinkDialogNavKey(
-                nodes = nodeHandlesToJsonMapper(nodes)
-            )
+        provider.viewModel.navigateWithNavKey(
+            RemoveNodeLinkDialogNavKey(handles = nodes)
         )
     }
 }

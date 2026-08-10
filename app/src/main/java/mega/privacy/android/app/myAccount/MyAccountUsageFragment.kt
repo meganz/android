@@ -90,7 +90,6 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 context = requireActivity(),
                 source = UpgradeAccountSource.MY_ACCOUNT_SCREEN
             )
-            viewModel.setOpenUpgradeFrom()
         }
     }
 
@@ -126,6 +125,14 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
             refreshVersionsInfo(it.versionsInfo, it.isFileVersioningEnabled)
         }
         viewLifecycleOwner.collectFlow(viewModel.state.map { it.storageState }
+            .distinctUntilChanged()) {
+            setupAccountDetails()
+        }
+        viewLifecycleOwner.collectFlow(viewModel.state.map { it.isBusinessAccount }
+            .distinctUntilChanged()) {
+            setupAccountDetails()
+        }
+        viewLifecycleOwner.collectFlow(viewModel.state.map { it.isProFlexiAccount }
             .distinctUntilChanged()) {
             setupAccountDetails()
         }

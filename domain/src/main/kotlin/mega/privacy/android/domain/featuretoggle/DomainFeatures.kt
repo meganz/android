@@ -6,7 +6,6 @@ enum class DomainFeatures(
     override val description: String,
     private val defaultValue: Boolean,
 ) : Feature {
-
     ;
 
     companion object : FeatureFlagValueProvider {

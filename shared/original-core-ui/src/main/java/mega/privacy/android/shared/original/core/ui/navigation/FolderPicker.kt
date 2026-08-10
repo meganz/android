@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.Fragment
+import mega.privacy.android.core.passcode.rememberPasscodeAwareLauncher
 
 /**
  * Launches a native Android Folder Picker
@@ -27,7 +28,7 @@ fun launchFolderPicker(
 ): ActivityResultLauncher<Uri?> {
     val context = LocalContext.current
 
-    return rememberLauncherForActivityResult(
+    return rememberPasscodeAwareLauncher(
         persistableOpenDocumentTree(initialUri, writePermission)
     ) { directoryUri ->
         onResult(directoryUri, writePermission, context, onCancel, onFolderSelected)

@@ -9,12 +9,17 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_REJOIN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
+
+    @Inject
+    lateinit var megaChatApi: MegaChatApiAndroid
 
     override fun onMeetingButtonClick() {
         if (chatId == MEGACHAT_INVALID_HANDLE) {
@@ -23,7 +28,7 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
         }
 
         releaseVideoDeviceAndRemoveChatVideoListener()
-        if (amIParticipatingInAChat(chatId)) {
+        if (amIParticipatingInAChat(chatId, megaChatApi)) {
             Timber.d("I am a member of the chat, just answer the call")
             findNavController().navigate(
                 JoinMeetingFragmentDirections

@@ -19,4 +19,8 @@ internal interface SyncPreferencesDatastore {
     suspend fun setSyncFrequencyInMinutes(frequencyInMinutes: Int)
 
     suspend fun getSyncFrequencyMinutes(): Int?
+
+    suspend fun setShouldRunForeground(shouldRun: Boolean)
+
+    suspend fun getShouldRunForeground(): Boolean?
 }

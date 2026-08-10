@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages.pending
 
 import mega.privacy.android.domain.entity.chat.PendingMessageState
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
  * @property nodeHandle
  * @property fingerprint
  * @property name
+ * @property pitagTrigger
  */
 data class SavePendingMessageRequest(
     val chatId: Long,
@@ -30,4 +32,5 @@ data class SavePendingMessageRequest(
     val nodeHandle: Long,
     val fingerprint: String?,
     val name: String?,
+    val pitagTrigger: PitagTrigger,
 )

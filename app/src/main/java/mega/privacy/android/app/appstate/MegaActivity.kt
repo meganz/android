@@ -1,120 +1,466 @@
 package mega.privacy.android.app.appstate
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import android.os.Parcelable
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.fragment.app.FragmentActivity
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
-import kotlinx.serialization.Serializable
+import de.palm.composestateevents.NavigationEventEffect
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.app.appstate.content.AppContentStateViewModel
-import mega.privacy.android.app.appstate.content.view.AppContentView
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.INTERNAL_ENTRY_COMPONENT
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.LAUNCH_INTENT
+import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
+import mega.privacy.android.app.appstate.content.model.NavigationGraphState
+import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.app.appstate.content.navigation.PendingBackStack
+import mega.privacy.android.app.appstate.content.navigation.PendingBackStackNavigationHandler
+import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
+import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
+import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
-import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
+import mega.privacy.android.app.appstate.global.model.RootNodeState
+import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.util.show
+import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.app.presence.SignalPresenceViewModel
-import mega.privacy.android.app.presentation.container.AppContainer
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.login.LoginNavDisplay
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
+import mega.privacy.android.app.presentation.login.LoginViewModel
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
+import mega.privacy.android.app.presentation.login.model.LoginScreen
+import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
+import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
+import mega.privacy.android.core.passcode.presentation.navigation.PasscodeNavKey
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
+import mega.privacy.android.core.sharedcomponents.parcelable
+import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
+import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaEventUseCase
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.navigation.contract.navOptions
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.destination.CreateAccountNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
+import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
+import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Single Activity for Mega App
+ */
 @AndroidEntryPoint
-class MegaActivity : ComponentActivity() {
+class MegaActivity : FragmentActivity() {
 
+    /**
+     * Navigation event queue
+     */
     @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+    lateinit var navigationEventQueue: NavigationEventQueue
 
-    @Serializable
-    data class LoggedInScreens(val isFromLogin: Boolean = false, val session: String) : NavKey
+    /**
+     * App dialogs event queue
+     */
+    @Inject
+    lateinit var appDialogsEventQueue: AppDialogsEventQueue
+
+
+    /**
+     * Navigation result manager
+     */
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    /**
+     * In app update handler
+     */
+    @Inject
+    lateinit var inAppUpdateHandler: InAppUpdateHandler
+
+    /**
+     * Fetch node provider
+     */
+    @Inject
+    lateinit var fetchNodeProvider: FetchNodeProvider
+
+    /**
+     * Intent action handler
+     */
+    @Inject
+    lateinit var intentActionHandler: MegaActivityIntentActionHandler
+
+    /**
+     * Monitor transfer over quota event
+     */
+    @Inject
+    lateinit var monitorTransferOverQuotaEventUseCase: MonitorTransferOverQuotaEventUseCase
+
+    private val passcodeViewModel: PasscodeCheckViewModel by viewModels()
+
+    private val globalStateViewModel: GlobalStateViewModel by viewModels()
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        intentActionHandler.savePendingDeepLink(this.intent)
         this.intent = intent
+        Timber.d("New intent received. Action: ${intent.action}")
+        lifecycleScope.launch {
+            consumeIntentExtras()
+        }
+    }
+
+    private suspend fun consumeIntentExtras() {
+        consumeActions()
+        consumeWarningMessage()
+        consumeIntentDestinations()
+    }
+
+    private suspend fun consumeActions() {
+        intentActionHandler.handleAction(
+            intent = intent,
+            refreshSession = globalStateViewModel::refreshSession,
+        )
+    }
+
+    private fun consumeWarningMessage() {
+        intent.getStringExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)?.let { warningMessage ->
+            globalStateViewModel.queueMessage(warningMessage)
+            intent.removeExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)
+        }
+    }
+
+    private suspend fun consumeIntentDestinations() {
+        intent.getDestinations()?.let { navKeys ->
+            //Add nav keys to navigation queue
+            navKeys.forEach {
+                Timber.d("NavKey from intent: $it")
+            }
+            navigationEventQueue.emit(navKeys)
+            intent.removeExtra(EXTRA_NAV_KEYS)
+        }
+    }
+
+    @SuppressLint("UnsafeIntentLaunch")
+    private fun launchLastActivityIfNeeded(rootNodeState: RootNodeState) {
+        if (rootNodeState.exists && intent.extras?.containsKey(LAUNCH_INTENT) == true) {
+            if (intent.component?.className != INTERNAL_ENTRY_COMPONENT) {
+                Timber.w("Rejected LAUNCH_INTENT from non-internal entry point")
+                finish()
+            } else {
+                intent.parcelable<Intent>(LAUNCH_INTENT)?.let { originalIntent ->
+                    if (originalIntent.component?.packageName == packageName) {
+                        startActivity(originalIntent)
+                    }
+                    finish()
+                }
+                intent.removeExtra(LAUNCH_INTENT)
+            }
+        }
+    }
+
+    private suspend fun handlePendingDeepLinks(rootNodeState: RootNodeState) {
+        intentActionHandler.handlePendingDeepLinks(intent, rootNodeState.exists)
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(SupportedLanguageContextWrapper.wrap(newBase))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkForInAppUpdateInstallStatus()
+    }
+
+    private fun checkForAppUpdates() {
+        lifecycleScope.launch {
+            runCatching {
+                inAppUpdateHandler.checkForAppUpdates()
+            }.onFailure { exception ->
+                Timber.e(exception, "InAppUpdate: Failed to check for app updates")
+            }
+        }
+    }
+
+    private fun checkForInAppUpdateInstallStatus() {
+        lifecycleScope.launch {
+            runCatching {
+                inAppUpdateHandler.checkForInAppUpdateInstallStatus()
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        intentActionHandler.savePendingDeepLinkToBundle(outState)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.d("MegaActivity created ${this.hashCode()}")
         val splashScreen = installSplashScreen()
-        var keepSplashScreen = true
+        var keepSplashScreen by mutableStateOf(true)
         super.onCreate(savedInstanceState)
+        intentActionHandler.restorePendingDeepLinkFromBundle(savedInstanceState)
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
         enableEdgeToEdge()
+        lifecycleScope.launch {
+            consumeIntentExtras()
+        }
         setContent {
-            val viewModel = viewModel<GlobalStateViewModel>()
+            val navGraphViewModel = hiltViewModel<NavigationGraphViewModel>() // nav graph content
             val presenceViewModel = hiltViewModel<SignalPresenceViewModel>()
+            val snackbarEventsViewModel = hiltViewModel<SnackbarEventsViewModel>()
+            val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
+            val requestStatusProgressViewModel = hiltViewModel<RequestStatusProgressViewModel>()
+            val loginViewModel = hiltViewModel<LoginViewModel>()
 
-            val state by viewModel.state.collectAsStateWithLifecycle()
-            val snackbarEventsViewModel = viewModel<SnackbarEventsViewModel>()
-            val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
+            val navGraphState by navGraphViewModel.state.collectAsStateWithLifecycle()
+            val globalState by globalStateViewModel.state.collectAsStateWithLifecycle()
+            val rootNodeState by globalStateViewModel.rootNodeExistsFlow.collectAsStateWithLifecycle()
+            val loginState by loginViewModel.state.collectAsStateWithLifecycle()
             val snackbarHostState = remember { SnackbarHostState() }
-            // This is used to recompose the LoginGraph when new login request is made
-            var fromLogin by remember { mutableStateOf(false) }
-            keepSplashScreen = state is GlobalState.Loading
 
-            AndroidTheme(isDark = state.themeMode.isDarkMode()) {
-                EventEffect(
-                    event = snackbarEventsState,
-                    onConsumed = snackbarEventsViewModel::consumeEvent,
-                    action = { snackbarHostState.show(it) }
+            LaunchedEffect(globalState, navGraphState) {
+                if (globalState !is GlobalState.Loading && navGraphState !is NavigationGraphState.Loading) {
+                    keepSplashScreen = false
+                }
+            }
+
+            if (!keepSplashScreen) {
+                val backStack: PendingBackStack<NavKey> =
+                    rememberPendingBackStack(HomeScreensNavKey())
+
+                val passcodeState by passcodeViewModel.state.collectAsStateWithLifecycle()
+
+                val navigationHandler = remember {
+                    val authStatus = (globalState as? GlobalState.LoggedIn)?.session?.let {
+                        PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
+                    } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
+                    PendingBackStackNavigationHandler(
+                        backstack = backStack,
+                        currentAuthStatus = authStatus,
+                        defaultLandingScreen = HomeScreensNavKey(),
+                        defaultLoginDestination = LoginNavKey(),
+                        initialLoginDestination = TourNavKey,
+                        hasRootNode = rootNodeState.exists,
+                        isConnected = globalState.isConnected,
+                        isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
+                        passcodeDestination = PasscodeNavKey,
+                        fetchNodeProvider = fetchNodeProvider,
+                        navigationResultManager = navigationResultManager,
+                    )
+                }
+
+                SessionConnectivityObserver(
+                    globalState = globalState,
+                    rootNodeState = rootNodeState,
+                    reconnect = globalStateViewModel::backgroundFastLogin
                 )
 
-                Box(modifier = Modifier.pointerInput(Unit) {
-                    awaitEachGesture {
-                        do {
-                            val event = awaitPointerEvent()
-                            if (event.type == PointerEventType.Press) {
-                                presenceViewModel.signalPresence()
-                            }
-                        } while (event.changes.any { it.pressed })
+                var wasLoggedIn by remember { mutableStateOf(false) }
+                LaunchedEffect(globalState) {
+                    val authStatus =
+                        (globalState as? GlobalState.LoggedIn)?.session?.let {
+                            PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
+                        } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
+                    val isLoggedIn = authStatus.isLoggedIn
+                    if (wasLoggedIn && !isLoggedIn && !loginState.is2FARequired) {
+                        loginViewModel.stopLogin(isPerformLocalLogOut = false)
                     }
-                }) {
-                    when (val currentState = state) {
-                        is GlobalState.Loading -> {}
-                        is GlobalState.LoggedIn -> {
-                            AppContainer(
-                                containers = containers,
-                            ) {
-                                val appContentStateViewModel =
-                                    hiltViewModel<AppContentStateViewModel>()
-                                AppContentView(
-                                    viewModel = appContentStateViewModel,
-                                    snackbarHostState = snackbarHostState,
-                                    navKey = LoggedInScreens(
-                                        isFromLogin = fromLogin,
-                                        session = currentState.session
-                                    ),
-                                )
-                            }
-                        }
+                    wasLoggedIn = isLoggedIn
+                    navigationHandler.onNetworkChange(globalState.isConnected)
+                    navigationHandler.onLoginChange(authStatus)
+                }
 
-                        is GlobalState.RequireLogin -> {
-                            fromLogin = true
-                            LoginNavDisplay(
-                                onFinish = ::finish,
-                                stopShowingSplashScreen = {
-                                    keepSplashScreen = false
-                                },
-                            )
+                // Check for app updates when user logs in
+                val currentSession = (globalState as? GlobalState.LoggedIn)?.session
+                LaunchedEffect(currentSession) {
+                    currentSession?.let {
+                        checkForAppUpdates()
+                    }
+                }
+
+                LaunchedEffect(rootNodeState) {
+                    navigationHandler.onRootNodeChange(rootNodeState)
+                    launchLastActivityIfNeeded(rootNodeState)
+                    handlePendingDeepLinks(rootNodeState)
+                }
+
+                LaunchedEffect(passcodeState) {
+                    navigationHandler.onPasscodeStateChanged(passcodeState is PasscodeCheckState.Locked)
+                }
+
+
+                val transferHandler = remember { TransferHandlerImpl(appTransferViewModel) }
+
+                AndroidTheme(isDark = globalState.themeMode.isDarkMode()) {
+                    Box(
+                        modifier = Modifier
+                            .semantics { testTagsAsResourceId = true }
+                            .pointerInput(Unit) {
+                                awaitEachGesture {
+                                    do {
+                                        val event = awaitPointerEvent()
+                                        if (event.type == PointerEventType.Press) {
+                                            presenceViewModel.signalPresence()
+                                        }
+                                    } while (event.changes.any { it.pressed })
+                                }
+                            }) {
+                        when (val graphstate = navGraphState) {
+                            is NavigationGraphState.Loading -> {}
+                            is NavigationGraphState.Data -> {
+                                val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
+                                val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
+                                val loginState by loginViewModel.state.collectAsStateWithLifecycle()
+                                val currentNavKey = backStack.lastOrNull()
+                                EventEffect(
+                                    event = snackbarEventsState,
+                                    onConsumed = snackbarEventsViewModel::consumeEvent,
+                                    action = { snackbarHostState.show(it.attributes) }
+                                )
+
+                                FeatureFlagGate(feature = ApiFeatures.QuotaWarningUpsellScreen) {
+                                    LaunchedEffect(Unit) {
+                                        monitorTransferOverQuotaEventUseCase().collect {
+                                            navigationHandler.navigate(
+                                                QuotaWarningUpgradeNavKey(
+                                                    type = QuotaWarningType.Transfer,
+                                                    trigger = QuotaWarningTrigger.Download,
+                                                ),
+                                                navOptions { dropIfAlreadyShown = true },
+                                            )
+                                        }
+                                    }
+                                }
+
+
+                                CompositionLocalProvider(
+                                    LocalSnackBarHostState provides snackbarHostState
+                                ) {
+                                    if (currentNavKey == null || !navigationHandler.isFetchNodeDestination(
+                                            currentNavKey
+                                        )
+                                    ) {
+                                        SnackbarLifetimeController()
+                                    }
+                                    MegaNavDisplay(
+                                        backStack = backStack,
+                                        navigationHandler = navigationHandler,
+                                        graphstate = graphstate,
+                                        transferHandler = transferHandler,
+                                        loginViewModel = loginViewModel,
+                                        emitNavigationEvent = { event ->
+                                            when (event) {
+                                                is NavigationQueueEvent -> navigationEventQueue.emit(
+                                                    navKeys = event.keys,
+                                                    navOptions = event.navOptions,
+                                                )
+
+                                                is AppDialogEvent -> appDialogsEventQueue.emit(
+                                                    event
+                                                )
+                                            }
+                                        },
+                                        onFinish = ::finish,
+                                    )
+
+                                    StartTransferComponent(
+                                        event = transferState.transferEvent,
+                                        onConsumeEvent = appTransferViewModel::consumedTransferEvent,
+                                        isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
+                                    )
+
+                                    if (currentNavKey !is HomeScreensNavKey && (currentNavKey == null || !navigationHandler.isFetchNodeDestination(
+                                            currentNavKey
+                                        ))
+                                    ) {
+                                        RequestStatusProgressContainer(
+                                            viewModel = requestStatusProgressViewModel,
+                                            modifier = Modifier
+                                                .align(Alignment.BottomCenter)
+                                                .navigationBarsPadding(),
+                                        )
+                                    }
+                                }
+
+                                val focusManager = LocalFocusManager.current
+                                NavigationEventEffect(
+                                    loginState.isPendingToShowFragment,
+                                    loginViewModel::isPendingToShowFragmentConsumed
+                                ) {
+                                    if (it != LoginScreen.LoginScreen) {
+                                        keepSplashScreen = false
+                                    }
+
+                                    when (it) {
+                                        LoginScreen.LoginScreen -> navigationHandler.navigate(
+                                            LoginNavKey(),
+                                            navOptions {
+                                                popUpTo<CreateAccountNavKey> { inclusive = true }
+                                            },
+                                        )
+
+                                        LoginScreen.CreateAccount -> navigationHandler.navigate(
+                                            CreateAccountNavKey(),
+                                            navOptions {
+                                                popUpTo<LoginNavKey> { inclusive = true }
+                                            },
+                                        )
+
+                                        LoginScreen.Tour -> {
+                                            focusManager.clearFocus()
+                                            navigationHandler.navigate(TourNavKey)
+                                        }
+
+                                        LoginScreen.ConfirmEmail -> navigationHandler.navigate(
+                                            ConfirmationEmailNavKey
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -122,12 +468,91 @@ class MegaActivity : ComponentActivity() {
         }
     }
 
-    private val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
-        {
-            PasscodeContainer(
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                content = it
+    companion object {
+        /**
+         * Get Intent to open this activity with Single top and clear top flags with optionals action and message
+         */
+        fun getIntent(context: Context, action: String? = null, warningMessage: String? = null) =
+            Intent(
+                context,
+                MegaActivity::class.java
+            ).apply {
+                this.action = action
+                putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+
+        /**
+         * Get a pending intent to open this activity with the specified warning message
+         */
+        fun getPendingIntentForWarningMessage(
+            context: Context,
+            warningMessage: String,
+            requestCode: Int = warningMessage.hashCode(), //unique request code per warning message
+        ): PendingIntent {
+            val intent = getIntent(context, warningMessage)
+            return PendingIntent.getActivity(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-        },
-    )
+        }
+
+        /**
+         * Get a pending intent to open this activity with the specified nav key
+         * @param context
+         * @param navKey
+         * @param requestCode
+         */
+        fun <T> getPendingIntentWithExtraDestination(
+            context: Context,
+            navKey: T,
+            requestCode: Int = navKey.hashCode(), //unique request code per nav key
+        ) where T : NavKey, T : Parcelable = getPendingIntentWithExtraDestinations(
+            context, listOf(navKey), requestCode
+        )
+
+        /**
+         * Get a pending intent to open this activity with the specified nav keys
+         * @param context
+         * @param navKeys
+         * @param requestCode
+         */
+        fun <T> getPendingIntentWithExtraDestinations(
+            context: Context,
+            navKeys: List<T>,
+            requestCode: Int = navKeys.hashCode(), //unique request code per nav keys
+        ): PendingIntent where T : NavKey, T : Parcelable = PendingIntent.getActivity(
+            context,
+            requestCode,
+            getIntentWithExtraDestinations(context, navKeys),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        /**
+         * Get intent with extra destinations
+         *
+         * @param T
+         * @param context
+         * @param navKeys
+         */
+        fun <T> getIntentWithExtraDestinations(
+            context: Context,
+            navKeys: List<T>,
+        ) where T : NavKey, T : Parcelable = getIntent(context).apply {
+            putParcelableArrayListExtra(EXTRA_NAV_KEYS, ArrayList(navKeys))
+        }
+
+        private fun Intent.getDestinations(): List<NavKey>? =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelableArrayListExtra(EXTRA_NAV_KEYS, NavKey::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                getParcelableArrayListExtra(EXTRA_NAV_KEYS)
+            }
+
+        private const val EXTRA_NAV_KEYS = "navKeys"
+        internal const val ACTION_DEEP_LINKS = "deepLinks"
+    }
 }

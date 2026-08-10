@@ -11,6 +11,7 @@ import androidx.work.testing.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.facade.WorkManagerGatewayImpl
 import mega.privacy.android.data.gateway.WorkManagerGateway
@@ -56,6 +57,7 @@ class WorkManagerGatewayImplTest {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test that delete oldest completed transfers worker is enqueued only once when calling enqueueDeleteOldestCompletedTransfersWorkRequest`() =
         runTest {
@@ -71,7 +73,7 @@ class WorkManagerGatewayImplTest {
             workInfo.test {
                 val info = awaitItem()
                 assertThat(info.size).isEqualTo(1)
-                assertThat(info[0].state).isEqualTo(WorkInfo.State.RUNNING)
+                assertThat(info[0].state).isEqualTo(WorkInfo.State.ENQUEUED) // has an initial delay
             }
         }
 

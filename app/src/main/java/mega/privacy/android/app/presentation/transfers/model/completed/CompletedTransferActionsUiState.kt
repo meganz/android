@@ -3,8 +3,10 @@ package mega.privacy.android.app.presentation.transfers.model.completed
 import android.net.Uri
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 
 /**
@@ -17,23 +19,30 @@ import java.io.File
  * @property parentUri The URI of the parent folder of the completed transfer.
  * @property fileUri The URI of the completed transfer file.
  * @property amINodeOwner Indicates if the user is the owner of the node associated with the completed transfer.
+ * @property isNodeInRubbishBin Indicates if the node associated with the completed transfer is in the rubbish bin.
+ * @property node The node associated with the completed transfer, if it still exists.
  * @property isOnline Indicates if the device is currently online.
  * @property openWithEvent Event to handle opening the completed transfer with another app.
  * @property shareLinkEvent Event to handle sharing a link to the completed transfer.
+ * @property viewInFolderEvent Event to handle viewing the completed transfer in its folder.
  */
 data class CompletedTransferActionsUiState(
     val completedTransfer: CompletedTransfer? = null,
     val parentUri: Uri? = null,
     val fileUri: Uri? = null,
     val amINodeOwner: Boolean = false,
+    val isNodeInRubbishBin: Boolean = false,
+    val node: UnTypedNode? = null,
     val isOnline: Boolean = true,
     val openWithEvent: StateEventWithContent<OpenWithEvent> = consumed(),
     val shareLinkEvent: StateEventWithContent<ShareLinkEvent> = consumed(),
+    val viewInFolderEvent: StateEventWithContent<ViewInFolderEvent> = consumed(),
 ) {
     val canViewInFolder
         get() = completedTransfer != null &&
                 ((completedTransfer.isContentUriDownload && fileUri != null)
-                        || completedTransfer.isContentUriDownload.not())
+                        || (completedTransfer.type.isDownloadType() && !completedTransfer.isContentUriDownload)
+                        || (completedTransfer.type.isDownloadType().not() && node != null))
 
     val canOpenWith
         get() = completedTransfer != null
@@ -41,7 +50,7 @@ data class CompletedTransferActionsUiState(
                 && fileUri != null
 
     val canShareLink
-        get() = completedTransfer != null && amINodeOwner
+        get() = completedTransfer != null && amINodeOwner && node != null
 }
 
 /**
@@ -77,4 +86,58 @@ data class ShareLinkEvent(
 
     val isTakenDown: Boolean
         get() = node?.isTakenDown == true
+}
+
+/**
+ * View in folder event
+ */
+sealed interface ViewInFolderEvent {
+    /**
+     * File for view in folder event not found
+     */
+    data object NotFound : ViewInFolderEvent
+
+    /**
+     * File for view in folder event found
+     */
+    sealed interface Found : ViewInFolderEvent {
+
+        /**
+         * The file name to be displayed in the folder
+         */
+        val fileName: String
+    }
+
+    /**
+     * The transfer to view in folder is a download to the local storage transfer, so it should be shown in file explorer
+     * @property uriPath the path of the transfer
+     */
+    data class Download(
+        override val fileName: String,
+        val uriPath: UriPath,
+    ) : Found
+
+    /**
+     * The transfer to view in folder is a download to offline transfer, so it should be shown in offline section
+     * @property parentNodeOfflineId
+     * @property title
+     * @property path the relative path of the file in offline files
+     */
+    data class DownloadToOffline(
+        override val fileName: String,
+        val parentNodeOfflineId: Int,
+        val title: String?,
+        val path: String,
+    ) : Found
+
+    /**
+     * The transfer to view in folder is an upload, so it should be shown in cloud drive
+     * @property parentNodeId
+     */
+    data class Upload(
+        override val fileName: String,
+        val parentNodeId: NodeId,
+    ) : Found
+
+
 }

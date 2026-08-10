@@ -259,8 +259,8 @@ class StartDownloadViewModelTest {
             assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
             val content = (event as StateEventWithContentTriggered).content
             assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
-            assertThat((content as TransferTriggerEvent.StartDownloadForOffline).node)
-                .isEqualTo(node)
+            assertThat((content as TransferTriggerEvent.StartDownloadForOffline).nodes)
+                .containsExactly(node)
             assertThat(content.withStartMessage).isEqualTo(withStartMessage)
         }
     }

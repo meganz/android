@@ -9,10 +9,15 @@ import mega.privacy.android.domain.entity.node.FileNode
 
 @Composable
 internal fun FileNode.fileInfo(): String {
-    val modifiedDate = formatModifiedDate(
-        java.util.Locale(Locale.current.language, Locale.current.region),
-        modificationTime
-    )
     val fileSize = formatFileSize(size, LocalContext.current)
-    return "$fileSize · $modifiedDate"
+    if (modificationTime != 0L) {
+        val modifiedDate = formatModifiedDate(
+            java.util.Locale(Locale.current.language, Locale.current.region),
+            modificationTime
+        )
+        return "$fileSize · $modifiedDate"
+    } else {
+        return fileSize
+    }
 }
+    

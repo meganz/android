@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
@@ -17,11 +18,11 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePasswordUseCase
-import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.ResetPasswordUseCase
+import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
@@ -158,7 +159,7 @@ internal class ChangePasswordViewModel @Inject constructor(
                         )
                     } else {
                         it.copy(
-                            snackBarMessage = R.string.general_text_error,
+                            snackBarMessage = sharedR.string.general_text_error,
                             loadingMessage = null
                         )
                     }
@@ -167,7 +168,7 @@ internal class ChangePasswordViewModel @Inject constructor(
     }.onFailure {
         _uiState.update {
             it.copy(
-                snackBarMessage = R.string.general_text_error,
+                snackBarMessage = sharedR.string.general_text_error,
                 loadingMessage = null
             )
         }
@@ -209,12 +210,21 @@ internal class ChangePasswordViewModel @Inject constructor(
      * is on either change password or reset password mode
      */
     fun determineIfScreenIsResetPasswordMode() {
-        if (action == Constants.ACTION_RESET_PASS_FROM_LINK || action == Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT) {
-            _uiState.update {
+        when (action) {
+            Constants.ACTION_RESET_PASS_FROM_LINK -> _uiState.update {
                 it.copy(
                     isShowAlertMessage = masterKey.isNullOrBlank() || linkToReset.isNullOrBlank(),
                     isResetPasswordLinkValid = linkToReset != null,
                     isResetPasswordMode = true
+                )
+            }
+
+            Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT -> _uiState.update {
+                it.copy(
+                    isShowAlertMessage = linkToReset.isNullOrBlank(),
+                    isResetPasswordLinkValid = linkToReset != null,
+                    isResetPasswordMode = true,
+                    isParkAccountMode = true
                 )
             }
         }

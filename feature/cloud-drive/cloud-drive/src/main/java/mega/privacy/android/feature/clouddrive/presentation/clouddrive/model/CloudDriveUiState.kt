@@ -1,131 +1,104 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.model
 
-import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
+import androidx.compose.runtime.Immutable
 import de.palm.composestateevents.StateEvent
-import de.palm.composestateevents.StateEventWithContent
-import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
-import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.TypedNodeItem
 
 /**
- * UI state for Cloud Drive
- * @param title Name of the folder
- * @property nodesLoadingState Current state of node loading
- * @property currentFolderId The current folder id being displayed
- * @property isCloudDriveRoot True if the current folder is the root of the Cloud Drive
- * @property items List of nodes in the current folder
- * @property currentViewType The current view type of the Cloud Drive
- * @property navigateToFolderEvent Event to navigate to a folder
- * @property navigateBack Event to navigate back
- * @property openedFileNode The file node that is currently opened
- * @property showHiddenNodes True if hidden nodes should be shown forcefully based on user settings
- * @property isHiddenNodesEnabled True if user is eligible for hidden nodes feature
- * @property isSelecting True if nodes are being selected
- * @property hasMediaItems True if there are media(image, video) items in the current folder
+ * Cloud drive ui state
+ *
+ * @property title
+ * @property nodeSourceType
+ * @property currentViewType
+ * @property isMediaDiscoveryAllowed
  */
-data class CloudDriveUiState(
-    val title: LocalizedText = LocalizedText.Literal(""),
-    val nodesLoadingState: NodesLoadingState = NodesLoadingState.Loading,
-    val isHiddenNodeSettingsLoading: Boolean = true,
-    val currentFolderId: NodeId = NodeId(-1L),
-    val isCloudDriveRoot: Boolean = false,
-    val items: List<NodeUiItem<TypedNode>> = emptyList(),
-    val currentViewType: ViewType = ViewType.LIST,
-    val navigateToFolderEvent: StateEventWithContent<TypedNode> = consumed(),
-    val navigateBack: StateEvent = consumed,
-    val openedFileNode: TypedFileNode? = null,
-    val showHiddenNodes: Boolean = false,
-    val isHiddenNodesEnabled: Boolean = false,
-    val gmsDocumentScanner: GmsDocumentScanner? = null,
-    val documentScanningError: DocumentScanningError? = null,
-    val isSelecting: Boolean = false,
-    val hasMediaItems: Boolean = false,
-    val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
-    val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
-    val storageCapacity: StorageOverQuotaCapacity = StorageOverQuotaCapacity.DEFAULT,
-    val isContactVerificationOn: Boolean = false,
-    val showContactNotVerifiedBanner: Boolean = false,
-) {
+@Immutable
+sealed interface CloudDriveUiState {
+    val title: LocalizedText
+    val nodeSourceType: NodeSourceType
+    val currentViewType: ViewType
+    val isMediaDiscoveryAllowed: Boolean
 
     /**
-     * True if nodes or hidden node settings are loading
+     * Loading
+     *
+     * @property title
+     * @property nodeSourceType
+     * @property currentViewType
      */
-    val isLoading = nodesLoadingState == NodesLoadingState.Loading || isHiddenNodeSettingsLoading
-
-    /**
-     * Count of visible items based on hidden nodes settings
-     */
-    val visibleItemsCount: Int
-
-    /**
-     * Count of visible selected items
-     */
-    val selectedItemsCount: Int
-
-    init {
-        // Count visible and selected items based on hidden nodes settings with single loop
-        if (showHiddenNodes || !isHiddenNodesEnabled) {
-            visibleItemsCount = items.size
-            selectedItemsCount = items.count { it.isSelected }
-        } else {
-            var visible = 0
-            var selected = 0
-            items.forEach { item ->
-                if (!item.isSensitive) {
-                    visible++
-                    if (item.isSelected) {
-                        selected++
-                    }
-                }
-            }
-            visibleItemsCount = visible
-            selectedItemsCount = selected
-        }
+    data class Loading(
+        override val title: LocalizedText,
+        override val nodeSourceType: NodeSourceType,
+        override val currentViewType: ViewType,
+    ) : CloudDriveUiState{
+        override val isMediaDiscoveryAllowed: Boolean = false
     }
 
     /**
-     * True if any item is selected
+     * Data
+     *
+     * @property title
+     * @property nodesLoadingState
+     * @property currentFolderId
+     * @property isCloudDriveRoot
+     * @property items
+     * @property currentViewType
+     * @property navigateBack
+     * @property hasMediaItems
+     * @property selectedSortOrder
+     * @property selectedSortConfiguration
+     * @property showContactNotVerifiedBanner
+     * @property nodeSourceType
+     * @property hasWritePermission
+     * @property isNodeInBackups
+     * @property inactivityMonths
+     * @property purgeTimestamp
      */
-    val isInSelectionMode = selectedItemsCount > 0
+    data class Data(
+        override val title: LocalizedText,
+        val nodesLoadingState: NodesLoadingState,
+        val currentFolderId: NodeId,
+        val isCloudDriveRoot: Boolean,
+        val items: List<TypedNodeItem<TypedNode>>,
+        override val currentViewType: ViewType,
+        val navigateBack: StateEvent,
+        val hasMediaItems: Boolean,
+        val selectedSortOrder: SortOrder,
+        val selectedSortConfiguration: NodeSortConfiguration,
+        val showContactNotVerifiedBanner: Boolean,
+        override val nodeSourceType: NodeSourceType,
+        val hasWritePermission: Boolean,
+        val isNodeInBackups: Boolean = false,
+        val inactivityMonths: Int? = null,
+        val purgeTimestamp: Long? = null,
+    ) : CloudDriveUiState {
 
-    /**
-     * True if there are no visible items and not loading
-     */
-    val isEmpty = visibleItemsCount == 0 && !isLoading
+        /**
+         * Flag to determine if inactivity banner should be shown. It is shown whenever an inactive
+         * purge event has been received (regardless of the computed months, which may be 0).
+         */
+        val showInactivityBanner = inactivityMonths != null
 
-    /**
-     * Returns a list of selected nodes.
-     */
-    val selectedNodes: List<TypedNode>
-        get() = items.mapNotNull { if (it.isSelected) it.node else null }
+        /**
+         * True if upload is allowed in the current folder
+         */
+        val isUploadAllowed = hasWritePermission
+                && nodeSourceType != NodeSourceType.RUBBISH_BIN
+                && !isNodeInBackups
 
-    /**
-     * Returns a list of selected node ids.
-     */
-    val selectedNodeIds: List<NodeId>
-        get() = selectedNodes.map { it.id }
-}
-
-/**
- * Sealed interface representing the different states of progressive node loading
- */
-sealed interface NodesLoadingState {
-    object Loading : NodesLoadingState
-    object PartiallyLoaded : NodesLoadingState
-    object FullyLoaded : NodesLoadingState
-    object Failed : NodesLoadingState
-
-    val isInProgress: Boolean
-        get() = this == Loading || this == PartiallyLoaded
-
-    val isComplete: Boolean
-        get() = this == FullyLoaded || this == Failed
+        /**
+         * True if media discovery is allowed in the current folder based on source, media presence
+         */
+        override val isMediaDiscoveryAllowed =
+            nodeSourceType == NodeSourceType.CLOUD_DRIVE && hasMediaItems && !isCloudDriveRoot
+                    && !isNodeInBackups
+    }
 }

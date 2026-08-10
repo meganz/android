@@ -136,6 +136,57 @@ interface FileSystemRepository {
     suspend fun doesFileExist(path: String): Boolean
 
     /**
+     * Read file content as UTF-8 text.
+     *
+     * @param path Absolute path to the file.
+     * @return File content as string.
+     * @throws java.io.FileNotFoundException if the file does not exist or is not readable.
+     */
+    suspend fun readTextFromPath(path: String): String
+
+    /**
+     * Read file content as UTF-8 text in chunks of lines. Use for gradual loading of large files.
+     * Each emission is a list of lines (without newline characters); the last emission may have fewer than [chunkSizeLines].
+     *
+     * @param path Absolute path to the file.
+     * @param chunkSizeLines Maximum number of lines per chunk.
+     * @return Flow of line chunks. Must be collected on a background dispatcher for I/O.
+     */
+    fun readLinesFromPathInChunks(path: String, chunkSizeLines: Int): Flow<List<String>>
+
+    /**
+     * Read at most [length] bytes from the start of the file at the given path.
+     *
+     * @param path Absolute path to the file.
+     * @param length Maximum number of bytes to read.
+     * @return the read bytes, or null if the file does not exist.
+     */
+    suspend fun readFirstBytesFromPath(path: String, length: Int): ByteArray?
+
+    /**
+     * Write text to a file at the given path (UTF-8). Overwrites if the file exists.
+     *
+     * @param path Absolute path to the file.
+     * @param text Content to write.
+     */
+    suspend fun writeTextToPath(path: String, text: String)
+
+    /**
+     * Persist a large transient bundle's bytes under [key]. Overwrites any existing entry.
+     */
+    suspend fun saveLargeBundle(key: String, bytes: ByteArray)
+
+    /**
+     * Read the bytes previously stored via [saveLargeBundle] under [key], or null if absent.
+     */
+    suspend fun readLargeBundle(key: String): ByteArray?
+
+    /**
+     * Drop the bytes stored via [saveLargeBundle] under [key]. No-op if absent.
+     */
+    suspend fun deleteLargeBundle(key: String)
+
+    /**
      * Returns the parent path of the file represented by path
      */
     suspend fun getParent(path: String): String
@@ -418,6 +469,23 @@ interface FileSystemRepository {
     fun getFileTypeInfoByName(name: String, duration: Int = 0): FileTypeInfo
 
     /**
+     * Get file type info from the first bytes of a file's content (magic numbers), used to
+     * identify files that have no extension.
+     *
+     * @param header the first bytes of the file
+     * @param duration duration of the file, when known
+     * @return the detected [FileTypeInfo], or null when the content cannot be recognised
+     */
+    fun getFileTypeInfoFromContent(header: ByteArray, duration: Int = 0): FileTypeInfo?
+
+    /**
+     * Check if the node is openable text file
+     *
+     * @param node file node to check
+     */
+    fun isNodeOpenableTextFile(node: FileNode): Boolean
+
+    /**
      * Copy uri
      *
      * @param source
@@ -497,11 +565,6 @@ interface FileSystemRepository {
      * @return true if the uri can be read, false otherwise
      */
     suspend fun canReadUri(stringUri: String): Boolean
-
-    /**
-     * Returns Offline Files Root Folder
-     */
-    suspend fun getOfflineFilesRootFolder(): File
 
     /**
      * Returns device model or SD Card based on file location
@@ -587,4 +650,12 @@ interface FileSystemRepository {
      *
      */
     suspend fun renameDocumentWithTheSameName(uriPaths: List<UriPath>)
+
+    /**
+     * Checks if there is at least one installed app able to open a file with the given [mimeType].
+     *
+     * @param mimeType the MIME type of the file to be opened
+     * @return true if a suitable app is available, false otherwise
+     */
+    suspend fun hasSuitableAppToOpenFile(mimeType: String): Boolean
 }

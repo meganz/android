@@ -17,6 +17,7 @@ class NotificationChannelsInitializer : Initializer<Unit> {
      * Create
      */
     override fun create(context: Context) {
+        if (!context.canResolveHiltEntryPoints()) return
         val entryPoint = EntryPointAccessors.fromApplication(
             context,
             NotificationChannelsInitializerEntryPoint::class.java

@@ -31,14 +31,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
@@ -60,9 +63,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLin
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import java.util.Locale
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -88,10 +89,11 @@ internal fun ManageChatHistoryRoute(
         }
     }
 
+    val resources = LocalResources.current
     LaunchedEffect(uiState.statusMessageResId) {
         uiState.statusMessageResId?.let {
             snackBarHostState.showAutoDurationSnackbar(
-                message = context.getString(it)
+                message = resources.getString(it)
             )
             viewModel.onStatusMessageDisplayed()
         }
@@ -99,7 +101,9 @@ internal fun ManageChatHistoryRoute(
 
     Box(modifier = modifier.semantics { testTagsAsResourceId = true }) {
         ManageChatHistoryScreen(
-            modifier = Modifier.systemBarsPadding().fillMaxSize(),
+            modifier = Modifier
+                .systemBarsPadding()
+                .fillMaxSize(),
             uiState = uiState,
             onNavigateUp = onNavigateUp,
             onConfirmClearChatClick = viewModel::clearChatHistory,
@@ -377,10 +381,10 @@ private fun List<DisplayValueState>.inStrings(): List<String> = map {
             it.id,
             it.quantity,
             it.quantity
-        ).lowercase(Locale.getDefault())
+        ).lowercase(LocalLocale.current.platformLocale)
 
         is DisplayValueState.SingularString -> {
-            stringResource(id = it.id).lowercase(Locale.getDefault())
+            stringResource(id = it.id).lowercase(LocalLocale.current.platformLocale)
         }
     }
 }
@@ -391,7 +395,7 @@ private fun ClearHistoryOption(title: String, modifier: Modifier = Modifier) {
         GenericTwoLineListItem(
             modifier = Modifier.padding(vertical = 4.dp),
             title = title,
-            titleTextColor = TextColor.Error,
+            titleTextColor = TextColor.Brand,
             subtitle = stringResource(id = R.string.subtitle_properties_chat_clear),
             showEntireSubtitle = true
         )

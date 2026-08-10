@@ -6,22 +6,31 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.feature.sync.domain.repository.SyncNotificationRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import mega.privacy.android.feature.sync.domain.usecase.sync.ChangeSyncLocalRootUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCaseImpl
+import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.SetSyncWorkerForegroundPreferenceUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
@@ -32,20 +41,41 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
 @ExperimentalCoroutinesApi
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MonitorSyncsUseCaseTest {
 
+    private lateinit var testDispatcher: TestDispatcher
+    private lateinit var testScope: TestScope
     private val syncRepository: SyncRepository = mock()
     private val changeSyncLocalRootUseCase: ChangeSyncLocalRootUseCase = mock()
     private val resumeSyncUseCase: ResumeSyncUseCase = mock()
     private val canReadUriUseCase: CanReadUriUseCase = mock()
+    private val setSyncWorkerForegroundPreferenceUseCase: SetSyncWorkerForegroundPreferenceUseCase =
+        mock()
+    private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase =
+        mock()
+    private val pauseSyncUseCase: PauseSyncUseCase = mock()
+    private val setUserPausedSyncUseCase: SetUserPausedSyncUseCase = mock()
+    private val syncNotificationRepository: SyncNotificationRepository = mock()
 
-    private val underTest = MonitorSyncsUseCaseImpl(
-        syncRepository = syncRepository,
-        changeSyncLocalRootUseCase = changeSyncLocalRootUseCase,
-        resumeSyncUseCase = resumeSyncUseCase,
-        canReadUriUseCase = canReadUriUseCase,
-    )
+    private lateinit var underTest: MonitorSyncsUseCaseImpl
+
+    @BeforeEach
+    fun setup() {
+        testDispatcher = UnconfinedTestDispatcher()
+        testScope = TestScope(testDispatcher)
+        underTest = MonitorSyncsUseCaseImpl(
+            syncRepository = syncRepository,
+            changeSyncLocalRootUseCase = changeSyncLocalRootUseCase,
+            resumeSyncUseCase = resumeSyncUseCase,
+            canReadUriUseCase = canReadUriUseCase,
+            setSyncWorkerForegroundPreferenceUseCase = setSyncWorkerForegroundPreferenceUseCase,
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase = isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+            pauseSyncUseCase = pauseSyncUseCase,
+            setUserPausedSyncUseCase = setUserPausedSyncUseCase,
+            syncNotificationRepository = syncNotificationRepository,
+            coroutineScope = testScope
+        )
+    }
 
     private val validFolderPairs = listOf(
         FolderPair(
@@ -92,7 +122,17 @@ internal class MonitorSyncsUseCaseTest {
 
     @AfterEach
     fun resetMocks() {
-        reset(syncRepository, changeSyncLocalRootUseCase, resumeSyncUseCase, canReadUriUseCase)
+        reset(
+            syncRepository,
+            changeSyncLocalRootUseCase,
+            resumeSyncUseCase,
+            canReadUriUseCase,
+            setSyncWorkerForegroundPreferenceUseCase,
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+            pauseSyncUseCase,
+            setUserPausedSyncUseCase,
+            syncNotificationRepository
+        )
     }
 
     @Test
@@ -161,7 +201,8 @@ internal class MonitorSyncsUseCaseTest {
     }
 
     @Test
-    fun `test that duplicate emissions are filtered and rapid emissions are conflated`() = runTest {
+    fun `test that duplicate emissions are filtered and rapid emissions are conflated`() =
+        runTest(testDispatcher) {
         val folderPair = validFolderPairs.first()
         val invalidFolderPair = invalidFolderPairs.first()
         val emissions = listOf(
@@ -220,4 +261,276 @@ internal class MonitorSyncsUseCaseTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that only syncs with MISMATCH_OF_ROOT_FSID error are processed as invalid`() =
+        runTest {
+            val syncWithDifferentError = FolderPair(
+                id = 5L,
+                syncType = SyncType.TYPE_TWOWAY,
+                pairName = "DifferentErrorSync",
+                localFolderPath = "SomePath",
+                remoteFolder = RemoteFolder(id = NodeId(999L), name = "test"),
+                syncStatus = SyncStatus.SYNCING,
+                syncError = SyncError.ACTIVE_SYNC_SAME_PATH // Different error
+            )
+
+            val mixedSyncs = validFolderPairs + invalidFolderPairs + listOf(syncWithDifferentError)
+
+            whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+                flow {
+                    emit(mixedSyncs)
+                    awaitCancellation()
+                }
+            )
+
+            invalidFolderPairs.forEach {
+                whenever(canReadUriUseCase(it.localFolderPath)).thenReturn(false)
+            }
+
+            underTest().test {
+                val result = awaitItem()
+
+                // Only MISMATCH_OF_ROOT_FSID syncs should be converted to paused
+                val expectedResult = validFolderPairs +
+                        listOf(syncWithDifferentError) + // This should remain unchanged
+                        invalidFolderPairs.map {
+                            it.copy(
+                                syncStatus = SyncStatus.PAUSED,
+                                syncError = SyncError.NO_SYNC_ERROR
+                            )
+                        }
+
+                Truth.assertThat(result).containsExactlyElementsIn(expectedResult)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that setSyncWorkerForegroundPreference is called when all syncs are completed`() =
+        runTest {
+            val completedSyncs = listOf(
+                validFolderPairs[0].copy(syncStatus = SyncStatus.SYNCED),
+                validFolderPairs[1].copy(syncStatus = SyncStatus.PAUSED)
+            )
+
+            whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+                flow {
+                    emit(completedSyncs)
+                    awaitCancellation()
+                }
+            )
+
+            underTest().test {
+                awaitItem()
+                verify(setSyncWorkerForegroundPreferenceUseCase).invoke(false)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that setSyncWorkerForegroundPreference is not called when syncs are still running`() =
+        runTest {
+            val runningSyncs = listOf(
+                validFolderPairs[0].copy(syncStatus = SyncStatus.SYNCING),
+                validFolderPairs[1].copy(syncStatus = SyncStatus.SYNCED)
+            )
+
+            whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+                flow {
+                    emit(runningSyncs)
+                    awaitCancellation()
+                }
+            )
+
+            underTest().test {
+                awaitItem()
+                verify(setSyncWorkerForegroundPreferenceUseCase, never()).invoke(any())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+
+    @Test
+    fun `test that setSyncWorkerForegroundPreference is not called when sync list is empty`() =
+        runTest {
+            whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+                flow {
+                    emit(emptyList())
+                    awaitCancellation()
+                }
+            )
+
+            underTest().test {
+                val result = awaitItem()
+                Truth.assertThat(result).isEmpty()
+                verify(setSyncWorkerForegroundPreferenceUseCase, never()).invoke(any())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that sync is paused when remote folder is used by sync on another device`() =
+        runTest {
+            val conflictingSync = validFolderPairs.first()
+            whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+                flow {
+                    emit(listOf(conflictingSync))
+                    awaitCancellation()
+                }
+            )
+            whenever(
+                isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                    nodeId = conflictingSync.remoteFolder.id,
+                    isSyncFolderSelection = true,
+                    shouldExcludeCurrentDevice = true,
+                    useCache = true,
+                )
+            ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device-id"))
+
+            underTest().test {
+                awaitItem()
+                verify(pauseSyncUseCase).invoke(conflictingSync.id)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that sync is not paused when remote folder is not used elsewhere`() = runTest {
+        whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+            flow {
+                emit(validFolderPairs)
+                awaitCancellation()
+            }
+        )
+        validFolderPairs.forEach { sync ->
+            whenever(
+                isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                    nodeId = sync.remoteFolder.id,
+                    isSyncFolderSelection = true,
+                    shouldExcludeCurrentDevice = true,
+                    useCache = true,
+                )
+            ).thenReturn(FolderUsageResult.NotUsed)
+        }
+
+        underTest().test {
+            awaitItem()
+            verify(pauseSyncUseCase, never()).invoke(any())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that conflicting sync is marked as user-paused`() = runTest {
+        val conflictingSync = validFolderPairs.first()
+        whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+            flow {
+                emit(listOf(conflictingSync))
+                awaitCancellation()
+            }
+        )
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId = conflictingSync.remoteFolder.id,
+                isSyncFolderSelection = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = true,
+            )
+        ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device-id"))
+
+        underTest().test {
+            awaitItem()
+            verify(setUserPausedSyncUseCase).invoke(conflictingSync.id, paused = true)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that sync is not marked as user-paused when no conflict exists`() = runTest {
+        whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+            flow {
+                emit(validFolderPairs)
+                awaitCancellation()
+            }
+        )
+        validFolderPairs.forEach { sync ->
+            whenever(
+                isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                    nodeId = sync.remoteFolder.id,
+                    isSyncFolderSelection = true,
+                    shouldExcludeCurrentDevice = true,
+                    useCache = true,
+                )
+            ).thenReturn(FolderUsageResult.NotUsed)
+        }
+
+        underTest().test {
+            awaitItem()
+            verify(setUserPausedSyncUseCase, never()).invoke(any(), any())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that notification is stored when conflict is detected`() = runTest {
+        val conflictingSync = validFolderPairs.first()
+        whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+            flow {
+                emit(listOf(conflictingSync))
+                awaitCancellation()
+            }
+        )
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId = conflictingSync.remoteFolder.id,
+                isSyncFolderSelection = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = true,
+            )
+        ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device-id"))
+
+        underTest().test {
+            awaitItem()
+            verify(syncNotificationRepository).setPendingCrossDeviceConflictNotification(
+                listOf(conflictingSync),
+                FolderUsageResult.UsedBySyncOrBackup("other-device-id"),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that multiple conflicting syncs are all paused and marked as user-paused`() =
+        runTest {
+            whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+                flow {
+                    emit(validFolderPairs)
+                    awaitCancellation()
+                }
+            )
+            validFolderPairs.forEach { sync ->
+                whenever(
+                    isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                        nodeId = sync.remoteFolder.id,
+                        isSyncFolderSelection = true,
+                        shouldExcludeCurrentDevice = true,
+                        useCache = true,
+                    )
+                ).thenReturn(FolderUsageResult.UsedByCameraUpload)
+            }
+
+            underTest().test {
+                awaitItem()
+                validFolderPairs.forEach { sync ->
+                    verify(pauseSyncUseCase).invoke(sync.id)
+                    verify(setUserPausedSyncUseCase).invoke(sync.id, paused = true)
+                }
+                verify(syncNotificationRepository).setPendingCrossDeviceConflictNotification(
+                    validFolderPairs,
+                    FolderUsageResult.UsedByCameraUpload,
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 }

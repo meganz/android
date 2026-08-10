@@ -357,9 +357,11 @@
     <color name="color_button_brand">#F23433</color>
     <color name="color_border_interactive">#F23433</color>
     <color name="color_icon_primary">#F3F4F4</color>
+    <color name="color_icon_brand">#F23433</color>
     <color name="color_icon_secondary">#A9ABAD</color>
     <color name="color_icon_inverse">#303233</color>
     <color name="color_text_primary">#F3F4F4</color>
+    <color name="color_text_brand">#F23433</color>
     <color name="color_text_error">#FD6F90</color>
     <color name="color_text_on_color_disabled">#A9ABAD</color>
     <color name="color_support_error">#FD6F90</color>

@@ -4,13 +4,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.logout.model.LogoutState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ProgressDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -18,13 +17,15 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 internal fun LogoutConfirmationDialog(
     onDismissed: () -> Unit = {},
-    logoutViewModel: LogoutViewModel = viewModel(),
+    logoutViewModel: LogoutViewModel = hiltViewModel(),
+    onLogoutSuccess: () -> Unit = {},
 ) {
     val logoutState by logoutViewModel.state.collectAsStateWithLifecycle()
     ConfirmationDialog(
         logoutState = logoutState,
         logout = logoutViewModel::logout,
-        onDismissed = onDismissed
+        onDismissed = onDismissed,
+        onLogoutSuccess = onLogoutSuccess,
     )
 
 }
@@ -34,6 +35,7 @@ private fun ConfirmationDialog(
     logoutState: LogoutState,
     logout: () -> Unit,
     onDismissed: () -> Unit,
+    onLogoutSuccess: () -> Unit
 ) {
     when (logoutState) {
         is LogoutState.Data -> {
@@ -56,9 +58,7 @@ private fun ConfirmationDialog(
         }
 
         LogoutState.Success -> {
-            // Success state - this might trigger navigation to login screen
-            // or the dialog might be dismissed automatically
-            // The parent component should handle this state
+            onLogoutSuccess()
         }
     }
 }
@@ -113,7 +113,8 @@ private fun LogoutConfirmationDialogPreview() {
         ConfirmationDialog(
             logoutState = LogoutState.Data(hasOfflineFiles = true, hasPendingTransfers = true),
             logout = {},
-            onDismissed = {}
+            onDismissed = {},
+            onLogoutSuccess = {},
         )
     }
 }
@@ -125,7 +126,8 @@ private fun LogoutConfirmationDialogErrorPreview() {
         ConfirmationDialog(
             logoutState = LogoutState.Error,
             logout = {},
-            onDismissed = {}
+            onDismissed = {},
+            onLogoutSuccess = {},
         )
     }
 }

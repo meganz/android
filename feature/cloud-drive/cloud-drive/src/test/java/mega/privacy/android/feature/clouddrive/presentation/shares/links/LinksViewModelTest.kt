@@ -7,6 +7,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
@@ -14,11 +15,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeSortOption
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -28,21 +24,33 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
+import mega.privacy.android.domain.entity.preference.FolderPreferenceKeys
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTypeUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderViewTypeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MonitorLinksUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksAction
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -51,11 +59,15 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
 class LinksViewModelTest {
-    private val monitorPublicLinksUseCase: MonitorPublicLinksUseCase = mock()
+    private val monitorLinksUseCase: MonitorLinksUseCase = mock()
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
+    private val monitorFolderViewTypeUseCase: MonitorFolderViewTypeUseCase = mock()
+    private val setFolderViewTypeUseCase: SetFolderViewTypeUseCase = mock()
+    private val monitorFolderSortOrderUseCase: MonitorFolderSortOrderUseCase = mock()
+    private val setFolderSortOrderUseCase: SetFolderSortOrderUseCase = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
-    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase = mock()
+    private val monitorLinksSortOrderUseCase: MonitorLinksSortOrderUseCase = mock()
     private val setCloudSortOrder: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
 
@@ -71,30 +83,42 @@ class LinksViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
         reset(
-            monitorPublicLinksUseCase,
+            monitorLinksUseCase,
             setViewTypeUseCase,
             monitorViewTypeUseCase,
+            monitorFolderViewTypeUseCase,
+            setFolderViewTypeUseCase,
+            monitorFolderSortOrderUseCase,
+            setFolderSortOrderUseCase,
             nodeUiItemMapper,
-            getLinksSortOrderUseCase,
+            monitorLinksSortOrderUseCase,
             setCloudSortOrder,
             nodeSortConfigurationUiMapper
         )
     }
 
     private fun createViewModel() = LinksViewModel(
-        monitorPublicLinksUseCase = monitorPublicLinksUseCase,
+        monitorLinksUseCase = monitorLinksUseCase,
         setViewTypeUseCase = setViewTypeUseCase,
         monitorViewTypeUseCase = monitorViewTypeUseCase,
+        monitorFolderViewTypeUseCase = monitorFolderViewTypeUseCase,
+        setFolderViewTypeUseCase = setFolderViewTypeUseCase,
+        monitorFolderSortOrderUseCase = monitorFolderSortOrderUseCase,
+        setFolderSortOrderUseCase = setFolderSortOrderUseCase,
         nodeUiItemMapper = nodeUiItemMapper,
-        getLinksSortOrderUseCase = getLinksSortOrderUseCase,
+        monitorLinksSortOrderUseCase = monitorLinksSortOrderUseCase,
         setCloudSortOrder = setCloudSortOrder,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
     )
 
     private suspend fun setupTestData(items: List<PublicLinkNode>) {
-        whenever(getLinksSortOrderUseCase(true)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(monitorLinksSortOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.default)
-        whenever(monitorPublicLinksUseCase(true)).thenReturn(flowOf(items))
+        whenever(monitorFolderViewTypeUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
+        whenever(monitorFolderSortOrderUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
+        whenever(monitorLinksUseCase(anyOrNull())).thenReturn(flowOf(items))
 
         val nodeUiItems = items.map { node ->
             NodeUiItem<TypedNode>(
@@ -132,7 +156,6 @@ class LinksViewModelTest {
             assertThat(initialState.navigateToFolderEvent).isEqualTo(consumed())
             assertThat(initialState.navigateBack).isEqualTo(consumed)
             assertThat(initialState.currentViewType).isEqualTo(ViewType.LIST)
-            assertThat(initialState.isSelecting).isFalse()
             assertThat(initialState.openedFileNode).isNull()
         }
     }
@@ -290,7 +313,6 @@ class LinksViewModelTest {
 
         val updatedState = underTest.uiState.value
         assertThat(updatedState.isInSelectionMode).isFalse()
-        assertThat(updatedState.isSelecting).isFalse()
         assertThat(updatedState.items[0].isSelected).isFalse()
         assertThat(updatedState.items[1].isSelected).isFalse()
     }
@@ -339,8 +361,6 @@ class LinksViewModelTest {
         testScheduler.advanceUntilIdle()
 
         val stateAfterSelectAll = underTest.uiState.value
-        // Verify that isSelecting is false and all items are selected
-        assertThat(stateAfterSelectAll.isSelecting).isFalse()
         assertThat(stateAfterSelectAll.isInSelectionMode).isTrue()
         assertThat(stateAfterSelectAll.items[0].isSelected).isTrue()
         assertThat(stateAfterSelectAll.items[1].isSelected).isTrue()
@@ -509,7 +529,12 @@ class LinksViewModelTest {
         underTest.processAction(LinksAction.ChangeViewTypeClicked)
         advanceUntilIdle()
 
-        verify(setViewTypeUseCase).invoke(ViewType.GRID)
+        verify(setFolderViewTypeUseCase).invoke(
+            folderKey = eq(FolderPreferenceKeys.LINKS),
+            viewType = eq(ViewType.GRID),
+            currentSortOrder = any(),
+            orElse = any(),
+        )
     }
 
     @Test
@@ -528,7 +553,12 @@ class LinksViewModelTest {
         underTest.processAction(LinksAction.ChangeViewTypeClicked)
         advanceUntilIdle()
 
-        verify(setViewTypeUseCase).invoke(ViewType.LIST)
+        verify(setFolderViewTypeUseCase).invoke(
+            folderKey = eq(FolderPreferenceKeys.LINKS),
+            viewType = eq(ViewType.LIST),
+            currentSortOrder = any(),
+            orElse = any(),
+        )
     }
 
     @Test
@@ -559,12 +589,12 @@ class LinksViewModelTest {
     }
 
     @Test
-    fun `test that getCloudSortOrder updates selectedSort in UI state on success`() = runTest {
+    fun `test that monitorSortOrder updates selectedSort in UI state`() = runTest {
         setupTestData(emptyList())
-        val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
+        val expectedSortOrder = SortOrder.ORDER_SIZE_DESC
         val expectedSortConfiguration = NodeSortConfiguration.default
 
-        whenever(getLinksSortOrderUseCase(true)).thenReturn(expectedSortOrder)
+        whenever(monitorLinksSortOrderUseCase()).thenReturn(flowOf(expectedSortOrder))
         whenever(nodeSortConfigurationUiMapper(expectedSortOrder)).thenReturn(
             expectedSortConfiguration
         )
@@ -580,14 +610,13 @@ class LinksViewModelTest {
     }
 
     @Test
-    fun `test that setSortOrder calls use case and refetches sort order`() = runTest {
+    fun `test that setSortOrder writes via setFolderSortOrderUseCase`() = runTest {
         setupTestData(emptyList())
         val sortConfiguration =
             NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
         val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
 
         whenever(nodeSortConfigurationUiMapper(sortConfiguration)).thenReturn(expectedSortOrder)
-        whenever(getLinksSortOrderUseCase(true)).thenReturn(expectedSortOrder)
 
         val underTest = createViewModel()
         advanceUntilIdle()
@@ -595,11 +624,12 @@ class LinksViewModelTest {
         underTest.setSortOrder(sortConfiguration)
         advanceUntilIdle()
 
-        // Verify that getCloudSortOrder was called at least twice:
-        // 1. During initialization
-        // 2. After setting the sort order (refetch)
-        verify(getLinksSortOrderUseCase, times(2)).invoke(true)
-        verify(setCloudSortOrder).invoke(expectedSortOrder)
+        verify(setFolderSortOrderUseCase).invoke(
+            folderKey = eq(FolderPreferenceKeys.LINKS),
+            sortOrder = eq(expectedSortOrder),
+            currentViewType = any(),
+            orElse = any(),
+        )
     }
 
     @Test
@@ -671,11 +701,19 @@ class LinksViewModelTest {
 
     @Test
     fun `test that selectedNodes returns correct nodes`() = runTest {
+        val typedFolderNode1 = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(1L)
+        }
+        val typedFolderNode2 = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(2L)
+        }
         val node1 = mock<PublicLinkFolder> {
             on { id } doReturn NodeId(1L)
+            on { node } doReturn typedFolderNode1
         }
         val node2 = mock<PublicLinkFolder> {
             on { id } doReturn NodeId(2L)
+            on { node } doReturn typedFolderNode2
         }
 
         setupTestData(listOf(node1, node2))

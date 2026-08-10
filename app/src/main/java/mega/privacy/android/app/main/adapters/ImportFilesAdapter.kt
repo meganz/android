@@ -25,13 +25,13 @@ import coil3.transform.RoundedCornersTransformation
 import com.google.android.material.textfield.TextInputLayout
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 
 internal class ImportFilesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>,
     View.OnClickListener {
@@ -298,7 +298,7 @@ internal class ImportFilesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
 
         val typedName = if (name.text != null) name.text.toString() else null
 
-        if (TextUtil.isTextEmpty(typedName)) {
+        if (typedName.isNullOrBlank()) {
             nameLayout.isErrorEnabled = true
             nameLayout.error = context.getString(R.string.empty_name)
         } else if (Constants.NODE_NAME_REGEX.matcher(typedName.orEmpty()).find()) {

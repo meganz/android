@@ -3,12 +3,12 @@ package mega.privacy.android.feature.clouddrive.presentation.shares.incomingshar
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 
 /**
  * UI state for Incoming Shares
@@ -28,7 +28,6 @@ data class IncomingSharesUiState(
     val currentViewType: ViewType = ViewType.LIST,
     val navigateToFolderEvent: StateEventWithContent<TypedNode> = consumed(),
     val navigateBack: StateEvent = consumed,
-    val isSelecting: Boolean = false,
     val hasMediaItems: Boolean = false,
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
@@ -46,6 +45,11 @@ data class IncomingSharesUiState(
     val isInSelectionMode = selectedItemsCount > 0
 
     /**
+     * True if all items are selected
+     */
+    val isAllSelected = selectedItemsCount == items.size
+
+    /**
      * True if there are no visible items and not loading
      */
     val isEmpty = items.isEmpty() && !isLoading
@@ -55,10 +59,4 @@ data class IncomingSharesUiState(
      */
     val selectedNodes: List<TypedNode>
         get() = items.mapNotNull { if (it.isSelected) it.node else null }
-
-    /**
-     * Returns a list of selected node ids.
-     */
-    val selectedNodeIds: List<NodeId>
-        get() = selectedNodes.map { it.id }
 }

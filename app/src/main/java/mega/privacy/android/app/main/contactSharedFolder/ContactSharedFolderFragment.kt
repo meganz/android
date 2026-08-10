@@ -14,29 +14,37 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentContactSharedFolderListBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.ContactFileBaseFragment
 import mega.privacy.android.app.main.ContactFileListActivity
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_LIST
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
-import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
+import mega.privacy.android.app.presentation.contactinfo.LegacyContactInfoViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Fragment for Contact shared Folder
@@ -48,6 +56,15 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
         private const val MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED = 5
     }
 
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
+
     private var _binding: FragmentContactSharedFolderListBinding? = null
     private val binding: FragmentContactSharedFolderListBinding
         get() = _binding!!
@@ -55,7 +72,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     private lateinit var listView: RecyclerView
 
     private val handler = Handler(Looper.getMainLooper())
-    private val viewModel by activityViewModels<ContactInfoViewModel>()
+    private val viewModel by activityViewModels<LegacyContactInfoViewModel>()
     private val startDownloadViewModel by activityViewModels<StartDownloadViewModel>()
     private val contactInfoActivity: ContactInfoActivity
         get() = (requireActivity() as ContactInfoActivity)
@@ -84,7 +101,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                     -1,
                     listView,
                     Constants.CONTACT_SHARED_FOLDER_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                    ITEM_VIEW_TYPE_LIST
                 )
             } else {
                 adapter.setNodes(contactNodes)
@@ -139,7 +156,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
      * @param sNode [MegaNode]
      */
     fun showOptionsPanel(sNode: MegaNode) {
-        Timber.d("Node handle: ${sNode.handle}")
+        Timber.d("showOptionsPanel")
         contactInfoActivity.showOptionsPanel(sNode)
     }
 
@@ -407,15 +424,22 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                         handleList.add(it.handle)
                     }
                     viewModel.setLeaveFolderNodeIds(handleList)
-                    Timber.d("Leave folder node ids: $handleList")
+                    Timber.d("Leave folder requested for %d nodes", handleList.size)
                 }
 
                 R.id.cab_menu_rename -> {
                     if (documents.isNotEmpty()) {
                         val node = documents[0]
+                        val snackbarShower = requireActivity() as SnackbarShower
+                        val actionNodeCallback = requireActivity() as ActionNodeCallback
                         MegaNodeDialogUtil.showRenameNodeDialog(
-                            context, node, (requireActivity() as SnackbarShower),
-                            (requireActivity() as ActionNodeCallback)
+                            context, node, snackbarShower,
+                            actionNodeCallback,
+                            onRenameConfirmed = { handle, newName ->
+                                renameNode(handle, newName, snackbarShower, actionNodeCallback)
+                            },
+                            getRootNodeUseCase = getRootNodeUseCase,
+                            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                         )
                     }
                 }
@@ -453,5 +477,24 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
+    }
+
+    private fun renameNode(
+        nodeHandle: Long,
+        newName: String,
+        snackbarShower: SnackbarShower,
+        actionNodeCallback: ActionNodeCallback,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    snackbarShower.showSnackbar(getString(sharedR.string.context_correctly_renamed))
+                    actionNodeCallback.finishRenameActionWithSuccess(newName)
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    snackbarShower.showSnackbar(getString(R.string.context_no_renamed))
+                }
+        }
     }
 }

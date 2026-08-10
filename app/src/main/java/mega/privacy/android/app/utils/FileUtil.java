@@ -127,7 +127,7 @@ public class FileUtil {
             return true;
         }
 
-        snackbarShower.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error),
+        snackbarShower.showSnackbar(SNACKBAR_TYPE, context.getString(mega.privacy.android.shared.resources.R.string.general_text_error),
                 MEGACHAT_INVALID_HANDLE);
 
         return false;
@@ -150,7 +150,7 @@ public class FileUtil {
             }
         }
 
-        snackbarShower.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error),
+        snackbarShower.showSnackbar(SNACKBAR_TYPE, context.getString(mega.privacy.android.shared.resources.R.string.general_text_error),
                 MEGACHAT_INVALID_HANDLE);
 
         return false;

@@ -35,7 +35,7 @@ class ProPlanCardTest {
                 storage = storage,
                 transfer = transfer,
                 price = price,
-                billingInfo = billingInfo,
+                yearlyBillingInfo = billingInfo,
                 isCurrentPlan = false,
                 onSelected = {}
             )
@@ -52,8 +52,6 @@ class ProPlanCardTest {
             .assertExists()
         composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_PRICE, useUnmergedTree = true)
             .assertExists()
-        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT, useUnmergedTree = true)
-            .assertExists()
         composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_BILLING_INFO, useUnmergedTree = true)
             .assertExists()
         composeRule.onNodeWithText(planName).assertExists()
@@ -61,9 +59,6 @@ class ProPlanCardTest {
             .assertExists()
         composeRule.onNodeWithText(storage).assertExists()
         composeRule.onNodeWithText(transfer).assertExists()
-        composeRule.onNodeWithText(price).assertExists()
-        composeRule.onNodeWithText(composeRule.activity.getString(R.string.general_month))
-            .assertExists()
         composeRule.onNodeWithText(billingInfo).assertExists()
     }
 
@@ -83,7 +78,7 @@ class ProPlanCardTest {
                 storage = storage,
                 transfer = transfer,
                 price = price,
-                billingInfo = billingInfo,
+                yearlyBillingInfo = billingInfo,
                 isCurrentPlan = true,
                 onSelected = {}
             )
@@ -110,7 +105,7 @@ class ProPlanCardTest {
                 storage = storage,
                 transfer = transfer,
                 price = price,
-                billingInfo = null,
+                yearlyBillingInfo = null,
                 isCurrentPlan = true,
                 onSelected = {}
             )
@@ -135,7 +130,7 @@ class ProPlanCardTest {
                 storage = storage,
                 transfer = transfer,
                 price = price,
-                billingInfo = billingInfo,
+                yearlyBillingInfo = billingInfo,
                 isCurrentPlan = true,
                 onSelected = {}
             )
@@ -159,7 +154,7 @@ class ProPlanCardTest {
                 storage = storage,
                 transfer = transfer,
                 price = price,
-                billingInfo = billingInfo,
+                yearlyBillingInfo = billingInfo,
                 isCurrentPlan = false,
                 onSelected = {}
             )
@@ -185,7 +180,7 @@ class ProPlanCardTest {
                 storage = storage,
                 transfer = transfer,
                 price = price,
-                billingInfo = billingInfo,
+                yearlyBillingInfo = billingInfo,
                 isCurrentPlan = true,
                 onSelected = { clickCount++ }
             )
@@ -216,7 +211,7 @@ class ProPlanCardTest {
                 storage = storage,
                 transfer = transfer,
                 price = price,
-                billingInfo = billingInfo,
+                yearlyBillingInfo = billingInfo,
                 isCurrentPlan = false,
                 onSelected = { clickCount++ }
             )
@@ -247,7 +242,7 @@ class ProPlanCardTest {
                 storage = storage,
                 transfer = transfer,
                 price = price,
-                billingInfo = billingInfo,
+                yearlyBillingInfo = billingInfo,
                 isCurrentPlan = false,
                 onSelected = { clickCount++ }
             )

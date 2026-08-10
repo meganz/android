@@ -8,12 +8,19 @@ import mega.privacy.android.domain.entity.node.NodeId
 /**
  * State contains label info
  * @property labelList List of [Label]
- * @property nodeId [NodeId]
+ * @property nodeId [NodeId] for single node mode
+ * @property nodeIds [List] of [NodeId] for multiple nodes mode
  */
 data class ChangeLabelState(
     val labelList: List<Label> = emptyList(),
-    val nodeId: NodeId? = null
-)
+    val nodeId: NodeId? = null,
+    val nodeIds: List<NodeId>? = null,
+) {
+    /**
+     * Determines if "Remove label" should be visible
+     */
+    val isRemoveEnabled = labelList.any { it.isSelected }
+}
 
 /**
  * Info about label

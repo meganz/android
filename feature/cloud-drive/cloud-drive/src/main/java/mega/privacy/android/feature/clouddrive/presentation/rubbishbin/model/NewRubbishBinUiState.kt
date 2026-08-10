@@ -3,17 +3,17 @@ package mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 
 /**
  * M3 UI State for RubbishBin using new NodeUiItem model
@@ -21,9 +21,9 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Nod
  * @property title The title of the current folder
  * @property currentFolderId The current folder ID
  * @property parentFolderId Parent folder ID of the current node
- * @property items List of [mega.privacy.android.core.nodecomponents.model.NodeUiItem] to display
+ * @property items List of [NodeUiItem] to display
  * @property currentViewType ViewType The current ViewType used by the UI
- * @property sortConfiguration [mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration] of current list
+ * @property sortConfiguration [mega.privacy.android.shared.nodes.model.NodeSortConfiguration] of current list
  * @property isLoading Whether the screen is loading
  * @property nodesLoadingState Current state of node loading
  * @property accountType Current account type
@@ -44,7 +44,6 @@ data class NewRubbishBinUiState(
     val nodesLoadingState: NodesLoadingState = NodesLoadingState.Loading,
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
-    val isHiddenNodesEnabled: Boolean = false,
     val isSelecting: Boolean = false,
     val messageEvent: StateEventWithContent<LocalizedText> = consumed(),
     val openedFileNode: TypedFileNode? = null,
@@ -69,6 +68,11 @@ data class NewRubbishBinUiState(
      */
     val selectedNodes: List<TypedNode>
         get() = items.filter { it.isSelected }.map { it.node }
+
+    /**
+     * True if all items are selected
+     */
+    val isAllSelected = items.size == selectedNodes.size
 
     /**
      * Number of selected file nodes

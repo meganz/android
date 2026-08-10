@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.shares
 
+
 /**
  * Enum class defining access permissions for incoming shares
  */
@@ -29,3 +30,15 @@ enum class AccessPermission {
      */
     OWNER
 }
+
+/**
+ * Returns true if the user has read permission
+ */
+fun AccessPermission.hasWritePermission() =
+    this == AccessPermission.OWNER || this == AccessPermission.READWRITE || this == AccessPermission.FULL
+
+/**
+ * Returns true if the user has full access permission
+ */
+fun AccessPermission.hasFullAccessPermission() =
+    this == AccessPermission.OWNER || this == AccessPermission.FULL

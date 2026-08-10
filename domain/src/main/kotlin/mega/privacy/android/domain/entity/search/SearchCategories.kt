@@ -88,5 +88,12 @@ enum class SearchCategory {
      *
      * shows only favourites nodes which is matching the search keyword
      */
-    FAVOURITES
+    FAVOURITES,
+
+    /**
+     * ALL_MEDIA
+     *
+     * shows any of {IMAGES, VIDEO}
+     */
+    ALL_MEDIA
 }

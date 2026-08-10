@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.FolderInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.folderlink.FetchNodeRequestResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -56,8 +57,10 @@ interface FolderLinkRepository {
 
     /**
      * Get children nodes by handle
+     * @param handle node handle of the folder
+     * @param order sorting order
      */
-    suspend fun getNodeChildren(handle: Long, order: Int? = null): List<UnTypedNode>
+    suspend fun getNodeChildren(handle: Long, order: SortOrder? = null): List<UnTypedNode>
 
     /**
      * Get [FolderInfo] of a public link

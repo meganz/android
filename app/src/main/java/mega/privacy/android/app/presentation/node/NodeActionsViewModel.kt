@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.node.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
@@ -26,13 +25,16 @@ import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
@@ -50,14 +52,19 @@ import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -101,12 +108,15 @@ class NodeActionsViewModel @Inject constructor(
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
+    private val getFileTypeInfoByContentUseCase: GetFileTypeInfoByContentUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -484,34 +494,44 @@ class NodeActionsViewModel @Inject constructor(
      *
      * @param fileNode
      */
-    suspend fun handleFileNodeClicked(fileNode: TypedFileNode) = when {
-        fileNode.type is PdfFileTypeInfo -> FileNodeContent.Pdf(
-            uri = getNodeContentUriUseCase(fileNode)
-        )
-
-        fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForNode
-
-        fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
-
-        fileNode.type is VideoFileTypeInfo || fileNode.type is AudioFileTypeInfo -> {
-            FileNodeContent.AudioOrVideo(
+    suspend fun handleFileNodeClicked(fileNode: TypedFileNode): FileNodeContent {
+        val fileType = resolveFileType(fileNode)
+        return when {
+            fileType is PdfFileTypeInfo -> FileNodeContent.Pdf(
                 uri = getNodeContentUriUseCase(fileNode)
             )
-        }
 
-        fileNode.type is UrlFileTypeInfo -> {
-            val content = getNodeContentUriUseCase(fileNode)
-            val path = getPathFromNodeContentUseCase(content)
-            FileNodeContent.UrlContent(
-                uri = content,
-                path = path
+            fileType is ImageFileTypeInfo -> FileNodeContent.ImageForNode
+
+            fileType is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
+
+            fileType is VideoFileTypeInfo || fileType is AudioFileTypeInfo -> {
+                FileNodeContent.AudioOrVideo(
+                    uri = getNodeContentUriUseCase(fileNode)
+                )
+            }
+
+            fileType is UrlFileTypeInfo -> {
+                val content = getNodeContentUriUseCase(fileNode)
+                val path = getPathFromNodeContentUseCase(content)
+                FileNodeContent.UrlContent(
+                    uri = content,
+                    path = path
+                )
+            }
+
+            else -> FileNodeContent.Other(
+                localFile = getNodePreviewFileUseCase(fileNode)
             )
         }
-
-        else -> FileNodeContent.Other(
-            localFile = getNodePreviewFileUseCase(fileNode)
-        )
     }
+
+    private suspend fun resolveFileType(fileNode: TypedFileNode) =
+        if (fileNode.type is UnMappedFileTypeInfo) {
+            getFileTypeInfoByContentUseCase(fileNode)
+        } else {
+            fileNode.type
+        }
 
     /**
      * Apply node content uri
@@ -585,4 +605,70 @@ class NodeActionsViewModel @Inject constructor(
      * return the file type of the given file
      */
     fun getTypeInfo(file: File) = fileTypeInfoMapper(file.name)
+
+    fun triggerAddVideoToPlaylistResultEvent(result: AddVideoToPlaylistResult) {
+        _state.update {
+            it.copy(addVideoToPlaylistResultEvent = triggered(result))
+        }
+    }
+
+    fun resetAddVideoToPlaylistResultEvent() {
+        _state.update {
+            it.copy(addVideoToPlaylistResultEvent = consumed())
+        }
+    }
+
+    /**
+     * Called when the user chooses to share the folder(s) with contacts. On the Compose picker
+     * path ([AppFeatures.ContactsComposeUI]) a hidden/sensitive-node warning is shown first when
+     * needed; the legacy picker warns itself, so no warning is surfaced here for it.
+     */
+    fun verifyShareFolder(nodeHandles: List<Long>) {
+        viewModelScope.launch {
+            val isComposeContactsPicker = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val warning = if (isComposeContactsPicker) {
+                runCatching {
+                    getShareFolderSensitiveWarningUseCase(nodeHandles.map { NodeId(it) })
+                }.getOrDefault(SensitiveNodeShareWarning.None)
+            } else {
+                SensitiveNodeShareWarning.None
+            }
+            if (warning == SensitiveNodeShareWarning.None) {
+                _state.update {
+                    it.copy(shareFolderPickerEvent = triggered(nodeHandles))
+                }
+            } else {
+                _state.update {
+                    it.copy(
+                        shareHiddenNodeWarningEvent = triggered(
+                            nodeHandles to (warning == SensitiveNodeShareWarning.Folders)
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Called when the user confirms the hidden/sensitive-node warning; proceeds to the picker.
+     */
+    fun shareHiddenNodeWarningConfirmed(nodeHandles: List<Long>) {
+        _state.update {
+            it.copy(shareFolderPickerEvent = triggered(nodeHandles))
+        }
+    }
+
+    fun markShareHiddenNodeWarningEventConsumed() {
+        _state.update {
+            it.copy(shareHiddenNodeWarningEvent = consumed())
+        }
+    }
+
+    fun markShareFolderPickerEventConsumed() {
+        _state.update {
+            it.copy(shareFolderPickerEvent = consumed())
+        }
+    }
 }

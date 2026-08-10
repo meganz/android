@@ -39,8 +39,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -156,7 +156,7 @@ fun VoiceClipRecorderView(
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val showTapAndHoldTooltip = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val snackbarHostState = LocalSnackBarHostStateOriginal.current
     val recordAudioPermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -164,8 +164,8 @@ fun VoiceClipRecorderView(
         if (!isGranted) {
             coroutineScope.launch {
                 val result = snackbarHostState?.showAutoDurationSnackbar(
-                    context.getString(R.string.chat_microphone_permissions_denied_for_voice_clip),
-                    context.getString(R.string.general_allow),
+                    resources.getString(R.string.chat_microphone_permissions_denied_for_voice_clip),
+                    resources.getString(R.string.general_allow),
                 )
                 if (result == SnackbarResult.ActionPerformed) {
                     onNavigateToAppSettings()
@@ -304,13 +304,19 @@ fun VoiceClipRecorderView(
                         )
                     } else {
                         Spacer(modifier = Modifier.weight(1f))
+                        val x = voiceClipRecorderState.value.offsetX
+                            .roundToInt()
+                            .takeIf { it < 0 } ?: 0
+
                         SlideToCancel(
                             modifier = Modifier
-                                .padding(end = 12.dp)
+                                .padding(
+                                    end = if (x < 0)
+                                        SLIDE_TO_CANCEL_SCROLLING_PADDING_IN_PX.dp
+                                    else
+                                        SLIDE_TO_CANCEL_PADDING_IN_PX.dp
+                                )
                                 .offset {
-                                    val x = voiceClipRecorderState.value.offsetX
-                                        .roundToInt()
-                                        .takeIf { it < 0 } ?: 0
                                     IntOffset(x, 0)
                                 }
                         )
@@ -466,7 +472,7 @@ private fun RecordScroller(modifier: Modifier = Modifier) {
 @Composable
 private fun SlideToCancel(modifier: Modifier = Modifier) {
     Row(
-        modifier = modifier.padding(end = 12.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -491,6 +497,8 @@ private fun formatSeconds(seconds: Int): String {
 private const val VOICE_RECORDER_VIEW_HEIGHT_IN_DP = 118
 private const val REC_SCROLLER_SIZE_IN_DP = 80
 private const val SLIDE_TO_CANCEL_THRESHOLD_IN_PX = 400
+private const val SLIDE_TO_CANCEL_PADDING_IN_PX = REC_SCROLLER_SIZE_IN_DP / 2
+private const val SLIDE_TO_CANCEL_SCROLLING_PADDING_IN_PX = 60
 
 @CombinedThemePreviews
 @Composable

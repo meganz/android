@@ -28,12 +28,14 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.primitives.Longs
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -44,6 +46,7 @@ import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward
 import mega.privacy.android.app.listeners.CreateChatListener
+import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor
 import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistoryAdapter
@@ -77,7 +80,9 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.navigation.ExtraConstant
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -102,6 +107,12 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
     @Inject
     lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
+
+    @Inject
+    lateinit var getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase
+
+    @Inject
+    lateinit var chatController: ChatController
 
     private val viewModel by viewModels<NodeAttachmentHistoryViewModel>()
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
@@ -144,9 +155,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     var chatId: Long = -1
     private var selectedMessageId: Long = -1
 
-    var chatC: ChatController? = null
-
-    private var myChatFilesFolder: MegaNode? = null
+    private var myChatFilesFolderHandle: Long? = null
     private var preservedMessagesSelected: ArrayList<MegaChatMessage>? = null
     private var preservedMessagesToImport: ArrayList<MegaChatMessage>? = null
 
@@ -169,11 +178,9 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         super.onCreate(savedInstanceState)
 
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
-
-        chatC = ChatController(this)
 
         megaChatApi.addNodeHistoryListener(chatId, this)
 
@@ -292,9 +299,10 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                     chatMessages = ArrayList()
 
                     if (adapter == null) {
-                        adapter = NodeAttachmentHistoryAdapter(this, listView).apply {
-                            messages = chatMessages
-                        }
+                        adapter =
+                            NodeAttachmentHistoryAdapter(this, listView, chatController).apply {
+                                messages = chatMessages
+                            }
                     }
 
                     listView?.setAdapter(adapter)
@@ -362,7 +370,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                             MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                         )
                     } else {
-                        forwardMessages(preservedMessagesSelected)
+                        preservedMessagesSelected?.let { forwardMessages(it) }
                         preservedMessagesSelected = null
                     }
                 }
@@ -579,7 +587,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                                         Timber.e("ERROR: NULL media file Uri")
                                         showSnackbar(
                                             Constants.SNACKBAR_TYPE,
-                                            getString(R.string.general_text_error)
+                                            getString(sharedR.string.general_text_error)
                                         )
                                     } else {
                                         pdfIntent.setDataAndType(
@@ -593,7 +601,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                                         Timber.e("ERROR: NULL media file Uri")
                                         showSnackbar(
                                             Constants.SNACKBAR_TYPE,
-                                            getString(R.string.general_text_error)
+                                            getString(sharedR.string.general_text_error)
                                         )
                                     } else {
                                         pdfIntent.setDataAndType(
@@ -624,14 +632,14 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                                             Timber.e("ERROR: HTTP server get local link")
                                             showSnackbar(
                                                 Constants.SNACKBAR_TYPE,
-                                                getString(R.string.general_text_error)
+                                                getString(sharedR.string.general_text_error)
                                             )
                                         }
                                     } else {
                                         Timber.e("ERROR: HTTP server get local link")
                                         showSnackbar(
                                             Constants.SNACKBAR_TYPE,
-                                            getString(R.string.general_text_error)
+                                            getString(sharedR.string.general_text_error)
                                         )
                                     }
                                 } else {
@@ -741,17 +749,17 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     }
 
     override fun handleStoredData() {
-        if (preservedMessagesToImport.isNullOrEmpty()) {
-            forwardMessages(preservedMessagesSelected)
+        if (preservedMessagesToImport?.isNotEmpty() == true) {
+            preservedMessagesSelected?.let { forwardMessages(it) }
             preservedMessagesSelected = null
         } else {
             preservedMessagesToImport?.let {
-                myChatFilesFolder?.let { newParentNode ->
+                myChatFilesFolderHandle?.let { newParentHandle ->
                     val messageIdsToCopy = it.map { it.msgId }
                     viewModel.copyAttachmentsToForward(
                         chatId = chatId,
                         messageIdsToCopy = messageIdsToCopy,
-                        newParentHandle = newParentNode.handle,
+                        newParentHandle = newParentHandle,
                     )
                 }
             }
@@ -775,7 +783,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     private inner class ActionBarCallBack : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             Timber.d("onActionItemClicked")
-            val messagesSelected = adapter?.selectedMessages
+            val messagesSelected = adapter?.selectedMessages ?: arrayListOf()
 
             if (viewModel.getStorageState() == StorageState.PayWall && item.itemId != R.id.cab_menu_select_all && item.itemId != R.id.cab_menu_unselect_all) {
                 showOverDiskQuotaPaywallWarning()
@@ -791,7 +799,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                 Timber.d("Forward message")
                 clearSelections()
                 hideMultipleSelect()
-                chatC?.prepareMessagesToForward(messagesSelected, chatId)
+                prepareMessagesToForward(messagesSelected, chatId)
             } else if (itemId == R.id.chat_cab_menu_delete) {
                 clearSelections()
                 hideMultipleSelect()
@@ -801,7 +809,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                 clearSelections()
                 hideMultipleSelect()
                 val messageIds = ArrayList<Long>()
-                messagesSelected?.forEach { message ->
+                messagesSelected.forEach { message ->
                     val megaNodeHandle = message.msgId
                     messageIds.add(megaNodeHandle)
                 }
@@ -813,7 +821,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             } else if (itemId == R.id.chat_cab_menu_import) {
                 clearSelections()
                 hideMultipleSelect()
-                chatC?.importNodesFromMessages(messagesSelected)
+                chatController.importNodesFromMessages(messagesSelected)
             } else if (itemId == R.id.chat_cab_menu_offline) {
                 checkNotificationsPermission(this@NodeAttachmentHistoryActivity)
                 clearSelections()
@@ -867,7 +875,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                 } else {
                     Timber.d("Chat with permissions")
                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(
-                        viewModel.isOnline() && chatC?.isInAnonymousMode == false
+                        viewModel.isOnline() && chatController?.isInAnonymousMode == false
                     )
 
                     val importIcon = menu.findItem(R.id.chat_cab_menu_import)
@@ -881,7 +889,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
                         if (viewModel.isOnline()) {
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(true)
-                            if (chatC?.isInAnonymousMode == true) {
+                            if (chatController?.isInAnonymousMode == true) {
                                 menu.findItem(R.id.chat_cab_menu_offline).setVisible(false)
                                 importIcon.setVisible(false)
                             } else {
@@ -917,7 +925,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                         }
                         if (viewModel.isOnline()) {
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(true)
-                            importIcon.setVisible(chatC?.isInAnonymousMode == false)
+                            importIcon.setVisible(chatController?.isInAnonymousMode == false)
                         } else {
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false)
                             importIcon.setVisible(false)
@@ -925,7 +933,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
                         menu.findItem(R.id.chat_cab_menu_delete).setVisible(showDelete)
                         menu.findItem(R.id.chat_cab_menu_forward).setVisible(
-                            viewModel.isOnline() && chatC?.isInAnonymousMode == false
+                            viewModel.isOnline() && chatController?.isInAnonymousMode == false
                         )
                         // Hide available offline option when multiple attachments are selected
                         menu.findItem(R.id.chat_cab_menu_offline).setVisible(false)
@@ -943,15 +951,14 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         }
     }
 
-    fun showConfirmationDeleteMessages(messages: ArrayList<MegaChatMessage>?, chat: MegaChatRoom) {
+    fun showConfirmationDeleteMessages(messages: ArrayList<MegaChatMessage>, chat: MegaChatRoom) {
         Timber.d("Chat ID: %s", chat.chatId)
 
         val dialogClickListener =
             DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
-                        val cC = ChatController(this)
-                        cC.deleteMessages(messages, chat)
+                        chatController.deleteMessages(messages, chat)
                     }
 
                     DialogInterface.BUTTON_NEGATIVE -> {}
@@ -961,7 +968,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         val builder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
-        if (messages?.size == 1) {
+        if (messages.size == 1) {
             builder.setMessage(R.string.confirmation_delete_one_message)
         } else {
             builder.setMessage(R.string.confirmation_delete_several_messages)
@@ -973,9 +980,48 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             ).show()
     }
 
-    fun forwardMessages(messagesSelected: ArrayList<MegaChatMessage>?) {
+    fun forwardMessages(messagesSelected: ArrayList<MegaChatMessage>) {
         Timber.d("forwardMessages")
-        chatC?.forwardMessages(messagesSelected, chatId)
+        chatController.forwardMessages(messagesSelected, chatId)
+    }
+
+    /**
+     * Splits the messages to forward into those that can be forwarded directly and those that
+     * need to be imported into the "My chat files" folder first.
+     */
+    private fun prepareMessagesToForward(
+        messagesSelected: ArrayList<MegaChatMessage>?,
+        idChat: Long,
+    ) {
+        if (messagesSelected.isNullOrEmpty()) return
+        Timber.d("Number of messages: %d, Chat ID: %d", messagesSelected.size, idChat)
+        val messagesToImport = ArrayList<MegaChatMessage>()
+        messagesSelected.forEach { message ->
+            val type = message.type
+            if (type == MegaChatMessage.TYPE_NODE_ATTACHMENT || type == MegaChatMessage.TYPE_VOICE_CLIP) {
+                if (message.userHandle != megaChatApi.myUserHandle) {
+                    messagesToImport.add(message)
+                }
+            }
+        }
+
+        if (messagesToImport.isEmpty()) {
+            forwardMessages(messagesSelected)
+            return
+        }
+
+        storedUnhandledData(messagesSelected, messagesToImport)
+        lifecycleScope.launch {
+            val chatFilesFolderId = runCatching { getMyChatsFilesFolderIdUseCase() }
+                .onFailure { Timber.e(it, "Error getting my chat files folder id") }
+                .getOrNull()
+            if (chatFilesFolderId != null) {
+                setMyChatFilesFolderHandle(chatFilesFolderId.longValue)
+                handleStoredData()
+            } else {
+                megaApi.getMyChatFilesFolder(GetAttrUserListener(this@NodeAttachmentHistoryActivity))
+            }
+        }
     }
 
     @Deprecated("Deprecated in Java")
@@ -1041,8 +1087,14 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                     }
 
                     val listener = CreateChatListener(
-                        CreateChatListener.SEND_MESSAGES, chats, users, this, this, idMessages,
-                        chatId
+                        action = CreateChatListener.SEND_MESSAGES,
+                        chats = chats,
+                        usersNoChat = users,
+                        context = this,
+                        snackbarShower = this,
+                        messageHandles = idMessages,
+                        chatId = chatId,
+                        chatController = chatController
                     )
 
                     for (user in users) {
@@ -1055,7 +1107,13 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                     Timber.d("Selected: %d chats to send", countChat)
 
                     val forwardChatProcessor =
-                        MultipleForwardChatProcessor(this, chatHandles, idMessages, chatId)
+                        MultipleForwardChatProcessor(
+                            this,
+                            chatHandles,
+                            idMessages,
+                            chatId,
+                            chatController
+                        )
                     forwardChatProcessor.forward(chatRoom)
                 }
             } else {
@@ -1163,7 +1221,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
             if (chatMessages?.isNotEmpty() == true) {
                 if (adapter == null) {
-                    adapter = NodeAttachmentHistoryAdapter(this, listView).apply {
+                    adapter = NodeAttachmentHistoryAdapter(this, listView, chatController).apply {
                         messages = chatMessages
                     }
                     listView?.layoutManager = mLayoutManager
@@ -1215,7 +1273,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         //Create adapter
         if (adapter == null) {
             Timber.d("Create adapter")
-            adapter = NodeAttachmentHistoryAdapter(this, listView).apply {
+            adapter = NodeAttachmentHistoryAdapter(this, listView, chatController).apply {
                 messages = chatMessages
             }
             listView?.layoutManager = mLayoutManager
@@ -1315,7 +1373,16 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     }
 
     fun setMyChatFilesFolder(myChatFilesFolder: MegaNode?) {
-        this.myChatFilesFolder = myChatFilesFolder
+        this.myChatFilesFolderHandle = myChatFilesFolder?.handle
+    }
+
+    /**
+     * Sets the handle of the "My chat files" folder.
+     *
+     * @param handle The handle to set.
+     */
+    fun setMyChatFilesFolderHandle(handle: Long) {
+        this.myChatFilesFolderHandle = handle
     }
 
     companion object {

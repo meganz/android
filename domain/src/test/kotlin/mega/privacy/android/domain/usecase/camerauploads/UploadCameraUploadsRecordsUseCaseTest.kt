@@ -21,6 +21,8 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploa
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -232,6 +234,8 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
                 appData = TransferAppData.CameraUpload,
                 isSourceTemporary = false,
                 shouldStartFirst = false,
+                pitagTrigger = PitagTrigger.Camera,
+                pitagTarget = PitagTarget.NotApplicable,
             )
             verify(copyNodeUseCase, never()).invoke(
                 nodeToCopy = existingNodeId,
@@ -432,6 +436,8 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
                     appData = TransferAppData.CameraUpload,
                     isSourceTemporary = false,
                     shouldStartFirst = false,
+                    pitagTrigger = PitagTrigger.Camera,
+                    pitagTarget = PitagTarget.NotApplicable,
                 )
             ).thenReturn(events)
         }
@@ -459,6 +465,8 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
                 appData = TransferAppData.CameraUpload,
                 isSourceTemporary = false,
                 shouldStartFirst = false,
+                pitagTrigger = PitagTrigger.Camera,
+                pitagTarget = PitagTarget.NotApplicable,
             )
         }
 
@@ -836,6 +844,8 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
                     appData = TransferAppData.CameraUpload,
                     isSourceTemporary = false,
                     shouldStartFirst = false,
+                    pitagTrigger = PitagTrigger.Camera,
+                    pitagTarget = PitagTarget.NotApplicable,
                 )
             ).thenReturn(flowOf())
         }
@@ -1010,6 +1020,8 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
                 appData = TransferAppData.CameraUpload,
                 isSourceTemporary = false,
                 shouldStartFirst = false,
+                pitagTrigger = PitagTrigger.Camera,
+                pitagTarget = PitagTarget.NotApplicable,
             )
         }
 
@@ -1049,6 +1061,8 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
                     appData = TransferAppData.CameraUpload,
                     isSourceTemporary = false,
                     shouldStartFirst = false,
+                    pitagTrigger = PitagTrigger.Camera,
+                    pitagTarget = PitagTarget.NotApplicable,
                 )
             ).thenReturn(flowOf(TransferEvent.TransferFinishEvent(mock(), null)))
         }
@@ -1268,6 +1282,8 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
                 appData = TransferAppData.CameraUpload,
                 isSourceTemporary = false,
                 shouldStartFirst = false,
+                pitagTrigger = PitagTrigger.Camera,
+                pitagTarget = PitagTarget.NotApplicable,
             )
         }
 

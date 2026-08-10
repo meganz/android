@@ -5,10 +5,11 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -26,7 +27,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import mega.android.core.ui.components.divider.SubtleDivider
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -47,8 +47,7 @@ internal fun ShareRecipientsListView(
         items(items) { recipient ->
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -56,7 +55,6 @@ internal fun ShareRecipientsListView(
                     shareRecipient = recipient,
                     modifier = Modifier
                         .weight(1f)
-                        .padding(vertical = 8.dp)
                         .combinedClickable(
                             onClick = {
                                 onRecipientClick(recipient)
@@ -84,9 +82,10 @@ internal fun ShareRecipientsListView(
                                 .size(24.dp)
                         )
                     }
+
+                    Spacer(Modifier.width(8.dp))
                 }
             }
-            SubtleDivider(modifier = Modifier.padding(start = 72.dp))
         }
     }
 }

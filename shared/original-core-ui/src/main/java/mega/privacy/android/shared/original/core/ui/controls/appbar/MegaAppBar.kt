@@ -45,12 +45,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.menus.MenuActions
 import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
-import mega.android.core.ui.model.menu.MenuAction
-import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.badge
@@ -414,7 +414,7 @@ internal fun MegaAppBarTitle(title: String, modifier: Modifier = Modifier, maxLi
     )
 
 @Composable
-internal fun MegaAppBarSubTitle(
+fun MegaAppBarSubTitle(
     subtitle: String,
     modifier: Modifier = Modifier,
     maxLines: Int = 1,
@@ -438,7 +438,7 @@ internal fun MegaAppBarMarqueeSubTitle(
 )
 
 @Composable
-internal fun MegaAppBarTitleAndSubtitle(
+fun MegaAppBarTitleAndSubtitle(
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     titleIcons: @Composable (RowScope.() -> Unit)? = null,

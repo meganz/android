@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
@@ -34,13 +35,11 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.getValue
 
 
 private const val CHAT_EXPLORER_FRAGMENT = "chatExplorerFragment"
 private const val QUERY_SEARCH = "querySearch"
 private const val IS_SEARCH_EXPANDED = "isSearchExpanded"
-private const val CONTACT_TYPE = "contactType"
 
 @AndroidEntryPoint
 internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
@@ -48,6 +47,9 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
 
     @Inject
     lateinit var monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private var fragmentContainer: FrameLayout? = null
     var chatExplorerFragment: ChatExplorerFragment? = null
@@ -72,7 +74,7 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
         Timber.d("onCreate first")
         super.onCreate(savedInstanceState)
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
 
@@ -236,14 +238,10 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
                         if (contacts.isEmpty()) {
                             showSnackbar(getString(R.string.no_contacts_invite))
                         } else {
-                            Intent(
-                                this,
-                                AddContactActivity::class.java
-                            ).apply {
-                                putExtra(CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-                            }.let {
-                                startActivityForResult(it, Constants.REQUEST_CREATE_CHAT)
-                            }
+                            megaNavigator.openNewChatForResult(
+                                activity = this,
+                                requestCode = Constants.REQUEST_CREATE_CHAT,
+                            )
                         }
                     }
                 } else {
@@ -412,13 +410,11 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
                     return
                 }
 
-                val intent = Intent(
-                    this,
-                    AddContactActivity::class.java
+                megaNavigator.openCreateGroupChatForResult(
+                    activity = this,
+                    requestCode = Constants.REQUEST_CREATE_CHAT,
+                    allowEmptyGroup = false,
                 )
-                intent.putExtra(CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-                intent.putExtra("onlyCreateGroup", true)
-                startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT)
             } else {
                 Timber.w("Online but not megaApi")
                 Util.showErrorAlertDialog(

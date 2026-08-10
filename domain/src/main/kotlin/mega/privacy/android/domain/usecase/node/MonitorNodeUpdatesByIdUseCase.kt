@@ -3,12 +3,13 @@ package mega.privacy.android.domain.usecase.node
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -20,7 +21,6 @@ import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorContactNameUpdatesUseCase
-import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import javax.inject.Inject
 
 /**
@@ -29,7 +29,6 @@ import javax.inject.Inject
 class MonitorNodeUpdatesByIdUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val getRootNodeUseCase: GetRootNodeUseCase,
-    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
     private val monitorContactNameUpdatesUseCase: MonitorContactNameUpdatesUseCase,
 ) {
@@ -45,14 +44,17 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
         nodeId: NodeId,
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     ) = flow {
-        val effectiveNodeId = resolveEffectiveNodeId(nodeId, nodeSourceType)
+        val effectiveNodeId = resolveEffectiveNodeId(
+            nodeId = nodeId,
+            nodeSourceType = nodeSourceType
+        )
         emitAll(
             merge(
                 monitorOnlineNodeUpdates(
                     effectiveNodeId = effectiveNodeId,
                     nodeSourceType = nodeSourceType
                 ),
-                monitorOfflineNodeUpdates(effectiveNodeId),
+                monitorOfflineNodeUpdates(),
                 monitorRefreshSessionUpdates(),
                 monitorContactNameUpdates(nodeSourceType)
             ).conflate().debounce(500L)
@@ -80,6 +82,7 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
                 node.parentId == effectiveNodeId
                         || node.id == effectiveNodeId
                         || update.isChangesInOutgoingShares(node, nodeSourceType)
+                        || isChangesInLinks(nodeSourceType, effectiveNodeId)
             }
         }
         .map {
@@ -102,16 +105,19 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
             && ((node as? FolderNode)?.isShared == true
             || this.changes[node]?.contains(NodeChanges.Outshare) == true)
 
-    private fun monitorOfflineNodeUpdates(
-        effectiveNodeId: NodeId,
-    ) = monitorOfflineNodeUpdatesUseCase()
-        .mapNotNull { offlineList ->
-            val relevantOfflineNodes = offlineList.filter { offline ->
-                offline.parentId.toLong() == effectiveNodeId.longValue ||
-                        offline.handle.toLong() == effectiveNodeId.longValue
-            }
-            if (relevantOfflineNodes.isNotEmpty()) NodeChanges.Attributes else null
-        }
+    /**
+     * Check if there are changes in root directory of links
+     */
+    private fun isChangesInLinks(
+        nodeSourceType: NodeSourceType,
+        effectiveNodeId: NodeId
+    ) = nodeSourceType == NodeSourceType.LINKS && effectiveNodeId.longValue == -1L
+
+    private fun monitorOfflineNodeUpdates() =
+        nodeRepository.monitorOfflineNodeIds()
+            .drop(1) // Skip the first emission (initial load from database)
+            .distinctUntilChanged() // Only emit when the filtered list actually changes
+            .map { NodeChanges.Attributes }
 
     private fun monitorRefreshSessionUpdates() = monitorRefreshSessionUseCase().map {
         NodeChanges.Attributes
@@ -122,7 +128,7 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
      */
     private fun monitorContactNameUpdates(nodeSourceType: NodeSourceType) =
         if (nodeSourceType == NodeSourceType.INCOMING_SHARES || nodeSourceType == NodeSourceType.OUTGOING_SHARES) {
-            monitorContactNameUpdatesUseCase().map {
+            monitorContactNameUpdatesUseCase(updateContactCache = true).map {
                 NodeChanges.Attributes
             }
         } else emptyFlow()

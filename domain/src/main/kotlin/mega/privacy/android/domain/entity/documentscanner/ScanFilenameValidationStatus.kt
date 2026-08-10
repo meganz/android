@@ -16,6 +16,16 @@ enum class ScanFilenameValidationStatus {
     EmptyFilename,
 
     /**
+     * The file name is only a dot
+     */
+    DotFileName,
+
+    /**
+     * The file name is only a double dot
+     */
+    DoubleDotFileName,
+
+    /**
      * The filename contains invalid characters
      */
     InvalidFilename,

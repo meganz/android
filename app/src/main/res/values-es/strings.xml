@@ -14,8 +14,6 @@
     <string name="general_select">Seleccionar</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Seleccionar carpeta</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Crear</string>
     <!-- button -->
     <string name="general_add">Añadir</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -61,10 +59,6 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Subir</string>
     <!-- Menu item -->
-    <string name="action_create_folder">Nueva carpeta</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Nuevo archivo de texto</string>
-    <!-- Menu item -->
     <string name="action_settings">Ajustes</string>
     <!-- Search button -->
     <string name="action_search">Buscar</string>
@@ -93,7 +87,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">La suscripción ha sido cancelada</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">La suscripción no se ha cancelado correctamente. Ponte en contacto con support&#64;mega.io para obtener ayuda.</string>
+    <string name="cancel_subscription_error">La suscripción no se ha cancelado correctamente. Contacta con soporte en https://mega.nz/support para obtener ayuda.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Cerrar el resto de sesiones</string>
     <!-- Message after kill all opened sessions -->
@@ -154,14 +148,10 @@
     <string name="login_before_share">Inicia sesión para poder compartir en MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Tu enlace de confirmación ya no es válido. Es posible que tu cuenta ya esté activa o que hayas cancelado el registro.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Nombre</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Apellido(s)</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Entiendo que [B]si olvido mi contraseña, puedo perder mis datos[/B]. Más información sobre el [A]cifrado punto a punto de MEGA[/A].</string>
     <!-- warning dialog -->
-    <string name="create_account_no_terms">Debes aceptar los Términos de Servicio</string>
+    <string name="create_account_no_terms">Debes aceptar los Términos de servicio</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Debes confirmar que comprendes el peligro de perder tu contraseña</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
@@ -279,8 +269,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">El enlace público se eliminará.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Renombrar</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Abrir</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Preparando archivo</string>
@@ -300,8 +288,6 @@
     <string name="context_move_to_trash">Mover a la Papelera</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Eliminar de MEGA</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Nombre de carpeta</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Creando carpeta</string>
     <!-- Menu option title -->
@@ -390,8 +376,6 @@
     <string name="subscription_type_monthly">Mensualmente</string>
     <!--  -->
     <string name="subscription_type_yearly">Anual</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Nueva carpeta</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Añadir contacto</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -445,13 +429,13 @@
     <!-- title of the notification when camera upload is initializing -->
     <string name="settings_camera_notif_initializing_title">Iniciando Subidas de la cámara</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
-    <string name="camera_notif_primary_local_unavailable">Se han desactivado las Subidas de la cámara. Tu carpeta local no está disponible.</string>
+    <string name="camera_notif_primary_local_unavailable">Se han desactivado las subidas de la cámara. Tu carpeta local no está disponible.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">Se ha desactivado la a subida multimedia secundaria. Tu carpeta local no está disponible.</string>
+    <string name="camera_notif_secondary_local_unavailable">Se han desactivado las subidas multimedia. Tu carpeta local no está disponible.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Apariencia</string>
     <!-- settings of the Features section -->
-    <string name="settings_features">Características</string>
+    <string name="settings_features">Funcionalidades</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="settings_storage">Almacenamiento</string>
     <!-- Settings of the Passcode -->
@@ -685,9 +669,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Enhorabuena, tu nueva dirección de correo electrónico para esta cuenta MEGA es: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Cannot be empty</string>
+    <string name="invalid_string">No puede estar vacío</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
+    <string name="invalid_input">Entrada no válida</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Restablecer la contraseña</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -739,7 +723,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Correo electrónico o contraseña no válidos Vuelve a intentarlo.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Tu cuenta ha sido suspendida por infringir nuestros Términos de servicio. Por favor, ponte en contacto con support&#64;mega.io</string>
+    <string name="error_account_suspended">Tu cuenta ha sido suspendida por infringir nuestros Términos de servicio. Contacta con soporte en https://mega.nz/support</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Demasiados intentos de acceso incorréctos. Vuelve a intentarlo en una hora.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -1019,12 +1003,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">minutos</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Conectado</item>
-        <item>Ausente</item>
-        <item>Ocupado</item>
-        <item>Sin conexión</item>
-    </string-array>
+    <string name="settings_chat_status_online">Conectado</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Ausente</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Ocupado</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Sin conexión</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Activar</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1277,8 +1262,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Ayuda</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Enviar valoración</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Feedback Android</string>
     <!-- mail body -->
@@ -1287,8 +1270,6 @@
     <string name="settings_feedback_body_device_model">Modelo del dispositivo</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Versión de Android</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">Nuevo archivo de texto</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Nombre del archivo</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1307,8 +1288,6 @@
     <string name="general_incorrect_names">Corrige los nombres de archivo antes de continuar</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caracteres no permitidos</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">Los siguientes caracteres no están permitidos: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Nombra tu archivo antes de continuar.</item>
@@ -1327,12 +1306,6 @@
     <string name="invalid_connection_state">Reconectando al chat</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Se ha producido un error y no se ha podido establecer la llamada.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">¿Te gusta esta aplicación?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Sí, calificar la aplicación</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">No, enviar valoración</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Sin permiso para acceder a contactos</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1413,8 +1386,6 @@
     <string name="tab_received_requests">Solicitudes recibidas</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Cuota de almacenamiento agotada</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Enlace inválido, solicita un nuevo enlace válido</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Contraseña del enlace inválida</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1502,12 +1473,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Calidad de vídeo</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Baja</item>
-        <item>Media</item>
-        <item>Alta</item>
-        <item>Original</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Baja</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Media</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Alta</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Original</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Llamada perdida</string>
     <!-- Refers to a location of file -->
@@ -1895,7 +1867,7 @@
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">días</string>
     <!-- Title of the option to generate a public chat link -->
-    <string name="get_chat_link_option">Obtén enlace de chat</string>
+    <string name="get_chat_link_option">Obtener enlace de chat</string>
     <!-- Title of the option to make a public chat private -->
     <string name="make_chat_private_option">Activar Rotación de la clave de cifrado</string>
     <!-- Title of the view to inform that a chat is private -->
@@ -1907,9 +1879,9 @@
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
     <string name="warning_make_chat_private">El chat no se puede convertir en privado porque el número de participantes excede el límite para chats privados.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
-    <string name="message_created_chat_link">[A]%1$s[/A][B] ha creado un enlace del chat.[/B]</string>
+    <string name="message_created_chat_link">[A]%1$s[/A][B] ha creado un enlace de chat.[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
-    <string name="message_deleted_chat_link">[A]%1$s[/A][B] ha eliminado un enlace del chat.[/B]</string>
+    <string name="message_deleted_chat_link">[A]%1$s[/A][B] ha eliminado un enlace de chat.[/B]</string>
     <!-- Title of the option to delete a chat link -->
     <string name="action_delete_link">Desactivar enlace de chat</string>
     <!-- Title of the alert when a chat link is invalid -->
@@ -1925,7 +1897,7 @@
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">Espectadores</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
-    <string name="error_chat_link_init_error">No se ha podido empezar el chat al cargar el enlace del chat.</string>
+    <string name="error_chat_link_init_error">No se ha podido iniciar el chat al cargar el enlace de chat.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B] ha activado la rotación de la clave de cifrado.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
@@ -1941,7 +1913,7 @@
     <!-- General label for files -->
     <string name="general_files">Archivos</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Guardar en el dispositivo</string>
+    <string name="general_save_to_device">Descargar</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Subir a MEGA</string>
     <!-- Label choose destination -->
@@ -2083,7 +2055,7 @@
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s y %2$d más</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
-    <string name="message_error_set_title_get_link">Para generar un enlace del chat, tienes que añadir una descripción primero:</string>
+    <string name="message_error_set_title_get_link">Para generar un enlace de chat, tienes que añadir una descripción primero:</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Llamada iniciada</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2235,7 +2207,7 @@
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Al eliminar el enlace ya no tendrás acceso a esta conversación.</string>
     <!-- Question of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_question_text">¿Quieres crear un nuevo chat de grupo y obtener un enlace del chat?</string>
+    <string name="context_create_chat_link_question_text">¿Quieres crear un nuevo chat de grupo y obtener un enlace de chat?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="context_make_private_chat_warning_text">La rotación de la clave de cifrado es un poco más segura, pero no te permite crear un enlace de chat y los nuevos participantes no verán los mensajes anteriores.</string>
     <!-- Label that indicates the steps of a wizard -->
@@ -2247,7 +2219,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Ignorar</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s ha silenciado la llamada</string>
+    <string name="muted_contact_micro">%s está silenciado</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">Silenciada</string>
     <!-- Subtitle of the call screen when the call is on hold -->
@@ -2271,7 +2243,7 @@
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Introducir el nombre del grupo</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
-    <string name="alert_enter_group_name">Para crear un enlace del chat, debes ponerle nombre al grupo.</string>
+    <string name="alert_enter_group_name">Para crear un enlace de chat, debes ponerle nombre al grupo.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Invita a contactos y chatea de forma segura con el chat cifrado de MEGA.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
@@ -2279,7 +2251,7 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Link de chat no disponible.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Enlace del chat eliminado</string>
+    <string name="chat_link_deleted">Enlace de chat eliminado</string>
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">Versión restaurada</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
@@ -3019,9 +2991,9 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Solo lectura</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">Esta carpeta se puede compartir exclusivamente en “solo lectura”. Al tratarse de una carpeta de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
+    <string name="backup_share_permission_text">Esta carpeta se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de una carpeta de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">Estas carpetas se puede compartir exclusivamente en “solo lectura”. Al tratarse de carpetas de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
+    <string name="backup_multi_share_permission_text">Estas carpetas se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de carpetas de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Algunas carpetas compartidas son carpetas de respaldo y de solo lectura. ¿Quieres continuar?</string>
     <!-- Title of the button when you want to answer a one to one call -->
@@ -3133,7 +3105,7 @@
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Introduce tu contraseña</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
-    <string name="scanning_transfers">Examinando&#8230;</string>
+    <string name="scanning_transfers">Analizando&#8230;</string>
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">Cancelar transferencias</string>
     <!-- Warning informing transfers were cancelled. -->
@@ -4096,13 +4068,19 @@
         <item quantity="many">No se han podido copiar %1$d de elementos</item>
         <item quantity="other">No se han podido copiar %1$d elementos</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Se ha copiado %1$d elemento,&#160;</item>
         <item quantity="many">Se ha copiado %1$d de elementos,&#160;</item>
         <item quantity="other">Se han copiado %1$d elementos,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">no se ha podido copiar %1$d elemento</item>
         <item quantity="many">no se han podido copiar %1$d de elementos</item>
@@ -4489,7 +4467,7 @@
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
     <string name="meetings_custom_recurrence_second_week_monthly_section">Segundo</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
-    <string name="meetings_custom_recurrence_third_week_monthly_section">Tercero</string>
+    <string name="meetings_custom_recurrence_third_week_monthly_section">Tercer</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
     <string name="meetings_custom_recurrence_fourth_week_monthly_section">Cuarto</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->
@@ -4750,16 +4728,6 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s está presentando</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Esta persona está compartiendo pantalla</string>
-    <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">Esta llamada se está grabando</string>
-    <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">Al permanecer en la llamada, das permiso para que se te grabe. La grabación solo se almacena en el dispositivo de la persona que la graba.</string>
-    <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">Entendido</string>
-    <!-- Label for the negative or cancel button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_negative_button">Abandonar llamada</string>
-    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Más información[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">%1$s ha empezado a grabar</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
@@ -4847,7 +4815,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">La subida está en pausa porque la batería está por debajo del %1$d&#160;%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Las subidas de la cámara han dejado de funcionar. Intenta volver a activarlas para solucionarlo. Si el problema persiste, contacta con support&#64;mega.io.</string>
+    <string name="photos_camera_uploads_general_issue">Las subidas de la cámara han dejado de funcionar. Intenta volver a activarlas para solucionarlo. Si el problema persiste, contacta con soporte en https://mega.nz/support</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Subidas de la cámara en curso, %1$d archivo pendiente</item>
@@ -4943,7 +4911,7 @@
     <!-- Search drop down chips filter type file type documents -->
     <string name="search_dropdown_chip_filter_type_file_type_documents">Documentos</string>
     <!-- Search drop down chips filter type date added -->
-    <string name="search_dropdown_chip_filter_type_date_added">Fecha de subida</string>
+    <string name="search_dropdown_chip_filter_type_date_added">Fecha de inclusión</string>
     <!-- Search drop down chips filter type last modified -->
     <string name="search_dropdown_chip_filter_type_last_modified">Última modificación</string>
     <!-- Search drop down chips filter type date modified today -->
@@ -5024,4 +4992,5 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Subidas de la cámara activadas</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Esta ubicación ya no existe.</string>
+    <string name="invalid_link">Enlace inválido. Por favor, inténtalo de nuevo o solicita uno nuevo.</string>
 </resources>

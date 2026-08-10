@@ -7,7 +7,6 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
@@ -27,8 +26,11 @@ import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentFromPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
+import mega.privacy.android.shared.nodes.R as NodesR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -55,11 +57,14 @@ import kotlin.time.Duration
 class OfflineNodeActionsViewModelTest {
     private val getOfflineFileUseCase: GetOfflineFileUseCase = mock()
     private val getOfflineFilesUseCase: GetOfflineFilesUseCase = mock()
+    private val getFileTypeInfoByContentFromPathUseCase: GetFileTypeInfoByContentFromPathUseCase =
+        mock()
     private val exportNodesUseCase: ExportNodesUseCase = mock()
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase = mock()
     private val snackBarHandler: SnackBarHandler = mock()
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
     private val nodeShareContentUrisIntentMapper: NodeShareContentUrisIntentMapper = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private lateinit var underTest: OfflineNodeActionsViewModel
 
@@ -73,19 +78,22 @@ class OfflineNodeActionsViewModelTest {
 
     private suspend fun stubCommon() {
         whenever(getOfflineFilesUseCase(any())).thenReturn(mapOf())
-        whenever(exportNodesUseCase(any())).thenReturn(mapOf())
+        whenever(exportNodesUseCase(any(), any())).thenReturn(mapOf())
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
     }
 
     private fun initViewModel() {
         underTest = OfflineNodeActionsViewModel(
             getOfflineFileUseCase = getOfflineFileUseCase,
             getOfflineFilesUseCase = getOfflineFilesUseCase,
+            getFileTypeInfoByContentFromPathUseCase = getFileTypeInfoByContentFromPathUseCase,
             exportNodesUseCase = exportNodesUseCase,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getOfflineFileInformationByIdUseCase = mock(),
             snackBarHandler = snackBarHandler,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
-            nodeShareContentUrisIntentMapper = nodeShareContentUrisIntentMapper
+            nodeShareContentUrisIntentMapper = nodeShareContentUrisIntentMapper,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -128,7 +136,7 @@ class OfflineNodeActionsViewModelTest {
             whenever(offlineFileInformation.isFolder).thenReturn(true)
             whenever(offlineFileInformation.handle).thenReturn("123")
             underTest.handleShareOfflineNodes(listOf(offlineFileInformation), true)
-            verify(exportNodesUseCase).invoke(any())
+            verify(exportNodesUseCase).invoke(any(), any())
         }
 
     @Test
@@ -144,7 +152,12 @@ class OfflineNodeActionsViewModelTest {
                 on { isFolder } doReturn true
                 on { handle } doReturn "456"
             }
-            whenever(exportNodesUseCase(listOf(123, 456))).thenReturn(
+            whenever(
+                exportNodesUseCase(
+                    listOf(123, 456),
+                    "OfflineNodeActionsViewModel"
+                )
+            ).thenReturn(
                 mapOf(
                     123L to "link1",
                     456L to "link2"
@@ -173,7 +186,7 @@ class OfflineNodeActionsViewModelTest {
             whenever(offlineFileInformation.isFolder).thenReturn(true)
             whenever(offlineFileInformation.handle).thenReturn("123")
             underTest.handleShareOfflineNodes(listOf(offlineFileInformation), false)
-            verify(snackBarHandler).postSnackbarMessage(R.string.error_server_connection_problem)
+            verify(snackBarHandler).postSnackbarMessage(NodesR.string.error_server_connection_problem)
         }
 
     @ParameterizedTest(name = "File type is {0}")
@@ -439,7 +452,9 @@ class OfflineNodeActionsViewModelTest {
             nodeContentUriIntentMapper,
             nodeShareContentUrisIntentMapper,
             getOfflineFileUseCase,
-            getPathFromNodeContentUseCase
+            getPathFromNodeContentUseCase,
+            getFeatureFlagValueUseCase,
+            getFileTypeInfoByContentFromPathUseCase,
         )
     }
 }

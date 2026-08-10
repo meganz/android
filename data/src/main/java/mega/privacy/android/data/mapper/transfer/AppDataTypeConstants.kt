@@ -17,6 +17,7 @@ internal enum class AppDataTypeConstants(
     TransferGroup("TRANSFER_GROUP", TransferAppData.TransferGroup::class),
     PreviewDownload("PREVIEW_DOWNLOAD", TransferAppData.PreviewDownload::class),
     OfflineDownload("OFFLINE_DOWNLOAD", TransferAppData.OfflineDownload::class),
+    SafDownload("SAF_DOWNLOAD", TransferAppData.SafDownload::class),
     ;
 
     override fun toString() = sdkTypeValue

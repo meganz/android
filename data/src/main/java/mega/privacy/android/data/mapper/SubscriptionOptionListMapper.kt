@@ -21,14 +21,20 @@ internal class SubscriptionOptionListMapper @Inject constructor(
         request: MegaRequest
     ) = (0 until request.pricing.numProducts).map {
         SubscriptionOption(
-            request.pricing.getAndroidID(it),
-            accountTypeMapper(request.pricing.getProLevel(it)),
-            request.pricing.getMonths(it),
-            request.pricing.getHandle(it),
-            request.pricing.getGBStorage(it),
-            request.pricing.getGBTransfer(it),
-            CurrencyPoint.SystemCurrencyPoint(request.pricing.getAmount(it).toLong()),
-            currencyMapper(request.currency.currencyName),
+            sku = request.pricing.getAndroidID(it),
+            accountType = accountTypeMapper(request.pricing.getProLevel(it)),
+            months = request.pricing.getMonths(it),
+            handle = request.pricing.getHandle(it),
+            storage = request.pricing.getGBStorage(it),
+            transfer = request.pricing.getGBTransfer(it),
+            amount = CurrencyPoint.SystemCurrencyPoint(request.pricing.getAmount(it).toLong()),
+            currency = currencyMapper(request.currency.currencyName.orEmpty()),
+            hasOffer = request.pricing.hasMobileOffers(it),
+            discountName = request.pricing.getMobileOfferLabel(it),
+            offerValidUntil = request.pricing.getMobileOfferExpiryTimestamp(it)
+                .takeIf { expiry -> expiry > 0 },
+            offerFlags = request.pricing.getMobileOfferFlags(it)
+                .takeIf { flags -> flags > 0 },
         )
     }
 }

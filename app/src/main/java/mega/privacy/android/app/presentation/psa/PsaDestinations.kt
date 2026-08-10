@@ -1,0 +1,103 @@
+package mega.privacy.android.app.presentation.psa
+
+import androidx.compose.runtime.DisposableEffect
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
+import mega.privacy.android.app.presentation.psa.model.PsaState
+import mega.privacy.android.app.presentation.psa.view.InfoPsaScreen
+import mega.privacy.android.app.presentation.psa.view.StandardPsaScreen
+import mega.privacy.android.app.presentation.psa.view.WebPsaScreen
+import mega.privacy.android.navigation.contract.bottomsheet.bottomSheetMetadata
+import mega.privacy.android.navigation.contract.bottomsheet.withBottomSheet
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
+import mega.privacy.android.navigation.contract.navkey.Suppressable
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.WebSiteNavKey
+
+@Serializable
+data class StandardPsaBottomSheet(val psa: PsaState.StandardPsa) : NavKey, Suppressable
+
+@Serializable
+data class InfoPsaBottomSheet(val psa: PsaState.InfoPsa) : NavKey, Suppressable
+
+@Serializable
+data class WebPsaScreen(val psa: PsaState.WebPsa) : NavKey, Suppressable
+
+internal fun EntryProviderScope<NavKey>.standardPsaBottomSheetDestination(
+    onNavigate: (NavKey) -> Unit,
+    closePsaScreen: (NavKey) -> Unit,
+    removeDestination: (NavKey) -> Unit,
+) {
+    entry<StandardPsaBottomSheet>(
+        metadata = buildMetadata {
+            withBottomSheet(
+                dismissOnBack = false,
+                dismissOnOutsideClick = false
+            )
+        },
+    ) { key ->
+        val viewModel = hiltViewModel<PsaScreenViewModel>()
+        StandardPsaScreen(
+            state = key.psa,
+            markAsSeen = {
+                viewModel.markAsSeen(it)
+                closePsaScreen(key)
+            },
+            navigateToPsaPage = { url -> onNavigate(WebSiteNavKey(url)) },
+            onDisplay = viewModel::setDisplayed,
+        )
+
+        DisposableEffect(key) {
+            onDispose { removeDestination(key) }
+        }
+    }
+}
+
+internal fun EntryProviderScope<NavKey>.infoPsaBottomSheetDestination(
+    closePsaScreen: (NavKey) -> Unit,
+    removeDestination: (NavKey) -> Unit,
+) {
+    entry<InfoPsaBottomSheet>(
+        metadata = bottomSheetMetadata(
+            dismissOnBack = false,
+            dismissOnOutsideClick = false
+        )
+    ) { key ->
+        val viewModel = hiltViewModel<PsaScreenViewModel>()
+        InfoPsaScreen(
+            state = key.psa,
+            markAsSeen = {
+                viewModel.markAsSeen(it)
+                closePsaScreen(key)
+            },
+            onDisplay = viewModel::setDisplayed,
+        )
+
+        DisposableEffect(key) {
+            onDispose { removeDestination(key) }
+        }
+    }
+}
+
+internal fun EntryProviderScope<NavKey>.webPsaDestination(
+    closePsaScreen: (NavKey) -> Unit,
+    removeDestination: (NavKey) -> Unit,
+) {
+    entry<WebPsaScreen>(metadata = transparentMetadata()) { key ->
+        val viewModel = hiltViewModel<PsaScreenViewModel>()
+        WebPsaScreen(
+            state = key.psa,
+            markAsSeen = {
+                viewModel.markAsSeen(it)
+                closePsaScreen(key)
+            },
+            onDisplay = viewModel::setDisplayed,
+        )
+
+        DisposableEffect(key) {
+            onDispose { removeDestination(key) }
+        }
+    }
+}

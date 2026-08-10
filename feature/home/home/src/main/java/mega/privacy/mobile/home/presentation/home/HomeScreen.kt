@@ -1,60 +1,262 @@
 package mega.privacy.mobile.home.presentation.home
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
-import androidx.navigation3.runtime.NavKey
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.button.MegaOutlinedButton
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
+import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.nodecomponents.components.AddContentFab
+import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
+import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
+import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
+import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
+import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
+import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
+import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.destination.ChatListNavKey
+import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
+import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
+import mega.privacy.android.navigation.destination.SearchNavKey
+import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.transfers.components.UploadingFiles
+import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
+import mega.privacy.mobile.analytics.event.HomeFabOptionsButtonPressedEvent
+import mega.privacy.mobile.analytics.event.HomeSearchBarPressedEvent
+import mega.privacy.mobile.home.presentation.configuration.HomeConfiguration
+import mega.privacy.mobile.home.presentation.home.actions.HomeScreenAction
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HomeScreen(
     state: HomeUiState,
-    onNavigateToConfiguration: () -> Unit,
-    onNavigate: (NavKey) -> Unit,
+    navigationHandler: NavigationHandler,
+    transferHandler: TransferHandler,
+    onHomeConfigurationTooltipDismissed: () -> Unit = {},
+    scanDocumentViewModel: ScanDocumentViewModel = hiltViewModel(),
 ) {
+    val megaNavigator = rememberMegaNavigator()
+    val megaResultContract = rememberMegaResultContract()
+    val rootFolderId = NodeId(-1L)
+    var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
+    val uploadUrisEventState = rememberUploadUrisEventState()
+    val snackbarHostState = LocalSnackBarHostState.current
+    val coroutineScope = rememberCoroutineScope()
+    val uploadHandler = rememberUploadHandler(
+        parentId = rootFolderId,
+        onFilesSelected = { uris ->
+            pitagTrigger = PitagTrigger.Picker
+            uploadUrisEventState.trigger(uris)
+        },
+        megaNavigator = megaNavigator,
+        megaResultContract = megaResultContract
+    )
+
+    val captureHandler = rememberCaptureHandler(
+        onPhotoCaptured = { uri ->
+            pitagTrigger = PitagTrigger.CameraCapture
+            uploadUrisEventState.trigger(listOf(uri))
+        },
+        megaResultContract = megaResultContract
+    )
+
+    val nameCollisionLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.nameCollisionActivityContract
+    ) { message ->
+        if (!message.isNullOrEmpty()) {
+            coroutineScope.launch {
+                snackbarHostState?.showAutoDurationSnackbar(message)
+            }
+        }
+    }
+
+    val fabOption by
+    navigationHandler.monitorResult<HomeFabOption>(HomeFabOptionsBottomSheetNavKey.KEY)
+        .collectAsStateWithLifecycle(null)
+
+    LaunchedEffect(fabOption) {
+        val fabOption = fabOption
+        if (fabOption != null) {
+            when (fabOption) {
+                HomeFabOption.UploadFiles -> uploadHandler.onUploadFilesClicked()
+                HomeFabOption.UploadFolder -> uploadHandler.onUploadFolderClicked()
+                HomeFabOption.ScanDocument -> scanDocumentViewModel.prepareDocumentScanner()
+                HomeFabOption.Capture -> captureHandler.onCaptureClicked()
+                HomeFabOption.CreateNewTextFile -> navigationHandler.navigate(
+                    NewTextFileDialogNavKey(parentNodeId = rootFolderId)
+                )
+
+                HomeFabOption.AddNewSync -> navigationHandler.navigate(SyncNewFolderNavKey())
+                HomeFabOption.AddNewBackup -> navigationHandler.navigate(
+                    SyncNewFolderNavKey(
+                        syncType = SyncType.TYPE_BACKUP
+                    )
+                )
+
+                HomeFabOption.NewChat -> navigationHandler.navigate(
+                    ChatListNavKey(createNewChat = true)
+                )
+
+                HomeFabOption.OpenLink -> navigationHandler.navigate(OpenLinkDialogNavKey)
+            }
+            navigationHandler.clearResult(HomeFabOptionsBottomSheetNavKey.KEY)
+        }
+    }
+
+    var homeConfigurationIconCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
-            .semantics { testTagsAsResourceId = true }
-            .padding(horizontal = 8.dp),
+            .semantics { testTagsAsResourceId = true },
+        topBar = {
+            MegaTopAppBar(
+                modifier = Modifier.testTag(HOME_MAIN_APP_BAR_TAG),
+                title = stringResource(sharedR.string.general_section_home),
+                navigationType = AppBarNavigationType.None,
+                trailingIcons = {
+                    TransfersToolbarWidget {
+                        navigationHandler.navigate(TransfersNavKey())
+                    }
+
+                    if (state is HomeUiState.Data) {
+                        IconButton(
+                            modifier = Modifier
+                                .testTag(CommonMenuAction.Search.testTag)
+                                .align(Alignment.CenterVertically),
+                            onClick = {
+                                Analytics.tracker.trackEvent(HomeSearchBarPressedEvent)
+                                navigationHandler.navigate(
+                                    SearchNavKey(
+                                        parentHandle = -1L,
+                                        nodeSourceType = NodeSourceType.CLOUD_DRIVE
+                                    )
+                                )
+                            },
+                        ) {
+                            MegaIcon(
+                                painter = CommonMenuAction.Search.getIconPainter(),
+                                contentDescription = CommonMenuAction.Search.getDescription(),
+                            )
+                        }
+
+                        if (state.isHomeCustomizationEnabled) {
+                            IconButton(
+                                modifier = Modifier
+                                    .testTag(HomeScreenAction.Customize.testTag)
+                                    .align(Alignment.CenterVertically)
+                                    .onGloballyPositioned { coordinates ->
+                                        homeConfigurationIconCoordinates = coordinates
+                                    },
+                                onClick = {
+                                    onHomeConfigurationTooltipDismissed()
+                                    navigationHandler.navigate(HomeConfiguration)
+                                },
+                            ) {
+                                MegaIcon(
+                                    painter = HomeScreenAction.Customize.getIconPainter(),
+                                    contentDescription = HomeScreenAction.Customize.getDescription(),
+                                )
+                            }
+                            DisposableEffect(Unit) {
+                                onDispose {
+                                    homeConfigurationIconCoordinates = null
+                                }
+                            }
+                        }
+                    }
+                },
+            )
+        },
+        floatingActionButton = {
+            if (state is HomeUiState.Data) {
+                AddContentFab(
+                    modifier = Modifier
+                        .testTag(HOME_FAB_TAG)
+                        .applyScrollToHideFabBehavior(),
+                    visible = true,
+                    onClick = {
+                        Analytics.tracker.trackEvent(HomeFabOptionsButtonPressedEvent)
+                        navigationHandler.navigate(HomeFabOptionsBottomSheetNavKey)
+                    }
+                )
+            }
+        },
     ) { paddingValues ->
         when (state) {
             is HomeUiState.Data -> {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
-                    contentPadding = PaddingValues(bottom = 50.dp),
+                        .padding(paddingValues.excludingBottomPadding()),
+                    contentPadding = PaddingValues(top = 8.dp, bottom = 80.dp),
                 ) {
                     items(state.widgets, key = { it.identifier }) { it ->
-                        it.content(Modifier, onNavigate)
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                    item {
-                        MegaOutlinedButton(
-                            text = "Configure Widgets",
-                            onClick = onNavigateToConfiguration,
-                            modifier = Modifier.fillMaxWidth()
+                        it.content(
+                            Modifier.padding(bottom = 16.dp),
+                            navigationHandler,
+                            transferHandler
                         )
                     }
                 }
+            }
+
+            is HomeUiState.Offline -> {
+                HomeOfflineScreen(
+                    hasOfflineFiles = state.hasOfflineFiles,
+                    onViewOfflineFilesClick = {
+                        navigationHandler.navigate(
+                            mega.privacy.android.navigation.destination.OfflineNavKey()
+                        )
+                    },
+                    modifier = Modifier.padding(paddingValues.excludingBottomPadding()),
+                )
             }
 
             is HomeUiState.Loading -> {
@@ -64,9 +266,41 @@ internal fun HomeScreen(
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    MegaText(text = "Home Screen Loading")
+                    // Blank screen
                 }
             }
         }
     }
+
+    HomeConfigurationTooltip(
+        state = state,
+        iconCoordinates = homeConfigurationIconCoordinates,
+        onDismiss = onHomeConfigurationTooltipDismissed,
+        onNavigateToConfiguration = {
+            onHomeConfigurationTooltipDismissed()
+            navigationHandler.navigate(HomeConfiguration)
+        },
+    )
+
+    UploadingFiles(
+        nameCollisionLauncher = nameCollisionLauncher,
+        parentNodeId = rootFolderId,
+        urisEvent = uploadUrisEventState.event,
+        onUrisConsumed = uploadUrisEventState::consume,
+        pitagTrigger = pitagTrigger,
+        onStartUpload = { transferTriggerEvent ->
+            transferHandler.setTransferEvent(transferTriggerEvent)
+            pitagTrigger = PitagTrigger.NotApplicable
+        },
+    )
+
+    ScanDocumentHandler(
+        parentNodeId = rootFolderId,
+        navigate = navigationHandler::navigate,
+        viewModel = scanDocumentViewModel
+    )
+
 }
+
+internal const val HOME_FAB_TAG = "home_screen:add_content_fab"
+internal const val HOME_MAIN_APP_BAR_TAG = "home_screen:main_app_bar"

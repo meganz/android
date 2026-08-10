@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 
 
 /**
@@ -14,8 +13,7 @@ import de.palm.composestateevents.triggered
  * @param writePermissionDeniedEvent Triggered if the write permission was denied by the user
  * @param seedCopiedToClipboardEvent Triggered if the seed is copied to clipboard
  * @param seed The seed that show in the UI as 13 unique codes
- * @param twoFAPin Typed 2FA pin provided by the authentication App from the user
- * @param isFirstTime2FA Triggered if it is the first time the 2FA is requested.
+ * @param twoFAPin Typed 2FA pin (0..6 digits) provided by the authentication App from the user.
  * @param userEmail The current user email required to generate the 2FA url to be copied to clipboard
  * @param isQRCodeGenerationCompleted UI state to check if generating the QR code process was completed or not
  * @param qrBitmap the qr code bitmap generated from the 2FA codes to display in the view
@@ -30,8 +28,7 @@ data class TwoFactorAuthenticationUIState(
     val writePermissionDeniedEvent: StateEvent = consumed,
     val seedCopiedToClipboardEvent: StateEvent = consumed,
     val seed: String? = null,
-    val twoFAPin: List<String> = listOf("", "", "", "", "", ""),
-    val isFirstTime2FA: StateEvent = triggered,
+    val twoFAPin: String = "",
     val userEmail: String? = null,
     val isQRCodeGenerationCompleted: Boolean = false,
     val qrBitmap: Bitmap? = null,

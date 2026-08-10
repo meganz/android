@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.TakeDownAlert
 import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
 import mega.privacy.android.domain.entity.UnknownAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingAcceptedAlert
+import mega.privacy.android.domain.entity.UpdatedSharedNodesAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingDeniedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingAcceptedAlert
@@ -47,6 +48,8 @@ import java.time.ZonedDateTime
 import javax.inject.Inject
 
 private const val CREATED_TIME_INDEX = 0L
+private const val PAYMENT_PLAN_NAME_INDEX = 0L
+private const val PAYMENT_EXPIRY_TIME_INDEX = 1L
 
 internal class UserAlertMapper @Inject constructor() {
     suspend operator fun invoke(
@@ -216,6 +219,13 @@ internal suspend fun toUserAlert(
                 isOwnChange = megaUserAlert.isOwnChange,
                 contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
                 nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
+                destination = getDestination(
+                    megaUserAlert,
+                    nodeProvider,
+                    rootParentNodeProvider,
+                    rubbishNodeProvider,
+                    rootNodeProvider
+                )
             )
         }
 
@@ -233,6 +243,13 @@ internal suspend fun toUserAlert(
                     isOwnChange = megaUserAlert.isOwnChange,
                     nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
                     contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                    destination = getDestination(
+                        megaUserAlert,
+                        nodeProvider,
+                        rootParentNodeProvider,
+                        rubbishNodeProvider,
+                        rootNodeProvider
+                    )
                 )
             } else {
                 val node = getNode(megaUserAlert, nodeProvider)
@@ -244,6 +261,13 @@ internal suspend fun toUserAlert(
                     nodeId = node?.handle,
                     nodeName = node?.name,
                     contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                    destination = getDestination(
+                        megaUserAlert,
+                        nodeProvider,
+                        rootParentNodeProvider,
+                        rubbishNodeProvider,
+                        rootNodeProvider
+                    )
                 )
             }
 
@@ -262,6 +286,13 @@ internal suspend fun toUserAlert(
                 folderCount = megaUserAlert.getNumber(folderIndex).toInt(),
                 fileCount = megaUserAlert.getNumber(fileIndex).toInt(),
                 contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                destination = getDestination(
+                    megaUserAlert,
+                    nodeProvider,
+                    rootParentNodeProvider,
+                    rubbishNodeProvider,
+                    rootNodeProvider
+                )
             )
         }
 
@@ -275,6 +306,33 @@ internal suspend fun toUserAlert(
                 nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
                 itemCount = megaUserAlert.getNumber(itemCountIndex).toInt(),
                 contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                destination = getDestination(
+                    megaUserAlert,
+                    nodeProvider,
+                    rootParentNodeProvider,
+                    rubbishNodeProvider,
+                    rootNodeProvider
+                )
+            )
+        }
+
+        MegaUserAlert.TYPE_UPDATEDSHAREDNODES -> {
+            val itemCountIndex: Long = 0
+            UpdatedSharedNodesAlert(
+                id = megaUserAlert.id,
+                seen = megaUserAlert.seen,
+                createdTime = megaUserAlert.getTimestamp(CREATED_TIME_INDEX),
+                isOwnChange = megaUserAlert.isOwnChange,
+                nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
+                itemCount = megaUserAlert.getNumber(itemCountIndex).toInt(),
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                destination = getDestination(
+                    megaUserAlert,
+                    nodeProvider,
+                    rootParentNodeProvider,
+                    rubbishNodeProvider,
+                    rootNodeProvider
+                )
             )
         }
 
@@ -285,7 +343,7 @@ internal suspend fun toUserAlert(
                 createdTime = megaUserAlert.getTimestamp(CREATED_TIME_INDEX),
                 isOwnChange = megaUserAlert.isOwnChange,
                 heading = megaUserAlert.heading,
-                title = megaUserAlert.title,
+                planName = megaUserAlert.getString(PAYMENT_PLAN_NAME_INDEX),
             )
         }
 
@@ -296,7 +354,7 @@ internal suspend fun toUserAlert(
                 createdTime = megaUserAlert.getTimestamp(CREATED_TIME_INDEX),
                 isOwnChange = megaUserAlert.isOwnChange,
                 heading = megaUserAlert.heading,
-                title = megaUserAlert.title,
+                planName = megaUserAlert.getString(PAYMENT_PLAN_NAME_INDEX),
             )
         }
 
@@ -307,7 +365,7 @@ internal suspend fun toUserAlert(
                 createdTime = megaUserAlert.getTimestamp(CREATED_TIME_INDEX),
                 isOwnChange = megaUserAlert.isOwnChange,
                 heading = megaUserAlert.heading,
-                title = megaUserAlert.title,
+                endTimestamp = megaUserAlert.getTimestamp(PAYMENT_EXPIRY_TIME_INDEX),
             )
         }
 

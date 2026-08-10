@@ -4,11 +4,10 @@ plugins {
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
-    id("kotlin-android")
 }
 
 android {
-    namespace = "mega.privacy.android.feature.settings"
+    namespace = "mega.privacy.android.feature.chat"
     testOptions {
         unitTests {
             targetSdk = 34
@@ -17,9 +16,15 @@ android {
 }
 
 dependencies {
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
     implementation(project(":domain"))
+    implementation(project(":navigation"))
+    implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
+
     implementation(lib.mega.core.ui)
     implementation(androidx.material3.window)
     implementation(androidx.bundles.compose.bom)
@@ -27,6 +32,9 @@ dependencies {
     implementation(androidx.hilt.navigation)
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation.compose)
+    implementation(androidx.navigation3.runtime)
+    implementation(androidx.navigation3.ui)
+    implementation(lib.logging.timber)
 
     //test
     testImplementation(project(":core-test"))

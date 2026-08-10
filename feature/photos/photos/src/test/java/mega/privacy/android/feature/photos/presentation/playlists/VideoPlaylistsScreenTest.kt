@@ -1,0 +1,281 @@
+package mega.privacy.android.feature.photos.presentation.playlists
+
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.palm.composestateevents.triggered
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.videosection.PlaylistType
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
+import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.nodes.components.SORT_ORDER_TAG
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.robolectric.annotation.Config
+
+@Config(sdk = [34])
+@RunWith(AndroidJUnit4::class)
+class VideoPlaylistsScreenTest {
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
+    private fun setComposeContent(
+        uiState: VideoPlaylistsTabUiState = VideoPlaylistsTabUiState.Data(),
+        videoPlaylistEditState: VideoPlaylistEditState = VideoPlaylistEditState(),
+        showVideoPlaylistRemovedDialog: Boolean = false,
+        onSortNodes: (NodeSortConfiguration) -> Unit = {},
+        modifier: Modifier = Modifier,
+        onClick: (VideoPlaylistUiEntity) -> Unit = {},
+        onLongClick: (VideoPlaylistUiEntity) -> Unit = {},
+        onConsumedPlaylistRemovedEvent: () -> Unit = {},
+        onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
+        onRemovedDialogDismiss: () -> Unit = {},
+        snackBarQueue: SnackbarEventQueue = mock(),
+        showRenameVideoPlaylistDialog: () -> Unit = {},
+        createVideoPlaylist: (String) -> Unit = {},
+        updatedVideoPlaylistTitle: (NodeId, String) -> Unit = { _, _ -> },
+        resetErrorMessage: () -> Unit = {},
+        resetShowRenameVideoPlaylistDialog: () -> Unit = {},
+        resetShowCreateVideoPlaylistDialog: () -> Unit = {},
+        resetCreateVideoPlaylistSuccessEvent: () -> Unit = {},
+        resetUpdateTitleSuccessEvent: () -> Unit = {},
+        getPresetNewVideoPlaylistTitle: (String) -> String = { "" },
+        onNavigateToDetail: (Long, PlaylistType) -> Unit = { _, _ -> },
+        newlyCreatedVideoPlaylist: (Long) -> Unit = {},
+        contentPadding: PaddingValues = PaddingValues(),
+    ) {
+        composeTestRule.setContent {
+            VideoPlaylistsTabScreen(
+                uiState = uiState,
+                videoPlaylistEditState = videoPlaylistEditState,
+                showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
+                onSortNodes = onSortNodes,
+                modifier = modifier,
+                onClick = onClick,
+                onLongClick = onLongClick,
+                onConsumedPlaylistRemovedEvent = onConsumedPlaylistRemovedEvent,
+                onDeleteButtonClicked = onDeleteButtonClicked,
+                onRemovedDialogDismiss = onRemovedDialogDismiss,
+                snackBarQueue = snackBarQueue,
+                showRenameVideoPlaylistDialog = showRenameVideoPlaylistDialog,
+                createVideoPlaylist = createVideoPlaylist,
+                updatedVideoPlaylistTitle = updatedVideoPlaylistTitle,
+                resetErrorMessage = resetErrorMessage,
+                resetShowRenameVideoPlaylistDialog = resetShowRenameVideoPlaylistDialog,
+                resetShowCreateVideoPlaylistDialog = resetShowCreateVideoPlaylistDialog,
+                resetCreateVideoPlaylistSuccessEvent = resetCreateVideoPlaylistSuccessEvent,
+                resetUpdateTitleSuccessEvent = resetUpdateTitleSuccessEvent,
+                getPresetNewVideoPlaylistTitle = getPresetNewVideoPlaylistTitle,
+                onNavigateToDetail = onNavigateToDetail,
+                newlyCreatedVideoPlaylist = newlyCreatedVideoPlaylist,
+                contentPadding = contentPadding,
+            )
+        }
+    }
+
+    @Test
+    fun `test that loading view is displayed as expected`() {
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Loading
+        )
+
+        VIDEO_PLAYLISTS_TAB_LOADING_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+
+        listOf(
+            VIDEO_PLAYLISTS_TAB_EMPTY_VIEW_TEST_TAG,
+            VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG,
+        ).assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that empty view is displayed as expected`() {
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = emptyList()
+            )
+        )
+
+        VIDEO_PLAYLISTS_TAB_EMPTY_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+
+        listOf(
+            VIDEO_PLAYLISTS_TAB_LOADING_VIEW_TEST_TAG,
+            VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG
+        ).assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that all videos view is displayed as expected`() {
+        val video = createVideoPlaylistUiEntity(1L)
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = listOf(video)
+            )
+        )
+
+        VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+
+        listOf(
+            VIDEO_PLAYLISTS_TAB_LOADING_VIEW_TEST_TAG,
+            VIDEO_PLAYLISTS_TAB_EMPTY_VIEW_TEST_TAG
+        ).assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that all playlists view is displayed when contentPadding is set`() {
+        val video = createVideoPlaylistUiEntity(1L)
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = listOf(video)
+            ),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp),
+        )
+
+        VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that SortBottomSheet is displayed correctly`() {
+        val video = createVideoPlaylistUiEntity(1L)
+        val onSortNodes = mock<(NodeSortConfiguration) -> Unit>()
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = listOf(video)
+            ),
+            onSortNodes = onSortNodes
+        )
+
+        VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+
+        with(SORT_ORDER_TAG.getNodeWithTag()) {
+            assertIsDisplayed()
+            performClick()
+        }
+
+        VIDEO_PLAYLISTS_TAB_SORT_BOTTOM_SHEET_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that RemovePlaylistDialog is displayed when showRemoveDialog is true`() {
+        val video = createVideoPlaylistUiEntity(1L)
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = listOf(video)
+            ),
+            showVideoPlaylistRemovedDialog = true
+        )
+
+        VIDEO_PLAYLISTS_TAB_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that RenameVideoPlaylistDialog is displayed when showUpdateVideoPlaylistDialog is true`() {
+        val video = createVideoPlaylistUiEntity(1L)
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = listOf(video)
+            ),
+            videoPlaylistEditState = VideoPlaylistEditState(
+                showUpdateVideoPlaylist = true
+            )
+        )
+
+        VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that RenameVideoPlaylistDialog is not displayed when showUpdateVideoPlaylistDialog is false`() {
+        val video = createVideoPlaylistUiEntity(1L)
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = listOf(video)
+            )
+        )
+
+        VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that CreateVideoPlaylistDialog is displayed when showCreateVideoPlaylistDialog is true`() {
+        setComposeContent(
+            videoPlaylistEditState = VideoPlaylistEditState(
+                showCreateVideoPlaylist = true
+            )
+        )
+
+        VIDEO_PLAYLISTS_TAB_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that CreateVideoPlaylistDialog is not displayed when showCreateVideoPlaylistDialog is false`() {
+        setComposeContent()
+
+        VIDEO_PLAYLISTS_TAB_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that resetShowRenameVideoPlaylistDialog is called when updateTitleSuccessEvent is triggered`() {
+        val resetShowRenameVideoPlaylistDialog = mock<() -> Unit>()
+        setComposeContent(
+            videoPlaylistEditState = VideoPlaylistEditState(
+                updateTitleSuccessEvent = triggered
+            ),
+            resetShowRenameVideoPlaylistDialog = resetShowRenameVideoPlaylistDialog,
+        )
+
+        composeTestRule.waitForIdle()
+
+        verify(resetShowRenameVideoPlaylistDialog).invoke()
+    }
+
+    @Test
+    fun `test that onNavigateToSelectVideos is called when createVideoPlaylistSuccessEvent is triggered`() {
+        val newlyCreatedVideoPlaylist = mock<(Long) -> Unit>()
+        val playlist = mock<UserVideoPlaylist> {
+            on { id }.thenReturn(NodeId(1L))
+        }
+        setComposeContent(
+            videoPlaylistEditState = VideoPlaylistEditState(
+                createVideoPlaylistSuccessEvent = triggered(playlist)
+            ),
+            newlyCreatedVideoPlaylist = newlyCreatedVideoPlaylist,
+        )
+
+        verify(newlyCreatedVideoPlaylist).invoke(playlist.id.longValue)
+    }
+
+    private fun String.assertIsDisplayedWithTag() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsDisplayed()
+
+
+    private fun List<String>.assertIsNotDisplayedWithTag() =
+        onEach {
+            it.assertIsNotDisplayedWithTag()
+        }
+
+    private fun String.assertIsNotDisplayedWithTag() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsNotDisplayed()
+
+    private fun String.getNodeWithTag() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true)
+
+    private fun createVideoPlaylistUiEntity(
+        handle: Long,
+        title: String = "Video playlist $handle",
+        playlistType: PlaylistType = PlaylistType.User,
+    ) = mock<VideoPlaylistUiEntity> {
+        on { id }.thenReturn(NodeId(handle))
+        on { this.title }.thenReturn(title)
+        on { type }.thenReturn(playlistType)
+    }
+}

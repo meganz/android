@@ -16,15 +16,32 @@ import kotlinx.serialization.Serializable
 data class MoveToRubbishOrDeleteDialogArgs(
     val isInRubbish: Boolean,
     val nodeHandles: List<Long>
-) : NavKey
+) : NavKey {
+    companion object {
+        /** Result key published when the user confirms the positive action. */
+        const val RESULT = "MoveToRubbishOrDeleteDialogArgs:result"
+    }
+}
+
+/**
+ * Result published by [MoveToRubbishOrDeleteNodeDialogM3] when the user clicks the
+ * positive button. [isInRubbish] mirrors the dialog mode so subscribers can tell
+ * apart a confirmed Move-to-Rubbish from a confirmed Delete-Permanently.
+ */
+@Serializable
+data class MoveToRubbishOrDeleteDialogResult(val isInRubbish: Boolean)
 
 /**
  * Navigation function to add the move to rubbish or delete dialog to the navigation graph
  *
- * @param onBack Callback when navigating back
+ * @param onBack Callback when the dialog is dismissed without confirming (cancel or back press).
+ *   It is NOT called on confirm — [returnResult] already pops the dialog off the back stack.
+ * @param returnResult Callback to publish [MoveToRubbishOrDeleteDialogResult] when the user
+ *   confirms; subscribers monitor [MoveToRubbishOrDeleteDialogArgs.RESULT].
  */
 internal fun EntryProviderScope<NavKey>.moveToRubbishOrDeleteDialogM3(
     onBack: () -> Unit,
+    returnResult: (String, MoveToRubbishOrDeleteDialogResult) -> Unit,
 ) {
     entry<MoveToRubbishOrDeleteDialogArgs>(
         metadata = DialogSceneStrategy.dialog(
@@ -36,7 +53,18 @@ internal fun EntryProviderScope<NavKey>.moveToRubbishOrDeleteDialogM3(
         MoveToRubbishOrDeleteNodeDialogM3(
             nodes = key.nodeHandles,
             isNodeInRubbish = key.isInRubbish,
-            onDismiss = onBack
+            onDismiss = onBack,
+            onConfirm = {
+                // returnResult already pops this dialog off the back stack. Do NOT also call
+                // onBack() here — that extra pop removed the screen behind the dialog (e.g. the
+                // open shared folder, or the text editor), sending the user too far back. Screens
+                // that need to close themselves after the move (e.g. the text editor) do so via
+                // their own result monitor on MoveToRubbishOrDeleteDialogArgs.RESULT.
+                returnResult(
+                    MoveToRubbishOrDeleteDialogArgs.RESULT,
+                    MoveToRubbishOrDeleteDialogResult(isInRubbish = key.isInRubbish),
+                )
+            },
         )
     }
 }

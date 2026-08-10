@@ -39,9 +39,14 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CHEC
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_ERROR
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_SUCCESS
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_BACKUP_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_DEVICE_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_FOLDER_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_IS_LOCAL
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_FILE_INDEX
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NOT_ENOUGH_STORAGE
@@ -71,6 +76,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAct
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
+import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -86,6 +92,7 @@ import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
+import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
@@ -99,17 +106,20 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFileSizeDifferenceUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleCUTransferEventsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.HasLocalFolderConflictWithSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsWifiNotSatisfiedUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCrossDeviceFolderConflictsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorIsChargingRequiredToUploadContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
@@ -124,6 +134,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
@@ -134,6 +145,7 @@ import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOve
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import timber.log.Timber
+import java.io.File
 import java.time.Instant
 import java.util.Hashtable
 import kotlin.time.Duration.Companion.milliseconds
@@ -148,6 +160,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
     private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
     private val isSecondaryFolderSetUseCase: IsSecondaryFolderSetUseCase,
     private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
@@ -200,6 +213,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val handleCUTransferEventsUseCase: HandleCUTransferEventsUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorCrossDeviceFolderConflictsUseCase: MonitorCrossDeviceFolderConflictsUseCase,
+    private val hasLocalFolderConflictWithSyncUseCase: HasLocalFolderConflictWithSyncUseCase,
+    private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -297,6 +314,11 @@ class CameraUploadsWorker @AssistedInject constructor(
     private var monitorParentNodesDeletedJob: Job? = null
 
     /**
+     * Job to monitor cross-device folder conflicts
+     */
+    private var monitorCrossDeviceFolderConflictsJob: Job? = null
+
+    /**
      * Job to retrieve files to upload
      */
     private val retrieveFilesJob = Job()
@@ -320,7 +342,9 @@ class CameraUploadsWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         runCatching {
             Timber.d("Start CU Worker")
-            crashReporter.log("${CameraUploadsWorker::class.java.simpleName} Started")
+            // Determine if this is a periodic or one-time worker based on tags
+            val isPeriodic = tags.contains("CAMERA_UPLOAD_TAG")
+            crashReporter.log("${CameraUploadsWorker::class.java.simpleName} Started with isPeriodic: $isPeriodic")
             // Signal to not kill the worker if the app is killed
             runCatching { setForeground(getForegroundInfo()) }.onFailure {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && it is ForegroundServiceStartNotAllowedException) {
@@ -330,15 +354,16 @@ class CameraUploadsWorker @AssistedInject constructor(
                 }
             }
 
-            monitorConnectivityStatusJob = monitorConnectivityStatus()
-            monitorBatteryLevelAndChargingStatusesJob = monitorBatteryLevelAndChargingStatusesJob()
-            monitorStorageOverQuotaStatusJob = monitorStorageOverQuotaStatus()
-            monitorParentNodesDeletedJob = monitorParentNodesDeleted()
-            monitorCameraUploadsTransfers = monitorCameraUploadsTransfers()
-
-            handleLocalIpChangeUseCase(shouldRetryChatConnections = false)
-
             if (canRunCameraUploads()) {
+                monitorConnectivityStatusJob = monitorConnectivityStatus()
+                monitorBatteryLevelAndChargingStatusesJob =
+                    monitorBatteryLevelAndChargingStatusesJob()
+                monitorStorageOverQuotaStatusJob = monitorStorageOverQuotaStatus()
+                monitorParentNodesDeletedJob = monitorParentNodesDeleted()
+                monitorCrossDeviceFolderConflictsJob = monitorCrossDeviceFolderConflicts()
+                monitorCameraUploadsTransfers = monitorCameraUploadsTransfers()
+
+                handleLocalIpChangeUseCase(shouldRetryChatConnections = false)
                 Timber.d("Starting upload process")
                 sendStartUploadStatus()
 
@@ -368,9 +393,12 @@ class CameraUploadsWorker @AssistedInject constructor(
             withContext(NonCancellable) {
                 Timber.e(
                     t = throwable,
-                    message = "Camera Uploads process aborted".apply {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                            "$this, worker stopReason is $stopReason"
+                    message = "Camera Uploads process aborted".let {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            "$it, worker stopReason is $stopReason"
+                        } else {
+                            it
+                        }
                     }
                 )
 
@@ -389,12 +417,29 @@ class CameraUploadsWorker @AssistedInject constructor(
                 }
             }
         }
+        finalizeWork()
+    }
 
-        return@withContext withContext(NonCancellable) {
+    private suspend fun finalizeWork(): Result {
+        return runCatching {
             cleanResources()
             sendFinishedStatus(finishedReason ?: CameraUploadsFinishedReason.COMPLETED)
             endWork(finishedReason ?: CameraUploadsFinishedReason.COMPLETED, restartMode).also {
                 crashReporter.log("${CameraUploadsWorker::class.java.simpleName} Finished")
+            }
+        }.getOrElse {
+            Timber.e(it)
+            return when {
+                // Fail only if the app explicitly cancelled the work on Android S or newer.
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && stopReason == STOP_REASON_CANCELLED_BY_APP -> {
+                    Timber.d("Camera UploadsWorker failed")
+                    Result.failure()
+                }
+                // For all other cases, including older OS versions or different stop reasons, retry.
+                else -> {
+                    Timber.d("Camera UploadsWorker retried")
+                    Result.retry()
+                }
             }
         }
     }
@@ -423,7 +468,9 @@ class CameraUploadsWorker @AssistedInject constructor(
 
             else -> {
                 cancelAllTransfers()
-                sendTransfersInterruptedInfoToBackupCenter()
+                if (finishedReason != CameraUploadsFinishedReason.UNKNOWN) {
+                    sendTransfersInterruptedInfoToBackupCenter()
+                }
                 when (restartMode) {
                     CameraUploadsRestartMode.RestartImmediately -> {
                         Result.retry()
@@ -533,6 +580,31 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
+     * Monitors folder conflicts from other devices using Camera/Media Uploads folders
+     * Delegates to domain use case for cleaner separation of concerns
+     */
+    private fun CoroutineScope.monitorCrossDeviceFolderConflicts() = launch {
+        monitorCrossDeviceFolderConflictsUseCase()
+            .collect { conflictResult ->
+                if (conflictResult != null) {
+                    Timber.w("Cross-device folder conflict detected: $conflictResult")
+                    val (deviceName, backupName) = extractConflictInfo(conflictResult.folderUsageResult)
+                    val handle = getUploadFolderHandleUseCase(conflictResult.cameraUploadFolderType)
+                    sendFolderConflictWithSyncOrBackupStatus(
+                        deviceName = deviceName,
+                        backupName = backupName,
+                        folderName = getNodeNameByHandle(handle),
+                        isLocalFolder = false,
+                    )
+                    abortWork(
+                        reason = CameraUploadsFinishedReason.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP,
+                        restartMode = CameraUploadsRestartMode.Stop
+                    )
+                }
+            }
+    }
+
+    /**
      * Monitors and processes only the Camera Uploads Transfers
      */
     private fun CoroutineScope.monitorCameraUploadsTransfers() = launch {
@@ -625,6 +697,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 !checkOrCreatePrimaryUploadNodes() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
                 isMediaUploadsEnabledUseCase() && !checkOrCreateSecondaryUploadNodes() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
                 !initializeBackup() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
+                hasFolderConflictWithSyncOrBackup() -> CameraUploadsFinishedReason.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP
                 !createTempCacheFile() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
                 else -> null
             }
@@ -637,6 +710,10 @@ class CameraUploadsWorker @AssistedInject constructor(
             CameraUploadsFinishedReason.LOCAL_PRIMARY_FOLDER_NOT_VALID,
             CameraUploadsFinishedReason.BUSINESS_ACCOUNT_EXPIRED,
                 -> CameraUploadsRestartMode.StopAndDisable
+
+            // stop (user must fix the conflict)
+            CameraUploadsFinishedReason.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP,
+                -> CameraUploadsRestartMode.Stop
 
             // reschedule
             else -> CameraUploadsRestartMode.Reschedule
@@ -1376,6 +1453,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             monitorBatteryLevelAndChargingStatusesJob,
             monitorStorageOverQuotaStatusJob,
             monitorParentNodesDeletedJob,
+            monitorCrossDeviceFolderConflictsJob,
             sendBackupHeartbeatJob,
             monitorCameraUploadsTransfers,
         ).forEach { it?.cancelAndJoin() }
@@ -1390,7 +1468,16 @@ class CameraUploadsWorker @AssistedInject constructor(
         if (!isConnectedToInternetUseCase()) return
 
         // Update both Primary and Secondary Folder Backup States to TEMPORARILY_DISABLED
-        updateBackupState(BackupState.TEMPORARILY_DISABLED)
+        updateBackupState(BackupState.TEMPORARILY_DISABLED).apply {
+            val stopReasonString = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                stopReason
+            } else {
+                "N/A (API < 31)"
+            }
+            Timber.d(
+                "updateBackupState(BackupState.TEMPORARILY_DISABLED) called with finishedReason: $finishedReason, stopReason: $stopReasonString"
+            )
+        }
 
         // Send an INACTIVE Heartbeat Status for both Primary and Secondary Folders
         updateBackupHeartbeatStatus(HeartbeatStatus.INACTIVE)
@@ -1735,6 +1822,148 @@ class CameraUploadsWorker @AssistedInject constructor(
             Timber.w(it)
         }
     }
+
+    /**
+     * Notify observers that Camera/Media Uploads folder conflicts with an existing Sync or Backup folder
+     * (either on the current device or on another device)
+     * @param deviceName The name of the device where the conflicting sync/backup is located
+     * @param backupName The name of the conflicting sync/backup
+     */
+    private suspend fun sendFolderConflictWithSyncOrBackupStatus(
+        deviceName: String? = null,
+        backupName: String? = null,
+        folderName: String? = null,
+        isLocalFolder: Boolean = false,
+    ) {
+        runCatching {
+            setProgress(
+                workDataOf(
+                    STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP,
+                    CONFLICT_DEVICE_NAME to (deviceName ?: ""),
+                    CONFLICT_BACKUP_NAME to (backupName ?: ""),
+                    CONFLICT_FOLDER_NAME to (folderName ?: ""),
+                    CONFLICT_IS_LOCAL to isLocalFolder,
+                )
+            )
+        }.onFailure { Timber.w(it) }
+    }
+
+    /**
+     * Checks if any Camera Uploads local or remote folder conflicts with an existing
+     * Sync or Backup folder. Local folders are checked first, then remote folders.
+     *
+     * @return true if a conflict is detected
+     */
+    private suspend fun hasFolderConflictWithSyncOrBackup(): Boolean {
+        if (hasLocalFolderConflictWithSyncOrBackup()) return true
+        if (hasRemoteFolderConflictWithSyncOrBackup()) return true
+        return false
+    }
+
+    /**
+     * Checks if the Camera Uploads or Media Uploads local folder conflicts with an existing
+     * Sync or Backup local folder.
+     *
+     * @return true if a local folder conflict is detected
+     */
+    private suspend fun hasLocalFolderConflictWithSyncOrBackup(): Boolean {
+        val primaryPath = getPrimaryFolderPathUseCase()
+        if (hasLocalFolderConflictWithSyncUseCase(primaryPath)) {
+            Timber.d("Camera Uploads local folder conflicts with sync/backup: $primaryPath")
+            sendFolderConflictWithSyncOrBackupStatus(
+                folderName = primaryPath.let { File(it).name },
+                isLocalFolder = true,
+            )
+            return true
+        }
+
+        if (isMediaUploadsEnabledUseCase()) {
+            val mediaUploadsPath = getSecondaryFolderPathUseCase()
+            if (hasLocalFolderConflictWithSyncUseCase(mediaUploadsPath)) {
+                Timber.d("Media Uploads local folder conflicts with sync/backup: $mediaUploadsPath")
+                sendFolderConflictWithSyncOrBackupStatus(
+                    folderName = mediaUploadsPath.let { File(it).name },
+                    isLocalFolder = true,
+                )
+                return true
+            }
+        }
+
+        return false
+    }
+
+    /**
+     * Checks if the Camera Uploads or Media Uploads remote folder conflicts with an existing
+     * Sync or Backup folder across devices.
+     *
+     * @return true if a remote folder conflict is detected
+     */
+    private suspend fun hasRemoteFolderConflictWithSyncOrBackup(): Boolean {
+        val primaryHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)
+        if (primaryHandle == -1L) {
+            return false
+        }
+        val primaryUsage = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+            nodeId = NodeId(primaryHandle),
+            isSyncFolderSelection = false,
+            shouldExcludeCurrentDevice = false,
+            useCache = true,
+        )
+        if (primaryUsage != FolderUsageResult.NotUsed) {
+            Timber.d("Camera Uploads remote folder conflicts with sync/backup: $primaryHandle")
+            val (deviceName, backupName) = extractConflictInfo(primaryUsage)
+            sendFolderConflictWithSyncOrBackupStatus(
+                deviceName = deviceName,
+                backupName = backupName,
+                folderName = getNodeNameByHandle(primaryHandle),
+                isLocalFolder = false,
+            )
+            return true
+        }
+
+        if (isMediaUploadsEnabledUseCase()) {
+            val secondaryHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
+            if (secondaryHandle == -1L) {
+                return false
+            }
+            val secondaryUsage = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId = NodeId(secondaryHandle),
+                isSyncFolderSelection = false,
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
+            )
+            if (secondaryUsage != FolderUsageResult.NotUsed) {
+                Timber.d("Media Uploads remote folder conflicts with sync/backup: $secondaryHandle")
+                val (deviceName, backupName) = extractConflictInfo(secondaryUsage)
+                sendFolderConflictWithSyncOrBackupStatus(
+                    deviceName = deviceName,
+                    backupName = backupName,
+                    folderName = getNodeNameByHandle(secondaryHandle),
+                    isLocalFolder = false,
+                )
+                return true
+            }
+        }
+
+        return false
+    }
+
+    /**
+     * Extracts device name and backup name from a [FolderUsageResult] conflict variant.
+     */
+    private fun extractConflictInfo(result: FolderUsageResult): Pair<String?, String?> =
+        when (result) {
+            is FolderUsageResult.UsedBySyncOrBackup -> result.deviceName to result.backupName
+            is FolderUsageResult.UsedBySyncOrBackupParent -> result.deviceName to result.backupName
+            is FolderUsageResult.UsedBySyncOrBackupChild -> result.deviceName to result.backupName
+            else -> null to null
+        }
+
+    /**
+     * Gets the display name of a node by its handle.
+     */
+    private suspend fun getNodeNameByHandle(handle: Long): String? =
+        runCatching { getNodeByHandleUseCase(handle)?.name }.getOrNull()
 
     /**
      *  Update backup state

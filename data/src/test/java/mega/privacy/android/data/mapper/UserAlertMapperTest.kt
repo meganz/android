@@ -319,14 +319,15 @@ class UserAlertMapperTest {
     }
 
     @Test
-    fun `test that payment reminder alerts return a heading and title`() = runTest {
+    fun `test that payment reminder alerts return a heading and expiry timestamp`() = runTest {
         val expectedHeading = "expectedHeading"
-        val expectedTitle = "expectedTitle"
+        val expectedExpiryTimestamp = 1718000000L
+        val expiryTimestampIndex = 1L
         val megaUserAlert =
             createMegaUserAlert(
                 typeId = MegaUserAlert.TYPE_PAYMENTREMINDER,
                 heading = expectedHeading,
-                title = expectedTitle
+                timestampResult = listOf(expiryTimestampIndex to expectedExpiryTimestamp)
             )
 
         val actual =
@@ -342,18 +343,19 @@ class UserAlertMapperTest {
             ) as PaymentReminderAlert
 
         assertThat(actual.heading).isEqualTo(expectedHeading)
-        assertThat(actual.title).isEqualTo(expectedTitle)
+        assertThat(actual.endTimestamp).isEqualTo(expectedExpiryTimestamp)
     }
 
     @Test
-    fun `test that payment failed alerts return a heading and title`() = runTest {
+    fun `test that payment failed alerts return a heading and plan name`() = runTest {
         val expectedHeading = "expectedHeading"
-        val expectedTitle = "expectedTitle"
+        val expectedPlanName = "Pro I"
+        val planNameIndex = 0L
         val megaUserAlert =
             createMegaUserAlert(
                 typeId = MegaUserAlert.TYPE_PAYMENT_FAILED,
                 heading = expectedHeading,
-                title = expectedTitle
+                stringResult = listOf(planNameIndex to expectedPlanName)
             )
 
         val actual =
@@ -369,18 +371,19 @@ class UserAlertMapperTest {
             ) as PaymentFailedAlert
 
         assertThat(actual.heading).isEqualTo(expectedHeading)
-        assertThat(actual.title).isEqualTo(expectedTitle)
+        assertThat(actual.planName).isEqualTo(expectedPlanName)
     }
 
     @Test
-    fun `test that payment succeeded alerts return a heading and title`() = runTest {
+    fun `test that payment succeeded alerts return a heading and plan name`() = runTest {
         val expectedHeading = "expectedHeading"
-        val expectedTitle = "expectedTitle"
+        val expectedPlanName = "Pro I"
+        val planNameIndex = 0L
         val megaUserAlert =
             createMegaUserAlert(
                 typeId = MegaUserAlert.TYPE_PAYMENT_SUCCEEDED,
                 heading = expectedHeading,
-                title = expectedTitle
+                stringResult = listOf(planNameIndex to expectedPlanName)
             )
 
         val actual =
@@ -396,7 +399,7 @@ class UserAlertMapperTest {
             ) as PaymentSucceededAlert
 
         assertThat(actual.heading).isEqualTo(expectedHeading)
-        assertThat(actual.title).isEqualTo(expectedTitle)
+        assertThat(actual.planName).isEqualTo(expectedPlanName)
     }
 
     @Test
@@ -1118,6 +1121,8 @@ private fun createMegaUserAlert(
     title: String? = null,
     numberResult: List<Pair<Long, Long>>? = null,
     handleResult: List<Pair<Long, Long>>? = null,
+    stringResult: List<Pair<Long, String?>>? = null,
+    timestampResult: List<Pair<Long, Long>>? = null,
 ): MegaUserAlert {
     val createdTimeIndex = 0L
     val invalidHandle: Long = -1
@@ -1138,5 +1143,7 @@ private fun createMegaUserAlert(
     }.apply {
         numberResult?.forEach { whenever(this.getNumber(it.first)).thenReturn(it.second) }
         handleResult?.forEach { whenever(this.getHandle(it.first)).thenReturn(it.second) }
+        stringResult?.forEach { whenever(this.getString(it.first)).thenReturn(it.second) }
+        timestampResult?.forEach { whenever(this.getTimestamp(it.first)).thenReturn(it.second) }
     }
 }

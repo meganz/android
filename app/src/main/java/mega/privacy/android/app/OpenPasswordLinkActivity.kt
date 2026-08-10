@@ -14,8 +14,8 @@ import mega.privacy.android.app.main.DecryptAlertDialog.DecryptDialogListener
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -54,10 +54,10 @@ class OpenPasswordLinkActivity : PasscodeActivity(), DecryptDialogListener {
         Timber.d("askForPasswordDialog")
 
         DecryptAlertDialog.Builder()
-            .setTitle(getString(R.string.hint_set_password_protection_dialog))
-            .setPosText(R.string.general_decryp)
+            .setTitle(getString(sharedR.string.password_dialog_hint))
+            .setPosText(sharedR.string.general_decrypt)
             .setNegText(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button)
-            .setErrorMessage(R.string.invalid_link_password)
+            .setErrorMessage(sharedR.string.password_dialog_error)
             .setKey(key)
             .setShownPassword(true)
             .build()
@@ -100,17 +100,17 @@ class OpenPasswordLinkActivity : PasscodeActivity(), DecryptDialogListener {
         Timber.d("onRequestFinish")
         progressBar?.visibility = View.GONE
 
-        if (e.errorCode == MegaError.API_OK && !TextUtil.isTextEmpty(decryptedLink)) {
+        if (e.errorCode == MegaError.API_OK && !decryptedLink.isNullOrBlank()) {
             var intent: Intent? = null
 
-            if (Util.matchRegexs(decryptedLink, Constants.FOLDER_LINK_REGEXS)) {
+            if (Util.matchRegexs(decryptedLink, Constants.FOLDER_LINK_REGEX_ARRAY)) {
                 Timber.d("Folder link url")
                 intent = Intent(
                     this@OpenPasswordLinkActivity,
                     FolderLinkComposeActivity::class.java
                 )
                 intent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
-            } else if (Util.matchRegexs(decryptedLink, Constants.FILE_LINK_REGEXS)) {
+            } else if (Util.matchRegexs(decryptedLink, Constants.FILE_LINK_REGEX_ARRAY)) {
                 Timber.d("Open link url")
                 intent = Intent(
                     this@OpenPasswordLinkActivity,

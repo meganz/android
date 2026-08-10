@@ -1,13 +1,18 @@
 package mega.privacy.android.app.presentation.login.confirmemail
 
+import android.os.SystemClock
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.login.confirmemail.mapper.ResendSignUpLinkErrorMapper
+import mega.privacy.android.app.presentation.login.confirmemail.model.RESEND_EMAIL_COUNTDOWN_SECONDS
 import mega.privacy.android.app.presentation.login.confirmemail.model.ResendSignUpLinkError
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
@@ -23,10 +28,12 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.MockedStatic
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
@@ -35,7 +42,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
-@ExtendWith(CoroutineMainDispatcherExtension::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ConfirmEmailViewModelTest {
 
@@ -45,18 +52,26 @@ class ConfirmEmailViewModelTest {
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase = mock()
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase = mock()
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
 
     private val resendSignUpLinkErrorMapper = ResendSignUpLinkErrorMapper()
 
     private lateinit var underTest: ConfirmEmailViewModel
 
+    private lateinit var systemClock: MockedStatic<SystemClock>
+
     private val email = "test@test.com"
     private val fullName = "Test User"
 
     @BeforeEach
-    fun setUp() = runTest {
+    fun setUp() {
+        systemClock = mockStatic(SystemClock::class.java)
+        // Drive the monotonic clock from the test scheduler so the resend countdown advances with
+        // virtual time and terminates — a fixed value would spin the loop forever on auto-advance.
+        systemClock.`when`<Long> { SystemClock.elapsedRealtime() }
+            .thenAnswer { extension.testDispatcher.scheduler.currentTime }
+
         whenever(monitorAccountConfirmationUseCase()).thenReturn(flowOf(false))
         whenever(monitorEphemeralCredentialsUseCase()).thenReturn(emptyFlow())
 
@@ -77,12 +92,19 @@ class ConfirmEmailViewModelTest {
 
     @AfterEach
     fun tearDown() {
+        systemClock.close()
         reset(
             monitorAccountConfirmationUseCase,
             resendSignUpLinkUseCase,
             cancelCreateAccountUseCase,
             saveLastRegisteredEmailUseCase,
         )
+    }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension()
     }
 
     @Test
@@ -222,6 +244,63 @@ class ConfirmEmailViewModelTest {
             assertThat(expectMostRecentItem().message).isNull()
         }
     }
+
+    @Test
+    fun `test that the resend button is disabled with the full countdown when the screen is shown`() =
+        runTest {
+            underTest.uiState.test {
+                val item = expectMostRecentItem()
+                assertThat(item.resendCountdownSeconds).isEqualTo(RESEND_EMAIL_COUNTDOWN_SECONDS)
+                assertThat(item.canResend).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the resend button is enabled once the cooldown elapses`() = runTest {
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val item = expectMostRecentItem()
+            assertThat(item.resendCountdownSeconds).isEqualTo(0)
+            assertThat(item.canResend).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that the countdown restarts after successfully resending the sign up link`() =
+        runTest {
+            whenever(resendSignUpLinkUseCase(email = email, fullName = fullName)) doReturn email
+            // Let the initial cooldown fully elapse.
+            advanceUntilIdle()
+
+            underTest.resendSignUpLink(email = email, fullName = fullName)
+            runCurrent()
+
+            underTest.uiState.test {
+                val item = expectMostRecentItem()
+                assertThat(item.resendCountdownSeconds).isEqualTo(RESEND_EMAIL_COUNTDOWN_SECONDS)
+                assertThat(item.canResend).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the countdown restarts after failing to resend the sign up link`() =
+        runTest {
+            whenever(
+                resendSignUpLinkUseCase(email = email, fullName = fullName)
+            ) doAnswer { throw CreateAccountException.TooManyAttemptsException }
+            // Let the initial cooldown fully elapse.
+            advanceUntilIdle()
+
+            underTest.resendSignUpLink(email = email, fullName = fullName)
+            runCurrent()
+
+            underTest.uiState.test {
+                val item = expectMostRecentItem()
+                assertThat(item.resendCountdownSeconds).isEqualTo(RESEND_EMAIL_COUNTDOWN_SECONDS)
+                assertThat(item.canResend).isFalse()
+            }
+        }
 
     @Test
     fun `test that name and email update correctly`() = runTest {

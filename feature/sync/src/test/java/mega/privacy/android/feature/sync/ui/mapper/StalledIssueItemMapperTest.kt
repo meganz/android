@@ -3,7 +3,6 @@ package mega.privacy.android.feature.sync.ui.mapper
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -17,6 +16,7 @@ import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueReso
 import mega.privacy.android.feature.sync.ui.model.StalledIssueDetailedInfo
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -392,6 +392,52 @@ internal class StalledIssueItemMapperTest {
 
                 assertThat(result.displayedName).isEqualTo("file.txt")
                 assertThat(result.displayedPath).isEqualTo("primary:Downloads/folder1/folder2")
+                verify(stalledIssueResolutionActionMapper).invoke(
+                    StallIssueType.DownloadIssue,
+                    false
+                )
+            }
+        }
+
+    @Test
+    fun `test that empty pathSegments after drop does not crash and yields empty name and path`() =
+        runTest {
+            mockStatic(Uri::class.java).use { mockedUri ->
+                val uriString = "content://documents/tree/primary:Ringtones"
+                val mockUri: Uri = mock {
+                    on { scheme } doReturn "content"
+                    // Only 2 segments -> drop(3) returns an empty list
+                    on { pathSegments } doReturn listOf("tree", "primary:Ringtones")
+                    on { toString() } doReturn uriString
+                }
+                mockedUri.`when`<Uri> { Uri.parse(uriString) }.thenReturn(mockUri)
+
+                val stalledIssue = StalledIssue(
+                    syncId = 11L,
+                    nodeIds = listOf(NodeId(14L)),
+                    localPaths = listOf(uriString),
+                    issueType = StallIssueType.DownloadIssue,
+                    conflictName = "short uri conflict",
+                    nodeNames = emptyList(),
+                    id = "1_3_0"
+                )
+                val detailedInfo = StalledIssueDetailedInfo("Short URI Title", "Short URI Desc")
+                val resolutionActions = listOf<StalledIssueResolutionAction>()
+
+                whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
+                whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, false))
+                    .thenReturn(resolutionActions)
+                whenever(
+                    fileTypeIconMapper(
+                        any(),
+                        any()
+                    )
+                ).thenReturn(iconPackR.drawable.ic_generic_medium_solid)
+
+                val result = underTest(stalledIssue, emptyList())
+
+                assertThat(result.displayedName).isEqualTo("")
+                assertThat(result.displayedPath).isEqualTo("")
                 verify(stalledIssueResolutionActionMapper).invoke(
                     StallIssueType.DownloadIssue,
                     false

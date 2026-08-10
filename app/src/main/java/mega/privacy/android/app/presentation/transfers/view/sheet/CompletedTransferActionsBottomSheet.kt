@@ -23,23 +23,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.core.content.FileProvider
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.sheets.BottomSheetAction
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.GetLinkActivity
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsViewModel
 import mega.privacy.android.app.presentation.transfers.model.completed.OpenWithEvent
 import mega.privacy.android.app.presentation.transfers.model.completed.ShareLinkEvent
+import mega.privacy.android.app.presentation.transfers.model.completed.ViewInFolderEvent
 import mega.privacy.android.app.presentation.transfers.view.completed.TEST_TAG_COMPLETED_TRANSFERS_VIEW
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -47,10 +47,13 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.core.sharedcomponents.BottomSheetAction
 import mega.privacy.android.feature.transfers.components.CompletedTransferBottomSheetHeader
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.FileStorageNavKey
+import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -68,6 +71,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun CompletedTransferActionsBottomSheet(
     completedTransfer: CompletedTransfer,
+    navigationHandler: NavigationHandler?,
     fileTypeResId: Int?,
     previewUri: Uri?,
     onDismissSheet: () -> Unit,
@@ -84,11 +88,14 @@ fun CompletedTransferActionsBottomSheet(
         fileTypeResId = fileTypeResId,
         previewUri = previewUri,
         uiState = uiState,
+        navigationHandler = navigationHandler,
         onOpenWith = viewModel::openWith,
         onShareLink = viewModel::shareLink,
         onClearTransfer = viewModel::clearTransfer,
         onConsumeOpenWithEvent = viewModel::onConsumeOpenWithEvent,
+        onViewInFolder = viewModel::onViewInFolder,
         onConsumeShareLinkEvent = viewModel::onConsumeShareLinkEvent,
+        onConsumeViewInFolder = viewModel::onConsumeViewInFolder,
         onDismissSheet = onDismissSheet,
         modifier = Modifier,
         sheetState = rememberModalBottomSheetState(),
@@ -105,11 +112,14 @@ fun CompletedTransferActionsBottomSheet(
     fileTypeResId: Int?,
     previewUri: Uri?,
     uiState: CompletedTransferActionsUiState,
+    navigationHandler: NavigationHandler?,
     onOpenWith: (CompletedTransfer) -> Unit,
-    onShareLink: (Long) -> Unit,
+    onShareLink: () -> Unit,
     onClearTransfer: (CompletedTransfer) -> Unit,
+    onViewInFolder: (CompletedTransfer) -> Unit,
     onConsumeOpenWithEvent: () -> Unit,
     onConsumeShareLinkEvent: () -> Unit,
+    onConsumeViewInFolder: () -> Unit,
     onDismissSheet: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
@@ -144,11 +154,8 @@ fun CompletedTransferActionsBottomSheet(
                 onClick = {
                     Analytics.tracker.trackEvent(CompletedTransfersItemViewInFolderMenuItemEvent)
                     if (uiState.isOnline(coroutineScope, snackbarHostState, context)) {
-                        activity?.let {
-                            onViewInFolder(completedTransfer, uiState.parentUri, it)
-                        }
+                        onViewInFolder(completedTransfer)
                     }
-                    onDismissSheet()
                 },
             )
         }
@@ -171,7 +178,7 @@ fun CompletedTransferActionsBottomSheet(
                 onClick = {
                     Analytics.tracker.trackEvent(CompletedTransfersItemShareMenuItemEvent)
                     if (uiState.isOnline(coroutineScope, snackbarHostState, context)) {
-                        onShareLink(handle)
+                        onShareLink()
                     }
                 },
             )
@@ -179,7 +186,7 @@ fun CompletedTransferActionsBottomSheet(
         BottomSheetAction(
             modifier = Modifier.testTag(TEST_TAG_CLEAR_ACTION),
             iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
-            name = stringResource(id = R.string.general_clear),
+            name = stringResource(id = sharedR.string.general_clear),
             onClick = {
                 Analytics.tracker.trackEvent(CompletedTransfersItemClearMenuItemEvent)
                 onClearTransfer(completedTransfer)
@@ -220,6 +227,17 @@ fun CompletedTransferActionsBottomSheet(
             onDismissSheet()
         },
     )
+    EventEffect(
+        event = uiState.viewInFolderEvent,
+        onConsumed = onConsumeViewInFolder,
+    ) { viewInFolderEvent ->
+        if (viewInFolderEvent !is ViewInFolderEvent.Found) {
+            snackbarHostState?.showSnackbar(context.getString(R.string.corrupt_video_dialog_text))
+        } else {
+            onViewInFolderSingleActivity(viewInFolderEvent, navigationHandler)
+        }
+        onDismissSheet()
+    }
 }
 
 internal fun CompletedTransferActionsUiState.isOnline(
@@ -286,39 +304,38 @@ private fun onOpenWith(
     }
 }
 
-private fun onViewInFolder(
-    completedTransfer: CompletedTransfer,
-    parentUri: Uri?,
-    activity: Activity,
+private fun onViewInFolderSingleActivity(
+    viewInFolderEvent: ViewInFolderEvent.Found,
+    navigationHandler: NavigationHandler?,
 ) {
-    with(completedTransfer) {
-        if (completedTransfer.type.isDownloadType()) {
-            val isOffline = isOffline == true
-            val path = parentUri?.toString()?.takeUnless { it.isBlank() } ?: "file://$path"
-
-            Intent(
-                activity,
-                if (isOffline) ManagerActivity::class.java else FileStorageActivity::class.java
-            ).apply {
-                if (isOffline) {
-                    action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
-                    putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, true)
-                } else {
-                    action = FileStorageActivity.Mode.BROWSE_FILES.action
-                }
-                putExtra(FileStorageActivity.EXTRA_PATH, path)
-                putStringArrayListExtra(
-                    FileStorageActivity.EXTRA_FILE_NAMES,
-                    arrayListOf(fileName)
+    when (viewInFolderEvent) {
+        is ViewInFolderEvent.Download -> {
+            navigationHandler?.navigate(
+                FileStorageNavKey(
+                    uriPath = viewInFolderEvent.uriPath.value,
+                    highlightedFiles = listOf(viewInFolderEvent.fileName),
                 )
-            }
-        } else {
-            Intent(activity, ManagerActivity::class.java).apply {
-                action = Constants.ACTION_OPEN_FOLDER
-                putExtra(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, parentHandle)
-                putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, arrayListOf(fileName))
-            }
-        }.let { activity.startActivity(it) }
+            )
+        }
+
+        is ViewInFolderEvent.DownloadToOffline -> {
+            navigationHandler?.navigate(
+                OfflineNavKey(
+                    nodeId = viewInFolderEvent.parentNodeOfflineId,
+                    highlightedFiles = viewInFolderEvent.fileName,
+                    title = viewInFolderEvent.title,
+                )
+            )
+        }
+
+        is ViewInFolderEvent.Upload -> {
+            navigationHandler?.navigate(
+                CloudDriveNavKey(
+                    nodeHandle = viewInFolderEvent.parentNodeId.longValue,
+                    highlightedNodeNames = listOf(viewInFolderEvent.fileName),
+                )
+            )
+        }
     }
 }
 
@@ -372,11 +389,14 @@ private fun CompletedTransferActionsBottomSheetPreview() {
             fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
             previewUri = null,
             uiState = CompletedTransferActionsUiState(),
+            navigationHandler = null,
             onOpenWith = {},
             onShareLink = {},
             onClearTransfer = {},
             onConsumeOpenWithEvent = {},
             onConsumeShareLinkEvent = {},
+            onViewInFolder = {},
+            onConsumeViewInFolder = {},
             onDismissSheet = {},
         )
     }

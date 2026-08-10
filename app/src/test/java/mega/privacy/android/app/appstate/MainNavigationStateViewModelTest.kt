@@ -3,22 +3,23 @@ package mega.privacy.android.app.appstate
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.Serializable
 import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
-import mega.privacy.android.app.presentation.settings.compose.home.view.SettingsHomeViewKtTest
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.navigation.Flagged
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.PreferredSlot
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -48,7 +50,8 @@ class MainNavigationStateViewModelTest {
     private val monitorStartScreenPreferenceDestinationUseCase =
         mock<MonitorStartScreenPreferenceDestinationUseCase>()
     private val screenPreferenceDestinationMapper = mock<ScreenPreferenceDestinationMapper>()
-    private val defaultStartScreen = mock<NavKey>()
+    private val defaultStartScreen = TestMainNavItemNavKey
+    private val navigationResultManager = mock<NavigationResultManager>()
 
     @BeforeAll
     fun initialisation() {
@@ -67,6 +70,7 @@ class MainNavigationStateViewModelTest {
             monitorConnectivityUseCase,
             monitorStartScreenPreferenceDestinationUseCase,
             screenPreferenceDestinationMapper,
+            navigationResultManager
         )
     }
 
@@ -83,7 +87,7 @@ class MainNavigationStateViewModelTest {
         stubConnectivity()
         stubAllEnabledFlaggedItems()
         val mainNavItem = mock<MainNavItem> {
-            on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+            on { destination }.thenReturn(TestMainNavItemNavKey)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
             on { label }.thenReturn(android.R.string.ok)
@@ -113,7 +117,7 @@ class MainNavigationStateViewModelTest {
         stubConnectivity()
         stubEmptyStartScreenPreference()
         val expected = mock<MainNavItem> {
-            on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+            on { destination }.thenReturn(TestMainNavItemNavKey)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
             on { label }.thenReturn(android.R.string.ok)
@@ -127,7 +131,7 @@ class MainNavigationStateViewModelTest {
             on { feature }.thenReturn(disabledFeature)
             with(this as KStubbing<MainNavItem>) {
                 // Using KStubbing to allow for more readable stubbing
-                on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+                on { destination }.thenReturn(TestMainNavItemNavKey)
                 on { preferredSlot }.thenReturn(PreferredSlot.Ordered(2))
                 on { availableOffline }.thenReturn(true)
                 on { label }.thenReturn(android.R.string.cancel)
@@ -138,7 +142,7 @@ class MainNavigationStateViewModelTest {
         val mainDestinations = setOf(expected, notExpected as MainNavItem)
 
         getEnabledFlaggedItemsUseCase.stub {
-            onBlocking { invoke(mainDestinations) }.thenReturn(flow { emit(setOf(expected)) })
+            on { invoke(mainDestinations) }.thenReturn(flow { emit(setOf(expected)) })
         }
 
         initUnderTest(mainDestinations)
@@ -157,7 +161,7 @@ class MainNavigationStateViewModelTest {
         stubConnectivity()
         stubEmptyStartScreenPreference()
         val expected = mock<MainNavItem> {
-            on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+            on { destination }.thenReturn(TestMainNavItemNavKey)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
             on { label }.thenReturn(android.R.string.ok)
@@ -171,7 +175,7 @@ class MainNavigationStateViewModelTest {
             on { feature }.thenReturn(enabledFeature)
             with(this as KStubbing<MainNavItem>) {
                 // Using KStubbing to allow for more readable stubbing
-                on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+                on { destination }.thenReturn(TestMainNavItemNavKey)
                 on { preferredSlot }.thenReturn(PreferredSlot.Ordered(2))
                 on { availableOffline }.thenReturn(true)
                 on { label }.thenReturn(android.R.string.cancel)
@@ -181,7 +185,7 @@ class MainNavigationStateViewModelTest {
         }
         val mainDestinations = setOf(expected, alsoExpected as MainNavItem)
         getEnabledFlaggedItemsUseCase.stub {
-            onBlocking { invoke(mainDestinations) }.thenReturn(flow {
+            on { invoke(mainDestinations) }.thenReturn(flow {
                 emit(
                     setOf(
                         expected,
@@ -207,7 +211,7 @@ class MainNavigationStateViewModelTest {
         stubEmptyStartScreenPreference()
         stubAllEnabledFlaggedItems()
         val mainNavItem = mock<MainNavItem> {
-            on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+            on { destination }.thenReturn(TestMainNavItemNavKey)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
             on { analyticsEventIdentifier }.thenReturn(mock())
@@ -234,7 +238,7 @@ class MainNavigationStateViewModelTest {
             stubEmptyStartScreenPreference()
             stubAllEnabledFlaggedItems()
             val mainNavItem = mock<MainNavItem> {
-                on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+                on { destination }.thenReturn(TestMainNavItemNavKey)
                 on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
                 on { availableOffline }.thenReturn(false)
                 on { analyticsEventIdentifier }.thenReturn(mock())
@@ -260,7 +264,7 @@ class MainNavigationStateViewModelTest {
         stubEmptyStartScreenPreference()
         stubAllEnabledFlaggedItems()
         val mainNavItem = mock<MainNavItem> {
-            on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+            on { destination }.thenReturn(TestMainNavItemNavKey)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(false)
             on { analyticsEventIdentifier }.thenReturn(mock())
@@ -291,7 +295,7 @@ class MainNavigationStateViewModelTest {
     fun `test that start screen destination is set if returned`() = runTest {
         stubConnectivity()
         stubAllEnabledFlaggedItems()
-        val expected = SettingsHomeViewKtTest.TestDestination
+        val expected = TestMainNavItemNavKey
         stubStartScreenPreference(mock<StartScreenDestinationPreference>())
         screenPreferenceDestinationMapper.stub {
             on { invoke(any<StartScreenDestinationPreference>()) }.thenReturn(
@@ -336,6 +340,85 @@ class MainNavigationStateViewModelTest {
                 }
         }
 
+    @Test
+    fun `test that NavigationItems update correctly when network connectivity changes`() = runTest {
+        stubEmptyStartScreenPreference()
+        stubAllEnabledFlaggedItems()
+
+        val onlineNavItem = mock<MainNavItem> {
+            on { destination }.thenReturn(TestMainNavItemNavKey)
+            on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
+            on { availableOffline }.thenReturn(false)
+            on { analyticsEventIdentifier }.thenReturn(mock())
+            on { label }.thenReturn(android.R.string.ok)
+            on { icon }.thenReturn(Icons.Default.Home)
+            on { badge }.thenReturn(null)
+        }
+
+        val offlineNavItem = mock<MainNavItem> {
+            on { destination }.thenReturn(TestMainNavItemNavKey)
+            on { preferredSlot }.thenReturn(PreferredSlot.Ordered(2))
+            on { availableOffline }.thenReturn(true)
+            on { analyticsEventIdentifier }.thenReturn(mock())
+            on { label }.thenReturn(android.R.string.cancel)
+            on { icon }.thenReturn(Icons.Default.Settings)
+            on { badge }.thenReturn(null)
+        }
+
+        val mainDestinations = setOf(onlineNavItem, offlineNavItem)
+
+        // Use MutableStateFlow to better match StateFlow behavior
+        // Start with true, then we can change it during the test
+        val connectivityFlow = MutableStateFlow(true)
+        monitorConnectivityUseCase.stub {
+            on { invoke() }.thenReturn(connectivityFlow)
+        }
+
+        initUnderTest(mainDestinations)
+
+        underTest.state
+            .filterIsInstance<MainNavState.Data>()
+            .test {
+                // Initial state should be connected
+                val connectedState = awaitItem()
+                // Both items should be enabled when connected
+                assertThat(connectedState.mainNavItems.size).isEqualTo(2)
+                assertThat(connectedState.mainNavItems.all { it.isEnabled }).isTrue()
+                assertThat(connectedState.isConnected).isTrue()
+
+                // Change connectivity to false
+                connectivityFlow.value = false
+                awaitItem()
+                val disconnectedState = awaitItem()
+                // Verify isConnected is false
+                assertThat(disconnectedState.isConnected).isFalse()
+                // Only offline-available item should be enabled when disconnected
+                // Find items by their properties to ensure we get the right ones
+                val onlineItem = disconnectedState.mainNavItems.firstOrNull {
+                    it.label == onlineNavItem.label && it.preferredSlot == onlineNavItem.preferredSlot
+                }
+                val offlineItem = disconnectedState.mainNavItems.firstOrNull {
+                    it.label == offlineNavItem.label && it.preferredSlot == offlineNavItem.preferredSlot
+                }
+                assertThat(onlineItem).isNotNull()
+                assertThat(offlineItem).isNotNull()
+                // Verify the online item (availableOffline = false) is disabled when disconnected
+                assertThat(onlineItem?.isEnabled).isFalse()
+                // Verify the offline item (availableOffline = true) is still enabled when disconnected
+                assertThat(offlineItem?.isEnabled).isTrue()
+
+                // Change connectivity back to true
+                connectivityFlow.value = true
+                awaitItem()
+                val reconnectedState = awaitItem()
+                // Both items should be enabled again when reconnected
+                assertThat(reconnectedState.mainNavItems.all { it.isEnabled }).isTrue()
+                assertThat(reconnectedState.isConnected).isTrue()
+
+                cancelAndIgnoreRemainingEvents()
+            }
+    }
+
 
     private fun initUnderTest(
         mainDestinations: Set<MainNavItem>,
@@ -347,11 +430,12 @@ class MainNavigationStateViewModelTest {
             monitorStartScreenPreferenceDestinationUseCase = monitorStartScreenPreferenceDestinationUseCase,
             screenPreferenceDestinationMapper = screenPreferenceDestinationMapper,
             defaultStartScreen = defaultStartScreen,
+            navigationResultManager = navigationResultManager
         )
     }
 
     private fun stubDefaultMainNavigationItems() = setOf(mock<MainNavItem> {
-        on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+        on { destination }.thenReturn(TestMainNavItemNavKey)
         on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
         on { availableOffline }.thenReturn(true)
         on { analyticsEventIdentifier }.thenReturn(mock())
@@ -361,7 +445,7 @@ class MainNavigationStateViewModelTest {
 
     private fun stubEmptyStartScreenPreference() {
         monitorStartScreenPreferenceDestinationUseCase.stub {
-            onBlocking { invoke() }.thenReturn(
+            on { invoke() }.thenReturn(
                 flow {
                     emit(null)
                     awaitCancellation()
@@ -372,7 +456,7 @@ class MainNavigationStateViewModelTest {
 
     private fun stubStartScreenPreference(destination: StartScreenDestinationPreference) {
         monitorStartScreenPreferenceDestinationUseCase.stub {
-            onBlocking { invoke() }.thenReturn(
+            on { invoke() }.thenReturn(
                 flow {
                     emit(destination)
                     awaitCancellation()
@@ -394,7 +478,10 @@ class MainNavigationStateViewModelTest {
 
     private fun stubAllEnabledFlaggedItems() {
         getEnabledFlaggedItemsUseCase.stub {
-            onBlocking { invoke(any<Set<Any>>()) }.thenAnswer { flow { emit(it.arguments.first()) } }
+            on { invoke(any<Set<Any>>()) }.thenAnswer { flow { emit(it.arguments.first()) } }
         }
     }
 }
+
+@Serializable
+private data object TestMainNavItemNavKey : MainNavItemNavKey

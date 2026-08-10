@@ -6,13 +6,14 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import javax.inject.Inject
 
 /**
@@ -20,18 +21,18 @@ import javax.inject.Inject
  */
 class DefaultTransfersNotificationMapper @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val megaNavigator: MegaNavigator,
 ) : TransfersNotificationMapper {
 
     override suspend fun invoke(
         activeTransferTotals: ActiveTransferTotals?,
         paused: Boolean,
     ): Notification {
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            TransfersActivity.getActiveTabIntent(context),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent: PendingIntent =
+            megaNavigator.getPendingIntentWithDestination(
+                context = context,
+                singleActivityDestination = { TransfersNavKey(TransfersNavKey.Tab.Active) }
+            )
         val content = context.getString(R.string.download_touch_to_show)
         val title =
             if (activeTransferTotals == null || activeTransferTotals.totalBytes == 0L) {

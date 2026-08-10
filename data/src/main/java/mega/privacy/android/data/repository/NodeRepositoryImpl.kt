@@ -3,15 +3,20 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.SortOrderSource
@@ -59,6 +64,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -71,9 +77,11 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
-import mega.privacy.android.domain.extension.Chunk
 import mega.privacy.android.domain.extension.ConcurrencyStrategy
+import mega.privacy.android.domain.extension.getNodeMappingStrategy
 import mega.privacy.android.domain.extension.mapAsync
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
@@ -110,6 +118,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val shareDataMapper: ShareDataMapper,
     private val megaExceptionMapper: MegaExceptionMapper,
@@ -137,7 +146,29 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val nodeLabelMapper: NodeLabelMapper,
     private val typedNodeMapper: TypedNodeMapper,
     private val nodePathMapper: NodePathMapper,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : NodeRepository {
+
+    private val sharedNodeUpdates: SharedFlow<NodeUpdate> = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
+        .mapNotNull {
+            it.nodeList?.mapNotNull { megaNode ->
+                val unTypedNode = convertToUnTypedNode(megaNode)
+                if (unTypedNode != null) {
+                    unTypedNode to nodeUpdateMapper(megaNode)
+                } else {
+                    null
+                }
+            }
+        }
+        .map { nodes -> NodeUpdate(nodes.toMap()) }
+        .flowOn(ioDispatcher)
+        .catch { Timber.e(it, "monitorNodeUpdates failed") }
+        .shareIn(
+            scope = applicationScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
+            replay = 0,
+        )
 
     override suspend fun getNodeOutgoingShares(nodeId: NodeId) =
         withContext(ioDispatcher) {
@@ -313,6 +344,7 @@ internal class NodeRepositoryImpl @Inject constructor(
                 )
             }
         }.awaitAll()
+            .filterNotNull()
     }
 
     override suspend fun getNodeChildrenFileTypes(
@@ -335,7 +367,7 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getNodeHistoryVersions(handle: NodeId) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(handle.longValue)?.let { megaNode ->
-            megaApiGateway.getVersions(megaNode).map { version ->
+            megaApiGateway.getVersions(megaNode).mapNotNull { version ->
                 convertToUnTypedNode(node = version, offline = getOfflineNode(version.handle))
             }
         } ?: throw SynchronisationException("Non null node found be null when fetched from api")
@@ -402,22 +434,13 @@ internal class NodeRepositoryImpl @Inject constructor(
             } ?: throw SynchronisationException("Non null node found be null when fetched from api")
         }
 
-    override fun monitorNodeUpdates(): Flow<NodeUpdate> {
-        return megaApiGateway.globalUpdates
-            .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
-            .mapNotNull {
-                it.nodeList?.map { megaNode ->
-                    convertToUnTypedNode(megaNode) to nodeUpdateMapper(megaNode)
-                }
-            }
-            .map { nodes ->
-                NodeUpdate(nodes.toMap())
-            }
-            .flowOn(ioDispatcher)
-    }
+    override fun monitorNodeUpdates(): Flow<NodeUpdate> = sharedNodeUpdates
 
     override fun monitorOfflineNodeUpdates(): Flow<List<Offline>> =
         megaLocalRoomGateway.monitorOfflineUpdates()
+
+    override fun monitorOfflineNodeIds(): Flow<List<Int?>> =
+        megaLocalRoomGateway.monitorOfflineNodeIds()
 
     override suspend fun isNodeInRubbishOrDeleted(nodeHandle: Long): Boolean =
         withContext(ioDispatcher) {
@@ -442,6 +465,10 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {
         megaApiGateway.base64ToHandle(base64)
+    }
+
+    override suspend fun convertHandleToBase64(handle: Long): String = withContext(ioDispatcher) {
+        megaApiGateway.handleToBase64(handle)
     }
 
     override suspend fun getOfflineNodeInformation(nodeHandle: Long) =
@@ -470,14 +497,8 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
 
-    private suspend fun convertToUnTypedNode(
-        node: MegaNode,
-        offline: Offline? = null,
-    ): UnTypedNode {
-        return nodeMapper(
-            megaNode = node, offline = offline,
-        )
-    }
+    private suspend fun convertToUnTypedNode(node: MegaNode, offline: Offline? = null) =
+        nodeMapper(megaNode = node, offline = offline)
 
 
     override suspend fun stopSharingNode(nodeId: NodeId): Unit = withContext(ioDispatcher) {
@@ -538,7 +559,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getInShares(email: String): List<UnTypedNode> = withContext(ioDispatcher) {
         runCatching {
             megaApiGateway.getContact(email)?.let {
-                megaApiGateway.getInShares(it).map { node ->
+                megaApiGateway.getInShares(it).mapNotNull { node ->
                     convertToUnTypedNode(node)
                 }
             }
@@ -713,7 +734,8 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaApiGateway.getNodesByOriginalFingerprint(
                 originalFingerprint = originalFingerprint,
                 parentNode = parentNode,
-            )?.let { megaNodeList -> nodeListMapper(megaNodeList) }.orEmpty()
+            )?.let { nodeListMapper(it) }
+                .orEmpty()
         }
 
     override suspend fun getNodeByFingerprintAndParentNode(
@@ -748,6 +770,12 @@ internal class NodeRepositoryImpl @Inject constructor(
                 ?.let { megaApiGateway.getMegaNodeByHandle(it.longValue) }
             megaApiGateway.getChildNode(parent, name)
                 ?.let { nodeMapper(megaNode = it, offline = getOfflineNode(it.handle)) }
+        }
+
+    override suspend fun doesChildExistByName(parentNodeId: NodeId, name: String): Boolean =
+        withContext(ioDispatcher) {
+            val parent = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
+            megaApiGateway.getChildNode(parent, name) != null
         }
 
     override suspend fun setOriginalFingerprint(nodeId: NodeId, originalFingerprint: String) =
@@ -861,17 +889,22 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun exportNode(nodeToExport: NodeId, expireTime: Long?): String =
+    override suspend fun exportNode(
+        nodeToExport: NodeId,
+        expireTime: Long?,
+        callerName: String,
+    ): String =
         withContext(ioDispatcher) {
             val node = getMegaNodeByHandle(nodeToExport, true)
-            exportNode(node, expireTime)
+            exportNode(node, expireTime, callerName)
         }
 
-    override suspend fun exportNode(node: TypedNode) = withContext(ioDispatcher) {
-        exportNode(megaNodeMapper(node), null)
-    }
+    override suspend fun exportNode(node: TypedNode, callerName: String): String =
+        withContext(ioDispatcher) {
+            exportNode(megaNodeMapper(node), null, callerName)
+        }
 
-    private suspend fun exportNode(node: MegaNode?, expireTime: Long?): String {
+    private suspend fun exportNode(node: MegaNode?, expireTime: Long?, callerName: String): String {
         requireNotNull(node) { "Node to export not found" }
         require(!node.isTakenDown) { "Node to export is taken down" }
 
@@ -879,8 +912,27 @@ internal class NodeRepositoryImpl @Inject constructor(
             return node.publicLink.orEmpty()
         }
         return suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("exportNode") { it.link.orEmpty() }
+            val listener =
+                continuation.getRequestListener("exportNode:$callerName") { it.link.orEmpty() }
             megaApiGateway.exportNode(node, expireTime, listener)
+        }
+    }
+
+    override suspend fun checkNodeAccessibility(nodeId: NodeId) = withContext(ioDispatcher) {
+        val node = getMegaNodeByHandle(nodeId, true)
+        requireNotNull(node) { "Node not found for handle ${nodeId.longValue}" }
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> continuation.resumeWith(Result.success(Unit))
+                        else -> continuation.resumeWith(
+                            Result.failure(megaExceptionMapper(error, "checkNodeAccessibility"))
+                        )
+                    }
+                }
+            )
+            megaApiGateway.getDownloadUrl(node, listener)
         }
     }
 
@@ -1062,7 +1114,7 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getNodesByFingerprint(fingerprint: String): List<UnTypedNode> {
         return withContext(ioDispatcher) {
-            megaApiGateway.getNodesByFingerprint(fingerprint).map {
+            megaApiGateway.getNodesByFingerprint(fingerprint).mapNotNull {
                 convertToUnTypedNode(it)
             }
         }
@@ -1273,17 +1325,24 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaApiGateway.getRootNode()?.let { NodeId(it.handle) }
     }
 
-    override suspend fun getNodeNameById(nodeId: NodeId): String? = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.name
-    }
+    override suspend fun getNodeInfoByIdUseCase(nodeId: NodeId): NodeInfo? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { node ->
+                NodeInfo(node.name, node.isNodeKeyDecrypted)
+            }
+        }
 
     override suspend fun getTypedNodesById(
         nodeId: NodeId,
         order: SortOrder?,
         folderTypeData: FolderTypeData?,
+        sensitivityFilter: SensitivityFilterOption?,
     ): List<TypedNode> = withContext(ioDispatcher) {
         val token = cancelTokenProvider.getOrCreateCancelToken()
-        val filter = megaSearchFilterMapper(parentHandle = nodeId)
+        val filter = megaSearchFilterMapper(
+            parentHandle = nodeId,
+            sensitivityFilter = sensitivityFilter,
+        )
         val offlineItemsDiffer = async { getAllOfflineNodeHandle() }
         val megaNodesDiffer = async {
             megaApiGateway.getChildren(
@@ -1295,13 +1354,13 @@ internal class NodeRepositoryImpl @Inject constructor(
         val offlineItems = offlineItemsDiffer.await()
         val megaNodes = megaNodesDiffer.await()
 
-        megaNodes.mapAsync(getConcurrencyStrategy(megaNodes.size)) { megaNode ->
+        megaNodes.mapAsync(getNodeMappingStrategy(megaNodes.size)) { megaNode ->
             typedNodeMapper(
                 megaNode = megaNode,
                 folderTypeData = folderTypeData,
                 offline = offlineItems[megaNode.handle.toString()]
             )
-        }
+        }.filterNotNull()
     }
 
     override suspend fun getTypedNodesByIdInChunks(
@@ -1309,9 +1368,13 @@ internal class NodeRepositoryImpl @Inject constructor(
         order: SortOrder?,
         initialBatchSize: Int,
         folderTypeData: FolderTypeData?,
+        sensitivityFilter: SensitivityFilterOption?,
     ): Flow<Pair<List<TypedNode>, Boolean>> = flow {
         val token = cancelTokenProvider.getOrCreateCancelToken()
-        val filter = megaSearchFilterMapper(parentHandle = nodeId)
+        val filter = megaSearchFilterMapper(
+            parentHandle = nodeId,
+            sensitivityFilter = sensitivityFilter,
+        )
         val offlineItems = getAllOfflineNodeHandle()
         val allChildren = megaApiGateway.getChildren(
             filter,
@@ -1322,43 +1385,32 @@ internal class NodeRepositoryImpl @Inject constructor(
         // Emit initial batch immediately
         val initialMegaNodes = allChildren.take(initialBatchSize)
         val initialTypedNodes = initialMegaNodes
-            .mapAsync(getConcurrencyStrategy(initialMegaNodes.size)) { megaNode ->
+            .mapAsync(ConcurrencyStrategy.Parallel) { megaNode ->
                 typedNodeMapper(
                     megaNode = megaNode,
                     folderTypeData = folderTypeData,
                     offline = offlineItems[megaNode.handle.toString()]
                 )
-            }
+            }.filterNotNull()
         emit(initialTypedNodes to (allChildren.size > initialBatchSize))
 
         // If there are more nodes, process them and emit the complete list
         if (allChildren.size > initialBatchSize) {
             // Process remaining nodes in chunks
-            val remainingMegaNodes = allChildren.drop(initialBatchSize)
-            val remainingTypedNodes = remainingMegaNodes
-                .mapAsync(getConcurrencyStrategy(remainingMegaNodes.size)) { megaNode ->
+            val remainingTypedNodes = withContext(defaultDispatcher) {
+                val remainingMegaNodes = allChildren.drop(initialBatchSize)
+                remainingMegaNodes.mapAsync(getNodeMappingStrategy(remainingMegaNodes.size)) { megaNode ->
                     typedNodeMapper(
                         megaNode = megaNode,
                         folderTypeData = folderTypeData,
                         offline = offlineItems[megaNode.handle.toString()]
                     )
-                }
+                }.filterNotNull()
+            }
             // Second emit: Complete list (initial + remaining) with hasMore = false
             emit(initialTypedNodes + remainingTypedNodes to false)
         }
     }.flowOn(ioDispatcher)
-
-    /**
-     * Determine concurrency strategy based on the number of nodes to map
-     * @param count
-     * @return ConcurrencyStrategy
-     */
-    private fun getConcurrencyStrategy(count: Int) = when {
-        count <= 100 -> ConcurrencyStrategy.Parallel // Small folders, process in parallel
-        count <= 1000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(20))
-        count <= 5000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(30))
-        else -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(40)) // Very large folders, larger chunks
-    }
 
     override suspend fun getFullNodePathById(nodeId: NodeId) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { node ->

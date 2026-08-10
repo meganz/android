@@ -7,24 +7,30 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoViewModel
+import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeLocation
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedAudioNode
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodeByHandleUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,6 +38,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito.reset
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.seconds
@@ -47,9 +54,9 @@ class TrackInfoViewModelTest {
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
-    private val getOfflinePathForNodeUseCase = mock<GetOfflinePathForNodeUseCase>()
-    private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getNodeLocationInfoUseCase = mock<GetNodeLocationInfo>()
+    private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
+    private val nodeDestinationMapper = mock<NodeDestinationMapper>()
 
     @BeforeEach
     fun setUp() {
@@ -58,22 +65,21 @@ class TrackInfoViewModelTest {
 
     private fun initUnderTest() {
         underTest = TrackInfoViewModel(
-            getOfflinePathForNodeUseCase = getOfflinePathForNodeUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             getAudioNodeByHandleUseCase = getAudioNodeByHandleUseCase,
             fileSizeStringMapper = fileSizeStringMapper,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
-            getNodeByHandle = getNodeByHandle,
-            getNodeLocationInfoUseCase = getNodeLocationInfoUseCase
+            getNodeLocationInfoUseCase = getNodeLocationInfoUseCase,
+            getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
         )
     }
 
     @AfterEach
     fun resetMocks() {
         reset(
-            getOfflinePathForNodeUseCase,
             monitorStorageStateEventUseCase,
             getAudioNodeByHandleUseCase,
             fileSizeStringMapper,
@@ -81,8 +87,9 @@ class TrackInfoViewModelTest {
             fileSizeStringMapper,
             removeOfflineNodeUseCase,
             durationInSecondsTextMapper,
-            getNodeByHandle,
-            getNodeLocationInfoUseCase
+            getNodeLocationInfoUseCase,
+            getNodeLocationUseCase,
+            nodeDestinationMapper,
         )
     }
 
@@ -105,6 +112,61 @@ class TrackInfoViewModelTest {
     }
 
     @Test
+    fun `test that nodeDestination is updated when getNodeDestination is called`() = runTest {
+        val handle = 100L
+        val nodeId = NodeId(handle)
+        val node = mock<TypedAudioNode> {
+            on { id } doReturn nodeId
+        }
+        val nodeLocation = mock<NodeLocation> {
+            on { this.node } doReturn node
+            on { ancestorIds } doReturn emptyList()
+            on { nodeSourceType } doReturn NodeSourceType.CLOUD_DRIVE
+        }
+        val expected = listOf(HomeScreensNavKey(DriveSyncNavKey(highlightedNodeHandle = handle)))
+
+        whenever(getAudioNodeByHandleUseCase(handle, false)) doReturn node
+        whenever(getNodeLocationUseCase(node)) doReturn nodeLocation
+        whenever(nodeDestinationMapper(nodeLocation)) doReturn expected
+
+        initUnderTest()
+        underTest.getNodeDestination(node)
+        advanceUntilIdle()
+
+        underTest.state.map { it.nodeDestination }.test {
+            val item = awaitItem()
+            assertThat(item).isNotEmpty()
+            val navKey = item?.first()
+            assertThat(navKey).isInstanceOf(HomeScreensNavKey::class.java)
+            assertThat((navKey as HomeScreensNavKey).root).isInstanceOf(DriveSyncNavKey::class.java)
+        }
+    }
+
+    @Test
+    fun `test that isNodeInBackups is true when the node location is in backups`() = runTest {
+        val handle = 100L
+        val node = mock<TypedAudioNode> {
+            on { id } doReturn NodeId(handle)
+        }
+        val nodeLocation = mock<NodeLocation> {
+            on { this.node } doReturn node
+            on { ancestorIds } doReturn emptyList()
+            on { nodeSourceType } doReturn NodeSourceType.BACKUPS
+        }
+
+        whenever(getNodeLocationUseCase(node)) doReturn nodeLocation
+        whenever(nodeDestinationMapper(nodeLocation)) doReturn emptyList()
+
+        initUnderTest()
+        underTest.getNodeDestination(node)
+        advanceUntilIdle()
+
+        underTest.state.map { it.isNodeInBackups }.test {
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
     fun `test the state is updated correctly after loadNodeInfo is invoked`() = runTest {
         val testSize = "100 KB"
         val testDuration = "1:40"
@@ -117,6 +179,11 @@ class TrackInfoViewModelTest {
             on { modificationTime }.thenReturn(testModificationTime)
             on { duration }.thenReturn(100.seconds)
         }
+        val nodeLocation = mock<NodeLocation> {
+            on { this.node } doReturn testAudioNode
+            on { ancestorIds } doReturn emptyList()
+            on { nodeSourceType } doReturn NodeSourceType.CLOUD_DRIVE
+        }
 
         whenever(getNodeLocationInfoUseCase(anyOrNull())).thenReturn(null)
 
@@ -125,6 +192,8 @@ class TrackInfoViewModelTest {
         )
         whenever(fileSizeStringMapper(anyOrNull())).thenReturn(testSize)
         whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(testDuration)
+        whenever(getNodeLocationUseCase(testAudioNode)).thenReturn(nodeLocation)
+        whenever(nodeDestinationMapper(nodeLocation)).thenReturn(emptyList())
 
         initUnderTest()
         underTest.loadTrackInfo(1L)
@@ -138,6 +207,7 @@ class TrackInfoViewModelTest {
             assertThat(actual.added).isEqualTo(testCreationTime)
             assertThat(actual.lastModified).isEqualTo(testModificationTime)
             assertThat(actual.durationString).isEqualTo(testDuration)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -148,17 +218,25 @@ class TrackInfoViewModelTest {
             val testAudioNode = mock<TypedAudioNode> {
                 on { id }.thenReturn(testNodeId)
             }
+            val nodeLocation = mock<NodeLocation> {
+                on { this.node } doReturn testAudioNode
+                on { ancestorIds } doReturn emptyList()
+                on { nodeSourceType } doReturn NodeSourceType.CLOUD_DRIVE
+            }
             whenever(getAudioNodeByHandleUseCase(anyOrNull(), anyOrNull())).thenReturn(
                 testAudioNode
             )
             whenever(isAvailableOfflineUseCase(anyOrNull())).thenReturn(true)
             whenever(fileSizeStringMapper(anyOrNull())).thenReturn("")
             whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn("")
+            whenever(getNodeLocationUseCase(testAudioNode)).thenReturn(nodeLocation)
+            whenever(nodeDestinationMapper(nodeLocation)).thenReturn(emptyList())
 
             initUnderTest()
             underTest.makeAvailableOffline(testNodeId.longValue)
+            advanceUntilIdle()
 
-            underTest.state.drop(1).test {
+            underTest.state.test {
                 assertThat(awaitItem().offlineRemovedEvent).isEqualTo(triggered)
                 cancelAndIgnoreRemainingEvents()
             }

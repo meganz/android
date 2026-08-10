@@ -1,0 +1,328 @@
+package mega.privacy.mobile.home.presentation.recents.bucket
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.LaunchedOnceEffect
+import mega.android.core.ui.extensions.delayedTrue
+import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.isSharedSource
+import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.contract.state.ReportSelectionMode
+import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
+import mega.privacy.android.shared.nodes.components.NodesView
+import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.RecentsBucketScreenEvent
+import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
+import mega.privacy.mobile.home.presentation.recents.bucket.view.RECENTS_LIST_LOADING_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.bucket.view.RECENTS_MEDIA_GRID_LOADING_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.bucket.view.RecentsBucketListLoadingView
+import mega.privacy.mobile.home.presentation.recents.bucket.view.RecentsBucketMediaGridLoadingView
+import mega.privacy.mobile.home.presentation.recents.bucket.view.RecentsMediaGridView
+import mega.privacy.mobile.home.presentation.recents.view.RecentDateHeader
+import kotlin.time.Duration.Companion.milliseconds
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RecentsBucketScreen(
+    viewModel: RecentsBucketViewModel,
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel,
+    onNavigate: (NavKey) -> Unit,
+    transferHandler: TransferHandler,
+    onBack: () -> Unit,
+    nodeSourceType: NodeSourceType,
+    selectionModeActionHandler: MultiNodeActionHandler,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+
+    ReportSelectionMode(isInSelectionMode = uiState.isInSelectionMode)
+    BackHandler(uiState.isInSelectionMode) {
+        viewModel.deselectAllItems()
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+    val resources = LocalResources.current
+    var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }
+    val listState = rememberLazyListState()
+    val snackbarQueue = rememberSnackBarQueue()
+
+    LaunchedOnceEffect {
+        Analytics.tracker.trackEvent(RecentsBucketScreenEvent)
+    }
+
+    MegaScaffoldWithTopAppBarScrollBehavior(
+        topBar = {
+            if (uiState.isInSelectionMode) {
+                NodeSelectionModeAppBar(
+                    count = uiState.selectedItemsCount,
+                    isAllSelected = uiState.isAllSelected,
+                    isSelecting = false,
+                    onSelectAllClicked = { viewModel.selectAllItems() },
+                    onCancelSelectionClicked = { viewModel.deselectAllItems() }
+                )
+            } else {
+                MegaTopAppBar(
+                    title = pluralStringResource(
+                        sharedR.plurals.num_of_files_with_parameter,
+                        uiState.fileCount,
+                        uiState.fileCount
+                    ),
+                    subtitle = stringResource(
+                        sharedR.string.home_recents_bucket_subtitle_added_to,
+                        uiState.parentFolderName.text
+                    ),
+                    navigationType = AppBarNavigationType.Back(onBack),
+                    actions = emptyList(),
+                    trailingIcons = {
+                        TransfersToolbarWidget { onNavigate(TransfersNavKey()) }
+                    }
+                )
+            }
+        },
+        bottomBar = {
+            NodeSelectionModeBottomBar(
+                availableActions = nodeOptionsActionUiState.availableActions,
+                visibleActions = nodeOptionsActionUiState.visibleActions,
+                visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
+                multiNodeActionHandler = selectionModeActionHandler,
+                selectedNodes = uiState.selectedNodes,
+                isSelecting = false
+            )
+        },
+    ) { paddingValues ->
+        RecentsBucketScreenContent(
+            modifier = Modifier.padding(paddingValues.excludingBottomPadding()),
+            contentPadding = paddingValues,
+            uiState = uiState,
+            listState = listState,
+            onItemClicked = { item ->
+                if (uiState.isInSelectionMode) {
+                    viewModel.toggleItemSelection(item)
+                } else {
+                    val node = item.node
+                    if (node is TypedFileNode) {
+                        openedFileNode = node
+                    }
+                }
+            },
+            onMenuClick = {
+                onNavigate(
+                    NodeOptionsBottomSheetNavKey(
+                        nodeHandle = it.id.longValue,
+                        nodeSourceType = nodeSourceType
+                    )
+                )
+            },
+            onLongClick = {
+                viewModel.onItemLongClicked(it)
+            },
+        )
+
+        LaunchedEffect(uiState.isEmpty) {
+            if (uiState.isEmpty) {
+                onBack()
+                snackbarQueue.queueMessage(resources.getString(sharedR.string.home_recents_bucket_snackbar_files_unavailable))
+            }
+        }
+
+        LaunchedEffect(uiState.selectedItemsCount) {
+            nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
+                uiState.selectedNodes.toSet(),
+                nodeSourceType = uiState.nodeSourceType
+            )
+        }
+
+        EventEffect(
+            event = nodeOptionsActionUiState.actionTriggeredEvent,
+            onConsumed = nodeOptionsActionViewModel::resetActionTriggered
+        ) {
+            viewModel.deselectAllItems()
+        }
+
+
+        EventEffect(
+            event = nodeOptionsActionUiState.dismissEvent,
+            onConsumed = nodeOptionsActionViewModel::resetDismiss
+        ) {
+            viewModel.deselectAllItems()
+        }
+
+        openedFileNode?.let { node ->
+            HandleNodeAction3(
+                typedFileNode = node,
+                snackBarHostState = LocalSnackBarHostState.current,
+                coroutineScope = coroutineScope,
+                onActionHandled = { openedFileNode = null },
+                nodeSourceData = NodeSourceData.RecentsBucket(
+                    nodeIds = uiState.nodeIds,
+                    isInShare = uiState.nodeSourceType.isSharedSource()
+                ),
+                onDownloadEvent = transferHandler::setTransferEvent,
+                onNavigate = onNavigate,
+            )
+        }
+    }
+
+    EventEffect(
+        event = uiState.navigateBack,
+        onConsumed = { viewModel.onNavigateBackEventConsumed() }
+    ) {
+        onBack()
+    }
+}
+
+@Composable
+internal fun RecentsBucketScreenContent(
+    uiState: RecentsBucketUiState,
+    listState: LazyListState,
+    onItemClicked: (NodeUiItem<TypedNode>) -> Unit,
+    onMenuClick: (NodeUiItem<TypedNode>) -> Unit,
+    onLongClick: (NodeUiItem<TypedNode>) -> Unit,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
+) {
+    var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
+
+    when {
+        uiState.isLoading -> {
+            // Show loading skeleton only if loading takes more than 200ms
+            val shouldShowSkeleton by delayedTrue(200.milliseconds)
+            Box(modifier = modifier) {
+                if (shouldShowSkeleton)
+                    if (uiState.isMediaBucket) {
+                        RecentsBucketMediaGridLoadingView(
+                            modifier = Modifier.testTag(RECENTS_MEDIA_GRID_LOADING_TEST_TAG)
+                        )
+                    } else {
+                        RecentsBucketListLoadingView(
+                            modifier = Modifier.testTag(RECENTS_LIST_LOADING_TEST_TAG)
+                        )
+                    }
+            }
+        }
+
+        uiState.isEmpty -> {
+            Box(modifier = modifier)
+        }
+
+        else -> {
+            Column(
+                modifier = modifier,
+            ) {
+                RecentDateHeader(
+                    modifier = Modifier.padding(bottom = 1.dp),
+                    timestamp = uiState.timestamp
+                )
+
+                if (uiState.isMediaBucket) {
+                    RecentsMediaGridView(
+                        contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
+                        nodeUiItems = uiState.items,
+                        onItemClicked = { item ->
+                            // RecentsMediaGridView has no built-in taken-down handling (unlike
+                            // NodesView used by the list path), so guard here.
+                            if (item.shouldDisputeTakenDownOnClick(uiState.isInSelectionMode)) {
+                                showTakenDownDialog = true
+                            } else {
+                                onItemClicked(item)
+                            }
+                        },
+                        onLongClick = { item ->
+                            // Taken-down files must not be selectable for bulk actions either;
+                            // show the dispute dialog instead of starting/extending a selection.
+                            if (item.isTakenDownFile) {
+                                showTakenDownDialog = true
+                            } else {
+                                onLongClick(item)
+                            }
+                        },
+                    )
+                } else {
+                    NodesView(
+                        items = uiState.items,
+                        onMenuClicked = onMenuClick,
+                        onItemClicked = onItemClicked,
+                        listContentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
+                        onLongClicked = onLongClick,
+                        onEnterMediaDiscoveryClick = { /** No-op */ },
+                        sortConfiguration = NodeSortConfiguration.default,
+                        onSortOrderClick = { /** No-op */ },
+                        onChangeViewTypeClicked = { /** No-op */ },
+                        showSortOrder = false,
+                        listState = listState,
+                        showMediaDiscoveryButton = false,
+                        showChangeViewType = false,
+                        isListView = true,
+                        isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                        showHiddenNodes = uiState.showHiddenNodes,
+                    )
+                }
+            }
+        }
+    }
+
+    if (showTakenDownDialog) {
+        TakeDownDialog(
+            isFolder = false,
+            onDismiss = { showTakenDownDialog = false },
+        )
+    }
+}
+
+/**
+ * Whether this item is a taken-down file (folders excluded), mirroring how the node lists
+ * handle taken-down nodes.
+ */
+internal val NodeUiItem<*>.isTakenDownFile: Boolean
+    get() = isTakenDown && !isFolderNode
+
+/**
+ * Whether tapping this item should open the taken-down dispute dialog instead of the file.
+ *
+ * Only applies outside selection mode (in selection mode a tap toggles selection).
+ */
+internal fun NodeUiItem<*>.shouldDisputeTakenDownOnClick(isInSelectionMode: Boolean): Boolean =
+    !isInSelectionMode && isTakenDownFile

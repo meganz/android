@@ -8,7 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.TimeUtils.formatBucketDate
 import mega.privacy.android.app.utils.TimeUtils.formatTime
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
@@ -265,7 +265,7 @@ class RecentActionBucketUiEntityMapperTest {
 
         val recentActionBucketUiEntity = underTest(recentActionBucket)
 
-        assertThat(recentActionBucketUiEntity.shareIcon).isEqualTo(mega.privacy.android.icon.pack.R.drawable.ic_folder_incoming_medium_solid)
+        assertThat(recentActionBucketUiEntity.shareIcon).isEqualTo(mega.privacy.android.icon.pack.R.drawable.ic_folder_users_medium_solid)
     }
 
     @Test

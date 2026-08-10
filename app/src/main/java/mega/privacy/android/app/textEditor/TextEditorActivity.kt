@@ -38,6 +38,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -52,17 +53,20 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CONVERTED_FILE_NAME
 import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
-import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
@@ -72,7 +76,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LONG_SNACKBAR_DURATION
-import mega.privacy.android.app.utils.Constants.MESSAGE_ID
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
@@ -82,7 +85,6 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
@@ -92,15 +94,20 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.TextEditorCloseMenuToolbarEvent
@@ -124,6 +131,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 import kotlin.math.roundToInt
 
 /**
@@ -131,6 +139,21 @@ import kotlin.math.roundToInt
  */
 @AndroidEntryPoint
 class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
+
+    @Inject
+    lateinit var chatController: ChatController
+
+    @Inject
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     companion object {
         private const val SCROLL_TEXT = "SCROLL_TEXT"
@@ -141,6 +164,37 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         private const val STATE = "STATE"
         private const val STATE_SHOWN = 0
         private const val STATE_HIDDEN = 1
+        private const val KEYBOARD_SCROLL_DELAY_MS = 150L
+        private const val CURSOR_SCROLL_TOP_MARGIN_PX = 50
+
+        /**
+         * Create intent for TextEditorActivity
+         *
+         * @param context Context
+         * @param nodeHandle Node handle
+         * @param mode Text editor mode (as String)
+         * @param nodeSourceType Node source type
+         * @param fileName Optional file name
+         * @return Intent for TextEditorActivity
+         */
+        fun createIntent(
+            context: android.content.Context,
+            nodeHandle: Long,
+            mode: String,
+            nodeSourceType: Int?,
+            fileName: String? = null,
+        ): Intent {
+            return Intent(context, TextEditorActivity::class.java).apply {
+                putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+                putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileName)
+                putExtra(TextEditorViewModel.MODE, mode)
+                putExtra(
+                    Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                    nodeSourceType
+                        ?: mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+                )
+            }
+        }
     }
 
     private val viewModel by viewModels<TextEditorViewModel>()
@@ -153,7 +207,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     private var currentUIState = STATE_SHOWN
     private var animator: ViewPropertyAnimator? = null
     private var countDownTimer: CountDownTimer? = null
-    private var isHiddenNodesEnabled: Boolean = false
     private var tempNodeId: NodeId? = null
     private var originalContentTextSize: Float = 0f
     private var originalNameTextSize: Float = 0f
@@ -197,12 +250,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         setContentView(binding.root)
         Analytics.tracker.trackEvent(TextEditorScreenEvent)
 
-        lifecycleScope.launch {
-            runCatching {
-                isHiddenNodesEnabled = isHiddenNodesActive()
-                invalidateOptionsMenu()
-            }.onFailure { Timber.e(it) }
-        }
+        invalidateOptionsMenu()
 
         binding.fileEditorToolbar.post {
             appBarHeight = binding.fileEditorToolbar.height
@@ -264,15 +312,39 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     0
                 }
             }
+
+            // Scroll to show cursor when keyboard appears in edit mode
+            if (isImeVisible && viewModel.isEditMode()) {
+                binding.contentEditText.postDelayed({
+                    val cursorPosition = binding.contentEditText.selectionStart
+                    val layout = binding.contentEditText.layout
+                    if (layout != null && cursorPosition >= 0) {
+                        // Get the line number where the cursor is
+                        val line = layout.getLineForOffset(cursorPosition)
+                        val lineTop = layout.getLineTop(line)
+
+                        // Get EditText's position relative to scroll view
+                        val editTextTop = binding.contentEditText.top
+
+                        // Calculate the absolute Y position of the cursor line
+                        val cursorLineY = editTextTop + lineTop
+
+                        // Calculate scroll position to show cursor line
+                        // We want some margin from the top (app bar + some padding)
+                        val targetScrollY = cursorLineY - appBarHeight - CURSOR_SCROLL_TOP_MARGIN_PX
+
+                        // Ensure we don't scroll beyond bounds
+                        val child = binding.fileEditorScrollView.getChildAt(0)
+                        val maxScrollY = (child?.height ?: 0) - binding.fileEditorScrollView.height
+                        val finalScrollY = targetScrollY.coerceIn(0, maxScrollY.coerceAtLeast(0))
+
+                        binding.fileEditorScrollView.smoothScrollTo(0, finalScrollY)
+                    }
+                }, KEYBOARD_SCROLL_DELAY_MS) // Delay to ensure keyboard animation and layout are complete
+            }
+
             WindowInsetsCompat.CONSUMED
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() == true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -398,12 +470,14 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             R.id.action_move -> {
                 Analytics.tracker.trackEvent(TextEditorMoveMenuItemEvent)
-                selectFolderToMove(this, longArrayOf(viewModel.getNode()!!.handle))
+                val handles = longArrayOf(viewModel.getNode()!!.handle)
+                selectFolderToMove(this, handles)
             }
 
             R.id.action_copy -> {
                 Analytics.tracker.trackEvent(TextEditorCopyMenuItemEvent)
-                selectFolderToCopy(this, longArrayOf(viewModel.getNode()!!.handle))
+                val handles = longArrayOf(viewModel.getNode()!!.handle)
+                selectFolderToCopy(this, handles)
             }
 
             R.id.action_line_numbers -> {
@@ -412,11 +486,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             R.id.action_move_to_trash, R.id.action_remove -> {
                 Analytics.tracker.trackEvent(TextEditorMoveToTheRubbishBinMenuItemEvent)
-                moveToRubbishOrRemove(
-                    viewModel.getNode()!!.handle,
-                    this,
-                    this
-                )
+                onMoveOrRemoveActionClicked(viewModel.getNode()!!.handle)
             }
 
             R.id.chat_action_import -> importNode()
@@ -424,8 +494,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 if (getStorageState() == StorageState.PayWall) {
                     AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
                 } else {
-                    val msgId = intent.getLongExtra(MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
-                    val chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
+                    val msgId = intent.getLongExtra(LEGACY_MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
+                    val chatId = intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, MEGACHAT_INVALID_HANDLE)
                     if (chatId == MEGACHAT_INVALID_HANDLE)
                         return false
                     viewModel.saveChatNodeToOffline(
@@ -435,11 +505,14 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 }
             }
 
-            R.id.chat_action_remove -> removeAttachmentMessage(
-                this,
-                viewModel.getChatRoom()!!.chatId,
-                viewModel.getMsgChat()
-            )
+            R.id.chat_action_remove -> viewModel.getMsgChat()?.let {
+                removeAttachmentMessage(
+                    activity = this,
+                    chatId = viewModel.getChatRoom()!!.chatId,
+                    message = it,
+                    chatController = chatController,
+                )
+            }
         }
 
         return super.onOptionsItemSelected(item)
@@ -619,16 +692,15 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     val isBusinessAccountExpired = viewModel.uiState.value.isBusinessAccountExpired
 
                     // Hide share menu for incoming shared items
-                    val shouldShowShare = !isIncomingSharedItems && !isInShare;
+                    val shouldShowShare = !isIncomingSharedItems && !isInShare
 
                     val shouldShowHideNode = when {
-                        !isHiddenNodesEnabled || isInShare || isInSharedItems || isNodeInBackups -> false
+                        isInShare || isInSharedItems || isNodeInBackups -> false
                         isPaidAccount && !isBusinessAccountExpired && ((node != null && node.isMarkedSensitive) || isSensitiveInherited) -> false
                         else -> true
                     }
 
                     val shouldShowUnhideNode = node != null
-                            && isHiddenNodesEnabled
                             && isNotInShare
                             && node.isMarkedSensitive
                             && !isSensitiveInherited
@@ -769,7 +841,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             } else {
                 statusBarHeight
             }
-            animateScrollerViewTopPadding(topPadding, ANIMATION_DURATION / 2) // Faster animation for scroll
+            animateScrollerViewTopPadding(
+                topPadding,
+                ANIMATION_DURATION / 2
+            ) // Faster animation for scroll
             binding.fileEditorScrollView.let {
                 if ((it.getChildAt(0).bottom <= it.height + scrollY) || scrollY == 0) {
                     showUI()
@@ -871,6 +946,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 binding.editFab.isVisible = isLoaded
             }
         }
+
+        collectFlow(viewModel.uiState.map { it.moveOrRemoveNodeEvent }) { event ->
+            (event as? StateEventWithContentTriggered)?.let {
+                handleMoveOrRemoveNodeEvent(it.content)
+                viewModel.onConsumeMoveOrRemoveNodeEvent()
+            }
+        }
     }
 
     /**
@@ -920,6 +1002,15 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             binding.contentEditText.isVisible = true
             binding.editFab.hide()
+
+            // Scroll to end and move cursor to the end when entering edit mode
+            binding.contentEditText.post {
+                // Set cursor to the end of text
+                val textLength = binding.contentEditText.text?.length ?: 0
+                binding.contentEditText.setSelection(textLength)
+
+                binding.fileEditorScrollView.fullScroll(android.view.View.FOCUS_DOWN)
+            }
         }
     }
 
@@ -1020,12 +1111,38 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             return
         }
 
-        renameDialog =
-            showRenameNodeDialog(this, viewModel.getNode()!!, this, object : ActionNodeCallback {
-                override fun finishRenameActionWithSuccess(newName: String) {
-                    binding.nameText.text = newName
+        val actionNodeCallback = object : ActionNodeCallback {
+            override fun finishRenameActionWithSuccess(newName: String) {
+                binding.nameText.text = newName
+            }
+        }
+        renameDialog = showRenameNodeDialog(
+            context = this, node = viewModel.getNode(), snackbarShower = this,
+            actionNodeCallback = actionNodeCallback,
+            onRenameConfirmed = { handle, newName ->
+                performRename(handle, newName, actionNodeCallback)
+            },
+            getRootNodeUseCase = getRootNodeUseCase,
+            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
+        )
+    }
+
+    private fun performRename(
+        nodeHandle: Long,
+        newName: String,
+        actionNodeCallback: ActionNodeCallback,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    showSnackbar(getString(sharedR.string.context_correctly_renamed))
+                    actionNodeCallback.finishRenameActionWithSuccess(newName)
                 }
-            })
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    showSnackbar(getString(R.string.context_no_renamed))
+                }
+        }
     }
 
     /**
@@ -1374,5 +1491,61 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 binding.editFab.show()
             }
         }
+    }
+
+    private fun onMoveOrRemoveActionClicked(handle: Long) {
+        if (!isOnline(this)) {
+            showSnackbar(getString(R.string.error_server_connection_problem))
+            return
+        }
+        viewModel.checkMoveOrRemoveNode(handle)
+    }
+
+    private fun handleMoveOrRemoveNodeEvent(result: MoveOrRemoveNodeResult) {
+        when (result) {
+            is MoveOrRemoveNodeResult.ConfirmMoveToRubbish -> showMoveToRubbishConfirmation(result.handle)
+            is MoveOrRemoveNodeResult.ConfirmRemoveFromMega -> showRemoveFromMegaConfirmation(result.handle)
+            MoveOrRemoveNodeResult.MovedToRubbish -> {
+                showSnackbar(getString(sharedResR.string.node_moved_success_message))
+                finish()
+            }
+
+            MoveOrRemoveNodeResult.MoveFailed ->
+                showSnackbar(getString(R.string.context_no_moved))
+
+            MoveOrRemoveNodeResult.ForeignNodeOverQuota ->
+                showForeignStorageOverQuotaWarningDialog(this)
+
+            MoveOrRemoveNodeResult.Removed -> {
+                showSnackbar(getString(R.string.context_correctly_removed))
+                finish()
+            }
+
+            MoveOrRemoveNodeResult.RemoveFailed ->
+                showSnackbar(getString(R.string.context_no_removed))
+
+            MoveOrRemoveNodeResult.Offline ->
+                showSnackbar(getString(R.string.error_server_connection_problem))
+        }
+    }
+
+    private fun showMoveToRubbishConfirmation(handle: Long) {
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setMessage(getString(R.string.confirmation_move_to_rubbish))
+            .setPositiveButton(getString(R.string.general_move)) { _, _ ->
+                viewModel.moveNodeToRubbishBin(handle)
+            }
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
+            .show()
+    }
+
+    private fun showRemoveFromMegaConfirmation(handle: Long) {
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setMessage(getString(R.string.confirmation_delete_from_mega))
+            .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
+                viewModel.removeNodeFromMega(handle)
+            }
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
+            .show()
     }
 }

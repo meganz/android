@@ -1,17 +1,20 @@
 package mega.privacy.android.app.presentation.fileinfo.model
 
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.account.model.AccountDeactivatedStatus
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
 
 /**
  * Represents the view state of the File info screen
@@ -52,12 +55,15 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property isRemindersForContactVerificationEnabled checks if reminders for contact verification is enabled
  * @property tagsEnabled checks if tags are enabled
  * @property tags list of tags for the node
- * @property mapLocationEnabled checks if GIS location is enabled
  * @property longitude the longitude of the node
  * @property latitude the latitude of the node
  * @property isPhoto true if the node is a photo (Image or Video)
  * @property accountDeactivatedStatus the status of the account if it's deactivated
  * @property leaveFolderNodeIds the list of node ids to be left
+ * @property isDecrypted
+ * @property nodeDestination the node location type for navigation
+ * @property shareHiddenNodeWarning the hidden/sensitive-node warning to show before sharing the
+ * folder with contacts, or [SensitiveNodeShareWarning.None] when no warning is required
  */
 internal data class FileInfoViewState(
     val title: String = "",
@@ -72,14 +78,14 @@ internal data class FileInfoViewState(
     val previewUriString: String? = null,
     val thumbnailUriString: String? = null,
     val folderTreeInfo: FolderTreeInfo? = null,
-    val outShares: List<ContactPermission> = emptyList(),
+    val outShares: List<ContactPermissionUiState> = emptyList(),
     val nodeLocationInfo: LocationInfo? = null,
     val isAvailableOffline: Boolean = false,
     val isAvailableOfflineEnabled: Boolean = false,
     val isAvailableOfflineAvailable: Boolean = false,
     val inShareOwnerContactItem: ContactItem? = null,
     val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
-    val contactToShowOptions: ContactPermission? = null,
+    val contactToShowOptions: ContactPermissionUiState? = null,
     val outShareContactsSelected: List<String> = emptyList(),
     val iconResource: Int? = null,
     val sizeInBytes: Long = 0,
@@ -95,15 +101,15 @@ internal data class FileInfoViewState(
     val actions: List<FileInfoMenuAction> = emptyList(),
     val requiredExtraAction: FileInfoExtraAction? = null,
     val isRemindersForContactVerificationEnabled: Boolean = false,
-    val tagsEnabled: Boolean = false,
     val tags: List<String> = emptyList(),
-    val mapLocationEnabled: Boolean = false,
     val longitude: Double = 0.0,
     val latitude: Double = 0.0,
     val isPhoto: Boolean = false,
     val accountDeactivatedStatus: AccountDeactivatedStatus? = null,
     val leaveFolderNodeIds: List<Long>? = null,
-    val isDecrypted: Boolean = true
+    val isDecrypted: Boolean = true,
+    val nodeDestination: List<NavKey>? = null,
+    val shareHiddenNodeWarning: SensitiveNodeShareWarning = SensitiveNodeShareWarning.None,
 ) {
 
     /**
@@ -113,7 +119,7 @@ internal data class FileInfoViewState(
         title = typedNode.name,
         isFile = typedNode is FileNode,
         sizeInBytes = (typedNode as? FileNode)?.size ?: this.sizeInBytes,
-        isAvailableOfflineAvailable = if (typedNode is FileNode) {
+        isAvailableOfflineAvailable = if (typedNode is FileNode && typedNode.isNodeKeyDecrypted) {
             true
         } else {
             this.isAvailableOfflineAvailable
@@ -142,25 +148,26 @@ internal data class FileInfoViewState(
     /**
      * Check Conditions to enable gis field
      */
-    fun canEnableMapLocation() = mapLocationEnabled && accessPermission == AccessPermission.OWNER
+    fun canEnableMapLocation() = accessPermission == AccessPermission.OWNER
 
     /**
      * Check Conditions to enable tags field
      */
-    fun canEditTags() = tagsEnabled && !isNodeInRubbish && !isNodeInBackups &&
+    fun canEditTags() = !isNodeInRubbish && !isNodeInBackups &&
             (accessPermission == AccessPermission.OWNER || accessPermission == AccessPermission.FULL)
 
-    fun canViewTags() = tagsEnabled && !isNodeInRubbish && !isNodeInBackups &&
+    fun canViewTags() = !isNodeInRubbish && !isNodeInBackups &&
             (accessPermission == AccessPermission.READ || accessPermission == AccessPermission.READWRITE)
 
     /**
      * Creates a copy of this view state with the info that can be extracted directly from folderTreeInfo
      */
-    fun copyWithFolderTreeInfo(folderTreeInfo: FolderTreeInfo) = this.copy(
-        folderTreeInfo = folderTreeInfo,
-        sizeInBytes = folderTreeInfo.totalCurrentSizeInBytes + folderTreeInfo.sizeOfPreviousVersionsInBytes,
-        isAvailableOfflineAvailable = folderTreeInfo.numberOfFiles > 0,
-    )
+    fun copyWithFolderTreeInfo(typedFolderNode: TypedFolderNode, folderTreeInfo: FolderTreeInfo) =
+        this.copy(
+            folderTreeInfo = folderTreeInfo,
+            sizeInBytes = folderTreeInfo.totalCurrentSizeInBytes + folderTreeInfo.sizeOfPreviousVersionsInBytes,
+            isAvailableOfflineAvailable = typedFolderNode.isNodeKeyDecrypted && folderTreeInfo.numberOfFiles > 0,
+        )
 
     /**
      * determines if the file history versions should be shown

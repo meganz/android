@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.PasscodeUtil
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.mapper.StorageStateIntMapper
@@ -1390,7 +1389,7 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
 
         return getPreferences(db)?.also { pref ->
             val uploadVideoQuality = pref.uploadVideoQuality
-            if (!TextUtil.isTextEmpty(uploadVideoQuality)
+            if (!uploadVideoQuality.isNullOrBlank()
                 && uploadVideoQuality.toInt() == SqliteDatabaseHandler.OLD_VIDEO_QUALITY_ORIGINAL
             ) {
                 pref.uploadVideoQuality = VideoQuality.ORIGINAL.value.toString()

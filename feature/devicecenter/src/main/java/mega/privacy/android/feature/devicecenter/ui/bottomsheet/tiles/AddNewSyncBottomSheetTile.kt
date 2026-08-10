@@ -6,11 +6,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -32,15 +30,6 @@ internal fun AddNewSyncBottomSheetTile(
         icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
         dividerType = dividerType,
         onActionClicked = onActionClicked,
-        trailingItem = {
-            MegaText(
-                text = stringResource(id = sharedResR.string.notifications_notification_item_new_tag),
-                textColor = TextColor.Accent,
-                modifier = Modifier.testTag(
-                    TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC_PRO_ONLY_LABEL
-                )
-            )
-        }
     )
 }
 

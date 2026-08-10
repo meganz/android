@@ -7,7 +7,6 @@ import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
 import static mega.privacy.android.app.utils.ChatUtil.getUserStatus;
 import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
 import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.Util.isOnline;
@@ -40,10 +39,9 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.domain.entity.Contact;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -222,7 +220,12 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
 
         holder.contactStateIcon.setVisibility(View.VISIBLE);
 
-        setContactStatus(getUserStatus(contact.getUserId()), holder.contactStateIcon, StatusIconLocation.STANDARD);
+        int userStatus = getUserStatus(
+                contact.getUserId(),
+                megaApi,
+                megaChatApi
+        );
+        setContactStatus(userStatus, holder.contactStateIcon, StatusIconLocation.STANDARD);
         holder.textViewContactName.setText(getContactNameDB(contact));
 
         if (!multipleSelect) {
@@ -486,9 +489,6 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
     @Override
     public void onClick(View v) {
         if (!isOnline(context)) {
-            if (context instanceof ManagerActivity) {
-                ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-            }
             return;
         }
 

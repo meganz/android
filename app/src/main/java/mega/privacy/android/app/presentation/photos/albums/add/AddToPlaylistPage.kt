@@ -60,7 +60,7 @@ internal fun AddToPlaylistPage(
     if (isCreatingPlaylist) {
         CreateVideoPlaylistDialog(
             title = stringResource(id = sharedR.string.video_section_playlists_create_playlist_dialog_title),
-            positiveButtonText = stringResource(id = R.string.general_create),
+            positiveButtonText = stringResource(id = sharedR.string.general_create_label),
             inputPlaceHolderText = { playlistNameSuggestion },
             errorMessage = playlistNameErrorMessageRes,
             onDialogInputChange = { onClearPlaylistNameErrorMessage() },

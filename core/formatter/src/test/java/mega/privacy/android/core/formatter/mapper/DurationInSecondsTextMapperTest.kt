@@ -29,5 +29,6 @@ class DurationInSecondsTextMapperTest {
         Arguments.of(15, "0:15"),
         Arguments.of(3601, "1:00:01"),
         Arguments.of(3660, "1:01:00"),
+        Arguments.of(-1, "")
     )
 }

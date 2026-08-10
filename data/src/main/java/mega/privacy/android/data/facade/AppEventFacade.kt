@@ -15,7 +15,9 @@ import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import javax.inject.Inject
 
@@ -29,6 +31,7 @@ internal class AppEventFacade @Inject constructor(
     private val cameraUploadsFolderDestinationUpdate =
         MutableSharedFlow<CameraUploadsFolderDestinationUpdate>()
     private val _transferOverQuota = MutableStateFlow(false)
+    private val _transferOverQuotaEvent = MutableSharedFlow<TransferOverQuotaStatus>()
     private val _storageOverQuota = MutableStateFlow(false)
     private val _fileAvailableOffline = MutableSharedFlow<Long>()
     private val _cookieSettings = MutableSharedFlow<Set<CookieType>>()
@@ -66,7 +69,7 @@ internal class AppEventFacade @Inject constructor(
     private val audioOutput = MutableSharedFlow<AudioDevice>()
     private val localVideoChangedDueToProximitySensor = MutableSharedFlow<Boolean>()
     private val updateUserData = MutableSharedFlow<Unit>()
-    private val miscLoaded = MutableStateFlow(false)
+    private val miscLoaded = MutableStateFlow<MiscLoadedState>(MiscLoadedState.NotLoaded)
     private val sslVerificationFailed = MutableSharedFlow<Unit>()
     private val transferTagToCancel = MutableSharedFlow<Int?>()
 
@@ -91,6 +94,13 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastTransferOverQuota(isCurrentOverQuota: Boolean) {
         _transferOverQuota.emit(isCurrentOverQuota)
+    }
+
+    override fun monitorTransferOverQuotaEvent(): Flow<TransferOverQuotaStatus> =
+        _transferOverQuotaEvent.asSharedFlow()
+
+    override suspend fun broadcastTransferOverQuotaEvent(status: TransferOverQuotaStatus) {
+        _transferOverQuotaEvent.emit(status)
     }
 
     override fun monitorStorageOverQuota(): Flow<Boolean> = _storageOverQuota.asSharedFlow()
@@ -234,17 +244,13 @@ internal class AppEventFacade @Inject constructor(
         _monitorUpgradeDialogShown.emit(Unit)
     }
 
-    override suspend fun broadcastMiscLoaded() {
-        miscLoaded.emit(true)
+    override suspend fun broadcastMiscState(state: MiscLoadedState) {
+        miscLoaded.emit(state)
     }
 
-    override suspend fun broadcastMiscUnloaded() {
-        miscLoaded.emit(false)
-    }
+    override fun monitorMiscState(): Flow<MiscLoadedState> = miscLoaded.asStateFlow()
 
-    override fun monitorMiscLoaded(): Flow<Boolean> {
-        return miscLoaded.asStateFlow()
-    }
+    override fun getCurrentMiscState(): MiscLoadedState = miscLoaded.value
 
     override suspend fun broadcastSslVerificationFailed() {
         sslVerificationFailed.emit(Unit)

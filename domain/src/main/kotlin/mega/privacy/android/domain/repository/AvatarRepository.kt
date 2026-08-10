@@ -46,6 +46,13 @@ interface AvatarRepository {
     suspend fun getAvatarColor(userHandle: Long): Int
 
     /**
+     * Get avatar secondary color for a user
+     *
+     * @param userHandle  User handle
+     */
+    suspend fun getAvatarSecondaryColor(userHandle: Long): Int
+
+    /**
      * Set avatar
      *
      * @param filePath
@@ -65,4 +72,13 @@ interface AvatarRepository {
      * Monitor user avatar updates
      */
     fun monitorUserAvatarUpdates(): Flow<Long>
+
+    /**
+     * Converts an avatar received as base64 string into a File.
+     *
+     * @param userHandle User handle used for the file name.
+     * @param base64StringAvatar The base64 avatar string to convert.
+     * @return The file is the conversion was possible.
+     */
+    suspend fun getAvatarFromBase64String(userHandle: Long, base64StringAvatar: String): File?
 }

@@ -1,6 +1,9 @@
 package mega.privacy.android.data.facade
 
+import android.app.usage.StorageStatsManager
 import android.content.Context
+import android.os.Process
+import android.os.storage.StorageManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -80,12 +83,23 @@ internal class CacheFolderFacade @Inject constructor(
 
     override suspend fun getCacheSize(): Long = withContext(ioDispatcher) {
         Timber.d("getCacheSize")
+        runCatching {
+            context.getSystemService(StorageStatsManager::class.java)
+                .queryStatsForUid(StorageManager.UUID_DEFAULT, Process.myUid())
+                .cacheBytes
+        }.getOrElse { error ->
+            Timber.w(error, "Unable to query cache size from StorageStatsManager")
+            getCacheSizeFromFiles()
+        }
+    }
+
+    private suspend fun getCacheSizeFromFiles(): Long {
         val cacheIntDir = context.cacheDir
         val cacheExtDir = context.externalCacheDir
         cacheIntDir?.let {
             Timber.d("Path to check internal: ${it.absolutePath}")
         }
-        fileGateway.getTotalSize(cacheIntDir).plus(fileGateway.getTotalSize(cacheExtDir))
+        return fileGateway.getTotalSize(cacheIntDir).plus(fileGateway.getTotalSize(cacheExtDir))
     }
 
     override suspend fun clearCache() {
@@ -113,9 +127,14 @@ internal class CacheFolderFacade @Inject constructor(
     override suspend fun getPreviewDownloadPathForNode(): String =
         (context.externalCacheDir ?: context.cacheDir).path + File.separator
 
-    override suspend fun getPreviewFile(fileName: String) = File(
-        getPreviewDownloadPathForNode() + fileName
-    ).takeIf { it.exists() }
+    override suspend fun getPreviewFile(
+        fileName: String,
+        fileSize: Long,
+        lastModifiedDate: Long,
+    ) = File(getPreviewDownloadPathForNode() + fileName).takeIf {
+        // node modificationTime is in seconds; File.lastModified() is in milliseconds
+        it.exists() && it.length() == fileSize && it.lastModified() / 1000L == lastModifiedDate
+    }
 
     override fun isFileInCacheDirectory(file: File): Boolean {
         val cachePaths = context.externalCacheDirs.asSequence()

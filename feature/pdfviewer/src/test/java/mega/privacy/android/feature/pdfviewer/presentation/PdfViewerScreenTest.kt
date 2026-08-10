@@ -1,0 +1,611 @@
+package mega.privacy.android.feature.pdfviewer.presentation
+
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
+import androidx.test.espresso.Espresso.pressBack
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_PAGE_INDICATOR_TAG
+import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_ERROR_DIALOG_TAG
+import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_PASSWORD_DIALOG_TAG
+import mega.privacy.android.feature.pdfviewer.presentation.components.PdfShareAction
+import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
+import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
+import mega.privacy.android.shared.resources.R as sharedR
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
+import org.mockito.Mockito.reset
+import org.mockito.Mockito.verify
+import org.robolectric.annotation.Config
+
+/**
+ * Unit tests for [PdfViewerScreen].
+ *
+ * Covers BackHandler priority (password → search → back) and top bar title visibility.
+ * and password/error dialogs.
+ */
+@RunWith(AndroidJUnit4::class)
+@Config(qualifiers = "w720dp-h1280dp-xhdpi")
+class PdfViewerScreenTest {
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    // Callback mocks
+    private val onBack = mock<() -> Unit>()
+    private val onMoreClicked = mock<() -> Unit>()
+    private val onPageChanged = mock<(Int, Int) -> Unit>()
+    private val onLoadComplete = mock<(Int) -> Unit>()
+    private val onError = mock<(PdfViewerError) -> Unit>()
+    private val onSubmitPassword = mock<(String) -> Unit>()
+    private val onDismissPasswordDialog = mock<() -> Unit>()
+    private val onDismissErrorDialog = mock<() -> Unit>()
+    private val onPasswordInputChanged = mock<() -> Unit>()
+    private val onRetry = mock<() -> Unit>()
+    private val onUploadToCloudDrive = mock<() -> Unit>()
+    private val onActivateSearch = mock<() -> Unit>()
+    private val onDeactivateSearch = mock<() -> Unit>()
+    private val onSearchQueryChanged = mock<(String) -> Unit>()
+    private val onNavigateToNextMatch = mock<() -> Unit>()
+    private val onNavigateToPreviousMatch = mock<() -> Unit>()
+
+    @Before
+    fun setup() {
+        reset(
+            onBack,
+            onMoreClicked,
+            onPageChanged,
+            onLoadComplete,
+            onError,
+            onSubmitPassword,
+            onDismissPasswordDialog,
+            onDismissErrorDialog,
+            onPasswordInputChanged,
+            onRetry,
+            onUploadToCloudDrive,
+            onActivateSearch,
+            onDeactivateSearch,
+            onSearchQueryChanged,
+            onNavigateToNextMatch,
+            onNavigateToPreviousMatch,
+        )
+    }
+
+    // Captured (action, node) pairs from the floating-toolbar handler in toolbar tests.
+    private val capturedToolbarActions = mutableListOf<Pair<MenuAction, TypedNode>>()
+    private val capturingActionHandler = SingleNodeActionHandler { action, node ->
+        capturedToolbarActions += action to node
+    }
+
+    private fun setContent(
+        uiState: PdfViewerState = defaultState(),
+        bottomBarActions: List<MenuActionWithIcon> = emptyList(),
+        singleNodeActionHandler: SingleNodeActionHandler = SingleNodeActionHandler { _, _ -> },
+        onShare: (() -> Unit)? = null,
+    ) {
+        composeTestRule.setContent {
+            PdfViewerScreen(
+                uiState = uiState,
+                onBack = onBack,
+                onMoreClicked = onMoreClicked,
+                onPageChanged = onPageChanged,
+                onLoadComplete = onLoadComplete,
+                onError = onError,
+                onSubmitPassword = onSubmitPassword,
+                onDismissPasswordDialog = onDismissPasswordDialog,
+                onDismissErrorDialog = onDismissErrorDialog,
+                onPasswordInputChanged = onPasswordInputChanged,
+                onRetry = onRetry,
+                onUploadToCloudDrive = onUploadToCloudDrive,
+                onActivateSearch = onActivateSearch,
+                onDeactivateSearch = onDeactivateSearch,
+                onSearchQueryChanged = onSearchQueryChanged,
+                onNavigateToNextMatch = onNavigateToNextMatch,
+                onNavigateToPreviousMatch = onNavigateToPreviousMatch,
+                bottomBarActions = bottomBarActions,
+                singleNodeActionHandler = singleNodeActionHandler,
+                onShare = onShare,
+            )
+        }
+    }
+
+    private fun defaultState(
+        source: PdfViewerSource? = PdfViewerSource.CloudNode(
+            nodeHandle = 12345L,
+            contentUri = "content://test.pdf",
+            isLocalContent = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        ),
+        title: String? = "Test Document.pdf",
+        error: PdfViewerError? = null,
+        searchState: PdfViewerSearchState = PdfViewerSearchState(),
+        currentPage: Int = 1,
+        totalPages: Int = 0,
+        isExternalFile: Boolean = false,
+        currentNode: TypedNode? = null,
+    ) = PdfViewerState(
+        isLoading = false,
+        source = source,
+        title = title,
+        error = error,
+        searchState = searchState,
+        currentPage = currentPage,
+        totalPages = totalPages,
+        isExternalFile = isExternalFile,
+        currentNode = currentNode,
+    )
+
+    @Test
+    fun `test that onDeactivateSearch is called when back is pressed and search is active`() {
+        setContent(
+            defaultState(
+                searchState = PdfViewerSearchState(isSearchActive = true)
+            )
+        )
+
+        pressBack()
+
+        verify(onDeactivateSearch).invoke()
+        verify(onBack, never()).invoke()
+        verify(onDismissPasswordDialog, never()).invoke()
+    }
+
+    @Test
+    fun `test that title is displayed in top bar`() {
+        setContent(defaultState(title = "My Document.pdf"))
+
+        composeTestRule.onNodeWithText("My Document.pdf").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that regular top bar is displayed when search is not active`() {
+        setContent(defaultState(searchState = PdfViewerSearchState(isSearchActive = false)))
+
+        composeTestRule.onNodeWithText("Test Document.pdf").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that password dialog is displayed when password error`() {
+        setContent(
+            defaultState(
+                error = PdfViewerError.PasswordProtected,
+            )
+        )
+
+        composeTestRule
+            .onNodeWithTag(PDF_VIEWER_PASSWORD_DIALOG_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that password dialog is displayed when invalid password error`() {
+        setContent(
+            defaultState(
+                error = PdfViewerError.InvalidPassword,
+            )
+        )
+        // InvalidPassword path delays 500ms before showing the dialog to avoid keyboard flicker.
+        composeTestRule.mainClock.advanceTimeBy(600)
+
+        composeTestRule
+            .onNodeWithTag(PDF_VIEWER_PASSWORD_DIALOG_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that error dialog is displayed when non-password error`() {
+        setContent(
+            defaultState(
+                error = PdfViewerError.FileNotFound,
+            )
+        )
+
+        composeTestRule
+            .onNodeWithTag(PDF_VIEWER_ERROR_DIALOG_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that onDismissErrorDialog is invoked when ok button is clicked on error dialog`() {
+        setContent(defaultState(error = PdfViewerError.FileNotFound))
+
+        val okLabel = composeTestRule.activity.getString(sharedR.string.general_ok_only)
+        composeTestRule.onNodeWithText(okLabel).performClick()
+
+        verify(onDismissErrorDialog).invoke()
+    }
+
+    @Test
+    fun `test that onDismissPasswordDialog is invoked when cancel button is clicked on password dialog`() {
+        setContent(defaultState(error = PdfViewerError.PasswordProtected))
+
+        val cancelLabel =
+            composeTestRule.activity.getString(sharedR.string.general_dialog_cancel_button)
+        composeTestRule.onNodeWithText(cancelLabel).performClick()
+
+        verify(onDismissPasswordDialog).invoke()
+    }
+
+    @Test
+    fun `test that page indicator is not displayed when totalPages is 1`() {
+        setContent(defaultState(currentPage = 1, totalPages = 1))
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that PdfPageIndicator is displayed when page changes during active search`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(
+            defaultState(
+                currentPage = 2,
+                totalPages = 4,
+                searchState = PdfViewerSearchState(isSearchActive = true),
+            )
+        )
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that PdfPageIndicator is hidden when auto-hide delay elapses during active search`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(
+            defaultState(
+                currentPage = 2,
+                totalPages = 4,
+                searchState = PdfViewerSearchState(isSearchActive = true),
+            )
+        )
+        // Advance past auto-hide delay (2000ms) and the exit animation (900ms delay + fade)
+        composeTestRule.mainClock.advanceTimeBy(5000)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that PdfPageIndicator remains visible when scrubbing during active search`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(
+            defaultState(
+                currentPage = 2,
+                totalPages = 4,
+                searchState = PdfViewerSearchState(isSearchActive = true),
+            )
+        )
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        // Begin scrubbing — sets scrubProgress to non-null, keeping indicator alive past auto-hide
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(0f, 10f))
+            }
+
+        // Advance past the auto-hide delay while the scrub is still active
+        composeTestRule.mainClock.advanceTimeBy(2100)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+
+        // End scrub — finger up should allow auto-hide to proceed
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput { up() }
+
+        // Advance past auto-hide delay (2000ms) and exit animation
+        composeTestRule.mainClock.advanceTimeBy(5000)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that page indicator is displayed when totalPages is greater than 1`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(defaultState(currentPage = 2, totalPages = 4))
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that PdfPageIndicator remains visible when scrubbing after auto-hide delay`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(defaultState(currentPage = 2, totalPages = 4))
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        // Advance past auto-hide delay without search active
+        composeTestRule.mainClock.advanceTimeBy(2100)
+
+        // Begin scrubbing — scrubProgress != null keeps indicator alive
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(0f, 10f))
+            }
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+
+        // End scrub — finger up should allow auto-hide to proceed
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput { up() }
+
+        // Advance past auto-hide delay (2000ms) and exit animation
+        composeTestRule.mainClock.advanceTimeBy(5000)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that PdfPageIndicator remains visible while thumb is pressed without dragging`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(defaultState(currentPage = 2, totalPages = 4))
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        // Press the thumb without moving — isScrubPressed should keep the indicator visible
+        // past the auto-hide delay even though scrubProgress is still null.
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput { down(center) }
+
+        composeTestRule.mainClock.advanceTimeBy(5000)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that PdfPageIndicator is hidden after release when thumb was pressed without dragging`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(defaultState(currentPage = 2, totalPages = 4))
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        // Press without dragging, then release. Auto-hide should resume after release.
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput {
+                down(center)
+                up()
+            }
+
+        // Advance past auto-hide delay (2000ms) and exit animation
+        composeTestRule.mainClock.advanceTimeBy(5000)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that onPasswordInputChanged is invoked when user types in password field`() {
+        setContent(defaultState(error = PdfViewerError.PasswordProtected))
+
+        composeTestRule
+            .onNode(hasSetTextAction())
+            .performTextInput("a")
+
+        verify(onPasswordInputChanged).invoke()
+    }
+
+    @Test
+    fun `test that onUploadToCloudDrive is invoked when upload button is clicked for external file`() {
+        setContent(
+            defaultState(
+                source = PdfViewerSource.ExternalFile(
+                    contentUri = "content://external/sample.pdf",
+                    fileName = "sample.pdf",
+                ),
+                isExternalFile = true,
+                totalPages = 1,
+            ),
+        )
+
+        val uploadLabel =
+            composeTestRule.activity.getString(sharedR.string.photos_save_to_cloud_drive_button_text)
+        composeTestRule.onNodeWithText(uploadLabel).performClick()
+
+        verify(onUploadToCloudDrive).invoke()
+    }
+
+    // region floating bottom toolbar
+    private val downloadAction = DownloadMenuAction()
+    private val getLinkAction = GetLinkMenuAction()
+    private val shareAction = ShareMenuAction()
+    private val trashAction = TrashMenuAction()
+    private val toolbarActions: List<MenuActionWithIcon> =
+        listOf(downloadAction, getLinkAction, shareAction, trashAction)
+
+    @Test
+    fun `test that floating toolbar is displayed when actions are not empty and currentNode is set`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(currentNode = node),
+            bottomBarActions = toolbarActions,
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(getLinkAction.testTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(shareAction.testTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(trashAction.testTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when bottomBarActions is empty`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(currentNode = node),
+            bottomBarActions = emptyList(),
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when currentNode is null`() {
+        setContent(
+            uiState = defaultState(currentNode = null),
+            bottomBarActions = toolbarActions,
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when isExternalFile is true`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(isExternalFile = true, currentNode = node),
+            bottomBarActions = toolbarActions,
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when search is active`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(
+                currentNode = node,
+                searchState = PdfViewerSearchState(isSearchActive = true),
+            ),
+            bottomBarActions = toolbarActions,
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when error is non-null`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(
+                currentNode = node,
+                error = PdfViewerError.FileNotFound,
+            ),
+            bottomBarActions = toolbarActions,
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when password error`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(
+                currentNode = node,
+                error = PdfViewerError.PasswordProtected,
+            ),
+            bottomBarActions = toolbarActions,
+        )
+        composeTestRule.mainClock.advanceTimeBy(600)
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that singleNodeActionHandler is invoked with the current node when a toolbar action is clicked`() {
+        val node = mock(TypedFileNode::class.java)
+        capturedToolbarActions.clear()
+        setContent(
+            uiState = defaultState(currentNode = node),
+            bottomBarActions = toolbarActions,
+            singleNodeActionHandler = capturingActionHandler,
+        )
+
+        composeTestRule.onNodeWithTag(trashAction.testTag).performClick()
+
+        assertThat(capturedToolbarActions).hasSize(1)
+        val (action, capturedNode) = capturedToolbarActions.single()
+        assertThat(action).isSameInstanceAs(trashAction)
+        assertThat(capturedNode).isSameInstanceAs(node)
+    }
+
+    // region top bar share
+    @Test
+    fun `test that share action is displayed when onShare is provided`() {
+        setContent(
+            uiState = defaultState(),
+            onShare = {},
+        )
+
+        composeTestRule.onNodeWithTag(PdfShareAction.testTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that share action is not displayed when onShare is null`() {
+        setContent(
+            uiState = defaultState(),
+            onShare = null,
+        )
+
+        composeTestRule.onNodeWithTag(PdfShareAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that share action is displayed for an external file when onShare is provided`() {
+        setContent(
+            uiState = defaultState(isExternalFile = true),
+            onShare = {},
+        )
+
+        composeTestRule.onNodeWithTag(PdfShareAction.testTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that onShare is invoked when the share action is clicked`() {
+        var shared = false
+        setContent(
+            uiState = defaultState(),
+            onShare = { shared = true },
+        )
+
+        composeTestRule.onNodeWithTag(PdfShareAction.testTag).performClick()
+
+        assertThat(shared).isTrue()
+    }
+    // endregion top bar share
+}

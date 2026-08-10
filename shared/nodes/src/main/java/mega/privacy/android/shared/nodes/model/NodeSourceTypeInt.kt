@@ -1,0 +1,26 @@
+package mega.privacy.android.shared.nodes.model
+
+/**
+ * Constants for Node Source Types represented as Int
+ * This is temporary solution to avoid changing all the code that uses Int to [mega.privacy.android.domain.entity.node.NodeSourceType]
+ */
+object NodeSourceTypeInt {
+    const val FILE_BROWSER_ADAPTER: Int = 2000
+    const val OFFLINE_ADAPTER: Int = 2004
+    const val RUBBISH_BIN_ADAPTER: Int = 2002
+    const val OUTGOING_SHARES_ADAPTER: Int = 2009
+    const val INCOMING_SHARES_ADAPTER: Int = 2010
+    const val BACKUPS_ADAPTER: Int = 2011
+    const val LINKS_ADAPTER: Int = 2025
+    const val AUDIO_BROWSE_ADAPTER: Int = 2028
+    const val DOCUMENTS_BROWSE_ADAPTER: Int = 2030
+    const val FAVOURITES_ADAPTER: Int = 2039
+    const val SEARCH_BY_ADAPTER: Int = 2018
+    const val VIDEO_BROWSE_ADAPTER: Int = 2032
+    const val RECENTS_BUCKET_ADAPTER: Int = 2034
+    const val VIDEO_PLAYLISTS_ADAPTER: Int = 2035
+    const val VIDEO_RECENTLY_WATCHED_ADAPTER: Int = 2036
+    const val FOLDER_LINK_ADAPTER: Int = 2005
+    const val FILE_LINK_ADAPTER: Int = 2019
+    const val CHAT_ADAPTER: Int = 2020
+}

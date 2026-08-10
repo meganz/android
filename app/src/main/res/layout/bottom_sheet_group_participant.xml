@@ -48,7 +48,7 @@
                 android:layout_centerVertical="true"
                 app:tint="?attr/textColorHint" />
 
-            <mega.privacy.android.app.components.twemoji.EmojiTextView
+            <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
                 android:id="@+id/group_participants_chat_name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -171,7 +171,7 @@
             <!--Leave chat-->
             <TextView
                 android:id="@+id/leave_group_participants_chat"
-                style="@style/BottomSheetOption.Red"
+                style="@style/BottomSheetOption.Brand"
                 android:text="@string/title_properties_chat_leave_chat"
                 app:drawableStartCompat="@drawable/ic_log_out_02_medium_thin_outline"/>
 
@@ -186,7 +186,7 @@
             <!--Remove contact-->
             <TextView
                 android:id="@+id/remove_group_participants_chat"
-                style="@style/BottomSheetOption.Red"
+                style="@style/BottomSheetOption.Brand"
                 android:text="@string/remove_participant_menu_item"
                 app:drawableStartCompat="@drawable/ic_x_medium_thin_outline"/>
         </LinearLayout>

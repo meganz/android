@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.folderlink
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -76,11 +77,27 @@ class FetchFolderNodesUseCaseTest {
                 )
             ).thenReturn(typedNodeList)
 
-            underTest(folderSubHandle)
+            val folderNodesResult = underTest(folderSubHandle)
             verify(repository).updateLastPublicHandle(nodeHandle)
             verify(addNodeType, times(1)).invoke(unTypeNode)
             verify(getFolderLinkChildrenNodesUseCase, times(1)).invoke(any(), anyOrNull())
+            assertThat(folderNodesResult.currentNodeId).isEqualTo(NodeId(nodeHandle))
         }
+
+    @Test
+    fun `test that currentNodeId is set from the fetched node handle`() = runTest {
+        val folderSubHandle = "123"
+        val nodeHandle = 1234L
+        val result = FetchNodeRequestResult(nodeHandle, false)
+        whenever(repository.fetchNodes()).thenReturn(result)
+        whenever(repository.getRootNode()).thenReturn(unTypeNode)
+        whenever(addNodeType(unTypeNode)).thenReturn(typedFolderNode)
+        whenever(getFolderLinkChildrenNodesUseCase(any(), anyOrNull())).thenReturn(typedNodeList)
+
+        val folderNodesResult = underTest(folderSubHandle)
+
+        assertThat(folderNodesResult.currentNodeId).isEqualTo(NodeId(nodeHandle))
+    }
 
     @Test
     fun `Test that on getting flag value as true InvalidDecryptionKey exception is thrown`() =

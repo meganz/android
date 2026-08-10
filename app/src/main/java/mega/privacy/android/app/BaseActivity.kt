@@ -23,59 +23,43 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
+import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.LAUNCH_INTENT
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ChatLogoutListener
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
-import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
-import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
-import mega.privacy.android.app.utils.Constants.ACCOUNT_BLOCKED_STRING
-import mega.privacy.android.app.utils.Constants.ACCOUNT_BLOCKED_TYPE
-import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
-import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
-import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
-import mega.privacy.android.app.utils.Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
-import mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE
-import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
-import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE
-import mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
-import mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
@@ -88,11 +72,14 @@ import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
@@ -100,7 +87,14 @@ import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorSslVerificationFailedUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 import nz.mega.sdk.MegaAccountDetails
@@ -164,12 +158,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
-    /**
-     * Monitor Chat Signal Presence Use Case
-     * Check if chat has signal presence
-     */
     @Inject
-    lateinit var monitorChatSignalPresenceUseCase: MonitorChatSignalPresenceUseCase
+    lateinit var crashReporter: CrashReporter
 
     @Inject
     lateinit var getDomainNameUseCase: GetDomainNameUseCase
@@ -180,13 +170,16 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     @Inject
     lateinit var appContainerWrapper: AppContainerWrapper
 
+    @Inject
+    lateinit var appDialogEventQueue: AppDialogsEventQueue
+
     private val billingViewModel by viewModels<BillingViewModel>()
     private val viewModel by viewModels<BaseViewModel>()
+    private val signalPresenceViewModel by viewModels<SignalPresenceViewModel>()
 
     @JvmField
     protected var app: MegaApplication = MegaApplication.getInstance()
     private var sslErrorDialog: AlertDialog? = null
-    private var delaySignalPresence = false
     private var upgradeAlert: AlertDialog? = null
     private var purchaseType: PurchaseType? = null
     private var activeSubscriptionSku: String? = null
@@ -221,18 +214,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
-        collectFlow(
-            combine(
-                flow { emit(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) },
-                billingViewModel.billingUpdateEvent,
-                ::Pair
-            )
-        ) { (singleActivityFlagEnabled, billingEvent) ->
+        collectFlow(billingViewModel.billingUpdateEvent) { billingEvent ->
             if (billingEvent is BillingEvent.OnPurchaseUpdate) {
                 onPurchasesUpdated(
                     purchases = billingEvent.purchases,
                     activeSubscription = billingEvent.activeSubscription,
-                    singleActivityFlagEnabled = singleActivityFlagEnabled
+                    source = billingEvent.upgradeSource,
                 )
                 billingViewModel.markHandleBillingEvent()
             }
@@ -248,14 +235,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     showExpiredBusinessAlert()
                     viewModel.onShowExpiredBusinessAlertConsumed()
                 }
-            }
-        }
-
-        collectFlow(monitorChatSignalPresenceUseCase(), Lifecycle.State.CREATED) {
-            Timber.d("BROADCAST TO SEND SIGNAL PRESENCE")
-            if (delaySignalPresence && megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
-                delaySignalPresence = false
-                retryConnectionsAndSignalPresence()
             }
         }
 
@@ -367,7 +346,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         text.setText(R.string.ssl_error_dialog_text)
         retryButton.setText(R.string.general_retry)
         openBrowserButton.setText(R.string.general_open_browser)
-        dismissButton.setText(R.string.general_dismiss)
+        dismissButton.setText(sharedR.string.general_dismiss_dialog)
 
         sslErrorDialog = builder.create().apply {
             setCancelable(false)
@@ -403,23 +382,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     protected fun retryConnectionsAndSignalPresence() {
         Timber.d("retryConnectionsAndSignalPresence")
-        try {
-            megaApi.retryPendingConnections()
-            megaChatApi.retryPendingConnections(false)
-
-            if (megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
-                delaySignalPresence = false
-
-                if (this !is MeetingActivity) {
-                    Timber.d("Send signal presence")
-                    megaChatApi.signalPresenceActivity()
-                }
-            } else {
-                delaySignalPresence = true
-            }
-        } catch (e: Exception) {
-            Timber.w(e, "Exception")
-        }
+        // Retry connections and signal presence via SignalPresenceViewModel
+        // MeetingActivity: retry connections without signaling presence
+        signalPresenceViewModel.retryConnections(signalPresence = this !is MeetingActivity)
     }
 
     private fun handleGoBack() {
@@ -453,7 +418,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @param type   There are three possible values to this param:
      *                - SNACKBAR_TYPE: creates a simple snackbar
      *                - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
-     *                - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
      * @param view   Layout where the snackbar is going to show.
      * @param s      Text to shown in the snackbar
      * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
@@ -475,9 +439,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @param type   There are three possible values to this param:
      *                  - SNACKBAR_TYPE: creates a simple snackbar
      *                  - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
-     *                  - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
      *                  - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
-     *                  - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
      * @param view   Layout where the snackbar is going to show.
      * @param anchor Sets the view the Snackbar should be anchored above, null as default
      * @param s      Text to shown in the snackbar
@@ -508,9 +470,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @param type      There are three possible values to this param:
      *                  - SNACKBAR_TYPE: creates a simple snackbar
      *                  - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
-     *                  - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
      *                  - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
-     *                  - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
      * @param view      Layout where the snackbar is going to show.
      * @param anchor    Sets the view the Snackbar should be anchored above, null as default
      * @param s         Text to shown in the snackbar
@@ -535,9 +495,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @param type          There are three possible values to this param:
      *                      - SNACKBAR_TYPE: creates a simple snackbar
      *                      - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
-     *                      - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
      *                      - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
-     *                      - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
      * @param view          Layout where the snackbar is going to show.
      * @param anchor        Sets the view the Snackbar should be anchored above, null as default
      * @param s             Text to shown in the snackbar
@@ -564,12 +522,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     view,
                     (if (s?.isNotEmpty() == true) s else getString(R.string.sent_as_message))
                         ?: return,
-                    Snackbar.LENGTH_LONG
-                )
-
-                NOT_SPACE_SNACKBAR_TYPE -> Snackbar.make(
-                    view,
-                    R.string.error_not_enough_free_space,
                     Snackbar.LENGTH_LONG
                 )
 
@@ -626,18 +578,24 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 MESSAGE_SNACKBAR_TYPE -> {
                     setAction(
                         R.string.action_see,
-                        SnackbarNavigateOption(context = view.context, idChat = idChat)
+                        SnackbarNavigateOption(
+                            context = view.context,
+                            type = type,
+                            idChat = idChat,
+                            megaNavigator = megaNavigator,
+                        )
                     )
                     show()
                 }
 
-                NOT_SPACE_SNACKBAR_TYPE -> {
-                    setAction(R.string.action_settings, SnackbarNavigateOption(view.context))
-                    show()
-                }
-
                 MUTE_NOTIFICATIONS_SNACKBAR_TYPE -> {
-                    setAction(R.string.general_unmute, SnackbarNavigateOption(view.context, type))
+                    setAction(
+                        R.string.general_unmute, SnackbarNavigateOption(
+                            context = view.context,
+                            type = type,
+                            megaNavigator = megaNavigator,
+                        )
+                    )
                     show()
                 }
 
@@ -649,35 +607,23 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     show()
                 }
 
-                INVITE_CONTACT_TYPE -> {
-                    setAction(
-                        R.string.contact_invite,
-                        SnackbarNavigateOption(view.context, type, userEmail)
-                    )
-                    show()
-                }
-
                 DISMISS_ACTION_SNACKBAR -> {
                     val snackbarTextView =
                         snackbarLayout.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                     snackbarTextView.maxLines = 5
                     setAction(
                         sharedResR.string.general_ok,
-                        SnackbarNavigateOption(view.context, type)
+                        SnackbarNavigateOption(
+                            context = view.context,
+                            type = type,
+                            megaNavigator = megaNavigator,
+                        )
                     )
                     show()
                 }
 
                 OPEN_FILE_SNACKBAR_TYPE -> {
                     setAction(getString(R.string.general_confirmation_open)) { action() }
-                    show()
-                }
-
-                SENT_REQUESTS_TYPE -> {
-                    setAction(
-                        R.string.tab_sent_requests,
-                        SnackbarNavigateOption(view.context, type, userEmail)
-                    )
                     show()
                 }
 
@@ -771,7 +717,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             AccountBlockedType.TOS_COPYRIGHT -> megaChatApi.logout(
                 ChatLogoutListener {
                     showAccountBlockedDialog(
-                        AccountBlockedType.TOS_COPYRIGHT,
                         getString(sharedR.string.dialog_account_suspended_ToS_copyright_message)
                     )
                 }
@@ -780,7 +725,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             AccountBlockedType.TOS_NON_COPYRIGHT -> megaChatApi.logout(
                 ChatLogoutListener {
                     showAccountBlockedDialog(
-                        AccountBlockedType.TOS_NON_COPYRIGHT,
                         getString(sharedR.string.dialog_account_suspended_ToS_non_copyright_message)
                     )
                 }
@@ -789,7 +733,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             AccountBlockedType.SUBUSER_DISABLED -> megaChatApi.logout(
                 ChatLogoutListener {
                     showAccountBlockedDialog(
-                        AccountBlockedType.SUBUSER_DISABLED,
                         getString(sharedR.string.error_business_disabled)
                     )
                 }
@@ -798,7 +741,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             AccountBlockedType.SUBUSER_REMOVED -> megaChatApi.logout(
                 ChatLogoutListener {
                     showAccountBlockedDialog(
-                        AccountBlockedType.SUBUSER_REMOVED,
                         getString(sharedR.string.error_business_removed)
                     )
                 }
@@ -823,7 +765,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
             AccountBlockedType.VERIFICATION_EMAIL -> {
                 showAccountBlockedDialog(
-                    AccountBlockedType.VERIFICATION_EMAIL,
                     getString(sharedR.string.login_account_suspension_email_verification_message)
                 )
             }
@@ -832,70 +773,27 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         }
     }
 
-    private fun showAccountBlockedDialog(
-        accountBlockedType: AccountBlockedType,
-        accountBlockedString: String,
-    ) {
-        if (!TextUtil.isTextEmpty(accountBlockedString)) {
-            if (this is LoginActivity) {
-                this.showAccountBlockedDialog(
-                    AccountBlockedEvent(
-                        handle = -1L,
-                        type = accountBlockedType,
-                        text = accountBlockedString
-                    )
-                )
-            } else {
-                if (this is WeakAccountProtectionAlertActivity && accountBlockedType == AccountBlockedType.VERIFICATION_EMAIL) {
-                    return
-                } else {
-                    val loginIntent =
-                        Intent(this, LoginActivity::class.java).apply {
-                            action = ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                            putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                            putExtra(
-                                ACCOUNT_BLOCKED_STRING, accountBlockedString
-                            )
-                            putExtra(
-                                ACCOUNT_BLOCKED_TYPE, accountBlockedType
-                            )
-                        }
-                    startActivity(loginIntent)
-                }
+    private fun showAccountBlockedDialog(accountBlockedString: String) {
+        if (!accountBlockedString.isNullOrBlank()) {
+            val intent = MegaActivity.getIntent(this).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
+            startActivity(intent)
         }
-    }
-
-    /**
-     * Launches an intent to navigate to Login screen.
-     */
-    @JvmOverloads
-    protected fun navigateToLogin(
-        isNewTask: Boolean = false,
-        keepCurrentActivity: Boolean = false,
-    ) {
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-        if (isNewTask) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        } else {
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        }
-        if (keepCurrentActivity) {
-            intent.putExtra(LAUNCH_INTENT, this.intent)
-        }
-        startActivity(intent)
     }
 
     /**
      * Launches an intent to navigate to Upgrade Account screen.
      */
     open fun navigateToUpgradeAccount() {
-        val intent = Intent(this, ManagerActivity::class.java)
-        intent.action = ACTION_SHOW_UPGRADE_ACCOUNT
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
+        startActivity(
+            MegaActivity.getIntentWithExtraDestinations(
+                this,
+                listOf(UpgradeAccountNavKey(source = UpgradeAccountSource.UNKNOWN))
+            ).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+        )
     }
 
     /**
@@ -944,6 +842,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         return false
     }
 
+    protected fun rootNodeDoesNotExist() = megaApi.rootNode == null
+
     /**
      * Checks if should refresh session due to karere or init megaChatAp if the init state is not
      * the right one.
@@ -970,11 +870,18 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         return false
     }
 
-    /**
-     * Refresh session.
-     */
     protected fun refreshSession(keepCurrentActivity: Boolean = false) {
-        navigateToLogin(keepCurrentActivity = keepCurrentActivity)
+        val intent = if (keepCurrentActivity) {
+            MegaActivityInternalLauncher
+                .getIntent(this, action = RefreshEvent.SdkReload.name)
+                .putExtra(LAUNCH_INTENT, this.intent)
+        } else {
+            Intent(this, MegaActivity::class.java).apply {
+                action = RefreshEvent.SdkReload.name
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            }
+        }
+        startActivity(intent)
         finish()
     }
 
@@ -995,7 +902,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     private fun onPurchasesUpdated(
         purchases: List<MegaPurchase>,
         activeSubscription: MegaPurchase?,
-        singleActivityFlagEnabled: Boolean,
+        source: UpgradeSource,
     ) {
         val type: PurchaseType = if (purchases.isNotEmpty()) {
             val purchase = purchases.first()
@@ -1004,9 +911,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             if (billingViewModel.isPurchased(purchase)) {
                 //payment has been processed
                 Timber.d("Purchase $sku successfully")
-                if (singleActivityFlagEnabled.not()) {
-                    RatingHandlerImpl(this).updateTransactionFlag(true)
-                }
                 PurchaseType.SUCCESS
             } else {
                 //payment is being processed or in unknown state
@@ -1019,9 +923,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             PurchaseType.DOWNGRADE
         }
         when {
-            this is MyAccountActivity && myAccountInfo.isUpgradeFromAccount()
-                    || this is ManagerActivity && myAccountInfo.isUpgradeFromManager()
-                    || this is FileManagementPreferencesActivity && myAccountInfo.isUpgradeFromSettings() -> {
+            this is MyAccountActivity && source == UpgradeSource.MyAccount
+                    || this is FileManagementPreferencesActivity && source == UpgradeSource.Settings -> {
                 purchaseType = type
                 // Remove the .test suffix for testing SKUs
                 activeSubscriptionSku = activeSubscription?.sku?.removeSuffix(".test")?.also {
@@ -1032,12 +935,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
-        val rootView = Util.getRootViewFromContext(this)
+        val rootView = Util.getRootViewFromContext(this) ?: return
         showSnackbar(type = type, view = rootView, s = content, idChat = chatId)
     }
 
     override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
-        val rootView = Util.getRootViewFromContext(this)
+        val rootView = Util.getRootViewFromContext(this) ?: return
         showSnackbar(type = type, view = rootView, s = content, action = action)
     }
 
@@ -1113,6 +1016,33 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                                 )
                             }
 
+                            Skus.SKU_STARTER_MONTH, Skus.SKU_STARTER_YEAR -> {
+                                account = sharedR.string.starter_account
+                                image = R.drawable.ic_generic_plan
+                                purchaseMessage.text = getString(
+                                    if (Skus.SKU_STARTER_YEAR == activeSubscriptionSku) sharedR.string.upgrade_account_successful_starter_yearly
+                                    else sharedR.string.upgrade_account_successful_starter_monthly
+                                )
+                            }
+
+                            Skus.SKU_BASIC_MONTH, Skus.SKU_BASIC_YEAR -> {
+                                account = sharedR.string.basic_account
+                                image = R.drawable.ic_generic_plan
+                                purchaseMessage.text = getString(
+                                    if (Skus.SKU_BASIC_YEAR == activeSubscriptionSku) sharedR.string.upgrade_account_successful_basic_yearly
+                                    else sharedR.string.upgrade_account_successful_basic_monthly
+                                )
+                            }
+
+                            Skus.SKU_ESSENTIAL_MONTH, Skus.SKU_ESSENTIAL_YEAR -> {
+                                account = sharedR.string.essential_account
+                                image = R.drawable.ic_generic_plan
+                                purchaseMessage.text = getString(
+                                    if (Skus.SKU_ESSENTIAL_YEAR == activeSubscriptionSku) sharedR.string.upgrade_account_successful_essential_yearly
+                                    else sharedR.string.upgrade_account_successful_essential_monthly
+                                )
+                            }
+
                             else -> {
                                 Timber.w("Unexpected account subscription level")
                                 return@setOnShowListener
@@ -1160,27 +1090,53 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     }
 
     /**
-     * Launches ManagerActivity intent to show over quota warning.
+     * Launches MegaActivity to show over quota warning.
      */
     protected fun launchOverQuota() {
-        startActivity(
-            Intent(this, ManagerActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .setAction(ACTION_OVERQUOTA_STORAGE)
-        )
-        finish()
+        lifecycleScope.launch {
+            startActivity(
+                storageOverQuotaIntent(isOverQuota = true).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+            )
+            finish()
+        }
     }
 
     /**
-     * Launches ManagerActivity intent to show pre over quota warning.
+     * Launches MegaActivity to show pre over quota warning.
      */
     protected fun launchPreOverQuota() {
-        startActivity(
-            Intent(this, ManagerActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .setAction(ACTION_PRE_OVERQUOTA_STORAGE)
-        )
-        finish()
+        lifecycleScope.launch {
+            startActivity(
+                storageOverQuotaIntent(isOverQuota = false).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+            )
+            finish()
+        }
+    }
+
+    private suspend fun storageOverQuotaIntent(isOverQuota: Boolean): Intent {
+        val useUpsell = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
+        }.getOrDefault(false)
+        return if (useUpsell) {
+            MegaActivity.getIntentWithExtraDestinations(
+                this,
+                listOf(
+                    QuotaWarningUpgradeNavKey(
+                        type = QuotaWarningType.Storage,
+                        trigger = QuotaWarningTrigger.Upload,
+                    )
+                )
+            )
+        } else {
+            MegaActivity.getIntentWithExtraDestinations(
+                this,
+                listOf(OverQuotaDialogNavKey(isOverQuota))
+            )
+        }
     }
 
     /**
@@ -1227,4 +1183,5 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             snackbar.show()
         }
     }
+
 }

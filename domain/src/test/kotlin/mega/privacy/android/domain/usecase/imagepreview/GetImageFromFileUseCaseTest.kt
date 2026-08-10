@@ -21,6 +21,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.net.URI
 import java.util.stream.Stream
 
 
@@ -35,9 +36,9 @@ class GetImageFromFileUseCaseTest {
     private val file = mock<File>()
     private val fileName = "testName"
     private val fileLength = 1L
-    private val filePath = "../cache/$fileName"
+    private val filePath = "/data/user/0/app/files/MEGA Offline/$fileName"
     private val thumbPreviewFileName = "thumbPreviewTestName"
-    private val previewCache = "../cache/previewsMEGA"
+    private val previewCache = "/data/user/0/app/cache/previewsMEGA"
     private val previewPath = "$previewCache/$thumbPreviewFileName"
 
     @BeforeAll
@@ -137,11 +138,31 @@ class GetImageFromFileUseCaseTest {
 
         val expected = ImageResult(
             isVideo = isVideo,
-            previewUri = if (doesPreviewExist) "file://$previewPath" else null,
-            fullSizeUri = "file://$filePath",
+            previewUri = if (doesPreviewExist) File(previewPath).toURI().toString() else null,
+            fullSizeUri = File(filePath).toURI().toString(),
             isFullyLoaded = true
         )
-        assertThat(underTest.invoke(file = file) == expected)
+        assertThat(underTest.invoke(file = file)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that fullSizeUri is a valid encoded uri when the path contains spaces`() = runTest {
+        whenever(file.exists()).thenReturn(true)
+        whenever(file.canRead()).thenReturn(true)
+        whenever(file.absolutePath).thenReturn(filePath)
+        whenever(file.name).thenReturn(fileName)
+        whenever(file.length()).thenReturn(fileLength)
+        whenever(isVideoFileUseCase(UriPath(filePath))).thenReturn(false)
+        whenever(thumbnailPreviewRepository.getPreviewFileName(fileName + fileLength))
+            .thenReturn(thumbPreviewFileName)
+        whenever(thumbnailPreviewRepository.getPreviewCacheFolderPath()).thenReturn(previewCache)
+        whenever(fileSystemRepository.doesFileExist(previewPath)).thenReturn(false)
+
+        val fullSizeUri = underTest.invoke(file = file).fullSizeUri
+
+        assertThat(fullSizeUri).isEqualTo(File(filePath).toURI().toString())
+        assertThat(fullSizeUri).doesNotContain(" ")
+        assertThat(URI.create(fullSizeUri).path).isEqualTo(filePath)
     }
 
     private fun provideParameters() = Stream.of(

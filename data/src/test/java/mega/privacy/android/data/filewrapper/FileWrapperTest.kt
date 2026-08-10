@@ -44,4 +44,84 @@ class FileWrapperTest {
             assertThat(FileWrapper.isPath(contentUri)).isFalse()
         }
     }
+
+    @Test
+    fun `test that getChildrenWithMetadata returns result from function`() {
+        val expected = listOf(
+            ChildMetadata(
+                uri = "content://child1",
+                name = "file1.txt",
+                isFolder = false,
+                size = 100L,
+                lastModified = 200L,
+                path = "/storage/emulated/0/file1.txt"
+            )
+        )
+        val wrapper = createFileWrapper(
+            getChildrenWithMetadataFunction = { expected }
+        )
+
+        val actual = wrapper.getChildrenWithMetadata()
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that getChildrenWithMetadata returns null when function throws`() {
+        val wrapper = createFileWrapper(
+            getChildrenWithMetadataFunction = { throw RuntimeException("test error") }
+        )
+
+        val actual = wrapper.getChildrenWithMetadata()
+
+        assertThat(actual).isNull()
+    }
+
+    @Test
+    fun `test that getChildrenWithMetadata returns empty list from function`() {
+        val wrapper = createFileWrapper(
+            getChildrenWithMetadataFunction = { emptyList() }
+        )
+
+        val actual = wrapper.getChildrenWithMetadata()
+
+        assertThat(actual).isEmpty()
+    }
+
+    @Test
+    fun `test that getChildrenWithMetadata propagates null from function`() {
+        // Empty list and null are different signals: empty means "directory has zero
+        // children", null means "lookup failed". The wrapper must preserve null so the
+        // C++ JNI side can return SCAN_INACCESSIBLE — coercing to emptyList() would
+        // tell the sync engine to delete every cached child of this directory.
+        val wrapper = createFileWrapper(
+            getChildrenWithMetadataFunction = { null }
+        )
+
+        val actual = wrapper.getChildrenWithMetadata()
+
+        assertThat(actual).isNull()
+    }
+
+    private fun createFileWrapper(
+        getChildrenWithMetadataFunction: () -> List<ChildMetadata>? = { emptyList() },
+    ) = FileWrapper(
+        uri = "content://test",
+        name = "test",
+        isFolder = true,
+        getChildrenUrisFunction = { emptyList() },
+        getDetachedFileDescriptorFunction = { null },
+        childFileExistsFunction = { false },
+        getChildByNameFunction = { null },
+        createChildFileFunction = { _, _ -> null },
+        getPathFunction = { null },
+        deleteFileFunction = { false },
+        deleteFolderIfEmptyFunction = { false },
+        setModificationTimeFunction = { false },
+        renameFunction = { null },
+        renameOverwriteFunction = { _, _, _ -> null },
+        moveDocumentFunction = { _, _ -> null },
+        createNestedPathFunction = { _, _, _ -> null },
+        getChildrenWithMetadataFunction = getChildrenWithMetadataFunction,
+    )
 }

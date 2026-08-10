@@ -39,3 +39,4 @@ internal fun DeviceCenterInfoScreenRouteM3(
         paddingValues = paddingValues,
     )
 }
+

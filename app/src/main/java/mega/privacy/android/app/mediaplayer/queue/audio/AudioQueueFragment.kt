@@ -44,11 +44,11 @@ import mega.privacy.android.app.mediaplayer.playlist.PlaylistActionModeCallback
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
 import mega.privacy.android.app.mediaplayer.queue.view.AudioQueueView
-import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -142,7 +142,7 @@ class AudioQueueFragment : Fragment() {
         }
 
         /**
-         * Called after a successful bind with our AudioPlayerService.
+         * Called after a successful bind with our LegacyAudioPlayerService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is MediaPlayerServiceBinder) {
@@ -287,10 +287,14 @@ class AudioQueueFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         activity?.addMenuProvider(queueSearchViewProvider)
 
+        if (audioQueueViewModel.uiState.value.isSelectMode) {
+            activateActionMode()
+        }
+
         context?.bindService(
             Intent(
                 requireContext(),
-                AudioPlayerService::class.java
+                LegacyAudioPlayerService::class.java
             ).apply {
                 putExtra(Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
             }, connection, Context.BIND_AUTO_CREATE
@@ -336,7 +340,9 @@ class AudioQueueFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         actionMode?.let {
-            it.finish()
+            if (activity?.isChangingConfigurations != true) {
+                it.finish()
+            }
             actionMode = null
         }
         playlistObserved = false

@@ -11,7 +11,7 @@ import javax.inject.Inject
 /**
  * Edit menu action
  */
-class EditMenuAction @Inject constructor() : MenuActionWithIcon {
+class EditMenuAction @Inject constructor() : DeferrableMenuAction {
     @Composable
     override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Edit)
 

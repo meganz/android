@@ -27,7 +27,9 @@ internal class GetBannersUseCaseTest {
             "http://test.com",
             "http://test.com",
             "http://test.com",
-            "http://test.com"
+            "http://test.com",
+            buttonText = "",
+            variant = 0
         ),
         Banner(
             2,
@@ -36,7 +38,9 @@ internal class GetBannersUseCaseTest {
             "http://test2.com",
             "http://test2.com",
             "http://test2.com",
-            "http://test2.com"
+            "http://test2.com",
+            buttonText = "",
+            variant = 0
         )
     )
 

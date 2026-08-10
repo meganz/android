@@ -33,16 +33,22 @@
 
         <Button
             android:id="@+id/dialog_first_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="end"
             style="?attr/borderlessButtonStyle" />
 
         <Button
             android:id="@+id/dialog_second_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="end"
             style="?attr/borderlessButtonStyle" />
 
         <Button
             android:id="@+id/dialog_third_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="end"
             style="?attr/borderlessButtonStyle" />
 

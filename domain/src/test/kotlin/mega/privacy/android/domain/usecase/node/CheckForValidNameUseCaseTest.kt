@@ -1,20 +1,28 @@
 package mega.privacy.android.domain.usecase.node
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.InvalidNameType
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.repository.RegexRepository
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import java.util.regex.Pattern
 import java.util.stream.Stream
 
@@ -22,57 +30,196 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CheckForValidNameUseCaseTest {
 
-    private val nodeExistsInParentUseCase: NodeExistsInParentUseCase = mock()
+    private lateinit var underTest: CheckForValidNameUseCase
     private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase = mock()
     private val regexRepository: RegexRepository = mock()
 
     private val invalidNamePattern = Pattern.compile(INVALID_NAME_REGEX)
-    private val underTest = CheckForValidNameUseCase(
-        nodeExistsInParentUseCase,
-        nodeExistsInCurrentLocationUseCase,
-        regexRepository
-    )
+
+    private val fileNode = mock<FileNode> {
+        on { type } doReturn PdfFileTypeInfo
+    }
+    private val nodeId = NodeId(1234L)
+    private val parentNodeId = NodeId(5678L)
+    private val folderNode = mock<FolderNode> {
+        on { id } doReturn nodeId
+        on { parentId } doReturn parentNodeId
+    }
+
+    @BeforeAll
+    fun setup() {
+        underTest = CheckForValidNameUseCase(
+            nodeExistsInCurrentLocationUseCase,
+            regexRepository
+        )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            nodeExistsInCurrentLocationUseCase,
+            regexRepository,
+        )
+
+        wheneverBlocking { regexRepository.invalidNamePattern } doReturn invalidNamePattern
+    }
 
     @ParameterizedTest(name = "Check for valid name {0}")
     @MethodSource("provideParams")
     fun `test provided name returns appropriate type`(
         providedName: String,
         node: UnTypedNode,
-        expected: ValidNameType,
+        expected: InvalidNameType,
     ) = runTest {
-        whenever(nodeExistsInParentUseCase(node, providedName)).thenReturn(false)
-        whenever(regexRepository.invalidNamePattern).thenReturn(invalidNamePattern)
+        whenever(nodeExistsInCurrentLocationUseCase(node.id, providedName)).thenReturn(false)
 
-        val actual = underTest(providedName, node)
-        Truth.assertThat(expected).isEqualTo(actual)
+        assertThat(expected).isEqualTo(
+            underTest(newName = providedName, node = node, isRenameAction = false)
+        )
     }
 
     @Test
-    fun `test that if same name found in node list returns NAME_ALREADY_EXISTS error type`() =
+    fun `test that if same name found in current folder during creation returns NAME_ALREADY_EXISTS error type`() =
         runTest {
-            val providedName = "SameName.txt"
-            val node = mock<FileNode>()
-            whenever(nodeExistsInParentUseCase(node, providedName)).thenReturn(true)
-            val actual = underTest(providedName, node)
-            Truth.assertThat(actual).isEqualTo(ValidNameType.NAME_ALREADY_EXISTS)
+            val providedName = "Folder name"
+
+            whenever(nodeExistsInCurrentLocationUseCase(nodeId, providedName)).thenReturn(true)
+
+            assertThat(underTest(newName = providedName, node = folderNode, isRenameAction = false))
+                .isEqualTo(InvalidNameType.NAME_ALREADY_EXISTS)
+        }
+
+    @Test
+    fun `test that if same name found in parent folder during rename returns NAME_ALREADY_EXISTS error type`() =
+        runTest {
+            val providedName = "Folder name"
+
+            whenever(
+                nodeExistsInCurrentLocationUseCase(
+                    parentNodeId,
+                    providedName
+                )
+            ).thenReturn(true)
+
+            assertThat(underTest(newName = providedName, node = folderNode, isRenameAction = true))
+                .isEqualTo(InvalidNameType.NAME_ALREADY_EXISTS)
+        }
+
+    @Test
+    fun `test that during rename folder name existence is checked against parent id`() =
+        runTest {
+            val providedName = "Folder name"
+
+            whenever(nodeExistsInCurrentLocationUseCase(nodeId, providedName)).thenReturn(true)
+            whenever(
+                nodeExistsInCurrentLocationUseCase(
+                    parentNodeId,
+                    providedName
+                )
+            ).thenReturn(false)
+
+            assertThat(underTest(newName = providedName, node = folderNode, isRenameAction = true))
+                .isEqualTo(InvalidNameType.VALID)
+        }
+
+    @Test
+    fun `test that during creation folder name existence is checked against node id`() =
+        runTest {
+            val providedName = "Folder name"
+
+            whenever(nodeExistsInCurrentLocationUseCase(nodeId, providedName)).thenReturn(false)
+            whenever(
+                nodeExistsInCurrentLocationUseCase(
+                    parentNodeId,
+                    providedName
+                )
+            ).thenReturn(true)
+
+            assertThat(underTest(newName = providedName, node = folderNode, isRenameAction = false))
+                .isEqualTo(InvalidNameType.VALID)
+        }
+
+    @Test
+    fun `test that if a text file without extension is renamed without extension, the type is valid`() =
+        runTest {
+            val textType = TextFileTypeInfo("whatever", "")
+            val fileNode = mock<FileNode> {
+                on { type } doReturn textType
+                on { parentId } doReturn parentNodeId
+            }
+            val providedName = "File"
+
+            whenever(
+                nodeExistsInCurrentLocationUseCase(parentNodeId, providedName)
+            ).thenReturn(false)
+
+            assertThat(
+                underTest(
+                    newName = providedName,
+                    node = fileNode,
+                    isRenameAction = true
+                )
+            ).isEqualTo(InvalidNameType.VALID)
+        }
+
+    @Test
+    fun `test that during rename file returns NAME_ALREADY_EXISTS when parent already contains the new name`() =
+        runTest {
+            val fileNode = mock<FileNode> {
+                on { type } doReturn PdfFileTypeInfo
+                on { parentId } doReturn parentNodeId
+            }
+            val providedName = "Proper rename.pdf"
+
+            whenever(
+                nodeExistsInCurrentLocationUseCase(parentNodeId, providedName)
+            ).thenReturn(true)
+
+            assertThat(
+                underTest(
+                    newName = providedName,
+                    node = fileNode,
+                    isRenameAction = true
+                )
+            ).isEqualTo(InvalidNameType.NAME_ALREADY_EXISTS)
+        }
+
+    @Test
+    fun `test that during rename file returns VALID when parent has no match and extension is preserved`() =
+        runTest {
+            val fileNode = mock<FileNode> {
+                on { type } doReturn PdfFileTypeInfo
+                on { parentId } doReturn parentNodeId
+            }
+            val providedName = "Proper rename.pdf"
+
+            whenever(
+                nodeExistsInCurrentLocationUseCase(parentNodeId, providedName)
+            ).thenReturn(false)
+
+            assertThat(
+                underTest(
+                    newName = providedName,
+                    node = fileNode,
+                    isRenameAction = true
+                )
+            ).isEqualTo(InvalidNameType.VALID)
         }
 
     private fun provideParams() =
         Stream.of(
-            Arguments.of(" ", mock<FileNode>(), ValidNameType.BLANK_NAME),
-            Arguments.of("SomeInvalidName/*", mock<FileNode>(), ValidNameType.INVALID_NAME),
-            Arguments.of("Folder", mock<FolderNode>(), ValidNameType.NO_ERROR),
-            Arguments.of("no extension", mock<FileNode>(), ValidNameType.NO_EXTENSION),
-            Arguments.of(
-                "changeInExtension.jpeg",
-                mock<FileNode> {
-                    whenever(it.type).thenReturn(PdfFileTypeInfo)
-                },
-                ValidNameType.DIFFERENT_EXTENSION
-            ),
-            Arguments.of("Proper rename.pdf", mock<FileNode> {
-                whenever(it.type).thenReturn(PdfFileTypeInfo)
-            }, ValidNameType.NO_ERROR)
+            Arguments.of(" ", fileNode, InvalidNameType.BLANK_NAME),
+            Arguments.of("", folderNode, InvalidNameType.BLANK_NAME),
+            Arguments.of(".", fileNode, InvalidNameType.DOT_NAME),
+            Arguments.of(".", folderNode, InvalidNameType.DOT_NAME),
+            Arguments.of("..", fileNode, InvalidNameType.DOUBLE_DOT_NAME),
+            Arguments.of("..", folderNode, InvalidNameType.DOUBLE_DOT_NAME),
+            Arguments.of("SomeInvalidName/*", fileNode, InvalidNameType.INVALID_NAME),
+            Arguments.of("SomeInvalidName/*", folderNode, InvalidNameType.INVALID_NAME),
+            Arguments.of("no extension", fileNode, InvalidNameType.NO_EXTENSION),
+            Arguments.of("changeInExtension.jpeg", fileNode, InvalidNameType.DIFFERENT_EXTENSION),
+            Arguments.of("Proper rename.pdf", fileNode, InvalidNameType.VALID),
+            Arguments.of("Folder", folderNode, InvalidNameType.VALID),
         )
 
     companion object {

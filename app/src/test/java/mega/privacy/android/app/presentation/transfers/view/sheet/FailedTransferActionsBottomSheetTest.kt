@@ -96,7 +96,7 @@ class FailedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_RETRY_ACTION).assertIsDisplayed()
             onNodeWithText(R.string.general_retry).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_CLEAR_FAILED_TRANSFER_ACTION).assertIsDisplayed()
-            onNodeWithText(R.string.general_clear).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_clear).assertIsDisplayed()
         }
     }
 
@@ -112,7 +112,7 @@ class FailedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_RETRY_ACTION).assertIsDisplayed()
             onNodeWithText(R.string.general_retry).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_CLEAR_FAILED_TRANSFER_ACTION).assertIsDisplayed()
-            onNodeWithText(R.string.general_clear).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_clear).assertIsDisplayed()
         }
     }
 

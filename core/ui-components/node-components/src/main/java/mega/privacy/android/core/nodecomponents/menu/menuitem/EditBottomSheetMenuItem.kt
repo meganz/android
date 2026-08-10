@@ -3,14 +3,14 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
-import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission.FULL
 import mega.privacy.android.domain.entity.shares.AccessPermission.OWNER
 import mega.privacy.android.domain.entity.shares.AccessPermission.READWRITE
-import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
+import mega.privacy.android.domain.usecase.file.IsNodeOpenableTextFileUseCase
 import java.io.File
 import javax.inject.Inject
 
@@ -21,7 +21,7 @@ import javax.inject.Inject
  */
 class EditBottomSheetMenuItem @Inject constructor(
     override val menuAction: EditMenuAction,
-    private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
+    private val isNodeOpenableTextFileUseCase: IsNodeOpenableTextFileUseCase,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
 
     override suspend fun shouldDisplay(
@@ -30,6 +30,7 @@ class EditBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType,
     ): Boolean {
         val filePath = (node as? FileNode)?.fullSizePath ?: return false
         val file = File(filePath)
@@ -37,8 +38,8 @@ class EditBottomSheetMenuItem @Inject constructor(
         return !isNodeInRubbish
                 && isInBackups.not()
                 && node.isTakenDown.not()
-                && getFileTypeInfoUseCase(file) is TextFileTypeInfo
-                && accessPermission in listOf(OWNER, READWRITE, FULL)
+                && isNodeOpenableTextFileUseCase(node)
+                && accessPermission in listOf(OWNER, READWRITE, FULL) && node.isNodeKeyDecrypted
     }
 
     override val groupId = 1

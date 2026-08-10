@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -19,6 +20,7 @@ import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -41,14 +43,16 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CALLS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CAMERA_UPLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CHAT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_SYNC
+import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_TRANSFERS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_CENTRE
-import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_SEND_FEEDBACK
+import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_RATE_APP
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HIDDEN_ITEMS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HIDE_RECENT_ACTIVITY
 import mega.privacy.android.app.constants.SettingsConstants.KEY_MEDIA_DISCOVERY_VIEW
 import mega.privacy.android.app.constants.SettingsConstants.KEY_PASSCODE_LOCK
 import mega.privacy.android.app.constants.SettingsConstants.KEY_QR_CODE_AUTO_ACCEPT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_RECOVERY_KEY
+import mega.privacy.android.app.constants.SettingsConstants.KEY_SORTING_VIEW_MODE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_START_SCREEN
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT
@@ -65,14 +69,19 @@ import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRe
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.presentation.settings.passcode.PasscodeSettingsActivity
+import mega.privacy.android.app.presentation.settings.sortingviewmode.SortingAndViewModeSettingsActivity
+import mega.privacy.android.app.presentation.settings.transfers.TransfersSettingsActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
+import mega.privacy.android.app.service.RATE_APP_URL
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity
-import javax.inject.Inject
 import mega.privacy.android.shared.resources.R as sharedResR
+import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
@@ -115,6 +124,17 @@ class SettingsFragment :
         super.onViewCreated(view, savedInstanceState)
         observeState()
         navigateToInitialPreference()
+        navigateToShowHiddenItemsPreference()
+        updateSortingAndViewModeVisibility()
+    }
+
+    private fun updateSortingAndViewModeVisibility() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val enabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.SortingAndViewMode)
+            }.getOrDefault(false)
+            findPreference<Preference>(KEY_SORTING_VIEW_MODE)?.isVisible = enabled
+        }
     }
 
     private fun observeState() {
@@ -156,12 +176,12 @@ class SettingsFragment :
                     findPreference<Preference>(KEY_FEATURES_SYNC)?.isEnabled = true
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
                     findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
+                    findPreference<Preference>(KEY_FEATURES_TRANSFERS)?.isEnabled = true
                     updatePasscodeLockSummary(state.passcodeLock)
                     updateSubFolderMediaDiscovery(state.subFolderMediaDiscoveryChecked)
                     findPreference<SwitchPreferenceCompat>(KEY_HIDDEN_ITEMS)?.apply {
                         val accountType = state.accountDetail?.levelDetail?.accountType
-                        val isHiddenNodesEnabled = state.isHiddenNodesEnabled == true
-                        isVisible = if (isHiddenNodesEnabled && accountType?.isPaid == true) {
+                        isVisible = if (accountType?.isPaid == true) {
                             if (accountType.isBusinessAccount) {
                                 viewModel.getBusinessStatus() != BusinessAccountStatus.Expired
                             } else {
@@ -173,6 +193,23 @@ class SettingsFragment :
 
                         isChecked = state.showHiddenItems
                     }
+                    findPreference<SwitchPreferenceCompat>(KEY_MEDIA_DISCOVERY_VIEW)?.isVisible =
+                        false
+
+                    if (state.deleteAccountEvent is StateEventWithContentTriggered) {
+                        if (state.deleteAccountEvent.content) {
+                            showInfoDialog(
+                                R.string.email_verification_title,
+                                R.string.email_verification_text,
+                            )
+                        } else {
+                            showInfoDialog(
+                                R.string.general_error_word,
+                                sharedResR.string.general_text_error,
+                            )
+                        }
+                        viewModel.onDeleteAccountEventConsumed()
+                    }
                 }
             }
         }
@@ -180,7 +217,6 @@ class SettingsFragment :
 
     private fun updateSubFolderMediaDiscovery(checked: Boolean) {
         findPreference<SwitchPreferenceCompat>(KEY_SUB_FOLDER_MEDIA_DISCOVERY)?.apply {
-            isVisible = true
             isChecked = checked
         }
     }
@@ -199,6 +235,17 @@ class SettingsFragment :
         }
     }
 
+    private fun navigateToShowHiddenItemsPreference() {
+        val hiddenItemsPreference =
+            findPreference<SwitchPreferenceCompat>(KEY_HIDDEN_ITEMS)
+
+        hiddenItemsPreference?.let {
+            if (arguments?.getBoolean(NAVIGATE_TO_SHOW_HIDDEN_ITEMS_PREFERENCE, false) == true) {
+                scrollToPreference(it)
+            }
+        }
+    }
+
     override fun onResume() {
         refreshSummaries()
         resetCounters(null)
@@ -207,6 +254,7 @@ class SettingsFragment :
 
     private fun refreshSummaries() {
         viewModel.refreshCameraUploadsOn()
+        viewModel.refreshMultiFactorAuthSetting()
     }
 
     private fun updatePasscodeLockSummary(enabled: Boolean) {
@@ -246,6 +294,22 @@ class SettingsFragment :
                     Intent(
                         context,
                         SettingsCallsActivity::class.java
+                    )
+                )
+
+            KEY_FEATURES_TRANSFERS ->
+                startActivity(
+                    Intent(
+                        context,
+                        TransfersSettingsActivity::class.java
+                    )
+                )
+
+            KEY_SORTING_VIEW_MODE ->
+                startActivity(
+                    Intent(
+                        context,
+                        SortingAndViewModeSettingsActivity::class.java
                     )
                 )
 
@@ -313,7 +377,7 @@ class SettingsFragment :
                 context.launchUrl(HELP_CENTRE_URL)
             }
 
-            KEY_HELP_SEND_FEEDBACK -> showEvaluatedAppDialog()
+            KEY_HELP_RATE_APP -> navigateToRateApp()
             KEY_ABOUT_PRIVACY_POLICY -> {
                 context.launchUrl(PRIVACY_POLICY_URL)
             }
@@ -419,11 +483,13 @@ class SettingsFragment :
         return super.onPreferenceTreeClick(preference)
     }
 
-    private fun showEvaluatedAppDialog() {
-        FeedBackDialog.newInstance(
-            viewModel.uiState.value.email,
-            viewModel.uiState.value.accountType
-        ).show(childFragmentManager, FeedBackDialog.TAG)
+    private fun navigateToRateApp() {
+        Timber.d("Rate the app")
+        runCatching {
+            startActivity(Intent(Intent.ACTION_VIEW, RATE_APP_URL.toUri()))
+        }.onFailure {
+            Timber.d("Can not handle action Intent.ACTION_VIEW")
+        }
     }
 
     private fun deleteAccountClicked() {
@@ -431,7 +497,7 @@ class SettingsFragment :
             .setTitle(getString(R.string.delete_account))
             .setMessage(resources.getString(R.string.delete_account_text))
             .setPositiveButton(R.string.delete_account) { _, _ -> deleteAccountConfirmed() }
-            .setNegativeButton(R.string.general_dismiss) { _, _ -> }
+            .setNegativeButton(sharedResR.string.general_dismiss_dialog) { _, _ -> }
             .show()
 
     }
@@ -451,19 +517,7 @@ class SettingsFragment :
     }
 
     private fun deleteAccount() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (viewModel.deleteAccount()) {
-                showInfoDialog(
-                    R.string.email_verification_title,
-                    R.string.email_verification_text
-                )
-            } else {
-                showInfoDialog(
-                    R.string.general_error_word,
-                    R.string.general_text_error
-                )
-            }
-        }
+        viewModel.deleteAccount()
     }
 
     private fun showInfoDialog(@StringRes title: Int, @StringRes message: Int) {
@@ -484,12 +538,14 @@ class SettingsFragment :
     companion object {
         internal const val INITIAL_PREFERENCE = "initial"
         internal const val NAVIGATE_TO_INITIAL_PREFERENCE = "navigateToInitial"
+        internal const val NAVIGATE_TO_SHOW_HIDDEN_ITEMS_PREFERENCE =
+            "navigateToShowHiddenItemsPreference"
 
         internal const val COOKIES_URI = "https://mega.io/cookie"
         internal const val GITHUB_URL = "https://github.com/meganz/android"
         internal const val TERMS_OF_SERVICE_URL = "https://mega.io/terms"
         internal const val PRIVACY_POLICY_URL = "https://mega.io/privacy"
-        internal const val HELP_CENTRE_URL = "https://help.mega.io/installs-apps/mobile"
+        internal const val HELP_CENTRE_URL = "https://help.mega.io/mobile-apps"
     }
 
     override fun onFragmentResult(requestKey: String, result: Bundle) {

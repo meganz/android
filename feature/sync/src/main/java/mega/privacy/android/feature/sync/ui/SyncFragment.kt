@@ -7,18 +7,18 @@ import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.views.SyncScreen
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import javax.inject.Inject
 
 /**
@@ -76,9 +76,11 @@ internal class SyncFragment : Fragment() {
                         megaNavigator = megaNavigator,
                         fileTypeIconMapper = fileTypeIconMapper,
                         syncPermissionsManager = syncPermissionsManager,
-                        onBackPressed = { requireActivity().onBackPressed() },
+                        onBackPressed = { requireActivity().onBackPressedDispatcher.onBackPressed() },
                         shouldNavigateToSyncList = activity?.intent?.getBooleanExtra(
                             SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, false
+                        ) == false && activity?.intent?.getBooleanExtra(
+                            SyncHostActivity.EXTRA_IS_SINGLE_ACTIVITY_NAVIGATION, false
                         ) == false,
                         newFolderDetail = activity?.intent?.getParcelableExtra(
                             SyncHostActivity.EXTRA_NEW_FOLDER_DETAIL,

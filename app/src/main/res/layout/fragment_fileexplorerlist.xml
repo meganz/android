@@ -60,7 +60,7 @@
 			<com.google.android.material.button.MaterialButton
 				android:id="@+id/action_text"
 				android:layout_marginEnd="19dp"
-				android:text="@string/context_upload"
+				android:text="@string/general_upload_label"
 				style="@style/Widget.Mega.Button"/>
 		</LinearLayout>
 

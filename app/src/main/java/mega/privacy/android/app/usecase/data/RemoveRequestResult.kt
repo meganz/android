@@ -1,8 +1,8 @@
 package mega.privacy.android.app.usecase.data
 
 import android.content.Context
-import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.DBUtil
+import mega.privacy.android.shared.resources.R as SharedR
 
 /**
  * Data class containing all the info related to a movement request.
@@ -26,14 +26,14 @@ data class RemoveRequestResult(
     fun getResultText(context: Context): String = when {
         isSuccess -> {
             context.resources.getQuantityString(
-                R.plurals.rubbish_bin_remove_items_snackbar_success,
+                SharedR.plurals.rubbish_remove_items_snackbar_success,
                 successCount,
                 successCount
             )
         }
         isFailed -> {
             context.resources.getQuantityString(
-                R.plurals.rubbish_bin_remove_items_snackbar_fail,
+                SharedR.plurals.rubbish_remove_items_snackbar_fail,
                 errorCount,
                 errorCount
             )
@@ -41,13 +41,13 @@ data class RemoveRequestResult(
         else -> {
             "${
                 context.resources.getQuantityString(
-                    R.plurals.rubbish_bin_remove_items_snackbar_success_concat,
+                    SharedR.plurals.rubbish_remove_items_snackbar_concat_success,
                     successCount,
                     successCount
                 )
             }${
                 context.resources.getQuantityString(
-                    R.plurals.rubbish_bin_remove_items_snackbar_fail_concat, errorCount, errorCount
+                    SharedR.plurals.rubbish_remove_items_snackbar_concat_fail, errorCount, errorCount
                 )
             }"
         }

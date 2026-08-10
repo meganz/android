@@ -1,10 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.meeting.chat.mapper.EmojiShortCodeMapper
-import mega.privacy.android.app.presentation.meeting.chat.mapper.UiReactionListMapper
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

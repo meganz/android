@@ -9,7 +9,7 @@
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">MEGA cần truy&#160;cập bộ nhớ thiết&#160;bị để đồng&#160;bộ hóa thư&#160;mục cục&#160;bộ của bạn. Chạm vào đây để cho phép quyền truy&#160;cập.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">Để liên&#160;tục đồng&#160;bộ hóa các tệp&#160;tin và thư&#160;mục của bạn, cho phép MEGA chạy trong nền</string>
+    <string name="sync_battery_optimisation_banner">Để liên&#160;tục đồng&#160;bộ hóa các tệp&#160;tin và thư&#160;mục, hãy cho phép MEGA chạy trong&#160;nền</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d tệp tin</item>
@@ -20,40 +20,40 @@
     </plurals>
     <!-- Sync folder counts to show ongoing syncing-->
     <plurals name="num_folders_num_files">
-        <item quantity="other">%1$d thư&#160;mục&#160;·&#160;</item>
+        <item quantity="other">%1$d thư mục&#160;·&#160;</item>
     </plurals>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_folders_num_files_2">
         <item quantity="other">%1$d tệp tin</item>
     </plurals>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Dọn các vấn&#160;đề đã giải&#160;quyết</string>
+    <string name="sync_menu_clear_issues">Dọn các vấn đề đã giải quyết</string>
     <!-- Sync message for two way sync-->
-    <string name="sync_two_way">Đồng&#160;bộ hai chiều</string>
+    <string name="sync_two_way">Đồng bộ hai chiều</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Đổi tên tất cả các mục</string>
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">Hợp nhất các thư mục và đổi tên các tệp tin</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Chọn tệp&#160;tin cục&#160;bộ</string>
+    <string name="sync_stalled_issue_choose_local_file">Chọn tệp tin cục bộ</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Chọn tệp&#160;tin được lưu&#160;trữ trên MEGA</string>
+    <string name="sync_stalled_issue_choose_remote_file">Chọn tệp tin được lưu trữ trên MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
-    <string name="sync_stalled_issue_choose_latest_modified_time">Chọn tệp&#160;tin được sửa&#160;đổi lần cuối&#160;cùng</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time">Chọn tệp tin được sửa đổi lần cuối cùng</string>
     <!-- Sync dialog continue button -->
-    <string name="sync_dialog_file_permission_positive_button">Tiếp tục</string>
+    <string name="sync_dialog_file_permission_positive_button">Tiếp&#160;tục</string>
     <!-- Sync dialog not now button -->
-    <string name="sync_dialog_file_permission_negative_button">Không Phải Lúc Này</string>
+    <string name="sync_dialog_file_permission_negative_button">Không&#160;phải lúc&#160;này</string>
     <!-- Sync dialog title for battery optimization -->
-    <string name="sync_dialog_battery_optimization_title">Tối&#160;ưu hóa pin</string>
+    <string name="sync_dialog_battery_optimization_title">Tối ưu pin</string>
     <!-- Sync dialog cancel button text -->
-    <string name="sync_dialog_battery_optimization_negative_button">Không cho phép</string>
+    <string name="sync_dialog_battery_optimization_negative_button">Không cho</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">Cho phép</string>
     <!-- Sync state message for No Stalled Issues -->
-    <string name="sync_stalled_issues_empty_message">Không có vấn&#160;đề</string>
+    <string name="sync_stalled_issues_empty_message">Không có vấn đề</string>
     <!-- Sync option to choose device folder -->
-    <string name="sync_folder_choose_device_folder_title">Thư&#160;mục&#160;thiết bị</string>
+    <string name="sync_folder_choose_device_folder_title">Thư mục thiết bị</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">Thư mục trên MEGA</string>
     <!-- Sync state Paused -->
@@ -61,15 +61,15 @@
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">Đang đồng&#160;bộ&#8230;</string>
     <!-- Sync permission title for device storage -->
-    <string name="sync_folders_device_storage">Thư&#160;mục thiết&#160;bị</string>
+    <string name="sync_folders_device_storage">Thư mục thiết bị</string>
     <!-- Sync permission title for mega storage -->
-    <string name="sync_folders_mega_storage">Thư&#160;mục trên MEGA</string>
+    <string name="sync_folders_mega_storage">Thư mục trên MEGA</string>
     <!-- Sync while syncing title for Issues info -->
-    <string name="sync_card_sync_issues_info">Th.tin vấn&#160;đề</string>
+    <string name="sync_card_sync_issues_info">Th.tin vấn đề</string>
     <!-- Sync Pause -->
     <string name="sync_card_pause_sync">Tạm dừng</string>
     <!-- Sync Run -->
-    <string name="sync_card_run_sync">Tiếp tục</string>
+    <string name="sync_card_run_sync">Tiếp tục truyền</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
     <string name="sync_dialog_message_wifi_or_mobile_data">Dùng WiFi và mạng di động</string>
     <!-- Sync dialog for sync only over Wi-Fi -->
@@ -77,9 +77,9 @@
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">Bạn sẽ cần thiết&#160;lập một thư&#160;mục cục&#160;bộ trên thiết&#160;bị của mình sẽ đồng&#160;bộ hóa với một thư&#160;mục chọn ra trên Ổ&#160;Mây của bạn</string>
     <!-- Sync stalled issue reason is no file issue-->
-    <string name="sync_stalled_issue_file_issue">Vấn&#160;đề tệp&#160;tin hoặc thư&#160;mục</string>
+    <string name="sync_stalled_issue_file_issue">Vấn đề tệp tin hoặc thư mục</string>
     <!-- Sync stalled issue reason is move or rename-->
-    <string name="sync_stalled_issue_move_or_rename">Không thể di&#160;chuyển hoặc đổi tên</string>
+    <string name="sync_stalled_issue_move_or_rename">Không thể di chuyển hoặc đổi tên</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
     <string name="sync_stalled_issue_delete_or_move_scanning">Việc xóa hoặc di&#160;chuyển đang chờ quét</string>
     <!-- Sync stalled issue reason is delete or move-->
@@ -121,7 +121,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Không thể tiếp cận thư mục đích</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">Đã xảy ra lỗi khi tải xuống tệp hoặc di chuyển tệp&#160;tin đã tải xuống tạm&#160;thời đến vị&#160;trí cuối&#160;cùng của nó.</string>
+    <string name="sync_stalled_issue_download_issue_detail">Đã phát&#160;sinh ra lỗi khi tải&#160;xuống, hoặc di&#160;chuyển tệp&#160;tin tạm&#160;thời đã tải đến vị&#160;trí đích đã đặt cho nó.</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Có lỗi cục&#160;bộ ngăn&#160;cản truy&#160;cập thư&#160;mục</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->

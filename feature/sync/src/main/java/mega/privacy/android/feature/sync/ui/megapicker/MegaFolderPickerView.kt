@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -23,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -33,6 +34,7 @@ import mega.privacy.android.feature.sync.ui.extension.getIcon
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
@@ -40,6 +42,8 @@ import mega.privacy.android.shared.original.core.ui.controls.skeleton.ListItemLo
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as SharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun MegaFolderPickerView(
@@ -51,6 +55,7 @@ internal fun MegaFolderPickerView(
     showChangeViewType: Boolean,
     listState: LazyListState,
     onFolderClick: (TypedNode) -> Unit,
+    onDisabledFolderClick: (TypedNodeUiModel) -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     isLoading: Boolean,
     modifier: Modifier = Modifier,
@@ -96,17 +101,35 @@ internal fun MegaFolderPickerView(
                     key = {
                         nodesList[it].node.id.longValue
                     }) {
-                    val nodeEntity = nodesList[it].node
+                    val nodeUiModel = nodesList[it]
+                    val nodeEntity = nodeUiModel.node
 
                     val icon = when (nodeEntity) {
                         is FolderNode -> nodeEntity.getIcon()
                         is FileNode -> fileTypeIconMapper(nodeEntity.type.extension)
                         else -> iconPackR.drawable.ic_generic_medium_solid
                     }
+
+                    val localResources = LocalResources.current
+
+                    // Show syncSubtitle for disabled folders connected to another device
+                    val folderInfo =
+                        if (nodeUiModel.isDisabled && nodeUiModel.deviceName != null) {
+                            localResources.getString(
+                                sharedResR.string.sync_folder_connection_this_device,
+                                nodeUiModel.deviceName
+                            )
+                        } else {
+                            (nodeEntity as? FolderNode)?.folderInfo()
+                        }
+
+                    // Dim all disabled folders (current device, other device, or excluded) so they are visually distinct
+                    val isDisabledFolder = nodeUiModel.isDisabled
+
                     NodeListViewItem(
+                        modifier = if (isDisabledFolder) Modifier.alpha(0.5f) else Modifier,
                         isSelected = false,
-                        folderInfo = (nodeEntity as? FolderNode)
-                            ?.folderInfo(),
+                        folderInfo = folderInfo,
                         icon = icon,
                         thumbnailData = ThumbnailRequest(nodeEntity.id),
                         fileSize = (nodeEntity as? FileNode)
@@ -125,8 +148,20 @@ internal fun MegaFolderPickerView(
                         isTakenDown = false,
                         isFavourite = false,
                         isSharedWithPublicLink = false,
-                        onClick = { onFolderClick(nodeEntity) },
-                        isEnabled = nodeEntity is FolderNode && nodesList[it].isDisabled.not(),
+                        onClick = {
+                            if (nodeUiModel.isDisabled) {
+                                // Only show remove-connection dialog for other-device backups
+                                // Block navigation into all disabled folders (synced, CU, MU, etc.)
+                                if (nodeUiModel.backupId != null) {
+                                    onDisabledFolderClick(nodeUiModel)
+                                }
+                                // else: do nothing - block navigation
+                            } else {
+                                onFolderClick(nodeEntity)
+                            }
+                        },
+                        // Allow clicks on all folder nodes (including disabled ones for dialog)
+                        isEnabled = nodeEntity is FolderNode,
                     )
                     MegaDivider(dividerType = DividerType.FullSize)
                 }
@@ -170,7 +205,7 @@ private fun EmptyFolderPlaceHolder(
             text = stringResource(R.string.sync_file_browser_empty_folder),
             textColor = TextColor.Secondary,
             modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.subtitle2,
+            style = MaterialTheme.typography.titleMedium,
         )
     }
 }
@@ -192,6 +227,7 @@ private fun MegaFolderPickerViewLoadingStatePreview() {
             modifier = Modifier,
             showChangeViewType = true,
             onFolderClick = {},
+            onDisabledFolderClick = {},
             fileTypeIconMapper = FileTypeIconMapper(),
             isLoading = false,
         )
@@ -212,6 +248,7 @@ private fun MegaFolderPickerViewEmptyPreview() {
             modifier = Modifier,
             showChangeViewType = true,
             onFolderClick = {},
+            onDisabledFolderClick = {},
             fileTypeIconMapper = FileTypeIconMapper(),
             isLoading = false,
         )
@@ -232,6 +269,31 @@ private fun PreviewMegaFolderPickerView() {
             modifier = Modifier,
             showChangeViewType = true,
             onFolderClick = {},
+            onDisabledFolderClick = {},
+            fileTypeIconMapper = FileTypeIconMapper(),
+            isLoading = false
+        )
+    }
+}
+
+/**
+ * A Preview Composable that displays folders with disabled state and device names
+ */
+@Composable
+@CombinedThemePreviews
+private fun PreviewMegaFolderPickerViewWithDisabledFolders() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        MegaFolderPickerView(
+            nodesList = SampleNodeDataProvider.valuesWithDisabledFolders,
+            sortOrder = "Name",
+            onSortOrderClick = {},
+            onChangeViewTypeClick = { },
+            showSortOrder = true,
+            listState = LazyListState(),
+            modifier = Modifier,
+            showChangeViewType = true,
+            onFolderClick = {},
+            onDisabledFolderClick = {},
             fileTypeIconMapper = FileTypeIconMapper(),
             isLoading = false
         )
@@ -243,20 +305,20 @@ private fun FolderNode.folderInfo(): String {
     return if (childFolderCount == 0 && childFileCount == 0) {
         stringResource(R.string.sync_file_browser_empty_folder)
     } else if (childFolderCount == 0 && childFileCount > 0) {
-        pluralStringResource(R.plurals.num_files_with_parameter, childFileCount, childFileCount)
+        pluralStringResource(SharedR.plurals.num_of_files_with_parameter, childFileCount, childFileCount)
     } else if (childFileCount == 0 && childFolderCount > 0) {
         pluralStringResource(
-            R.plurals.num_folders_with_parameter,
+            SharedR.plurals.num_of_folders_with_parameter,
             childFolderCount,
             childFolderCount
         )
     } else {
         pluralStringResource(
-            R.plurals.num_folders_num_files,
+            SharedR.plurals.num_of_folders_and_num_of_files,
             childFolderCount,
             childFolderCount
         ) + pluralStringResource(
-            R.plurals.num_folders_num_files_2,
+            SharedR.plurals.num_of_files_with_parameter,
             childFileCount,
             childFileCount
         )

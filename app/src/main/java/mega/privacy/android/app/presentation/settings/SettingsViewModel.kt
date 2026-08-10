@@ -2,9 +2,9 @@ package mega.privacy.android.app.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -34,7 +33,6 @@ import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
-import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -55,13 +53,12 @@ import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
 import timber.log.Timber
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
@@ -70,7 +67,6 @@ class SettingsViewModel @Inject constructor(
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val monitorContactLinksOptionUseCase: MonitorContactLinksOptionUseCase,
-    private val startScreen: MonitorStartScreenPreference,
     private val monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
     private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
@@ -95,7 +91,7 @@ class SettingsViewModel @Inject constructor(
     private val mainDestinations: Set<@JvmSuppressWildcards MainNavItem>,
     private val monitorStartScreenPreferenceDestinationUseCase: MonitorStartScreenPreferenceDestinationUseCase,
     private val screenPreferenceDestinationMapper: ScreenPreferenceDestinationMapper,
-    @DefaultStartScreen private val defaultStartScreen: NavKey,
+    @DefaultStartScreen private val defaultStartScreen: MainNavItemNavKey,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -120,11 +116,8 @@ class SettingsViewModel @Inject constructor(
             startScreenSummary = "",
             hideRecentActivityChecked = false,
             mediaDiscoveryViewState = MediaDiscoveryViewSettings.INITIAL.ordinal,
-            email = "",
-            accountType = "",
             passcodeLock = false,
             subFolderMediaDiscoveryChecked = true,
-            isHiddenNodesEnabled = null,
             showHiddenItems = false,
             accountDetail = null,
         )
@@ -198,10 +191,6 @@ class SettingsViewModel @Inject constructor(
                             )
                         }
                     },
-                flow { emit(isHiddenNodesActive()) }
-                    .map { enabled ->
-                        { state: SettingsState -> state.copy(isHiddenNodesEnabled = enabled) }
-                    },
                 monitorShowHiddenItemsUseCase()
                     .map { isEnabled ->
                         { state: SettingsState -> state.copy(showHiddenItems = isEnabled) }
@@ -225,38 +214,16 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun monitorStartScreenSummary(): Flow<(SettingsState) -> SettingsState> {
-        return flow { emit(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) }
-            .flatMapLatest { singleActivityFlagEnabled ->
-                if (singleActivityFlagEnabled) {
-                    monitorStartScreenPreferenceDestinationUseCase()
-                        .map { destinationPreference ->
-                            screenPreferenceDestinationMapper(destinationPreference)
-                                ?: defaultStartScreen
-                        }.map { destination ->
-                            startScreenSummaryMapper(mainDestinations.first { it.destination == destination })
-                        }.map { screenName ->
-                            { state: SettingsState -> state.copy(startScreenSummary = screenName) }
-                        }
-                } else {
-                    startScreen()
-                        .map { startScreen ->
-                            startScreenSummaryMapper(startScreen)
-                        }.map { screenName ->
-                            { state: SettingsState -> state.copy(startScreenSummary = screenName) }
-                        }
-                }
-
+    private fun monitorStartScreenSummary(): Flow<(SettingsState) -> SettingsState> =
+        monitorStartScreenPreferenceDestinationUseCase()
+            .map { destinationPreference ->
+                screenPreferenceDestinationMapper(destinationPreference)
+                    ?: defaultStartScreen
+            }.map { destination ->
+                startScreenSummaryMapper(mainDestinations.first { it.destination == destination })
+            }.map { screenName ->
+                { state: SettingsState -> state.copy(startScreenSummary = screenName) }
             }
-
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
-    }
 
     /**
      * Get link for Cookie policy page
@@ -294,9 +261,11 @@ class SettingsViewModel @Inject constructor(
      */
     fun refreshMultiFactorAuthSetting() {
         viewModelScope.launch {
-            state.update {
-                it.copy(multiFactorAuthChecked = isMultiFactorAuthEnabledUseCase())
-            }
+            runCatching { isMultiFactorAuthEnabledUseCase() }
+                .onSuccess { enabled ->
+                    state.update { it.copy(multiFactorAuthChecked = enabled) }
+                }
+                .onFailure { Timber.w(it, "Failed to refresh 2FA setting") }
         }
     }
 
@@ -304,8 +273,6 @@ class SettingsViewModel @Inject constructor(
         { state: SettingsState ->
             state.copy(
                 deleteAccountVisible = canDeleteAccount(userAccount),
-                email = userAccount.email,
-                accountType = userAccount.accountTypeString
             )
         }
 
@@ -325,14 +292,25 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    suspend fun deleteAccount() = runCatching { requestAccountDeletion() }
-        .fold(
-            { true },
-            { e ->
-                Timber.e(e, "Error when asking for the cancellation link")
-                false
-            }
-        )
+    /**
+     * Request account deletion. The result is exposed as a one-shot
+     * [SettingsState.deleteAccountEvent] so the UI shows the outcome dialog only when resumed,
+     * avoiding lifecycle races. The request runs in [viewModelScope] so it survives
+     * configuration changes.
+     */
+    fun deleteAccount() = viewModelScope.launch {
+        val isSuccess = runCatching { requestAccountDeletion() }
+            .onFailure { Timber.e(it, "Error when asking for the cancellation link") }
+            .isSuccess
+        state.update { it.copy(deleteAccountEvent = triggered(isSuccess)) }
+    }
+
+    /**
+     * Consume the [SettingsState.deleteAccountEvent] once the UI has handled it.
+     */
+    fun onDeleteAccountEventConsumed() {
+        state.update { it.copy(deleteAccountEvent = consumed()) }
+    }
 
     /**
      * Set hide recent activity setting

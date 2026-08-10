@@ -8,11 +8,15 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fromId
 import mega.privacy.android.app.fromPluralId
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
+import mega.privacy.android.app.utils.LocationInfo
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -331,6 +335,85 @@ class FileInfoScreenTest {
             hasTestTag(TEST_TAG_FILE_INFO_HEADER)
         )
             .assert(hasAnyChild(hasText("MySecret folder2")))
+    }
+
+    @Test
+    fun `test that clicking description does not set description when node is in backups`() {
+        var descriptionSet = false
+        composeTestRule.setContent {
+            val snackBarHostState = remember { SnackbarHostState() }
+            val viewState = FileInfoViewState(
+                accessPermission = AccessPermission.OWNER,
+                isNodeInBackups = true,
+            )
+            FileInfoScreen(
+                viewState = viewState,
+                snackBarHostState = snackBarHostState,
+                onBackPressed = { },
+                onTakeDownLinkClick = {},
+                onLocationClick = { },
+                availableOfflineChanged = {},
+                onVersionsClick = { },
+                onSetDescriptionClick = { descriptionSet = true },
+                onSharedWithContactClick = {},
+                onSharedWithContactSelected = {},
+                onSharedWithContactUnselected = {},
+                onSharedWithContactMoreOptionsClick = {},
+                onShowMoreSharedWithContactsClick = {},
+                onPublicLinkCopyClick = { },
+                onMenuActionClick = {},
+                onVerifyContactClick = {},
+                onAddTagClick = {},
+                getAddress = { _, _, _ -> null },
+                onShareContactOptionsDismissed = {},
+                onSharedWithContactRemoveClicked = {},
+                onSharedWithContactMoreInfoClick = {},
+                onSharedWithContactChangePermissionClicked = {},
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TEST_TAG_DESCRIPTION, useUnmergedTree = true)
+            .performClick()
+
+        assertFalse(descriptionSet)
+    }
+
+    @Test
+    fun `test that location is hidden when node is in backups`() {
+        composeTestRule.setContent {
+            val snackBarHostState = remember { SnackbarHostState() }
+            val viewState = FileInfoViewState(
+                nodeLocationInfo = LocationInfo(location = "Cloud drive"),
+                isNodeInBackups = true,
+            )
+            FileInfoScreen(
+                viewState = viewState,
+                snackBarHostState = snackBarHostState,
+                onBackPressed = { },
+                onTakeDownLinkClick = {},
+                onLocationClick = { },
+                availableOfflineChanged = {},
+                onVersionsClick = { },
+                onSetDescriptionClick = { },
+                onSharedWithContactClick = {},
+                onSharedWithContactSelected = {},
+                onSharedWithContactUnselected = {},
+                onSharedWithContactMoreOptionsClick = {},
+                onShowMoreSharedWithContactsClick = {},
+                onPublicLinkCopyClick = { },
+                onMenuActionClick = {},
+                onVerifyContactClick = {},
+                onAddTagClick = {},
+                getAddress = { _, _, _ -> null },
+                onShareContactOptionsDismissed = {},
+                onSharedWithContactRemoveClicked = {},
+                onSharedWithContactMoreInfoClick = {},
+                onSharedWithContactChangePermissionClicked = {},
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TEST_TAG_LOCATION, useUnmergedTree = true)
+            .assertDoesNotExist()
     }
 
 }

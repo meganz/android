@@ -33,19 +33,21 @@ internal class MonitorMediaAlbumsUseCaseTest {
 
     private val albumRepository: AlbumRepository = mock()
     private val photosRepository: PhotosRepository = mock()
+    private val getUserAlbumCoverPhotoUseCase: GetUserAlbumCoverPhotoUseCase = mock()
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
 
     @BeforeEach
     fun setUp() {
-        reset(albumRepository, photosRepository)
+        reset(albumRepository, photosRepository, getUserAlbumCoverPhotoUseCase)
     }
 
     private fun initUseCase() {
         underTest = MonitorMediaAlbumsUseCase(
             albumRepository = albumRepository,
             photosRepository = photosRepository,
+            getUserAlbumCoverPhotoUseCase = getUserAlbumCoverPhotoUseCase,
             defaultDispatcher = testDispatcher,
             applicationScope = TestScope(testDispatcher)
         )
@@ -53,25 +55,49 @@ internal class MonitorMediaAlbumsUseCaseTest {
 
     @Test
     fun `test that albums are updated when user sets change`() = runTest {
-        val initialUserSets = createMockUserSets()
-        val updatedUserSets = createMockUserSets().drop(1) // Remove one album
+        val allUserSets = createMockUserSets()
+        val updatedUserSets = allUserSets.dropLast(1)
 
-        whenever(albumRepository.getAllUserSets()).thenReturn(initialUserSets)
+        whenever(albumRepository.getAllUserSets())
+            .thenReturn(allUserSets) // Initial load - getAllUserSets() called in getUserAlbums
+            .thenReturn(allUserSets) // Update flow - getAllUserSets() called in getUserAlbums
         whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(updatedUserSets))
+        whenever(albumRepository.monitorUserSetsContentUpdate()).thenReturn(flowOf(emptyList()))
 
         initUseCase()
 
-        setupAlbumRepositoryMocks(initialUserSets)
-        setupAlbumRepositoryMocks(updatedUserSets)
+        // Set up mocks for each album
+        allUserSets.forEach { set ->
+            val isChanged = updatedUserSets.any { it.id == set.id }
+
+            // Initial load: changedSets = allUserSets, so refresh = true for all
+            whenever(
+                getUserAlbumCoverPhotoUseCase(
+                    albumId = AlbumId(set.id),
+                    refresh = true
+                )
+            ).thenReturn(null)
+
+            // Update flow: changedSets = updatedUserSets, so refresh = isChanged
+            whenever(
+                getUserAlbumCoverPhotoUseCase(
+                    albumId = AlbumId(set.id),
+                    refresh = isChanged
+                )
+            ).thenReturn(null)
+        }
 
         underTest().test {
-            // Initial emission
+            // Emission 1: Initial load from onStart - emits all albums with refresh = true
             val initialResult = awaitItem()
-            assertThat(initialResult).hasSize(3) // 3 user albums
+            assertThat(initialResult).hasSize(allUserSets.size)
 
-            // Updated emission
+            // Emission 2: From monitorUserSetsUpdate() flow - emits all albums, refresh = true only for changed sets
             val updatedResult = awaitItem()
-            assertThat(updatedResult).hasSize(2) // 2 user albums
+            assertThat(updatedResult).hasSize(allUserSets.size)
+
+            // Emission 3: From monitorUserSetsContentUpdate() flow - emits empty list (no content updates)
+            awaitItem()
 
             awaitComplete()
         }
@@ -81,21 +107,43 @@ internal class MonitorMediaAlbumsUseCaseTest {
     fun `test that user albums without cover photos are handled correctly`() = runTest {
         val userSets = createMockUserSetsWithoutCover()
 
-        whenever(albumRepository.getAllUserSets()).thenReturn(userSets)
+        whenever(albumRepository.getAllUserSets())
+            .thenReturn(userSets) // Initial load
+            .thenReturn(userSets) // Update flow (emptyList() as changedSets)
         whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(emptyList()))
+        whenever(albumRepository.monitorUserSetsContentUpdate()).thenReturn(flowOf(emptyList()))
 
         initUseCase()
 
-        setupAlbumRepositoryMocks(userSets)
+        // Set up mocks for both scenarios
+        userSets.forEach { set ->
+            // Initial load: changedSets = userSets, so refresh = true
+            whenever(
+                getUserAlbumCoverPhotoUseCase(
+                    albumId = AlbumId(set.id),
+                    refresh = true
+                )
+            ).thenReturn(null)
+
+            // Update flow: changedSets = emptyList(), so refresh = false
+            whenever(
+                getUserAlbumCoverPhotoUseCase(
+                    albumId = AlbumId(set.id),
+                    refresh = false
+                )
+            ).thenReturn(null)
+        }
 
         underTest().test {
-            awaitItem()
+            // Emission 1: Initial load from onStart - emits all albums with refresh = true
+            assertThat(awaitItem()).hasSize(userSets.size)
 
-            val result = awaitItem()
-            val userAlbums = result.filterIsInstance<MediaAlbum.User>()
-            userAlbums.forEach { userAlbum ->
-                assertThat(userAlbum.cover).isNull()
-            }
+            // Emission 2: From monitorUserSetsUpdate() flow - emits all albums with refresh = false (no changes)
+            val userAlbums = awaitItem().filterIsInstance<MediaAlbum.User>()
+            assertThat(userAlbums).hasSize(userSets.size)
+
+            // Emission 3: From monitorUserSetsContentUpdate() flow - emits all albums with refresh = false
+            awaitItem()
 
             awaitComplete()
         }
@@ -103,15 +151,23 @@ internal class MonitorMediaAlbumsUseCaseTest {
 
     @Test
     fun `test that empty user sets are handled correctly`() = runTest {
-        whenever(albumRepository.getAllUserSets()).thenReturn(emptyList())
+        whenever(albumRepository.getAllUserSets())
+            .thenReturn(emptyList())
+            .thenReturn(emptyList())
         whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(emptyList()))
+        whenever(albumRepository.monitorUserSetsContentUpdate()).thenReturn(flowOf(emptyList()))
 
         initUseCase()
 
         underTest().test {
-            awaitItem()
-            val result = awaitItem()
-            assertThat(result).hasSize(0) // No user albums
+            // Emission 1: Initial load from onStart - no albums (empty list)
+            assertThat(awaitItem()).hasSize(0)
+
+            // Emission 2: From monitorUserSetsUpdate() flow - no albums (empty list)
+            assertThat(awaitItem()).hasSize(0)
+
+            // Emission 3: From monitorUserSetsContentUpdate() flow - no albums (empty list)
+            assertThat(awaitItem()).hasSize(0)
 
             awaitComplete()
         }
@@ -250,10 +306,5 @@ internal class MonitorMediaAlbumsUseCaseTest {
         )
     }
 
-    private suspend fun setupAlbumRepositoryMocks(userSets: List<UserSet>) {
-        userSets.forEach { userSet ->
-            whenever(albumRepository.getAlbumElementIDs(AlbumId(userSet.id)))
-                .thenReturn(emptyList())
-        }
-    }
+    // No extra repository setup needed as covers are provided by getUserAlbumCoverPhotoUseCase
 }

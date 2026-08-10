@@ -8,13 +8,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
-import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
@@ -33,13 +33,13 @@ import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesEntityMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesModelMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
+import mega.privacy.android.data.mapper.home.HomePinnedItemMapper
 import mega.privacy.android.data.mapper.home.HomeWidgetConfigurationMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfEntityMapper
 import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfModelMapper
 import mega.privacy.android.data.mapper.transfer.TransferStateIntMapper
-import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferGroupEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLegacyModelMapper
@@ -59,10 +59,10 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.entity.home.PinnedHomeItem
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
-import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -82,11 +82,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val contactEntityMapper: ContactEntityMapper,
     private val contactModelMapper: ContactModelMapper,
     private val completedTransferDao: Lazy<CompletedTransferDao>,
-    private val activeTransferDao: Lazy<ActiveTransferDao>,
     private val completedTransferModelMapper: CompletedTransferModelMapper,
     private val completedTransferEntityMapper: CompletedTransferEntityMapper,
     private val completedTransferLegacyModelMapper: CompletedTransferLegacyModelMapper,
-    private val activeTransferEntityMapper: ActiveTransferEntityMapper,
     private val backupDao: Lazy<BackupDao>,
     private val backupEntityMapper: BackupEntityMapper,
     private val backupModelMapper: BackupModelMapper,
@@ -119,6 +117,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val transferStateIntMapper: TransferStateIntMapper,
     private val homeWidgetConfigurationDao: Lazy<HomeWidgetConfigurationDao>,
     private val homeWidgetConfigurationMapper: HomeWidgetConfigurationMapper,
+    private val homePinnedItemDao: Lazy<HomePinnedItemDao>,
+    private val homePinnedItemMapper: HomePinnedItemMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.get().insertOrUpdateContact(contactEntityMapper(contact))
@@ -198,20 +198,15 @@ internal class MegaLocalRoomFacade @Inject constructor(
         return entities.map { contactModelMapper(it) }
     }
 
-    override fun getCompletedTransfers(size: Int?) =
+    override suspend fun getCompletedTransfers() =
         completedTransferDao.get().getAllCompletedTransfers()
-            .map { list ->
-                list.map { completedTransferModelMapper(it) }
-                    .toMutableList()
-                    .apply { sortWith(compareByDescending { it.timestamp }) }
-                    .let { if (size != null) it.take(size) else it }
-            }
+            .map(completedTransferModelMapper::invoke)
 
-    override fun getCompletedTransfersByStateWithLimit(
+    override fun monitorCompletedTransfersByStateWithLimit(
         limit: Int,
         vararg transferStates: TransferState,
     ) =
-        completedTransferDao.get().getCompletedTransfersByStateWithLimit(
+        completedTransferDao.get().monitorCompletedTransfersByStateWithLimit(
             transferStates.map(transferStateIntMapper::invoke),
             limit
         ).map { it.map(completedTransferModelMapper::invoke) }
@@ -286,42 +281,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
             }
     }
 
-    override suspend fun getActiveTransferByUniqueId(uniqueId: Long) =
-        activeTransferDao.get().getActiveTransferByUniqueId(uniqueId)
-
-    override suspend fun getActiveTransferByTag(tag: Int) =
-        activeTransferDao.get().getActiveTransferByTag(tag)
-
-    override fun getActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.get().getActiveTransfersByType(transferType)
-
-
-    override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.get().getCurrentActiveTransfersByType(transferType)
-
-    override suspend fun getCurrentActiveTransfers(): List<ActiveTransfer> =
-        activeTransferDao.get().getCurrentActiveTransfers()
-
-    override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
-        activeTransferDao.get()
-            .insertOrUpdateActiveTransfer(activeTransferEntityMapper(activeTransfer))
-
-    override suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>) =
-        activeTransfers.map { activeTransferEntityMapper(it) }.let { mappedActiveTransfers ->
-            activeTransferDao.get().insertOrUpdateActiveTransfers(mappedActiveTransfers)
-        }
-
-    override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.get().deleteAllActiveTransfersByType(transferType)
-
-    override suspend fun deleteAllActiveTransfers() =
-        activeTransferDao.get().deleteAllActiveTransfers()
-
-    override suspend fun setActiveTransfersAsFinishedByUniqueId(
-        uniqueIds: List<Long>,
-        cancelled: Boolean,
-    ) = activeTransferDao.get().setActiveTransfersAsFinishedByUniqueId(uniqueIds, cancelled)
-
     override suspend fun insertActiveTransferGroup(activeTransferActionGroup: ActiveTransferActionGroup) =
         activeTransferGroupDao.get()
             .insertActiveTransferGroup(activeTransferGroupEntityMapper(activeTransferActionGroup))
@@ -332,6 +291,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteActiveTransferGroup(groupId: Int) {
         activeTransferGroupDao.get().deleteActiveTransfersGroupById(groupId)
     }
+
+    override suspend fun getActiveTransferGroups(): List<ActiveTransferActionGroup> =
+        activeTransferGroupDao.get().getActiveTransferGroups()
 
     override suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>) =
         cameraUploadsRecordDao.get().insertOrUpdateCameraUploadsRecords(
@@ -480,6 +442,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override fun monitorOfflineUpdates() = offlineDao.get().monitorOffline()
         .map { it.map { offlineEntity -> offlineModelMapper(offlineEntity) } }
 
+    override fun monitorOfflineNodeIds() = offlineDao.get().monitorOfflineNodeIds()
 
     override suspend fun getAllOfflineInfo() =
         offlineDao.get().getOfflineFiles()?.map { offlineModelMapper(it) } ?: emptyList()
@@ -688,8 +651,33 @@ internal class MegaLocalRoomFacade @Inject constructor(
             entities.map { homeWidgetConfigurationMapper(it) }
         }
 
-    override suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String){
+    override suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String) {
         homeWidgetConfigurationDao.get().deleteWidgetConfigurationById(widgetIdentifier)
+    }
+
+    override suspend fun deleteAllHomeScreenWidgetConfigurations() {
+        homeWidgetConfigurationDao.get().deleteAllWidgetConfigurations()
+    }
+
+    override fun monitorPinnedHomeItems() =
+        homePinnedItemDao.get().monitorPinnedItems().map { entities ->
+            entities.map { homePinnedItemMapper(it) }
+        }
+
+    override suspend fun insertPinnedHomeItems(items: List<PinnedHomeItem>) {
+        homePinnedItemDao.get().insertOrUpdatePinnedItems(items.map { homePinnedItemMapper(it) })
+    }
+
+    override suspend fun updatePinnedHomeItemName(nodeHandle: Long, name: String) {
+        homePinnedItemDao.get().updatePinnedItemName(nodeHandle, name)
+    }
+
+    override suspend fun deletePinnedHomeItem(nodeHandle: Long) {
+        homePinnedItemDao.get().deletePinnedItemByHandle(nodeHandle)
+    }
+
+    override suspend fun deleteAllPinnedHomeItems() {
+        homePinnedItemDao.get().deleteAllPinnedItems()
     }
 
     companion object {

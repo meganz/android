@@ -3,17 +3,17 @@ package mega.privacy.android.feature.sync.navigation
 import android.content.Context
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncViewModel
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 
 
 /**
@@ -54,7 +54,7 @@ internal fun NavGraphBuilder.syncNavGraph(
         shouldNavigateToSyncList = shouldNavigateToSyncList,
         openUpgradeAccountPage = openUpgradeAccountPage,
         popToSyncListView = {
-            navController.navFromNewFolderRouteToListRoute()
+            navController.navFromNewFolderRouteToListRoute(it)
         },
         megaDomainName = megaDomainName,
     )
@@ -101,9 +101,9 @@ internal fun NavGraphBuilder.syncNavGraph(
  * Method to specifically navigate from syncNewFolderRoute to syncListRoute
  * It avoids duplicated navigation due the use of shortcuts, deep links, etc.
  */
-private fun NavController.navFromNewFolderRouteToListRoute() {
+private fun NavController.navFromNewFolderRouteToListRoute(syncType: SyncType) {
     navigate(SyncList()) {
-        popUpTo(SyncNewFolder()) { inclusive = true }
+        popUpTo(SyncNewFolder(syncType = syncType)) { inclusive = true }
     }
     if (previousBackStackEntry?.destination?.route == currentBackStackEntry?.destination?.route) {
         popBackStack()

@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.chat.list.view
 
-import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -43,6 +41,7 @@ import kotlinx.coroutines.flow.collectLatest
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.icon.pack.R as IconR
@@ -87,7 +86,6 @@ fun ChatListView(
     isMeetingView: Boolean,
     isSearchMode: Boolean,
     modifier: Modifier = Modifier,
-    isNew: Boolean = false,
     hasAnyContact: Boolean = false,
     isLoading: Boolean = false,
     tooltip: MeetingTooltipItem = MeetingTooltipItem.NONE,
@@ -118,7 +116,6 @@ fun ChatListView(
                 selectedIds = selectedIds,
                 isEmptyStateShowed = showEmptyState,
                 scrollToTop = scrollToTop,
-                isNew = isNew,
                 tooltip = tooltip,
                 onItemClick = onItemClick,
                 onItemMoreClick = onItemMoreClick,
@@ -159,8 +156,13 @@ private fun ListView(
 ) {
     val listState = rememberLazyListState()
     var selectionEnabled by remember { mutableStateOf(false) }
-    var showTooltip = tooltip == MeetingTooltipItem.RECURRING_OR_PENDING
-            || tooltip == MeetingTooltipItem.RECURRING || tooltip == MeetingTooltipItem.PENDING
+    var showTooltip by remember(tooltip) {
+        mutableStateOf(
+            tooltip == MeetingTooltipItem.RECURRING_OR_PENDING
+                    || tooltip == MeetingTooltipItem.RECURRING
+                    || tooltip == MeetingTooltipItem.PENDING
+        )
+    }
 
     FastScrollLazyColumn(
         state = listState,
@@ -195,7 +197,6 @@ private fun ListView(
                     modifier = modifier.testTag("chat_room_list:item"),
                     item = item,
                     isSelected = selectionEnabled && selectedIds.contains(item.chatId),
-                    isNew = isNew,
                     isEmptyStateShowed = isEmptyStateShowed,
                     isSelectionEnabled = selectionEnabled,
                     onItemClick = onItemClick,
@@ -221,7 +222,9 @@ private fun ListView(
     }
 
     LaunchedEffect(scrollToTop) {
-        listState.animateScrollToItem(0)
+        if (scrollToTop) {
+            listState.animateScrollToItem(0)
+        }
     }
 
     LaunchedEffect(selectedIds) {
@@ -385,9 +388,7 @@ private fun EmptyView(
             color = TextColor.Secondary,
             onAnnotationClick = {
                 Analytics.tracker.trackEvent(InviteFriendsLearnMorePressedEvent)
-                context.startActivity(
-                    Intent(Intent.ACTION_VIEW, Uri.parse("https://mega.io/chatandmeetings"))
-                )
+                context.launchUrl("https://mega.io/chatandmeetings")
             },
             baseStyle = MaterialTheme.typography.body1.copy(
                 textAlign = TextAlign.Center,

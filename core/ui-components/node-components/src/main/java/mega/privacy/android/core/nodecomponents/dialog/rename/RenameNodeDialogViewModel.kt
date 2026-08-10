@@ -12,20 +12,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnLoadNodeName
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnNodeNameChanged
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameConfirmed
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameValidationPassed
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeNameErrorMessageMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
+import mega.privacy.android.domain.entity.InvalidNameType
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
-import mega.privacy.android.domain.usecase.node.ValidNameType
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,6 +38,7 @@ class RenameNodeDialogViewModel @Inject constructor(
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val checkForValidNameUseCase: CheckForValidNameUseCase,
     private val renameNodeUseCase: RenameNodeUseCase,
+    private val nodeNameErrorMessageMapper: NodeNameErrorMessageMapper,
     private val snackBarHandler: SnackBarHandler,
 ) : ViewModel() {
 
@@ -50,12 +52,7 @@ class RenameNodeDialogViewModel @Inject constructor(
                     runCatching {
                         getNodeByHandleUseCase(action.nodeId)
                     }.onSuccess { node ->
-                        _state.update {
-                            it.copy(
-                                nodeName = node?.name,
-                                errorMessage = null
-                            )
-                        }
+                        _state.update { it.copy(nodeName = node?.name) }
                     }
                 }
             }
@@ -80,6 +77,12 @@ class RenameNodeDialogViewModel @Inject constructor(
             is OnChangeNodeExtensionDialogShown -> {
                 _state.update { it.copy(showChangeNodeExtensionDialogEvent = consumed()) }
             }
+
+            is OnNodeNameChanged -> {
+                if (_state.value.errorMessage != null) {
+                    _state.update { it.copy(errorMessage = null) }
+                }
+            }
         }
     }
 
@@ -87,33 +90,25 @@ class RenameNodeDialogViewModel @Inject constructor(
         action: OnRenameConfirmed,
         currentNode: UnTypedNode,
     ) {
-        when (checkForValidNameUseCase(action.newNodeName, currentNode)) {
-            ValidNameType.BLANK_NAME -> {
-                _state.update { it.copy(errorMessage = R.string.invalid_string) }
-            }
-
-            ValidNameType.INVALID_NAME -> {
-                _state.update { it.copy(errorMessage = R.string.invalid_characters_defined) }
-            }
-
-            ValidNameType.NAME_ALREADY_EXISTS -> {
-                _state.update { it.copy(errorMessage = R.string.same_file_name_warning) }
-            }
-
-            ValidNameType.NO_EXTENSION -> {
-                _state.update { it.copy(errorMessage = R.string.file_without_extension_warning) }
-            }
-
-            ValidNameType.DIFFERENT_EXTENSION -> {
+        when (val invalidNameType = checkForValidNameUseCase(
+            newName = action.newNodeName,
+            node = currentNode,
+            isRenameAction = true
+        )) {
+            InvalidNameType.DIFFERENT_EXTENSION -> {
                 _state.update { it.copy(showChangeNodeExtensionDialogEvent = triggered(action.newNodeName)) }
             }
 
             else -> {
-                _state.update {
-                    it.copy(renameValidationPassedEvent = triggered)
-                }
+                nodeNameErrorMessageMapper(invalidNameType, currentNode is FolderNode)?.let {
+                    _state.update { state -> state.copy(errorMessage = it) }
+                } ?: run {
+                    _state.update {
+                        it.copy(renameValidationPassedEvent = triggered)
+                    }
 
-                renameNode(currentNode.id, action.newNodeName)
+                    renameNode(currentNode.id, action.newNodeName)
+                }
             }
         }
     }

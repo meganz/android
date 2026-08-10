@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
-import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
-import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
+import mega.privacy.android.app.presentation.twofactorauthentication.extensions.NUMBER_PINS
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
@@ -47,10 +46,11 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
 
     init {
         getMasterKeyStatus()
+        getAuthenticationCode()
     }
 
 
-    private fun updateTwoFAState(twoFA: List<String>) {
+    private fun updateTwoFAState(twoFA: String) {
         _uiState.update { state ->
             state.copy(
                 twoFAPin = twoFA,
@@ -61,29 +61,14 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
     }
 
     /**
-     * Sets isFirstTime2FA as consumed.
+     * Updates the 2FA code in state. Sanitises non-digit characters and truncates to 6
+     * digits. Submits to the SDK automatically once the user has typed 6 digits.
      */
-    fun onFirstTime2FAConsumed() =
-        _uiState.update { state -> state.copy(isFirstTime2FA = consumed) }
-
-    /**
-     * Updates 2FA code in state.
-     */
-    fun on2FAChanged(twoFA: String) = twoFA.getTwoFactorAuthentication()?.let {
-        updateTwoFAState(it)
-        submitMultiFactorAuthPin(twoFA)
-    }
-
-    /**
-     * Updates a pin of the 2FA code in state.
-     */
-    fun on2FAPinChanged(pin: String, index: Int) {
-        val updated2FA =
-            uiState.value.twoFAPin.getUpdatedTwoFactorAuthentication(pin = pin, index = index)
-
-        updateTwoFAState(updated2FA)
-        updated2FA.getTwoFactorAuthentication()?.apply {
-            submitMultiFactorAuthPin(this)
+    fun on2FAChanged(twoFA: String) {
+        val sanitized = twoFA.filter(Char::isDigit).take(NUMBER_PINS)
+        updateTwoFAState(sanitized)
+        if (sanitized.length == NUMBER_PINS) {
+            submitMultiFactorAuthPin(sanitized)
         }
     }
 
@@ -224,8 +209,7 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
      */
     fun on2FAPinReset() = _uiState.update {
         it.copy(
-            isFirstTime2FA = triggered,
-            twoFAPin = listOf("", "", "", "", "", ""),
+            twoFAPin = "",
             authenticationState = AuthenticationState.Fixed
         )
     }
@@ -254,13 +238,12 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
             }.onFailure { e ->
                 _uiState.update {
                     it.copy(
-                        isFirstTime2FA = consumed,
                         isPinSubmitted = true,
                         authenticationState =
-                        if (e is EnableMultiFactorAuthException)
-                            AuthenticationState.Failed
-                        else
-                            AuthenticationState.Error,
+                            if (e is EnableMultiFactorAuthException)
+                                AuthenticationState.Failed
+                            else
+                                AuthenticationState.Error,
                     )
                 }
             }

@@ -9,31 +9,12 @@ import androidx.appcompat.app.AlertDialog
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.utils.LocationInfo
-import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import java.io.File
 
 interface MegaNodeUtilWrapper {
-
-    /**
-     * Gets the node of the user attribute "My chat files" from the DB.
-     *
-     * Before call this method is necessary to call existsMyChatFilesFolder() method
-     *
-     * @return "My chat files" folder node
-     * @see MegaNodeUtil.existsMyChatFilesFolder
-     */
-    fun getMyChatFilesFolder(): MegaNode?
-
-    /**
-     * Gets the handle of Cloud root node.
-     *
-     * @return The handle of Cloud root node if available, invalid handle otherwise.
-     */
-    fun getCloudRootHandle(): Long
 
     /**
      * The method to calculate how many nodes are folders in array list
@@ -53,31 +34,6 @@ interface MegaNodeUtilWrapper {
     fun showTakenDownNodeActionNotAvailableDialog(node: MegaNode?, context: Context): Boolean
 
     /**
-     *
-     * Shares a node.
-     *
-     * @param context Current Context.
-     * @param node    Node to share.
-     */
-    fun shareNode(context: Context, node: MegaNode?)
-
-    /**
-     *
-     * Shares a node.
-     * If the node is a folder creates and/or shares the folder link.
-     * If the node is a file and exists in local storage, shares the file. If not, creates and/or shares the file link.
-     *
-     * @param context                  Current Context.
-     * @param node                     Node to share.
-     * @param onExportFinishedListener Listener to manage the result of export request.
-     */
-    fun shareNode(
-        context: Context,
-        node: MegaNode?,
-        onExportFinishedListener: (() -> Unit)?,
-    )
-
-    /**
      * Method to know if all nodes are unloaded. If so, share them.
      *
      * @param context   The Activity context.
@@ -93,19 +49,6 @@ interface MegaNodeUtilWrapper {
      * @return The link with all exported nodes
      */
     fun getExportNodesLink(listNodes: List<MegaNode>): StringBuilder
-
-    /**
-     * Share multiple nodes out of MEGA app.
-     *
-     * If a folder is involved, we will share links of all nodes.
-     *
-     * Other apps can't handle the mixture of link and file, so if there is any file that is not
-     * downloaded, we will share links of all files.
-     *
-     * @param context the context where nodes are shared
-     * @param nodes nodes to share
-     */
-    fun shareNodes(context: Context, nodes: List<MegaNode>)
 
     /**
      * Checks if there is any error before continues any action.
@@ -131,29 +74,16 @@ interface MegaNodeUtilWrapper {
         nodes: List<MegaNode>?,
     ): Boolean
 
-    /**
-     * Checks if the user attribute "My chat files" is saved in DB and exists
-     *
-     * @return True if the the user attribute "My chat files" is saved in the DB, false otherwise
-     */
-    fun existsMyChatFilesFolder(): Boolean
-
-    /**
-     * Checks if a node is  outgoing or a pending outgoing share.
-     *
-     * @param node MegaNode to check
-     * @return True if the node is a outgoing or a pending outgoing share, false otherwise
-     */
-    suspend fun isOutShare(node: MegaNode): Boolean
 
     /**
      * Gets the the icon that has to be displayed for a folder.
      *
+     * @param megaApi       MegaApiAndroid instance to use.
      * @param node          MegaNode referencing the folder to check
      * @param drawerItem    indicates if the icon has to be shown in Outgoing shares section or any other
      * @return The icon of the folder to be displayed.
      */
-    fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem): Int
+    fun getFolderIcon(megaApi: MegaApiAndroid, node: MegaNode, drawerItem: DrawerItem): Int
 
     /**
      * Checks if it is on Links section and in root level.
@@ -164,23 +94,6 @@ interface MegaNodeUtilWrapper {
      */
     fun isInRootLinksLevel(adapterType: Int, parentHandle: Long): Boolean
 
-    /**
-     * Checks if the Toolbar option "share" should be visible or not depending on the permissions of the MegaNode
-     *
-     * @param adapterType   view in which is required the check
-     * @param isFolderLink  if true, the node comes from a folder link
-     * @param handle        identifier of the MegaNode to check
-     * @return True if the option "share" should be visible, false otherwise
-     */
-    fun showShareOption(adapterType: Int, isFolderLink: Boolean, handle: Long): Boolean
-
-    /**
-     * This method is to detect whether the node has been deleted completely
-     * or in rubbish bin
-     * @param handle node's handle to be detected
-     * @return whether the node is in rubbish
-     */
-    fun isNodeInRubbishOrDeleted(handle: Long): Boolean
 
     /**
      * Check if all nodes are file nodes and not taken down.
@@ -189,32 +102,6 @@ interface MegaNodeUtilWrapper {
      * @return whether all nodes are file nodes and not taken down.
      */
     fun areAllFileNodesAndNotTakenDown(nodes: List<MegaNode>): Boolean
-
-    /**
-     * Check if all nodes have full access.
-     *
-     * @param nodes nodes to check
-     * @return whether all nodes have full access
-     */
-    fun allHaveFullAccess(nodes: List<MegaNode?>): Boolean
-
-    /**
-     * Check if all nodes have owner access and are not taken down.
-     *
-     * @param nodes List of nodes to check.
-     * @return True if all nodes have owner access and are not taken down, false otherwise.
-     */
-    fun allHaveOwnerAccessAndNotTakenDown(nodes: List<MegaNode?>): Boolean
-
-    /**
-     * Checks if a folder node is empty.
-     * If a folder is empty means although contains more folders inside,
-     * all of them don't contain any file.
-     *
-     * @param node  MegaNode to check.
-     * @return  True if the folder is folder and is empty, false otherwise.
-     */
-    fun isEmptyFolder(node: MegaNode?): Boolean
 
     /**
      * Get list of all child files.
@@ -292,30 +179,6 @@ interface MegaNodeUtilWrapper {
      * @param handles handles to copy
      */
     fun selectFolderToCopy(activity: Activity, handles: LongArray)
-
-    /**
-     * Get location info of a node.
-     *
-     * @param adapterType node source adapter type
-     * @param fromIncomingShare is from incoming share
-     * @param handle node handle
-     *
-     * @return location info
-     */
-    fun getNodeLocationInfo(
-        adapterType: Int,
-        fromIncomingShare: Boolean,
-        handle: Long,
-    ): LocationInfo?
-
-    /**
-     * Handle click event of the location text.
-     *
-     * @param activity current activity
-     * @param adapterType node source adapter type
-     * @param location location info
-     */
-    fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo)
 
     /**
      * Launch [ZipBrowserActivity] to preview a zip file.

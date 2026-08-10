@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.foundation.background
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
@@ -36,25 +36,26 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import mega.privacy.android.app.R
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.constants.StringsConstants
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.grey_300
 import mega.privacy.android.shared.original.core.ui.theme.red_400
 import mega.privacy.android.shared.original.core.ui.theme.red_900
-import mega.privacy.android.shared.original.core.ui.theme.accent_050
-import mega.privacy.android.shared.original.core.ui.theme.accent_900
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -70,7 +71,7 @@ internal fun CreateVideoPlaylistDialog(
     errorMessage: Int? = null,
     isInputValid: () -> Boolean = { true },
 ) {
-    var textState by rememberSaveable { mutableStateOf(initialInputText()) }
+    var textState by remember { mutableStateOf(initialInputText()) }
     val isEnabled by rememberSaveable { mutableStateOf(true) }
     val isError by rememberSaveable { mutableStateOf(false) }
     val singleLine = true
@@ -159,6 +160,7 @@ internal fun CreateVideoPlaylistDialog(
                         ),
                     cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
                     textStyle = mergedTextStyle,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                     maxLines = 1,
                     singleLine = singleLine,
                     decorationBox = @Composable { innerTextField ->
@@ -196,14 +198,11 @@ internal fun CreateVideoPlaylistDialog(
                                     .padding(end = 8.dp)
                                     .testTag(ERROR_MESSAGE_TEST_TAG),
                                 text = when (it) {
-                                    R.string.invalid_characters_defined -> stringResource(id = it).replace(
-                                        "%1\$s",
-                                        StringsConstants.INVALID_CHARACTERS
+                                    sharedR.string.general_invalid_characters_defined -> stringResource(
+                                        id = it, StringsConstants.INVALID_CHARACTERS
                                     )
 
-                                    R.string.invalid_string -> stringResource(id = it)
-
-                                    else -> stringResource(id = sharedR.string.video_section_playlists_error_message_playlist_name_exists)
+                                    else -> stringResource(it)
                                 },
                                 textColor = TextColor.Error,
                                 style = caption
@@ -266,7 +265,7 @@ private fun CreateVideoPlaylistDialogPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
-            positiveButtonText = stringResource(id = R.string.general_create),
+            positiveButtonText = stringResource(id = sharedR.string.general_create_label),
             onDismissRequest = {},
             onDialogPositiveButtonClicked = {},
             onDialogInputChange = {},
@@ -284,12 +283,12 @@ private fun CreateVideoPlaylistDialogWithErrorPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
-            positiveButtonText = stringResource(id = R.string.general_create),
+            positiveButtonText = stringResource(id = sharedR.string.general_create_label),
             onDismissRequest = {},
             onDialogPositiveButtonClicked = {},
             onDialogInputChange = {},
             inputPlaceHolderText = { "New playlist(x)" },
-            errorMessage = R.string.invalid_characters_defined
+            errorMessage = sharedR.string.general_invalid_characters_defined
         ) {
             false
         }
@@ -302,7 +301,7 @@ private fun CreateVideoPlaylistDialogWithSameNamePreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
-            positiveButtonText = stringResource(id = R.string.general_create),
+            positiveButtonText = stringResource(id = sharedR.string.general_create_label),
             onDismissRequest = {},
             onDialogPositiveButtonClicked = {},
             onDialogInputChange = {},

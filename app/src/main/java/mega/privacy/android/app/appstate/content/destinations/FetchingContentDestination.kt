@@ -1,0 +1,75 @@
+package mega.privacy.android.app.appstate.content.destinations
+
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.togetherWith
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.ui.NavDisplay
+import kotlinx.serialization.Serializable
+import mega.privacy.android.app.presentation.login.FetchNodesViewModel
+import mega.privacy.android.app.presentation.login.view.FetchNodesContent
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
+import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
+import mega.privacy.android.navigation.contract.suppression.withOverlaySuppression
+import mega.privacy.android.navigation.destination.MyAccountNavKey
+
+@Serializable
+data class FetchingContentNavKey(
+    val session: String,
+    val isFromLogin: Boolean,
+    val refreshEvent: RefreshEvent? = null,
+) : NoNodeNavKey
+
+fun EntryProviderScope<NavKey>.fetchingContentDestination(
+    navigate: (NavKey) -> Unit,
+) {
+    entry<FetchingContentNavKey>(
+        metadata = NavDisplay.transitionSpec {
+            EnterTransition.None togetherWith ExitTransition.None
+        } + buildMetadata { withOverlaySuppression() }
+    ) {
+        val activity = LocalActivity.current
+        val viewModel = hiltViewModel<FetchNodesViewModel, FetchNodesViewModel.Factory>(
+            creationCallback = { factory ->
+                factory.create(
+                    FetchNodesViewModel.Args(
+                        session = it.session,
+                        isFromLogin = it.isFromLogin,
+                        refreshEvent = it.refreshEvent
+                    )
+                )
+            }
+        )
+        val state by viewModel.state.collectAsStateWithLifecycle()
+
+        val needsBackOverride =
+            state.isFastLoginInProgress || (state.fetchNodesUpdate?.progress?.floatValue
+                ?: 0.0f) < 1f
+        BackHandler(enabled = needsBackOverride) {
+            activity?.moveTaskToBack(true)
+        }
+
+        val refreshFinished =
+            state.isRefreshSession && state.fetchNodesUpdate?.progress?.floatValue == 1F
+        LaunchedEffect(refreshFinished) {
+            if (refreshFinished) {
+                navigate(MyAccountNavKey())
+            }
+        }
+
+        FetchNodesContent(
+            isRequestStatusInProgress = state.isRequestStatusInProgress,
+            currentProgress = state.currentProgress,
+            currentStatusText = state.currentStatusText,
+            requestStatusProgress = state.requestStatusProgress,
+        )
+    }
+}

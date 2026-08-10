@@ -4,7 +4,6 @@ import androidx.recyclerview.widget.DiffUtil
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.ContactItem
 
@@ -20,7 +19,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property chatTitle                                  Chat title.
  * @property openSendToChat                             True, open sent to chat screen. False, close it.
  * @property openRemoveParticipantDialog                True, open remove participant dialog. False, close it.
- * @property selected                                   [ChatParticipant] selected.
+ * @property selected                                   [ChatParticipantUiState] selected.
  * @property openChatRoom                               Chat id of the chat room to send message.
  * @property showChangePermissionsDialog                Show change permissions dialog.
  * @property openChatCall                               Chat id of the chat room to send message.
@@ -33,7 +32,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property addParticipantsNoContactsDialog            True if show add participants no contacts dialog, false if not.
  * @property addParticipantsNoContactsLeftToAddDialog   True if show add participants no contacts left to add dialog, false if not.
  * @property buttons                                    List of available action buttons.
- * @property participantItemList                        List of [ContactItem].
+ * @property participantItemList                        List of [ChatParticipantUiState].
  * @property firstParticipant                           First participant in the chat room.
  * @property secondParticipant                          Second participant in the chat room.
  * @property numOfParticipants                          Number of participants in chat
@@ -56,7 +55,7 @@ data class ChatInfoUiState(
     val chatTitle: String = "",
     val openSendToChat: Boolean = false,
     val openRemoveParticipantDialog: Boolean = false,
-    val selected: ChatParticipant? = null,
+    val selected: ChatParticipantUiState? = null,
     val openChatRoom: Long? = null,
     val showChangePermissionsDialog: ChatRoomPermission? = null,
     val openChatCall: Long? = null,
@@ -69,9 +68,9 @@ data class ChatInfoUiState(
     val addParticipantsNoContactsDialog: Boolean = false,
     val addParticipantsNoContactsLeftToAddDialog: Boolean = false,
     val buttons: List<ChatInfoAction> = ChatInfoAction.entries,
-    val participantItemList: List<ChatParticipant> = emptyList(),
-    val firstParticipant: ChatParticipant? = null,
-    val secondParticipant: ChatParticipant? = null,
+    val participantItemList: List<ChatParticipantUiState> = emptyList(),
+    val firstParticipant: ChatParticipantUiState? = null,
+    val secondParticipant: ChatParticipantUiState? = null,
     val numOfParticipants: Int = 0,
     val is24HourFormat: Boolean = false,
     val enabledWaitingRoomOption: Boolean = true,

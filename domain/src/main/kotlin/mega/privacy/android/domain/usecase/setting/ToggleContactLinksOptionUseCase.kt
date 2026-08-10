@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.setting
 
-import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.repository.SettingsRepository
 import javax.inject.Inject
 
@@ -14,16 +13,8 @@ class ToggleContactLinksOptionUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @return
+     * @return the new value of the setting
      */
-    suspend operator fun invoke() = runCatching {
-        settingsRepository.getContactLinksOption()
-    }.onSuccess { current ->
-        return settingsRepository.setContactLinksOption(!current)
-    }.recover { error ->
-        if (error is SettingNotFoundException) {
-            return settingsRepository.setContactLinksOption(true)
-        }
-        throw error
-    }.getOrThrow()
+    suspend operator fun invoke() =
+        settingsRepository.setContactLinksOption(!settingsRepository.getContactLinksOption())
 }

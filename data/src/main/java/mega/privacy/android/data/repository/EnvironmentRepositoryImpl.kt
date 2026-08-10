@@ -14,16 +14,19 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.environment.DevicePowerConnectionStateMapper
 import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.model.protobuf.TombstoneProtos
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.domain.entity.AppInfo
+import mega.privacy.android.domain.entity.AppVersion
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import timber.log.Timber
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -39,6 +42,7 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     private val applicationIpAddressWrapper: ApplicationIpAddressWrapper,
     private val thermalStateMapper: ThermalStateMapper,
     private val devicePowerConnectionStateMapper: DevicePowerConnectionStateMapper,
+    private val appVersionMapper: AppVersionMapper
 ) : EnvironmentRepository {
     private val isHistoricalProcessExitReasonsFetched = AtomicBoolean(false)
 
@@ -60,6 +64,7 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
         sdkVersion = megaApiGateway.getSdkVersion(),
     )
 
+    override fun getAppVersion() = appVersionMapper(context.getString(R.string.app_version))
 
     override fun getDeviceSdkVersionInt() = deviceGateway.getSdkVersionInt()
 
@@ -138,4 +143,9 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     }
 
     override fun getTimezone(): String = deviceGateway.getTimezone()
+
+    override fun getLocale(): Locale = context.resources.configuration.locales
+        .takeIf { it.size() > 0 }
+        ?.get(0)
+        ?: Locale.getDefault()
 }

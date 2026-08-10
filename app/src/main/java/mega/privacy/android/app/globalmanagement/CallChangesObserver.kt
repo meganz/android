@@ -16,6 +16,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.notifications.CallPushMessageNotificationManager
 import mega.privacy.android.app.utils.CallUtil
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.call.EndCallReason
 import mega.privacy.android.domain.entity.meeting.CallPushMessageNotificationActionType
+import mega.privacy.android.domain.entity.meeting.FakeIncomingCallState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -192,6 +194,10 @@ class CallChangesObserver @Inject constructor(
         if (call.callCompositionChange == CallCompositionChanges.Added && numberOfParticipants > 1) {
             Timber.d("Handle call")
             if (getMyUserHandleUseCase() == call.peerIdCallCompositionChange) {
+                callPushMessageNotificationManager.remove(
+                    call.chatId
+                )
+                setFakeIncomingCallUseCase(chatId = call.chatId, type = null)
                 CallUtil.clearIncomingCallNotification(call.callId)
                 chatManagement.removeValues(call.chatId)
             }
@@ -297,7 +303,7 @@ class CallChangesObserver @Inject constructor(
         val isPendingHangUpCall = isPendingToHangUpUseCase(call.chatId)
 
         if (!isNotificationShown &&
-            isFakeIncomingCall == null &&
+            (isFakeIncomingCall == null || isFakeIncomingCall == FakeIncomingCallState.Remove) &&
             !isPendingHangUpCall
         ) {
             if (isRinging) {
@@ -425,9 +431,7 @@ class CallChangesObserver @Inject constructor(
      *
      * @param incomingCallChatId
      */
-    private fun checkOneCall(incomingCallChatId: Long
-
-    ) {
+    private fun checkOneCall(incomingCallChatId: Long) {
         Timber.d("One call : Chat ID is $incomingCallChatId, openCall Chat ID is $openCallChatId")
         if (openCallChatId == incomingCallChatId) {
             Timber.d("The call is already opened")
@@ -507,6 +511,7 @@ class CallChangesObserver @Inject constructor(
      */
     fun showOneCallNotification(incomingCall: MegaChatCall) {
         Timber.d("Show incoming call notification and start to sound. Chat ID is ${incomingCall.chatid}")
+        LegacyAudioPlayerService.pauseAudioPlayer(application)
         MegaApplication.getInstance()
             .createOrUpdateAudioManager(false, Constants.AUDIO_MANAGER_CALL_RINGING)
         chatManagement.addNotificationShown(incomingCall.chatid)

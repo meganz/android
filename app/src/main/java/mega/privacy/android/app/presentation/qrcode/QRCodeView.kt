@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.qrcode
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -68,9 +69,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.avatar.model.AvatarContent
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.app.presentation.avatar.view.Avatar
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.app.presentation.extensions.dialogContent
 import mega.privacy.android.app.presentation.extensions.dialogTitle
 import mega.privacy.android.app.presentation.extensions.printEmail
@@ -553,7 +554,7 @@ private fun handleSave(
                 requireNotNull(bitmap)
                 saveBitmap(bitmap, qrFilePath)
                 onSaveQRCode()
-            }.onFailure { snackBarHostState.showAutoDurationSnackbar(activity.getString(R.string.general_text_error)) }
+            }.onFailure { snackBarHostState.showAutoDurationSnackbar(activity.getString(sharedResR.string.general_text_error)) }
         }
     }
 }
@@ -645,8 +646,9 @@ private fun shareImage(activity: Activity, uri: Uri?) {
     uri?.let {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "image/*"
-            putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()))
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            putExtra(Intent.EXTRA_STREAM, uri)
+            clipData = ClipData.newUri(activity.contentResolver, "", uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
         }
 
         activity.startActivity(

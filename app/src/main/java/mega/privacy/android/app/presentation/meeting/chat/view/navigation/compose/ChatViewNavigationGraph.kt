@@ -1,9 +1,12 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose
 
+import android.annotation.SuppressLint
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.navigation.BottomSheetNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
@@ -13,8 +16,9 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.Constants
 import java.net.URLEncoder
@@ -29,7 +33,6 @@ internal const val ChatNavigationRoutePattern =
 internal fun chatNavigationRoutePattern(chatId: Long, action: String, link: String?) =
     "chat/$chatId/$action?link=$link"
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.chatViewNavigationGraph(
     bottomSheetNavigator: BottomSheetNavigator,
     navController: NavHostController,
@@ -44,6 +47,10 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
     onBackPress: () -> Unit,
     onCameraPermissionDenied: () -> Unit,
     enablePasscodeCheck: () -> Unit,
+    navigateToWebSite: (String) -> Unit,
+    onNavigate: (NavKey) -> Unit = {},
+    monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
+    clearResult: (String) -> Unit = {},
 ) {
     navigation(
         startDestination = ConversationRoute,
@@ -57,11 +64,12 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
             },
         ),
     ) {
-
         chatScreen(
             navController = navController,
             bottomSheetNavigator = bottomSheetNavigator,
             scaffoldState = scaffoldState,
+            monitorResult = monitorResult,
+            clearResult = clearResult,
             navigateToFreePlanLimitParticipants = navController::navigateToFreePlanLimitsParticipantsDialog,
             showOptionsModal = navController::navigateToMessageOptionsModal,
             showEmojiModal = navController::navigateToEmojiPickerModal,
@@ -89,14 +97,20 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
             navigateToConversation = navController::navigateToChatViewGraph,
             onBackPress = onBackPress,
             enablePasscodeCheck = enablePasscodeCheck,
+            navigateToWebSite = navigateToWebSite,
+            onNavigate = onNavigate,
         )
 
-        chatFileModal(navController = navController) {
-            navController.popBackStack(
-                ConversationRoute,
-                false
-            )
-        }
+        chatFileModal(
+            navController = navController,
+            onNavigate = onNavigate,
+            closeBottomSheets = {
+                navController.popBackStack(
+                    ConversationRoute,
+                    false
+                )
+            },
+        )
 
         messageOptionsModal(
             navController = navController,
@@ -135,7 +149,8 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
         chatToolbarModal(
             navController = navController,
             scaffoldState = scaffoldState,
-            onCameraPermissionDenied = onCameraPermissionDenied
+            onCameraPermissionDenied = onCameraPermissionDenied,
+            onNavigate = onNavigate,
         ) {
             navController.popBackStack(
                 ConversationRoute,
@@ -206,11 +221,16 @@ internal class ChatArgs(val chatId: Long, val action: String, val link: String?)
             )
 }
 
+@SuppressLint("LifecycleCurrentStateInComposition")
 @Composable
 inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavHostController): T {
     val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
     val parentEntry = remember(this) {
         navController.getBackStackEntry(navGraphRoute)
     }
-    return hiltViewModel(parentEntry)
+    return if (parentEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
+        hiltViewModel(parentEntry)
+    } else {
+        hiltViewModel()
+    }
 }

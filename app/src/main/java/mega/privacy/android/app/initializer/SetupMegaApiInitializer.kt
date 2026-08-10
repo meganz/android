@@ -9,14 +9,11 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.globalmanagement.BackgroundRequestListener
-import mega.privacy.android.app.listeners.GlobalListener
+import mega.privacy.android.app.listeners.global.GlobalListener
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.global.InitialiseGlobalListenersUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -49,19 +46,6 @@ class SetupMegaApiInitializer : Initializer<Unit> {
         fun globalListener(): GlobalListener
 
         /**
-         * Request listener
-         *
-         */
-        fun requestListener(): BackgroundRequestListener
-
-        /**
-         * Get feature flag value use case
-         *
-         * @return [GetFeatureFlagValueUseCase]
-         */
-        fun getFeatureFlagValueUseCase(): GetFeatureFlagValueUseCase
-
-        /**
          * App scope
          *
          */
@@ -81,6 +65,7 @@ class SetupMegaApiInitializer : Initializer<Unit> {
      *
      */
     override fun create(context: Context) {
+        if (!context.canResolveHiltEntryPoints()) return
         val entryPoint =
             EntryPointAccessors.fromApplication(
                 context,
@@ -91,9 +76,11 @@ class SetupMegaApiInitializer : Initializer<Unit> {
         megaApi.downloadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
         megaApi.uploadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
         addListeners(megaApi, entryPoint)
-        setStreamingBufferSize(megaApi, context)
-        setSDKLanguage(megaApi)
-        setResourceLimit(megaApi)
+        entryPoint.appScope().launch {
+            setStreamingBufferSize(megaApi, context)
+            setSDKLanguage(megaApi)
+            setResourceLimit(megaApi)
+        }
     }
 
     private fun addListeners(
@@ -102,11 +89,7 @@ class SetupMegaApiInitializer : Initializer<Unit> {
     ) {
         Timber.d("ADD REQUEST LISTENER")
         setupMegaApiInitializerEntryPoint.appScope().launch {
-            if (setupMegaApiInitializerEntryPoint.getFeatureFlagValueUseCase()(AppFeatures.SingleActivity)) {
-                setupMegaApiInitializerEntryPoint.initialiseGlobalRequestListenerUseCase()()
-            } else {
-                megaApiAndroid.addRequestListener(setupMegaApiInitializerEntryPoint.requestListener())
-            }
+            setupMegaApiInitializerEntryPoint.initialiseGlobalRequestListenerUseCase()()
         }
 
         megaApiAndroid.addGlobalListener(setupMegaApiInitializerEntryPoint.globalListener())
@@ -170,7 +153,10 @@ class SetupMegaApiInitializer : Initializer<Unit> {
      *
      */
     override fun dependencies(): List<Class<out Initializer<*>>> =
-        listOf(LoggerInitializer::class.java)
+        listOf(
+            LoggerInitializer::class.java, NativeLibraryInitializer::class.java,
+            WebRtcContextInitializer::class.java
+        )
 
     companion object {
         private const val BUFFER_COMP: Long = 1073741824 // 1 GB

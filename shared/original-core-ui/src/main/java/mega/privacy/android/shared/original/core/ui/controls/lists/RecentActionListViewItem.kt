@@ -51,6 +51,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSe
 /**
  * Composable for the recent actions list item
  */
+@Deprecated("Use revamped version")
 @Composable
 fun RecentActionListViewItem(
     firstLineText: String,
@@ -76,7 +77,7 @@ fun RecentActionListViewItem(
                     onItemClick()
                 }
                 .padding(horizontal = 12.dp, vertical = 10.dp)
-                .alpha(1f.takeIf { !isSensitive } ?: 0.5f),
+                .alpha(if (isSensitive) 0.5f else 1f),
         ) {
             Image(
                 modifier = Modifier

@@ -1,46 +1,126 @@
 package mega.privacy.android.navigation.destination
 
+import android.os.Parcelable
 import androidx.navigation3.runtime.NavKey
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 /**
  * Cloud drive route args
  * @property nodeHandle the handle of the node to display
  * @property nodeName optional name to show as screen title
  * @property nodeSourceType the source type of the node
- * @property isNewFolder whether the screen is opened after creating a new folder
  * @property highlightedNodeHandle the handle of the node to highlight
  * @property highlightedNodeNames the names of the nodes to highlight
  */
 @Serializable
+@Parcelize
 data class CloudDriveNavKey(
     val nodeHandle: Long = -1L,
     val nodeName: String? = null,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
-    val isNewFolder: Boolean = false,
     val highlightedNodeHandle: Long? = null,
     val highlightedNodeNames: List<String>? = null,
-) : NavKey
+) : NavKey, Parcelable
 
 /**
  * Shares route args
  */
 @Serializable
-data object SharesNavKey : NavKey
+@Parcelize
+data object SharesNavKey : NavKey, Parcelable
 
 /**
  * Offline route args
  */
 @Serializable
+@Parcelize
 data class OfflineNavKey(
     val title: String? = null,
     val nodeId: Int = -1,
     val path: String? = null,
     val highlightedFiles: String? = null,
-) : NavKey
+) : NoNodeNavKey, Parcelable
 
 @Serializable
 data class DriveSyncNavKey(
-    val initialTabIndex: Int = 0,
+    val initialTabIndex: Int = DRIVE_TAB_INDEX,
+    val highlightedNodeHandle: Long? = null,
+) : MainNavItemNavKey {
+
+    companion object {
+        const val DRIVE_TAB_INDEX = 0
+        const val SYNC_TAB_INDEX = 1
+    }
+}
+
+/**
+ * Cloud drive media discovery route args
+ * @property folderId the handle of the folder to display media for
+ * @property folderName the name of the folder
+ * @property fromFolderLink whether the folder is from a folder link
+ * @property nodeSourceType the source type of the node
+ */
+@Serializable
+@Parcelize
+data class CloudDriveMediaDiscoveryNavKey(
+    val folderId: Long,
+    val folderName: String,
+    val fromFolderLink: Boolean = false,
+    val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+) : NavKey, Parcelable
+
+/**
+ * Favourites route args
+ */
+@Serializable
+data object FavouritesNavKey : NavKey
+
+/**
+ * Audio section route args
+ */
+@Serializable
+data object AudioNavKey : NavKey
+
+/**
+ * Search route args
+ */
+@Serializable
+data class SearchNavKey(
+    val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    val parentHandle: Long,
 ) : NavKey
+
+/**
+ * @isOverQuota whether the user is over quota (red) or near quota (orange)
+ * @overQuotaAlert whether to show the over quota alert dialog or just reminder dialog
+ */
+@Serializable
+@Parcelize
+data class OverQuotaDialogNavKey(
+    val isOverQuota: Boolean,
+    val overQuotaAlert: Boolean = true,
+) : DialogNavKey, Parcelable
+
+/**
+ * NavKey for folder link screen
+ * @param uriString the uri string of the folder link
+ */
+@Serializable
+data class FolderLinkNavKey(
+    val uriString: String? = null,
+) : NoSessionNavKey.Optional
+
+/**
+ * NavKey for file link screen
+ * @param uriString the uri string of the file link
+ */
+@Serializable
+data class FileLinkNavKey(
+    val uriString: String? = null,
+) : NoSessionNavKey.Optional

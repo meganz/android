@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.domain.repository
 
+import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
@@ -76,4 +77,31 @@ interface SyncNotificationRepository {
      * @return the sync error notification message
      */
     fun getSyncIssueNotificationByType(type: SyncNotificationType): SyncNotificationMessage
+
+    /**
+     * Get the cross-device conflict notification message
+     * @param conflictingSyncs List of syncs that have cross-device folder conflicts
+     * @param folderUsageResult The folder usage result for the notification
+     * @return the cross-device conflict notification message
+     */
+    suspend fun getCrossDeviceConflictNotification(
+        conflictingSyncs: List<FolderPair>,
+        folderUsageResult: FolderUsageResult,
+    ): SyncNotificationMessage
+
+    /**
+     * Set pending cross-device conflict notification to be shown
+     * @param conflictingSyncs List of syncs that have cross-device folder conflicts
+     * @param folderUsageResult The folder usage result for the notification
+     */
+    suspend fun setPendingCrossDeviceConflictNotification(
+        conflictingSyncs: List<FolderPair>,
+        folderUsageResult: FolderUsageResult,
+    )
+
+    /**
+     * Get pending cross-device conflict notification if any
+     * @return the pending cross-device conflict notification message, or null if none pending
+     */
+    suspend fun getPendingCrossDeviceConflictNotification(): SyncNotificationMessage?
 }

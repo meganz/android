@@ -1,0 +1,1034 @@
+package mega.privacy.android.app.appstate.content.navigation
+
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.Serializable
+import mega.privacy.android.app.appstate.content.destinations.FetchNodeProviderImpl
+import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
+import mega.privacy.android.app.appstate.global.model.RootNodeState
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
+import mega.privacy.android.navigation.contract.navOptions
+import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.navigation.destination.MediaMainNavKey
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+
+class PendingBackStackNavigationHandlerTest {
+    private lateinit var underTest: PendingBackStackNavigationHandler
+    private val navigationResultManager = NavigationResultManager()
+
+    private val backStack = PendingBackStack(NavBackStack())
+
+    private data object DefaultLoginDestination : NoSessionNavKey.Mandatory
+    private data object InitialLoginDestination : NoSessionNavKey.Mandatory
+
+    private data object NoSessionDestination1 : NoSessionNavKey.Mandatory
+    private data object NoSessionDestination2 : NoSessionNavKey.Mandatory
+
+    private data object OptionalNoSessionNavKey1 : NoSessionNavKey.Optional
+    private data object OptionalNoSessionNavKey2 : NoSessionNavKey.Optional
+
+
+    private data object NoNodeDestination1 : NoNodeNavKey
+    private data object NoNodeDestination2 : NoNodeNavKey
+
+    @Serializable
+    private data object Destination1 : NavKey
+
+    @Serializable
+    private data object Destination2 : NavKey
+
+    @Serializable
+    private data object Destination3 : NavKey
+
+    private data object PasscodeDestination : NavKey
+
+    private data object DefaultLandingScreen : NavKey
+
+    private val initialSession = "initial"
+
+    private val fetchNodeProvider: FetchNodeProvider = FetchNodeProviderImpl()
+
+    @BeforeEach
+    fun setUp() {
+        underTest = initHandler(
+            backStack = backStack,
+            authStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(initialSession),
+            hasRoot = true,
+            isPasscodeLocked = false
+        )
+    }
+
+    private fun initHandler(
+        backStack: PendingBackStack<NavKey>,
+        authStatus: PendingBackStackNavigationHandler.AuthStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(
+            initialSession
+        ),
+        hasRoot: Boolean = true,
+        isPasscodeLocked: Boolean = false,
+        isConnected: Boolean = true,
+    ) =
+        PendingBackStackNavigationHandler(
+            backstack = backStack,
+            currentAuthStatus = authStatus,
+            hasRootNode = hasRoot,
+            defaultLandingScreen = DefaultLandingScreen,
+            defaultLoginDestination = DefaultLoginDestination,
+            initialLoginDestination = InitialLoginDestination,
+            fetchNodeProvider = fetchNodeProvider,
+            isPasscodeLocked = isPasscodeLocked,
+            passcodeDestination = PasscodeDestination,
+            navigationResultManager = navigationResultManager,
+            isConnected = isConnected
+        )
+
+    @AfterEach
+    fun tearDown() {
+        backStack.clear()
+        backStack.pending = emptyList()
+    }
+
+    @Test
+    fun `test that back removes last element from backStack`() {
+        backStack.add(Destination1)
+        underTest.back()
+        assertThat(backStack).containsExactly(DefaultLandingScreen)
+    }
+
+    @Test
+    fun `test that navigate adds multiple destinations to backStack`() {
+        val list = listOf(Destination1, Destination2)
+        underTest.navigate(list)
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination2)
+    }
+
+    @Test
+    fun `test that navigateAndClearBackStack clears backStack and adds destination`() {
+        backStack.add(Destination1)
+        underTest.navigateAndClearBackStack(Destination2)
+        assertThat(backStack).containsExactly(Destination2)
+    }
+
+    @Test
+    fun `test that backTo removes items until target destination`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+        underTest.backTo(Destination1, inclusive = false)
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1)
+    }
+
+    @Test
+    fun `test that backTo restores landing screen when inclusive removes the only entry`() {
+        backStack.clear()
+        backStack.add(Destination1)
+        underTest.backTo(Destination1, inclusive = true)
+        assertThat(backStack).containsExactly(DefaultLandingScreen)
+    }
+
+    @Test
+    fun `test that navigateAndClearTo clears back to parent and adds new destination`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        underTest.navigateAndClearTo(Destination3, newParent = Destination2, inclusive = true)
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination3)
+    }
+
+    @Test
+    fun `test that returnResult sets Value and pops BackStack`() = runTest {
+        backStack.add(Destination1)
+        val key = "testKey"
+        underTest.returnResult(key, "resultValue")
+
+        val result = underTest.monitorResult<String>(key)
+        result.test {
+            assert(awaitItem() == "resultValue")
+        }
+
+        assertThat(backStack).containsExactly(DefaultLandingScreen)
+    }
+
+    @Test
+    fun `test that returnResult restores landing screen when popping the only entry`() = runTest {
+        backStack.clear()
+        backStack.add(Destination1)
+        underTest.returnResult("testKey", "resultValue")
+        assertThat(backStack).containsExactly(DefaultLandingScreen)
+    }
+
+    @Test
+    fun `test that monitorResult returns flow that updates on returnResult`() = runTest {
+        backStack.add(Destination1)
+        val key = "resultKey"
+        val testFlow = underTest.monitorResult<String>(key)
+        testFlow.test {
+            assert(awaitItem() == null) // initial
+            underTest.returnResult(key, "Hello")
+            assert(awaitItem() == "Hello")
+        }
+    }
+
+    @Test
+    fun `test that clearResult sets value to null`() = runTest {
+        backStack.add(Destination1)
+        val key = "key"
+        underTest.returnResult(key, "value")
+        underTest.clearResult(key)
+
+        val result = underTest.monitorResult<String>(key)
+        result.test {
+            assert(awaitItem() == null)
+        }
+    }
+
+    @Test
+    fun `test that clearAllResults clears all flows`() = runTest {
+        backStack.add(Destination1)
+        underTest.returnResult("a", 1)
+        underTest.returnResult("b", 2)
+
+        underTest.clearAllResults()
+
+        val aFlow = underTest.monitorResult<Int>("a")
+        val bFlow = underTest.monitorResult<Int>("b")
+
+        aFlow.test { assert(awaitItem() == null) }
+        bFlow.test { assert(awaitItem() == null) }
+    }
+
+    @Test
+    fun `test that optional no session destination is added even if not logged in`() = runTest {
+        underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
+        underTest.navigate(OptionalNoSessionNavKey1)
+        assertThat(backStack.last()).isEqualTo(OptionalNoSessionNavKey1)
+    }
+
+    @Test
+    fun `test that optional no session destinations are added even if not logged in`() = runTest {
+        underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
+        underTest.navigate(listOf(OptionalNoSessionNavKey1, OptionalNoSessionNavKey2))
+        assertThat(backStack.takeLast(2)).containsExactly(
+            OptionalNoSessionNavKey1, OptionalNoSessionNavKey2
+        )
+    }
+
+    @Test
+    fun `test that default landing screen is added instead if not logged in and mandatory no session destination is added`() =
+        runTest {
+            underTest.navigate(NoSessionDestination1)
+            assertThat(backStack.last()).isEqualTo(DefaultLandingScreen)
+        }
+
+    @Test
+    fun `test that default landing screen is added instead if not logged in and mandatory no session destinations are added`() =
+        runTest {
+            underTest.navigate(listOf(NoSessionDestination1, NoSessionDestination2))
+            assertThat(backStack.last()).isEqualTo(DefaultLandingScreen)
+        }
+
+    @Test
+    fun `test that no navigation happens if logged in and mandatory no session destination is added`() =
+        runTest {
+            underTest.navigate(Destination1)
+            underTest.navigate(NoSessionDestination1)
+            assertThat(backStack.last()).isEqualTo(Destination1)
+        }
+
+    @Test
+    fun `test that default login destination is added instead if not logged in and destination requires it`() =
+        runTest {
+            underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
+            underTest.navigate(Destination1)
+            assertThat(backStack).containsExactly(
+                InitialLoginDestination, DefaultLoginDestination
+            )
+        }
+
+    @Test
+    fun `test that default login destination is added instead if not logged in and last destination requires it`() =
+        runTest {
+            underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
+            underTest.navigate(listOf(NoSessionDestination1, Destination2))
+            assertThat(backStack).containsExactly(
+                InitialLoginDestination, DefaultLoginDestination
+            )
+        }
+
+    @Test
+    fun `test that non NoSessionNavKey destinations are removed if initialised without a session`() =
+        runTest {
+            val tempBackStack = PendingBackStack(
+                NavBackStack(
+                    NoSessionDestination1, NoSessionDestination2, Destination1, Destination2
+                )
+            )
+            initHandler(
+                backStack = tempBackStack,
+                authStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
+            )
+            assertThat(tempBackStack).containsExactly(NoSessionDestination1, NoSessionDestination2)
+            assertThat(tempBackStack.pending).containsExactly(Destination1, Destination2)
+        }
+
+    @Test
+    fun `test that existing destination is replaced if initialised without a session`() = runTest {
+        val tempBackStack = PendingBackStack<NavKey>(NavBackStack(Destination1))
+        initHandler(
+            backStack = tempBackStack,
+            authStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
+        )
+
+        assertThat(tempBackStack).containsExactly(InitialLoginDestination)
+        assertThat(tempBackStack.pending).containsExactly(Destination1)
+    }
+
+    @Test
+    fun `test that multiple existing destinations are replaced if initialised without a session`() =
+        runTest {
+            val tempBackStack =
+                PendingBackStack(NavBackStack(Destination1, Destination3, Destination2))
+            initHandler(
+                backStack = tempBackStack,
+                authStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
+            )
+
+            assertThat(tempBackStack).containsExactly(InitialLoginDestination)
+            assertThat(tempBackStack.pending).containsExactly(
+                Destination1, Destination3, Destination2
+            )
+        }
+
+    @Test
+    fun `test that backstack is replaced by login destination if logged out`() = runTest {
+        backStack.addAll(listOf(Destination1, Destination3))
+
+        underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
+
+        assertThat(backStack).containsExactly(InitialLoginDestination, DefaultLoginDestination)
+    }
+
+    @Test
+    fun `test that default landing screen is added if navigating to a login screen while logged in`() =
+        runTest {
+            underTest.navigate(DefaultLoginDestination)
+
+            assertThat(backStack.lastOrNull()).isEqualTo(DefaultLandingScreen)
+        }
+
+    @Test
+    fun `test that no-node destination is added even if not logged in`() = runTest {
+        underTest.onRootNodeChange(RootNodeState(exists = false))
+        underTest.navigate(NoNodeDestination1)
+        assertThat(backStack.last()).isEqualTo(NoNodeDestination1)
+    }
+
+    @Test
+    fun `test that no-node destinations are added even if not logged in`() = runTest {
+        underTest.onRootNodeChange(RootNodeState(exists = false))
+        underTest.navigate(listOf(NoNodeDestination1, NoNodeDestination2))
+        assertThat(backStack.takeLast(2)).containsExactly(
+            NoNodeDestination1, NoNodeDestination2
+        )
+    }
+
+    @Test
+    fun `test that fetch node destination is added instead if not fetched in and destination requires it`() =
+        runTest {
+            underTest.onRootNodeChange(RootNodeState(exists = false))
+            underTest.navigate(Destination1)
+            assertThat(backStack).containsExactly(FetchingContentNavKey(initialSession, false))
+        }
+
+    @Test
+    fun `test that fetch node destination is added instead if not fetched and last destination requires it`() =
+        runTest {
+            underTest.onRootNodeChange(RootNodeState(exists = false))
+            underTest.navigate(listOf(NoNodeDestination1, Destination2))
+            assertThat(backStack).containsExactly(FetchingContentNavKey(initialSession, false))
+        }
+
+    @Test
+    fun `test that non NoNodeNavKey destinations are removed if initialised without a root node`() =
+        runTest {
+            val tempBackStack = PendingBackStack(
+                NavBackStack(
+                    NoNodeDestination1, NoNodeDestination2, Destination1, Destination2
+                )
+            )
+            initHandler(
+                backStack = tempBackStack,
+                hasRoot = false
+            )
+
+            assertThat(tempBackStack).containsExactly(
+                NoNodeDestination1, NoNodeDestination2, FetchingContentNavKey(initialSession, false)
+            )
+            assertThat(tempBackStack.pending).containsExactly(Destination1, Destination2)
+        }
+
+    @Test
+    fun `test that existing destination is replaced if initialised without a root node`() =
+        runTest {
+            val tempBackStack = PendingBackStack<NavKey>(NavBackStack(Destination1))
+            initHandler(
+                backStack = tempBackStack,
+                hasRoot = false
+            )
+
+            assertThat(tempBackStack).containsExactly(FetchingContentNavKey(initialSession, false))
+            assertThat(tempBackStack.pending).containsExactly(Destination1)
+        }
+
+    @Test
+    fun `test that multiple existing destinations are replaced if initialised without a root node`() =
+        runTest {
+            val tempBackStack =
+                PendingBackStack(NavBackStack(Destination1, Destination3, Destination2))
+            initHandler(
+                backStack = tempBackStack,
+                hasRoot = false
+            )
+
+            assertThat(tempBackStack).containsExactly(FetchingContentNavKey(initialSession, false))
+            assertThat(tempBackStack.pending).containsExactly(
+                Destination1, Destination3, Destination2
+            )
+        }
+
+    @Test
+    fun `test that backstack is replaced by fetch nodes destination if has root node is set to false`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination3))
+
+            underTest.onRootNodeChange(RootNodeState(exists = false))
+
+            assertThat(backStack).containsExactly(FetchingContentNavKey(initialSession, false))
+        }
+
+    @Test
+    fun `test that default landing screen is added if navigating to the fetch node destination while node is present`() =
+        runTest {
+            underTest.navigate(FetchingContentNavKey(initialSession, false))
+
+            assertThat(backStack.lastOrNull()).isEqualTo(DefaultLandingScreen)
+        }
+
+    @Test
+    fun `test that if session is added, but there is no pending destinations, the default landing screen is added`() =
+        runTest {
+            underTest.onRootNodeChange(RootNodeState(exists = false))
+            assertThat(backStack.pending).isEmpty()
+            underTest.onRootNodeChange(RootNodeState(exists = true))
+
+            assertThat(backStack.lastOrNull()).isEqualTo(DefaultLandingScreen)
+        }
+
+    @Test
+    fun `test that pending destinations are added to the backstack when root node is fetched`() =
+        runTest {
+            underTest.onRootNodeChange(RootNodeState(exists = false))
+
+            backStack.pending = listOf(Destination2, Destination3)
+
+            underTest.onRootNodeChange(RootNodeState(exists = true))
+
+            assertThat(backStack).containsExactly(DefaultLandingScreen, Destination2, Destination3)
+        }
+
+    @Test
+    fun `test that if logged in but there are no pending destinations, fetch nodes destination is added to backStack`() =
+        runTest {
+            underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
+            val newSession = "ANewSession"
+            underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.LoggedIn(newSession))
+            assertThat(backStack).containsExactly(FetchingContentNavKey(newSession, false))
+        }
+
+    @Test
+    fun `test that if passcode lock is enabled passcode destination is added on top of current stack`() =
+        runTest {
+            val navTree = listOf(Destination1, Destination2)
+            backStack.addAll(navTree)
+            underTest.onPasscodeStateChanged(true)
+            assertThat(backStack).containsExactly(
+                DefaultLandingScreen,
+                Destination1,
+                Destination2,
+                PasscodeDestination
+            )
+            assertThat(backStack.pending).isEmpty()
+        }
+
+    @Test
+    fun `test that when passcode unlocks passcode is removed from stack and pending is unchanged`() =
+        runTest {
+            val navTree = listOf(Destination1, Destination2)
+            backStack.addAll(navTree)
+            underTest.onPasscodeStateChanged(true)
+
+            assertThat(backStack).containsExactly(
+                DefaultLandingScreen,
+                Destination1,
+                Destination2,
+                PasscodeDestination
+            )
+
+            underTest.onPasscodeStateChanged(false)
+            assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination2)
+            assertThat(backStack.pending).isEmpty()
+        }
+
+    @Test
+    fun `test that passcode is only added after login and fetch nodes is completed`() = runTest {
+        val tempBackStack = PendingBackStack<NavKey>(NavBackStack(Destination1))
+        val tempHandler = initHandler(
+            backStack = tempBackStack,
+            authStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
+            hasRoot = false
+        )
+        val session = "newSession"
+
+        tempHandler.onPasscodeStateChanged(true)
+        assertThat(tempBackStack).containsExactly(InitialLoginDestination)
+        tempHandler.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.LoggedIn(session))
+        assertThat(tempBackStack).containsExactly(FetchingContentNavKey(session, false))
+        tempHandler.onRootNodeChange(RootNodeState(exists = true))
+        assertThat(tempBackStack).containsExactly(PasscodeDestination)
+    }
+
+    @Test
+    fun `test that passcode is added when locked and logged in offline without root node`() =
+        runTest {
+            val tempBackStack = PendingBackStack<NavKey>(NavBackStack(DefaultLandingScreen))
+            val tempHandler = initHandler(
+                backStack = tempBackStack,
+                authStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(initialSession),
+                hasRoot = false,
+                isConnected = false,
+            )
+
+            tempHandler.onPasscodeStateChanged(true)
+
+            assertThat(tempBackStack.last()).isEqualTo(PasscodeDestination)
+        }
+
+    @Test
+    fun `test that initial passcode lock is added when logged in offline without root node`() =
+        runTest {
+            val tempBackStack = PendingBackStack<NavKey>(NavBackStack(DefaultLandingScreen))
+            initHandler(
+                backStack = tempBackStack,
+                authStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(initialSession),
+                hasRoot = false,
+                isConnected = false,
+                isPasscodeLocked = true,
+            )
+
+            assertThat(tempBackStack.last()).isEqualTo(PasscodeDestination)
+        }
+
+
+    @Test
+    fun `test that if initial passcode lock is enabled passcode destination is added on top of stack`() =
+        runTest {
+            val navTree = listOf(Destination1, Destination2)
+            val tempBackStack = PendingBackStack(NavBackStack(*navTree.toTypedArray()))
+            initHandler(
+                backStack = tempBackStack,
+                isPasscodeLocked = true,
+            )
+            assertThat(tempBackStack).containsExactly(
+                Destination1,
+                Destination2,
+                PasscodeDestination
+            )
+            assertThat(tempBackStack.pending).isEmpty()
+        }
+
+    @Test
+    fun `test that backstack is not empty after initialising handler`() = runTest {
+        assertThat(backStack).containsExactly(DefaultLandingScreen)
+    }
+
+    @Test
+    fun `test that logging out removes fetch nodes destination`() = runTest {
+        val tempBackStack = PendingBackStack<NavKey>(NavBackStack(DefaultLandingScreen))
+        val tempHandler = initHandler(
+            backStack = tempBackStack,
+            hasRoot = false,
+            isPasscodeLocked = true,
+        )
+
+        tempHandler.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
+
+        assertThat(tempBackStack).containsExactly(
+            InitialLoginDestination, DefaultLoginDestination
+        )
+    }
+
+    @Test
+    fun `test that refresh event ChangeEnvironment is passed correctly when root node changes to false`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination3))
+
+            underTest.onRootNodeChange(
+                RootNodeState(
+                    exists = false,
+                    refreshEvent = RefreshEvent.ChangeEnvironment
+                )
+            )
+
+            val lastDestination = backStack.last() as? FetchingContentNavKey
+            assertThat(lastDestination).isNotNull()
+            assertThat(lastDestination?.session).isEqualTo(initialSession)
+            assertThat(lastDestination?.isFromLogin).isFalse()
+            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.ChangeEnvironment)
+        }
+
+    @Test
+    fun `test that null refresh event is passed correctly when root node changes to false`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination3))
+
+            underTest.onRootNodeChange(RootNodeState(exists = false, refreshEvent = null))
+
+            val lastDestination = backStack.last() as? FetchingContentNavKey
+            assertThat(lastDestination).isNotNull()
+            assertThat(lastDestination?.session).isEqualTo(initialSession)
+            assertThat(lastDestination?.isFromLogin).isFalse()
+            assertThat(lastDestination?.refreshEvent).isNull()
+        }
+
+    @Test
+    fun `test that refresh event ChangeEnvironment is passed when root node changes from true to false with change environment event`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination2))
+
+            underTest.onRootNodeChange(
+                RootNodeState(
+                    exists = false,
+                    refreshEvent = RefreshEvent.ChangeEnvironment
+                )
+            )
+
+            val lastDestination = backStack.last() as? FetchingContentNavKey
+            assertThat(lastDestination).isNotNull()
+            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.ChangeEnvironment)
+            assertThat(backStack).containsExactly(
+                FetchingContentNavKey(initialSession, false, RefreshEvent.ChangeEnvironment)
+            )
+        }
+
+    @Test
+    fun `test that home screens are removed if a new home screen is pushed`() = runTest {
+        val initialHomeScreen = HomeScreensNavKey()
+        val expectedHomeScreen = HomeScreensNavKey(MediaMainNavKey)
+
+        backStack.add(initialHomeScreen)
+        underTest.navigate(expectedHomeScreen)
+
+        assertThat(backStack).doesNotContain(initialHomeScreen)
+        assertThat(backStack).contains(expectedHomeScreen)
+    }
+
+    @Test
+    fun `test that destination is not added if already present`() = runTest {
+        data class TestKey(val value: String) : NavKey
+
+        val destination = TestKey("key")
+        backStack.add(destination)
+        underTest.navigate(destination)
+        assertThat(backStack.count { it == destination }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that multiple destinations are not added if already present`() = runTest {
+        data class TestKey(val value: String) : NavKey
+
+        val destination1 = TestKey("key1")
+        val destination2 = TestKey("key2")
+
+        val list = listOf(destination1, destination2)
+        backStack.addAll(list)
+        underTest.navigate(list)
+        assertThat(backStack.count { it == destination1 }).isEqualTo(1)
+        assertThat(backStack.count { it == destination2 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that navigate with navOptions popUpTo pops back stack to target destination`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpTo<Destination1> {
+                inclusive = false
+            }
+        }
+        underTest.navigate(Destination3, options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination3
+        )
+    }
+
+    @Test
+    fun `test that navigate with navOptions popUpTo inclusive pops target destination as well`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpTo<Destination1> {
+                inclusive = true
+            }
+        }
+        underTest.navigate(Destination3, options)
+
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination3)
+    }
+
+    @Test
+    fun `test that navigate list with navOptions popUpTo pops back stack before adding destinations`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpTo<Destination1> {
+                inclusive = false
+            }
+        }
+        underTest.navigate(listOf(Destination2, Destination3), options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination2, Destination3
+        )
+    }
+
+    @Test
+    fun `test that navigate with popUpToRoot clears back stack to root`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpToRoot {
+                inclusive = false
+            }
+        }
+        underTest.navigate(Destination2, options)
+
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination2)
+    }
+
+    @Test
+    fun `test that navigate with popUpToRoot inclusive clears entire back stack`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpToRoot {
+                inclusive = true
+            }
+        }
+        underTest.navigate(Destination2, options)
+
+        assertThat(backStack).containsExactly(Destination2)
+    }
+
+    @Test
+    fun `test that navigate with null navOptions does not pop back stack`() {
+        backStack.addAll(listOf(Destination1, Destination2))
+
+        underTest.navigate(Destination3, navOptions = null)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination2, Destination3
+        )
+    }
+
+    @Test
+    fun `test that navigate with launchSingleTop replaces top destination of same type`() {
+        backStack.add(Destination1)
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigate(Destination1, options)
+
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1)
+        assertThat(backStack.count { it == Destination1 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that navigate with launchSingleTop does not replace top destination of different type`() {
+        backStack.add(Destination1)
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigate(Destination2, options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination2
+        )
+    }
+
+    @Test
+    fun `test that navigate list with launchSingleTop replaces matching top destinations`() {
+        backStack.addAll(listOf(Destination1, Destination2))
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigate(listOf(Destination1, Destination2), options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination2
+        )
+        assertThat(backStack.count { it == Destination1 }).isEqualTo(1)
+        assertThat(backStack.count { it == Destination2 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that navigate list with launchSingleTop does not replace when top destinations do not match`() {
+        backStack.addAll(listOf(Destination1, Destination3))
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigate(listOf(Destination1, Destination2), options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination3, Destination1, Destination2
+        )
+    }
+
+    @Test
+    fun `test that navigate with launchSingleTop and popUpTo applies both operations`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            launchSingleTop = true
+            popUpTo<Destination1> {
+                inclusive = false
+            }
+        }
+        underTest.navigate(Destination3, options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination3
+        )
+    }
+
+    @Test
+    fun `test that navigate with launchSingleTop does not remove when backstack has fewer items than destinations`() {
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigate(listOf(Destination1, Destination2), options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination2
+        )
+    }
+
+    @Test
+    fun `test that navigateAndClearBackStack with navOptions clears backStack and adds destination`() {
+        backStack.addAll(listOf(Destination1, Destination2))
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigateAndClearBackStack(Destination3, options)
+
+        assertThat(backStack).containsExactly(Destination3)
+    }
+
+    @Test
+    fun `test that navigateAndClearTo with navOptions popUpTo pops back stack beyond the new parent`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpTo<Destination1> {
+                inclusive = true
+            }
+        }
+        underTest.navigateAndClearTo(
+            Destination3,
+            newParent = Destination2,
+            inclusive = true,
+            navOptions = options,
+        )
+
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination3)
+    }
+
+    @Test
+    fun `test that navigateAndClearTo with launchSingleTop replaces remaining top destination of same type`() {
+        data class TestKey(val value: String) : NavKey
+
+        backStack.addAll(listOf(Destination1, TestKey("A")))
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigateAndClearTo(
+            TestKey("B"),
+            newParent = TestKey("A"),
+            inclusive = false,
+            navOptions = options,
+        )
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, TestKey("B")
+        ).inOrder()
+    }
+
+    @Test
+    fun `test that navigateAndClearTo with null navOptions only clears back to the new parent`() {
+        backStack.addAll(listOf(Destination1, Destination2))
+
+        underTest.navigateAndClearTo(
+            Destination3,
+            newParent = Destination1,
+            inclusive = false,
+            navOptions = null,
+        )
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination3
+        ).inOrder()
+    }
+
+    @Test
+    fun `test that navigate removes existing dialog before re-adding it`() {
+        underTest.displayDialog(DialogDestination1)
+        underTest.navigate(Destination1)
+        underTest.displayDialog(DialogDestination1)
+
+        assertThat(backStack.count { it == DialogDestination1 }).isEqualTo(1)
+        assertThat(backStack.last()).isEqualTo(DialogDestination1)
+    }
+
+    @Test
+    fun `test that navigate removes duplicate dialog keys while keeping non-dialog destinations`() {
+        underTest.displayDialog(DialogDestination1)
+        underTest.navigate(Destination1)
+        underTest.displayDialog(DialogDestination1)
+
+        assertThat(backStack.count { it == DialogDestination1 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that displayDialog removes existing dialog before re-adding it`() {
+        underTest.displayDialog(DialogDestination1)
+        underTest.navigate(Destination1)
+        underTest.displayDialog(DialogDestination1)
+
+        assertThat(backStack.count { it == DialogDestination1 }).isEqualTo(1)
+        assertThat(backStack.last()).isEqualTo(DialogDestination1)
+    }
+
+    @Test
+    fun `test that displayDialog does not add duplicate dialog to pending when base is empty`() {
+        val emptyBackStack = PendingBackStack(NavBackStack())
+        emptyBackStack.pending += DialogDestination1
+        val handler = initHandler(
+            backStack = emptyBackStack,
+            authStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
+        )
+        // base has login destination after init, so clear it to test the pending branch
+        emptyBackStack.clear()
+        handler.displayDialog(DialogDestination1)
+
+        assertThat(emptyBackStack.pending.count { it == DialogDestination1 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that navigate prepends defaultLandingScreen when backstack would only contain dialogs`() {
+        backStack.clear()
+        backStack.add(DialogDestination1)
+        underTest.navigate(DialogDestination2)
+        assertThat(backStack)
+            .containsExactly(DefaultLandingScreen, DialogDestination1, DialogDestination2)
+            .inOrder()
+    }
+
+    @Test
+    fun `test that navigateAndClearBackStack prepends defaultLandingScreen when destination is a dialog`() {
+        underTest.navigateAndClearBackStack(DialogDestination1)
+        assertThat(backStack).containsExactly(DefaultLandingScreen, DialogDestination1).inOrder()
+    }
+
+    @Test
+    fun `test that back prepends defaultLandingScreen when only dialogs remain after popping`() {
+        backStack.clear()
+        backStack.addAll(listOf(DialogDestination1, DialogDestination2))
+        underTest.back()
+        assertThat(backStack).containsExactly(DefaultLandingScreen, DialogDestination1).inOrder()
+    }
+
+    @Test
+    fun `test that init prepends defaultLandingScreen when restored backstack contains only dialogs`() {
+        val restoredBackStack = PendingBackStack(NavBackStack<NavKey>())
+        restoredBackStack.add(DialogDestination1)
+        initHandler(backStack = restoredBackStack)
+        assertThat(restoredBackStack)
+            .containsExactly(DefaultLandingScreen, DialogDestination1)
+            .inOrder()
+    }
+
+    @Test
+    fun `test that displayDialog does not leave duplicate equal dialog keys when multiple instances of the same dialog class exist`() {
+        backStack.clear()
+        backStack.addAll(
+            listOf(
+                DefaultLandingScreen,
+                ParameterizedDialogDestination("A"),
+                Destination1,
+                ParameterizedDialogDestination("B"),
+            )
+        )
+
+        underTest.displayDialog(ParameterizedDialogDestination("A"))
+
+        assertThat(backStack.count { it == ParameterizedDialogDestination("A") }).isEqualTo(1)
+        assertThat(backStack.last()).isEqualTo(ParameterizedDialogDestination("A"))
+    }
+
+    @Test
+    fun `test that displayDialog while fetch nodes is in progress does not duplicate pending dialog key`() {
+        underTest.onRootNodeChange(RootNodeState(exists = false))
+
+        underTest.displayDialog(DialogDestination1)
+        underTest.displayDialog(DialogDestination1)
+
+        assertThat(backStack.pending.count { it == DialogDestination1 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that pending key already on the back stack is not duplicated when root node arrives`() {
+        underTest.onRootNodeChange(RootNodeState(exists = false))
+        underTest.navigate(Destination1)
+        backStack.addAll(listOf(Destination1, Destination2))
+
+        underTest.onRootNodeChange(RootNodeState(exists = true))
+
+        assertThat(backStack.count { it == Destination1 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that logout does not duplicate no-session key present on both back stack and pending`() {
+        backStack.add(OptionalNoSessionNavKey1)
+        backStack.pending += OptionalNoSessionNavKey1
+
+        underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
+
+        assertThat(backStack.count { it == OptionalNoSessionNavKey1 }).isEqualTo(1)
+    }
+
+    private data object DialogDestination1 : DialogNavKey
+    private data object DialogDestination2 : DialogNavKey
+
+    @Serializable
+    private data class ParameterizedDialogDestination(val value: String) : DialogNavKey
+}

@@ -13,11 +13,29 @@ internal sealed interface MegaPickerAction {
         val disableBatteryOptimizationPermissionGranted: Boolean,
     ) : MegaPickerAction
 
-    data object ErrorMessageShown : MegaPickerAction
+    /**
+     * Action triggered when the snackbar message has been shown
+     */
+    data object SnackbarShown : MegaPickerAction
 
     data object AllFilesAccessPermissionDialogShown : MegaPickerAction
 
     data object DisableBatteryOptimizationsDialogShown : MegaPickerAction
 
     data object NextScreenOpened : MegaPickerAction
+
+    /**
+     * Action triggered when a disabled folder is clicked
+     */
+    data class DisabledFolderClicked(val node: TypedNodeUiModel) : MegaPickerAction
+
+    /**
+     * Action triggered when the user confirms the folder connection removal
+     */
+    data object RemoveConnectionConfirmed : MegaPickerAction
+
+    /**
+     * Action triggered when the remove connection dialog is dismissed
+     */
+    data object RemoveConnectionDialogDismissed : MegaPickerAction
 }

@@ -1,0 +1,3387 @@
+package mega.privacy.android.app.presentation.videoplayer
+
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.view.TextureView
+import android.view.View
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
+import mega.privacy.android.app.TimberJUnit5Extension
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
+import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
+import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
+import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import mega.privacy.android.app.presentation.videoplayer.mapper.PlayerErrorTypeMapper
+import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
+import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
+import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
+import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
+import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
+import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
+import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
+import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
+import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
+import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
+import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.BlockedMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
+import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
+import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
+import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApiUseCase
+import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
+import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
+import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByHandlesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByParentHandleUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesFromInSharesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesFromOutSharesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesFromPublicLinksUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByParentHandleFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodeAccessibilityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.navigation.PendingFileLinkPreviewAutoOpen
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_LINK_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
+import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
+import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
+import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackAviStartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackMkvStartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackMovStartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackMp4StartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackOtherStartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.Mockito.clearInvocations
+import org.mockito.Mockito.mockStatic
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
+import java.io.File
+import java.time.Instant
+import java.util.stream.Stream
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+
+@ExtendWith(
+    value = [
+        CoroutineMainDispatcherExtension::class,
+        InstantTaskExecutorExtension::class,
+        TimberJUnit5Extension::class
+    ]
+)
+@ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class VideoPlayerViewModelV2Test {
+    private lateinit var underTest: VideoPlayerViewModelV2
+
+    private val context = mock<Context>()
+    private val mediaPlayerGateway = mock<MediaPlayerGateway>()
+    private val videoPlayerItemMapper = mock<VideoPlayerItemMapper>()
+    private val getVideoNodeByHandleUseCase = mock<GetVideoNodeByHandleUseCase>()
+    private val getVideoNodesUseCase = mock<GetVideoNodesUseCase>()
+    private val getVideoNodesFromPublicLinksUseCase = mock<GetVideoNodesFromPublicLinksUseCase>()
+    private val getVideoNodesFromInSharesUseCase = mock<GetVideoNodesFromInSharesUseCase>()
+    private val getVideoNodesFromOutSharesUseCase = mock<GetVideoNodesFromOutSharesUseCase>()
+    private val getVideoNodesByEmailUseCase = mock<GetVideoNodesByEmailUseCase>()
+    private val getUserNameByEmailUseCase = mock<GetUserNameByEmailUseCase>()
+    private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
+    private val getBackupsNodeUseCase = mock<GetBackupsNodeUseCase>()
+    private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
+    private val getVideosBySearchTypeUseCase = mock<GetVideosBySearchTypeUseCase>()
+    private val getVideoNodesByParentHandleUseCase = mock<GetVideoNodesByParentHandleUseCase>()
+    private val getVideoNodesByHandlesUseCase = mock<GetVideoNodesByHandlesUseCase>()
+    private val getRootNodeFromMegaApiFolderUseCase = mock<GetRootNodeFromMegaApiFolderUseCase>()
+    private val getParentNodeFromMegaApiFolderUseCase =
+        mock<GetParentNodeFromMegaApiFolderUseCase>()
+    private val getVideosByParentHandleFromMegaApiFolderUseCase =
+        mock<GetVideosByParentHandleFromMegaApiFolderUseCase>()
+    private val monitorSubFolderMediaDiscoverySettingsUseCase =
+        mock<MonitorSubFolderMediaDiscoverySettingsUseCase>()
+    private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
+    private val httpServerIsRunningUseCase = mock<HttpServerIsRunningUseCase>()
+    private val httpServerStartUseCase = mock<HttpServerStartUseCase>()
+    private val httpServerStopUseCase = mock<HttpServerStopUseCase>()
+    private val getLocalFolderLinkUseCase = mock<GetLocalFolderLinkUseCase>()
+    private val getLocalLinkFromMegaApiUseCase = mock<GetLocalLinkFromMegaApiUseCase>()
+    private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
+    private val getOfflineNodeInformationByIdUseCase = mock<GetOfflineNodeInformationByIdUseCase>()
+    private val getOfflineNodesByParentIdUseCase = mock<GetOfflineNodesByParentIdUseCase>()
+    private val getLocalFilePathUseCase = mock<GetLocalFilePathUseCase>()
+    private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
+    private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
+    private var fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
+    private val getFileByPathUseCase = mock<GetFileByPathUseCase>()
+    private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
+    private val saveVideoRecentlyWatchedUseCase = mock<SaveVideoRecentlyWatchedUseCase>()
+    private val saveRecentlyUsedItemUseCase = mock<SaveRecentlyUsedItemUseCase>()
+    private val removeRecentlyUsedItemUseCase = mock<RemoveRecentlyUsedItemUseCase>()
+    private val setVideoRepeatModeUseCase = mock<SetVideoRepeatModeUseCase>()
+    private val fakeMonitorAccountDetailFlow = MutableSharedFlow<AccountDetail>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val fakeMonitorShowHiddenItemsFlow = MutableSharedFlow<Boolean>()
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
+    private val isNodeInBackupsNodeUseCase = mock<IsNodeInBackupsUseCase>()
+    private val isNodeInCloudDriveUseCase = mock<IsNodeInCloudDriveUseCase>()
+    private val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
+    private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
+    private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
+    private lateinit var testArgs: VideoPlayerViewModelV2.Args
+    private val trackPlaybackPositionUseCase = mock<TrackPlaybackPositionUseCase>()
+    private val monitorPlaybackTimesUseCase = mock<MonitorPlaybackTimesUseCase>()
+    private val savePlaybackTimesUseCase = mock<SavePlaybackTimesUseCase>()
+    private val getSRTSubtitleFileListUseCase = mock<GetSRTSubtitleFileListUseCase>()
+    private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val playerErrorTypeMapper = mock<PlayerErrorTypeMapper>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val checkNodeAccessibilityUseCase = mock<CheckNodeAccessibilityUseCase>()
+    private val isUserLoggedInUseCase = mock<IsUserLoggedInUseCase>()
+    private val pendingFileLinkPreviewAutoOpen = PendingFileLinkPreviewAutoOpen()
+    private var fakeMonitorConnectivityFlow = MutableSharedFlow<Boolean>()
+    private val testHandle: Long = 123456
+    private val testFileName = "test.mp4"
+    private val testSize = 100L
+    private val testDuration = 200.seconds
+    private val testDurationString = "3:20"
+    private val testAbsolutePath = "https://www.example.com"
+    private val testTitle = "video queue title"
+    private val expectedCollectionId = 123456L
+    private val expectedCollectionTitle = "collection title"
+
+    private fun initViewModel() {
+        fakeMonitorTransferEventsFlow = MutableSharedFlow()
+        whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+        underTest = VideoPlayerViewModelV2(
+            context = context,
+            mediaPlayerGateway = mediaPlayerGateway,
+            applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
+            mainDispatcher = UnconfinedTestDispatcher(),
+            ioDispatcher = UnconfinedTestDispatcher(),
+            videoPlayerItemMapper = videoPlayerItemMapper,
+            getVideoNodeByHandleUseCase = getVideoNodeByHandleUseCase,
+            getVideoNodesUseCase = getVideoNodesUseCase,
+            getVideoNodesFromPublicLinksUseCase = getVideoNodesFromPublicLinksUseCase,
+            getVideoNodesFromInSharesUseCase = getVideoNodesFromInSharesUseCase,
+            getVideoNodesFromOutSharesUseCase = getVideoNodesFromOutSharesUseCase,
+            getVideoNodesByEmailUseCase = getVideoNodesByEmailUseCase,
+            getUserNameByEmailUseCase = getUserNameByEmailUseCase,
+            getRubbishNodeUseCase = getRubbishNodeUseCase,
+            getBackupsNodeUseCase = getBackupsNodeUseCase,
+            getRootNodeUseCase = getRootNodeUseCase,
+            getVideosBySearchTypeUseCase = getVideosBySearchTypeUseCase,
+            getVideoNodesByParentHandleUseCase = getVideoNodesByParentHandleUseCase,
+            getVideoNodesByHandlesUseCase = getVideoNodesByHandlesUseCase,
+            getRootNodeFromMegaApiFolderUseCase = getRootNodeFromMegaApiFolderUseCase,
+            getParentNodeFromMegaApiFolderUseCase = getParentNodeFromMegaApiFolderUseCase,
+            getVideosByParentHandleFromMegaApiFolderUseCase = getVideosByParentHandleFromMegaApiFolderUseCase,
+            monitorSubFolderMediaDiscoverySettingsUseCase = monitorSubFolderMediaDiscoverySettingsUseCase,
+            getThumbnailUseCase = getThumbnailUseCase,
+            httpServerIsRunningUseCase = httpServerIsRunningUseCase,
+            httpServerStartUseCase = httpServerStartUseCase,
+            httpServerStopUseCase = httpServerStopUseCase,
+            getLocalFolderLinkUseCase = getLocalFolderLinkUseCase,
+            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
+            getOfflineNodeInformationByIdUseCase = getOfflineNodeInformationByIdUseCase,
+            getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
+            getLocalLinkFromMegaApiUseCase = getLocalLinkFromMegaApiUseCase,
+            getLocalFilePathUseCase = getLocalFilePathUseCase,
+            getFingerprintUseCase = getFingerprintUseCase,
+            monitorTransferEventsUseCase = monitorTransferEventsUseCase,
+            getFileByPathUseCase = getFileByPathUseCase,
+            monitorVideoRepeatModeUseCase = monitorVideoRepeatModeUseCase,
+            saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase,
+            saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
+            removeRecentlyUsedItemUseCase = removeRecentlyUsedItemUseCase,
+            setVideoRepeatModeUseCase = setVideoRepeatModeUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
+            isNodeInBackupsNodeUseCase = isNodeInBackupsNodeUseCase,
+            isNodeInCloudDriveUseCase = isNodeInCloudDriveUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            checkNodeAccessibilityUseCase = checkNodeAccessibilityUseCase,
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
+            isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
+            trackPlaybackPositionUseCase = trackPlaybackPositionUseCase,
+            monitorPlaybackTimesUseCase = monitorPlaybackTimesUseCase,
+            savePlaybackTimesUseCase = savePlaybackTimesUseCase,
+            getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
+            broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            playerErrorTypeMapper = playerErrorTypeMapper,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            isUserLoggedInUseCase = isUserLoggedInUseCase,
+            pendingFileLinkPreviewAutoOpen = pendingFileLinkPreviewAutoOpen,
+            args = testArgs,
+        )
+    }
+
+    @BeforeEach
+    fun setUp() {
+        testArgs = VideoPlayerViewModelV2.Args(
+            fileLinkUrl = null,
+            localFilePath = null,
+            adapterType = INVALID_VALUE,
+            handle = INVALID_HANDLE,
+            fileName = "",
+            collectionTitle = null,
+            collectionId = null,
+            chatId = null,
+            msgId = null,
+            serializedData = null,
+        )
+        whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+        whenever(monitorSubFolderMediaDiscoverySettingsUseCase()).thenReturn(flowOf(true))
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(fakeMonitorNodeUpdatesFlow)
+        whenever(monitorAccountDetailUseCase()).thenReturn(fakeMonitorAccountDetailFlow)
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(fakeMonitorShowHiddenItemsFlow)
+        runBlocking {
+            whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+            whenever(isUserLoggedInUseCase()).thenReturn(false)
+        }
+        whenever(monitorVideoRepeatModeUseCase()).thenReturn(flowOf(RepeatToggleMode.REPEAT_NONE))
+        whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(null))
+        fakeMonitorConnectivityFlow = MutableSharedFlow()
+        whenever(monitorConnectivityUseCase()).thenReturn(fakeMonitorConnectivityFlow)
+        whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.CANNOT_PLAY)
+    }
+
+    @AfterEach
+    fun resetMocks() {
+        reset(
+            context,
+            mediaPlayerGateway,
+            videoPlayerItemMapper,
+            getVideoNodeByHandleUseCase,
+            getVideoNodesUseCase,
+            getVideoNodesFromPublicLinksUseCase,
+            getVideoNodesFromInSharesUseCase,
+            getVideoNodesFromOutSharesUseCase,
+            getVideoNodesByEmailUseCase,
+            getUserNameByEmailUseCase,
+            getRubbishNodeUseCase,
+            getBackupsNodeUseCase,
+            getRootNodeUseCase,
+            getVideosBySearchTypeUseCase,
+            getVideoNodesByParentHandleUseCase,
+            getVideoNodesByHandlesUseCase,
+            getRootNodeFromMegaApiFolderUseCase,
+            getParentNodeFromMegaApiFolderUseCase,
+            getVideosByParentHandleFromMegaApiFolderUseCase,
+            monitorSubFolderMediaDiscoverySettingsUseCase,
+            getThumbnailUseCase,
+            httpServerStopUseCase,
+            httpServerStartUseCase,
+            httpServerIsRunningUseCase,
+            getLocalFilePathUseCase,
+            getFileTypeInfoByNameUseCase,
+            getOfflineNodeInformationByIdUseCase,
+            getOfflineNodesByParentIdUseCase,
+            getLocalLinkFromMegaApiUseCase,
+            getFingerprintUseCase,
+            monitorTransferEventsUseCase,
+            getFileByPathUseCase,
+            monitorVideoRepeatModeUseCase,
+            saveVideoRecentlyWatchedUseCase,
+            saveRecentlyUsedItemUseCase,
+            removeRecentlyUsedItemUseCase,
+            setVideoRepeatModeUseCase,
+            monitorAccountDetailUseCase,
+            isHiddenNodesOnboardedUseCase,
+            monitorShowHiddenItemsUseCase,
+            getBusinessStatusUseCase,
+            isNodeInRubbishBinUseCase,
+            isNodeInBackupsNodeUseCase,
+            isNodeInCloudDriveUseCase,
+            monitorNodeUpdatesUseCase,
+            durationInSecondsTextMapper,
+            isParticipatingInChatCallUseCase,
+            trackPlaybackPositionUseCase,
+            monitorPlaybackTimesUseCase,
+            savePlaybackTimesUseCase,
+            getSRTSubtitleFileListUseCase,
+            broadcastTransferOverQuotaUseCase,
+            monitorConnectivityUseCase,
+            getFeatureFlagValueUseCase,
+            checkNodeAccessibilityUseCase,
+            isUserLoggedInUseCase,
+        )
+    }
+
+    @Test
+    fun `test that isPipEnabled is set to true when feature flag returns true`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerPictureInPicture)).thenReturn(
+            true
+        )
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isPipEnabled).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isPipEnabled is set to false when feature flag returns false`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerPictureInPicture)).thenReturn(
+            false
+        )
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isPipEnabled).isFalse()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isPipEnabled remains false when feature flag throws an exception`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerPictureInPicture)).thenThrow(
+            RuntimeException("flag error")
+        )
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isPipEnabled).isFalse()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isConnected is updated to true when monitorConnectivityUseCase emits true`() =
+        runTest {
+            initViewModel()
+            fakeMonitorConnectivityFlow.emit(true)
+            underTest.uiState.test {
+                assertThat(awaitItem().isConnected).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isConnected is updated to false when monitorConnectivityUseCase emits false`() =
+        runTest {
+            initViewModel()
+            fakeMonitorConnectivityFlow.emit(false)
+            underTest.uiState.test {
+                assertThat(awaitItem().isConnected).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the errorState is updated correctly when emit BlockedMegaException`() =
+        runTest {
+            mockBlockedMegaException()
+            underTest.uiState.test {
+                assertThat(awaitItem().blockedError).isEqualTo(triggered)
+                underTest.onBlockedErrorConsumed()
+                assertThat(awaitItem().blockedError).isEqualTo(consumed)
+            }
+        }
+
+    private suspend fun mockBlockedMegaException() {
+        val expectedTransfer = mock<Transfer> {
+            on { isForeignOverQuota }.thenReturn(true)
+            on { nodeHandle }.thenReturn(INVALID_HANDLE)
+        }
+        val event = mock<TransferEvent.TransferTemporaryErrorEvent> {
+            on { transfer }.thenReturn(expectedTransfer)
+            on { error }.thenReturn(mock<BlockedMegaException>())
+        }
+        fakeMonitorTransferEventsFlow.emit(event)
+    }
+
+    @Test
+    fun `test that retryFailedEvent is triggered when INTENT_EXTRA_KEY_REBUILD_PLAYLIST is false`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(intent = intent, rebuildPlaylist = false)
+            underTest.initVideoPlayerData(intent)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
+            }
+        }
+
+    private fun initTestDataForTestingInvalidParams(
+        intent: Intent,
+        rebuildPlaylist: Boolean? = null,
+        launchSource: Int? = null,
+        data: Uri? = null,
+        handle: Long? = null,
+        fileName: String? = null,
+    ) {
+        rebuildPlaylist?.let {
+            whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)).thenReturn(it)
+        }
+        launchSource?.let {
+            testArgs = testArgs.copy(adapterType = launchSource)
+        }
+        whenever(intent.data).thenReturn(data)
+        handle?.let {
+            whenever(intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)).thenReturn(it)
+        }
+        whenever(intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)).thenReturn(fileName)
+    }
+
+    @Test
+    fun `test that retryFailedEvent is triggered when INTENT_EXTRA_KEY_ADAPTER_TYPE is INVALID_VALUE`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = INVALID_VALUE
+            )
+            underTest.initVideoPlayerData(intent)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that retryFailedEvent is triggered when data of Intent is null`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = FOLDER_LINK_ADAPTER,
+            )
+            underTest.initVideoPlayerData(intent)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that retryFailedEvent is triggered when INTENT_EXTRA_KEY_HANDLE is INVALID_HANDLE`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = FOLDER_LINK_ADAPTER,
+                data = mock(),
+                handle = INVALID_HANDLE
+            )
+            underTest.initVideoPlayerData(intent)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that retryFailedEvent is triggered when INTENT_EXTRA_KEY_FILE_NAME is null`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = FOLDER_LINK_ADAPTER,
+                data = mock(),
+                handle = 123456
+            )
+            underTest.initVideoPlayerData(intent)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that retryFailedEvent is not triggered when currentPlayingUri is null when getLocalFolderLink return null`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = FOLDER_LINK_ADAPTER,
+                data = mock(),
+                handle = 123456,
+                fileName = "test.mp4"
+            )
+            whenever(getLocalFolderLinkUseCase(any())).thenReturn(null)
+            underTest.initVideoPlayerData(intent)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that the mediaPlaySources is updated correctly when an intent is received`() =
+        runTest {
+            val intent = mock<Intent>()
+            val testHandle: Long = 123456
+            val testFileName = "test.mp4"
+            val uri: Uri = mock()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = uri,
+                handle = testHandle,
+                fileName = testFileName
+            )
+            initViewModel()
+            underTest.initVideoPlayerData(intent)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                actual.mediaPlaySources?.let { sources ->
+                    assertThat(sources.mediaItems).isNotEmpty()
+                    assertThat(sources.mediaItems.size).isEqualTo(1)
+                    assertThat(sources.mediaItems[0].mediaId).isEqualTo(testHandle.toString())
+                    assertThat(sources.newIndexForCurrentItem).isEqualTo(INVALID_VALUE)
+                    assertThat(sources.nameToDisplay).isEqualTo(testFileName)
+                }
+                assertThat(actual.metadata.nodeName).isEqualTo(testFileName)
+            }
+        }
+
+    @Test
+    fun `test that items is updated correctly when INTENT_EXTRA_KEY_IS_PLAYLIST is false`() =
+        runTest {
+            val intent = mock<Intent>()
+
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = testFileName
+            )
+            val node = initTypedVideoNode()
+            val videoPlayerItem = initVideoPlayerItem(testHandle, testFileName)
+            whenever(
+                videoPlayerItemMapper(
+                    nodeHandle = testHandle,
+                    nodeName = testFileName,
+                    thumbnail = null,
+                    type = MediaQueueItemType.Playing,
+                    size = 100,
+                    duration = testDuration,
+                    isSensitive = false,
+                )
+            ).thenReturn(videoPlayerItem)
+            whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(false)
+            whenever(getVideoNodeByHandleUseCase(testHandle)).thenReturn(node)
+            initViewModel()
+            underTest.initVideoPlayerData(intent)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                actual.items.let { items ->
+                    assertThat(items).isNotEmpty()
+                    assertThat(items.size).isEqualTo(1)
+                    assertThat(items[0]).isEqualTo(videoPlayerItem)
+                }
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    private fun initTypedVideoNode() =
+        mock<TypedVideoNode> {
+            on { this.id }.thenReturn(NodeId(testHandle))
+            on { this.name }.thenReturn(testFileName)
+            on { this.size }.thenReturn(testSize)
+            on { this.duration }.thenReturn(testDuration)
+        }
+
+    private fun initVideoPlayerItem(
+        handle: Long,
+        name: String,
+        type: MediaQueueItemType? = null,
+        isSelect: Boolean = false,
+    ) =
+        mock<VideoPlayerItem> {
+            on { nodeHandle }.thenReturn(handle)
+            on { nodeName }.thenReturn(name)
+            on { this.duration }.thenReturn(testDurationString)
+            on { this.type }.thenReturn(type)
+            on { this.isSelected }.thenReturn(isSelect)
+        }
+
+    @Test
+    fun `test that stat is updated correctly when launch source is OFFLINE_ADAPTER`() =
+        runTest {
+            val intent = mock<Intent>()
+            val testHandle: Long = 2
+            val testFileName = "test.mp4"
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = OFFLINE_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = testFileName
+            )
+
+            val testParentId = 654321
+            val testTitle = "video queue title"
+            val offlineNode = mock<OtherOfflineNodeInformation> {
+                on { name }.thenReturn(testTitle)
+            }
+            whenever(
+                intent.getIntExtra(
+                    INTENT_EXTRA_KEY_PARENT_ID,
+                    -1
+                )
+            ).thenReturn(testParentId)
+            whenever(getOfflineNodeInformationByIdUseCase(testParentId)).thenReturn(offlineNode)
+
+            val offlineFiles = (1..3).map {
+                initOfflineFileInfo(it, it.toString())
+            }
+            val items = offlineFiles.map {
+                initVideoPlayerItem(it.handle.toLong(), it.name)
+            }
+            whenever(getOfflineNodesByParentIdUseCase(testParentId)).thenReturn(offlineFiles)
+            offlineFiles.forEachIndexed { index, file ->
+                whenever(
+                    videoPlayerItemMapper(
+                        file.handle.toLong(),
+                        file.name,
+                        null,
+                        getMediaQueueItemType(index, 1),
+                        file.totalSize,
+                        false,
+                        200.seconds
+                    )
+                ).thenReturn(items[index])
+            }
+
+            whenever(
+                intent.getBooleanExtra(
+                    INTENT_EXTRA_KEY_IS_PLAYLIST,
+                    true
+                )
+            ).thenReturn(true)
+
+            initViewModel()
+            mockStatic(Uri::class.java).use {
+                whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
+                underTest.initVideoPlayerData(intent)
+                underTest.uiState.test {
+                    val actual = awaitItem()
+                    actual.items.let { items ->
+                        assertThat(items).isNotEmpty()
+                        assertThat(items.size).isEqualTo(3)
+                        items.forEachIndexed { index, item ->
+                            assertThat(item).isEqualTo(items[index])
+                        }
+                    }
+                    actual.mediaPlaySources?.let { sources ->
+                        assertThat(sources.mediaItems).isNotEmpty()
+                        assertThat(sources.mediaItems.size).isEqualTo(3)
+                        assertThat(sources.newIndexForCurrentItem).isEqualTo(1)
+                    }
+                    assertThat(actual.playQueueTitle).isEqualTo(testTitle)
+                    assertThat(actual.currentPlayingIndex).isEqualTo(1)
+                    assertThat(actual.currentPlayingHandle).isEqualTo(2)
+                    cancelAndConsumeRemainingEvents()
+                }
+            }
+        }
+
+    private fun initOfflineFileInfo(
+        id: Int,
+        handle: String,
+    ): OfflineFileInformation {
+        val fileTypedInfo = mock<VideoFileTypeInfo> {
+            on { isSupported }.thenReturn(true)
+            on { duration }.thenReturn(200.seconds)
+        }
+        return mock<OfflineFileInformation> {
+            on { this.id }.thenReturn(id)
+            on { name }.thenReturn("test.mp4")
+            on { this.handle }.thenReturn(handle)
+            on { totalSize }.thenReturn(100)
+            on { fileTypeInfo }.thenReturn(fileTypedInfo)
+            on { absolutePath }.thenReturn(testAbsolutePath)
+        }
+    }
+
+    private fun getMediaQueueItemType(currentIndex: Int, playingIndex: Int) =
+        when {
+            currentIndex == playingIndex -> MediaQueueItemType.Playing
+            playingIndex == -1 || currentIndex < playingIndex -> MediaQueueItemType.Previous
+            else -> MediaQueueItemType.Next
+        }
+
+    @Test
+    fun `test that stat is updated correctly when launch source is ZIP_ADAPTER`() =
+        runTest {
+            val intent = mock<Intent>()
+            val testHandle: Long = 1.toString().hashCode().toLong()
+            val testFileName = "test.mp4"
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = ZIP_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = testFileName
+            )
+
+            val testZipPath = "test.zip"
+            whenever(
+                intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY)
+            ).thenReturn(testZipPath)
+            val testTitle = "video queue title"
+            val testFiles: Array<File> = (1..3).map {
+                val name = it.toString()
+                whenever(getFileTypeInfoByNameUseCase(name)).thenReturn(mock<VideoFileTypeInfo>())
+                initFile(name)
+            }.toTypedArray()
+            val testParentFile = mock<File> {
+                on { name }.thenReturn(testTitle)
+            }
+            val testFile = mock<File> {
+                on { parentFile }.thenReturn(testParentFile)
+                on { listFiles() }.thenReturn(testFiles)
+            }
+            whenever(getFileByPathUseCase(testZipPath)).thenReturn(testFile)
+            val items = testFiles.map {
+                initVideoPlayerItem(it.name.hashCode().toLong(), it.name)
+            }
+            testFiles.forEachIndexed { index, file ->
+                whenever(
+                    videoPlayerItemMapper(
+                        file.name.hashCode().toLong(),
+                        file.name,
+                        null,
+                        getMediaQueueItemType(index, 0),
+                        file.length(),
+                        false,
+                        0.seconds
+                    )
+                ).thenReturn(items[index])
+            }
+            whenever(
+                intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)
+            ).thenReturn(true)
+            initViewModel()
+            mockStatic(FileUtil::class.java).use {
+                testFiles.forEach { file ->
+                    whenever(FileUtil.getUriForFile(context, file)).thenReturn(mock())
+                }
+                underTest.initVideoPlayerData(intent)
+                underTest.uiState.test {
+                    val actual = awaitItem()
+                    actual.items.let { items ->
+                        assertThat(items).isNotEmpty()
+                        assertThat(items.size).isEqualTo(3)
+                        items.forEachIndexed { index, item ->
+                            assertThat(item).isEqualTo(items[index])
+                        }
+                    }
+                    actual.mediaPlaySources?.let { sources ->
+                        assertThat(sources.mediaItems).isNotEmpty()
+                        assertThat(sources.mediaItems.size).isEqualTo(3)
+                        assertThat(sources.newIndexForCurrentItem).isEqualTo(0)
+                    }
+                    assertThat(actual.playQueueTitle).isEqualTo(testTitle)
+                    assertThat(actual.currentPlayingIndex).isEqualTo(0)
+                    assertThat(actual.currentPlayingHandle).isEqualTo(
+                        1.toString().hashCode().toLong()
+                    )
+                    cancelAndConsumeRemainingEvents()
+                }
+            }
+        }
+
+    private fun initFile(name: String) = mock<File> {
+        on { this.name }.thenReturn(name)
+        on { this.length() }.thenReturn(100L)
+        on { isFile }.thenReturn(true)
+    }
+
+    @Test
+    fun `test that state is updated correctly when launch source is VIDEO_BROWSE_ADAPTER`() =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            testStateIsUpdatedCorrectlyByLaunchSource(
+                intent = intent,
+                launchSource = VIDEO_BROWSE_ADAPTER
+            ) {
+                getVideoNodesUseCase(any())
+            }
+        }
+
+    @ParameterizedTest(name = "when launch source is {0}")
+    @ValueSource(ints = [RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER])
+    fun `test that state is updated correctly with node handles`(launchSource: Int) =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(intent.getLongArrayExtra(any())).thenReturn(longArrayOf(1, 2, 3))
+            testStateIsUpdatedCorrectlyByLaunchSource(
+                intent = intent,
+                launchSource = launchSource
+            ) {
+                getVideoNodesByHandlesUseCase(any())
+            }
+        }
+
+    @ParameterizedTest(name = "parentHandle is {0}")
+    @MethodSource("provideParametersForFolderLink")
+    fun `test that state is updated correctly when launch source is FOLDER_LINK_ADAPTER`(
+        parentHandle: Long,
+        getParentNode: suspend () -> FileNode,
+        initSourceData: suspend () -> String,
+    ) =
+        runTest {
+            val intent = mock<Intent>()
+            val testParentNode = mock<FileNode> {
+                on { name }.thenReturn(testTitle)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(
+                intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
+            ).thenReturn(parentHandle)
+            whenever(getParentNode()).thenReturn(testParentNode)
+            whenever(initSourceData()).thenReturn(testAbsolutePath)
+            testStateIsUpdatedCorrectlyByLaunchSource(
+                intent = intent,
+                launchSource = FOLDER_LINK_ADAPTER
+            ) {
+                getVideosByParentHandleFromMegaApiFolderUseCase(any(), any())
+            }
+        }
+
+    private fun provideParametersForFolderLink() = Stream.of(
+        Arguments.of(
+            INVALID_VALUE,
+            suspend { getRootNodeFromMegaApiFolderUseCase() },
+            suspend { getLocalFolderLinkUseCase(any()) }
+        ),
+        Arguments.of(
+            testHandle,
+            suspend { getParentNodeFromMegaApiFolderUseCase(any()) },
+            suspend { getLocalFolderLinkUseCase(any()) }
+        ),
+    )
+
+    private suspend fun testStateIsUpdatedCorrectlyByLaunchSource(
+        intent: Intent,
+        launchSource: Int,
+        playingIndex: Int = 1,
+        testArray: IntArray = intArrayOf(1, 2, 3),
+        queueTitle: String = testTitle,
+        initSourceData: suspend () -> List<TypedVideoNode>?,
+    ) {
+        val testHandle: Long = 2
+        val testFileName = "test.mp4"
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = launchSource,
+            data = mock(),
+            handle = testHandle,
+            fileName = testFileName
+        )
+
+        whenever(context.getString(any())).thenReturn(testTitle)
+
+        val testVideoNodes = testArray.map {
+            initVideoNode(it.toLong())
+        }
+        whenever(initSourceData()).thenReturn(testVideoNodes)
+        whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn(testAbsolutePath)
+        whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
+
+        val entities = testVideoNodes.map {
+            initVideoPlayerItem(it.id.longValue, it.name)
+        }
+        entities.onEach {
+            whenever(it.copy(type = MediaQueueItemType.Playing)).thenReturn(it)
+            whenever(it.copy(type = MediaQueueItemType.Previous)).thenReturn(it)
+            whenever(it.copy(type = MediaQueueItemType.Next)).thenReturn(it)
+        }
+        testVideoNodes.forEachIndexed { index, node ->
+            whenever(
+                videoPlayerItemMapper(
+                    node.id.longValue,
+                    node.name,
+                    null,
+                    getMediaQueueItemType(index, playingIndex),
+                    node.size,
+                    false,
+                    node.duration
+                )
+            ).thenReturn(entities[index])
+        }
+
+        whenever(
+            intent.getBooleanExtra(
+                INTENT_EXTRA_KEY_IS_PLAYLIST,
+                true
+            )
+        ).thenReturn(true)
+        initViewModel()
+        mockStatic(Uri::class.java).use {
+            whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
+            underTest.initVideoPlayerData(intent)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                actual.items.let { items ->
+                    assertThat(items).isNotEmpty()
+                    assertThat(items.size).isEqualTo(testArray.size)
+                    items.forEachIndexed { index, item ->
+                        assertThat(item).isEqualTo(entities[index])
+                    }
+                }
+                actual.mediaPlaySources?.let { sources ->
+                    assertThat(sources.mediaItems).isNotEmpty()
+                    assertThat(sources.mediaItems.size).isEqualTo(testArray.size)
+                    assertThat(sources.newIndexForCurrentItem).isEqualTo(playingIndex)
+                }
+                assertThat(actual.playQueueTitle).isEqualTo(queueTitle)
+                assertThat(actual.currentPlayingIndex).isEqualTo(playingIndex)
+                assertThat(actual.currentPlayingHandle).isEqualTo(testArray[playingIndex])
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+    }
+
+    private fun initVideoNode(
+        handle: Long,
+        isMarkedSensitive: Boolean = false,
+        isSensitiveInherited: Boolean = false,
+        isTakenDown: Boolean = false,
+    ) =
+        mock<TypedVideoNode> {
+            on { id }.thenReturn(NodeId(handle))
+            on { name }.thenReturn(testFileName)
+            on { size }.thenReturn(testSize)
+            on { duration }.thenReturn(testDuration)
+            on { this.isMarkedSensitive }.thenReturn(isMarkedSensitive)
+            on { this.isSensitiveInherited }.thenReturn(isSensitiveInherited)
+            on { this.isTakenDown }.thenReturn(isTakenDown)
+        }
+
+    @Test
+    fun `test that state is updated correctly when launch source is SEARCH_BY_ADAPTER`() =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(intent.getStringExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE)).thenReturn(testTitle)
+            whenever(intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)).thenReturn(
+                longArrayOf(1, 2, 3)
+            )
+            testStateIsUpdatedCorrectlyByLaunchSource(
+                intent = intent,
+                launchSource = SEARCH_BY_ADAPTER
+            ) {
+                getVideoNodesByHandlesUseCase(any())
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when launch source is CONTACT_FILE_ADAPTER and parentHandle is INVALID_HANDLE`() =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(intent.getStringExtra(INTENT_EXTRA_KEY_CONTACT_EMAIL)).thenReturn("email")
+            whenever(getUserNameByEmailUseCase(any())).thenReturn(testTitle)
+            initTestDataByParentNode(intent, INVALID_HANDLE) {
+                getRootNodeUseCase()
+            }
+            testStateIsUpdatedCorrectlyByLaunchSource(
+                intent = intent,
+                launchSource = CONTACT_FILE_ADAPTER,
+                queueTitle = "$testTitle $testTitle"
+            ) {
+                getVideoNodesByEmailUseCase(any())
+            }
+        }
+
+    @ParameterizedTest(name = "when launch source is {0}, and parentHandle is {1}")
+    @MethodSource("provideParameters")
+    fun `test that state is updated correctly`(
+        launchSource: Int,
+        parentHandle: Long,
+        queueTitle: String,
+        initParentNode: suspend () -> Node?,
+        getVideoNodes: suspend () -> List<TypedVideoNode>?,
+    ) = runTest {
+        val intent = mock<Intent>()
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+        initTestDataByParentNode(intent, parentHandle) {
+            initParentNode()
+        }
+        testStateIsUpdatedCorrectlyByLaunchSource(
+            intent = intent,
+            launchSource = launchSource,
+            queueTitle = queueTitle
+        ) {
+            getVideoNodes()
+        }
+    }
+
+    private fun provideParameters() = createInvalidTestParameters() + createValidTestParameters()
+
+    private fun createInvalidTestParameters() = listOf(
+        createTestParameterWithInvalidHandle(
+            launchSource = FAVOURITES_ADAPTER,
+            initParentNode = { getRootNodeUseCase() },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = FROM_ALBUM_SHARING,
+            initParentNode = { getRootNodeUseCase() },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = FROM_IMAGE_VIEWER,
+            initParentNode = { getRootNodeUseCase() },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = FROM_MEDIA_DISCOVERY,
+            initParentNode = { getRootNodeUseCase() },
+            getVideoNodes = { getVideosBySearchTypeUseCase(any(), any(), any(), any()) },
+        ),
+        createTestParameterWithValidHandle(
+            launchSource = FROM_MEDIA_DISCOVERY,
+            getVideoNodes = { getVideosBySearchTypeUseCase(any(), any(), any(), any()) },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = OUTGOING_SHARES_ADAPTER,
+            initParentNode = { getRootNodeUseCase() },
+            getVideoNodes = { getVideoNodesFromOutSharesUseCase(any(), any()) }
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = INCOMING_SHARES_ADAPTER,
+            initParentNode = { getRootNodeUseCase() },
+            getVideoNodes = { getVideoNodesFromInSharesUseCase(any()) }
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = LINKS_ADAPTER,
+            initParentNode = { getRootNodeUseCase() },
+            getVideoNodes = { getVideoNodesFromPublicLinksUseCase(any()) }
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = FILE_BROWSER_ADAPTER,
+            initParentNode = { getRootNodeUseCase() },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = BACKUPS_ADAPTER,
+            initParentNode = { getBackupsNodeUseCase() },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = RUBBISH_BIN_ADAPTER,
+            initParentNode = { getRubbishNodeUseCase() },
+        ),
+    )
+
+    private fun createValidTestParameters() = listOf(
+        createTestParameterWithValidHandle(launchSource = FAVOURITES_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = FROM_ALBUM_SHARING),
+        createTestParameterWithValidHandle(launchSource = FROM_IMAGE_VIEWER),
+        createTestParameterWithValidHandle(launchSource = CONTACT_FILE_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = OUTGOING_SHARES_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = INCOMING_SHARES_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = LINKS_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = FILE_BROWSER_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = BACKUPS_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = RUBBISH_BIN_ADAPTER),
+    )
+
+    private fun createTestParameterWithInvalidHandle(
+        launchSource: Int,
+        initParentNode: suspend () -> Node? = { getVideoNodeByHandleUseCase(any(), any()) },
+        getVideoNodes: suspend () -> List<TypedVideoNode>? =
+            { getVideoNodesByParentHandleUseCase(any(), any()) },
+    ) = arrayOf(launchSource, INVALID_HANDLE, testTitle, initParentNode, getVideoNodes)
+
+    private fun createTestParameterWithValidHandle(
+        launchSource: Int,
+        initParentNode: suspend () -> Node? = { getVideoNodeByHandleUseCase(any(), any()) },
+        getVideoNodes: suspend () -> List<TypedVideoNode>? =
+            { getVideoNodesByParentHandleUseCase(any(), any()) },
+    ) = arrayOf(launchSource, testHandle, testTitle, initParentNode, getVideoNodes)
+
+    private suspend fun initTestDataByParentNode(
+        intent: Intent,
+        parentHandle: Long,
+        initParentNode: suspend () -> Node? = { getVideoNodeByHandleUseCase(any(), any()) },
+    ) {
+        val testParentNode = mock<TypedVideoNode> {
+            on { name }.thenReturn(testTitle)
+        }
+        whenever(
+            intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
+        ).thenReturn(parentHandle)
+        whenever(initParentNode()).thenReturn(testParentNode)
+    }
+
+    @Test
+    fun `test that metadata is updated correctly`() = runTest {
+        initViewModel()
+        val testTitle = "title"
+        val testArist = "artist"
+        val testAlbum = "album"
+        val testNodeName = "nodeName"
+        val testMetadata = Metadata(
+            title = testTitle,
+            artist = testArist,
+            album = testAlbum,
+            nodeName = testNodeName
+        )
+        underTest.updateMetadata(testMetadata)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.metadata.title).isEqualTo(testTitle)
+            assertThat(actual.metadata.artist).isEqualTo(testArist)
+            assertThat(actual.metadata.album).isEqualTo(testAlbum)
+            assertThat(actual.metadata.nodeName).isEqualTo(testNodeName)
+        }
+    }
+
+    @Test
+    fun `test that currentPlayingVideoSize is updated correctly`() = runTest {
+        initViewModel()
+        val testWidth = 1920
+        val testHeight = 1080
+        val testVideoSize = VideoSize(width = testWidth, height = testHeight)
+        underTest.updateCurrentPlayingVideoSize(testVideoSize)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.currentPlayingVideoSize?.width).isEqualTo(testWidth)
+            assertThat(actual.currentPlayingVideoSize?.height).isEqualTo(testHeight)
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly after updateCurrentPlayingHandle is invoked`() =
+        runTest {
+            val testHandle = 2L
+            val handleNotInItems = 4L
+            val testItems = (1..3).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val testItem = initVideoPlayerItem(2.toLong(), "2", MediaQueueItemType.Playing)
+            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
+            whenever(testItems[1].copy(type = MediaQueueItemType.Playing)).thenReturn(testItem)
+            initViewModel()
+            underTest.updateCurrentPlayingHandle(testHandle, false, testItems)
+            testScheduler.advanceUntilIdle()
+            underTest.uiState.test {
+                awaitItem().let {
+                    assertThat(it.currentPlayingIndex).isEqualTo(
+                        testItems.indexOfFirst { item -> item.nodeHandle == testHandle }
+                    )
+                    assertThat(it.currentPlayingHandle).isEqualTo(testHandle)
+                    assertThat(it.items[1].type).isEqualTo(MediaQueueItemType.Playing)
+                }
+                underTest.updateCurrentPlayingHandle(handleNotInItems, false, testItems)
+                awaitItem().let {
+                    assertThat(it.currentPlayingIndex).isEqualTo(0)
+                    assertThat(it.currentPlayingHandle).isEqualTo(handleNotInItems)
+                }
+            }
+        }
+
+    @Test
+    fun `test that correct functions are invoked after setRepeatToggleModeForPlayer is invoked`() =
+        runTest {
+            val testMode = RepeatToggleMode.REPEAT_ONE
+            initViewModel()
+            underTest.setRepeatToggleModeForPlayer(testMode)
+            verify(setVideoRepeatModeUseCase).invoke(testMode.ordinal)
+            verify(mediaPlayerGateway).setRepeatToggleMode(testMode)
+        }
+
+    @Test
+    fun `test that updateRepeatToggleMode is updated correctly`() =
+        runTest {
+            val testRepeatOneMode = RepeatToggleMode.REPEAT_ONE
+            val testRepeatNoneMode = RepeatToggleMode.REPEAT_NONE
+            initViewModel()
+            underTest.updateRepeatToggleMode(testRepeatOneMode)
+            testScheduler.advanceUntilIdle()
+            underTest.uiState.test {
+                assertThat(awaitItem().repeatToggleMode).isEqualTo(testRepeatOneMode)
+                underTest.updateRepeatToggleMode(testRepeatNoneMode)
+                assertThat(awaitItem().repeatToggleMode).isEqualTo(testRepeatNoneMode)
+            }
+        }
+
+    @Test
+    fun `test that saveVideoRecentlyWatchedUseCase is invoked as expected when saveVideoWatchedTime is called`() =
+        runTest {
+            val expectedId = 1L
+            val instant = Instant.ofEpochMilli(2000L)
+            testArgs = testArgs.copy(
+                collectionId = expectedCollectionId,
+                collectionTitle = expectedCollectionTitle,
+            )
+            initViewModel()
+            mockStatic(Instant::class.java).use {
+                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
+                val testMediaItem = MediaItem.Builder()
+                    .setMediaId(expectedId.toString())
+                    .build()
+                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+                underTest.saveVideoWatchedTime()
+
+                verify(saveVideoRecentlyWatchedUseCase).invoke(
+                    expectedId,
+                    2,
+                    expectedCollectionId,
+                    expectedCollectionTitle
+                )
+                // CWLO membership is no longer decided here; it is computed on leave.
+                verify(saveRecentlyUsedItemUseCase, never()).invoke(any(), any(), any())
+            }
+        }
+
+    @Test
+    fun `test that mediaPlaybackState is updated correctly`() = runTest {
+        val testPlayingState = MediaPlaybackState.Playing
+        val testPausedState = MediaPlaybackState.Paused
+        initViewModel()
+        underTest.updatePlaybackState(testPlayingState)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().mediaPlaybackState).isEqualTo(testPlayingState)
+            underTest.updatePlaybackState(testPausedState)
+            assertThat(awaitItem().mediaPlaybackState).isEqualTo(testPausedState)
+        }
+    }
+
+    @Test
+    fun `test that onPlayWhenReadyChanged updates mediaPlaybackState correctly`() = runTest {
+        initViewModel()
+        underTest.onPlayWhenReadyChanged(MediaPlaybackState.Playing, isPausedByUser = false)
+        advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().mediaPlaybackState).isEqualTo(MediaPlaybackState.Playing)
+
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            assertThat(awaitItem().mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that shouldResumeOnAudioFocusGain is false after user pause and stays false on non user pause`() =
+        runTest {
+            initViewModel()
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+            assertThat(underTest.shouldResumeOnAudioFocusGain()).isFalse()
+
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = false)
+            advanceUntilIdle()
+            assertThat(underTest.shouldResumeOnAudioFocusGain()).isFalse()
+        }
+
+    @Test
+    fun `test that shouldResumeOnAudioFocusGain is true after user resumes playback`() = runTest {
+        initViewModel()
+        underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+        advanceUntilIdle()
+        assertThat(underTest.shouldResumeOnAudioFocusGain()).isFalse()
+
+        underTest.onPlayWhenReadyChanged(MediaPlaybackState.Playing, isPausedByUser = false)
+        advanceUntilIdle()
+        assertThat(underTest.shouldResumeOnAudioFocusGain()).isTrue()
+    }
+
+    @Test
+    fun `test that buildPlaybackSourcesForPlayer does not resume playback when user has paused`() =
+        runTest {
+            val intent = mock<Intent>()
+            val uri: Uri = mock()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = uri,
+                handle = testHandle,
+                fileName = testFileName
+            )
+            initViewModel()
+            underTest.initVideoPlayerData(intent)
+            advanceUntilIdle()
+
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.initVideoPlayerData(intent)
+            advanceUntilIdle()
+
+            verify(mediaPlayerGateway, never()).setPlayWhenReady(true)
+        }
+
+    @Test
+    fun `test that buildPlaybackSourcesForPlayer resumes playback when user has not paused and isRestartPlaying is true`() =
+        runTest {
+            val intent = mock<Intent>()
+            val uri: Uri = mock()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = uri,
+                handle = testHandle,
+                fileName = testFileName
+            )
+            initViewModel()
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.initVideoPlayerData(intent)
+            advanceUntilIdle()
+
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+        }
+
+    @Test
+    fun `test that pauseForBackground sets Paused and isAutoReplay when player was playing`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            initViewModel()
+            clearInvocations(mediaPlayerGateway)
+            underTest.pauseForBackground()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).setPlayWhenReady(false)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
+                assertThat(actual.isAutoReplay).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that pauseForBackground does not set isAutoReplay when player was already paused`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+            initViewModel()
+            clearInvocations(mediaPlayerGateway)
+            underTest.pauseForBackground()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway, never()).setPlayWhenReady(any())
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
+                assertThat(actual.isAutoReplay).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that pauseForBackground does not drive gateway pause when user already paused`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            initViewModel()
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.pauseForBackground()
+            advanceUntilIdle()
+
+            verify(mediaPlayerGateway, never()).setPlayWhenReady(any())
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
+                assertThat(actual.isAutoReplay).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that pausePlaybackNonUserInitiated does not mark paused by user so focus gain can resume`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            initViewModel()
+            clearInvocations(mediaPlayerGateway)
+            underTest.pausePlaybackNonUserInitiated()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).setPlayWhenReady(false)
+            // ExoPlayer reports app-driven setPlayWhenReady as USER_REQUEST; allowUpdatePausedByUser
+            // is cleared for this pause so the next callback does not flip isPausedByUser.
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+            assertThat(underTest.shouldResumeOnAudioFocusGain()).isTrue()
+        }
+
+    @Test
+    fun `test that pausePlaybackNonUserInitiated when already paused keeps shouldResumeOnAudioFocusGain false if user paused`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+            initViewModel()
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+            clearInvocations(mediaPlayerGateway)
+            underTest.pausePlaybackNonUserInitiated()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway, never()).setPlayWhenReady(any())
+            assertThat(underTest.shouldResumeOnAudioFocusGain()).isFalse()
+        }
+
+    @Test
+    fun `test that handleAutoReplayIfPaused calls setPlayWhenReady when Paused and isAutoReplay`() =
+        runTest {
+            initViewModel()
+            underTest.updatePlaybackState(MediaPlaybackState.Paused)
+            underTest.updatePlaybackStateWithReplay(false)
+            advanceUntilIdle()
+            clearInvocations(mediaPlayerGateway)
+            underTest.handleAutoReplayIfPaused()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Playing)
+                assertThat(actual.isAutoReplay).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that handleAutoReplayIfPaused does not resume when not isAutoReplay`() = runTest {
+        initViewModel()
+        underTest.updatePlaybackState(MediaPlaybackState.Paused)
+        advanceUntilIdle()
+        clearInvocations(mediaPlayerGateway)
+        underTest.handleAutoReplayIfPaused()
+        advanceUntilIdle()
+        verify(mediaPlayerGateway, never()).setPlayWhenReady(true)
+    }
+
+    @Test
+    fun `test that snackBarMessage is updated correctly`() = runTest {
+        val testMessage = "test message"
+        initViewModel()
+        underTest.updateSnackBarMessage(testMessage)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().snackBarMessage).isEqualTo(testMessage)
+            underTest.updateSnackBarMessage(null)
+            assertThat(awaitItem().snackBarMessage).isNull()
+        }
+    }
+
+    @Test
+    fun `test that retryEvent is triggered when onPlayerError is invoked within retry limit`() =
+        runTest {
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryEvent).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that retryFailedEvent is triggered when onPlayerError is invoked more than 6 times`() =
+        runTest {
+            initViewModel()
+            repeat(7) { underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED) }
+            underTest.uiState.test {
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that playerErrorType in uiState reflects the result from playerErrorTypeMapper`() =
+        runTest {
+            whenever(
+                playerErrorTypeMapper(
+                    errorCode = PlaybackException.ERROR_CODE_UNSPECIFIED,
+                    isConnected = true,
+                )
+            ).thenReturn(PlayerErrorType.FILE_NOT_SUPPORTED)
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            underTest.uiState.test {
+                assertThat(awaitItem().playerErrorType).isEqualTo(PlayerErrorType.FILE_NOT_SUPPORTED)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onPlayerError sets isVideoNotRendered when error type is VIDEO_NOT_RENDERED`() =
+        runTest {
+            whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.VIDEO_NOT_RENDERED)
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_DECODER_INIT_FAILED)
+            underTest.uiState.test {
+                assertThat(awaitItem().isVideoNotRendered).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that blockedError is triggered on first onPlayerError when checkNodeAccessibilityUseCase throws BlockedMegaException`() =
+        runTest {
+            whenever(checkNodeAccessibilityUseCase(any())).thenAnswer {
+                throw BlockedMegaException(
+                    0,
+                    "blocked"
+                )
+            }
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                assertThat(awaitItem().blockedError).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onPlayerError triggers blockedError when onMediaItemTransition resets playerRetry and video is taken down`() =
+        runTest {
+            initViewModel()
+            // First video fails — playerRetry becomes 1. checkNodeAccessibilityUseCase is called
+            // but completes normally (no throw), so execution continues to the retry path.
+            whenever(checkNodeAccessibilityUseCase(any())).thenAnswer { }
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            advanceUntilIdle()
+            // Transition to next video (taken down) — must reset playerRetry to 0.
+            underTest.onMediaItemTransition(testHandle.toString(), false)
+            // Make the use case throw BlockedMegaException for the new video.
+            whenever(checkNodeAccessibilityUseCase(any())).thenAnswer {
+                throw BlockedMegaException(0, "blocked")
+            }
+            // Second video fails — playerRetry becomes 1 again, so checkNodeAccessibilityUseCase
+            // is invoked and blockedError must be triggered.
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                assertThat(awaitItem().blockedError).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onPlayerError triggers retryFailedEvent immediately when error type is FILE_NOT_SUPPORTED`() =
+        runTest {
+            whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.FILE_NOT_SUPPORTED)
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_DECODING_FORMAT_UNSUPPORTED)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that retryEvent is triggered on second onPlayerError when within retry limit`() =
+        runTest {
+            initViewModel()
+            // First error launches an async coroutine (playerRetry == 1); do NOT advance so
+            // the assertion is driven only by the second error's synchronous else-if branch.
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryEvent).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `the state is updated correctly when monitorAccountDetailUseCase is triggered`() =
+        runTest {
+            val testAccountType = mock<AccountType> {
+                on { isBusinessAccount }.thenReturn(true)
+            }
+            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
+            initViewModel()
+            fakeMonitorShowHiddenItemsFlow.emit(true)
+            emitAccountDetail(testAccountType)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.accountType?.isBusinessAccount).isTrue()
+                assertThat(actual.isBusinessAccountExpired).isTrue()
+                assertThat(actual.hiddenNodeEnabled).isTrue()
+                assertThat(actual.showHiddenItems).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    private suspend fun emitAccountDetail(accountType: AccountType) {
+        val testLevelDetail = mock<AccountLevelDetail> {
+            on { this.accountType }.thenReturn(accountType)
+        }
+        val testAccountDetail = mock<AccountDetail> {
+            on { levelDetail }.thenReturn(testLevelDetail)
+        }
+        fakeMonitorAccountDetailFlow.emit(testAccountDetail)
+    }
+
+    @ParameterizedTest(name = "when value is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isMoreOptionShown is updated correctly`(value: Boolean) = runTest {
+        initViewModel()
+        underTest.updateIsMoreOptionShown(value)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().isMoreOptionShown).isEqualTo(value)
+        }
+    }
+
+    @Test
+    fun `test that screenshotWhenVideoPlaying does not invoke successCallback when captureView is not a TextureView`() =
+        runTest {
+            var callbackInvoked = false
+            val mockView = mock<View>()
+
+            underTest.screenshotWhenVideoPlaying(
+                rootPath = "test/path",
+                captureView = mockView,
+                successCallback = { callbackInvoked = true },
+            )
+            advanceUntilIdle()
+
+            assertThat(callbackInvoked).isFalse()
+        }
+
+    @Test
+    fun `test that screenshotWhenVideoPlaying does not invoke successCallback when TextureView is not available`() =
+        runTest {
+            var callbackInvoked = false
+            val mockTextureView = mock<TextureView> {
+                on { isAvailable } doReturn false
+            }
+
+            underTest.screenshotWhenVideoPlaying(
+                rootPath = "test/path",
+                captureView = mockTextureView,
+                successCallback = { callbackInvoked = true },
+            )
+            advanceUntilIdle()
+
+            assertThat(callbackInvoked).isFalse()
+        }
+
+    @ParameterizedTest(name = "when item is {0}")
+    @MethodSource("provideSpeedPlaybackItem")
+    fun `test that currentSpeedPlayback is updated correctly`(item: VideoSpeedPlaybackItem) =
+        runTest {
+            initViewModel()
+            underTest.updateCurrentSpeedPlaybackItem(item)
+            testScheduler.advanceUntilIdle()
+            verify(mediaPlayerGateway).updatePlaybackSpeed(item)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.currentSpeedPlayback.speed).isEqualTo(item.speed)
+                assertThat(actual.currentSpeedPlayback.text).isEqualTo(item.text)
+            }
+        }
+
+    private fun provideSpeedPlaybackItem() = VideoSpeedPlaybackItem.entries
+
+    @Test
+    fun `test isNodeComesFromIncoming is return true`() = runTest {
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(true)
+        whenever(isNodeInCloudDriveUseCase(any())).thenReturn(true)
+        whenever(isNodeInBackupsNodeUseCase(any())).thenReturn(true)
+        assertThat(underTest.isNodeComesFromIncoming()).isTrue()
+    }
+
+    @ParameterizedTest(name = "when value is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that state is updated correctly when updatePlaybackStateWithReplay is invoked`(
+        value: Boolean,
+    ) =
+        runTest {
+            initViewModel()
+            underTest.updatePlaybackStateWithReplay(value)
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).setPlayWhenReady(value)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaybackState).isEqualTo(
+                    if (value) {
+                        MediaPlaybackState.Playing
+                    } else {
+                        MediaPlaybackState.Paused
+                    }
+                )
+                assertThat(actual.isAutoReplay).isEqualTo(!value)
+            }
+        }
+
+    @Test
+    fun `test that getCurrentPlayingPosition returns as expected`() = runTest {
+        whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(100)
+        whenever(durationInSecondsTextMapper(100.milliseconds)).thenReturn(testDurationString)
+        initViewModel()
+        val actual = underTest.getCurrentPlayingPosition()
+        assertThat(actual).isEqualTo(testDurationString)
+    }
+
+    @Test
+    fun `test that expected function is invoked when seekToByHandle is invoked`() = runTest {
+        val testItems = (0..2).map {
+            initVideoPlayerItem(it.toLong(), it.toString())
+        }
+        underTest.seekToByHandle(1, testItems)
+        verify(mediaPlayerGateway).playerSeekTo(1)
+    }
+
+    @Test
+    fun `test that items are updated correctly when swapItems function is invoked`() = runTest {
+        val testItems = (0..2).map {
+            initVideoPlayerItem(it.toLong(), it.toString())
+        }
+        val mediaItems = (0..2).map {
+            MediaItem.Builder().setMediaId(it.toString()).build()
+        }
+        initViewModel()
+        underTest.swapItems(1, 2, testItems, mediaItems)
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.items[1].nodeHandle).isEqualTo(2L)
+            assertThat(actual.items[2].nodeHandle).isEqualTo(1L)
+        }
+    }
+
+    @Test
+    fun `test that swapItems re-initialises mediaItemsDuringChanged when size mismatch occurs`() =
+        runTest {
+            val initialItems = (0..2).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val initialMediaItems = (0..2).map {
+                MediaItem.Builder().setMediaId(it.toString()).build()
+            }
+            initViewModel()
+            // First swap: populates mediaItemsDuringChanged with 3 entries
+            underTest.swapItems(0, 1, initialItems, initialMediaItems)
+            advanceUntilIdle()
+
+            // Simulate playlist growing to 4 items — triggers size-mismatch re-init
+            val expandedItems = (0..3).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val expandedMediaItems = (0..3).map {
+                MediaItem.Builder().setMediaId(it.toString()).build()
+            }
+            underTest.swapItems(1, 2, expandedItems, expandedMediaItems)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.items[1].nodeHandle).isEqualTo(2L)
+                assertThat(actual.items[2].nodeHandle).isEqualTo(1L)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that mediaPlaySources are updated correctly when updateItemsAfterReorder is invoked`() =
+        runTest {
+            val testItems = (0..2).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val mediaItems = (0..2).map {
+                MediaItem.Builder().setMediaId(it.toString()).build()
+            }
+            initViewModel()
+            underTest.swapItems(1, 2, testItems, mediaItems)
+            underTest.updateItemsAfterReorder()
+            verify(mediaPlayerGateway).buildPlaySources(any())
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaySources?.mediaItems?.get(1)?.mediaId).isEqualTo("2")
+                assertThat(actual.mediaPlaySources?.mediaItems?.get(2)?.mediaId).isEqualTo("1")
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @ParameterizedTest(name = "if isParticipatingInChatCallUseCase returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isParticipatingInChatCall returns correctly`(value: Boolean) = runTest {
+        whenever(isParticipatingInChatCallUseCase()).thenReturn(value)
+        initViewModel()
+        val actual = underTest.isParticipatingInChatCall()
+        assertThat(actual).isEqualTo(value)
+    }
+
+    @Test
+    fun `test that action mode is updated as expected`() = runTest {
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isActionMode).isFalse()
+            underTest.updateActionMode(true)
+            assertThat(awaitItem().isActionMode).isTrue()
+            underTest.updateActionMode(false)
+            assertThat(awaitItem().isActionMode).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that search state is updated as expected`() = runTest {
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+            underTest.searchWidgetStateUpdate()
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.EXPANDED)
+            skipItems(1)
+            underTest.searchWidgetStateUpdate()
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+        }
+    }
+
+    @Test
+    fun `test that states of the search feature are updated as expected`() = runTest {
+        initViewModel()
+        underTest.searchWidgetStateUpdate()
+        underTest.searchQuery("")
+        underTest.uiState.test {
+            val initial = awaitItem()
+            assertThat(initial.searchState).isEqualTo(SearchWidgetState.EXPANDED)
+            assertThat(initial.query).isNotNull()
+            underTest.closeSearch()
+            val actual = awaitItem()
+            assertThat(actual.searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+            assertThat(actual.query).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly when updateItemInSelectionState is invoked`() =
+        runTest {
+            val testItems = (0..2).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val testSelectItem = initVideoPlayerItem(handle = 1L, name = "1", isSelect = true)
+            whenever(testItems[1].copy(isSelected = true)).thenReturn(testSelectItem)
+            initViewModel()
+            underTest.updateItemInSelectionState(1, testItems[1], testItems)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.items[1].isSelected).isTrue()
+                assertThat(actual.selectedItemHandles.size).isEqualTo(1)
+                assertThat(actual.selectedItemHandles.contains(1)).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when clearAllSelected is invoked`() =
+        runTest {
+            val testItems = (0..2).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val testSelectItem = initVideoPlayerItem(handle = 1L, name = "1", isSelect = true)
+            whenever(testItems[1].copy(isSelected = true)).thenReturn(testSelectItem)
+            whenever(testSelectItem.copy(isSelected = false)).thenReturn(testItems[1])
+            initViewModel()
+            underTest.updateItemInSelectionState(1, testItems[1], testItems)
+            underTest.uiState.test {
+                awaitItem().let {
+                    assertThat(it.items[1].isSelected).isTrue()
+                    assertThat(it.selectedItemHandles.size).isEqualTo(1)
+                    assertThat(it.selectedItemHandles.contains(1)).isTrue()
+                }
+                underTest.clearAllSelected()
+                awaitItem().let {
+                    assertThat(it.items[1].isSelected).isFalse()
+                    assertThat(it.selectedItemHandles).isEmpty()
+                }
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when removeSelectedItems is invoked`() =
+        runTest {
+            val testItems = (0..2).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val mediaItems = (0..2).map {
+                MediaItem.Builder().setMediaId(it.toString()).build()
+            }
+            val selectHandles = listOf(1L, 2L)
+            initViewModel()
+            underTest.removeSelectedItems(selectHandles, testItems, mediaItems)
+            verify(mediaPlayerGateway).buildPlaySources(any())
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.items.size).isEqualTo(1)
+                assertThat(actual.items.first().nodeHandle).isEqualTo(0)
+                assertThat(actual.mediaPlaySources?.mediaItems?.size).isEqualTo(1)
+                assertThat(actual.mediaPlaySources?.mediaItems?.first()?.mediaId).isEqualTo("0")
+                assertThat(actual.selectedItemHandles).isEmpty()
+                assertThat(actual.currentPlayingIndex).isEqualTo(0)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @ParameterizedTest(name = "and isFullscreen is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isFullscreen is updated correctly when updateFullscreen is invoked`(
+        isFullscreen: Boolean,
+    ) = runTest {
+        initViewModel()
+        underTest.updateFullscreen(isFullscreen)
+        testScheduler.advanceUntilIdle()
+        assertThat(analyticsExtension.events.first()).isInstanceOf(
+            if (isFullscreen) {
+                VideoPlayerFullScreenPressedEvent::class.java
+            } else {
+                VideoPlayerOriginalPressedEvent::class.java
+            }
+        )
+        underTest.uiState.test {
+            assertThat(awaitItem().isFullscreen).isEqualTo(isFullscreen)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @ParameterizedTest(name = "and lock state is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isLocked is updated correctly when updateLockStatus is invoked`(
+        isLocked: Boolean,
+    ) = runTest {
+        initViewModel()
+        underTest.updateLockStatus(isLocked)
+        testScheduler.advanceUntilIdle()
+        assertThat(analyticsExtension.events.first()).isInstanceOf(
+            if (isLocked) {
+                LockButtonPressedEvent::class.java
+            } else {
+                UnlockButtonPressedEvent::class.java
+            }
+        )
+        underTest.uiState.test {
+            assertThat(awaitItem().isLocked).isEqualTo(isLocked)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @ParameterizedTest(name = "when mediaPlayerIsPlaying returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isMediaPlayerPlaying returns correctly `(
+        value: Boolean,
+    ) = runTest {
+        initViewModel()
+        whenever(mediaPlayerGateway.mediaPlayerIsPlaying()).thenReturn(value)
+        val actual = underTest.isMediaPlayerPlaying()
+        assertThat(actual).isEqualTo(value)
+    }
+
+    @ParameterizedTest(name = "when isUpdateName is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that state is updated correctly after onMediaItemTransition is invoked`(
+        isUpdateName: Boolean,
+    ) = runTest {
+        val testMediaItem = MediaItem.Builder()
+            .setMediaId(testHandle.toString())
+            .build()
+        whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
+        initViewModel()
+        underTest.onMediaItemTransition(testHandle.toString(), isUpdateName)
+        assertThat(analyticsExtension.events.first()).isInstanceOf(VideoPlayerIsActivatedEvent::class.java)
+        verify(saveVideoRecentlyWatchedUseCase).invoke(any(), any(), any(), anyOrNull())
+        if (isUpdateName) {
+            underTest.uiState.test {
+                val metadata = awaitItem().metadata
+                assertThat(metadata.title).isNull()
+                assertThat(metadata.artist).isNull()
+                assertThat(metadata.album).isNull()
+                assertThat(metadata.nodeName).isEmpty()
+            }
+        }
+    }
+
+    @Test
+    fun `test that isVideoNotRendered is cleared after onMediaItemTransition is invoked`() =
+        runTest {
+            whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.VIDEO_NOT_RENDERED)
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_DECODER_INIT_FAILED)
+            underTest.uiState.test {
+                // skip state where isVideoNotRendered = true
+                awaitItem()
+                underTest.onMediaItemTransition(testHandle.toString(), false)
+                val state = awaitItem()
+                assertThat(state.isVideoNotRendered).isFalse()
+                assertThat(state.playerErrorType).isNull()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that subtitle status is cleared correctly after onMediaItemTransition is invoked`() =
+        runTest {
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem, mock())
+            underTest.clearSubtitleInfo(0)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.matchedSubtitleInfo).isNull()
+                assertThat(actual.addedSubtitleInfo).isNull()
+                assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
+            }
+        }
+
+    @Test
+    fun `test that saved playback position is applied without dialog when initVideoPlayerData is invoked`() =
+        runTest {
+            val playbackInfo = mock<PlaybackInformation> {
+                on { currentPosition }.thenReturn(100)
+            }
+            val map = mapOf(testHandle to playbackInfo)
+            testArgs = testArgs.copy(handle = testHandle)
+            whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(map))
+            val intent = mock<Intent>()
+            val uri: Uri = mock()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = uri,
+                handle = testHandle,
+                fileName = testFileName
+            )
+            whenever(getVideoNodesUseCase(any())).thenReturn(emptyList())
+            initViewModel()
+            underTest.initVideoPlayerData(intent)
+
+            verify(mediaPlayerGateway).playerSeekToPositionInMs(100)
+            assertThat(underTest.uiState.value.showPlaybackDialog).isFalse()
+            assertThat(underTest.uiState.value.playbackPosition).isNull()
+        }
+
+    @ParameterizedTest(name = "when state is {0}")
+    @ValueSource(ints = [MEDIA_PLAYER_STATE_ENDED, MEDIA_PLAYER_STATE_READY])
+    fun `test that behaviour is as expected after onPlaybackStateChanged is invoked`(
+        state: Int,
+    ) = runTest {
+        whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+        initViewModel()
+        underTest.updatePlaybackState(
+            if (state == MEDIA_PLAYER_STATE_ENDED) {
+                MediaPlaybackState.Playing
+            } else {
+                MediaPlaybackState.Paused
+            }
+        )
+        underTest.onPlaybackStateChanged(state)
+        if (state == MEDIA_PLAYER_STATE_READY) {
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+        } else {
+            underTest.uiState.test {
+                assertThat(awaitItem().mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
+            }
+        }
+    }
+
+    @Test
+    fun `test that removeRecentlyUsedItemUseCase is invoked when onPlaybackStateChanged ends within 3 seconds of completion`() =
+        runTest {
+            val handle = 12345L
+            val mediaItem = MediaItem.Builder().setMediaId(handle.toString()).build()
+            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(mediaItem)
+            whenever(mediaPlayerGateway.getCurrentItemDuration()).thenReturn(60_000L)
+            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(58_000L)
+            initViewModel()
+            underTest.updatePlaybackState(MediaPlaybackState.Playing)
+
+            underTest.onPlaybackStateChanged(MEDIA_PLAYER_STATE_ENDED)
+
+            verify(removeRecentlyUsedItemUseCase).invoke(handle)
+        }
+
+    @Test
+    fun `test that saveRecentlyUsedItemUseCase is invoked when onPlaybackStateChanged ends past 15 seconds and more than 3 seconds from completion`() =
+        runTest {
+            val handle = 12345L
+            val mediaItem = MediaItem.Builder().setMediaId(handle.toString()).build()
+            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(mediaItem)
+            whenever(mediaPlayerGateway.getCurrentItemDuration()).thenReturn(60_000L)
+            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(50_000L)
+            initViewModel()
+            underTest.updatePlaybackState(MediaPlaybackState.Playing)
+
+            underTest.onPlaybackStateChanged(MEDIA_PLAYER_STATE_ENDED)
+
+            verify(saveRecentlyUsedItemUseCase).invoke(
+                nodeHandle = handle,
+                type = RecentlyUsedType.Video,
+                fileName = underTest.uiState.value.metadata.nodeName,
+            )
+            verify(removeRecentlyUsedItemUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that saveRecentlyUsedItemUseCase is not invoked when onPlaybackStateChanged ends at 15 seconds or less`() =
+        runTest {
+            val handle = 12345L
+            val mediaItem = MediaItem.Builder().setMediaId(handle.toString()).build()
+            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(mediaItem)
+            whenever(mediaPlayerGateway.getCurrentItemDuration()).thenReturn(10_000L)
+            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(10_000L)
+            initViewModel()
+            underTest.updatePlaybackState(MediaPlaybackState.Playing)
+
+            underTest.onPlaybackStateChanged(MEDIA_PLAYER_STATE_ENDED)
+
+            verify(saveRecentlyUsedItemUseCase, never()).invoke(any(), any(), any())
+            verify(removeRecentlyUsedItemUseCase).invoke(handle)
+        }
+
+    @Test
+    fun `test that getMatchedSubtitleFileInfo function returns correctly`() = runTest {
+        val testInfoList = listOf(
+            mock<SubtitleFileInfo> {
+                on { name }.thenReturn(testFileName)
+            }
+        )
+        whenever(getSRTSubtitleFileListUseCase()).thenReturn(testInfoList)
+        testArgs = testArgs.copy(fileName = testFileName)
+        initViewModel()
+        val actual = underTest.getMatchedSubtitleFileInfo()
+        assertThat(actual).isNotNull()
+        assertThat(actual?.name).isEqualTo(testFileName)
+    }
+
+    @Test
+    fun `test that showSubtitleDialog is updated correctly and setPlayWhenReady false is called when updateShowSubtitleDialog is invoked with true`() =
+        runTest {
+            initViewModel()
+            underTest.updateShowSubtitleDialog(true)
+            testScheduler.advanceUntilIdle()
+            verify(mediaPlayerGateway).setPlayWhenReady(false)
+            underTest.uiState.test {
+                assertThat(awaitItem().showSubTitlesOptions).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that showSubtitleDialog is updated correctly when updateShowSubtitleDialog is invoked with false`() =
+        runTest {
+            initViewModel()
+            underTest.updateShowSubtitleDialog(false)
+            testScheduler.advanceUntilIdle()
+            underTest.uiState.test {
+                assertThat(awaitItem().showSubTitlesOptions).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that updateShowSubtitleDialog false does not resume playback when user was paused before opening subtitle dialog`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+            initViewModel()
+            underTest.updateShowSubtitleDialog(true)
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.updateShowSubtitleDialog(false)
+
+            verify(mediaPlayerGateway, never()).setPlayWhenReady(true)
+        }
+
+    @Test
+    fun `test that updateShowSubtitleDialog false resumes playback when video was playing before opening subtitle dialog`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            initViewModel()
+            underTest.updateShowSubtitleDialog(true)
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.updateShowSubtitleDialog(false)
+
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+        }
+
+    @Test
+    fun `test that state is updated correctly after navigateToSelectSubtitle is invoked`() =
+        runTest {
+            initViewModel()
+            advanceUntilIdle()
+            underTest.uiState.drop(1).test {
+                underTest.updateShowSubtitleDialog(true)
+                assertThat(awaitItem().showSubTitlesOptions).isTrue()
+                underTest.navigateToSelectSubtitle()
+                verify(mediaPlayerGateway).setPlayWhenReady(false)
+                assertThat(awaitItem().showSubTitlesOptions).isFalse()
+            }
+        }
+
+    @ParameterizedTest(name = "when value is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that navigateToSelectSubtitleScreen is update correctly after updateNavigateToSelectSubtitle is invoked`(
+        value: Boolean,
+    ) = runTest {
+        initViewModel()
+        underTest.updateNavigateToSelectSubtitle(value)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().navigateToSelectSubtitleScreen).isEqualTo(value)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @ParameterizedTest(name = "when LaunchSource is {0}")
+    @ValueSource(ints = [OFFLINE_ADAPTER, LINKS_ADAPTER])
+    fun `test that isShowSubtitleIcon returns correctly`(
+        launchSource: Int,
+    ) = runTest {
+        testArgs = testArgs.copy(adapterType = launchSource)
+        initViewModel()
+        val actual = underTest.isShowSubtitleIcon()
+        assertThat(actual).isEqualTo(launchSource != OFFLINE_ADAPTER)
+    }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is Off`() = runTest {
+        initViewModel()
+        underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem)
+        underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.Off)
+        advanceUntilIdle()
+        assertThat(analyticsExtension.events.first()).isInstanceOf(
+            OffOptionForHideSubtitlePressedEvent::class.java
+        )
+        verify(mediaPlayerGateway).hideSubtitle()
+        underTest.uiState.test {
+            assertThat(awaitItem().subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is AddSubtitleItem and info is null`() =
+        runTest {
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem)
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).showSubtitle()
+            underTest.uiState.test {
+                assertThat(awaitItem().subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.AddSubtitleItem)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is AddSubtitleItem, subtitle url is not null`() =
+        runTest {
+            val testUrl = "testUrl"
+            val mockSubtitleInfo = mock<SubtitleFileInfo> {
+                on { url }.thenReturn(testUrl)
+            }
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(
+                SubtitleSelectedStatus.AddSubtitleItem,
+                mockSubtitleInfo
+            )
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).addSubtitle(testUrl)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.AddSubtitleItem)
+                assertThat(actual.showSubTitlesOptions).isFalse()
+                assertThat(actual.addedSubtitleInfo).isEqualTo(mockSubtitleInfo)
+                assertThat(actual.matchedSubtitleInfo).isNull()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is AddSubtitleItem, subtitle url is null`() =
+        runTest {
+            val mockSubtitleInfo = mock<SubtitleFileInfo>()
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(
+                SubtitleSelectedStatus.AddSubtitleItem,
+                mockSubtitleInfo
+            )
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
+                assertThat(actual.showSubTitlesOptions).isFalse()
+                assertThat(actual.addedSubtitleInfo).isEqualTo(mockSubtitleInfo)
+                assertThat(actual.matchedSubtitleInfo).isNull()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is SelectMatchedItem`() =
+        runTest {
+            val testUrl = "testUrl"
+            val mockSubtitleInfo = mock<SubtitleFileInfo> {
+                on { url }.thenReturn(testUrl)
+            }
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(
+                SubtitleSelectedStatus.SelectMatchedItem,
+                mockSubtitleInfo
+            )
+            underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.Off)
+            underTest.updateSubtitleSelectedStatus(
+                SubtitleSelectedStatus.SelectMatchedItem,
+                mockSubtitleInfo
+            )
+            underTest.uiState.test {
+                underTest.updateSubtitleSelectedStatus(
+                    SubtitleSelectedStatus.SelectMatchedItem,
+                    mockSubtitleInfo
+                )
+                awaitItem().let {
+                    assertThat(it.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.SelectMatchedItem)
+                    assertThat(it.showSubTitlesOptions).isFalse()
+                    assertThat(it.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
+                    assertThat(it.addedSubtitleInfo).isNull()
+                }
+                underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.Off)
+                skipItems(1)
+                underTest.updateSubtitleSelectedStatus(
+                    SubtitleSelectedStatus.SelectMatchedItem,
+                    mockSubtitleInfo
+                )
+                awaitItem().let {
+                    assertThat(it.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.SelectMatchedItem)
+                    assertThat(it.showSubTitlesOptions).isFalse()
+                    assertThat(it.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
+                    assertThat(it.addedSubtitleInfo).isNull()
+                }
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is SelectMatchedItem and subtitle url is null`() =
+        runTest {
+            val mockSubtitleInfo = mock<SubtitleFileInfo>()
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(
+                SubtitleSelectedStatus.SelectMatchedItem,
+                mockSubtitleInfo
+            )
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
+                assertThat(actual.showSubTitlesOptions).isFalse()
+                assertThat(actual.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
+                assertThat(actual.addedSubtitleInfo).isNull()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when monitorVideoRepeatModeUseCase returns a value`() =
+        runTest {
+            val mode = RepeatToggleMode.REPEAT_ONE
+            whenever(monitorVideoRepeatModeUseCase()).thenReturn(flowOf(mode))
+            initViewModel()
+            underTest.initRepeatToggleMode()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.repeatToggleMode).isEqualTo(mode)
+                verify(mediaPlayerGateway).setRepeatToggleMode(mode)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that filterNonSensitiveNodes returns all nodes when showHiddenItems is true`() =
+        runTest {
+            val intent = mock<Intent>()
+            val mockAccountType = mock<AccountType> { on { isPaid }.thenReturn(true) }
+            testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+                intent = intent,
+                isSensitive = true,
+                isSensitiveInherited = true,
+                accountType = mockAccountType
+            ) { getVideoNodesUseCase(any()) }
+        }
+
+    private suspend fun testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+        intent: Intent,
+        launchSource: Int = VIDEO_BROWSE_ADAPTER,
+        playingIndex: Int = 1,
+        testArray: IntArray = intArrayOf(1, 2, 3),
+        isSensitive: Boolean = false,
+        isSensitiveInherited: Boolean = false,
+        isShowHiddenItems: Boolean = true,
+        accountType: AccountType? = null,
+        isAccountExpired: Boolean = false,
+        initSourceData: suspend () -> List<TypedVideoNode>?,
+    ) {
+        val testHandle = 2L
+        val testFileName = "test.mp4"
+
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = launchSource,
+            data = mock(),
+            handle = testHandle,
+            fileName = testFileName
+        )
+
+        whenever(context.getString(any())).thenReturn(testTitle)
+
+        val testVideoNodes = testArray.mapIndexed { index, it ->
+            initVideoNode(
+                handle = it.toLong(),
+                isMarkedSensitive = index == 2 && isSensitive,
+                isSensitiveInherited = index == 2 && isSensitiveInherited
+            )
+        }
+
+        whenever(initSourceData()).thenReturn(testVideoNodes)
+        whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn(testAbsolutePath)
+        whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
+
+        val entities = testVideoNodes.map { initVideoPlayerItem(it.id.longValue, it.name) }
+
+        entities.forEach { entity ->
+            whenever(entity.copy(type = MediaQueueItemType.Playing)).thenReturn(entity)
+            whenever(entity.copy(type = MediaQueueItemType.Previous)).thenReturn(entity)
+            whenever(entity.copy(type = MediaQueueItemType.Next)).thenReturn(entity)
+        }
+
+        testVideoNodes.forEachIndexed { index, node ->
+            whenever(
+                videoPlayerItemMapper(
+                    node.id.longValue,
+                    node.name,
+                    null,
+                    getMediaQueueItemType(index, playingIndex),
+                    node.size,
+                    node.isMarkedSensitive || node.isSensitiveInherited,
+                    node.duration
+                )
+            ).thenReturn(entities[index])
+        }
+
+        whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(true)
+
+        initViewModel()
+        mockStatic(Uri::class.java).use {
+            whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
+            accountType?.let { emitAccountDetail(it) }
+            fakeMonitorShowHiddenItemsFlow.emit(isShowHiddenItems)
+            underTest.initVideoPlayerData(intent)
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                val expectedSize =
+                    if (isShowHiddenItems || isAccountExpired || accountType?.isPaid == false) {
+                        testArray.size
+                    } else {
+                        testArray.size - 1
+                    }
+
+                assertThat(actual.items).isNotEmpty()
+                assertThat(actual.items.size).isEqualTo(expectedSize)
+                actual.items.forEachIndexed { index, item ->
+                    assertThat(item).isEqualTo(entities[index])
+                }
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+    }
+
+    @Test
+    fun `test that filterNonSensitiveNodes returns all nodes when accountType is not paid`() =
+        runTest {
+            val intent = mock<Intent>()
+            val mockAccountType = mock<AccountType> { on { isPaid }.thenReturn(false) }
+            testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+                intent = intent,
+                isSensitive = true,
+                isSensitiveInherited = true,
+                isShowHiddenItems = false,
+                accountType = mockAccountType
+            ) { getVideoNodesUseCase(any()) }
+        }
+
+    @Test
+    fun `test that filterNonSensitiveNodes returns all nodes when business account is expired`() =
+        runTest {
+            val intent = mock<Intent>()
+            val mockAccountType = mock<AccountType> {
+                on { isBusinessAccount }.thenReturn(true)
+                on { isPaid }.thenReturn(true)
+            }
+            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
+            testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+                intent = intent,
+                isSensitive = true,
+                isSensitiveInherited = true,
+                isShowHiddenItems = false,
+                isAccountExpired = true,
+                accountType = mockAccountType
+            ) { getVideoNodesUseCase(any()) }
+        }
+
+    @Test
+    fun `test that filterNonSensitiveNodes filters out sensitive nodes when showHiddenItems is false and account is paid`() =
+        runTest {
+            val intent = mock<Intent>()
+            val mockAccountType = mock<AccountType> { on { isPaid }.thenReturn(true) }
+            testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+                intent = intent,
+                isSensitive = true,
+                isSensitiveInherited = false,
+                isShowHiddenItems = false,
+                accountType = mockAccountType
+            ) { getVideoNodesUseCase(any()) }
+        }
+
+    @Test
+    fun `test that filterNonSensitiveNodes filters out nodes with inherited sensitivity when showHiddenItems is false and account is paid`() =
+        runTest {
+            val intent = mock<Intent>()
+            val mockAccountType = mock<AccountType> { on { isPaid }.thenReturn(true) }
+            testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+                intent = intent,
+                isSensitive = false,
+                isSensitiveInherited = true,
+                isShowHiddenItems = false,
+                accountType = mockAccountType
+            ) { getVideoNodesUseCase(any()) }
+        }
+
+    @Test
+    fun `test that monitorTransferEventsUseCase works correctly for correct TransferTemporaryErrorEvent but different playing handle and non TransferTemporaryErrorEvent`() =
+        runTest {
+            val testTransfer = mock<Transfer> {
+                on { isForeignOverQuota } doReturn false
+                on { nodeHandle }.thenReturn(1L)
+            }
+            val quotaException = mock<QuotaExceededMegaException> {
+                on { value }.doReturn(1)
+            }
+            val quotaEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer } doReturn testTransfer
+                on { error } doReturn quotaException
+            }
+            val blockedException = mock<BlockedMegaException>()
+            val blockedEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer } doReturn testTransfer
+                on { error } doReturn blockedException
+            }
+            val updateEvent = mock<TransferEvent.TransferUpdateEvent> {
+                on { transfer } doReturn testTransfer
+            }
+            val testItems = (1..3).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val testItem = initVideoPlayerItem(2.toLong(), "2", MediaQueueItemType.Playing)
+            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
+            whenever(testItems[1].copy(type = MediaQueueItemType.Playing)).thenReturn(testItem)
+
+            initViewModel()
+            underTest.updateCurrentPlayingHandle(testHandle, false, testItems)
+
+            fakeMonitorTransferEventsFlow.emit(quotaEvent)
+            advanceUntilIdle()
+
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.blockedError).isEqualTo(consumed)
+                cancelAndConsumeRemainingEvents()
+            }
+
+            fakeMonitorTransferEventsFlow.emit(blockedEvent)
+            advanceUntilIdle()
+
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.blockedError).isEqualTo(consumed)
+                cancelAndConsumeRemainingEvents()
+            }
+
+            fakeMonitorTransferEventsFlow.emit(updateEvent)
+            advanceUntilIdle()
+
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.blockedError).isEqualTo(consumed)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+
+    @Test
+    fun `test that monitorTransferEventsUseCase works correctly for correct TransferTemporaryErrorEvent with current playing handle`() =
+        runTest {
+            val testTransfer = mock<Transfer> {
+                on { isForeignOverQuota } doReturn false
+                on { nodeHandle }.thenReturn(testHandle)
+            }
+            val quotaException = mock<QuotaExceededMegaException> {
+                on { value }.doReturn(1)
+            }
+            val quotaEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer } doReturn testTransfer
+                on { error } doReturn quotaException
+            }
+            val blockedException = mock<BlockedMegaException>()
+            val blockedEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer } doReturn testTransfer
+                on { error } doReturn blockedException
+            }
+            val testItems = (1..3).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val testItem = initVideoPlayerItem(2.toLong(), "2", MediaQueueItemType.Playing)
+            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
+            whenever(testItems[1].copy(type = MediaQueueItemType.Playing)).thenReturn(testItem)
+
+            initViewModel()
+            underTest.updateCurrentPlayingHandle(testHandle, false, testItems)
+
+            fakeMonitorTransferEventsFlow.emit(quotaEvent)
+            advanceUntilIdle()
+
+            verify(broadcastTransferOverQuotaUseCase).invoke(true)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.blockedError).isEqualTo(consumed)
+                cancelAndConsumeRemainingEvents()
+            }
+
+            fakeMonitorTransferEventsFlow.emit(blockedEvent)
+            advanceUntilIdle()
+
+            verifyNoMoreInteractions(broadcastTransferOverQuotaUseCase)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.blockedError).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+
+    @ParameterizedTest(name = "when adapter type is {0}, nodeSourceType should be {1}")
+    @MethodSource("provideAdapterToNodeSourceType")
+    fun `test that nodeSourceType in uiState is set correctly based on adapter type`(
+        adapterType: Int,
+        expected: NodeSourceType,
+    ) = runTest {
+        testArgs = testArgs.copy(adapterType = adapterType)
+        initViewModel()
+        assertThat(underTest.uiState.value.nodeSourceType).isEqualTo(expected)
+    }
+
+    private fun provideAdapterToNodeSourceType() = listOf(
+        Arguments.of(OFFLINE_ADAPTER, NodeSourceType.OFFLINE),
+        Arguments.of(RUBBISH_BIN_ADAPTER, NodeSourceType.RUBBISH_BIN),
+        Arguments.of(FROM_CHAT, NodeSourceType.CHAT),
+        Arguments.of(FROM_IMAGE_VIEWER, NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER),
+        Arguments.of(VERSIONS_ADAPTER, NodeSourceType.MEDIA_PLAYER_VERSIONS),
+        Arguments.of(ZIP_ADAPTER, NodeSourceType.MEDIA_PLAYER_ZIP_FILE),
+        Arguments.of(FILE_LINK_ADAPTER, NodeSourceType.FILE_LINK),
+        Arguments.of(FOLDER_LINK_ADAPTER, NodeSourceType.FOLDER_LINK),
+        Arguments.of(FROM_ALBUM_SHARING, NodeSourceType.FOLDER_LINK),
+        Arguments.of(INCOMING_SHARES_ADAPTER, NodeSourceType.MEDIA_PLAYER_DEFAULT),
+        Arguments.of(OUTGOING_SHARES_ADAPTER, NodeSourceType.MEDIA_PLAYER_DEFAULT),
+        Arguments.of(LINKS_ADAPTER, NodeSourceType.MEDIA_PLAYER_DEFAULT),
+        Arguments.of(BACKUPS_ADAPTER, NodeSourceType.MEDIA_PLAYER_DEFAULT),
+        Arguments.of(FILE_BROWSER_ADAPTER, NodeSourceType.MEDIA_PLAYER_DEFAULT),
+        Arguments.of(VIDEO_BROWSE_ADAPTER, NodeSourceType.MEDIA_PLAYER_DEFAULT),
+        Arguments.of(RECENTS_BUCKET_ADAPTER, NodeSourceType.MEDIA_PLAYER_DEFAULT),
+        Arguments.of(FAVOURITES_ADAPTER, NodeSourceType.MEDIA_PLAYER_DEFAULT),
+        Arguments.of(INVALID_VALUE, NodeSourceType.MEDIA_PLAYER_DEFAULT),
+    )
+
+    @Test
+    fun `test that fileLinkUrl in uiState is set when fileLinkUrl is provided in args`() =
+        runTest {
+            val expectedUrl = "https://mega.nz/file/abc123"
+            testArgs = testArgs.copy(fileLinkUrl = expectedUrl)
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().fileLinkUrl).isEqualTo(expectedUrl)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that localFilePath in uiState is set when localFilePath is provided in args`() =
+        runTest {
+            val expectedPath = "/storage/emulated/0/archive.zip"
+            testArgs = testArgs.copy(localFilePath = expectedPath)
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().localFilePath).isEqualTo(expectedPath)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that updateNameWhenNodeUpdates updates metadata and currentPlayingItemName when name changes for current playing node`() =
+        runTest {
+            val newName = "renamed.mp4"
+            val mockNode = mock<FileNode> {
+                on { id } doReturn NodeId(INVALID_HANDLE)
+                on { type } doReturn mock<VideoFileTypeInfo>()
+                on { name } doReturn newName
+            }
+            initViewModel()
+
+            fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(mapOf(mockNode to listOf(NodeChanges.Name))))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.metadata.nodeName).isEqualTo(newName)
+                assertThat(actual.currentPlayingItemName).isEqualTo(newName)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that updateNameWhenNodeUpdates does not update state when name changes for a different node`() =
+        runTest {
+            val mockNode = mock<FileNode> {
+                on { id } doReturn NodeId(testHandle)
+                on { type } doReturn mock<VideoFileTypeInfo>()
+                on { name } doReturn "other.mp4"
+            }
+            initViewModel()
+            // currentPlayingHandle defaults to INVALID_HANDLE, not testHandle
+
+            fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(mapOf(mockNode to listOf(NodeChanges.Name))))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.currentPlayingItemName).isNotEqualTo("other.mp4")
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isInPipMode is set to true when updateIsInPipMode is called with true`() =
+        runTest {
+            initViewModel()
+            underTest.updateIsInPipMode(true)
+            underTest.uiState.test {
+                assertThat(awaitItem().isInPipMode).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isInPipMode is set to false when updateIsInPipMode is called with false`() =
+        runTest {
+            initViewModel()
+            underTest.updateIsInPipMode(true)
+            underTest.updateIsInPipMode(false)
+            underTest.uiState.test {
+                assertThat(awaitItem().isInPipMode).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that filterTakeDownNodes filters out taken down nodes from playlist`() =
+        runTest {
+            val intent = mock<Intent>()
+            val testHandle = 2L
+            val testArray = intArrayOf(1, 2, 3)
+            val playingIndex = 1
+
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = testFileName
+            )
+            whenever(context.getString(any())).thenReturn(testTitle)
+
+            val testVideoNodes = testArray.mapIndexed { index, it ->
+                initVideoNode(handle = it.toLong(), isTakenDown = index == 2)
+            }
+            whenever(getVideoNodesUseCase(any())).thenReturn(testVideoNodes)
+            whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn(testAbsolutePath)
+            whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+
+            val nonTakenDownNodes = testVideoNodes.dropLast(1)
+            val entities = nonTakenDownNodes.map { initVideoPlayerItem(it.id.longValue, it.name) }
+            entities.forEach {
+                whenever(it.copy(type = MediaQueueItemType.Playing)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Previous)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Next)).thenReturn(it)
+            }
+            nonTakenDownNodes.forEachIndexed { index, node ->
+                whenever(
+                    videoPlayerItemMapper(
+                        node.id.longValue,
+                        node.name,
+                        null,
+                        getMediaQueueItemType(index, playingIndex),
+                        node.size,
+                        false,
+                        node.duration
+                    )
+                ).thenReturn(entities[index])
+            }
+            whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(true)
+
+            initViewModel()
+            mockStatic(Uri::class.java).use {
+                whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
+                underTest.initVideoPlayerData(intent)
+                underTest.uiState.test {
+                    val actual = awaitItem()
+                    assertThat(actual.items.size).isEqualTo(nonTakenDownNodes.size)
+                    cancelAndConsumeRemainingEvents()
+                }
+            }
+        }
+
+    @Test
+    fun `test that filterTakeDownNodes keeps non taken down nodes in playlist`() =
+        runTest {
+            val intent = mock<Intent>()
+            val testHandle = 2L
+            val testArray = intArrayOf(1, 2, 3)
+            val playingIndex = 1
+
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = testFileName
+            )
+            whenever(context.getString(any())).thenReturn(testTitle)
+
+            val testVideoNodes = testArray.map { initVideoNode(handle = it.toLong()) }
+            whenever(getVideoNodesUseCase(any())).thenReturn(testVideoNodes)
+            whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn(testAbsolutePath)
+            whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+
+            val entities = testVideoNodes.map { initVideoPlayerItem(it.id.longValue, it.name) }
+            entities.forEach {
+                whenever(it.copy(type = MediaQueueItemType.Playing)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Previous)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Next)).thenReturn(it)
+            }
+            testVideoNodes.forEachIndexed { index, node ->
+                whenever(
+                    videoPlayerItemMapper(
+                        node.id.longValue,
+                        node.name,
+                        null,
+                        getMediaQueueItemType(index, playingIndex),
+                        node.size,
+                        false,
+                        node.duration
+                    )
+                ).thenReturn(entities[index])
+            }
+            whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(true)
+
+            initViewModel()
+            mockStatic(Uri::class.java).use {
+                whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
+                underTest.initVideoPlayerData(intent)
+                underTest.uiState.test {
+                    val actual = awaitItem()
+                    assertThat(actual.items.size).isEqualTo(testArray.size)
+                    cancelAndConsumeRemainingEvents()
+                }
+            }
+        }
+
+    @Test
+    fun `test that VideoPlaybackMp4StartedEvent is tracked when playing an mp4 file`() = runTest {
+        val intent = mock<Intent>()
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = VIDEO_BROWSE_ADAPTER,
+            data = mock(),
+            handle = testHandle,
+            fileName = "video.mp4"
+        )
+        initViewModel()
+        underTest.initVideoPlayerData(intent)
+        advanceUntilIdle()
+        assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackMp4StartedEvent>()).isNotEmpty()
+    }
+
+    @Test
+    fun `test that VideoPlaybackAviStartedEvent is tracked when playing an avi file`() = runTest {
+        val intent = mock<Intent>()
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = VIDEO_BROWSE_ADAPTER,
+            data = mock(),
+            handle = testHandle,
+            fileName = "video.avi"
+        )
+        initViewModel()
+        underTest.initVideoPlayerData(intent)
+        advanceUntilIdle()
+        assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackAviStartedEvent>()).isNotEmpty()
+    }
+
+    @Test
+    fun `test that VideoPlaybackMkvStartedEvent is tracked when playing an mkv file`() = runTest {
+        val intent = mock<Intent>()
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = VIDEO_BROWSE_ADAPTER,
+            data = mock(),
+            handle = testHandle,
+            fileName = "video.mkv"
+        )
+        initViewModel()
+        underTest.initVideoPlayerData(intent)
+        advanceUntilIdle()
+        assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackMkvStartedEvent>()).isNotEmpty()
+    }
+
+    @Test
+    fun `test that VideoPlaybackMovStartedEvent is tracked when playing a mov file`() = runTest {
+        val intent = mock<Intent>()
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = VIDEO_BROWSE_ADAPTER,
+            data = mock(),
+            handle = testHandle,
+            fileName = "video.mov"
+        )
+        initViewModel()
+        underTest.initVideoPlayerData(intent)
+        advanceUntilIdle()
+        assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackMovStartedEvent>()).isNotEmpty()
+    }
+
+    @Test
+    fun `test that VideoPlaybackOtherStartedEvent is tracked when playing a file with an unrecognized extension`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = "video.wmv"
+            )
+            initViewModel()
+            underTest.initVideoPlayerData(intent)
+            advanceUntilIdle()
+            assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackOtherStartedEvent>()).isNotEmpty()
+        }
+
+    @Test
+    fun `test that VideoPlaybackMp4StartedEvent is tracked when playing a file with uppercase MP4 extension`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = "video.MP4"
+            )
+            initViewModel()
+            underTest.initVideoPlayerData(intent)
+            advanceUntilIdle()
+            assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackMp4StartedEvent>()).isNotEmpty()
+        }
+
+    @Test
+    fun `test that isFromLink is true when adapter type is FILE_LINK_ADAPTER`() = runTest {
+        testArgs = testArgs.copy(adapterType = FILE_LINK_ADAPTER)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromLink).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is true when adapter type is FOLDER_LINK_ADAPTER`() = runTest {
+        testArgs = testArgs.copy(adapterType = FOLDER_LINK_ADAPTER)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromLink).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is true when adapter type is FROM_ALBUM_SHARING`() = runTest {
+        testArgs = testArgs.copy(adapterType = FROM_ALBUM_SHARING)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromLink).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is false when adapter type is not a link adapter`() = runTest {
+        testArgs = testArgs.copy(adapterType = FILE_BROWSER_ADAPTER)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromLink).isFalse()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isFromOffline is true when adapter type is OFFLINE_ADAPTER`() = runTest {
+        testArgs = testArgs.copy(adapterType = OFFLINE_ADAPTER)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromOffline).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isFromOffline is false when adapter type is not OFFLINE_ADAPTER`() = runTest {
+        testArgs = testArgs.copy(adapterType = FILE_BROWSER_ADAPTER)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromOffline).isFalse()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isAlbumSharingLink is true when adapter type is FROM_ALBUM_SHARING`() = runTest {
+        testArgs = testArgs.copy(adapterType = FROM_ALBUM_SHARING)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isAlbumSharingLink).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isAlbumSharingLink is false when adapter type is not FROM_ALBUM_SHARING`() =
+        runTest {
+            testArgs = testArgs.copy(adapterType = FILE_BROWSER_ADAPTER)
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().isAlbumSharingLink).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isLoggedIn is set to true when IsUserLoggedInUseCase returns true`() = runTest {
+        whenever(isUserLoggedInUseCase()).thenReturn(true)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isLoggedIn).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isLoggedIn is set to false when IsUserLoggedInUseCase returns false`() =
+        runTest {
+            whenever(isUserLoggedInUseCase()).thenReturn(false)
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().isLoggedIn).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isLoggedIn remains false when IsUserLoggedInUseCase throws an exception`() =
+        runTest {
+            whenever(isUserLoggedInUseCase()).thenThrow(RuntimeException("login check error"))
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().isLoggedIn).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that removeBlockedItemAndNavigate returns false when items list is empty`() =
+        runTest {
+            initViewModel()
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 1L,
+                items = emptyList(),
+                mediaItems = emptyList(),
+            )
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test that removeBlockedItemAndNavigate returns false when only one item in playlist`() =
+        runTest {
+            val item = initVideoPlayerItem(handle = 1L, name = "video.mp4")
+            val mediaItem = MediaItem.Builder().setMediaId("1").build()
+            initViewModel()
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 1L,
+                items = listOf(item),
+                mediaItems = listOf(mediaItem),
+            )
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test that removeBlockedItemAndNavigate removes current item and navigates to next when blocked item is not last`() =
+        runTest {
+            val items = (0..2).map { initVideoPlayerItem(handle = it.toLong(), name = "$it.mp4") }
+            val mediaItems = (0..2).map { MediaItem.Builder().setMediaId(it.toString()).build() }
+            initViewModel()
+
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 1L,
+                items = items,
+                mediaItems = mediaItems,
+            )
+
+            assertThat(result).isTrue()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).buildPlaySources(any())
+            verify(mediaPlayerGateway).playerSeekTo(1)
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+            verify(mediaPlayerGateway).playerPrepare()
+            underTest.uiState.test {
+                awaitItem().let { state ->
+                    assertThat(state.items.size).isEqualTo(2)
+                    assertThat(state.items.none { it.nodeHandle == 1L }).isTrue()
+                    assertThat(state.currentPlayingIndex).isEqualTo(1)
+                    assertThat(state.mediaPlaySources?.newIndexForCurrentItem).isEqualTo(INVALID_VALUE)
+                    assertThat(state.currentPlayingItemName).isEqualTo("2.mp4")
+                }
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that removeBlockedItemAndNavigate removes current item and navigates to previous when blocked item is last`() =
+        runTest {
+            val items = (0..2).map { initVideoPlayerItem(handle = it.toLong(), name = "$it.mp4") }
+            val mediaItems = (0..2).map { MediaItem.Builder().setMediaId(it.toString()).build() }
+            initViewModel()
+
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 2L,
+                items = items,
+                mediaItems = mediaItems,
+            )
+
+            assertThat(result).isTrue()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).buildPlaySources(any())
+            verify(mediaPlayerGateway).playerSeekTo(1)
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+            verify(mediaPlayerGateway).playerPrepare()
+            underTest.uiState.test {
+                awaitItem().let { state ->
+                    assertThat(state.items.size).isEqualTo(2)
+                    assertThat(state.items.none { it.nodeHandle == 2L }).isTrue()
+                    assertThat(state.currentPlayingIndex).isEqualTo(1)
+                    assertThat(state.mediaPlaySources?.newIndexForCurrentItem).isEqualTo(INVALID_VALUE)
+                    assertThat(state.currentPlayingItemName).isEqualTo("1.mp4")
+                }
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that removeBlockedItemAndNavigate returns false when current handle not found in items`() =
+        runTest {
+            val item = initVideoPlayerItem(handle = 1L, name = "1.mp4")
+            val mediaItem = MediaItem.Builder().setMediaId("1").build()
+            initViewModel()
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 999L,
+                items = listOf(item),
+                mediaItems = listOf(mediaItem),
+            )
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test that removeBlockedItemAndNavigate returns false when items and mediaItems sizes differ`() =
+        runTest {
+            val items = listOf(initVideoPlayerItem(handle = 1L, name = "1.mp4"))
+            val mediaItems = (0..1).map { MediaItem.Builder().setMediaId(it.toString()).build() }
+            initViewModel()
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 1L,
+                items = items,
+                mediaItems = mediaItems,
+            )
+            assertThat(result).isFalse()
+        }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
+
+        private const val MEDIA_PLAYER_STATE_ENDED = 4
+        private const val MEDIA_PLAYER_STATE_READY = 3
+    }
+}

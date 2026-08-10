@@ -164,16 +164,6 @@ class MonitorCallPushNotificationUseCase @Inject constructor(
                             }
                         }
                     }
-
-                    // Monitor call composition changes to detect when user joins from another device
-                    if (call.peerIdParticipants?.contains(getMyUserHandleUseCase()) == true) {
-                        // User joined the call from another device while this device shows notification
-                        setFakeIncomingCallUseCase(
-                            chatId = call.chatId,
-                            type = FakeIncomingCallState.Remove
-                        )
-                        result[call.chatId] = CallPushMessageNotificationActionType.Remove
-                    }
                 }
                 result
             }.filter { it.isNotEmpty() }

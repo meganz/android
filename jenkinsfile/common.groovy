@@ -7,68 +7,6 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurperClassic
 
 /**
- * Check out mega chat SDK by commit ID
- *
- * @param megaChatCommitId commit ID
- */
-void checkoutMegaChatSdkByCommit(String megaChatCommitId) {
-    println("####### Entering common.checkoutMegaChatSdkByCommit() #######")
-    sh """
-    echo checkoutMegaChatSdkByCommit
-    cd $WORKSPACE
-    cd sdk/src/main/jni/megachat/sdk
-    git checkout $megaChatCommitId
-    cd $WORKSPACE
-    """
-}
-
-/**
- * checkout SDK by commit ID
- * @param sdkCommitId the commit ID to checkout
- */
-void checkoutSdkByCommit(String sdkCommitId) {
-    println("####### Entering common.checkoutSdkByCommit() #######")
-    sh """
-    echo checkoutSdkByCommit
-    cd $WORKSPACE
-    cd sdk/src/main/jni/mega/sdk
-    git checkout $sdkCommitId
-    cd $WORKSPACE
-    """
-}
-
-/**
- * set up SDK submodules and check out to latest develop branch
- */
-void fetchSdkSubmodules() {
-    println("####### Entering common.fetchSdkSubmodules() #######")
-    gitlabCommitStatus(name: 'Fetch SDK Submodules') {
-        withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-            script {
-                sh """
-                    cd ${WORKSPACE}
-                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git
-                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
-                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git
-                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
-                    git submodule sync
-                    git submodule update --init --recursive --remote
-                    cd sdk/src/main/jni/mega/sdk
-                    git fetch
-                    git checkout ${SDK_BRANCH}
-                    git pull || true
-                    cd ../../megachat/sdk
-                    git fetch
-                    git checkout ${MEGACHAT_BRANCH}
-                    git pull || true
-                    cd ${WORKSPACE}
-                """
-            }
-        }
-    }
-}
-
-/**
  * Check if this build is triggered by a GitLab Merge Request.
  * @return true if this build is triggered by a GitLab MR. False if this build is triggerd
  * by a plain git push.
@@ -113,9 +51,45 @@ void sendToMR(String message) {
     def mrNumber = getMrNumber()
     if (mrNumber != null && !mrNumber.isEmpty()) {
         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-            env.MARKDOWN_LINK = message
+            env.MESSAGE_BODY = message
             env.MERGE_REQUEST_URL = "${env.GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MESSAGE_BODY}\" ${MERGE_REQUEST_URL}'
+        }
+    }
+}
+
+/**
+ * Send a large markdown file as a GitLab MR comment using a JSON payload.
+ * Wraps the content in a collapsible <details> block and uses jq to safely
+ * encode the file as JSON. Use this instead of sendToMR() for large content
+ * such as code review reports.
+ *
+ * @param filePath absolute or workspace-relative path to the markdown file to send
+ * @param summary the summary of the MR comment
+ */
+void sendFileToMRComment(String filePath, String summary) {
+    println("####### Entering common.sendLargeTextToMR() #######")
+
+    def mrNumber = getMrNumber()
+    if (mrNumber != null && !mrNumber.isEmpty()) {
+        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+            def jsonPayloadFile = "${WORKSPACE}/.mr_comment_payload_${System.currentTimeMillis()}.json"
+            env.MR_COMMENT_SOURCE_FILE = filePath
+            env.MR_COMMENT_PAYLOAD_FILE = jsonPayloadFile
+            env.COMMENT_SUMMARY = summary
+            env.MERGE_REQUEST_URL = "${env.GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+            sh '''
+                jq -n --rawfile body ${MR_COMMENT_SOURCE_FILE} \
+                    --arg summary "${COMMENT_SUMMARY}" \
+                    '{"body": ("<details><summary>Code Review Report\n\n" + $summary + "\n\n</summary>" + $body + "</details>")}' \
+                    > ${MR_COMMENT_PAYLOAD_FILE}
+                curl --request POST \
+                     --header "PRIVATE-TOKEN:$TOKEN" \
+                     --header "Content-Type: application/json" \
+                     --data @${MR_COMMENT_PAYLOAD_FILE} \
+                     ${MERGE_REQUEST_URL}
+                rm -f ${MR_COMMENT_PAYLOAD_FILE}
+            '''
         }
     }
 }
@@ -562,39 +536,6 @@ void downloadAndExtractNativeSymbols() {
 }
 
 
-void downloadDependencyLibForSdk() {
-    gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
-        sh """
-            # we still have to download webrtc file for lint check. :( 
-            cd "${WORKSPACE}/jenkinsfile/"
-            bash download_webrtc.sh
-
-            mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-            cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-
-            pwd 
-            ls -lh
-        """
-
-        println("applying default google map api config... ")
-        withCredentials([
-                file(credentialsId: 'ANDROID_DEFAULT_GOOGLE_MAPS_API_FILE_DEBUG', variable: 'ANDROID_DEFAULT_GOOGLE_MAPS_API_FILE_DEBUG')
-        ]) {
-            String googleMapsApiFolder = "default_google_maps_api_unzipped"
-
-            sh """
-                cd ${WORKSPACE}
-                unzip -o ${ANDROID_DEFAULT_GOOGLE_MAPS_API_FILE_DEBUG} -d ${googleMapsApiFolder}
-                
-                mkdir -p app/src/debug/res/values
-                mkdir -p app/src/release/res/values
-                cp -fv ${googleMapsApiFolder}/debug/res/values/google_maps_api.xml app/src/debug/res/values/google_maps_api.xml
-                cp -fv ${googleMapsApiFolder}/release/res/values/google_maps_api.xml app/src/release/res/values/google_maps_api.xml
-            """
-        }
-    }
-}
-
 /**
  * Enable Artifactory and call the closure function
  * @param closure
@@ -748,18 +689,32 @@ ArrayList<String> getModuleList() {
         returnStdout: true
     ).trim()
 
-    def moduleList = moduleListRaw.readLines()
+    List<String> candidatePaths = moduleListRaw.readLines()
         .findAll { it.startsWith("SUBPROJECT_PATH:") }
         .collect { it.replace("SUBPROJECT_PATH:", "").trim() }
-        .findAll {
-            // Filter out modules that do not have a gradle.kts file
-            def files = sh(
-                    script: "ls -1 ${WORKSPACE}/${it}",
-                    returnStdout: true
-            ).trim().readLines()
-            files?.any { fileName -> fileName.endsWith("gradle.kts") } ?: false
-        }
 
+    if (candidatePaths.isEmpty()) {
+        return new ArrayList<String>()
+    }
+
+    // Probe every module's directory in one `sh` call instead of one per module. Each `sh`
+    // step pays ~300ms of Jenkins overhead, so per-module probes cost ~22s across 70 modules.
+    // `find` lists every *.gradle.kts file under the workspace once (skipping build outputs);
+    // we then keep candidate paths whose parent directory appeared in that listing.
+    def gradleFilesRaw = sh(
+            script: "cd ${WORKSPACE} && find . -type d -name build -prune -o -type f -name '*.gradle.kts' -print",
+            returnStdout: true
+    ).trim()
+
+    Set<String> dirsWithGradleFile = new HashSet<String>()
+    for (String line : gradleFilesRaw.readLines()) {
+        String rel = line.trim()
+        if (rel.startsWith("./")) rel = rel.substring(2)
+        int slash = rel.lastIndexOf('/')
+        if (slash >= 0) dirsWithGradleFile.add(rel.substring(0, slash))
+    }
+
+    List<String> moduleList = candidatePaths.findAll { dirsWithGradleFile.contains(it) }
     print("MODULE_LIST: ${moduleList}")
     return new ArrayList<String>(moduleList)
 }
@@ -783,6 +738,108 @@ ArrayList<String> getUnitTestModuleList() {
     return new ArrayList<String>(moduleList)
 }
 
+
+/**
+ * Build a Map of build statistics for the current Jenkins build.
+ * Reads env vars + currentBuild + params, returns a Map. No I/O, safe to call from any post block.
+ *
+ * @param agentAcquiredMs   When the agent was acquired and execution started on a slave
+ *                          (System.currentTimeMillis() captured at the top of the first agent stage).
+ * @param stageDurationsMs  map keyed by 'build_apk_ms', 'unit_test_ms', 'lint_ms'.
+ *                          Missing keys are emitted as null (stage never ran or was skipped).
+ * @param stageNodeNames    map keyed by 'build_apk', 'unit_test', 'lint' — agent name that ran
+ *                          each parallel stage. Missing keys emit null.
+ * @param status            currentBuild.currentResult (SUCCESS / FAILURE / UNSTABLE / ABORTED).
+ * @param skipped           true if the build was skipped (Draft/WIP MR).
+ * @param codeReviewOnly    true if only the Code Review stage ran.
+ */
+Map collectBuildStats(long agentAcquiredMs, Map stageDurationsMs, Map stageNodeNames,
+                      String status, boolean skipped, boolean codeReviewOnly) {
+    long endMs = System.currentTimeMillis()
+    long scheduledMs = (currentBuild.timeInMillis ?: agentAcquiredMs) as long
+    long queueWaitMs = Math.max(0L, agentAcquiredMs - scheduledMs)
+
+    String mrNumber = getMrNumber()
+    String mrUrl = env.CHANGE_URL
+    if ((mrUrl == null || mrUrl.isEmpty()) && mrNumber != null && !mrNumber.isEmpty()) {
+        String homepage = env.gitlabSourceRepoHomepage
+        if (homepage != null && !homepage.isEmpty()) {
+            mrUrl = "${homepage}/-/merge_requests/${mrNumber}"
+        }
+    }
+
+    Map stages = [
+            build_apk_ms: stageDurationsMs['build_apk_ms'],
+            unit_test_ms: stageDurationsMs['unit_test_ms'],
+            lint_ms     : stageDurationsMs['lint_ms'],
+    ]
+
+    Map nodes = [
+            build_apk: stageNodeNames['build_apk'],
+            unit_test: stageNodeNames['unit_test'],
+            lint     : stageNodeNames['lint'],
+    ]
+
+    return [
+            schema_version  : 1,
+            status          : status?.toLowerCase(),
+            skipped         : skipped,
+            code_review_only: codeReviewOnly,
+            build_number    : env.BUILD_NUMBER,
+            build_url       : env.BUILD_URL,
+            commit_id       : env.GIT_COMMIT,
+            mr_number       : mrNumber,
+            mr_url          : mrUrl,
+            source_branch   : env.CHANGE_BRANCH ?: env.gitlabSourceBranch,
+            target_branch   : env.GITLAB_OA_TARGET_BRANCH ?: env.CHANGE_TARGET,
+            author          : env.CHANGE_AUTHOR_DISPLAY_NAME ?: env.CHANGE_AUTHOR ?: env.gitlabUserName,
+            trigger_kind    : env.gitlabActionType ?: env.GITLAB_OBJECT_KIND,
+            scheduled_ts    : formatBuildStatsTimestamp(scheduledMs),
+            build_start_ts  : formatBuildStatsTimestamp(agentAcquiredMs),
+            build_end_ts    : formatBuildStatsTimestamp(endMs),
+            queue_wait_ms   : queueWaitMs,
+            duration_ms     : endMs - agentAcquiredMs,
+            total_ms        : endMs - scheduledMs,
+            stages          : stages,
+            nodes           : nodes,
+    ]
+}
+
+/**
+ * Upload per-build stats as a JSON file to Artifactory for offline CI performance analysis.
+ * Path: android-mega/cicd/build-stats/<YYYY>/<MM>/<UTC_TS>-<BUILD>-<MR>.json
+ * One file per build — no shared state, no race conditions.
+ *
+ * Wrapped in try/catch so a stats upload failure NEVER fails the pipeline.
+ */
+void recordBuildStats(Map stats) {
+    try {
+        Date now = new Date()
+        TimeZone utc = TimeZone.getTimeZone("UTC")
+        String utcTs = now.format("yyyyMMdd'T'HHmmss'Z'", utc)
+        String monthPath = now.format("yyyy/MM", utc)
+        String mrPart = (stats.mr_number ?: 'no-mr').toString()
+        String fileName = "${utcTs}-${env.BUILD_NUMBER}-${mrPart}.json"
+        String remoteUrl = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/build-stats/${monthPath}/${fileName}"
+
+        String jsonText = JsonOutput.prettyPrint(JsonOutput.toJson(stats))
+        writeFile file: fileName, text: jsonText
+
+        useArtifactory() {
+            sh """
+                cd ${WORKSPACE}
+                curl -f -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${fileName} ${remoteUrl}
+            """
+        }
+        println("[build-stats] uploaded ${remoteUrl}")
+    } catch (Exception e) {
+        println("[build-stats] upload failed: ${e}")
+    }
+}
+
+private String formatBuildStatsTimestamp(long ms) {
+    return new Date(ms).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("UTC"))
+}
 
 return this
 

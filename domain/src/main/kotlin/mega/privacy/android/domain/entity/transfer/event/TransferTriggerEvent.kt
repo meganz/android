@@ -3,6 +3,7 @@ package mega.privacy.android.domain.entity.transfer.event
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -40,9 +41,9 @@ sealed interface TransferTriggerEvent {
         override val checkPausedTransfers get() = CheckPausedTransfersType.OncePerPausedState
 
         /**
-         * The id of the chat where these files will be attached
+         * The ids of the chats where these files will be attached
          */
-        val chatId: Long
+        val chatIds: List<Long>
 
         /**
          * List of files to be uploaded
@@ -54,13 +55,16 @@ sealed interface TransferTriggerEvent {
          */
         val isVoiceClip: Boolean
 
+        val pitagTrigger: PitagTrigger
+
         /**
          * Upload files to chat
          */
         data class Files(
-            override val chatId: Long,
+            override val chatIds: List<Long>,
             override val uris: List<UriPath>,
             override val waitNotificationPermissionResponseToStart: Boolean = false,
+            override val pitagTrigger: PitagTrigger,
         ) : StartChatUpload {
             override val isVoiceClip = false
         }
@@ -71,12 +75,14 @@ sealed interface TransferTriggerEvent {
          *
          */
         data class VoiceClip(
-            override val chatId: Long,
+            val chatId: Long,
             val file: File,
             override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartChatUpload {
+            override val chatIds = listOf(chatId)
             override val uris get() = listOf(UriPath(file.absolutePath))
             override val isVoiceClip = true
+            override val pitagTrigger = PitagTrigger.VoiceClip
         }
     }
 
@@ -125,19 +131,29 @@ sealed interface TransferTriggerEvent {
 
 
     /**
-     * Event to start downloading a node for offline use
-     * @param node the node to be saved offline
+     * Event to start downloading nodes for offline use
      */
     data class StartDownloadForOffline(
-        val node: TypedNode?,
         override val isHighPriority: Boolean = false,
         override val waitNotificationPermissionResponseToStart: Boolean = false,
         override val withStartMessage: Boolean,
+        override val nodes: List<TypedNode>,
     ) : DownloadTriggerEvent {
-        override val nodes = node?.let { listOf(node) } ?: emptyList()
         override val appData = TransferAppData.OfflineDownload
-    }
 
+        /**
+         * Event to start downloading a single node for offline use
+         * @param node TypedNode
+         * @param withStartMessage True if a message should be shown when the transfer starts.
+         */
+        constructor(
+            node: TypedNode?,
+            withStartMessage: Boolean,
+        ) : this(
+            nodes = node?.let { listOf(node) } ?: emptyList(),
+            withStartMessage = withStartMessage
+        )
+    }
 
     /**
      * Event to start downloading a list of nodes to download folder
@@ -240,6 +256,7 @@ sealed interface TransferTriggerEvent {
          * true if this upload is a high priority transfer, false otherwise
          */
         val isHighPriority: Boolean
+        val pitagTrigger: PitagTrigger
 
         /**
          * Upload files
@@ -249,7 +266,8 @@ sealed interface TransferTriggerEvent {
             override val pathsAndNames: Map<String, String?>,
             override val destinationId: NodeId,
             override val waitNotificationPermissionResponseToStart: Boolean = false,
-            val specificStartMessage: String? = null
+            val specificStartMessage: String? = null,
+            override val pitagTrigger: PitagTrigger,
         ) : StartUpload {
             override val isHighPriority = false
         }
@@ -271,6 +289,7 @@ sealed interface TransferTriggerEvent {
         ) : StartUpload {
             override val pathsAndNames = mapOf(path to null)
             override val isHighPriority = true
+            override val pitagTrigger = PitagTrigger.NotApplicable
         }
 
         /**
@@ -283,6 +302,7 @@ sealed interface TransferTriggerEvent {
             override val pathsAndNames: Map<String, String?>,
             override val destinationId: NodeId,
             override val waitNotificationPermissionResponseToStart: Boolean = false,
+            override val pitagTrigger: PitagTrigger,
         ) : StartUpload {
             override val isHighPriority = false
         }

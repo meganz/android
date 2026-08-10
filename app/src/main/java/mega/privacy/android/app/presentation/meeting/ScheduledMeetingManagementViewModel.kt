@@ -363,7 +363,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar))
         }.onFailure { exception ->
             Timber.e(exception)
-            triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
+            triggerSnackbarMessage(getStringFromStringResMapper(sharedR.string.general_text_error))
         }
     }
 
@@ -377,7 +377,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar))
         }.onFailure { exception ->
             Timber.e(exception)
-            triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
+            triggerSnackbarMessage(getStringFromStringResMapper(sharedR.string.general_text_error))
         }
     }
 
@@ -403,7 +403,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             )
         }.onFailure { exception ->
             Timber.e(exception)
-            triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
+            triggerSnackbarMessage(getStringFromStringResMapper(sharedR.string.general_text_error))
         }
     }
 
@@ -434,7 +434,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             broadcastScheduledMeetingCanceledUseCase(R.string.meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar)
         }.onFailure { exception ->
             Timber.e(exception)
-            triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
+            triggerSnackbarMessage(getStringFromStringResMapper(sharedR.string.general_text_error))
         }
     }
 
@@ -451,7 +451,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             broadcastScheduledMeetingCanceledUseCase(R.string.meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar)
         }.onFailure { exception ->
             Timber.e(exception)
-            triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
+            triggerSnackbarMessage(getStringFromStringResMapper(sharedR.string.general_text_error))
         }
     }
 
@@ -611,7 +611,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
                     removeChatLinkUseCase(id)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
+                    triggerSnackbarMessage(getStringFromStringResMapper(sharedR.string.general_text_error))
                 }.onSuccess { _ ->
                     Timber.d("Remove chat link successfully")
                     _state.update { it.copy(enabledMeetingLinkOption = false, meetingLink = null) }
@@ -646,7 +646,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
                                 triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_update_scheduled_meeting_occurrence_success_snackbar))
                             }.onFailure { exception ->
                                 Timber.e(exception)
-                                triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
+                                triggerSnackbarMessage(getStringFromStringResMapper(sharedR.string.general_text_error))
                             }
                         }
                     }
@@ -837,7 +837,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
                     createChatLinkUseCase(id)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
+                    triggerSnackbarMessage(getStringFromStringResMapper(sharedR.string.general_text_error))
                 }.onSuccess { request ->
                     _state.update {
                         it.copy(

@@ -15,13 +15,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
+import mega.privacy.android.shared.account.overquota.StorageCapacityMapper
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
@@ -33,7 +32,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
@@ -50,7 +48,6 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -63,6 +60,10 @@ import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -110,7 +111,6 @@ class MediaDiscoveryViewModelTest {
     private val setViewType = mock<SetViewType>()
     private val monitorSubFolderMediaDiscoverySettingsUseCase =
         mock<MonitorSubFolderMediaDiscoverySettingsUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
@@ -123,7 +123,7 @@ class MediaDiscoveryViewModelTest {
         }.thenReturn(flowOf(AccountDetail()))
     }
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        onBlocking {
+        on {
             invoke()
         }.thenReturn(false)
     }
@@ -170,7 +170,6 @@ class MediaDiscoveryViewModelTest {
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
@@ -184,19 +183,18 @@ class MediaDiscoveryViewModelTest {
     }
 
     private fun commonStub() {
-        getCameraSortOrder.stub { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC) }
+        getCameraSortOrder.stub { on { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC) }
         whenever(monitorConnectivityUseCase()).thenReturn(flow { awaitCancellation() })
         whenever(monitorMediaDiscoveryView()).thenReturn(flow { awaitCancellation() })
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flow { awaitCancellation() })
         whenever(monitorAccountDetailUseCase()).thenReturn(flow { awaitCancellation() })
-        getFeatureFlagValueUseCase.stub { onBlocking { invoke(any()) }.thenReturn(false) }
         whenever(monitorStorageStateUseCase()).thenReturn(
             StorageState.Green.asHotFlow()
         )
-        getCurrentStorageStateUseCase.stub { onBlocking { invoke() }.thenReturn(StorageState.Green) }
+        getCurrentStorageStateUseCase.stub { on { invoke() }.thenReturn(StorageState.Green) }
 
         setAlmostFullStorageBannerClosingTimestampUseCase.stub {
-            onBlocking { invoke() }.thenReturn(Unit)
+            on { invoke() }.thenReturn(Unit)
         }
         whenever(monitorAlmostFullStorageBannerClosingTimestampUseCase()).thenReturn(flowOf(true))
         whenever(
@@ -205,7 +203,7 @@ class MediaDiscoveryViewModelTest {
                 shouldShow = any()
             )
         ).thenReturn(
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         )
     }
 
@@ -231,7 +229,6 @@ class MediaDiscoveryViewModelTest {
             getPublicNodeListByIds,
             setViewType,
             monitorSubFolderMediaDiscoverySettingsUseCase,
-            getFeatureFlagValueUseCase,
             isNodeInRubbishBinUseCase,
             getNodeByIdUseCase,
             getPublicChildNodeFromIdUseCase,
@@ -300,10 +297,9 @@ class MediaDiscoveryViewModelTest {
         }
 
     @Test
-    fun `test that turn on flag HiddenNodes and it is not from folder link then the flow is correct`() =
+    fun `test that it is not from folder link then the flow is correct`() =
         runTest {
             commonStub()
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
             initViewModel()
             underTest.initialize(null, null, false)
             verify(monitorShowHiddenItemsUseCase, times(1)).invoke()
@@ -311,32 +307,9 @@ class MediaDiscoveryViewModelTest {
         }
 
     @Test
-    fun `test that turn off flag HiddenNodes and it is not from folder link then the flow is correct`() =
+    fun `test that it is from folder link then the flow is correct`() =
         runTest {
             commonStub()
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn false
-            initViewModel()
-            underTest.initialize(null, null, false)
-            verifyNoInteractions(monitorShowHiddenItemsUseCase)
-            verifyNoInteractions(monitorAccountDetailUseCase)
-        }
-
-    @Test
-    fun `test that turn on flag HiddenNodes and it is from folder link then the flow is correct`() =
-        runTest {
-            commonStub()
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
-            initViewModel()
-            underTest.initialize(null, null, true)
-            verifyNoInteractions(monitorShowHiddenItemsUseCase)
-            verifyNoInteractions(monitorAccountDetailUseCase)
-        }
-
-    @Test
-    fun `test that turn off flag HiddenNodes and it is from folder link then the flow is correct`() =
-        runTest {
-            commonStub()
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn false
             initViewModel()
             underTest.initialize(null, null, true)
             verifyNoInteractions(monitorShowHiddenItemsUseCase)
@@ -403,11 +376,6 @@ class MediaDiscoveryViewModelTest {
     fun `test that filterNonSensitivePhotos return non-sensitive photos when showHiddenItems is false and isPaid`() =
         runTest {
             commonStub()
-            getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(
-                    true
-                )
-            }
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
             initViewModel()
             underTest.initialize(null, null, null)
@@ -554,33 +522,33 @@ class MediaDiscoveryViewModelTest {
         Arguments.of(
             StorageState.Red,
             true,
-            StorageOverQuotaCapacity.FULL
+            StorageOverQuotaCapacity.Full
         ),
         Arguments.of(
             StorageState.Green,
             true,
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         ), Arguments.of(
             StorageState.Orange,
             true,
-            StorageOverQuotaCapacity.ALMOST_FULL
+            StorageOverQuotaCapacity.AlmostFull
         ), Arguments.of(
             StorageState.Orange,
             false,
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         ),
         Arguments.of(
             StorageState.Change,
             true,
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         ), Arguments.of(
             StorageState.Unknown,
             true,
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         ), Arguments.of(
             StorageState.PayWall,
             true,
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         )
     )
 
@@ -659,9 +627,9 @@ class MediaDiscoveryViewModelTest {
         underTest.showSortByDialog(true)
         underTest.showFilterDialog(true)
         underTest.showSlidersPopup(true)
-        underTest.updateZoomLevel(mega.privacy.android.app.presentation.photos.model.ZoomLevel.Grid_1)
-        underTest.setCurrentSort(mega.privacy.android.app.presentation.photos.model.Sort.OLDEST)
-        underTest.setCurrentMediaType(mega.privacy.android.app.presentation.photos.model.FilterMediaType.IMAGES)
+        underTest.updateZoomLevel(ZoomLevel.Grid_1)
+        underTest.setCurrentSort(Sort.OLDEST)
+        underTest.setCurrentMediaType(FilterMediaType.IMAGES)
 
         // When: clearState is called
         underTest.clearState()
@@ -671,10 +639,10 @@ class MediaDiscoveryViewModelTest {
         assertThat(currentState.currentFolderId).isNull()
         assertThat(currentState.sourcePhotos).isEmpty()
         assertThat(currentState.mediaListItemList).isEmpty()
-        assertThat(currentState.currentZoomLevel).isEqualTo(mega.privacy.android.app.presentation.photos.model.ZoomLevel.Grid_3)
+        assertThat(currentState.currentZoomLevel).isEqualTo(ZoomLevel.Grid_3)
         assertThat(currentState.selectedPhotoIds).isEmpty()
-        assertThat(currentState.currentSort).isEqualTo(mega.privacy.android.app.presentation.photos.model.Sort.NEWEST)
-        assertThat(currentState.currentMediaType).isEqualTo(mega.privacy.android.app.presentation.photos.model.FilterMediaType.ALL_MEDIA)
+        assertThat(currentState.currentSort).isEqualTo(Sort.NEWEST)
+        assertThat(currentState.currentMediaType).isEqualTo(FilterMediaType.ALL_MEDIA)
         assertThat(currentState.selectedTimeBarTab).isEqualTo(mega.privacy.android.app.presentation.photos.model.TimeBarTab.All)
         assertThat(currentState.yearsCardList).isEmpty()
         assertThat(currentState.monthsCardList).isEmpty()
@@ -696,7 +664,7 @@ class MediaDiscoveryViewModelTest {
         assertThat(currentState.errorMessage).isNull()
         assertThat(currentState.accountType).isNull()
         assertThat(currentState.isHiddenNodesOnboarded).isFalse()
-        assertThat(currentState.storageCapacity).isEqualTo(StorageOverQuotaCapacity.DEFAULT)
+        assertThat(currentState.storageCapacity).isEqualTo(StorageOverQuotaCapacity.Default)
         assertThat(currentState.isBusinessAccountExpired).isFalse()
         assertThat(currentState.hiddenNodeEnabled).isFalse()
         assertThat(currentState.isClearSelectedPhotos).isTrue()

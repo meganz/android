@@ -16,11 +16,13 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -30,6 +32,7 @@ import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNot
 import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
+import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.MAX_WORKER_EXECUTION_DURATION
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.ON_TRANSFER_UPDATE_REFRESH_MILLIS
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -41,6 +44,7 @@ import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTran
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.ClearCompletedTransfersCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingDownloadsUseCase
 import org.junit.jupiter.api.AfterAll
@@ -49,7 +53,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
-import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
@@ -96,7 +99,7 @@ class DownloadsWorkerTest {
         mock<TransfersActionGroupProgressNotificationBuilder>()
     private val transfersProgressNotificationSummaryBuilder =
         mock<TransfersProgressNotificationSummaryBuilder>()
-    private val displayPathFromUriCache = mock<HashMap<String, String>>()
+    private val clearCompletedTransfersCacheUseCase = mock<ClearCompletedTransfersCacheUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -144,7 +147,8 @@ class DownloadsWorkerTest {
             transfersActionGroupProgressNotificationBuilder = transfersActionGroupProgressNotificationBuilder,
             transfersProgressNotificationSummaryBuilder = transfersProgressNotificationSummaryBuilder,
             loginMutex = mock(),
-            displayPathFromUriCache = displayPathFromUriCache,
+            clearCompletedTransfersCacheUseCase = clearCompletedTransfersCacheUseCase,
+            deleteActiveTransferGroupUseCase = mock(),
         )
     }
 
@@ -170,7 +174,7 @@ class DownloadsWorkerTest {
             transfersFinishNotificationSummaryBuilder,
             transfersActionGroupProgressNotificationBuilder,
             transfersProgressNotificationSummaryBuilder,
-            displayPathFromUriCache,
+            clearCompletedTransfersCacheUseCase,
         )
     }
 
@@ -296,7 +300,7 @@ class DownloadsWorkerTest {
             val transferTotal = mockActiveTransferTotals(true)
             commonStub(transferTotals = listOf(transferTotal))
             underTest.doWork()
-            verify(displayPathFromUriCache).clear()
+            verify(clearCompletedTransfersCacheUseCase).invoke()
         }
 
     @Test
@@ -368,6 +372,46 @@ class DownloadsWorkerTest {
                 awaitItem()
                 expectNoEvents()
             }
+        }
+
+    @Test
+    fun `test that doWork returns success if the progress flow never completes (timeout safety net)`() =
+        runTest {
+            commonStub()
+            // Simulate a flow that emits an event with ongoing transfers but then hangs forever
+            // (mimics a stalled SDK: pendingWork stays true, no more events come)
+            whenever(monitorActiveAndPendingTransfersUseCase(TransferType.DOWNLOAD)) doReturn
+                    flow {
+                        emit(mockMonitorProgressResult(pendingWork = true))
+                        awaitCancellation()
+                    }
+            val resultDeferred = backgroundScope.async {
+                underTest.doWork()
+            }
+            // Advance virtual time past the 5-hour MAX_WORKER_EXECUTION_DURATION
+            advanceTimeBy(MAX_WORKER_EXECUTION_DURATION)
+            val result = resultDeferred.await()
+            // When the timeout fires and lastMonitorOngoingActiveTransfersResult is null,
+            // doWork() returns Result.success() (no ongoing transfers == no more work needed)
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun `test that crashReporter logs when the progress flow times out`() =
+        runTest {
+            commonStub()
+            whenever(monitorActiveAndPendingTransfersUseCase(TransferType.DOWNLOAD)) doReturn
+                    flow {
+                        emit(mockMonitorProgressResult(pendingWork = true))
+                        awaitCancellation()
+                    }
+            val resultDeferred = backgroundScope.async {
+                underTest.doWork()
+            }
+            advanceTimeBy(MAX_WORKER_EXECUTION_DURATION)
+            resultDeferred.await()
+            // Verify the timeout log is emitted (in addition to the normal start/finish logs)
+            verify(crashReporter, times(3)).log(any())
         }
 
     private fun commonStub(

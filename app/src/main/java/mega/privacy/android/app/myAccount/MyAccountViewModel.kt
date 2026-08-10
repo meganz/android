@@ -23,13 +23,13 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.dialog.storagestatus.SubscriptionCheckResult
@@ -37,31 +37,34 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_NO_NAVIGATION
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
-import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
+import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.ACTION_REFRESH
-import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_REFRESH
 import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
 import mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE
-import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.PaymentMethodType
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.SubscriptionStatus
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.AccountStorageDetail
+import mega.privacy.android.domain.entity.account.AccountTransferDetail
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -106,7 +109,7 @@ import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
-import nz.mega.sdk.MegaAccountDetails
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError.API_EARGS
@@ -120,7 +123,6 @@ import javax.inject.Inject
  * My account view model
  *
  * @property context
- * @property myAccountInfo
  * @property megaApi
  * @property setAvatarUseCase
  * @property isMultiFactorAuthEnabledUseCase [IsMultiFactorAuthEnabledUseCase]
@@ -150,13 +152,14 @@ import javax.inject.Inject
  * @property snackBarHandler Handler used to display a Snackbar
  * @property getBusinessStatusUseCase
  * @property monitorAccountDetailUseCase
+ * @property fileSizeStringMapper
  */
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
 class MyAccountViewModel @Inject constructor(
     @ApplicationContext val context: Context,
-    private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
+    private val fileSizeStringMapper: FileSizeStringMapper,
     private val setAvatarUseCase: SetAvatarUseCase,
     private val isMultiFactorAuthEnabledUseCase: IsMultiFactorAuthEnabledUseCase,
     private val checkVersionsUseCase: CheckVersionsUseCase,
@@ -218,6 +221,8 @@ class MyAccountViewModel @Inject constructor(
     private val _numberOfSubscription = MutableStateFlow(INVALID_VALUE.toLong())
 
     private var resetJob: Job? = null
+    private var numVersions = INVALID_VALUE
+    private var previousVersionsSize = INVALID_VALUE.toLong()
 
     /**
      * Number of subscription
@@ -239,9 +244,10 @@ class MyAccountViewModel @Inject constructor(
 
         viewModelScope.launch {
             flow {
-                emitAll(monitorUserUpdates()
-                    .catch { Timber.w("Exception monitoring user updates: $it") }
-                    .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
+                emitAll(
+                    monitorUserUpdates()
+                        .catch { Timber.w("Exception monitoring user updates: $it") }
+                        .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
             }.collect {
                 when (it) {
                     UserChanges.Email -> refreshCurrentUserEmail()
@@ -285,11 +291,22 @@ class MyAccountViewModel @Inject constructor(
             monitorAccountDetailUseCase()
                 .catch { Timber.w("Exception monitoring account details: $it") }
                 .collectLatest { accountDetail ->
+                    val isProSubscription = isProSubscriptionCheck(accountDetail.levelDetail)
                     _state.update {
                         it.copy(
                             subscriptionDetails = accountDetail.levelDetail,
                             accountType = accountDetail.levelDetail?.accountType
                                 ?: AccountType.FREE,
+                            isProSubscription = isProSubscription,
+                            usedStorage = accountDetail.storageDetail.formatSize { usedStorage },
+                            totalStorage = accountDetail.storageDetail.formatSize { totalStorage },
+                            usedStoragePercentage = accountDetail.storageDetail?.usedPercentage ?: 0,
+                            cloudStorage = accountDetail.storageDetail.formatSize { usedCloudDrive },
+                            incomingStorage = accountDetail.storageDetail.formatSize { usedIncoming },
+                            rubbishStorage = accountDetail.storageDetail.formatSize { usedRubbish },
+                            usedTransfer = accountDetail.transferDetail.formatSize { usedTransfer },
+                            totalTransfer = accountDetail.transferDetail.formatSize { totalTransfer },
+                            usedTransferPercentage = accountDetail.transferDetail?.usedTransferPercentage ?: 0,
                         )
                     }
                 }
@@ -316,8 +333,8 @@ class MyAccountViewModel @Inject constructor(
                 it.copy(
                     name = getCurrentUserFullName(
                         forceRefresh = forceRefresh,
-                        defaultFirstName = context.getString(R.string.first_name_text),
-                        defaultLastName = context.getString(R.string.lastname_text),
+                        defaultFirstName = context.getString(sharedR.string.general_first_name),
+                        defaultLastName = context.getString(sharedR.string.general_last_name),
                     )
                 )
             }
@@ -348,9 +365,12 @@ class MyAccountViewModel @Inject constructor(
     /**
      * Checks the User's Subscription type
      */
-    private fun checkSubscription() {
+    private suspend fun checkSubscription() {
+        val currentSubscriptionMethodId = monitorAccountDetailUseCase()
+            .catch { emit(AccountDetail()) }
+            .firstOrNull()?.levelDetail?.subscriptionMethodId
         PlatformInfo.entries.firstOrNull {
-            it.subscriptionMethodId == myAccountInfo.subscriptionMethodId
+            it.subscriptionMethodId == currentSubscriptionMethodId
         }?.run {
             when {
                 isSubscriptionAndGatewaySame(subscriptionMethodId) -> {
@@ -443,9 +463,12 @@ class MyAccountViewModel @Inject constructor(
         this.withElevation.value = withElevation
     }
 
+    private fun formattedVersionsSize(): String? =
+        if (previousVersionsSize >= 0) fileSizeStringMapper(previousVersionsSize) else null
+
     private fun setVersionsInfo() {
         _state.update {
-            it.copy(versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize(context))
+            it.copy(versionsInfo = formattedVersionsSize())
         }
     }
 
@@ -486,35 +509,35 @@ class MyAccountViewModel @Inject constructor(
      *
      * @return
      */
-    fun getUsedStorage(): String = myAccountInfo.usedFormatted
+    fun getUsedStorage(): String = state.value.usedStorage
 
     /**
      * Get used storage percentage
      *
      * @return
      */
-    fun getUsedStoragePercentage(): Int = myAccountInfo.usedPercentage
+    fun getUsedStoragePercentage(): Int = state.value.usedStoragePercentage
 
     /**
      * Get total storage
      *
      * @return
      */
-    fun getTotalStorage(): String = myAccountInfo.totalFormatted
+    fun getTotalStorage(): String = state.value.totalStorage
 
     /**
      * Get used transfer
      *
      * @return
      */
-    fun getUsedTransfer(): String = myAccountInfo.usedTransferFormatted
+    fun getUsedTransfer(): String = state.value.usedTransfer
 
     /**
      * Get used transfer percentage
      *
      * @return
      */
-    fun getUsedTransferPercentage(): Int = myAccountInfo.usedTransferPercentage
+    fun getUsedTransferPercentage(): Int = state.value.usedTransferPercentage
 
 
     /**
@@ -523,21 +546,21 @@ class MyAccountViewModel @Inject constructor(
      * @return
      */
     fun getUsedTransferStatus(): UsedTransferStatus =
-        getUsedTransferStatusUseCase(myAccountInfo.usedTransferPercentage)
+        getUsedTransferStatusUseCase(state.value.usedTransferPercentage)
 
     /**
      * Get total transfer
      *
      * @return
      */
-    fun getTotalTransfer(): String = myAccountInfo.totalTransferFormatted
+    fun getTotalTransfer(): String = state.value.totalTransfer
 
     /**
      * Get renew time
      *
      * @return
      */
-    fun getRenewTime(): Long = myAccountInfo.subscriptionRenewTime
+    fun getRenewTime(): Long = state.value.subscriptionDetails?.subscriptionRenewTime ?: 0L
 
     /**
      * Has renewable subscription
@@ -545,8 +568,9 @@ class MyAccountViewModel @Inject constructor(
      * @return
      */
     fun hasRenewableSubscription(): Boolean {
-        return myAccountInfo.subscriptionStatus == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
-                && myAccountInfo.subscriptionRenewTime > 0
+        val details = state.value.subscriptionDetails ?: return false
+        return details.subscriptionStatus == SubscriptionStatus.VALID
+                && details.subscriptionRenewTime > 0
     }
 
     /**
@@ -554,14 +578,15 @@ class MyAccountViewModel @Inject constructor(
      *
      * @return
      */
-    fun getExpirationTime(): Long = myAccountInfo.proExpirationTime
+    fun getExpirationTime(): Long = state.value.subscriptionDetails?.proExpirationTime ?: 0L
 
     /**
      * Has expirable subscription
      *
      * @return
      */
-    fun hasExpirableSubscription(): Boolean = myAccountInfo.proExpirationTime > 0
+    fun hasExpirableSubscription(): Boolean =
+        (state.value.subscriptionDetails?.proExpirationTime ?: 0L) > 0
 
     /**
      * There is no subscription
@@ -589,21 +614,21 @@ class MyAccountViewModel @Inject constructor(
      *
      * @return
      */
-    fun getCloudStorage(): String = myAccountInfo.formattedUsedCloud
+    fun getCloudStorage(): String = state.value.cloudStorage
 
     /**
      * Get incoming storage
      *
      * @return
      */
-    fun getIncomingStorage(): String = myAccountInfo.formattedUsedIncoming
+    fun getIncomingStorage(): String = state.value.incomingStorage
 
     /**
      * Get rubbish storage
      *
      * @return
      */
-    fun getRubbishStorage(): String = myAccountInfo.formattedUsedRubbish
+    fun getRubbishStorage(): String = state.value.rubbishStorage
 
     /**
      * Get master key
@@ -617,15 +642,14 @@ class MyAccountViewModel @Inject constructor(
      *
      */
     fun checkVersions() {
-        if (myAccountInfo.numVersions == INVALID_VALUE) {
+        if (numVersions == INVALID_VALUE) {
             viewModelScope.launch {
                 runCatching { checkVersionsUseCase() }
                     .fold(
                         onSuccess = { value ->
                             value?.let {
-                                myAccountInfo.numVersions = value.numberOfVersions
-                                myAccountInfo.previousVersionsSize =
-                                    value.sizeOfPreviousVersionsInBytes
+                                numVersions = value.numberOfVersions
+                                previousVersionsSize = value.sizeOfPreviousVersionsInBytes
                                 setVersionsInfo()
                             }
                         },
@@ -654,19 +678,6 @@ class MyAccountViewModel @Inject constructor(
                 snackbarDuration = MegaSnackbarDuration.Long,
             )
         }
-    }
-
-    /**
-     * Refresh
-     *
-     * @param activity
-     */
-    fun refresh(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-        intent.action = ACTION_REFRESH
-
-        activity.startActivityForResult(intent, REQUEST_CODE_REFRESH)
     }
 
     /**
@@ -1025,7 +1036,7 @@ class MyAccountViewModel @Inject constructor(
             }.onSuccess { isDisableFileVersions ->
                 _state.update {
                     it.copy(
-                        versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize(context),
+                        versionsInfo = formattedVersionsSize(),
                         isFileVersioningEnabled = isDisableFileVersions.not()
                     )
                 }
@@ -1049,13 +1060,13 @@ class MyAccountViewModel @Inject constructor(
                 confirmationLink = newAccountCancellationLink
                 checkAccountCancellationLinkValidity()
             }.onFailure { exception ->
-                Timber.e("An issue occurred when querying the Account Cancellation Link", exception)
+                Timber.e(exception, "An issue occurred when querying the Account Cancellation Link")
                 _state.update {
                     it.copy(
                         errorMessageRes = when (exception) {
                             is QueryCancelLinkException.UnrelatedAccountCancellationLink -> R.string.error_not_logged_with_correct_account
                             is QueryCancelLinkException.ExpiredAccountCancellationLink -> R.string.cancel_link_expired
-                            else -> R.string.invalid_link
+                            else -> sharedR.string.general_invalid_link
                         }
                     )
                 }
@@ -1072,7 +1083,7 @@ class MyAccountViewModel @Inject constructor(
             runCatching {
                 isUrlMatchesRegexUseCase(
                     url = confirmationLink,
-                    patterns = CANCEL_ACCOUNT_LINK_REGEXS,
+                    patterns = CANCEL_ACCOUNT_LINK_REGEX_ARRAY,
                 )
             }.onSuccess { isMatching ->
                 Timber.d(
@@ -1086,8 +1097,8 @@ class MyAccountViewModel @Inject constructor(
                 }
             }.onFailure { exception ->
                 Timber.e(
-                    "An issue occurred when checking if the URL matches the Cancel Account Link Regex",
-                    exception
+                    exception,
+                    "An issue occurred when checking if the URL matches the Cancel Account Link Regex"
                 )
                 _state.update { it.copy(errorMessageRes = R.string.general_error_word) }
             }
@@ -1116,7 +1127,7 @@ class MyAccountViewModel @Inject constructor(
                             errorMessageRes = if (exception is ConfirmCancelAccountException.IncorrectPassword) {
                                 R.string.old_password_provided_incorrect
                             } else {
-                                R.string.general_text_error
+                                sharedR.string.general_text_error
                             },
                         )
                     }
@@ -1153,7 +1164,7 @@ class MyAccountViewModel @Inject constructor(
                 confirmationLink = newChangeEmailLink
                 checkChangeEmailLinkValidity()
             }.onFailure { exception ->
-                Timber.e("An issue occurred when querying the Change Email Link", exception)
+                Timber.e(exception, "An issue occurred when querying the Change Email Link")
                 if (exception is QueryChangeEmailLinkException.LinkNotGenerated) {
                     _state.update { it.copy(showInvalidChangeEmailLinkPrompt = true) }
                 } else {
@@ -1171,7 +1182,7 @@ class MyAccountViewModel @Inject constructor(
         runCatching {
             isUrlMatchesRegexUseCase(
                 url = confirmationLink,
-                patterns = Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS,
+                patterns = Constants.VERIFY_CHANGE_MAIL_LINK_REGEX_ARRAY,
             )
         }.onSuccess { isMatching ->
             Timber.d(
@@ -1185,8 +1196,8 @@ class MyAccountViewModel @Inject constructor(
             }
         }.onFailure { exception ->
             Timber.e(
-                "An issue occurred when checking if the URL matches the Change Email Link Regex",
-                exception
+                exception,
+                "An issue occurred when checking if the URL matches the Change Email Link Regex"
             )
             _state.update { it.copy(errorMessageRes = R.string.general_error_word) }
         }
@@ -1223,7 +1234,7 @@ class MyAccountViewModel @Inject constructor(
                     if (Patterns.EMAIL_ADDRESS.matcher(newEmail).find()) {
                         Timber.d("Successfully changed the email address associated to the Account")
                         snackBarHandler.postSnackbarMessage(
-                            resId = R.string.email_changed, newEmail,
+                            message = context.getString(R.string.email_changed, newEmail),
                             snackbarDuration = MegaSnackbarDuration.Long,
                         )
                     } else {
@@ -1237,7 +1248,7 @@ class MyAccountViewModel @Inject constructor(
                             errorMessageRes = when (exception) {
                                 is ConfirmChangeEmailException.EmailAlreadyInUse -> R.string.mail_already_used
                                 is ConfirmChangeEmailException.IncorrectPassword -> R.string.old_password_provided_incorrect
-                                else -> R.string.general_text_error
+                                else -> sharedR.string.general_text_error
                             }
                         )
                     }
@@ -1263,7 +1274,7 @@ class MyAccountViewModel @Inject constructor(
         when (result) {
             API_OK -> actionSuccess.invoke(context.getString(R.string.pass_changed_alert))
             API_EARGS -> actionError.invoke(context.getString(R.string.old_password_provided_incorrect))
-            else -> actionError.invoke(context.getString(R.string.general_text_error))
+            else -> actionError.invoke(context.getString(sharedR.string.general_text_error))
         }
     }
 
@@ -1279,14 +1290,6 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Set open upgrade from
-     *
-     */
-    fun setOpenUpgradeFrom() {
-        myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.ACCOUNT
-    }
-
-    /**
      * Refresh account info
      *
      */
@@ -1294,7 +1297,7 @@ class MyAccountViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val accountDetails = getAccountDetailsUseCase(
-                    forceRefresh = myAccountInfo.usedFormatted.trim().isEmpty()
+                    forceRefresh = state.value.usedStorage.trim().isEmpty()
                 )
                 getExtendedAccountDetail(
                     forceRefresh = false,
@@ -1305,14 +1308,12 @@ class MyAccountViewModel @Inject constructor(
                 getPaymentMethodUseCase(false)
 
                 val businessProFlexiStatus = getBusinessStatusUseCase()
-                val isProSubscription = isProSubscriptionCheck()
                 _state.update { state ->
                     state.copy(
                         isBusinessAccount = accountDetails.isBusinessAccount &&
                                 accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
                         isProFlexiAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.PRO_FLEXI,
                         businessProFlexiStatus = businessProFlexiStatus,
-                        isProSubscription = isProSubscription,
                     )
                 }
             }.onFailure {
@@ -1348,27 +1349,14 @@ class MyAccountViewModel @Inject constructor(
 
     /**
      * To check if user has active Pro subscription and update UI state
+     *
+     * @param subscriptionDetails
      */
-    private fun isProSubscriptionCheck(): Boolean {
-        val subscriptionList =
-            state.value.subscriptionDetails?.accountSubscriptionDetailList
-        val planDetail = state.value.subscriptionDetails?.accountPlanDetail
-        val isActiveProSubscription = when (planDetail?.accountType) {
-            AccountType.PRO_LITE,
-            AccountType.PRO_I,
-            AccountType.PRO_II,
-            AccountType.PRO_III,
-                -> {
-                if (subscriptionList?.size == 1) {
-                    planDetail.accountType == subscriptionList.firstOrNull()?.subscriptionLevel
-                } else {
-                    false
-                }
-            }
-
-            else -> false
-        }
-        return isActiveProSubscription ?: false
+    private fun isProSubscriptionCheck(subscriptionDetails: AccountLevelDetail?): Boolean {
+        val subscriptionList = subscriptionDetails?.accountSubscriptionDetailList ?: return false
+        val planDetail = subscriptionDetails.accountPlanDetail
+        return subscriptionList.any { it.paymentMethodType == PaymentMethodType.GOOGLE_WALLET }
+                && planDetail?.accountType?.isPaid == true
     }
 
     /**
@@ -1376,6 +1364,12 @@ class MyAccountViewModel @Inject constructor(
      */
     fun isProSubscription(): Boolean =
         state.value.isProSubscription
+
+    private fun AccountStorageDetail?.formatSize(selector: AccountStorageDetail.() -> Long): String =
+        this?.let { fileSizeStringMapper(selector(it)) } ?: ""
+
+    private fun AccountTransferDetail?.formatSize(selector: AccountTransferDetail.() -> Long): String =
+        this?.let { fileSizeStringMapper(selector(it)) } ?: ""
 
     /**
      * Dismiss logout confirmation dialog

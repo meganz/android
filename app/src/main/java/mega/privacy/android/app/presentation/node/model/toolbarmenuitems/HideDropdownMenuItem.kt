@@ -10,10 +10,8 @@ import mega.privacy.android.app.presentation.node.model.menuaction.HideDropdownM
 import mega.privacy.android.app.presentation.node.model.menuaction.HideMenuAction
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
 import javax.inject.Inject
@@ -25,7 +23,6 @@ import javax.inject.Inject
  */
 class HideDropdownMenuItem @Inject constructor(
     override val menuAction: HideDropdownMenuAction,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -39,9 +36,7 @@ class HideDropdownMenuItem @Inject constructor(
         allFileNodes: Boolean,
         resultCount: Int,
     ): Boolean {
-        val isHiddenNodesEnabled = isHiddenNodesActive()
-
-        if (!isHiddenNodesEnabled || !hasNodeAccessPermission || !noNodeTakenDown || !noNodeInBackups) {
+        if (!hasNodeAccessPermission || !noNodeTakenDown || !noNodeInBackups) {
             return false
         }
 
@@ -80,12 +75,5 @@ class HideDropdownMenuItem @Inject constructor(
             actionHandler(menuAction, selectedNodes)
         }
         onDismiss()
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 }

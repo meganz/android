@@ -19,14 +19,23 @@ import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore.Companion.REQUEST_PHONE_NUMBER_FILE
 import mega.privacy.android.data.preferences.base.createEncrypted
 import mega.privacy.android.data.preferences.cameraUploadsSettingsPreferenceDataStoreName
+import mega.privacy.android.data.preferences.chatSettingsPreferenceDataStoreName
+import mega.privacy.android.data.preferences.continueWhereLeftOffSortPreferenceFileName
 import mega.privacy.android.data.preferences.credentialDataStoreName
+import mega.privacy.android.data.preferences.mediaTimelinePreferenceFileName
 import mega.privacy.android.data.preferences.migration.CameraUploadsSettingsPreferenceDataStoreMigration
+import mega.privacy.android.data.preferences.migration.ChatSettingsPreferenceDataStoreMigration
 import mega.privacy.android.data.preferences.migration.CredentialsPreferencesMigration
-import mega.privacy.android.data.preferences.psa.psaPreferenceDataStoreName
-import mega.privacy.android.data.preferences.security.PasscodeDatastoreMigration
+import mega.privacy.android.data.preferences.qaAccountCacheDataStoreName
+import mega.privacy.android.data.preferences.security.PasscodeDatastoreV1ToV2Migration
 import mega.privacy.android.data.preferences.security.passcodeDatastoreName
-import mega.privacy.android.data.preferences.transfersPreferencesDataStoreName
+import mega.privacy.android.data.preferences.pinnedItemsSortPreferenceFileName
+import mega.privacy.android.data.preferences.viewedLinksSortPreferenceFileName
+import mega.privacy.android.data.qualifier.ContinueWhereLeftOffSortPreference
+import mega.privacy.android.data.qualifier.MediaTimelinePreferenceDataStore
 import mega.privacy.android.data.qualifier.RequestPhoneNumberPreference
+import mega.privacy.android.data.qualifier.PinnedItemsSortPreference
+import mega.privacy.android.data.qualifier.ViewedLinksSortPreference
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Named
 import javax.inject.Singleton
@@ -69,18 +78,18 @@ internal object DataStoreModule {
     fun providePasscodeDataStore(
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
-        passcodeDatastoreMigration: PasscodeDatastoreMigration,
-    ): DataStore<Preferences> =
-        PreferenceDataStoreFactory.create(
-            corruptionHandler = ReplaceFileCorruptionHandler(
-                produceNewData = { emptyPreferences() }
-            ),
-            migrations = listOf(
-                passcodeDatastoreMigration
-            ),
-            scope = CoroutineScope(ioDispatcher),
-            produceFile = { context.preferencesDataStoreFile(passcodeDatastoreName) }
-        )
+        masterKey: MasterKey?,
+        v1ToV2Migration: PasscodeDatastoreV1ToV2Migration,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.createEncrypted(
+        corruptionHandler = ReplaceFileCorruptionHandler(
+            produceNewData = { emptyPreferences() }
+        ),
+        migrations = listOf(v1ToV2Migration),
+        scope = CoroutineScope(ioDispatcher),
+        masterKey = masterKey,
+        context = context,
+        fileName = passcodeDatastoreName
+    )
 
     @Singleton
     @Provides
@@ -107,17 +116,26 @@ internal object DataStoreModule {
 
     @Singleton
     @Provides
-    @Named(psaPreferenceDataStoreName)
-    fun providePsaPreferenceDataStore(
+    @Named(chatSettingsPreferenceDataStoreName)
+    fun provideChatSettingsPreferenceDataStore(
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
-        corruptionHandler = ReplaceFileCorruptionHandler(
-            produceNewData = { emptyPreferences() }
-        ),
-        scope = CoroutineScope(ioDispatcher),
-        produceFile = { context.preferencesDataStoreFile(psaPreferenceDataStoreName) }
-    )
+        migration: ChatSettingsPreferenceDataStoreMigration,
+    ): DataStore<Preferences> =
+        PreferenceDataStoreFactory.create(
+            corruptionHandler = ReplaceFileCorruptionHandler(
+                produceNewData = { emptyPreferences() }
+            ),
+            migrations = listOf(
+                migration
+            ),
+            scope = CoroutineScope(ioDispatcher),
+            produceFile = {
+                context.preferencesDataStoreFile(
+                    chatSettingsPreferenceDataStoreName
+                )
+            }
+        )
 
     @Singleton
     @Provides
@@ -144,16 +162,76 @@ internal object DataStoreModule {
 
     @Singleton
     @Provides
-    @Named(transfersPreferencesDataStoreName)
-    fun provideTransfersPreferencesDataStore(
+    @Named(qaAccountCacheDataStoreName)
+    fun provideQAAccountCacheDataStore(
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    ): DataStore<Preferences> =
-        PreferenceDataStoreFactory.create(
+        masterKey: MasterKey?,
+    ): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.createEncrypted(
             corruptionHandler = ReplaceFileCorruptionHandler(
                 produceNewData = { emptyPreferences() }
             ),
             scope = CoroutineScope(ioDispatcher),
-            produceFile = { context.preferencesDataStoreFile(transfersPreferencesDataStoreName) }
+            masterKey = masterKey,
+            context = context,
+            fileName = qaAccountCacheDataStoreName
         )
+    }
+
+    @Provides
+    @Singleton
+    @MediaTimelinePreferenceDataStore
+    internal fun provideMediaTimelinePreferenceDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler(
+            produceNewData = { emptyPreferences() }
+        ),
+        scope = CoroutineScope(ioDispatcher),
+        produceFile = { context.preferencesDataStoreFile(mediaTimelinePreferenceFileName) }
+    )
+
+    @Provides
+    @Singleton
+    @ContinueWhereLeftOffSortPreference
+    internal fun provideContinueWhereLeftOffSortPreferenceDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler(
+            produceNewData = { emptyPreferences() }
+        ),
+        scope = CoroutineScope(ioDispatcher),
+        produceFile = { context.preferencesDataStoreFile(continueWhereLeftOffSortPreferenceFileName) }
+    )
+
+    @Provides
+    @Singleton
+    @ViewedLinksSortPreference
+    internal fun provideViewedLinksSortPreferenceDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler(
+            produceNewData = { emptyPreferences() }
+        ),
+        scope = CoroutineScope(ioDispatcher),
+        produceFile = { context.preferencesDataStoreFile(viewedLinksSortPreferenceFileName) }
+    )
+
+    @Provides
+    @Singleton
+    @PinnedItemsSortPreference
+    internal fun providePinnedItemsSortPreferenceDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler(
+            produceNewData = { emptyPreferences() }
+        ),
+        scope = CoroutineScope(ioDispatcher),
+        produceFile = { context.preferencesDataStoreFile(pinnedItemsSortPreferenceFileName) }
+    )
 }
