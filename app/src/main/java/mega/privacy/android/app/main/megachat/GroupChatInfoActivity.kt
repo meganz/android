@@ -33,7 +33,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.MegaApplication.Companion.userWaitingForCall
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -1144,7 +1143,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     } else {
                         -1
                     },
-                    chatRoom
+                    chatRoom,
+                    chatManagement.userWaitingForCall,
                 ) && CallUtil.canCallBeStartedFromContactOption(
                     this,
                 )
@@ -1240,7 +1240,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     fun startCall() {
         val audio = PermissionUtils.hasPermissions(this, Manifest.permission.RECORD_AUDIO)
         viewModel.onCallTap(
-            userHandle = userWaitingForCall,
+            userHandle = chatManagement.userWaitingForCall,
             video = false,
             audio = audio,
         )

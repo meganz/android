@@ -27,6 +27,7 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.globalmanagement.ChatApiListenerCoordinator
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.globalmanagement.SmsVerificationState
 import mega.privacy.android.app.meeting.CallService
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.workmanager.WorkManagerConfigurationProvider
@@ -132,6 +133,9 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
     @Inject
     lateinit var logFlushGateway: LogFlushGateway
 
+    @Inject
+    lateinit var smsVerificationState: SmsVerificationState
+
     /**
      * On create
      *
@@ -143,7 +147,7 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         registerActivityLifecycleCallbacks(activityLifecycleHandler)
-        isVerifySMSShowed = false
+        smsVerificationState.isVerificationShown = false
 
         globalInitialiser.onAppCreate()
     }
@@ -343,40 +347,11 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
         const val APP_KEY = "6tioyn8ka5l6hty"
 
         /**
-         * Is logging out
-         */
-        @JvmStatic
-        var isLoggingOut = false
-
-        /**
-         * Is show info chat messages
-         */
-        @JvmStatic
-        var isShowInfoChatMessages = false
-
-        /**
-         * Open chat id
-         */
-        @JvmStatic
-        var openChatId: Long = -1
-
-        /**
-         * Is verify s m s showed
-         */
-        var isVerifySMSShowed = false
-            private set
-
-        /**
          * Is web open due to email verification
          */
         var isWebOpenDueToEmailVerification = false
             private set
 
-        /**
-         * User waiting for call
-         */
-        @JvmStatic
-        var userWaitingForCall = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
         private lateinit var instance: MegaApplication
 
         /**
@@ -384,16 +359,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
          */
         @JvmStatic
         fun getInstance(): MegaApplication = instance
-
-        /**
-         * Sms verify showed
-         *
-         * @param isShowed
-         */
-        @JvmStatic
-        fun smsVerifyShowed(isShowed: Boolean) {
-            isVerifySMSShowed = isShowed
-        }
 
         /**
          * Set is web open due to email verification

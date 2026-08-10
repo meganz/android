@@ -13,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
@@ -58,6 +59,9 @@ class ChatActivity : AppCompatActivity() {
 
     @Inject
     lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
+
+    @Inject
+    lateinit var chatManagement: ChatManagement
 
     private val newIntents = Channel<Intent>(capacity = Channel.UNLIMITED)
 
@@ -107,6 +111,7 @@ class ChatActivity : AppCompatActivity() {
                 chatDestination(
                     navigationHandler = navigationHandler,
                     megaNavigator = megaNavigator,
+                    chatManagement = chatManagement,
                 )
             }
         }

@@ -9,8 +9,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaApplication.Companion.userWaitingForCall
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
@@ -49,6 +49,9 @@ class ScheduledMeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDial
 
     @Inject
     lateinit var navigator: MegaNavigator
+
+    @Inject
+    lateinit var chatManagement: ChatManagement
 
     private var selectedChat: MegaChatRoom? = null
     private var chatId = MegaApiJava.INVALID_HANDLE
@@ -298,7 +301,7 @@ class ScheduledMeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDial
         } else if (id == R.id.start_chat_group_participants_chat) {
             viewModel.onSendMsgTap()
         } else if (id == R.id.contact_list_option_call_layout) {
-            userWaitingForCall = participantHandle
+            chatManagement.userWaitingForCall = participantHandle
             if (canCallBeStartedFromContactOption(requireActivity())) {
                 viewModel.onStartCallTap()
             }

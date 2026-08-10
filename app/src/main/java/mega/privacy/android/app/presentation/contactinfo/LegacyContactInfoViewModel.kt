@@ -221,7 +221,7 @@ class LegacyContactInfoViewModel @Inject constructor(
                 chatRoom = getChatRoomUseCase(it.chatId)?.also { chat ->
                     monitorChatRetentionTimeUpdate(chat.chatId)
                 },
-                userWaitingForCall = MegaApplication.userWaitingForCall,
+                userWaitingForCall = chatManagement.userWaitingForCall,
             )
             if (shouldInitiateCall && chatId != INVALID_CHAT_HANDLE) {
                 _uiState.update { state -> state.copy(shouldInitiateCall = true) }

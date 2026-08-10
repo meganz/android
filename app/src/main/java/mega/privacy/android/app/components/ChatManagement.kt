@@ -74,6 +74,21 @@ class ChatManagement @Inject constructor(
      */
     var hasEndCallDialogBeenIgnored = false
 
+    /**
+     * Chat id of the conversation currently open on screen, or -1 when none is open.
+     */
+    var openChatId: Long = -1
+
+    /**
+     * Boolean indicating whether info chat messages should be shown.
+     */
+    var isShowInfoChatMessages = false
+
+    /**
+     * Handle of the user a call is waiting to be started for.
+     */
+    var userWaitingForCall = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+
     // List of chat ids to control if a chat is already joining.
     private val joiningChatIds: MutableList<Long> = mutableListOf()
 

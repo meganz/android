@@ -22,13 +22,13 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.SettingsConstants.KEY_2FA
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_APP_VERSION
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_CODE_LINK
@@ -97,6 +97,9 @@ class SettingsFragment :
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var chatManagement: ChatManagement
 
     private var numberOfClicksAppVersion = 0
 
@@ -393,8 +396,8 @@ class SettingsFragment :
             KEY_ABOUT_APP_VERSION -> {
                 if (++numberOfClicksAppVersion == 5) {
                     numberOfClicksAppVersion = 0
-                    if (!MegaApplication.isShowInfoChatMessages) {
-                        MegaApplication.isShowInfoChatMessages = true
+                    if (!chatManagement.isShowInfoChatMessages) {
+                        chatManagement.isShowInfoChatMessages = true
                         view?.let {
                             Snackbar.make(
                                 it,
@@ -403,7 +406,7 @@ class SettingsFragment :
                             ).show()
                         }
                     } else {
-                        MegaApplication.isShowInfoChatMessages = false
+                        chatManagement.isShowInfoChatMessages = false
                         view?.let {
                             Snackbar.make(
                                 it,

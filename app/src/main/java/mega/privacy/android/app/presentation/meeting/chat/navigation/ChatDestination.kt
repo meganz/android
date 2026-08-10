@@ -15,7 +15,7 @@ import androidx.navigation.navOptions
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.chatsession.ChatSessionContainer
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.chatViewNavigationGraph
@@ -38,17 +38,19 @@ import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent
  * @param navigationHandler The scaffold navigation handler. Used to open another chat on top of
  * the current one and to bridge the inner graph to Navigation 3 results.
  * @param megaNavigator The centralized navigator in the :app module.
+ * @param chatManagement Process-scoped chat state used to track the open chat.
  */
 internal fun EntryProviderScope<NavKey>.chatDestination(
     navigationHandler: NavigationHandler,
     megaNavigator: MegaNavigator,
+    chatManagement: ChatManagement,
 ) {
     entry<ChatLegacyContainerNavKey> { key ->
         // Keep the chat marked as open while this entry is the visible (resumed) destination.
         LifecycleResumeEffect(key.chatId) {
-            MegaApplication.openChatId = key.chatId
+            chatManagement.openChatId = key.chatId
             Analytics.tracker.trackEvent(ChatConversationScreenEvent)
-            onPauseOrDispose { MegaApplication.openChatId = -1L }
+            onPauseOrDispose { chatManagement.openChatId = -1L }
         }
 
         ChatSessionContainer {

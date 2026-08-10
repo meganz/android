@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting.listeners
 import androidx.lifecycle.MutableLiveData
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
+import mega.privacy.android.app.globalmanagement.LogoutState
 
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.utils.CallUtil.callStatusToString
@@ -14,7 +15,9 @@ import nz.mega.sdk.MegaChatCallListenerInterface
 import nz.mega.sdk.MegaChatSession
 import timber.log.Timber
 
-class MeetingListener : MegaChatCallListenerInterface {
+class MeetingListener(
+    private val logoutState: LogoutState,
+) : MegaChatCallListenerInterface {
 
     var customCountDownTimer: CustomCountDownTimer? = null
 
@@ -24,7 +27,7 @@ class MeetingListener : MegaChatCallListenerInterface {
             return
         }
 
-        if (MegaApplication.isLoggingOut) {
+        if (logoutState.isLoggingOut) {
             Timber.w("Logging out")
             return
         }
@@ -57,7 +60,7 @@ class MeetingListener : MegaChatCallListenerInterface {
             return
         }
 
-        if (MegaApplication.isLoggingOut) {
+        if (logoutState.isLoggingOut) {
             Timber.w("Logging out")
             return
         }

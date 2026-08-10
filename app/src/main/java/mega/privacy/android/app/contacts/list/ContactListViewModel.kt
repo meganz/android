@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.list.data.ContactActionItem
@@ -253,7 +252,7 @@ internal class ContactListViewModel @Inject constructor(
      */
     fun onCallTap(video: Boolean, audio: Boolean) = viewModelScope.launch {
         runCatching {
-            get1On1ChatIdUseCase(MegaApplication.userWaitingForCall)
+            get1On1ChatIdUseCase(chatManagement.userWaitingForCall)
         }.onSuccess { chatId ->
             startCall(chatId, video, audio)
         }.onFailure {

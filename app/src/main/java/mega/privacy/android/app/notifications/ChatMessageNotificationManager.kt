@@ -10,10 +10,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
@@ -46,6 +46,7 @@ import kotlin.time.Duration.Companion.seconds
 class ChatMessageNotificationManager @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val megaNavigator: MegaNavigator,
+    private val chatManagement: ChatManagement,
 ) {
     companion object {
         private const val GROUP_KEY = "Karere"
@@ -82,7 +83,7 @@ class ChatMessageNotificationManager @Inject constructor(
             }
 
             is ChatMessageNotificationData.Message -> {
-                if (chat.chatId == MegaApplication.openChatId) {
+                if (chat.chatId == chatManagement.openChatId) {
                     Timber.d("Chat opened. Removing notification")
                     notificationManagerCompat.cancel(messageNotificationId)
                     checkIfShouldCancelSummaryNotification(unreadCount, summaryNotificationId)

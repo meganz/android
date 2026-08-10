@@ -17,10 +17,10 @@ import coil3.request.transformations
 import coil3.transform.CircleCropTransformation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SelectChatsToAttachActivityContract
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.list.ContactListViewModel
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.BottomSheetContactDetailBinding
@@ -66,6 +66,9 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     @Inject
     lateinit var navigator: MegaNavigator
+
+    @Inject
+    lateinit var chatManagement: ChatManagement
 
     /**
      * Send message button click listener
@@ -200,7 +203,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionCall.setOnClickListener {
-            MegaApplication.userWaitingForCall = contactHandle
+            chatManagement.userWaitingForCall = contactHandle
             if (CallUtil.canCallBeStartedFromContactOption(requireActivity())) {
                 val audio = PermissionUtils.hasPermissions(
                     requireContext(),

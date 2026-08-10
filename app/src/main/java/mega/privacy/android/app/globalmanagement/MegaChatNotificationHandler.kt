@@ -10,7 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.notifications.ChatMessageNotificationManager
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
@@ -47,6 +47,7 @@ class MegaChatNotificationHandler @Inject constructor(
     private val fileDurationMapper: FileDurationMapper,
     private val chatMessageMapper: @JvmSuppressWildcards suspend (@JvmSuppressWildcards MegaChatMessage) -> @JvmSuppressWildcards ChatMessage,
     private val saveChatMessagesUseCase: SaveChatMessagesUseCase,
+    private val chatManagement: ChatManagement,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : MegaChatNotificationListenerInterface {
     /**
@@ -73,7 +74,7 @@ class MegaChatNotificationHandler @Inject constructor(
 
             val seenMessage = status == MegaChatMessage.STATUS_SEEN
 
-            if (MegaApplication.openChatId == chatId && !seenMessage) {
+            if (chatManagement.openChatId == chatId && !seenMessage) {
                 Timber.d("Do not update/show notification - opened chat")
                 return
             }

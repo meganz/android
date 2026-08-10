@@ -37,6 +37,7 @@ import mega.privacy.android.app.appstate.MegaActivityInternalLauncher
 import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.LAUNCH_INTENT
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.globalmanagement.SmsVerificationState
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -114,7 +115,6 @@ import kotlin.time.Duration.Companion.seconds
  * @property megaChatApi                    [MegaChatApiAndroid]
  * @property dbH                            [DatabaseHandler]
  * @property myAccountInfo                  [MyAccountInfo]
- * @property app                            [MegaApplication]
  * @property outMetrics                     [DisplayMetrics]
  * @property getAccountDetailsUseCase
  * @property billingViewModel
@@ -173,12 +173,13 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     @Inject
     lateinit var appDialogEventQueue: AppDialogsEventQueue
 
+    @Inject
+    lateinit var smsVerificationState: SmsVerificationState
+
     private val billingViewModel by viewModels<BillingViewModel>()
     private val viewModel by viewModels<BaseViewModel>()
     private val signalPresenceViewModel by viewModels<SignalPresenceViewModel>()
 
-    @JvmField
-    protected var app: MegaApplication = MegaApplication.getInstance()
     private var sslErrorDialog: AlertDialog? = null
     private var upgradeAlert: AlertDialog? = null
     private var purchaseType: PurchaseType? = null
@@ -747,8 +748,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             )
 
             AccountBlockedType.VERIFICATION_SMS -> {
-                if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed) return
-                MegaApplication.smsVerifyShowed(true)
+                if (megaApi.smsAllowedState() == 0 || smsVerificationState.isVerificationShown) return
+                smsVerificationState.isVerificationShown = true
                 lifecycleScope.launch {
                     runCatching {
                         saveAccountCredentialsUseCase()

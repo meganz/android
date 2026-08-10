@@ -9,8 +9,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaApplication.Companion.userWaitingForCall
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
@@ -44,6 +44,9 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
 
     @Inject
     lateinit var navigator: MegaNavigator
+
+    @Inject
+    lateinit var chatManagement: ChatManagement
 
     private var titleNameContactChatPanel: EmojiTextView? = null
     private var contactImageView: RoundedImageView? = null
@@ -277,7 +280,7 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
         } else if (id == R.id.start_chat_group_participants_chat) {
             (requireActivity() as GroupChatInfoActivity).startConversation(participantHandle)
         } else if (id == R.id.contact_list_option_call_layout) {
-            userWaitingForCall = participantHandle
+            chatManagement.userWaitingForCall = participantHandle
             if (CallUtil.canCallBeStartedFromContactOption(requireActivity())) {
                 (requireActivity() as GroupChatInfoActivity).startCall()
             }

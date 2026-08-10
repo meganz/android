@@ -1102,14 +1102,19 @@ object CallUtil {
      *
      * @param newState The state of chat
      * @param chatRoom The MegaChatRoom
+     * @param userWaitingForCall Handle of the user a call is waiting to be started for
      * @return True, if the chat is connected and a call can be started. False, otherwise
      */
     @JvmStatic
-    fun isChatConnectedInOrderToInitiateACall(newState: Int, chatRoom: MegaChatRoom?): Boolean =
+    fun isChatConnectedInOrderToInitiateACall(
+        newState: Int,
+        chatRoom: MegaChatRoom?,
+        userWaitingForCall: Long,
+    ): Boolean =
         newState == MegaChatApi.CHAT_CONNECTION_ONLINE &&
                 chatRoom != null &&
                 chatRoom.getPeerHandle(0) != MEGACHAT_INVALID_HANDLE &&
-                chatRoom.getPeerHandle(0) == MegaApplication.userWaitingForCall
+                chatRoom.getPeerHandle(0) == userWaitingForCall
 
     /**
      * Method to display a dialogue informing the user that he/she cannot start or join a meeting while on a call in progress.

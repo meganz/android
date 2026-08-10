@@ -30,10 +30,11 @@ class ChatApiListenerCoordinator @Inject constructor(
     private val megaChatNotificationHandler: MegaChatNotificationHandler,
     private val globalChatListener: GlobalChatListener,
     private val monitorCallSoundsUseCase: MonitorCallSoundsUseCase,
+    private val logoutState: LogoutState,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
 ) {
-    private val meetingListener = MeetingListener()
+    private val meetingListener = MeetingListener(logoutState)
     private val soundsController = CallSoundsController(context)
     private var callSoundsJob: Job? = null
     private var registered = false

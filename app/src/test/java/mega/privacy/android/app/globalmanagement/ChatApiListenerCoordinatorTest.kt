@@ -33,6 +33,7 @@ class ChatApiListenerCoordinatorTest {
     private val megaChatNotificationHandler = mock<MegaChatNotificationHandler>()
     private val globalChatListener = mock<GlobalChatListener>()
     private val monitorCallSoundsUseCase = mock<MonitorCallSoundsUseCase>()
+    private val logoutState = LogoutState()
     private val context = mock<Context>()
 
     @BeforeEach
@@ -53,6 +54,7 @@ class ChatApiListenerCoordinatorTest {
         megaChatNotificationHandler = megaChatNotificationHandler,
         globalChatListener = globalChatListener,
         monitorCallSoundsUseCase = monitorCallSoundsUseCase,
+        logoutState = logoutState,
         applicationScope = applicationScope,
         context = context,
     )
