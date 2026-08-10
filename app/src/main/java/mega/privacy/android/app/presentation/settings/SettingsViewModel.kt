@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.presentation.settings.model.NavigationSettingsEntry
 import mega.privacy.android.app.presentation.settings.model.SettingsState
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenSummaryMapper
 import mega.privacy.android.domain.entity.MyAccountUpdate
@@ -40,10 +42,12 @@ import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCa
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.preference.MonitorNavigationItemsPreferenceUseCase
 import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorContactLinksOptionUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
@@ -54,8 +58,10 @@ import mega.privacy.android.domain.usecase.setting.SetShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
+import mega.privacy.android.navigation.contract.sortedByPreferredSlot
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -92,6 +98,8 @@ class SettingsViewModel @Inject constructor(
     private val monitorStartScreenPreferenceDestinationUseCase: MonitorStartScreenPreferenceDestinationUseCase,
     private val screenPreferenceDestinationMapper: ScreenPreferenceDestinationMapper,
     @DefaultStartScreen private val defaultStartScreen: MainNavItemNavKey,
+    private val getEnabledFlaggedItemsUseCase: GetEnabledFlaggedItemsUseCase,
+    private val monitorNavigationItemsPreferenceUseCase: MonitorNavigationItemsPreferenceUseCase,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -113,7 +121,7 @@ class SettingsViewModel @Inject constructor(
             cameraUploadsOn = false,
             chatEnabled = true,
             callsEnabled = true,
-            startScreenSummary = "",
+            navigationEntry = NavigationSettingsEntry.StartScreen(summary = ""),
             hideRecentActivityChecked = false,
             mediaDiscoveryViewState = MediaDiscoveryViewSettings.INITIAL.ordinal,
             passcodeLock = false,
@@ -159,7 +167,7 @@ class SettingsViewModel @Inject constructor(
                             )
                         }
                     },
-                monitorStartScreenSummary(),
+                monitorNavigationEntry(),
                 monitorHideRecentActivityUseCase()
                     .map { hide ->
                         { state: SettingsState -> state.copy(hideRecentActivityChecked = hide) }
@@ -214,6 +222,19 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    private fun monitorNavigationEntry(): Flow<(SettingsState) -> SettingsState> = flow {
+        val customisableNavigation = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation)
+        }.getOrDefault(false)
+        emitAll(
+            if (customisableNavigation) {
+                monitorCustomiseNavigationEntry()
+            } else {
+                monitorStartScreenSummary()
+            }
+        )
+    }
+
     private fun monitorStartScreenSummary(): Flow<(SettingsState) -> SettingsState> =
         monitorStartScreenPreferenceDestinationUseCase()
             .map { destinationPreference ->
@@ -222,8 +243,36 @@ class SettingsViewModel @Inject constructor(
             }.map { destination ->
                 startScreenSummaryMapper(mainDestinations.first { it.destination == destination })
             }.map { screenName ->
-                { state: SettingsState -> state.copy(startScreenSummary = screenName) }
+                { state: SettingsState ->
+                    state.copy(navigationEntry = NavigationSettingsEntry.StartScreen(screenName))
+                }
             }
+
+    private fun monitorCustomiseNavigationEntry(): Flow<(SettingsState) -> SettingsState> =
+        combine(
+            getEnabledFlaggedItemsUseCase(mainDestinations),
+            monitorNavigationItemsPreferenceUseCase(),
+        ) { enabledItems, preference ->
+            val orderableItems = enabledItems.filterNot { it.preferredSlot is PreferredSlot.Last }
+            val orderableIds = orderableItems.map { it.id }.toSet()
+            val defaultIds = orderableItems.sortedByPreferredSlot().map { it.id }
+            val visibleIds = preference?.orderedVisibleItemIds
+                ?.filter { it in orderableIds }
+                .orEmpty()
+            val customised = visibleIds.isNotEmpty() && visibleIds != defaultIds
+            { state: SettingsState ->
+                state.copy(
+                    navigationEntry = NavigationSettingsEntry.CustomiseNavigation(customised)
+                )
+            }
+        }.catch { error ->
+            Timber.e(error, "Failed to monitor the customise navigation entry state")
+            emit { state ->
+                state.copy(
+                    navigationEntry = NavigationSettingsEntry.CustomiseNavigation(customised = false)
+                )
+            }
+        }
 
     /**
      * Get link for Cookie policy page

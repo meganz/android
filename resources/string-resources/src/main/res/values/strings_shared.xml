@@ -3753,4 +3753,8 @@
     <string name="settings_customise_navigation_tooltip_body">Choose which items appear in your navigation</string>
     <!-- Action button label inside the onboarding tooltip pointing at the bottom navigation bar that opens the Customise navigation screen -->
     <string name="settings_customise_navigation_tooltip_action">Explore</string>
+    <!-- Settings: subtitle of the Customise navigation entry when the default navigation arrangement is used -->
+    <string name="settings_customise_navigation_state_default">Default</string>
+    <!-- Settings: subtitle of the Customise navigation entry when a custom navigation arrangement is saved -->
+    <string name="settings_customise_navigation_state_custom">Custom</string>
 </resources>

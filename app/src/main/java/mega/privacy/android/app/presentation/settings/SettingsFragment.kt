@@ -28,6 +28,7 @@ import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesA
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.SettingsConstants.KEY_2FA
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_APP_VERSION
@@ -39,6 +40,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CANCEL_ACCOUNT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHANGE_PASSWORD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_SETTINGS
+import mega.privacy.android.app.constants.SettingsConstants.KEY_CUSTOMISE_NAVIGATION
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CALLS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CAMERA_UPLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CHAT
@@ -67,6 +69,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.INTENT_EXTRA
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.presentation.settings.model.NavigationSettingsEntry
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.presentation.settings.passcode.PasscodeSettingsActivity
 import mega.privacy.android.app.presentation.settings.sortingviewmode.SortingAndViewModeSettingsActivity
@@ -79,6 +82,9 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.navigation.destination.CustomiseNavigationNavKey
+import mega.privacy.mobile.analytics.event.SettingsCustomiseNavigationMenuItemEvent
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import javax.inject.Inject
@@ -166,7 +172,29 @@ class SettingsFragment :
                         isEnabled = state.deleteEnabled
                     }
 
-                    findPreference<Preference>(KEY_START_SCREEN)?.summary = state.startScreenSummary
+                    when (val entry = state.navigationEntry) {
+                        is NavigationSettingsEntry.StartScreen -> {
+                            findPreference<Preference>(KEY_CUSTOMISE_NAVIGATION)?.isVisible = false
+                            findPreference<Preference>(KEY_START_SCREEN)?.apply {
+                                isVisible = true
+                                summary = entry.summary
+                            }
+                        }
+
+                        is NavigationSettingsEntry.CustomiseNavigation -> {
+                            findPreference<Preference>(KEY_START_SCREEN)?.isVisible = false
+                            findPreference<Preference>(KEY_CUSTOMISE_NAVIGATION)?.apply {
+                                isVisible = true
+                                setSummary(
+                                    if (entry.customised) {
+                                        sharedResR.string.settings_customise_navigation_state_custom
+                                    } else {
+                                        sharedResR.string.settings_customise_navigation_state_default
+                                    }
+                                )
+                            }
+                        }
+                    }
 
                     findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.takeIf { it.isChecked != state.hideRecentActivityChecked }
                         ?.let { it.isChecked = state.hideRecentActivityChecked }
@@ -446,6 +474,16 @@ class SettingsFragment :
                     StartScreenPreferencesActivity::class.java
                 )
             )
+
+            KEY_CUSTOMISE_NAVIGATION -> {
+                Analytics.tracker.trackEvent(SettingsCustomiseNavigationMenuItemEvent)
+                startActivity(
+                    MegaActivity.getIntentWithExtraDestinations(
+                        requireContext(),
+                        listOf(CustomiseNavigationNavKey),
+                    )
+                )
+            }
 
             KEY_HIDE_RECENT_ACTIVITY -> {
                 val checked =

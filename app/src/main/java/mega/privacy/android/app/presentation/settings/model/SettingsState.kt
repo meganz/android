@@ -18,7 +18,8 @@ import mega.privacy.android.domain.entity.account.AccountDetail
  * @property cameraUploadsOn
  * @property chatEnabled
  * @property callsEnabled
- * @property startScreenSummary
+ * @property navigationEntry entry shown in the User interface section for the main navigation
+ * preference
  * @property hideRecentActivityChecked
  * @property mediaDiscoveryViewState
  * @property passcodeLock
@@ -40,7 +41,7 @@ data class SettingsState(
     val cameraUploadsOn: Boolean,
     val chatEnabled: Boolean,
     val callsEnabled: Boolean,
-    val startScreenSummary: String,
+    val navigationEntry: NavigationSettingsEntry,
     val hideRecentActivityChecked: Boolean,
     val mediaDiscoveryViewState: Int,
     val passcodeLock: Boolean,

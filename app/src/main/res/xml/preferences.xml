@@ -93,6 +93,14 @@
 		app:allowDividerBelow="false">
 
 		<Preference
+			android:key="settings_customise_navigation"
+			android:title="@string/settings_customise_navigation_title"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false"
+			app:isPreferenceVisible="false" />
+
+		<Preference
 			android:defaultValue="default"
 			android:key="settings_start_screen"
 			android:title="@string/start_screen_setting"

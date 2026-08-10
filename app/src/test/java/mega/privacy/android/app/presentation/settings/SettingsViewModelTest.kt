@@ -20,11 +20,14 @@ import mega.privacy.android.app.TEST_USER_ACCOUNT
 import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
+import mega.privacy.android.app.presentation.settings.model.NavigationSettingsEntry
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenSummaryMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.MyAccountUpdate
+import mega.privacy.android.domain.entity.preference.NavigationItemsPreference
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -38,10 +41,12 @@ import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCa
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.preference.MonitorNavigationItemsPreferenceUseCase
 import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorContactLinksOptionUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
@@ -51,6 +56,7 @@ import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -111,6 +117,11 @@ class SettingsViewModelTest {
 
     private val defaultStartScreen = mock<MainNavItemNavKey>()
 
+    private val getEnabledFlaggedItemsUseCase = mock<GetEnabledFlaggedItemsUseCase>()
+
+    private val monitorNavigationItemsPreferenceUseCase =
+        mock<MonitorNavigationItemsPreferenceUseCase>()
+
     @BeforeEach
     fun setUp() {
         monitorContactLinksOptionUseCase.stub {
@@ -162,6 +173,10 @@ class SettingsViewModelTest {
 
         monitorAccountDetailUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
         monitorStartScreenPreferenceDestinationUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
+        getEnabledFlaggedItemsUseCase.stub {
+            on { invoke(any<Set<MainNavItem>>()) }.thenReturn(emptyFlow())
+        }
+        monitorNavigationItemsPreferenceUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
         whenever(monitorMyAccountUpdateUseCase()).thenReturn(emptyFlow())
 
         whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(emptyFlow())
@@ -203,7 +218,9 @@ class SettingsViewModelTest {
             mainDestinations = mainNavItems,
             monitorStartScreenPreferenceDestinationUseCase = monitorStartScreenPreferenceDestinationUseCase,
             screenPreferenceDestinationMapper = screenPreferenceDestinationMapper,
-            defaultStartScreen = defaultStartScreen
+            defaultStartScreen = defaultStartScreen,
+            getEnabledFlaggedItemsUseCase = getEnabledFlaggedItemsUseCase,
+            monitorNavigationItemsPreferenceUseCase = monitorNavigationItemsPreferenceUseCase,
         )
     }
 
@@ -234,6 +251,8 @@ class SettingsViewModelTest {
             getBusinessStatusUseCase,
             monitorMyAccountUpdateUseCase,
             requestAccountDeletion,
+            getEnabledFlaggedItemsUseCase,
+            monitorNavigationItemsPreferenceUseCase,
         )
     }
 
@@ -644,13 +663,13 @@ class SettingsViewModelTest {
             initViewModel(mainNavItems)
 
             underTest.uiState
-//                .test { cancelAndConsumeRemainingEvents().forEach { println(it) } }
-                .map { it.startScreenSummary }
+                .map { it.navigationEntry }
                 .distinctUntilChanged()
                 .test {
-                    assertThat(awaitItem()).isEmpty()
+                    assertThat(awaitItem()).isEqualTo(NavigationSettingsEntry.StartScreen(""))
                     advanceUntilIdle()
-                    assertThat(awaitItem()).isEqualTo(expected)
+                    assertThat(awaitItem())
+                        .isEqualTo(NavigationSettingsEntry.StartScreen(expected))
                 }
         }
 
@@ -689,13 +708,133 @@ class SettingsViewModelTest {
 
         initViewModel(mainNavItems)
 
-        underTest.uiState.map { it.startScreenSummary }
+        underTest.uiState.map { it.navigationEntry }
             .distinctUntilChanged()
             .test {
-                assertThat(awaitItem()).isEmpty()
+                assertThat(awaitItem()).isEqualTo(NavigationSettingsEntry.StartScreen(""))
                 advanceUntilIdle()
-                assertThat(awaitItem()).isEqualTo(expected)
+                assertThat(awaitItem()).isEqualTo(NavigationSettingsEntry.StartScreen(expected))
             }
+    }
+
+    @Test
+    fun `test that navigation entry is CustomiseNavigation when customisable navigation flag is enabled`() =
+        runTest {
+            stubCustomisableNavigation(preference = null)
+
+            initViewModel(customisableNavItems)
+
+            underTest.uiState
+                .map { it.navigationEntry }
+                .distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(NavigationSettingsEntry.StartScreen(""))
+                    advanceUntilIdle()
+                    assertThat(awaitItem())
+                        .isEqualTo(NavigationSettingsEntry.CustomiseNavigation(customised = false))
+                }
+        }
+
+    @Test
+    fun `test that customise navigation entry is not customised when no preference is saved`() =
+        runTest {
+            stubCustomisableNavigation(preference = null)
+
+            initViewModel(customisableNavItems)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().navigationEntry)
+                    .isEqualTo(NavigationSettingsEntry.CustomiseNavigation(customised = false))
+            }
+        }
+
+    @Test
+    fun `test that customise navigation entry is not customised when the saved arrangement equals the default`() =
+        runTest {
+            stubCustomisableNavigation(
+                preference = NavigationItemsPreference(listOf("home", "drive"))
+            )
+
+            initViewModel(customisableNavItems)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().navigationEntry)
+                    .isEqualTo(NavigationSettingsEntry.CustomiseNavigation(customised = false))
+            }
+        }
+
+    @Test
+    fun `test that customise navigation entry is customised when the saved arrangement differs from the default`() =
+        runTest {
+            stubCustomisableNavigation(
+                preference = NavigationItemsPreference(listOf("drive", "home"))
+            )
+
+            initViewModel(customisableNavItems)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().navigationEntry)
+                    .isEqualTo(NavigationSettingsEntry.CustomiseNavigation(customised = true))
+            }
+        }
+
+    @Test
+    fun `test that customise navigation entry is not customised when no saved item matches an enabled one`() =
+        runTest {
+            stubCustomisableNavigation(
+                preference = NavigationItemsPreference(listOf("unknown"))
+            )
+
+            initViewModel(customisableNavItems)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().navigationEntry)
+                    .isEqualTo(NavigationSettingsEntry.CustomiseNavigation(customised = false))
+            }
+        }
+
+    @Test
+    fun `test that customise navigation entry falls back to not customised when monitoring fails`() =
+        runTest {
+            stubCustomisableNavigation(preference = null)
+            monitorNavigationItemsPreferenceUseCase.stub {
+                on { invoke() }.thenReturn(flow { throw RuntimeException("Preference read failed") })
+            }
+
+            initViewModel(customisableNavItems)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().navigationEntry)
+                    .isEqualTo(NavigationSettingsEntry.CustomiseNavigation(customised = false))
+            }
+        }
+
+    private val customisableNavItems = setOf(
+        navItem(itemId = "home", slot = PreferredSlot.Ordered(1)),
+        navItem(itemId = "drive", slot = PreferredSlot.Ordered(2)),
+        navItem(itemId = "menu", slot = PreferredSlot.Last),
+    )
+
+    private fun stubCustomisableNavigation(preference: NavigationItemsPreference?) {
+        getFeatureFlagValueUseCase.stub {
+            on { invoke(ApiFeatures.CustomisableBottomNavigation) }.thenReturn(true)
+        }
+        getEnabledFlaggedItemsUseCase.stub {
+            on { invoke(customisableNavItems) }.thenReturn(flowOf(customisableNavItems))
+        }
+        monitorNavigationItemsPreferenceUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(preference))
+        }
+    }
+
+    private fun navItem(itemId: String, slot: PreferredSlot) = mock<MainNavItem> {
+        on { id } doReturn itemId
+        on { preferredSlot } doReturn slot
     }
 
     companion object {
