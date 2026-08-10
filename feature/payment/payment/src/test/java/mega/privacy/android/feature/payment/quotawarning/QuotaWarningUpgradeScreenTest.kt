@@ -2,6 +2,7 @@ package mega.privacy.android.feature.payment.quotawarning
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -15,9 +16,9 @@ import mega.privacy.android.feature.payment.presentation.quotawarning.QuotaWarni
 import mega.privacy.android.feature.payment.presentation.quotawarning.QuotaWarningUpgradeState
 import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_CONTACT_SUPPORT
 import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_ERROR
-import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_LEARN_MORE
 import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_RETRY
 import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_SKELETON
+import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_SUBTITLE
 import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_TITLE
 import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_VIEW_ALL_PLANS
 import mega.privacy.android.navigation.payment.QuotaWarningTrigger
@@ -80,7 +81,7 @@ class QuotaWarningUpgradeScreenTest {
     }
 
     @Test
-    fun `test that transfer scenario shows a learn more link`() {
+    fun `test that transfer scenario appends the learn more link to the subtitle`() {
         setScreen(
             type = QuotaWarningType.Transfer,
             trigger = QuotaWarningTrigger.Download,
@@ -91,7 +92,12 @@ class QuotaWarningUpgradeScreenTest {
             ),
         )
 
-        composeRule.onNodeWithTag(TEST_TAG_QUOTA_WARNING_LEARN_MORE).assertExists()
+        val subtitle = composeRule.activity.getString(
+            sharedR.string.subscription_quota_transfer_low_download_subtitle
+        )
+        val learnMore = composeRule.activity.getString(sharedR.string.general_learn_more)
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_WARNING_SUBTITLE)
+            .assertTextEquals("$subtitle $learnMore")
     }
 
     @Test

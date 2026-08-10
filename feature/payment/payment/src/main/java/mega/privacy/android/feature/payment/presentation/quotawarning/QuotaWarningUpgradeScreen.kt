@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.payment.presentation.quotawarning
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,7 +47,6 @@ import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
-import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
@@ -333,19 +331,34 @@ private fun QuotaWarningDataContent(
                     .fillMaxWidth()
                     .testTag(TEST_TAG_QUOTA_WARNING_TITLE),
             )
-            if (subtitleHasLink) {
+            val subtitleText = if (showLearnMore) {
+                "$subtitle [B]${stringResource(sharedR.string.general_learn_more)}[/B]"
+            } else {
+                subtitle
+            }
+            if (subtitleHasLink || showLearnMore) {
+                val linkStyle = MegaSpanStyle.TextColorStyle(
+                    spanStyle = SpanStyle(textDecoration = TextDecoration.Underline),
+                    textColor = TextColor.Primary,
+                )
                 LinkSpannedText(
-                    value = subtitle,
+                    value = subtitleText,
                     spanStyles = mapOf(
                         SpanIndicator('A') to SpanStyleWithAnnotation(
-                            megaSpanStyle = MegaSpanStyle.LinkColorStyle(
-                                spanStyle = SpanStyle(),
-                                linkColor = LinkColor.Primary,
-                            ),
+                            megaSpanStyle = linkStyle,
                             annotation = MANAGE_PLAN_LINK_ANNOTATION,
                         ),
+                        SpanIndicator('B') to SpanStyleWithAnnotation(
+                            megaSpanStyle = linkStyle,
+                            annotation = LEARN_MORE_LINK_ANNOTATION,
+                        ),
                     ),
-                    onAnnotationClick = { onManagePlanClick() },
+                    onAnnotationClick = { annotation ->
+                        when (annotation) {
+                            MANAGE_PLAN_LINK_ANNOTATION -> onManagePlanClick()
+                            LEARN_MORE_LINK_ANNOTATION -> onLearnMoreClick()
+                        }
+                    },
                     baseTextColor = TextColor.Primary,
                     baseStyle = MaterialTheme.typography.bodyLarge.copy(
                         textAlign = TextAlign.Center,
@@ -363,19 +376,6 @@ private fun QuotaWarningDataContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag(TEST_TAG_QUOTA_WARNING_SUBTITLE),
-                )
-            }
-            if (showLearnMore) {
-                MegaText(
-                    text = stringResource(sharedR.string.general_learn_more),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        textAlign = TextAlign.Center,
-                        textDecoration = TextDecoration.Underline,
-                    ),
-                    textColor = TextColor.Primary,
-                    modifier = Modifier
-                        .clickable(onClick = onLearnMoreClick)
-                        .testTag(TEST_TAG_QUOTA_WARNING_LEARN_MORE),
                 )
             }
             QuotaCurrentPlanCard(
@@ -663,6 +663,8 @@ private const val CONTENT_MAX_WIDTH = 500
 
 private const val MANAGE_PLAN_LINK_ANNOTATION = "mega.io"
 
+private const val LEARN_MORE_LINK_ANNOTATION = "learn_more"
+
 /**
  * Test tag for the quota-warning screen close button
  */
@@ -682,11 +684,6 @@ const val TEST_TAG_QUOTA_WARNING_TITLE = "quota_warning:title"
  * Test tag for the quota-warning screen subtitle
  */
 const val TEST_TAG_QUOTA_WARNING_SUBTITLE = "quota_warning:subtitle"
-
-/**
- * Test tag for the quota-warning screen "Learn more" link
- */
-const val TEST_TAG_QUOTA_WARNING_LEARN_MORE = "quota_warning:learn_more"
 
 /**
  * Test tag for the quota-warning screen upgrade button
