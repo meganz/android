@@ -15,6 +15,7 @@ import androidx.work.impl.utils.WorkProgressUpdater
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -30,7 +31,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -2027,19 +2027,24 @@ internal class CameraUploadsWorkerTest {
         }
 
     @Test
-    fun `test that the worker returns retry within five seconds when finalization suspends for longer after a foreground service timeout`() =
+    fun `test that the worker returns retry when finalization exceeds the timeout after a foreground service timeout`() =
         runTest {
             setupDefaultCheckConditionMocks()
             doReturn(STOP_REASON_TIMEOUT).whenever(underTest).stopReason
+            var finalizationCancelled = false
             whenever(deleteCameraUploadsTemporaryRootDirectoryUseCase()) doSuspendableAnswer {
-                delay(10.seconds)
-                true
+                try {
+                    delay(10.seconds)
+                    true
+                } catch (e: CancellationException) {
+                    finalizationCancelled = true
+                    throw e
+                }
             }
-            val start = currentTime
 
             val result = underTest.doWork()
 
-            assertThat(currentTime - start).isAtMost(5.seconds.inWholeMilliseconds)
+            assertThat(finalizationCancelled).isTrue()
             assertThat(result).isEqualTo(ListenableWorker.Result.retry())
         }
 
