@@ -17,7 +17,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
@@ -209,7 +212,7 @@ class VideoPlayerActivity : AppCompatActivity(), MegaSnackbarShower {
             LegacyActivityScaffold(
                 container = { content ->
                     MegaAppContainer(
-                        themeMode = mode,
+                        themeMode = mode.ignoringForcedNightMode(),
                         isSessionRequired = isSessionRequired,
                         finishOnSessionRefresh = false,
                         content = content,
@@ -422,5 +425,22 @@ class VideoPlayerActivity : AppCompatActivity(), MegaSnackbarShower {
         private const val INTENT_KEY_STATE = "state"
         private const val STATE_HEADSET_UNPLUGGED = 0
     }
+}
+
+/**
+ * [VideoPlayerActivity.attachBaseContext] forces night mode so the player is always dark, which
+ * also makes `isSystemInDarkTheme()` report dark for everything composed in this activity.
+ * Resolve [ThemeMode.System] against the application configuration instead, so the screens opened
+ * on top of the player, such as the quota-warning upsell, follow the app theme.
+ */
+@Composable
+private fun ThemeMode.ignoringForcedNightMode(): ThemeMode {
+    if (this != ThemeMode.System) return this
+    val context = LocalContext.current
+    val isDark = remember(context) {
+        (context.applicationContext.resources.configuration.uiMode
+                and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+    }
+    return if (isDark) ThemeMode.Dark else ThemeMode.Light
 }
 

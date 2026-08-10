@@ -17,6 +17,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.Serializable
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
 import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerScreen
@@ -118,18 +119,20 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
             )
         }
 
-        VideoPlayerScreen(
-            viewModel = viewModel,
-            player = player,
-            playQueueButtonClicked = {
-                navigate(VideoPlayerQueueScreenNavKey)
-            },
-            onMoreActionsClicked = onMoreActionsClicked,
-            onRetry = onRetry,
-            onFinish = onFinish,
-            onEnterPip = onEnterPip,
-            navigateToTransfers = { navigationHandler.navigate(TransfersNavKey()) },
-        )
+        AndroidTheme(isDark = true) {
+            VideoPlayerScreen(
+                viewModel = viewModel,
+                player = player,
+                playQueueButtonClicked = {
+                    navigate(VideoPlayerQueueScreenNavKey)
+                },
+                onMoreActionsClicked = onMoreActionsClicked,
+                onRetry = onRetry,
+                onFinish = onFinish,
+                onEnterPip = onEnterPip,
+                navigateToTransfers = { navigationHandler.navigate(TransfersNavKey()) },
+            )
+        }
     }
 }
 
