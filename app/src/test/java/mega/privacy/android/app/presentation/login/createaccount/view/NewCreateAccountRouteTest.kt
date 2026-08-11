@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.login.createaccount.view
 
+import android.content.Context
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasImeAction
@@ -10,8 +12,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.text.input.ImeAction
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountStatus
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountUIState
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.CONFIRM_PASSWORD
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.CREATE_ACCOUNT_BUTTON
@@ -25,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 
 @RunWith(AndroidJUnit4::class)
 class NewCreateAccountRouteTest {
@@ -48,11 +55,12 @@ class NewCreateAccountRouteTest {
         onNetworkWarningShown: () -> Unit = {},
         onCreateAccountSuccess: (EphemeralCredentials) -> Unit = {},
         onBackIconPressed: () -> Unit = {},
+        snackBarHostState: SnackbarHostState = mock(),
     ) {
         composeRule.setContent {
             NewCreateAccountScreen(
                 uiState = state,
-                snackBarHostState = mock(),
+                snackBarHostState = snackBarHostState,
                 onFirstNameInputChanged = onFirstNameInputChanged,
                 onLastNameInputChanged = onLastNameInputChanged,
                 onEmailInputChanged = onEmailInputChanged,
@@ -259,5 +267,21 @@ class NewCreateAccountRouteTest {
             lastNameField.performTextInput(validLastName)
             verify(lastNameChanged).invoke(validLastName)
         }
+    }
+
+    @Test
+    fun `test that generic error is shown when create account status is UnknownError`() {
+        val snackBarHostState = mock<SnackbarHostState>()
+
+        setupRule(
+            state = CreateAccountUIState(
+                createAccountStatusEvent = triggered(CreateAccountStatus.UnknownError)
+            ),
+            snackBarHostState = snackBarHostState
+        )
+
+        val expectedMessage = ApplicationProvider.getApplicationContext<Context>()
+            .getString(R.string.general_something_went_wrong_error)
+        verifyBlocking(snackBarHostState) { showSnackbar(expectedMessage) }
     }
 }

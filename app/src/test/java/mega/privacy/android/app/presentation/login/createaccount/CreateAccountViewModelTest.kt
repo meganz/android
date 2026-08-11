@@ -618,6 +618,39 @@ class CreateAccountViewModelTest {
             }
         }
 
+    @Test
+    fun `test that create account error event is triggered when account creation throws an unexpected error`() =
+        runTest {
+            whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.GOOD)
+            whenever(
+                createAccountUseCase(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            ).thenAnswer { throw IllegalStateException("Unexpected failure") }
+            whenever(isEmailValidUseCase(any())).thenReturn(true)
+            connectivityFlow.emit(true)
+
+            initInputFields()
+
+            underTest.createAccount()
+
+            verify(createAccountUseCase).invoke(any(), any(), any(), any())
+            underTest.uiState.test {
+                val item = awaitItem()
+                assertThat(item.createAccountStatusEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+                if (item.createAccountStatusEvent is StateEventWithContentTriggered) {
+                    assertThat((item.createAccountStatusEvent as StateEventWithContentTriggered<CreateAccountStatus>).content)
+                        .isInstanceOf(CreateAccountStatus.UnknownError::class.java)
+                }
+                assertThat(item.isLoading).isFalse()
+            }
+        }
+
 
     @Test
     fun `test that credentials are saved when onCreateAccountSuccess is called`() =

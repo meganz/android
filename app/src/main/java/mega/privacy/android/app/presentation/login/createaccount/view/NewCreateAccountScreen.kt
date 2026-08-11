@@ -242,6 +242,7 @@ internal fun NewCreateAccountScreen(
         }
     }
 
+    val unknownErrorMessage = stringResource(R.string.general_something_went_wrong_error)
     EventEffect(
         event = uiState.createAccountStatusEvent,
         onConsumed = onResetCreateAccountStatusEvent
@@ -257,7 +258,7 @@ internal fun NewCreateAccountScreen(
 
             is CreateAccountStatus.UnknownError -> {
                 snackBarHostState.showSnackbar(
-                    message = createAccountStatus.message
+                    message = unknownErrorMessage
                 )
             }
         }

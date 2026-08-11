@@ -278,15 +278,12 @@ class CreateAccountViewModel @Inject constructor(
         }
         if (!areAllInputsValid || !areTermsAgreed) return@launch
 
-        // Check if connected to network
         if (_uiState.value.isConnected.not()) {
             _uiState.update { it.copy(showNoNetworkWarning = true) }
             return@launch
         }
-        // Show Create Account in progress
         _uiState.update { it.copy(isLoading = true) }
 
-        // Create account
         runCatching {
             createAccountUseCase(
                 getInputValue(KEY_EMAIL),
@@ -305,13 +302,16 @@ class CreateAccountViewModel @Inject constructor(
                     )
                 }
 
-                is CreateAccountException.Unknown -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        createAccountStatusEvent = triggered(
-                            CreateAccountStatus.UnknownError(e.message ?: "Unknown error")
+                else -> {
+                    Timber.e(e, "Create account failed")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            createAccountStatusEvent = triggered(
+                                CreateAccountStatus.UnknownError
+                            )
                         )
-                    )
+                    }
                 }
             }
         }.onSuccess { credentials ->
