@@ -21,7 +21,6 @@ import mega.privacy.android.feature.sync.navigation.syncNavGraph
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.SyncState
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
-import mega.privacy.android.feature.sync.ui.settings.SettingsSyncViewModel
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
@@ -101,8 +100,6 @@ internal fun AndroidSyncFeatureNavigation(
         hiltViewModel(viewModelStoreOwner = viewModelStoreOwner)
     val syncIssueNotificationViewModel: SyncIssueNotificationViewModel =
         hiltViewModel(viewModelStoreOwner = viewModelStoreOwner)
-    val settingsSyncViewModel: SettingsSyncViewModel =
-        hiltViewModel(viewModelStoreOwner = viewModelStoreOwner)
 
     NavHost(
         navController = animatedNavController,
@@ -127,7 +124,6 @@ internal fun AndroidSyncFeatureNavigation(
             syncStalledIssuesViewModel = syncStalledIssuesViewModel,
             syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
             syncIssueNotificationViewModel = syncIssueNotificationViewModel,
-            settingsSyncViewModel = settingsSyncViewModel,
             megaDomainName = megaDomainName,
         )
     }

@@ -46,7 +46,6 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriv
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.getSelectedItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
-import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -58,6 +57,7 @@ import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNa
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
+import mega.privacy.android.navigation.destination.SyncSettingsNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
@@ -134,7 +134,6 @@ internal fun DriveSyncScreen(
     val megaNavigator = viewModel.megaNavigator
     var showUploadOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(initialTabIndex) }
-    var showSyncSettings by rememberSaveable { mutableStateOf(false) }
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
         navigationHandler = navigationHandler,
@@ -205,8 +204,8 @@ internal fun DriveSyncScreen(
                                     )
 
                                     selectedTabIndex == 1 -> add(
-                                        MenuActionWithClick(CommonMenuAction.More) {
-                                            showSyncSettings = true
+                                        MenuActionWithClick(CommonMenuAction.Settings) {
+                                            navigationHandler.navigate(SyncSettingsNavKey)
                                         }
                                     )
                                 }
@@ -358,9 +357,6 @@ internal fun DriveSyncScreen(
         )
     }
 
-    SyncSettingsBottomSheetViewM3(shouldShowBottomSheet = showSyncSettings) {
-        showSyncSettings = false
-    }
 }
 
 internal const val DRIVE_SYNCS_FAB_TAG = "drive_syncs_screen:add_content_fab"

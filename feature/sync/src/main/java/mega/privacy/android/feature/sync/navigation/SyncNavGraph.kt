@@ -5,7 +5,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
-import mega.privacy.android.feature.sync.ui.settings.SettingsSyncViewModel
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
@@ -44,7 +43,6 @@ internal fun NavGraphBuilder.syncNavGraph(
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
     syncIssueNotificationViewModel: SyncIssueNotificationViewModel,
-    settingsSyncViewModel: SettingsSyncViewModel,
 ) {
 
     syncEmptyDestination(onNavigateToNewFolder = { navController.navigate(SyncNewFolder()) })
@@ -92,7 +90,6 @@ internal fun NavGraphBuilder.syncNavGraph(
         syncStalledIssuesViewModel = syncStalledIssuesViewModel,
         syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
         syncIssueNotificationViewModel = syncIssueNotificationViewModel,
-        settingsSyncViewModel = settingsSyncViewModel,
         megaDomainName = megaDomainName,
     )
 }

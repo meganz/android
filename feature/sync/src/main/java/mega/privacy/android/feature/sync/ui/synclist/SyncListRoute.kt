@@ -1,29 +1,23 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
-import mega.privacy.android.feature.sync.ui.settings.SettingsSyncAction
-import mega.privacy.android.feature.sync.ui.settings.SettingsSyncViewModel
-import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetContent
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
@@ -61,6 +55,7 @@ fun SyncListRoute(
     onCameraUploadsSettingsClicked: () -> Unit,
     onOpenMegaFolderClicked: (Long) -> Unit,
     isInCloudDrive: Boolean = false,
+    onSyncSettingsClicked: (() -> Unit)? = null,
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
 ) {
@@ -78,7 +73,7 @@ fun SyncListRoute(
         syncStalledIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
         syncSolvedIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
         syncIssueNotificationViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
-        settingsSyncViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
+        onSyncSettingsClicked = onSyncSettingsClicked,
         isInCloudDrive = isInCloudDrive,
         viewModel = hiltViewModel(),
         selectedChip = selectedChip,
@@ -97,23 +92,20 @@ internal fun SyncListRoute(
     onCameraUploadsSettingsClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: (String?) -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
+    onSyncSettingsClicked: (() -> Unit)? = null,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
     syncIssueNotificationViewModel: SyncIssueNotificationViewModel,
-    settingsSyncViewModel: SettingsSyncViewModel,
     isInCloudDrive: Boolean = false,
     viewModel: SyncListViewModel = hiltViewModel(),
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val syncSettingsState by settingsSyncViewModel.uiState.collectAsStateWithLifecycle()
     val stalledIssueState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
-    val modalSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    val coroutineScope = rememberCoroutineScope()
 
     SyncListScreen(
         isInCloudDrive = isInCloudDrive,
@@ -166,14 +158,10 @@ internal fun SyncListRoute(
         },
         snackBarHostState = snackBarHostState,
         syncPermissionsManager = syncPermissionsManager,
-        actions = listOf(SyncListMenuAction.MoreActionMenu),
+        actions = listOfNotNull(onSyncSettingsClicked?.let { CommonMenuAction.Settings }),
         onActionPressed = {
             when (it) {
-                is SyncListMenuAction.MoreActionMenu -> {
-                    coroutineScope.launch {
-                        modalSheetState.show()
-                    }
-                }
+                is CommonMenuAction.Settings -> onSyncSettingsClicked?.invoke()
             }
         },
         onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
@@ -201,25 +189,4 @@ internal fun SyncListRoute(
         }
     }
 
-    LaunchedEffect(key1 = syncSettingsState.snackbarMessage) {
-        syncSettingsState.snackbarMessage?.let { message ->
-            try {
-                snackBarHostState.showAutoDurationSnackbar(
-                    message.joinToString(separator = " ") { resources.getString(it) }
-                )
-            } finally {
-                settingsSyncViewModel.handleAction(SettingsSyncAction.SnackbarShown)
-            }
-        }
-    }
-
-    SyncSettingsBottomSheetContent(
-        viewModel = settingsSyncViewModel,
-        modalSheetState = modalSheetState,
-        shouldShowBottomSheet = isInCloudDrive.not()
-    ) {
-        coroutineScope.launch {
-            modalSheetState.hide()
-        }
-    }
 }

@@ -66,6 +66,17 @@ sealed interface CommonMenuAction : MenuActionWithIcon {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.SearchSmall)
     }
 
+    data object Settings : CommonMenuAction {
+        override val testTag: String = "app_bar:settings"
+
+        @Composable
+        override fun getDescription() = stringResource(R.string.general_settings)
+
+        @Composable
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.GearSix)
+    }
+
     data object Clear : CommonMenuAction {
         override val testTag: String = "node_selection_action:clear"
 

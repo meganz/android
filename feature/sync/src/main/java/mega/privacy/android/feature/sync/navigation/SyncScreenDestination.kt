@@ -90,6 +90,9 @@ fun EntryProviderScope<NavKey>.syncScreens(
                 onCameraUploadsSettingsClicked = {
                     navigationHandler.navigate(SettingsCameraUploadsNavKey)
                 },
+                onSyncSettingsClicked = {
+                    navigationHandler.navigate(SyncSettingsNavKey)
+                },
             )
         }
     }
