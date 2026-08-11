@@ -45,7 +45,7 @@ class UpdateNodeNameCollisionsResultUseCase @Inject constructor(
                             getNodeNameCollisionRenameNameUseCase(collision.nameCollision)
                         if (renameNamesSet.contains(newRenameName)) {
                             newRenameName = generateSequence(newRenameName) {
-                                it.getPossibleRenameName()
+                                it.getPossibleRenameName(nameCollision.isFile)
                             }.first { !renameNamesSet.contains(it) }
                         }
                         if (applyOnNext) {

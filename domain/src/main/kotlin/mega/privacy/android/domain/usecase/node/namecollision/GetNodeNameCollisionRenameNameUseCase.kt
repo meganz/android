@@ -29,7 +29,7 @@ class GetNodeNameCollisionRenameNameUseCase @Inject constructor(
             else -> getNodeByHandleUseCase(nameCollision.parentHandle)
         } ?: throw NodeDoesNotExistsException()
         return generateSequence(nameCollision.name) {
-            it.getPossibleRenameName()
+            it.getPossibleRenameName(nameCollision.isFile)
         }.first { newName ->
             getChildNodeUseCase(parentNode.id, newName) == null
         }
@@ -39,10 +39,12 @@ class GetNodeNameCollisionRenameNameUseCase @Inject constructor(
 /**
  * Gets a possible name for rename a collision item in case the user wants to rename it.
  *
+ * @param isFile True if the item is a file, so the extension is preserved when adding the suffix.
+ * False if it is a folder, so the suffix is appended to the whole name.
  * @return The rename name.
  */
-internal fun String.getPossibleRenameName(): String {
-    var extension = substringAfterLast('.', "")
+internal fun String.getPossibleRenameName(isFile: Boolean): String {
+    var extension = if (isFile) substringAfterLast('.', "") else ""
     val pointIndex = if (extension.isEmpty())
         length
     else

@@ -117,43 +117,42 @@ class GetNodeNameCollisionRenameNameUseCaseTest {
         "noextension, noextension (1)",
         "folder, folder (1)",
     )
-    fun `test possible rename name is generated correctly`(fileName: String, newName: String) =
-        runTest {
-            val parentNodeId = NodeId(789L)
-            val nodeNameCollision = NodeNameCollision.Default(
-                collisionHandle = 123L,
-                nodeHandle = 456L,
-                name = fileName,
-                size = 789L,
-                childFolderCount = 0,
-                childFileCount = 0,
-                lastModified = 123456L,
-                parentHandle = parentNodeId.longValue,
-                isFile = true,
-                type = NodeNameCollisionType.COPY
-            )
-            val folderNode = mock<FolderNode> {
-                on { id } doReturn parentNodeId
-            }
-            whenever(getNodeByHandleUseCase(parentNodeId.longValue)).thenReturn(
-                folderNode
-            )
-            whenever(
-                getChildNodeUseCase(
-                    parentNodeId,
-                    fileName
-                )
-            ) doReturn mock<FileNode>()
-            whenever(
-                getChildNodeUseCase(
-                    parentNodeId,
-                    newName
-                )
-            ) doReturn null
+    fun `test that invoke returns expected rename name when collision is a file`(
+        fileName: String,
+        expectedName: String,
+    ) = runTest {
+        val result = getRenameNameForCollision(fileName, isFile = true)
 
-            val result = underTest(nameCollision = nodeNameCollision)
+        assertThat(result).isEqualTo(expectedName)
+    }
 
-            assertThat(result).isEqualTo(newName)
+    @ParameterizedTest
+    @CsvSource(
+        "23.18GB, 23.18GB (1)",
+        "folder.name (1), folder.name (2)",
+        "folder, folder (1)",
+    )
+    fun `test that invoke appends suffix to full name when collision is a folder`(
+        folderName: String,
+        expectedName: String,
+    ) = runTest {
+        val result = getRenameNameForCollision(folderName, isFile = false)
+
+        assertThat(result).isEqualTo(expectedName)
+    }
+
+    private suspend fun getRenameNameForCollision(
+        name: String,
+        isFile: Boolean,
+    ): String {
+        val parentNodeId = NodeId(defaultNodeNameCollision.parentHandle)
+        val nodeNameCollision = defaultNodeNameCollision.copy(name = name, isFile = isFile)
+        val folderNode = mock<FolderNode> {
+            on { id } doReturn parentNodeId
         }
+        whenever(getNodeByHandleUseCase(parentNodeId.longValue)).thenReturn(folderNode)
+        whenever(getChildNodeUseCase(parentNodeId, name)) doReturn mock<FileNode>()
 
+        return underTest(nameCollision = nodeNameCollision)
+    }
 }
