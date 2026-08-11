@@ -1,5 +1,7 @@
 package mega.privacy.android.app.providers.documentprovider
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.provider.DocumentsContract.Document
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -196,6 +198,23 @@ class CloudDriveDocumentDataProviderTest {
     fun tearDown() {
         Dispatchers.resetMain()
     }
+
+    @Test
+    fun `test that monitorConnectivity registers a single network callback when invoked twice`() =
+        runTest {
+            val connectivityManager = mock<ConnectivityManager>()
+            val context = mock<Context> {
+                on { getSystemService(ConnectivityManager::class.java) } doReturn connectivityManager
+                on { getSystemServiceName(ConnectivityManager::class.java) } doReturn Context.CONNECTIVITY_SERVICE
+                on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
+            }
+
+            underTest.monitorConnectivity(context)
+            underTest.monitorConnectivity(context)
+            advanceUntilIdle()
+
+            verify(connectivityManager).registerDefaultNetworkCallback(any())
+        }
 
     // region sessionState
 

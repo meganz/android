@@ -13,6 +13,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
@@ -125,9 +126,13 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         connectivityState.value = connected
     }
 
-    /** Call once from the content provider's [android.content.ContentProvider.onCreate]. */
+    private var monitorConnectivityJob: Job? = null
+
+    /** Called at app create (see `CloudDriveDocumentProviderInitialiser`); repeat calls are no-ops. */
+    @Synchronized
     fun monitorConnectivity(context: Context) {
-        applicationScope.launch {
+        if (monitorConnectivityJob?.isActive == true) return
+        monitorConnectivityJob = applicationScope.launch {
             monitorConnectivityFlow(context)
                 .catch {
                     Timber.e(it, "CloudDriveDocumentDataProvider monitorConnectivity")

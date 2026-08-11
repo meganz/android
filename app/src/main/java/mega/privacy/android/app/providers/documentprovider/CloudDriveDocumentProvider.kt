@@ -124,9 +124,13 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
     private var lastFolderOpenParent: String? = null
     private var lastFileOpenDocumentId: String? = null
 
+    /**
+     * Content providers are installed before the application (and, in instrumented tests, before
+     * the dependency graph) exists, so no dependency may be touched here. Connectivity monitoring
+     * is started by `CloudDriveDocumentProviderInitialiser` at app create.
+     */
     override fun onCreate(): Boolean {
         Timber.d("CloudDriveDocumentProvider onCreate called")
-        context?.let { dataProvider.monitorConnectivity(it) }
         return true
     }
 

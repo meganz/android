@@ -10,6 +10,7 @@ import mega.privacy.android.app.appstate.global.initialisation.appcreate.ApiServ
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.CallObserverInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.CameraUploadsWorkerNotificationInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.ChatApiInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.appcreate.CloudDriveDocumentProviderInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.CoilImageLoaderInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.CrashReportingInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.EmojiInitialiser
@@ -51,6 +52,7 @@ internal class AppCreateInitialisersModule {
         remoteConfigInitialiser: RemoteConfigInitialiser,
         cameraUploadsWorkerNotificationInitialiser: CameraUploadsWorkerNotificationInitialiser,
         syncMonitorInitialiser: SyncMonitorInitialiser,
+        cloudDriveDocumentProviderInitialiser: CloudDriveDocumentProviderInitialiser,
     ): Set<@JvmSuppressWildcards AsyncAppCreateInitialiser> = setOf(
         miscFlagsInitialiser,
         apiServerInitialiser,
@@ -62,6 +64,7 @@ internal class AppCreateInitialisersModule {
         remoteConfigInitialiser,
         cameraUploadsWorkerNotificationInitialiser,
         syncMonitorInitialiser,
+        cloudDriveDocumentProviderInitialiser,
     )
 
     @Provides
