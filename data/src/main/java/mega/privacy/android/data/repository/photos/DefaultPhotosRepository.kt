@@ -398,19 +398,6 @@ internal class DefaultPhotosRepository @Inject constructor(
             .map { ImageNodeInfo(id = NodeId(it.handle), name = it.name) }
     }
 
-    override suspend fun getImageNode(nodeId: NodeId): ImageNode? {
-        val node = withContext(ioDispatcher) {
-            val megaNode = megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
-                ?: return@withContext null
-            typedNodeMapper(
-                megaNode = megaNode,
-                folderTypeData = null,
-                offline = offlineNodesCache[nodeId.longValue.toString()],
-            ) as? TypedFileNode
-        } ?: return null
-        return typedFileNodeToImageNodeMapper(node)
-    }
-
     @Deprecated("Please consider using monitorMediaTypedNodes")
     override fun monitorPhotos(): Flow<List<Photo>> {
         Timber.d("DefaultPhotosRepository::monitorPhotos")

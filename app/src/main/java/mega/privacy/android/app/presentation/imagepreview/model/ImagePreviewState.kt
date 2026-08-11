@@ -29,4 +29,9 @@ internal data class ImagePreviewState(
     val isLoggedIn: Boolean = false,
     val isFromOffline: Boolean = false,
     val showVideoEditorTooltip: Boolean = false,
-)
+    val totalImageCount: Int? = null,
+) {
+    val isPaginated = totalImageCount != null
+    val pageCount = totalImageCount ?: imageNodes.size
+    val hasNoContent = if (isPaginated) totalImageCount == 0 else imageNodes.isEmpty()
+}

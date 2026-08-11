@@ -141,9 +141,8 @@ internal fun ImagePreviewScreen(
     onClickAddToAlbum: (ImageNode) -> Unit = {},
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
-    val imageNodes = viewState.imageNodes
 
-    if (viewState.isInitialized && imageNodes.isEmpty()) {
+    if (viewState.isInitialized && viewState.hasNoContent) {
         LaunchedEffect(Unit) {
             onClickBack()
         }
@@ -166,7 +165,7 @@ internal fun ImagePreviewScreen(
             initialPage = currentImageNodeIndex,
             initialPageOffsetFraction = 0f,
         ) {
-            imageNodes.size
+            viewState.pageCount
         }
 
         val coroutineScope = rememberCoroutineScope()
@@ -178,13 +177,11 @@ internal fun ImagePreviewScreen(
         var flickOffsetFraction by remember { mutableFloatStateOf(0f) }
 
         LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { page ->
-                viewState.imageNodes.getOrNull(page)?.let {
-                    viewModel.setCurrentImageNodeIndex(page)
-                    viewModel.setCurrentImageNode(it)
-                    viewModel.setCurrentImageNodeAvailableOffline(it)
+            snapshotFlow { pagerState.currentPage }
+                .distinctUntilChanged()
+                .collect { page ->
+                    viewModel.onPageChanged(page)
                 }
-            }
         }
 
         if (viewState.resultMessage.isNotEmpty()) {
@@ -271,7 +268,7 @@ internal fun ImagePreviewScreen(
                         )
                         .padding(innerPadding),
                     pagerState = pagerState,
-                    imageNodes = imageNodes,
+                    resolveImageNode = viewModel::resolveImageNode,
                     currentImageNodeIndex = currentImageNodeIndex,
                     currentImageNode = currentImageNode,
                     downloadImage = viewModel::monitorImageResult,
@@ -329,8 +326,8 @@ internal fun ImagePreviewScreen(
                             val photoIndexText = stringResource(
                                 R.string.wizard_steps_indicator,
                                 index + 1,
-                                imageNodes.size
-                            ).takeIf { imageNodes.size > 1 }
+                                viewState.pageCount
+                            ).takeIf { viewState.pageCount > 1 }
 
                             ImagePreviewBottomBar(
                                 imageName = currentImageNode.name,
@@ -500,7 +497,7 @@ private fun hideBottomSheet(
 @Composable
 private fun ImagePreviewContent(
     pagerState: PagerState,
-    imageNodes: List<ImageNode>,
+    resolveImageNode: suspend (Int) -> ImageNode?,
     currentImageNodeIndex: Int,
     currentImageNode: ImageNode,
     onImageTap: () -> Unit,
@@ -522,17 +519,24 @@ private fun ImagePreviewContent(
             modifier = Modifier.fillMaxSize(),
             state = pagerState,
             beyondViewportPageCount = 1,
-            key = {
-                imageNodes.getOrNull(it)?.id?.longValue?.toString() ?: "empty_$it"
-            },
         ) { index ->
-            val imageNode = imageNodes.getOrNull(index)
-            if (imageNode != null) {
+            val imageNode by produceState<ImageNode?>(initialValue = null, key1 = index) {
+                value = resolveImageNode(index)
+            }
+            val node = imageNode
+            if (node == null) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator(color = MaterialTheme.colors.secondary)
+                }
+            } else {
                 val imageResultTriple by produceState<Triple<Int, String?, String?>>(
                     initialValue = Triple(0, null, null),
-                    key1 = imageNode.id,
+                    key1 = node.id,
                 ) {
-                    downloadImage(imageNode).collectLatest { imageResult ->
+                    downloadImage(node).collectLatest { imageResult ->
                         value = Triple(
                             imageResult.getProgressPercentage() ?: 0,
                             getImagePath(imageResult),
@@ -556,7 +560,7 @@ private fun ImagePreviewContent(
                 val imageState = rememberZoomableImageState(zoomableState)
 
                 ImagePreviewContent(
-                    imageNode = imageNode,
+                    imageNode = node,
                     progress = progress,
                     imagePath = imagePath,
                     errorImagePath = fallbackImagePath,

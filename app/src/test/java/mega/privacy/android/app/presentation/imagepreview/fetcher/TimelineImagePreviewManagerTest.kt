@@ -6,10 +6,12 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
+import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.FilterMediaType
-import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.ImageNodeInfo
+import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadFolderHandlesUseCase
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
 import mega.privacy.android.domain.usecase.photos.ListTimelineImageNodeInfoByOffsetUseCase
@@ -25,6 +27,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
@@ -34,6 +37,7 @@ class TimelineImagePreviewManagerTest {
     private val getMediaTimelineSectionsUseCase = mock<GetMediaTimelineSectionsUseCase>()
     private val listTimelineImageNodeInfoByOffsetUseCase =
         mock<ListTimelineImageNodeInfoByOffsetUseCase>()
+    private val getImageNodeByIdUseCase = mock<GetImageNodeByIdUseCase>()
     private val getCameraUploadFolderHandlesUseCase = mock<GetCameraUploadFolderHandlesUseCase>()
     private val timelineFilterUiStateMapper = TimelineFilterUiStateMapper()
 
@@ -45,6 +49,7 @@ class TimelineImagePreviewManagerTest {
         underTest = TimelineImagePreviewManager(
             getMediaTimelineSectionsUseCase = getMediaTimelineSectionsUseCase,
             listTimelineImageNodeInfoByOffsetUseCase = listTimelineImageNodeInfoByOffsetUseCase,
+            getImageNodeByIdUseCase = getImageNodeByIdUseCase,
             getCameraUploadFolderHandlesUseCase = getCameraUploadFolderHandlesUseCase,
             timelineFilterUiStateMapper = timelineFilterUiStateMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
@@ -56,20 +61,15 @@ class TimelineImagePreviewManagerTest {
         reset(
             getMediaTimelineSectionsUseCase,
             listTimelineImageNodeInfoByOffsetUseCase,
+            getImageNodeByIdUseCase,
             getCameraUploadFolderHandlesUseCase,
         )
     }
 
     @Test
-    fun `test that initialize returns the total ref count across sections`() = runTest {
-        val sectionA = section("A", 3)
-        val sectionB = section("B", 2)
+    fun `test that initialize returns the total media count across sections`() = runTest {
         whenever(getMediaTimelineSectionsUseCase(any(), any()))
-            .thenReturn(listOf(sectionA, sectionB))
-        whenever(listTimelineImageNodeInfoByOffsetUseCase(any(), eq(sectionA), any(), any(), any()))
-            .thenReturn(List(3) { info(100L + it) })
-        whenever(listTimelineImageNodeInfoByOffsetUseCase(any(), eq(sectionB), any(), any(), any()))
-            .thenReturn(List(2) { info(200L + it) })
+            .thenReturn(listOf(section("A", 3), section("B", 2)))
 
         val total = underTest.initialize(
             sort = Sort.NEWEST,
@@ -120,41 +120,78 @@ class TimelineImagePreviewManagerTest {
         }
 
     @Test
-    fun `test that infoAt returns the ref at the global index across sections`() = runTest {
-        val sectionA = section("A", 3)
-        val sectionB = section("B", 2)
-        val a = List(3) { info(100L + it) }
-        val b = List(2) { info(200L + it) }
-        whenever(getMediaTimelineSectionsUseCase(any(), any()))
-            .thenReturn(listOf(sectionA, sectionB))
-        whenever(listTimelineImageNodeInfoByOffsetUseCase(any(), eq(sectionA), any(), any(), any()))
-            .thenReturn(a)
-        whenever(listTimelineImageNodeInfoByOffsetUseCase(any(), eq(sectionB), any(), any(), any()))
-            .thenReturn(b)
-        underTest.initialize(
-            Sort.NEWEST,
-            FilterMediaType.ALL_MEDIA,
-            TimelinePhotosSource.ALL_PHOTOS,
-            false,
-        )
+    fun `test that getImageNodeAtIndex pages the ref list and resolves the node by id`() = runTest {
+        val node = mock<ImageNode>()
+        stubSections(total = 100)
+        stubRefPages()
+        whenever(getImageNodeByIdUseCase(NodeId(5L))).thenReturn(node)
+        underTest.initialize(Sort.NEWEST, FilterMediaType.ALL_MEDIA, TimelinePhotosSource.ALL_PHOTOS, false)
 
-        assertThat(underTest.getInfoAtIndex(0)).isEqualTo(a[0])
-        assertThat(underTest.getInfoAtIndex(2)).isEqualTo(a[2])
-        assertThat(underTest.getInfoAtIndex(3)).isEqualTo(b[0])
-        assertThat(underTest.getInfoAtIndex(4)).isEqualTo(b[1])
+        val result = underTest.getImageNodeAtIndex(5)
+
+        assertThat(result).isEqualTo(node)
+        verify(getImageNodeByIdUseCase).invoke(NodeId(5L))
     }
 
     @Test
-    fun `test that infoAt returns null when the index is out of range`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
-        underTest.initialize(
-            Sort.NEWEST,
-            FilterMediaType.ALL_MEDIA,
-            TimelinePhotosSource.ALL_PHOTOS,
-            false,
-        )
+    fun `test that getImageNodeAtIndex returns null without paging when the index is out of range`() =
+        runTest {
+            stubSections(total = 10)
+            stubRefPages()
+            underTest.initialize(Sort.NEWEST, FilterMediaType.ALL_MEDIA, TimelinePhotosSource.ALL_PHOTOS, false)
 
-        assertThat(underTest.getInfoAtIndex(0)).isNull()
+            val result = underTest.getImageNodeAtIndex(20)
+
+            assertThat(result).isNull()
+            verifyNoInteractions(listTimelineImageNodeInfoByOffsetUseCase)
+        }
+
+    @Test
+    fun `test that indexOfImageNode returns the index where the node actually sits`() = runTest {
+        stubSections(total = 100)
+        stubRefPages()
+        underTest.initialize(Sort.NEWEST, FilterMediaType.ALL_MEDIA, TimelinePhotosSource.ALL_PHOTOS, false)
+
+        val index = underTest.indexOfImageNode(preferredIndex = 5, nodeId = NodeId(7L))
+
+        assertThat(index).isEqualTo(7)
+    }
+
+    @Test
+    fun `test that indexOfImageNode falls back to the preferred index when the node is not loaded`() =
+        runTest {
+            stubSections(total = 100)
+            stubRefPages()
+            underTest.initialize(Sort.NEWEST, FilterMediaType.ALL_MEDIA, TimelinePhotosSource.ALL_PHOTOS, false)
+
+            val index = underTest.indexOfImageNode(preferredIndex = 5, nodeId = NodeId(999L))
+
+            assertThat(index).isEqualTo(5)
+        }
+
+    @Test
+    fun `test that getImageNode resolves the node by id`() = runTest {
+        val node = mock<ImageNode>()
+        whenever(getImageNodeByIdUseCase(NodeId(7L))).thenReturn(node)
+
+        val result = underTest.getImageNode(NodeId(7L))
+
+        assertThat(result).isEqualTo(node)
+        verify(getImageNodeByIdUseCase).invoke(NodeId(7L))
+    }
+
+    private suspend fun stubSections(total: Int) {
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
+            .thenReturn(listOf(section("A", total)))
+    }
+
+    private suspend fun stubRefPages() {
+        whenever(listTimelineImageNodeInfoByOffsetUseCase(any(), eq(null), any(), any(), any()))
+            .thenAnswer { invocation ->
+                val maxElements = invocation.getArgument<Int>(3)
+                val offset = invocation.getArgument<Long>(4)
+                (offset until offset + maxElements).map { ImageNodeInfo(NodeId(it), "n$it.jpg") }
+            }
     }
 
     private fun section(groupId: String, count: Int) = MediaTimelineSection(
@@ -163,6 +200,4 @@ class TimelineImagePreviewManagerTest {
         endDate = 0L,
         count = count.toLong(),
     )
-
-    private fun info(id: Long) = ImageNodeInfo(id = NodeId(id), name = "node_$id.jpg")
 }

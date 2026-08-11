@@ -630,34 +630,6 @@ class DefaultPhotosRepositoryTest {
             ).inOrder()
         }
 
-    @Test
-    fun `test that getImageNode resolves the node by handle`() = runTest {
-        val megaNode = createMegaNode(handle = 7L)
-        val fileNode = mock<TypedFileNode> { on { id }.thenReturn(NodeId(7L)) }
-        val imageNode = mock<ImageNode>()
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = 7L)).thenReturn(megaNode)
-        whenever(
-            typedNodeMapper(eq(megaNode), anyOrNull(), anyOrNull(), any(), any())
-        ).thenReturn(fileNode)
-        whenever(typedFileNodeToImageNodeMapper(fileNode)).thenReturn(imageNode)
-        underTest = createUnderTest()
-
-        val result = underTest.getImageNode(NodeId(7L))
-
-        assertThat(result).isEqualTo(imageNode)
-        verify(megaApiGateway).getMegaNodeByHandle(nodeHandle = 7L)
-    }
-
-    @Test
-    fun `test that getImageNode returns null when no node exists for the id`() = runTest {
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = 999L)).thenReturn(null)
-        underTest = createUnderTest()
-
-        val result = underTest.getImageNode(NodeId(999L))
-
-        assertThat(result).isNull()
-    }
-
     private fun createUnderTest() = DefaultPhotosRepository(
         nodeRepository = nodeRepository,
         megaApiFacade = megaApiGateway,

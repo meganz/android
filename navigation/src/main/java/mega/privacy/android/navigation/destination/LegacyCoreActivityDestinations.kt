@@ -395,6 +395,8 @@ data class MediaTimelinePhotoPreviewNavKey(
     val sortType: String,
     val filterType: String,
     val mediaSource: String,
+    val anchorIndex: Int = 0,
+    val totalCount: Int = 0,
 ) : NavKey
 
 @Serializable

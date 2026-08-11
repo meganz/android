@@ -22,13 +22,15 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_PUBLIC_LINK_URL
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_INDEX
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImagePreviewManager
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.triggeredContent
-import mega.privacy.android.shared.nodes.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
@@ -59,7 +61,6 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.imagepreview.ClearImageResultUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
@@ -73,12 +74,15 @@ import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCo
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.shared.nodes.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.shared.resources.R as sharedResR
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.AfterEach
@@ -92,6 +96,7 @@ import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -106,7 +111,6 @@ import kotlin.time.Duration
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ImagePreviewViewModelTest {
-
     private lateinit var underTest: ImagePreviewViewModel
 
     private val savedStateHandle = mock<SavedStateHandle>()
@@ -156,6 +160,8 @@ class ImagePreviewViewModelTest {
     private val monitorVideoEditorTooltipShownUseCase: MonitorVideoEditorTooltipShownUseCase =
         mock()
     private val setVideoEditorTooltipShownUseCase: SetVideoEditorTooltipShownUseCase = mock()
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
+    private val timelineImagePreviewManager: TimelineImagePreviewManager = mock()
 
     private val accountLevelDetail = mock<AccountLevelDetail> {
         on { accountType }.thenReturn(AccountType.PRO_III)
@@ -168,6 +174,7 @@ class ImagePreviewViewModelTest {
     fun setup() {
         wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(flowOf(false))
         wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(flowOf(accountDetail))
+        wheneverBlocking { isHiddenNodesOnboardedUseCase() }.thenReturn(false)
         whenever(monitorVideoEditorTooltipShownUseCase()).thenReturn(flowOf(true))
         initViewModel()
     }
@@ -208,6 +215,7 @@ class ImagePreviewViewModelTest {
         isUserLoggedInUseCase,
         monitorVideoEditorTooltipShownUseCase,
         setVideoEditorTooltipShownUseCase,
+        timelineImagePreviewManager,
     ).also {
         imageNodeFetchers.clear()
         underTest.consumeTransferEvent()
@@ -256,6 +264,8 @@ class ImagePreviewViewModelTest {
             isUserLoggedInUseCase = isUserLoggedInUseCase,
             monitorVideoEditorTooltipShownUseCase = monitorVideoEditorTooltipShownUseCase,
             setVideoEditorTooltipShownUseCase = setVideoEditorTooltipShownUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            timelineImagePreviewManager = timelineImagePreviewManager,
             context = mock(),
         )
     }
@@ -1313,6 +1323,146 @@ class ImagePreviewViewModelTest {
         return mock<ImageNode> {
             on { this.isMarkedSensitive } doReturn isMarkedSensitive
             on { this.isSensitiveInherited } doReturn isSensitiveInherited
+        }
+    }
+
+    @Test
+    fun `test that timeline pagination resolves the anchor and exposes the total count`() =
+        runTest {
+            val anchorNode = mock<ImageNode>()
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+            whenever(savedStateHandle.get<Int>(PARAMS_CURRENT_IMAGE_NODE_INDEX)).thenReturn(3)
+            whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE)).thenReturn(3L)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+            whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any())).thenReturn(10)
+            whenever(timelineImagePreviewManager.indexOfImageNode(3, NodeId(3L))).thenReturn(3)
+            whenever(timelineImagePreviewManager.getImageNodeAtIndex(3)).thenReturn(anchorNode)
+            initViewModel()
+
+            advanceUntilIdle()
+
+            val state = underTest.state.value
+            assertThat(state.isInitialized).isTrue()
+            assertThat(state.totalImageCount).isEqualTo(10)
+            assertThat(state.currentImageNodeIndex).isEqualTo(3)
+            assertThat(state.currentImageNode).isEqualTo(anchorNode)
+            assertThat(underTest.resolveImageNode(3)).isEqualTo(anchorNode)
+        }
+
+    @Test
+    fun `test that timeline pagination corrects the anchor index when the tapped node moved`() =
+        runTest {
+            val tappedNode = mock<ImageNode>()
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+            whenever(savedStateHandle.get<Int>(PARAMS_CURRENT_IMAGE_NODE_INDEX)).thenReturn(3)
+            whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE)).thenReturn(4L)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+            whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any())).thenReturn(10)
+            whenever(timelineImagePreviewManager.indexOfImageNode(3, NodeId(4L))).thenReturn(4)
+            whenever(timelineImagePreviewManager.getImageNodeAtIndex(4)).thenReturn(tappedNode)
+            initViewModel()
+
+            advanceUntilIdle()
+
+            val state = underTest.state.value
+            assertThat(state.currentImageNodeIndex).isEqualTo(4)
+            assertThat(state.currentImageNode).isEqualTo(tappedNode)
+        }
+
+    @Test
+    fun `test that timeline pagination is not used when the feature flag is off`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(false)
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        initViewModel()
+
+        advanceUntilIdle()
+
+        assertThat(underTest.state.value.totalImageCount).isNull()
+        verifyNoInteractions(timelineImagePreviewManager)
+    }
+
+    @Test
+    fun `test that timeline pagination shows the anchor immediately using the grid total`() =
+        runTest {
+            val anchorNode = mock<ImageNode>()
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+            whenever(savedStateHandle.get<Int>(PARAMS_CURRENT_IMAGE_NODE_INDEX)).thenReturn(3)
+            whenever(savedStateHandle.get<Int>(PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT)).thenReturn(10)
+            whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE)).thenReturn(3L)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+            whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any())).thenReturn(10)
+            whenever(timelineImagePreviewManager.getImageNode(NodeId(3L))).thenReturn(anchorNode)
+            whenever(timelineImagePreviewManager.indexOfImageNode(3, NodeId(3L))).thenReturn(3)
+            whenever(timelineImagePreviewManager.getImageNodeAtIndex(3)).thenReturn(anchorNode)
+            initViewModel()
+
+            advanceUntilIdle()
+
+            verify(timelineImagePreviewManager, atLeastOnce()).getImageNode(NodeId(3L))
+            val state = underTest.state.value
+            assertThat(state.totalImageCount).isEqualTo(10)
+            assertThat(state.currentImageNodeIndex).isEqualTo(3)
+            assertThat(state.currentImageNode).isEqualTo(anchorNode)
+        }
+
+    @Test
+    fun `test that onPageChanged resolves and shows the node for the new page`() = runTest {
+        val node48 = mock<ImageNode>()
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+        whenever(savedStateHandle.get<Int>(PARAMS_CURRENT_IMAGE_NODE_INDEX)).thenReturn(0)
+        whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE)).thenReturn(0L)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any())).thenReturn(100)
+        whenever(timelineImagePreviewManager.indexOfImageNode(0, NodeId(0L))).thenReturn(0)
+        initViewModel()
+        advanceUntilIdle()
+        whenever(timelineImagePreviewManager.getImageNodeAtIndex(48)).thenReturn(node48)
+
+        underTest.onPageChanged(48)
+        advanceUntilIdle()
+
+        val state = underTest.state.value
+        assertThat(state.currentImageNodeIndex).isEqualTo(48)
+        assertThat(state.currentImageNode).isEqualTo(node48)
+    }
+
+    @Test
+    fun `test that resolveImageNode delegates each page to the timeline manager`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+        whenever(savedStateHandle.get<Int>(PARAMS_CURRENT_IMAGE_NODE_INDEX)).thenReturn(0)
+        whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE)).thenReturn(0L)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any())).thenReturn(100)
+        whenever(timelineImagePreviewManager.indexOfImageNode(0, NodeId(0L))).thenReturn(0)
+        val nodes = mutableMapOf<Int, ImageNode>()
+        (46..50).forEach { index ->
+            val node = mock<ImageNode>()
+            nodes[index] = node
+            whenever(timelineImagePreviewManager.getImageNodeAtIndex(index)).thenReturn(node)
+        }
+        initViewModel()
+        advanceUntilIdle()
+
+        (46..50).forEach { index ->
+            assertThat(underTest.resolveImageNode(index)).isEqualTo(nodes[index])
+            verify(timelineImagePreviewManager).getImageNodeAtIndex(index)
         }
     }
 }

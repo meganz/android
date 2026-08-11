@@ -721,16 +721,18 @@ fun MediaMainScreen(
                                         effectiveOnSortOptionChange(it)
                                         showTimelineSortDialog = false
                                     },
-                                    onTimelinePhotoClick = {
+                                    onTimelinePhotoClick = { id, anchorIndex, totalCount ->
                                         if (selectionModeType == MediaSelectionModeType.Timeline) {
-                                            onTimelinePhotoSelected(it)
+                                            onTimelinePhotoSelected(id)
                                         } else {
                                             onNavigateToTimelinePhotoPreview(
                                                 MediaTimelinePhotoPreviewNavKey(
-                                                    id = it,
+                                                    id = id,
                                                     sortType = effectiveCurrentSort.toLegacySort().name,
                                                     filterType = effectiveTimelineFilterUiState.mediaType.name,
-                                                    mediaSource = effectiveTimelineFilterUiState.mediaSource.toLegacyPhotosSource().name
+                                                    mediaSource = effectiveTimelineFilterUiState.mediaSource.toLegacyPhotosSource().name,
+                                                    anchorIndex = anchorIndex,
+                                                    totalCount = totalCount,
                                                 )
                                             )
                                         }
@@ -823,7 +825,7 @@ private fun MediaScreen.MediaContent(
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortDialogDismissed: () -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
-    onTimelinePhotoClick: (id: Long) -> Unit,
+    onTimelinePhotoClick: (id: Long, anchorIndex: Int, totalCount: Int) -> Unit,
     onTimelinePhotoSelected: (id: Long) -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
@@ -860,11 +862,15 @@ private fun MediaScreen.MediaContent(
                             onZoomIn = onTimelineRevampZoomIn,
                             onZoomOut = onTimelineRevampZoomOut,
                             onMediaTimePeriodSelected = onMediaTimePeriodSelected,
-                            onNodeClicked = { node ->
+                            onNodeClicked = { node, anchorIndex ->
                                 when {
                                     node == null -> return@TimelineRevampScreen
                                     node.isTakenDown -> onTimelineRevampNodeClicked(node)
-                                    else -> onTimelinePhotoClick(node.id)
+                                    else -> {
+                                        val totalCount = (timelineRevampUiState as? TimelineRevampUiState.Data)
+                                            ?.sections?.sumOf { it.count.toInt() } ?: 0
+                                        onTimelinePhotoClick(node.id, anchorIndex, totalCount)
+                                    }
                                 }
                             },
                             onNodeSelected = { node -> onTimelinePhotoSelected(node.id) },
@@ -935,7 +941,7 @@ private fun MediaScreen.MediaContent(
                         onGridSizeChange = onTimelineGridSizeChange,
                         onSortDialogDismissed = onTimelineSortDialogDismissed,
                         onSortOptionChange = onTimelineSortOptionChange,
-                        onPhotoClick = onTimelinePhotoClick,
+                        onPhotoClick = { onTimelinePhotoClick(it, 0, 0) },
                         onPhotoSelected = onTimelinePhotoSelected,
                         handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                         handleNotificationPermissionResult = handleNotificationPermissionResult,

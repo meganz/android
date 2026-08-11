@@ -330,9 +330,4 @@ interface PhotosRepository {
         maxElements: Int,
         offset: Long,
     ): List<ImageNodeInfo>
-
-    /**
-     * Returns the [ImageNode] for [nodeId], or null when no node exists for it.
-     */
-    suspend fun getImageNode(nodeId: NodeId): ImageNode?
 }

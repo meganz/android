@@ -552,7 +552,7 @@ class TimelineRevampScreenTest {
                 onZoomIn = {},
                 onZoomOut = {},
                 onMediaTimePeriodSelected = {},
-                onNodeClicked = {},
+                onNodeClicked = { _, _ -> },
                 onNodeSelected = onNodeSelected,
                 onScrollingChanged = {},
                 selectedPhotoIds = selectedPhotoIds,

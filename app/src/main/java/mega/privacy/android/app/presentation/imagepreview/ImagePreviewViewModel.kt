@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
@@ -30,11 +31,12 @@ import mega.privacy.android.app.components.largebundle.LargeBundleHolder
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImagePreviewManager
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
-import mega.privacy.android.shared.nodes.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -46,6 +48,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -80,11 +84,14 @@ import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.feature.photos.model.TimelinePhotosSource
+import mega.privacy.android.shared.nodes.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -136,6 +143,8 @@ class ImagePreviewViewModel @Inject constructor(
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val monitorVideoEditorTooltipShownUseCase: MonitorVideoEditorTooltipShownUseCase,
     private val setVideoEditorTooltipShownUseCase: SetVideoEditorTooltipShownUseCase,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    private val timelineImagePreviewManager: TimelineImagePreviewManager,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -147,8 +156,17 @@ class ImagePreviewViewModel @Inject constructor(
         return largeBundleHolder.get(key) ?: Bundle()
     }
 
+    private inline fun <reified T : Enum<T>> Bundle.readEnum(key: String): T? =
+        getString(key)?.let { runCatching { enumValueOf<T>(it) }.getOrNull() }
+
     private val currentImageNodeIdValue: Long
         get() = savedStateHandle[PARAMS_CURRENT_IMAGE_NODE_ID_VALUE] ?: 0L
+
+    private val currentImageNodeIndexValue: Int
+        get() = savedStateHandle[PARAMS_CURRENT_IMAGE_NODE_INDEX] ?: 0
+
+    private val currentImageNodeTotalCountValue: Int
+        get() = savedStateHandle[PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT] ?: 0
 
     private val imagePreviewMenuSource: ImagePreviewMenuSource
         get() = savedStateHandle[IMAGE_PREVIEW_MENU_OPTIONS] ?: ImagePreviewMenuSource.TIMELINE
@@ -166,7 +184,7 @@ class ImagePreviewViewModel @Inject constructor(
 
     init {
         monitorConnectivity()
-        viewModelScope.launch {
+        viewModelScope.launch(defaultDispatcher) {
             handleInitFlow()
             monitorOfflineNodeUpdates()
         }
@@ -218,6 +236,19 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     private suspend fun handleInitFlow() {
+        if (isTimelinePaginationEnabled()) {
+            handlePaginatedTimelineFlow()
+        } else {
+            handleFullImageNodesFlow()
+        }
+    }
+
+    private suspend fun isTimelinePaginationEnabled(): Boolean =
+        imagePreviewFetcherSource == ImagePreviewFetcherSource.TIMELINE &&
+                runCatching { getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination) }
+                    .getOrDefault(false)
+
+    private suspend fun handleFullImageNodesFlow() {
         val imageFetcher = imageNodeFetchers[imagePreviewFetcherSource] ?: return
         val params = loadParams()
         combine(
@@ -261,6 +292,100 @@ class ImagePreviewViewModel @Inject constructor(
             }
         }.catch { Timber.e(it) }
             .launchIn(viewModelScope)
+    }
+
+    private suspend fun handlePaginatedTimelineFlow() {
+        previewAnchor()
+        loadTimelineOrdering()
+    }
+
+    private suspend fun previewAnchor() {
+        val total = currentImageNodeTotalCountValue
+        if (total <= 0) return
+        val anchor = timelineImagePreviewManager.getImageNode(NodeId(currentImageNodeIdValue))
+            ?: return
+        val index = currentImageNodeIndexValue.coerceIn(0, total - 1)
+        _state.update {
+            it.copy(
+                isInitialized = true,
+                totalImageCount = total,
+                currentImageNodeIndex = index,
+                currentImageNode = anchor,
+                isCurrentImageNodeAvailableOffline = anchor.isAvailableOffline,
+            )
+        }
+    }
+
+    /**
+     * Resolves account/sensitivity state and the total media count (which switches the pager into
+     * paginated mode), then positions it on the anchor, correcting the index if the tapped node moved.
+     */
+    private suspend fun loadTimelineOrdering() {
+        val params = loadParams()
+        val showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull() ?: false
+        val hiddenNodesEnabled = monitorHiddenNodesEnabledUseCase().firstOrNull() ?: false
+        val accountType = monitorAccountDetailUseCase().firstOrNull()?.levelDetail?.accountType
+        val isBusinessAccountExpired = accountType?.isBusinessAccount == true &&
+                getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+
+        val total = timelineImagePreviewManager.initialize(
+            sort = params.readEnum<Sort>(TimelineImageNodeFetcher.TIMELINE_SORT_TYPE)
+                ?: Sort.NEWEST,
+            mediaType = params.readEnum<FilterMediaType>(TimelineImageNodeFetcher.TIMELINE_FILTER_TYPE)
+                ?: FilterMediaType.ALL_MEDIA,
+            source = params.readEnum<TimelinePhotosSource>(TimelineImageNodeFetcher.TIMELINE_MEDIA_SOURCE)
+                ?: TimelinePhotosSource.ALL_PHOTOS,
+            hideSensitive = hiddenNodesEnabled && !showHiddenItems,
+        )
+
+        _state.update { state ->
+            state.copy(
+                isInitialized = true,
+                totalImageCount = if (total > 0) total else state.totalImageCount,
+                accountType = accountType,
+                isBusinessAccountExpired = isBusinessAccountExpired,
+                isHiddenNodesOnboarded = isHiddenNodesOnboarded,
+            )
+        }
+        if (total <= 0) return
+
+        val anchorIndex = currentImageNodeIndexValue.coerceIn(0, total - 1)
+        val resolvedIndex = timelineImagePreviewManager
+            .indexOfImageNode(anchorIndex, NodeId(currentImageNodeIdValue))
+        val anchorNode = timelineImagePreviewManager.getImageNodeAtIndex(resolvedIndex) ?: return
+        _state.update { state ->
+            state.copy(
+                currentImageNodeIndex = resolvedIndex,
+                currentImageNode = anchorNode,
+                isCurrentImageNodeAvailableOffline = anchorNode.isAvailableOffline,
+            )
+        }
+    }
+
+    /**
+     * Resolves the [ImageNode] for the pager page at [index]: from the timeline manager in paginated
+     * mode, or the fully-held list otherwise. Null while it can't be resolved.
+     */
+    suspend fun resolveImageNode(index: Int): ImageNode? =
+        if (_state.value.isPaginated) {
+            timelineImagePreviewManager.getImageNodeAtIndex(index)
+        } else {
+            _state.value.imageNodes.getOrNull(index)
+        }
+
+    /**
+     * Reacts to the pager settling on [index]: updates the current index and resolves that page's
+     * node for the chrome (bottom bar, menu, offline state).
+     */
+    fun onPageChanged(index: Int) {
+        setCurrentImageNodeIndex(index)
+        viewModelScope.launch(defaultDispatcher) {
+            val node = resolveImageNode(index) ?: return@launch
+            if (_state.value.currentImageNodeIndex != index) return@launch
+            setCurrentImageNode(node)
+            setCurrentImageNodeAvailableOffline(node)
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -1028,6 +1153,8 @@ class ImagePreviewViewModel @Inject constructor(
         const val IMAGE_PREVIEW_MENU_OPTIONS = "image_preview_menu_options"
         const val FETCHER_PARAMS = "fetcher_params"
         const val PARAMS_CURRENT_IMAGE_NODE_ID_VALUE = "currentImageNodeIdValue"
+        const val PARAMS_CURRENT_IMAGE_NODE_INDEX = "currentImageNodeIndexValue"
+        const val PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT = "currentImageNodeTotalCountValue"
         const val IMAGE_PREVIEW_IS_FOREIGN = "image_preview_is_foreign"
         const val IMAGE_PREVIEW_ADD_TO_ALBUM = "image_preview_add_to_album"
         const val IMAGE_PREVIEW_PUBLIC_LINK_URL = "image_preview_public_link_url"

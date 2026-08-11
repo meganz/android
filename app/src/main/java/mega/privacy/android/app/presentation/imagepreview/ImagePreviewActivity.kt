@@ -69,6 +69,8 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_IS_FOREIGN
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_MENU_OPTIONS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_INDEX
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
@@ -309,7 +311,9 @@ class ImagePreviewActivity : BaseActivity() {
             // Render snackbar from Nav3 components, e.g. LegacyActivityScaffold > StartTransferComponent
             LocalSnackBarHostState.current?.let { hostState ->
                 Box(
-                    modifier = Modifier.fillMaxSize().systemBarsPadding(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .systemBarsPadding(),
                     contentAlignment = Alignment.BottomCenter,
                 ) {
                     MegaSnackbar(hostState)
@@ -776,6 +780,8 @@ class ImagePreviewActivity : BaseActivity() {
             imageSource: ImagePreviewFetcherSource,
             menuOptionsSource: ImagePreviewMenuSource,
             anchorImageNodeId: NodeId? = null,
+            anchorImageNodeIndex: Int? = null,
+            anchorImageNodeTotalCount: Int? = null,
             params: Map<String, Any> = mapOf(),
             isForeign: Boolean = false,
             enableAddToAlbum: Boolean = false,
@@ -788,6 +794,10 @@ class ImagePreviewActivity : BaseActivity() {
                 putExtra(IMAGE_NODE_FETCHER_SOURCE, imageSource)
                 putExtra(IMAGE_PREVIEW_MENU_OPTIONS, menuOptionsSource)
                 putExtra(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE, anchorImageNodeId?.longValue)
+                anchorImageNodeIndex?.let { putExtra(PARAMS_CURRENT_IMAGE_NODE_INDEX, it) }
+                anchorImageNodeTotalCount?.let {
+                    putExtra(PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT, it)
+                }
                 putExtra(FETCHER_PARAMS, paramsKey)
                 putExtra(IMAGE_PREVIEW_IS_FOREIGN, isForeign)
                 putExtra(IMAGE_PREVIEW_ADD_TO_ALBUM, enableAddToAlbum)
