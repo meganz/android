@@ -13,8 +13,10 @@ import mega.privacy.android.feature.sync.domain.usecase.solvedissue.ClearSyncSol
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ClearSyncDebrisUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncDebrisSizeInBytesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorPauseSyncOnBatterySaverUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByChargingUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetPauseSyncOnBatterySaverUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSyncByChargingUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.worker.GetSyncFrequencyUseCase
@@ -33,6 +35,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -47,6 +50,9 @@ internal class SettingsSyncViewModelTest {
 
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
     private val monitorSyncByChargingUseCase: MonitorSyncByChargingUseCase = mock()
+    private val monitorPauseSyncOnBatterySaverUseCase: MonitorPauseSyncOnBatterySaverUseCase =
+        mock()
+    private val setPauseSyncOnBatterySaverUseCase: SetPauseSyncOnBatterySaverUseCase = mock()
     private val setSyncByWiFiUseCase: SetSyncByWiFiUseCase = mock()
     private val getSyncDebrisSizeUseCase: GetSyncDebrisSizeInBytesUseCase = mock()
     private val clearSyncDebrisUseCase: ClearSyncDebrisUseCase = mock()
@@ -63,6 +69,7 @@ internal class SettingsSyncViewModelTest {
     fun setup() {
         whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(false))
         whenever(monitorSyncByChargingUseCase()).thenReturn(flowOf(false))
+        whenever(monitorPauseSyncOnBatterySaverUseCase()).thenReturn(flowOf(false))
         getSyncDebrisSizeUseCase.stub {
             on { invoke() }.thenReturn(0L)
         }
@@ -73,6 +80,8 @@ internal class SettingsSyncViewModelTest {
         reset(
             monitorSyncByWiFiUseCase,
             monitorSyncByChargingUseCase,
+            monitorPauseSyncOnBatterySaverUseCase,
+            setPauseSyncOnBatterySaverUseCase,
             setSyncByWiFiUseCase,
             setSyncByChargingUseCase,
             getSyncDebrisSizeUseCase,
@@ -334,12 +343,52 @@ internal class SettingsSyncViewModelTest {
         verify(clearSyncDebrisUseCase).invoke()
     }
 
+    @ParameterizedTest(name = "checked: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that setPauseSyncOnBatterySaverUseCase is called when the battery saver toggle is changed`(
+        checked: Boolean,
+    ) = runTest {
+        initViewModel()
+
+        underTest.handleAction(SettingsSyncAction.PauseSyncOnBatterySaverToggled(checked))
+
+        verify(setPauseSyncOnBatterySaverUseCase).invoke(checked)
+    }
+
+    @ParameterizedTest(name = "pause on battery saver: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that state reflects the pause on battery saver preference`(
+        pauseOnBatterySaver: Boolean,
+    ) = runTest {
+        whenever(monitorPauseSyncOnBatterySaverUseCase()).thenReturn(flowOf(pauseOnBatterySaver))
+        initViewModel()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().pauseSyncOnBatterySaver).isEqualTo(pauseOnBatterySaver)
+        }
+    }
+
+    @Test
+    fun `test that the battery saver toggle does not change the sync power option`() = runTest {
+        whenever(monitorSyncByChargingUseCase()).thenReturn(flowOf(true))
+        whenever(monitorPauseSyncOnBatterySaverUseCase()).thenReturn(flowOf(true))
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.syncPowerOption).isEqualTo(SyncPowerOption.SyncOnlyWhenCharging)
+            assertThat(state.pauseSyncOnBatterySaver).isTrue()
+        }
+    }
+
     private fun initViewModel() {
         underTest = SettingsSyncViewModel(
             monitorSyncByWiFiUseCase = monitorSyncByWiFiUseCase,
             monitorSyncByChargingUseCase = monitorSyncByChargingUseCase,
+            monitorPauseSyncOnBatterySaverUseCase = monitorPauseSyncOnBatterySaverUseCase,
             setSyncByWiFiUseCase = setSyncByWiFiUseCase,
             setSyncByChargingUseCase = setSyncByChargingUseCase,
+            setPauseSyncOnBatterySaverUseCase = setPauseSyncOnBatterySaverUseCase,
             getSyncDebrisSizeUseCase = getSyncDebrisSizeUseCase,
             clearSyncDebrisUseCase = clearSyncDebrisUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,

@@ -12,6 +12,9 @@ internal sealed class SettingsSyncAction {
     // Power Settings Actions
     data class SyncPowerOptionSelected(val option: SyncPowerOption) : SettingsSyncAction()
 
+    // Battery Saver Settings Actions
+    data class PauseSyncOnBatterySaverToggled(val checked: Boolean) : SettingsSyncAction()
+
     // Other Actions
     data object ClearDebrisClicked : SettingsSyncAction()
 

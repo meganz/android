@@ -8,6 +8,7 @@ import mega.privacy.android.feature.sync.ui.model.SyncPowerOption
 internal data class SettingsSyncUiState(
     val syncConnectionType: SyncConnectionType = SyncConnectionType.WiFiOrMobileData,
     val syncPowerOption: SyncPowerOption = SyncPowerOption.SyncAlways,
+    val pauseSyncOnBatterySaver: Boolean = false,
     val syncDebrisSizeInBytes: Long? = null,
     val showSyncFrequency: Boolean = false,
     val syncFrequency: SyncFrequency = SyncFrequency.EVERY_15_MINUTES,

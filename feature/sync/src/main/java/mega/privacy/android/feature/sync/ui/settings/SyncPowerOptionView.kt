@@ -21,7 +21,7 @@ internal fun SyncPowerOptionView(
 ) {
     GenericTwoLineListItem(
         modifier = modifier.testTag(SETTINGS_SYNC_POWER_OPTIONS_VIEW),
-        title = stringResource(sharedR.string.settings_sync_power_settings_title),
+        title = stringResource(sharedR.string.settings_sync_battery_usage_title),
         subtitle = when (syncPowerOption) {
             SyncPowerOption.SyncAlways -> stringResource(sharedR.string.settings_sync_power_always_title)
             SyncPowerOption.SyncOnlyWhenCharging -> stringResource(sharedR.string.settings_sync_battery_sync_only_when_charging_title)

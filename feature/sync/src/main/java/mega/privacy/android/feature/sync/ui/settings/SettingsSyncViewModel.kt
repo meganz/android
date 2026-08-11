@@ -15,8 +15,10 @@ import mega.privacy.android.feature.sync.domain.usecase.solvedissue.ClearSyncSol
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ClearSyncDebrisUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncDebrisSizeInBytesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorPauseSyncOnBatterySaverUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByChargingUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetPauseSyncOnBatterySaverUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSyncByChargingUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.worker.GetSyncFrequencyUseCase
@@ -34,8 +36,10 @@ import javax.inject.Inject
 internal class SettingsSyncViewModel @Inject constructor(
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
     private val monitorSyncByChargingUseCase: MonitorSyncByChargingUseCase,
+    private val monitorPauseSyncOnBatterySaverUseCase: MonitorPauseSyncOnBatterySaverUseCase,
     private val setSyncByWiFiUseCase: SetSyncByWiFiUseCase,
     private val setSyncByChargingUseCase: SetSyncByChargingUseCase,
+    private val setPauseSyncOnBatterySaverUseCase: SetPauseSyncOnBatterySaverUseCase,
     private val getSyncDebrisSizeUseCase: GetSyncDebrisSizeInBytesUseCase,
     private val clearSyncDebrisUseCase: ClearSyncDebrisUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
@@ -60,9 +64,10 @@ internal class SettingsSyncViewModel @Inject constructor(
             combine(
                 monitorSyncByWiFiUseCase().catch { Timber.e("Error Monitoring Wifi Setting $it") },
                 monitorSyncByChargingUseCase().catch { Timber.e("Error Monitoring Charging Setting $it") },
-            ) { wifiSettings, batterySettings ->
-                wifiSettings to batterySettings
-            }.collect { (wiFiOnly, syncOnlyWhenCharging) ->
+                monitorPauseSyncOnBatterySaverUseCase().catch { Timber.e("Error Monitoring Battery Saver Setting $it") },
+            ) { wifiSettings, batterySettings, batterySaverSettings ->
+                Triple(wifiSettings, batterySettings, batterySaverSettings)
+            }.collect { (wiFiOnly, syncOnlyWhenCharging, pauseOnBatterySaver) ->
 
                 val syncConnectionType = when {
                     wiFiOnly -> SyncConnectionType.WiFiOnly
@@ -77,6 +82,7 @@ internal class SettingsSyncViewModel @Inject constructor(
                     it.copy(
                         syncConnectionType = syncConnectionType,
                         syncPowerOption = syncPowerOption,
+                        pauseSyncOnBatterySaver = pauseOnBatterySaver,
                     )
                 }
             }
@@ -124,6 +130,10 @@ internal class SettingsSyncViewModel @Inject constructor(
 
             is SettingsSyncAction.SyncPowerOptionSelected -> {
                 setSyncPowerOption(action.option)
+            }
+
+            is SettingsSyncAction.PauseSyncOnBatterySaverToggled -> {
+                setPauseSyncOnBatterySaver(action.checked)
             }
 
             is SettingsSyncAction.ClearDebrisClicked -> {
@@ -212,6 +222,14 @@ internal class SettingsSyncViewModel @Inject constructor(
                         )
                     )
                 }
+            }.onFailure(Timber::e)
+        }
+    }
+
+    private fun setPauseSyncOnBatterySaver(checked: Boolean) {
+        viewModelScope.launch {
+            runCatching {
+                setPauseSyncOnBatterySaverUseCase(checked)
             }.onFailure(Timber::e)
         }
     }

@@ -49,6 +49,9 @@ internal fun SettingsSyncRoute(
         syncPowerOptionSelected = { selectedOption ->
             viewModel.handleAction(SettingsSyncAction.SyncPowerOptionSelected(selectedOption))
         },
+        pauseSyncOnBatterySaverChanged = { checked ->
+            viewModel.handleAction(SettingsSyncAction.PauseSyncOnBatterySaverToggled(checked))
+        },
         syncFrequencySelected = { selectedFrequency ->
             viewModel.handleAction(SettingsSyncAction.SyncFrequencySelected(selectedFrequency))
         },
@@ -64,6 +67,7 @@ internal fun SettingSyncScreen(
     syncDebrisCleared: () -> Unit,
     syncConnectionTypeSelected: (SyncConnectionType) -> Unit,
     syncPowerOptionSelected: (SyncPowerOption) -> Unit,
+    pauseSyncOnBatterySaverChanged: (Boolean) -> Unit,
     syncFrequencySelected: (SyncFrequency) -> Unit,
     snackbarShown: () -> Unit,
 ) {
@@ -103,6 +107,10 @@ internal fun SettingSyncScreen(
                     syncPowerOptionsClicked = {
                         showSyncPowerOptionsDialog = true
                     },
+                )
+                SyncBatterySaverView(
+                    pauseSyncOnBatterySaver = uiState.pauseSyncOnBatterySaver,
+                    pauseSyncOnBatterySaverChanged = pauseSyncOnBatterySaverChanged,
                 )
                 SyncDebrisView(
                     size = uiState.syncDebrisSizeInBytes,

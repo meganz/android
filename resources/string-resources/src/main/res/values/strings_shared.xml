@@ -1245,6 +1245,12 @@
     <string name="settings_sync_power_always_title">Sync always</string>
     <!-- Sync only when charging label for sync power options -->
     <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
+    <!-- Settings title for the sync and backup battery usage options -->
+    <string name="settings_sync_battery_usage_title">Battery usage</string>
+    <!-- Description shown in the sync and backup battery usage options dialog -->
+    <string name="settings_sync_battery_usage_description">Syncs and backups pause below 20% battery when not charging.</string>
+    <!-- Settings toggle to pause syncs and backups while the device battery saver is on -->
+    <string name="settings_sync_battery_pause_on_battery_saver_title">Pause when battery saver is on</string>
     <!-- Message shown when uploading edited image as a new file -->
     <string name="photo_editor_upload_message">Uploading edits as a new file</string>
     <!-- Dialog title asking user to discard changes -->

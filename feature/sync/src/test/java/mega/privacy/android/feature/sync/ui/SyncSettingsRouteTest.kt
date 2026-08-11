@@ -44,6 +44,7 @@ internal class SyncSettingsRouteTest {
                 syncConnectionTypeSelected = {},
                 syncFrequencySelected = {},
                 syncPowerOptionSelected = {},
+                pauseSyncOnBatterySaverChanged = {},
                 snackbarShown = {}
             )
         }
@@ -67,6 +68,7 @@ internal class SyncSettingsRouteTest {
                 syncConnectionTypeSelected = {},
                 syncFrequencySelected = {},
                 syncPowerOptionSelected = {},
+                pauseSyncOnBatterySaverChanged = {},
                 snackbarShown = {}
             )
         }
@@ -90,6 +92,7 @@ internal class SyncSettingsRouteTest {
                 syncConnectionTypeSelected = {},
                 syncFrequencySelected = {},
                 syncPowerOptionSelected = {},
+                pauseSyncOnBatterySaverChanged = {},
                 snackbarShown = {}
             )
         }
@@ -113,6 +116,7 @@ internal class SyncSettingsRouteTest {
                 syncConnectionTypeSelected = {},
                 syncFrequencySelected = {},
                 syncPowerOptionSelected = {},
+                pauseSyncOnBatterySaverChanged = {},
                 snackbarShown = {}
             )
         }
@@ -136,6 +140,7 @@ internal class SyncSettingsRouteTest {
                 syncConnectionTypeSelected = {},
                 syncFrequencySelected = {},
                 syncPowerOptionSelected = {},
+                pauseSyncOnBatterySaverChanged = {},
                 snackbarShown = {}
             )
         }
@@ -159,6 +164,7 @@ internal class SyncSettingsRouteTest {
                 syncConnectionTypeSelected = {},
                 syncFrequencySelected = {},
                 syncPowerOptionSelected = {},
+                pauseSyncOnBatterySaverChanged = {},
                 snackbarShown = {}
             )
         }

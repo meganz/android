@@ -55,7 +55,8 @@ internal fun SyncPowerOptionsDialog(
                 )
             }
         },
-        titleText = stringResource(sharedRes.string.settings_sync_power_settings_title),
+        titleText = stringResource(sharedRes.string.settings_sync_battery_usage_title),
+        subTitleText = stringResource(sharedRes.string.settings_sync_battery_usage_description),
         modifier = modifier
     )
 }
