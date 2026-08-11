@@ -259,24 +259,22 @@ work and reviewers can see the component. Do this here — not as an after-the-f
      - `Already uploaded` — skip the upload (the component already exists from an earlier run)
        and continue to Step 4.
      - `Skip (not recommended)` — continue to Step 4 without uploading. Warn the user that the
-       MR will reference a Weblate component that does not yet exist, and they must run
-       `/weblate` before the MR is merged.
+       Step 4 push will be **denied by the Weblate push gate hook**
+       (`.claude/hooks/pre-push-weblate-gate.sh`) while the strings are missing from the branch
+       component — skipping only works if the user themselves exported `WEBLATE_PUSH_GATE=off`
+       in the session environment before launching Claude Code.
 
-3. **Keep the description consistent.** When new/changed strings are detected, append a
-   `🌐 New Strings — Weblate Sync Required` callout to the MR description generated in Step 3
-   (above the `## Resources` block), matching the wording used by the `android-code-review`
-   report section in `.claude/skills/android-code-review/SKILL.md`. The callout MUST include the
-   **Weblate component link** so reviewers/translators can open the strings directly. Build the
-   slug from `$FEATURE_BRANCH` the same way `/weblate` does (`re.sub("[^A-Za-z0-9]+","",branch).lower()`):
+3. **Include the Weblate component URL in the description.** The upload happens before the MR
+   is created, so the MR description generated in Step 3 must link the resulting component.
+   Add a `## Translations` section (above the `## Resources` block) with the component URL —
+   build the slug from `$FEATURE_BRANCH` the same way `/weblate` does
+   (`re.sub("[^A-Za-z0-9]+","",branch).lower()`):
    ```
-   #### 🌐 New Strings — Weblate Sync Required
-   > New string keys were detected in this branch.
-   > `string_key_one`, `string_key_two`
-   > Weblate component: https://translate.developers.mega.co.nz/projects/android/strings_shared-<slug>/
+   ## Translations
+   New strings uploaded to Weblate: https://translate.developers.mega.co.nz/projects/android/strings_shared-<slug>/
    ```
-   If the upload was performed in this step, state that the component already exists; if the
-   user chose `Skip`, state that `/weblate` must be run before merge. Omit the callout entirely
-   when no new strings were detected.
+   List the uploaded string keys under the link. Omit the section entirely when no new strings
+   were detected.
 
 4. **Label the MR.** When new/changed strings are detected (regardless of the upload choice
    above), the MR MUST carry the GitLab label **`Weblate strings resource`** (it already exists

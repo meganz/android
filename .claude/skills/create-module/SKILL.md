@@ -288,6 +288,7 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
     id("kotlin-android")
 }
 
@@ -296,6 +297,8 @@ android {
         abortOnError = true
     }
     namespace = "<namespace>"
+
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
 dependencies {
@@ -315,6 +318,12 @@ dependencies {
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
     testRuntimeOnly(testlib.junit.jupiter.engine)
+
+    // screenshot tests
+    screenshotTestImplementation(project(":core-test"))
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
 }
 ```
 
@@ -326,11 +335,14 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
     id("kotlin-android")
 }
 
 android {
     namespace = "<namespace>"
+
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
 dependencies {
@@ -361,6 +373,12 @@ dependencies {
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
     testRuntimeOnly(testlib.junit.jupiter.engine)
+
+    // screenshot tests
+    screenshotTestImplementation(project(":core-test"))
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
 }
 ```
 
@@ -418,7 +436,10 @@ Default plugins by module type:
 | `mega.android.library.compose` | Yes |    Yes     | No | Yes |
 | `mega.android.hilt` | Yes |    Yes     | No | Yes |
 | `kotlin.serialisation` | Yes |    Yes     | No | No |
+| `compose.screenshot` | Yes |    Yes     | No | No |
 | `kotlin-android` | Yes |    Yes     | No | Yes |
+
+The `compose.screenshot` plugin comes with the `experimentalProperties["android.experimental.enableScreenshotTest"] = true` line in the `android {}` block and the `screenshotTestImplementation` dependency block (including `project(":core-test")`, which provides the Weblate fleeting-UI helpers used by `/weblate` screenshot tests). Omit all three together only when `--no-compose` is passed.
 
 Optional plugins (added via `--plugins`):
 

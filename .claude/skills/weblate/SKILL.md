@@ -2,11 +2,12 @@
 name: weblate
 description: >
   Upload new Android strings to Weblate. Extracts new strings added in the current branch
-  (compared to develop) from strings_shared.xml, writes them to the transifex/weblate/strings.xml
-  file, runs the upload script, then sources a screenshot for each string — reusing an existing
-  Compose screenshot-test golden, or adding a screenshot test and recording one when none exists
-  (asking the dev how to handle fleeting components like snackbars) — and maps it to the uploaded
-  strings via the Weblate API.
+  (compared to develop) from strings_shared.xml, ensures every string has a description,
+  writes them to the transifex/weblate/strings.xml file, runs the upload script, sets each
+  unit's translator-facing explanation, then sources a screenshot for every string — reusing
+  an existing Compose screenshot-test golden, or adding a screenshot test and recording one
+  when none exists (rendering fleeting components like snackbars in isolation) — and maps it
+  to the uploaded strings via the Weblate API. A screenshot per string is mandatory.
 triggers:
   - /weblate
   - upload strings
@@ -18,9 +19,17 @@ triggers:
 # Weblate String Upload
 
 Upload new Android string resources to Weblate for translation. Extracts strings added in the
-current branch (vs develop), writes them to the Weblate repo's `strings.xml`, runs the
-upload script, and attaches a screenshot for each string — preferring an existing Compose
-screenshot-test golden, otherwise adding a screenshot test and recording one.
+current branch (vs develop), ensures each has a description, writes them to the Weblate repo's
+`strings.xml`, runs the upload script, sets each unit's `explanation`, and attaches a screenshot
+for each string — preferring an existing Compose screenshot-test golden, otherwise adding a
+screenshot test and recording one.
+
+> **Enforcement:** `tools/weblate/weblate_gate.sh` verifies that every added/changed string in
+> `strings_shared.xml` exists in the branch Weblate component **with a description and a mapped
+> screenshot**. It runs as a Claude Code push hook (`.claude/hooks/pre-push-weblate-gate.sh`,
+> denies the `git push`) and as the Jenkins MR stage "Weblate Strings Check" (fails the
+> pipeline). `develop`, `master`, `release/*`, and `task/pre-release/*` branches are exempt.
+> Completing this skill end-to-end satisfies both gates.
 
 ## Usage
 
@@ -29,6 +38,15 @@ screenshot-test golden, otherwise adding a screenshot test and recording one.
 ```
 
 ## Configuration
+
+**First-time setup** (the `transifex/` directory is a separate, gitignored repo — see
+`tools/weblate/README.md` for the full guide):
+
+```bash
+git clone git@code.developers.mega.co.nz:mobile/android/transifex.git transifex
+cp transifex/weblate/translate.json.example transifex/weblate/translate.json
+# set SOURCE_TOKEN in translate.json: Weblate → Your profile → API access
+```
 
 The Weblate API config is in `transifex/weblate/translate.json`:
 
@@ -112,6 +130,25 @@ These will be `<!-- comment -->` and `<string name="...">...</string>` lines.
 
 If no new strings are found, inform the user and stop — there is nothing to upload.
 
+### Step 2b — Ensure every new string has a description
+
+Every uploaded string must carry a description for translators: the `<!-- comment -->` directly
+above the string in `strings_shared.xml` becomes the unit's source-string note in Weblate, and
+Step 6f additionally copies it into the unit's editable `explanation` field. The push gate hook
+rejects strings that end up in Weblate with neither.
+
+For each new string from Step 2, check that the diff contains a comment line immediately above
+its `<string>`/`<plurals>` entry. For any string **without** a comment:
+
+1. Draft a one-line description covering: what the text says/does, where it appears (screen,
+   dialog, snackbar…), and the meaning of every placeholder (`%1$s`, `%d`, …). For `<plurals>`,
+   note what the quantity refers to.
+2. Show the drafted description(s) to the developer and ask for confirmation or edits.
+3. Add the confirmed comment above the string in
+   `resources/string-resources/src/main/res/values/strings_shared.xml` and commit it to the
+   branch — the description is part of the string resource, not upload-only metadata.
+4. Carry the comment into the Step 3 `strings.xml` like any other.
+
 ### Step 3 — Write strings.xml
 
 Clear all existing content in `transifex/weblate/strings.xml` and write the new strings
@@ -163,8 +200,9 @@ git diff --name-only -- resources/string-resources/
 
 ### Step 5 — Source a screenshot for each new string (prefer screenshot-test goldens)
 
-Every string uploaded to Weblate benefits from a screenshot showing it in context — it gives
-translators the surrounding UI. **Prefer Compose screenshot-test goldens as the image source**
+Every string uploaded to Weblate **must** have a screenshot showing it in context — it gives
+translators the surrounding UI, and the push gate hook denies the push of any string without
+a mapped screenshot. **Prefer Compose screenshot-test goldens as the image source**
 rather than always asking the developer for an ad-hoc screenshot. A golden is a recorded,
 deterministic render of a real composable, so if one already shows the string, reuse it; if
 none exists, add a screenshot test, record the golden, and use that.
@@ -268,22 +306,44 @@ PNGs land under the `reference/` path from Step 5b — use the light-theme one f
 > branch and become a CI baseline, so after pushing, check the screenshot-validation CI job and
 > re-record in the canonical environment if it fails.
 
-#### Step 5d — Fleeting components (snackbars, toasts, transient overlays)
+#### Step 5d — Fleeting components (snackbars, toasts, tooltips, content descriptions)
 
-Some strings appear only in components that cannot be captured on a static screen — snackbars,
-toasts, and other transient overlays that are dismissed before a preview settles. For these,
-**ask the developer** which they prefer:
+Some strings never settle on a static screen: snackbars/toasts animate in from a state-driven
+host (a static preview renders them invisible), core-ui tooltips draw in a separate `Popup`
+window the screenshot engine cannot capture, and content descriptions have no visual at all.
+These still **must** get a screenshot — uploading without one is not an option (the push gate
+denies the push). Use the shared helpers in `:core-test`
+(`mega.privacy.android.core.test.weblate`), adding
+`screenshotTestImplementation(project(":core-test"))` to the module if it is missing:
 
-- **(a) Add a small example component to the screenshot test** that renders the fleeting
-  component's content in isolation (e.g. render the snackbar's visual directly rather than
-  triggering it), record its golden, and use that. This gives translators an image without
-  needing to capture the live transient state.
-- **(b) Upload the string without a screenshot.**
+- **Snackbar/toast strings** — `WeblateSnackbarScreenshot`: renders the screen content with a
+  MEGA-styled snackbar pinned at the bottom, exactly as it appears live:
+  ```kotlin
+  WeblateSnackbarScreenshot(
+      snackbarText = stringResource(sharedR.string.my_new_snackbar_message),
+      actionLabel = "Undo", // optional
+  ) {
+      MyScreenContent(...)
+  }
+  ```
+- **Content-description strings** — `WeblateContentDescriptionScreenshot`: renders the
+  **whole screen** with an in-hierarchy MEGA tooltip bubble overlaid, its caret pointing at
+  the control the text describes:
+  ```kotlin
+  WeblateContentDescriptionScreenshot(
+      description = stringResource(sharedR.string.my_new_content_description),
+      tooltipAlignment = Alignment.TopEnd, // where the described control sits
+      tooltipOffset = DpOffset(x = (-155).dp, y = 52.dp), // nudge caret under the control
+  ) {
+      MyScreen(...) // the full screen containing the control
+  }
+  ```
+  The caret follows the alignment's horizontal bias (start/centre/end). Record the golden,
+  view it, and adjust `tooltipOffset` until the caret sits under the described control
+  before uploading.
 
-Note in the prompt that **going without a screenshot is generally discouraged for snackbars**
-(translators lose useful context), but may be acceptable for other fleeting components. Use the
-developer's choice: for (a) follow Step 5c with the example component; for (b) skip the
-screenshot for that string and note it in the Step 7 summary.
+Wrap either helper in the usual `@PreviewTest @CombinedThemePreviews` + theme-wrapper test
+method (Step 5c) and record the golden as normal.
 
 #### Step 5e — Manual screenshot fallback
 
@@ -298,6 +358,11 @@ For each PNG collected in Step 5 (a reused golden, a freshly recorded golden, or
 screenshot), upload it and map it to the strings it covers.
 
 Read the API config from `transifex/weblate/translate.json` to get `BASE_URL` and `SOURCE_TOKEN`.
+
+> **Note on curl writes:** the repo's bash-guard hook hard-denies direct `curl` write calls
+> (`-X POST/PATCH`, `-d`, `-F`). Write each write-call below (6c, 6e, 6f) into a small script
+> file (e.g. `transifex/weblate/tmp_weblate_<ticket>.sh`, matching the existing
+> `map_screenshot_*.sh` pattern) and execute that script instead of running `curl` inline.
 
 #### Step 6a — Get the branch component slug
 
@@ -402,13 +467,38 @@ curl -s -X POST \
     "<BASE_URL>/screenshots/<screenshot_id>/units/"
 ```
 
+### Step 6f — Set the translator-facing explanation for every uploaded string
+
+The XML comment only reaches the unit's read-only source note. Weblate also has an editable
+`explanation` field that is shown more prominently to translators — set it for **every**
+uploaded string (all of them, not just the screenshot-mapped ones).
+
+For each uploaded string, reuse the unit ID from Step 6d (or look it up with the same
+`context:=` query), then PATCH the unit:
+
+```bash
+curl -s -X PATCH \
+    -H "Authorization: Token <SOURCE_TOKEN>" \
+    -H "Content-Type: application/json" \
+    -d '{"explanation": "<description>"}' \
+    "<BASE_URL>/units/<unit_id>/"
+```
+
+The explanation text is the string's description from Step 2b (the XML comment, trimmed),
+expanded if needed so placeholders and plural quantities are spelled out. Escape any double
+quotes for the JSON body. Verify each response echoes the explanation back; report any
+failures in Step 7 — the push gate accepts a unit note as a fallback, but the explanation
+should normally be present.
+
 ### Step 7 — Confirm
 
 Report the result to the user:
 - List the strings that were uploaded
 - Show the upload script output (success/failure)
+- Confirm the explanation was set for each string (Step 6f), noting any that were drafted
+  fresh in Step 2b and any PATCH failures
 - For each string, note the screenshot source: reused golden, newly added screenshot test
-  (name the test + golden path), fleeting-component example, or no screenshot (and why)
+  (name the test + golden path), fleeting-component example, or manual image
 - If a screenshot was uploaded: show the screenshot name and how many strings were mapped to it
 - If new screenshot tests/goldens were added, remind the user they are committed to the branch
   and must pass the CI screenshot-validation job (re-record in the canonical environment if it

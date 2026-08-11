@@ -43,6 +43,9 @@ CODE_REVIEW_OUTPUT_FILE = "code_review_report.md"
 CODE_REVIEW_SUMMARY_FILE = "code_review_summary.md"
 CODE_REVIEW_ERROR_REPORT_FILE = "code_review_error_report.txt"
 
+WEBLATE_GATE_REPORT_FILE = "weblate_gate_report.txt"
+WEBLATE_CHECK_CMD = "weblate_check"
+
 /**
  * common.groovy file with common methods
  */
@@ -139,7 +142,8 @@ pipeline {
             script {
                 common = load('jenkinsfile/common.groovy')
 
-                if (common.hasGitLabMergeRequest()) {
+                // Weblate-only runs skip the generic message: the stage posts its own result comment
+                if (common.hasGitLabMergeRequest() && !isWeblateCheckOnly()) {
                     // If CI build is skipped due to Draft status, send a comment to MR
                     if (shouldSkipBuild()) {
                         def skipMessage = ":raising_hand: Android CI Pipeline Build Skipped! <BR/> " +
@@ -221,7 +225,7 @@ pipeline {
             parallel {
                 stage('Build APK (GMS+QA)') {
                     when {
-                        expression { !shouldSkipBuild() && !isCodeReviewOnly() }
+                        expression { !shouldSkipBuild() && !isCodeReviewOnly() && !isWeblateCheckOnly() }
                     }
                     steps {
 
@@ -276,7 +280,7 @@ pipeline {
                 stage('Unit Test and Code Coverage') {
                     agent { label NODE_LABELS }
                     when {
-                        expression { !shouldSkipBuild() && !isCodeReviewOnly() }
+                        expression { !shouldSkipBuild() && !isCodeReviewOnly() && !isWeblateCheckOnly() }
                     }
                     steps {
                         script {
@@ -336,7 +340,7 @@ pipeline {
                 stage('Lint Check') {
                     agent { label NODE_LABELS }
                     when {
-                        expression { !shouldSkipBuild() && !isCodeReviewOnly() }
+                        expression { !shouldSkipBuild() && !isCodeReviewOnly() && !isWeblateCheckOnly() }
                     }
                     steps {
                         gitlabCommitStatus(name: 'Lint Check') {
@@ -380,6 +384,65 @@ pipeline {
                         }
                     }
                 }  //stage('Lint Check')
+
+                stage('Weblate Strings Check') {
+                    agent { label NODE_LABELS }
+                    when {
+                        expression { isWeblateCheckOnly() || (!shouldSkipBuild() && !isCodeReviewOnly()) }
+                    }
+                    steps {
+                        gitlabCommitStatus(name: 'Weblate Strings Check') {
+                            script {
+                                STAGE_START_MS['weblate_gate_ms'] = System.currentTimeMillis()
+                                STAGE_NODE_NAMES['weblate_gate'] = env.NODE_NAME
+
+                                def sourceBranch = env.CHANGE_BRANCH ?: env.gitlabSourceBranch ?: env.GIT_BRANCH
+                                def targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: env.CHANGE_TARGET ?: env.gitlabTargetBranch ?: 'develop'
+                                util.useGitLab() {
+                                    withCredentials([string(credentialsId: 'WEBLATE_TOKEN', variable: 'WEBLATE_TOKEN')]) {
+                                        def gateStatus = sh(
+                                                script: "WEBLATE_GATE_FETCH=1 bash tools/weblate/weblate_gate.sh '${sourceBranch}' 'origin/${targetBranch}' > ${WEBLATE_GATE_REPORT_FILE} 2>&1",
+                                                returnStatus: true
+                                        )
+                                        String gateReport = fileExists(WEBLATE_GATE_REPORT_FILE) ? readFile(WEBLATE_GATE_REPORT_FILE).trim() : 'no report produced'
+                                        echo "Weblate gate exit ${gateStatus}:\n${gateReport}"
+                                        String htmlReport = gateReport.replaceAll('\n', '<br/>')
+                                        if (gateStatus == 1) {
+                                            common.sendToMR(":x: **Weblate Strings Check failed**<br/>${htmlReport}")
+                                            util.failPipeline("Weblate strings check failed:\n${gateReport}")
+                                        } else if (gateStatus == 3) {
+                                            common.sendToMR(":information_source: **Weblate Strings Check**<br/>${htmlReport}")
+                                        } else if (gateStatus != 0) {
+                                            // fail-open: verification problems must not block unrelated MRs
+                                            common.sendToMR(":warning: **Weblate Strings Check could not verify this MR** — please check manually.<br/>${htmlReport}")
+                                        } else if (isWeblateCheckOnly()) {
+                                            // manually triggered runs always get explicit feedback
+                                            common.sendToMR(":white_check_mark: **Weblate Strings Check passed**<br/>${htmlReport}")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                def s = STAGE_START_MS['weblate_gate_ms']
+                                if (s != null) {
+                                    STAGE_DURATIONS_MS['weblate_gate_ms'] = System.currentTimeMillis() - s
+                                }
+                            }
+                        }
+                        failure {
+                            script {
+                                BUILD_STEP = "Weblate Strings Check"
+                            }
+                        }
+                        cleanup {
+                            cleanWs(cleanWhenFailure: true)
+                        }
+                    }
+                } //stage('Weblate Strings Check')
 
                 stage('Code Review') {
                     agent { label NODE_LABELS }
@@ -747,4 +810,16 @@ def isCodeReviewOnly() {
     return env.GITLAB_OBJECT_KIND == "note" &&
             env.GITLAB_COMMENT_TRIGGER != null &&
             env.GITLAB_COMMENT_TRIGGER.trim() == CODE_REVIEW_CMD
+}
+
+/**
+ * Returns true when the build was triggered solely by the "weblate_check" comment,
+ * meaning only the Weblate Strings Check stage should run. Accepts both the
+ * GitLab Branch Source (GITLAB_OBJECT_KIND/GITLAB_COMMENT_TRIGGER) and the GitLab
+ * plugin webhook (gitlabActionType/gitlabTriggerPhrase) conventions.
+ */
+def isWeblateCheckOnly() {
+    boolean isNote = env.gitlabActionType == "NOTE" || env.GITLAB_OBJECT_KIND == "note"
+    String phrase = env.gitlabTriggerPhrase ?: env.GITLAB_COMMENT_TRIGGER
+    return isNote && phrase != null && phrase.trim() == WEBLATE_CHECK_CMD
 }
