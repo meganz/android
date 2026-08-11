@@ -6,22 +6,20 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.presentation.psa.PsaContainer
-import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import dagger.hilt.android.lifecycle.withCreationCallback
+import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.transfers.preview.model.LoadingPreviewViewModel
-import mega.privacy.android.app.presentation.transfers.preview.view.LoadingPreviewInfo
-import mega.privacy.android.app.presentation.transfers.preview.view.loadingPreviewScreen
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
+import mega.privacy.android.app.presentation.transfers.preview.view.LoadingPreviewNavKey
+import mega.privacy.android.app.presentation.transfers.preview.view.loadingPreviewEntry
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import javax.inject.Inject
 
 /**
@@ -36,44 +34,67 @@ class LoadingPreviewActivity : AppCompatActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
-    private val viewModel by viewModels<LoadingPreviewViewModel>()
+    /**
+     * Navigation result manager
+     */
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    /**
+     * Feature destinations
+     */
+    @Inject
+    lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
+
+    /**
+     * App dialog destinations
+     */
+    @Inject
+    lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
+
+    private val viewModel: LoadingPreviewViewModel by viewModels(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<LoadingPreviewViewModel.Factory> { factory ->
+                val args = LoadingPreviewViewModel.Args(
+                    transferPath = intent?.getStringExtra(EXTRA_FILE_PATH)
+                        .takeUnless { it.isNullOrEmpty() },
+                    transferUniqueId = intent?.getLongExtra(EXTRA_TRANSFER_UNIQUE_ID, -1)
+                        .takeUnless { it == -1L },
+                    transferTag = intent?.getIntExtra(EXTRA_TRANSFER_TAG, -1)
+                        .takeUnless { it == -1 },
+                )
+                factory.create(args)
+            }
+        }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {
-            val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            OriginalTheme(isDark = mode.isDarkMode()) {
-                PasscodeContainer(
-                    content = {
-                        PsaContainer {
-                            val navHostController = rememberNavController()
-                            val transferPath =
-                                intent?.getStringExtra(EXTRA_FILE_PATH)
-                                    .takeUnless { it.isNullOrEmpty() }
-                            val transferUniqueId =
-                                intent?.getLongExtra(EXTRA_TRANSFER_UNIQUE_ID, -1)
-                                    .takeUnless { it == -1L }
-                            val transferTag =
-                                intent.getIntExtra(EXTRA_TRANSFER_TAG, -1)
-                                    .takeUnless { it == -1 }
-
-                            NavHost(
-                                navController = navHostController,
-                                startDestination = LoadingPreviewInfo(
-                                    transferPath = transferPath,
-                                    transferUniqueId = transferUniqueId,
-                                    transferTag = transferTag,
-                                ),
-                                modifier = Modifier.navigationBarsPadding(),
-                            ) {
-                                loadingPreviewScreen(
-                                    onBackPress = { supportFinishAfterTransition() },
-                                )
-                            }
-                        }
-                    }
+            val mode by monitorThemeModeUseCase()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            LegacyActivityScaffold(
+                container = { content ->
+                    // A preview download can be started from a link, so no session is required
+                    SharedAppContainer(
+                        themeMode = mode,
+                        isSessionRequired = false,
+                        finishOnSessionRefresh = false,
+                        content = content,
+                    )
+                },
+                initialKey = LoadingPreviewNavKey,
+                navigationResultManager = navigationResultManager,
+                featureDestinations = featureDestinations,
+                appDialogDestinations = appDialogDestinations,
+                onEmptyBackStack = { if (!isFinishing) finish() },
+            ) { _, _ ->
+                loadingPreviewEntry(
+                    viewModel = viewModel,
+                    themeMode = mode,
+                    onBackPress = { supportFinishAfterTransition() },
                 )
             }
         }

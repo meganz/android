@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaEventQueue
+import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
@@ -41,6 +43,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
@@ -49,6 +52,7 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -74,6 +78,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSav
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWorkerAndWaitUntilIsStartedUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
@@ -142,6 +147,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val getPreviewDownloadUseCase: GetPreviewDownloadUseCase,
+    private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val transferOverQuotaEventQueue: TransferOverQuotaEventQueue,
     private val ratingHandler: RatingHandlerImpl,
     private val crashReporter: CrashReporter,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -595,7 +603,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     val startTime = previewDownload.startTime * 100
                     val duration = (getCurrentTimeInMillisUseCase() - startTime).milliseconds
 
-                    if (duration > 1.5.seconds) {
+                    if (shouldWarnAboutTransferOverQuota()) {
+                        Timber.d("Still over quota, warning about it instead of showing the preview")
+                        transferOverQuotaEventQueue.emit(TransferOverQuotaSource.Download)
+                    } else if (duration > 1.5.seconds) {
                         _uiState.updateEventAndClearProgress(
                             SlowDownloadPreviewInProgress(
                                 transferUniqueId = previewDownload.uniqueId,
@@ -609,6 +620,30 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * A preview download stalled by bandwidth over quota is not retried until the SDK delay
+     * expires, so no new over quota event is raised and the loading preview screen would wait
+     * forever. Opening the file again is a deliberate action, so it deserves the warning.
+     *
+     * @return true when the caller must warn about over quota instead of showing the screen.
+     */
+    private suspend fun shouldWarnAboutTransferOverQuota(): Boolean {
+        if (!isQuotaWarningUpsellEnabled()) return false
+
+        return runCatching { isInTransferOverQuotaUseCase() }
+            .onFailure { Timber.e(it) }
+            .getOrDefault(false)
+    }
+
+    private var quotaWarningUpsellEnabled: Boolean? = null
+
+    private suspend fun isQuotaWarningUpsellEnabled(): Boolean =
+        quotaWarningUpsellEnabled ?: runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
+        }.onFailure { Timber.e(it) }
+            .getOrDefault(false)
+            .also { quotaWarningUpsellEnabled = it }
 
     /**
      * It starts downloading the node for attach with the appropriate use case

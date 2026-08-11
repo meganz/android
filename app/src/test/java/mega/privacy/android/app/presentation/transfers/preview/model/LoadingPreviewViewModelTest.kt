@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.preview.model
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.testing.invoke
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -18,7 +16,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.transfers.preview.view.LoadingPreviewInfo
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -28,6 +25,8 @@ import mega.privacy.android.domain.exception.NetworkUnavailableException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.transfers.NoTransferToShowException
 import mega.privacy.android.domain.exception.transfers.TransferNotFoundException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -59,12 +58,13 @@ class LoadingPreviewViewModelTest {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
         on { invoke() } doReturn flowOf(true)
     }
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
     private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val transferUniqueId = 12L
     private val fileName = "test.txt"
-    private var savedStateHandle = SavedStateHandle()
+    private var args = LoadingPreviewViewModel.Args()
 
     @Before
     fun setup() {
@@ -74,8 +74,10 @@ class LoadingPreviewViewModelTest {
             monitorTransferEventsUseCase,
             broadcastTransferTagToCancelUseCase,
             monitorConnectivityUseCase,
+            getFeatureFlagValueUseCase,
             fileTypeIconMapper,
         )
+        args = LoadingPreviewViewModel.Args()
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
     }
 
@@ -90,23 +92,22 @@ class LoadingPreviewViewModelTest {
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             broadcastTransferTagToCancelUseCase = broadcastTransferTagToCancelUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
-            savedStateHandle = savedStateHandle,
+            args = args,
             appScope = appScope,
         )
     }
 
-    private fun initSavedStateHandle(
+    private fun initArgs(
         transferUniqueId: Long? = null,
         transferPath: String? = null,
         transferTag: Int? = null,
     ) {
-        savedStateHandle = SavedStateHandle.Companion.invoke(
-            route = LoadingPreviewInfo(
-                transferUniqueId = transferUniqueId,
-                transferPath = transferPath,
-                transferTag = transferTag,
-            )
+        args = LoadingPreviewViewModel.Args(
+            transferUniqueId = transferUniqueId,
+            transferPath = transferPath,
+            transferTag = transferTag,
         )
     }
 
@@ -114,15 +115,18 @@ class LoadingPreviewViewModelTest {
         transfer: Transfer?,
         flow: Flow<TransferEvent> = emptyFlow(),
         connectivityFlow: Flow<Boolean> = flowOf(true),
+        isQuotaWarningUpsellEnabled: Boolean = false,
     ) {
         whenever(getTransferByUniqueIdUseCase(transferUniqueId)) doReturn transfer
         whenever(monitorTransferEventsUseCase()).thenReturn(flow)
         whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)) doReturn
+                isQuotaWarningUpsellEnabled
     }
 
     @Test
     fun `test initial state`() = runTest {
-        initSavedStateHandle()
+        initArgs()
 
         initTest()
 
@@ -145,7 +149,7 @@ class LoadingPreviewViewModelTest {
     @Test
     fun `test that when transfer unique id nor tag are not provided, state is updated with error`() =
         runTest {
-            initSavedStateHandle()
+            initArgs()
 
             initTest()
 
@@ -161,7 +165,7 @@ class LoadingPreviewViewModelTest {
             file.createNewFile()
             val progress = Progress(1f)
 
-            initSavedStateHandle(
+            initArgs(
                 transferUniqueId = transferUniqueId,
                 transferPath = file.absolutePath,
             )
@@ -187,7 +191,7 @@ class LoadingPreviewViewModelTest {
                 on { this.fileName } doReturn fileName
             }
 
-            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            initArgs(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer)
             whenever(fileTypeIconMapper(extension)) doReturn fileTypeResId
 
@@ -204,7 +208,7 @@ class LoadingPreviewViewModelTest {
     @Test
     fun `test that when transfer nor file are found, then file name and file typeRes are not set but error is`() =
         runTest {
-            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            initArgs(transferUniqueId = transferUniqueId)
             commonStub(transfer = null)
 
             initTest()
@@ -232,7 +236,7 @@ class LoadingPreviewViewModelTest {
                 on { this.transfer } doReturn transfer
             }
 
-            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            initArgs(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
@@ -258,7 +262,7 @@ class LoadingPreviewViewModelTest {
                 on { this.transfer } doReturn transfer
             }
 
-            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            initArgs(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
@@ -283,13 +287,67 @@ class LoadingPreviewViewModelTest {
                 on { this.error } doReturn error
             }
 
-            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            initArgs(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
 
             underTest.uiState.test {
                 assertThat(awaitItem().error).isEqualTo(error)
+            }
+        }
+
+    @Test
+    fun `test that temporary error event, with quota exceeded exception, does not update state with error when the quota warning upsell screen is enabled`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.uniqueId } doReturn transferUniqueId
+                on { this.fileName } doReturn fileName
+            }
+            val error = mock<QuotaExceededMegaException>()
+            val event = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { this.transfer } doReturn transfer
+                on { this.error } doReturn error
+            }
+
+            initArgs(transferUniqueId = transferUniqueId)
+            commonStub(
+                transfer = transfer,
+                flow = flowOf(event),
+                isQuotaWarningUpsellEnabled = true,
+            )
+
+            initTest()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().error).isNull()
+            }
+        }
+
+    @Test
+    fun `test that finish event, with quota exceeded exception, does not update state with error when the quota warning upsell screen is enabled`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.uniqueId } doReturn transferUniqueId
+                on { this.fileName } doReturn fileName
+            }
+            val error = mock<QuotaExceededMegaException>()
+            val event = mock<TransferEvent.TransferFinishEvent> {
+                on { this.transfer } doReturn transfer
+                on { this.error } doReturn error
+            }
+
+            initArgs(transferUniqueId = transferUniqueId)
+            commonStub(
+                transfer = transfer,
+                flow = flowOf(event),
+                isQuotaWarningUpsellEnabled = true,
+            )
+
+            initTest()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().error).isNull()
             }
         }
 
@@ -306,7 +364,7 @@ class LoadingPreviewViewModelTest {
                 on { this.error } doReturn error
             }
 
-            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            initArgs(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
@@ -329,7 +387,7 @@ class LoadingPreviewViewModelTest {
                 on { this.error } doReturn error
             }
 
-            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            initArgs(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
@@ -354,7 +412,7 @@ class LoadingPreviewViewModelTest {
                 on { this.error } doReturn error
             }
 
-            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            initArgs(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
@@ -404,7 +462,7 @@ class LoadingPreviewViewModelTest {
                 on { this.fileName } doReturn fileName
             }
 
-            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            initArgs(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer)
 
             whenever(broadcastTransferTagToCancelUseCase(transferTagToCancel)) doReturn Unit
@@ -430,7 +488,7 @@ class LoadingPreviewViewModelTest {
             on { this.transfer } doReturn transfer
         }
 
-        initSavedStateHandle(transferUniqueId = transferUniqueId)
+        initArgs(transferUniqueId = transferUniqueId)
         commonStub(transfer = transfer, flow = flowOf(event))
 
         initTest()
@@ -443,7 +501,7 @@ class LoadingPreviewViewModelTest {
         runTest {
             val transferTagToCancel = 1234
 
-            initSavedStateHandle(transferTag = transferTagToCancel)
+            initArgs(transferTag = transferTagToCancel)
             commonStub(transfer = null)
 
             whenever(broadcastTransferTagToCancelUseCase(transferTagToCancel)) doReturn Unit
@@ -465,7 +523,7 @@ class LoadingPreviewViewModelTest {
                 on { this.fileName } doReturn fileName
             }
 
-            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            initArgs(transferUniqueId = transferUniqueId)
             commonStub(
                 transfer = transfer,
                 connectivityFlow = flowOf(true, false),
@@ -493,7 +551,7 @@ class LoadingPreviewViewModelTest {
                 on { this.transfer } doReturn transfer
             }
 
-            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            initArgs(transferUniqueId = transferUniqueId)
             commonStub(
                 transfer = transfer,
                 flow = flowOf(event),
