@@ -23,6 +23,7 @@ import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerViewModel
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
+import mega.privacy.android.feature.sync.ui.settings.SettingsSyncRoute
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
@@ -39,6 +40,7 @@ import mega.privacy.android.navigation.destination.SyncMegaPickerNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncPromotionNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
+import mega.privacy.android.navigation.destination.SyncSettingsNavKey
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -201,6 +203,13 @@ fun EntryProviderScope<NavKey>.syncScreens(
                 Analytics.tracker.trackEvent(AndroidSyncGetStartedButtonEvent)
                 navigationHandler.navigate(SyncNewFolderNavKey())
             }
+        }
+    }
+
+    entry<SyncSettingsNavKey> {
+        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        OriginalTheme(isDark = themeMode.isDarkMode()) {
+            SettingsSyncRoute()
         }
     }
 
