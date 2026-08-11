@@ -268,7 +268,7 @@ internal fun InviteContactsScreen(
                     ) {
                         MegaIcon(
                             modifier = Modifier.size(24.dp),
-                            painter = painterResource(iconPackR.drawable.ic_qr_scan_medium_thin_outline),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Qr),
                             contentDescription = stringResource(sharedR.string.invite_contacts_my_qr_code_action),
                             tint = IconColor.Primary,
                         )

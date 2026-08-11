@@ -234,6 +234,7 @@ interface IconPackInterface {
                 val PlaySquare: ImageVector
                 val Plus: ImageVector
                 val PlusCircle: ImageVector
+                val Qr: ImageVector
                 val RectangleImageStack: ImageVector
                 val RectangleStackPlus: ImageVector
                 val Refresh02: ImageVector

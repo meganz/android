@@ -130,6 +130,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlinePlaySquareI
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlinePlaylistImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlinePlusCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlinePlusImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineQrImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineRectangleImageStackImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineRectangleStackPlusImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineRefresh02ImageVector
@@ -584,6 +585,8 @@ public object IconPack : IconPackInterface {
 
                 override val PlusCircle: ImageVector by
                         lazy { createMediumThinOutlinePlusCircleImageVector() }
+
+                override val Qr: ImageVector by lazy { createMediumThinOutlineQrImageVector() }
 
                 override val RectangleImageStack: ImageVector by
                         lazy { createMediumThinOutlineRectangleImageStackImageVector() }
