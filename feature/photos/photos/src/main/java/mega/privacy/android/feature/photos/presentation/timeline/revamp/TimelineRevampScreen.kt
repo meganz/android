@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -39,13 +40,19 @@ import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.components.state.EmptyStateView
@@ -54,9 +61,9 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.core.sharedcomponents.header.StickySectionHeader
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.R
+import mega.privacy.android.feature.photos.components.StickySectionHeader
 import mega.privacy.android.feature.photos.components.TimelineGridSizeSettingsMenu
 import mega.privacy.android.feature.photos.extensions.isScrolledToEnd
 import mega.privacy.android.feature.photos.extensions.isScrolledToTop
@@ -81,6 +88,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.rememberCameraU
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.resources.R as sharedR
+import timber.log.Timber
 import java.time.Year
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -91,6 +99,7 @@ internal fun TimelineRevampScreen(
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     showEnableCameraUploadsPage: Boolean,
     onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
+    loadMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2>,
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -162,6 +171,7 @@ internal fun TimelineRevampScreen(
                 periodCards = uiState.periodCards,
                 arePeriodCardsLoading = uiState.arePeriodCardsLoading,
                 onVisibleRangeChanged = onVisibleRangeChanged,
+                loadMediaRange = loadMediaRange,
                 onGridSizeChange = onGridSizeChange,
                 onZoomIn = onZoomIn,
                 onZoomOut = onZoomOut,
@@ -212,6 +222,7 @@ private fun TimelineRevampContent(
     periodCards: List<PhotosNodeListCard>,
     arePeriodCardsLoading: Boolean,
     onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
+    loadMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2>,
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -336,6 +347,7 @@ private fun TimelineRevampContent(
                 locale = locale,
                 lazyGridState = lazyGridState,
                 onVisibleRangeChanged = onVisibleRangeChanged,
+                loadMediaRange = loadMediaRange,
                 onGridSizeChange = onGridSizeChange,
                 onZoomIn = onZoomIn,
                 onZoomOut = onZoomOut,
@@ -362,6 +374,7 @@ private fun TimelineRevampGrid(
     locale: Locale,
     lazyGridState: LazyGridState,
     onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
+    loadMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2>,
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -390,13 +403,12 @@ private fun TimelineRevampGrid(
     val currentSelectedPhotoIds by rememberUpdatedState(selectedPhotoIds)
     val currentOnNodeSelected by rememberUpdatedState(onNodeSelected)
 
-    // Cells swept while their node is still loading lazily cannot fire onNodeSelected yet; they
-    // are parked here (as snapshot state, so their shimmer placeholders render as selected) and
-    // selected once the node arrives.
-    val pendingDragSelection = remember { mutableStateSetOf<Int>() }
+    // Cells marked for selection while their node is still loading; their shimmer placeholders
+    // render as selected and they join the selection once the node arrives.
+    val pendingSelection = remember { mutableStateSetOf<Int>() }
 
     LaunchedEffect(loadedNodes) {
-        val iterator = pendingDragSelection.iterator()
+        val iterator = pendingSelection.iterator()
         while (iterator.hasNext()) {
             val node = loadedNodes[iterator.next()] ?: continue
             iterator.remove()
@@ -407,7 +419,7 @@ private fun TimelineRevampGrid(
     }
 
     LaunchedEffect(selectedPhotoIds.isEmpty()) {
-        if (selectedPhotoIds.isEmpty()) pendingDragSelection.clear()
+        if (selectedPhotoIds.isEmpty()) pendingSelection.clear()
     }
 
     NotifyVisibleMediaRange(
@@ -435,6 +447,92 @@ private fun TimelineRevampGrid(
     val totalGridItems = remember(sections, headerIndexes, bannerContent != null) {
         val bannerItems = if (bannerContent != null) 1 else 0
         bannerItems + 1 + headerIndexes.size + sections.sumOf { it.count }.toInt()
+    }
+
+    val isSelectionMode = selectedPhotoIds.isNotEmpty()
+    val scope = rememberCoroutineScope()
+
+    // Global media-index range of each month (keyed by monthKey), backing the month headers'
+    // select-all checkboxes.
+    val monthRanges = remember(sections, sectionStartOffsets) {
+        buildMap {
+            var rangeStart = 0
+            var rangeEnd = -1
+            var currentMonth: String? = null
+            sections.zip(sectionStartOffsets).forEach { (section, offset) ->
+                val month = monthKey(section.startDate)
+                if (month != currentMonth) {
+                    currentMonth?.let { put(it, rangeStart..rangeEnd) }
+                    currentMonth = month
+                    rangeStart = offset
+                }
+                rangeEnd = offset + section.count.toInt() - 1
+            }
+            currentMonth?.let { put(it, rangeStart..rangeEnd) }
+        }
+    }
+
+    // A range is fully selected when every cell is selected, pending selection, or taken down.
+    fun isRangeSelected(range: IntRange): Boolean = range.all { index ->
+        val node = loadedNodes[index]
+        if (node == null) index in pendingSelection
+        else node.isTakenDown || node.id in currentSelectedPhotoIds
+    }
+
+    // Applies the same per-node toggle a tap fires across the whole range. Cells not in
+    // loadedNodes (which cannot represent a range larger than its cache) resolve through
+    // loadMediaRange, marked pending meanwhile when selecting.
+    fun toggleRangeSelection(range: IntRange) {
+        val selectAll = !isRangeSelected(range)
+        var hasUnloadedCells = false
+        range.forEach { index ->
+            val node = loadedNodes[index]
+            if (node == null) {
+                hasUnloadedCells = true
+                if (selectAll) pendingSelection.add(index) else pendingSelection.remove(index)
+            } else {
+                if (!selectAll) pendingSelection.remove(index)
+                node.takeUnless { it.isTakenDown }
+                    ?.takeIf { (it.id in currentSelectedPhotoIds) != selectAll }
+                    ?.let { currentOnNodeSelected(it) }
+            }
+        }
+        if (hasUnloadedCells) {
+            scope.launch {
+                try {
+                    loadMediaRange(range.first, range.last).forEach { (index, node) ->
+                        // Leaving selection mode clears the pending marks; don't revive the selection.
+                        if (!selectAll || index in pendingSelection) {
+                            node.takeUnless { it.isTakenDown }
+                                ?.takeIf { (it.id in currentSelectedPhotoIds) != selectAll }
+                                ?.let { currentOnNodeSelected(it) }
+                        }
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to resolve the section selection")
+                }
+            }
+        }
+    }
+
+    // The month owning the top-most visible media — the month the sticky/top header represents.
+    val topVisibleMonthRange by remember(
+        sections,
+        sectionStartOffsets,
+        monthRanges,
+        offsetByGroupId
+    ) {
+        derivedStateOf {
+            if (sections.isEmpty()) return@derivedStateOf null
+            val minVisibleIndex = lazyGridState.layoutInfo.visibleItemsInfo
+                .mapNotNull { globalMediaIndexOf(it.key, offsetByGroupId) }
+                .minOrNull() ?: 0
+            val sectionIndex = sectionIndexOfMedia(minVisibleIndex, sectionStartOffsets)
+                .coerceIn(sections.indices)
+            monthRanges[monthKey(sections[sectionIndex].startDate)]
+        }
     }
 
     // Recomputes on scroll (reads lazyGridState.layoutInfo, a snapshot state) and is re-created when
@@ -482,12 +580,12 @@ private fun TimelineRevampGrid(
                         val node = currentLoadedNodes[index]
                         if (node == null) {
                             if (selected) {
-                                pendingDragSelection.add(index)
+                                pendingSelection.add(index)
                             } else {
-                                pendingDragSelection.remove(index)
+                                pendingSelection.remove(index)
                             }
                         } else {
-                            if (!selected) pendingDragSelection.remove(index)
+                            if (!selected) pendingSelection.remove(index)
                             node.takeUnless { it.isTakenDown }
                                 ?.takeIf { (it.id in currentSelectedPhotoIds) != selected }
                                 ?.let { currentOnNodeSelected(it) }
@@ -513,15 +611,29 @@ private fun TimelineRevampGrid(
                 key = NON_STICKY_HEADER_ITEM,
                 span = { GridItemSpan(maxLineSpan) },
             ) {
+                val selectableRange = topVisibleMonthRange?.takeIf { isSelectionMode }
                 StickySectionHeader(
                     modifier = Modifier
                         .testTag(TIMELINE_REVAMP_NON_STICKY_HEADER_TAG),
                     title = stickyLabel,
+                    leadingContent = selectableRange?.let { range ->
+                        {
+                            SectionSelectAllCheckbox(
+                                checked = isRangeSelected(range),
+                                modifier = Modifier.testTag(
+                                    TIMELINE_REVAMP_NON_STICKY_HEADER_CHECKBOX_TAG
+                                ),
+                            )
+                        }
+                    },
                     trailingContent = {
                         TimelineRevampGridSizeMenu(
                             gridSize = gridSize,
                             onGridSizeChange = onGridSizeChange,
                         )
+                    },
+                    onClick = selectableRange?.let { range ->
+                        { toggleRangeSelection(range) }
                     },
                 )
             }
@@ -533,10 +645,25 @@ private fun TimelineRevampGrid(
                         key = "$HEADER_KEY_PREFIX$monthHeaderKey",
                         span = { GridItemSpan(maxLineSpan) },
                     ) {
+                        val selectableRange = monthRanges[monthHeaderKey]
+                            ?.takeIf { isSelectionMode }
                         StickySectionHeader(
                             modifier = Modifier
                                 .testTag("$TIMELINE_REVAMP_SECTION_HEADER_TAG$monthHeaderKey"),
                             title = timelineMonthLabel(section.startDate, locale),
+                            leadingContent = selectableRange?.let { range ->
+                                {
+                                    SectionSelectAllCheckbox(
+                                        checked = isRangeSelected(range),
+                                        modifier = Modifier.testTag(
+                                            "$TIMELINE_REVAMP_SECTION_HEADER_CHECKBOX_TAG$monthHeaderKey"
+                                        ),
+                                    )
+                                }
+                            },
+                            onClick = selectableRange?.let { range ->
+                                { toggleRangeSelection(range) }
+                            },
                         )
                     }
                 }
@@ -554,7 +681,7 @@ private fun TimelineRevampGrid(
                         isSelected = if (node != null) {
                             node.id in selectedPhotoIds
                         } else {
-                            base + index in pendingDragSelection
+                            base + index in pendingSelection
                         },
                         shouldShowFavourite = node?.isFavourite == true,
                         isHiddenNodesEnabled = isHiddenNodesEnabled,
@@ -566,16 +693,30 @@ private fun TimelineRevampGrid(
         }
 
         if (showStickyHeader) {
+            val selectableRange = topVisibleMonthRange?.takeIf { isSelectionMode }
             StickySectionHeader(
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .testTag(TIMELINE_REVAMP_STICKY_HEADER_TAG),
                 title = stickyLabel,
+                leadingContent = selectableRange?.let { range ->
+                    {
+                        SectionSelectAllCheckbox(
+                            checked = isRangeSelected(range),
+                            modifier = Modifier.testTag(
+                                TIMELINE_REVAMP_STICKY_HEADER_CHECKBOX_TAG
+                            ),
+                        )
+                    }
+                },
                 trailingContent = {
                     TimelineRevampGridSizeMenu(
                         gridSize = gridSize,
                         onGridSizeChange = onGridSizeChange,
                     )
+                },
+                onClick = selectableRange?.let { range ->
+                    { toggleRangeSelection(range) }
                 },
             )
         }
@@ -680,6 +821,22 @@ private fun dayRangeLabel(
     val maxDayText = String.format(locale, "%02d", maxDay)
     val dayPart = if (minDay == maxDay) minDayText else "$minDayText$DAY_RANGE_SEPARATOR$maxDayText"
     return "$monthName $dayPart ${zonedDateTime.year}"
+}
+
+@Composable
+private fun SectionSelectAllCheckbox(
+    checked: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Checkbox(
+        checked = checked,
+        onCheckStateChanged = {},
+        clickable = false,
+        tapTargetArea = false,
+        modifier = modifier.semantics {
+            toggleableState = ToggleableState(checked)
+        },
+    )
 }
 
 @Composable
@@ -824,6 +981,12 @@ internal const val TIMELINE_REVAMP_CARD_LIST_TAG = "timeline_revamp_content:card
 internal const val TIMELINE_REVAMP_CARD_LIST_SKELETON_TAG =
     "timeline_revamp_content:card_list_skeleton"
 internal const val TIMELINE_REVAMP_SECTION_HEADER_TAG = "timeline_revamp_content:section_header_"
+internal const val TIMELINE_REVAMP_SECTION_HEADER_CHECKBOX_TAG =
+    "timeline_revamp_content:section_header_checkbox_"
+internal const val TIMELINE_REVAMP_STICKY_HEADER_CHECKBOX_TAG =
+    "timeline_revamp_content:sticky_header_checkbox"
+internal const val TIMELINE_REVAMP_NON_STICKY_HEADER_CHECKBOX_TAG =
+    "timeline_revamp_content:non_sticky_header_checkbox"
 internal const val TIMELINE_REVAMP_GRID_SIZE_ICON_TAG = "timeline_revamp_content:grid_size_icon"
 internal const val TIMELINE_REVAMP_LOADING_SKELETON_TAG = "timeline_revamp_content:loading_skeleton"
 internal const val TIMELINE_REVAMP_EMPTY_VIEW_TAG = "timeline_revamp_content:empty_view"
@@ -853,6 +1016,7 @@ private fun TimelineRevampScreenPreview() {
                 loadedNodes = emptyMap(),
             ),
             onVisibleRangeChanged = { _, _ -> },
+            loadMediaRange = { _, _ -> emptyMap() },
             onGridSizeChange = {},
             onZoomIn = {},
             onZoomOut = {},
@@ -899,6 +1063,7 @@ private fun TimelineRevampWithBannerPreview() {
                 loadedNodes = emptyMap(),
             ),
             onVisibleRangeChanged = { _, _ -> },
+            loadMediaRange = { _, _ -> emptyMap() },
             onGridSizeChange = {},
             onZoomIn = {},
             onZoomOut = {},
@@ -930,6 +1095,7 @@ private fun TimelineRevampEmptyPreview() {
         TimelineRevampScreen(
             uiState = TimelineRevampUiState.Empty,
             onVisibleRangeChanged = { _, _ -> },
+            loadMediaRange = { _, _ -> emptyMap() },
             onGridSizeChange = {},
             onZoomIn = {},
             onZoomOut = {},

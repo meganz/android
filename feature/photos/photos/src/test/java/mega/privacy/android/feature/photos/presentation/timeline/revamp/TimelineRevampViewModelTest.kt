@@ -943,6 +943,58 @@ internal class TimelineRevampViewModelTest {
         }
     }
 
+    @Test
+    fun `test that loadMediaRange returns the requested slots after the visible-window loader has run`() =
+        runTest {
+            val sections = listOf(section(groupId = "May 2026", count = 60))
+            val nodes = (0 until 60).map { mock<TypedFileNode>() }
+            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(sections)
+            whenever(listMediaNodesByOffsetUseCase(any(), any(), any(), any(), any()))
+                .thenAnswer { invocation ->
+                    val maxElements = invocation.getArgument<Int>(3)
+                    val offset = invocation.getArgument<Long>(4).toInt()
+                    nodes.subList(offset, offset + maxElements)
+                }
+            nodes.forEachIndexed { index, node ->
+                whenever(mediaTimelineNodeUiItemMapper(node)).thenReturn(item(id = index.toLong()))
+            }
+            initUnderTest()
+
+            underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+                awaitItem()
+                underTest.onVisibleRangeChanged(firstIndex = 0, lastIndex = 1)
+                awaitItem()
+
+                val loaded = underTest.loadMediaRange(firstIndex = 30, lastIndex = 59)
+                assertThat(loaded.keys).containsExactlyElementsIn((30..59).toList())
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that loadMediaRange returns the requested slots before any visible range was reported`() =
+        runTest {
+            val sections = listOf(section(groupId = "May 2026", count = 4))
+            val nodes = (0 until 4).map { mock<TypedFileNode>() }
+            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(sections)
+            whenever(listMediaNodesByOffsetUseCase(any(), any(), any(), any(), any()))
+                .thenReturn(nodes)
+            nodes.forEachIndexed { index, node ->
+                whenever(mediaTimelineNodeUiItemMapper(node)).thenReturn(item(id = index.toLong()))
+            }
+            initUnderTest()
+
+            underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+                awaitItem()
+
+                val loaded = underTest.loadMediaRange(firstIndex = 0, lastIndex = 3)
+                assertThat(loaded.keys).containsExactly(0, 1, 2, 3)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     private fun section(groupId: String, count: Long) =
         MediaTimelineSection(groupId = groupId, startDate = 0L, endDate = 0L, count = count)
 

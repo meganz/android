@@ -585,6 +585,70 @@ class TimelineRevampViewModel @Inject constructor(
         ensureContentMonitorStarted()
     }
 
+    /**
+     * Loads and returns the media in the given global slot range, keyed by global index. Used by
+     * section select-all, which needs every node of the range, on-screen or not. The fetched nodes
+     * are deliberately not cached: a range can exceed the LRU cache capacity, where caching would
+     * evict the visible window and lose part of the range before it could ever be observed through
+     * [TimelineRevampUiState.Data.loadedNodes].
+     *
+     * @param firstIndex the first global media index of the range
+     * @param lastIndex the last global media index of the range
+     */
+    suspend fun loadMediaRange(
+        firstIndex: Int,
+        lastIndex: Int,
+    ): Map<Int, PhotosNodeContentItemV2> {
+        if (firstIndex < 0 || firstIndex > lastIndex) return emptyMap()
+        val result = HashMap<Int, PhotosNodeContentItemV2>()
+        var sectionStartOffset = 0
+        for (section in sectionsState.value.sectionsOrEmpty()) {
+            if (sectionStartOffset > lastIndex) break
+            val slotCount = section.count.toInt()
+            val sectionEnd = sectionStartOffset + slotCount - 1
+            if (sectionEnd >= firstIndex) {
+                val localWindowStart = (firstIndex - sectionStartOffset).coerceAtLeast(0)
+                val localWindowEnd = (lastIndex - sectionStartOffset).coerceAtMost(slotCount - 1)
+                fetchSectionWindowItems(
+                    section = section,
+                    localWindowStart = localWindowStart,
+                    localWindowEnd = localWindowEnd,
+                ).forEach { (localIndex, item) ->
+                    result[sectionStartOffset + localIndex] = item
+                }
+            }
+            sectionStartOffset += slotCount
+        }
+        return result
+    }
+
+    /**
+     * The items of the section-local window `[localWindowStart, localWindowEnd]`: taken from the
+     * cache where already loaded, with the rest fetched — without caching (see [loadMediaRange]).
+     */
+    private suspend fun fetchSectionWindowItems(
+        section: MediaTimelineSection,
+        localWindowStart: Int,
+        localWindowEnd: Int,
+    ): Map<Int, PhotosNodeContentItemV2> {
+        val windowItems = HashMap<Int, PhotosNodeContentItemV2>()
+        for (localIndex in localWindowStart..localWindowEnd) {
+            mediaCache[SlotKey(section.groupId, localIndex)]?.let { windowItems[localIndex] = it }
+        }
+
+        val uncachedRange = findUncachedRange(
+            groupId = section.groupId,
+            localWindowStart = localWindowStart,
+            localWindowEnd = localWindowEnd,
+        ) ?: return windowItems // the whole window is already cached
+
+        val nodes = fetchSectionNodes(section, uncachedRange) ?: return windowItems
+        nodes.forEachIndexed { i, node ->
+            windowItems[uncachedRange.first + i] = mediaTimelineNodeUiItemMapper(node)
+        }
+        return windowItems
+    }
+
     private fun ensureMediaLoaderStarted() {
         if (!mediaLoaderStarted.compareAndSet(false, true)) return
         viewModelScope.launch {

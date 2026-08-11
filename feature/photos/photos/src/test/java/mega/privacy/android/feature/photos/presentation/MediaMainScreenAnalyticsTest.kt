@@ -145,6 +145,7 @@ class MediaMainScreenAnalyticsTest {
                     timelineTabUiState = timelineTabUiState,
                     timelineRevampUiState = TimelineRevampUiState.Loading,
                     onTimelineRevampVisibleRangeChanged = { _, _ -> },
+                    loadTimelineRevampMediaRange = { _, _ -> emptyMap() },
                     onTimelineRevampScrollingChanged = {},
                     onTimelineRevampGridSizeChange = {},
                     onTimelineRevampZoomIn = {},
