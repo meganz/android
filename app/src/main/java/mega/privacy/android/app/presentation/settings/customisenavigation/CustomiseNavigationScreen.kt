@@ -73,6 +73,8 @@ internal object CustomiseNavigationScreenTestTags {
     const val RESET_BUTTON = "$PREFIX:button_reset"
 
     fun navigationItemRow(id: String) = "$PREFIX:item_$id"
+
+    fun previewBarItem(id: String) = "$PREFIX:preview_item_$id"
 }
 
 /**
@@ -242,7 +244,7 @@ private fun NavigationPreviewBarSegment(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.testTag(CustomiseNavigationScreenTestTags.previewBarItem(item.id)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
