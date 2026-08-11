@@ -16,8 +16,12 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedImageNode
+import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase.Companion.FILE
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaEventUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -27,9 +31,12 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.Ignore
 
 @ExperimentalCoroutinesApi
@@ -44,6 +51,8 @@ internal class GetImageUseCaseTest {
 
     private val isFullSizeRequiredUseCase: IsFullSizeRequiredUseCase = mock()
     private val photosRepository: PhotosRepository = mock()
+    private val broadcastTransferOverQuotaEventUseCase: BroadcastTransferOverQuotaEventUseCase =
+        mock()
     private val imageNode: TypedImageNode = mock {
         on { fetchFullImage }.thenReturn { _, _ ->
             emptyFlow()
@@ -55,13 +64,17 @@ internal class GetImageUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        underTest =
-            GetImageUseCase(isFullSizeRequiredUseCase, photosRepository)
+        underTest = GetImageUseCase(
+            isFullSizeRequiredUseCase,
+            photosRepository,
+            broadcastTransferOverQuotaEventUseCase,
+        )
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     @BeforeEach
     fun recreateMocks() {
+        reset(photosRepository, broadcastTransferOverQuotaEventUseCase)
         fetchThumbnailLambda = mock {
             on { invoke() }.thenReturn(thumbnailFilePath)
         }
@@ -267,4 +280,80 @@ internal class GetImageUseCaseTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    internal fun `test that transfer over quota is broadcast when the full image download is cancelled by over quota`() =
+        runTest {
+            stubFullImageFailure(
+                CancellationException("Over quota", QuotaExceededMegaException(-17, "Over quota"))
+            )
+
+            collectIgnoringFailure()
+
+            verify(broadcastTransferOverQuotaEventUseCase).invoke(TransferOverQuotaStatus.OverQuota)
+        }
+
+    @Test
+    internal fun `test that transfer over quota is broadcast when the full image download fails with over quota`() =
+        runTest {
+            stubFullImageFailure(QuotaExceededMegaException(-17, "Over quota"))
+
+            collectIgnoringFailure()
+
+            verify(broadcastTransferOverQuotaEventUseCase).invoke(TransferOverQuotaStatus.OverQuota)
+        }
+
+    @Test
+    internal fun `test that the image result is kept cached when the full image download is cancelled by over quota`() =
+        runTest {
+            stubFullImageFailure(
+                CancellationException("Over quota", QuotaExceededMegaException(-17, "Over quota"))
+            )
+            whenever(imageNode.id).thenReturn(NodeId(7L))
+
+            collectIgnoringFailure()
+
+            verify(photosRepository, never()).clearImageResult(NodeId(7L))
+        }
+
+    @Test
+    internal fun `test that the image result cache is cleared when the full image download fails with another error`() =
+        runTest {
+            stubFullImageFailure(MegaException(-3, "Try again"))
+            whenever(imageNode.id).thenReturn(NodeId(7L))
+
+            collectIgnoringFailure()
+
+            verify(photosRepository).clearImageResult(NodeId(7L))
+        }
+
+    @Test
+    internal fun `test that transfer over quota is not broadcast when the full image download fails with another error`() =
+        runTest {
+            stubFullImageFailure(MegaException(-3, "Try again"))
+
+            collectIgnoringFailure()
+
+            verifyNoInteractions(broadcastTransferOverQuotaEventUseCase)
+        }
+
+    private suspend fun stubFullImageFailure(error: Throwable) {
+        imageNode.stub {
+            on { type } doReturn mock<StaticImageFileTypeInfo>()
+            on { fetchThumbnail } doReturn fetchThumbnailLambda
+            on { fetchPreview } doReturn fetchPreviewLambda
+            on { fetchFullImage } doReturn { _, _ -> flow { throw error } }
+        }
+        whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(true)
+    }
+
+    /**
+     * The download failure is rethrown to the caller, which is the collector's business; this only
+     * asserts on what the use case reports on the way out.
+     */
+    private suspend fun collectIgnoringFailure() {
+        runCatching {
+            underTest.invoke(imageNode, true, highPriority = false, resetDownloads = {}).collect { }
+        }
+    }
 }

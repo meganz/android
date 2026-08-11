@@ -5,12 +5,12 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
+import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.exception.FetchChatMegaNodeException
-import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -48,12 +48,7 @@ internal class FullImageFromServerMapper @Inject constructor(
                         }
 
                         else -> {
-                            cancel(
-                                error.errorString, MegaException(
-                                    error.errorCode,
-                                    error.errorString
-                                )
-                            )
+                            cancel(error.errorString, error.toException("getFullImage"))
                         }
                     }
                     resetDownloads()
@@ -61,12 +56,7 @@ internal class FullImageFromServerMapper @Inject constructor(
                 },
                 onTransferTemporaryError = { _, error ->
                     if (error.errorCode == MegaError.API_EOVERQUOTA) {
-                        cancel(
-                            error.errorString, MegaException(
-                                error.errorCode,
-                                error.errorString
-                            )
-                        )
+                        cancel(error.errorString, error.toException("getFullImage"))
                     }
                 },
                 onTransferUpdate = {
@@ -108,12 +98,7 @@ internal class FullImageFromServerMapper @Inject constructor(
                         }
 
                         else -> {
-                            cancel(
-                                error.errorString, MegaException(
-                                    error.errorCode,
-                                    error.errorString
-                                )
-                            )
+                            cancel(error.errorString, error.toException("getFullImage"))
                         }
                     }
                     resetDownloads()
@@ -121,12 +106,7 @@ internal class FullImageFromServerMapper @Inject constructor(
                 },
                 onTransferTemporaryError = { _, error ->
                     if (error.errorCode == MegaError.API_EOVERQUOTA) {
-                        cancel(
-                            error.errorString, MegaException(
-                                error.errorCode,
-                                error.errorString
-                            )
-                        )
+                        cancel(error.errorString, error.toException("getFullImage"))
                     }
                 },
                 onTransferUpdate = {

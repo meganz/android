@@ -8,7 +8,10 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.TypedImageNode
+import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.PhotosRepository
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaEventUseCase
 import javax.inject.Inject
 
 /**
@@ -17,6 +20,7 @@ import javax.inject.Inject
 class GetImageUseCase @Inject constructor(
     private val isFullSizeRequiredUseCase: IsFullSizeRequiredUseCase,
     private val photosRepository: PhotosRepository,
+    private val broadcastTransferOverQuotaEventUseCase: BroadcastTransferOverQuotaEventUseCase,
 ) {
     /**
      * Invoke
@@ -88,7 +92,12 @@ class GetImageUseCase @Inject constructor(
             if (fullSizeRequired) {
                 node.fetchFullImage(highPriority) {
                     resetDownloads()
-                }.catch { exception -> throw exception }.collect { result ->
+                }.catch { exception ->
+                    if (exception.isTransferOverQuota()) {
+                        broadcastTransferOverQuota()
+                    }
+                    throw exception
+                }.collect { result ->
                     when (result) {
                         is ImageProgress.Started -> {
                             imageResult.transferTag = result.transferTag
@@ -112,13 +121,40 @@ class GetImageUseCase @Inject constructor(
                     }
                 }
             }
-        }.onCompletion {
+        }.onCompletion { cause ->
             // If this download flow terminates (normally, on error, or — most importantly —
             // because the collector was cancelled, e.g. the user swiped to another page) before
             // fully loading, evict the partial cache entry so the node is re-fetched on the next
             // access instead of being stuck on a low-res preview or a black frame. No-op when the
             // download completed (saveImageResult already removed the entry).
-            photosRepository.clearImageResult(node.id)
+            //
+            // Bandwidth over quota is the exception: the download cannot progress until the quota
+            // window ends, so keeping the entry is what stops the viewer from restarting it, and
+            // raising the warning again, every time the screen recomposes — including when it
+            // recomposes on returning from that very warning.
+            if (cause?.isTransferOverQuota() != true) {
+                photosRepository.clearImageResult(node.id)
+            }
+        }
+    }
+
+    /**
+     * The download is cancelled with the cause wrapped in a [kotlinx.coroutines.CancellationException],
+     * so the quota failure is only reachable through it.
+     */
+    private fun Throwable.isTransferOverQuota(): Boolean =
+        this is QuotaExceededMegaException || cause is QuotaExceededMegaException
+
+    /**
+     * Full size images are downloaded on their own SDK listener rather than through the monitored
+     * transfer pipeline, so nothing else reports the bandwidth over quota they hit. Without this
+     * the failure never reaches the user, who is left looking at a stale thumbnail.
+     *
+     * Failing to broadcast must not replace the image error being rethrown to the caller.
+     */
+    private suspend fun broadcastTransferOverQuota() {
+        runCatching {
+            broadcastTransferOverQuotaEventUseCase(TransferOverQuotaStatus.OverQuota)
         }
     }
 
