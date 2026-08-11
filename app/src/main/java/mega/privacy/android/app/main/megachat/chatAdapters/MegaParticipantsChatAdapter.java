@@ -38,10 +38,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import dagger.hilt.android.EntryPointAccessors;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.main.controllers.ChatController;
@@ -87,8 +90,8 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         this.chatId = groupChatInfoActivity.getChatHandle();
         this.isPreview = groupChatInfoActivity.getChat().isPreview();
 
-        megaApi = MegaApplication.getInstance().getMegaApi();
-        megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        megaApi = EntryPointAccessors.fromApplication(groupChatInfoActivity, MegaApiEntryPoint.class).megaApi();
+        megaChatApi = EntryPointAccessors.fromApplication(groupChatInfoActivity, MegaApiEntryPoint.class).megaChatApi();
 
         Display display = groupChatInfoActivity.getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();

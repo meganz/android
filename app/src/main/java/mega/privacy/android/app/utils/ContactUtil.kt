@@ -2,11 +2,11 @@ package mega.privacy.android.app.utils
 
 import android.content.Context
 import android.content.Intent
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME
 import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
+import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.domain.entity.Contact
 import nz.mega.sdk.MegaUser
 
@@ -21,7 +21,7 @@ object ContactUtil {
     @JvmStatic
     @Deprecated("Use GetContactFromCacheByHandleUseCase instead.")
     fun getContactDB(contactHandle: Long): Contact? =
-        MegaApplication.getInstance().dbH.findContactByHandle(contactHandle)
+        getDbHandler().findContactByHandle(contactHandle)
 
     @JvmStatic
     fun getMegaUserNameDB(user: MegaUser?): String? {
@@ -70,7 +70,7 @@ object ContactUtil {
 
     @JvmStatic
     fun getNicknameContact(email: String?): String? {
-        val contactDB = MegaApplication.getInstance().dbH.findContactByEmail(email)
+        val contactDB = getDbHandler().findContactByEmail(email)
         if (contactDB != null) {
             return contactDB.nickname
         }

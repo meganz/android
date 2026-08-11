@@ -33,6 +33,7 @@ import coil3.request.target
 import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
 import coil3.util.CoilUtils
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.MimeTypeThumbnail
@@ -41,6 +42,7 @@ import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.SortByHeaderBinding
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel.Companion.orderNameMap
@@ -964,7 +966,10 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
             holder.textViewFileSize?.visibility = View.VISIBLE
             holder.textViewFileSize?.let { txtView ->
-                txtView.text = MegaApplication.getInstance().megaApiFolder.let {
+                txtView.text = EntryPointAccessors.fromApplication(
+                    txtView.context,
+                    MegaApiEntryPoint::class.java,
+                ).megaApiFolder().let {
                     if (type == Constants.FOLDER_LINK_ADAPTER)
                         MegaApiUtils.getMegaNodeFolderLinkInfo(node, it, txtView.context)
                     else

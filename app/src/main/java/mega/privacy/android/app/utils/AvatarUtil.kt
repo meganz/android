@@ -14,8 +14,10 @@ import android.util.Pair
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.vdurmont.emoji.EmojiParser
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.main.ShareContactInfo
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
@@ -143,7 +145,10 @@ object AvatarUtil {
             return getColor(null)
         }
 
-        val megaApi = MegaApplication.getInstance().megaApi
+        val megaApi = EntryPointAccessors.fromApplication(
+            applicationContext,
+            MegaApiEntryPoint::class.java,
+        ).megaApi()
         return getColor(megaApi.getUserAvatarColor(user))
     }
 
@@ -159,7 +164,10 @@ object AvatarUtil {
             return getColor(null)
         }
 
-        val megaApi = MegaApplication.getInstance().megaApi
+        val megaApi = EntryPointAccessors.fromApplication(
+            applicationContext,
+            MegaApiEntryPoint::class.java,
+        ).megaApi()
         return getColor(megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(handle)))
     }
 
@@ -171,8 +179,12 @@ object AvatarUtil {
      */
     @JvmStatic
     fun getColorAvatar(handle: String?): Int {
-        val avatarColor =
-            handle?.let { MegaApplication.getInstance().megaApi.getUserAvatarColor(it) }
+        val avatarColor = handle?.let {
+            EntryPointAccessors.fromApplication(
+                applicationContext,
+                MegaApiEntryPoint::class.java,
+            ).megaApi().getUserAvatarColor(it)
+        }
         return getColor(avatarColor)
     }
 

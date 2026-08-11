@@ -11,9 +11,11 @@ import android.os.Build
 import android.view.View
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.CallNotificationIntentService
@@ -40,8 +42,14 @@ class ChatAdvancedNotificationBuilder(
 ) {
     private val context: Context = context.applicationContext
     var dbH: DatabaseHandler = getDbHandler()
-    var megaApi: MegaApiAndroid = getInstance().megaApi
-    var megaChatApi: MegaChatApiAndroid = getInstance().getMegaChatApi()
+    var megaApi: MegaApiAndroid = EntryPointAccessors.fromApplication(
+        context,
+        MegaApiEntryPoint::class.java,
+    ).megaApi()
+    var megaChatApi: MegaChatApiAndroid = EntryPointAccessors.fromApplication(
+        context,
+        MegaApiEntryPoint::class.java,
+    ).megaChatApi()
 
     private val chatC: ChatController = ChatController(
         context = context,

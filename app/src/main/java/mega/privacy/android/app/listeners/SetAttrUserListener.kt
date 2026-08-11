@@ -3,9 +3,9 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.DatabaseEntryPoint
+import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
@@ -141,7 +141,7 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
         if (map != null && map.size() > 0 && !map["h"].isNullOrBlank()) {
             val handle = MegaApiJava.base64ToHandle(map["h"])
             if (handle != MegaApiJava.INVALID_HANDLE) {
-                MegaApplication.getInstance().dbH.myChatFilesFolderHandle = handle
+                getDbHandler().myChatFilesFolderHandle = handle
             }
         }
     }

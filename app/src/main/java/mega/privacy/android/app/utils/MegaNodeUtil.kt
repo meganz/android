@@ -277,7 +277,7 @@ object MegaNodeUtil {
     private fun isCameraUploads(megaApi: MegaApiAndroid, n: MegaNode): Boolean {
         var cameraSyncHandle: String? = null
         var secondaryMediaHandle: String? = null
-        val dbH = MegaApplication.getInstance().dbH
+        val dbH = getDbHandler()
         val prefs = dbH.preferences
 
         //Check if the item is the Camera Uploads folder

@@ -27,9 +27,10 @@ import coil3.request.transformations
 import coil3.size.Scale
 import coil3.transform.RoundedCornersTransformation
 import coil3.util.CoilUtils.dispose
-import mega.privacy.android.app.MegaApplication
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.main.providers.MegaProviderAdapter.ViewHolderProvider
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
@@ -49,7 +50,10 @@ class MegaProviderAdapter(
     private val listView: RecyclerView,
     private val type: Int,
 ) : RecyclerView.Adapter<ViewHolderProvider?>(), View.OnClickListener, OnLongClickListener {
-    var megaApi: MegaApiAndroid = MegaApplication.getInstance().megaApi
+    var megaApi: MegaApiAndroid = EntryPointAccessors.fromApplication(
+        context,
+        MegaApiEntryPoint::class.java,
+    ).megaApi()
 
     @JvmField
     var positionClicked: Int = -1

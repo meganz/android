@@ -9,7 +9,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.MegaApplication
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
@@ -36,9 +37,13 @@ import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
+import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraEnumerator
+import timber.log.Timber
 
 /**
  * Util wrapper module
@@ -165,10 +170,21 @@ abstract class UtilWrapperModule {
          * Provides the [CookieEnabledCheckWrapper]
          */
         @Provides
-        fun provideCookieEnabledCheckWrapper(): CookieEnabledCheckWrapper =
+        fun provideCookieEnabledCheckWrapper(
+            @ApplicationScope applicationScope: CoroutineScope,
+            getCookieSettingsUseCase: GetCookieSettingsUseCase,
+            updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
+        ): CookieEnabledCheckWrapper =
             object : CookieEnabledCheckWrapper {
                 override fun checkEnabledCookies() {
-                    MegaApplication.getInstance().checkEnabledCookies()
+                    applicationScope.launch {
+                        runCatching {
+                            val enabledCookies = getCookieSettingsUseCase()
+                            updateCrashAndPerformanceReportersUseCase(enabledCookies)
+                        }.onFailure {
+                            Timber.e("Failed to get cookie settings: $it")
+                        }
+                    }
                 }
             }
 

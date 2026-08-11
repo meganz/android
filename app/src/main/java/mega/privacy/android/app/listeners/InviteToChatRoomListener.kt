@@ -1,8 +1,9 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
-import mega.privacy.android.app.MegaApplication
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.R
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -65,8 +66,12 @@ class InviteToChatRoomListener(context: Context) : ChatBaseListener(context) {
      */
     fun inviteToChat(chatId: Long, contactsData: List<String>) {
         numberOfRequests = contactsData.size
-        val megaApi = MegaApplication.getInstance().megaApi
-        val megaChatApi = MegaApplication.getInstance().megaChatApi
+        val entryPoint = EntryPointAccessors.fromApplication(
+            context,
+            MegaApiEntryPoint::class.java,
+        )
+        val megaApi = entryPoint.megaApi()
+        val megaChatApi = entryPoint.megaChatApi()
 
         for (contact in contactsData.indices) {
             val user: MegaUser? = megaApi.getContact(contactsData[contact])

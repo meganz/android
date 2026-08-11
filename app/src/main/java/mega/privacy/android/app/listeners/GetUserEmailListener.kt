@@ -2,7 +2,7 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -23,7 +23,7 @@ class GetUserEmailListener(
     val position: Int = INVALID_POSITION,
 ) : MegaRequestListenerInterface {
 
-    private val databaseHandler: DatabaseHandler by lazy { MegaApplication.getInstance().dbH }
+    private val databaseHandler: DatabaseHandler by lazy { getDbHandler() }
 
     /**
      * Callback function for onRequestStart

@@ -5,11 +5,13 @@ import static mega.privacy.android.app.utils.Util.isOnline;
 
 import android.content.Context;
 
+import dagger.hilt.android.EntryPointAccessors;
+
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.listeners.MultipleRequestListener;
@@ -35,10 +37,10 @@ public class ContactController {
         Timber.d("ContactController created");
         this.context = context;
         if (megaApi == null) {
-            megaApi = MegaApplication.getInstance().getMegaApi();
+            megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();
         }
         if (megaChatApi == null) {
-            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+            megaChatApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaChatApi();
         }
 
         if (dbH == null) {

@@ -6,10 +6,10 @@ import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.di.DatabaseEntryPoint
+import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
@@ -36,7 +36,7 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
      */
     private var onlyDBUpdate = false
     private var holderPosition = 0
-    private val databaseHandler: DatabaseHandler by lazy { MegaApplication.getInstance().dbH }
+    private val databaseHandler: DatabaseHandler by lazy { getDbHandler() }
 
     private val databaseEntryPoint: DatabaseEntryPoint by lazy {
         EntryPointAccessors.fromApplication(context.applicationContext)

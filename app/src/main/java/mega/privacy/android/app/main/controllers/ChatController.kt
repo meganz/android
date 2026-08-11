@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.text.Html
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
@@ -719,9 +718,6 @@ class ChatController @Inject constructor(
      * @param peerHandle identifier of the user to save
      */
     fun setNonContactAttributesInDB(peerHandle: Long) {
-        val dbH: DatabaseHandler = getInstance().dbH
-        val megaChatApi = getInstance().getMegaChatApi()
-
         val firstName = megaChatApi.getUserFirstnameFromCache(peerHandle)
         if (!isTextEmpty(firstName)) {
             dbH.setNonContactFirstName(firstName, peerHandle.toString() + "")

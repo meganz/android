@@ -16,11 +16,14 @@ import android.content.Intent;
 
 import androidx.activity.result.ActivityResultLauncher;
 
+import dagger.hilt.android.EntryPointAccessors;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ShareListener;
@@ -45,7 +48,7 @@ public class NodeController {
         Timber.d("NodeController created");
         this.context = context;
         if (megaApi == null) {
-            megaApi = MegaApplication.getInstance().getMegaApi();
+            megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();
         }
     }
 

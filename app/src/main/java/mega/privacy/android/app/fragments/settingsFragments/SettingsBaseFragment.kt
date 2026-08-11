@@ -5,19 +5,27 @@ import android.os.Bundle
 import android.view.View
 import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.activities.settingsActivities.PreferencesBaseActivity
 import mega.privacy.android.app.interfaces.SimpleSnackbarCallBack
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
+import javax.inject.Inject
 
 abstract class SettingsBaseFragment : PreferenceFragmentCompat() {
-    protected val megaApi: MegaApiAndroid by lazy { getInstance().megaApi }
-    protected val megaChatApi: MegaChatApiAndroid by lazy { getInstance().getMegaChatApi() }
-    protected var dbH: DatabaseHandler = getInstance().dbH
+
+    @Inject
+    @MegaApi
+    internal lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    internal lateinit var megaChatApi: MegaChatApiAndroid
+
+    @Inject
+    internal lateinit var dbH: DatabaseHandler
     protected val prefs: MegaPreferences?
         get() = dbH.preferences
     protected var snackbarCallBack: SimpleSnackbarCallBack? = null

@@ -27,10 +27,11 @@ import coil3.request.transformations
 import coil3.size.Scale
 import coil3.transform.RoundedCornersTransformation
 import coil3.util.CoilUtils.dispose
-import mega.privacy.android.app.MegaApplication
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.main.VersionsFileActivity
 import mega.privacy.android.app.main.adapters.VersionsFileAdapter.ViewHolderVersion
 import mega.privacy.android.app.utils.Constants
@@ -47,7 +48,10 @@ class VersionsFileAdapter(
     var listFragment: RecyclerView,
 ) : RecyclerView.Adapter<ViewHolderVersion?>(), View.OnClickListener, OnLongClickListener,
     DragThumbnailGetter {
-    private val megaApi: MegaApiAndroid = MegaApplication.getInstance().megaApi
+    private val megaApi: MegaApiAndroid = EntryPointAccessors.fromApplication(
+        context,
+        MegaApiEntryPoint::class.java,
+    ).megaApi()
     var nodes: ArrayList<MegaNode>? = null
         set(value) {
             Timber.d("Setting nodes: ${value?.size}")

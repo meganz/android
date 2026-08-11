@@ -1,10 +1,11 @@
 package mega.privacy.android.app.listeners
 
 import dagger.hilt.android.scopes.ActivityScoped
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.main.megaachievements.ReferralBonus
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaAchievementsDetails
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -18,7 +19,9 @@ import javax.inject.Inject
  */
 @ActivityScoped
 @Deprecated("You should call GetAccountAchievementsOverview instead")
-class GetAchievementsListener @Inject constructor() : MegaRequestListenerInterface {
+class GetAchievementsListener @Inject constructor(
+    @MegaApi private val megaApi: MegaApiAndroid,
+) : MegaRequestListenerInterface {
 
     /**
      * isFetching: Boolean
@@ -44,7 +47,7 @@ class GetAchievementsListener @Inject constructor() : MegaRequestListenerInterfa
     fun fetch() {
         if (isFetching) return
         isFetching = true
-        getInstance().megaApi.getAccountAchievements(this)
+        megaApi.getAccountAchievements(this)
     }
 
     /**
