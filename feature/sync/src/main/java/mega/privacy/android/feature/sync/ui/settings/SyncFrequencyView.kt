@@ -2,8 +2,7 @@ package mega.privacy.android.feature.sync.ui.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import mega.android.core.ui.components.list.FlexibleLineListItem
+import mega.android.core.ui.components.settings.SettingsNavigationItem
 import mega.privacy.android.feature.sync.ui.model.SyncFrequency
 
 @Composable
@@ -12,12 +11,12 @@ internal fun SyncFrequencyView(
     syncFrequencyClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    FlexibleLineListItem(
-        modifier = modifier.testTag(SETTINGS_SYNC_SYNC_FREQUENCY_VIEW),
+    SettingsNavigationItem(
+        modifier = modifier,
+        key = SETTINGS_SYNC_FREQUENCY_KEY,
         title = "Sync frequency (QA option)",
         subtitle = frequencyToString(currentSyncFrequency),
-        enableClick = true,
-        onClickListener = syncFrequencyClicked,
+        onClicked = { syncFrequencyClicked() },
     )
 }
 
@@ -30,4 +29,4 @@ private fun frequencyToString(syncFrequency: SyncFrequency): String {
     }
 }
 
-private const val SETTINGS_SYNC_SYNC_FREQUENCY_VIEW = "SETTINGS_SYNC_FREQUENCY_VIEW"
+internal const val SETTINGS_SYNC_FREQUENCY_KEY = "sync_frequency"

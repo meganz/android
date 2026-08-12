@@ -2,10 +2,10 @@ package mega.privacy.android.feature.sync.ui.settings
 
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.sync.ui.model.SyncConnectionType
 import mega.privacy.android.feature.sync.ui.model.SyncPowerOption
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 class SettingsSyncScreenshotTest {
 
@@ -13,7 +13,7 @@ class SettingsSyncScreenshotTest {
     @CombinedThemePreviews
     @Composable
     fun SettingSyncScreenDefault() {
-        OriginalTheme(isDark = false) {
+        AndroidThemeForPreviews {
             SettingSyncScreen(
                 uiState = SettingsSyncUiState(
                     syncConnectionType = SyncConnectionType.WiFiOrMobileData,
