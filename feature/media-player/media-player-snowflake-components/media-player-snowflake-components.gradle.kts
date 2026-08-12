@@ -8,6 +8,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":shared:original-core-ui"))
 

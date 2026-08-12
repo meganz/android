@@ -11,6 +11,7 @@ import android.os.Looper
 import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.TextureView
@@ -21,43 +22,26 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.image.MegaIcon
-import mega.android.core.ui.theme.AppTheme
-import mega.android.core.ui.theme.values.IconColor
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
+import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
+import mega.privacy.android.feature.mediaplayer.components.VideoPlayerOverlayChip
+import mega.privacy.android.feature.mediaplayer.components.VideoPlayerOverlayChipState
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
-import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.VideoPlayerRotateToLandscapePressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRotateToPortraitPressedEvent
 import timber.log.Timber
@@ -78,6 +62,8 @@ class VideoPlayerController(
     private val playerViewClicked: () -> Unit,
     private val onSnapshotSelected: () -> Unit,
     private val resetAutoHideTimer: () -> Unit,
+    private val onLongPressSpeedChange: (SpeedPlaybackItem) -> Unit,
+    private val onLongPressActivated: () -> Unit,
 ) {
     private val repeatToggleButton = container.findViewById<ImageButton>(R.id.repeat_toggle)
     private val playerComposeView = container.findViewById<PlayerView>(R.id.player_compose_view)
@@ -92,16 +78,36 @@ class VideoPlayerController(
     private val rewButton = container.findViewById<ImageButton>(R.id.exo_rew)
     private val ffwdButton = container.findViewById<ImageButton>(R.id.exo_ffwd)
 
-    // Seek indicator overlay — created programmatically so it stays visible even when
+    // Overlay chip views — created programmatically so they remain visible even when
     // the player controller is auto-hidden.
-    private lateinit var seekIndicatorView: ComposeView
-    private val seekState = mutableStateOf<SeekIndicatorState?>(null)
+    private lateinit var seekChipView: ComposeView
+    private lateinit var longPressChipView: ComposeView
+    private val seekChipState = mutableStateOf<VideoPlayerOverlayChipState?>(null)
+    private val longPressChipState = mutableStateOf<VideoPlayerOverlayChipState?>(null)
 
     private val seekHandler = Handler(Looper.getMainLooper())
     private var accumulatedSeekMs = 0L
-    private val hideSeekIndicatorRunnable = Runnable {
+    private val hideSeekChipRunnable = Runnable {
         accumulatedSeekMs = 0L
-        seekState.value = null
+        seekChipState.value = null
+    }
+
+    private var currentSpeedPlayback: SpeedPlaybackItem = uiState.currentSpeedPlayback
+    private var longPressSavedSpeed: SpeedPlaybackItem? = null
+    private val longPressHandler = Handler(Looper.getMainLooper())
+    private var isLongPressActive = false
+
+    private val startLongPressRunnable = Runnable {
+        val speed = currentSpeedPlayback
+        if (speed == VideoSpeedPlaybackItem.PlaybackSpeed_2X) return@Runnable
+        longPressSavedSpeed = speed
+        isLongPressActive = true
+        playerComposeView.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        onLongPressActivated()
+        longPressChipState.value = VideoPlayerOverlayChipState.LongPressSpeedHeld(
+            speedText = VideoSpeedPlaybackItem.PlaybackSpeed_2X.text,
+        )
+        onLongPressSpeedChange(VideoSpeedPlaybackItem.PlaybackSpeed_2X)
     }
 
     private var scaleGestureDetector: ScaleGestureDetector? = null
@@ -118,7 +124,7 @@ class VideoPlayerController(
     private var playQueueInOverflowMenu = mutableStateOf(uiState.items.size > SINGLE_PLAYLIST_SIZE)
 
     init {
-        initSeekIndicatorOverlay()
+        initChipOverlays()
         playerComposeView.setControllerAnimationEnabled(false)
         setupRepeatToggleButton(uiState.repeatToggleMode)
         setupMoreOptionButton()
@@ -131,72 +137,44 @@ class VideoPlayerController(
         setupDeviceRotateButton()
     }
 
-    private fun initSeekIndicatorOverlay() {
+    private fun initChipOverlays() {
         fun Int.toPx(): Int = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
         ).toInt()
 
-        seekIndicatorView = ComposeView(context)
-        seekIndicatorView.setupComposeView(context) { SeekIndicatorContent() }
-
         val isLandscape =
             context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        val bottomMarginDp =
-            if (isLandscape) SEEK_INDICATOR_BOTTOM_MARGIN_LAND_DP
-            else SEEK_INDICATOR_BOTTOM_MARGIN_PORT_DP
 
+        seekChipView = ComposeView(context)
+        seekChipView.setupComposeView(context) { VideoPlayerOverlayChip(seekChipState.value) }
+        val seekBottomMarginDp =
+            if (isLandscape) SEEK_CHIP_BOTTOM_MARGIN_LAND_DP else SEEK_CHIP_BOTTOM_MARGIN_PORT_DP
         playerComposeView.addView(
-            seekIndicatorView,
+            seekChipView,
             FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
-            ).also {
-                it.bottomMargin = bottomMarginDp.toPx()
-            },
+            ).also { it.bottomMargin = seekBottomMarginDp.toPx() },
         )
-    }
 
-    private data class SeekIndicatorState(val seconds: Int, val isForward: Boolean)
-
-    @Composable
-    private fun SeekIndicatorContent() {
-        val state = seekState.value ?: return
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color(0x80000000))
-                .padding(horizontal = 12.dp, vertical = 6.dp),
-        ) {
-            if (!state.isForward) {
-                MegaIcon(
-                    painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.FastBackward),
-                    contentDescription = null,
-                    tint = IconColor.Primary,
-                    modifier = Modifier.size(16.dp),
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-            MegaText(
-                text = pluralStringResource(
-                    SharedR.plurals.video_player_seek_seconds,
-                    state.seconds,
-                    state.seconds
-                ),
-                textColor = TextColor.Primary,
-                style = AppTheme.typography.labelLarge
-            )
-            if (state.isForward) {
-                Spacer(modifier = Modifier.width(8.dp))
-                MegaIcon(
-                    painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.FastForward),
-                    contentDescription = null,
-                    tint = IconColor.Primary,
-                    modifier = Modifier.size(16.dp),
-                )
-            }
+        longPressChipView = ComposeView(context)
+        longPressChipView.setupComposeView(context) {
+            VideoPlayerOverlayChip(longPressChipState.value)
         }
+        val longPressChipBottomMarginDp = if (isLandscape) {
+            SEEK_CHIP_BOTTOM_MARGIN_LAND_DP
+        } else {
+            SEEK_CHIP_BOTTOM_MARGIN_PORT_DP + LONG_PRESS_CHIP_PORTRAIT_EXTRA_DP
+        }
+        playerComposeView.addView(
+            longPressChipView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+            ).also { it.bottomMargin = longPressChipBottomMarginDp.toPx() },
+        )
     }
 
     /**
@@ -345,6 +323,10 @@ class VideoPlayerController(
         isGesturesEnabled = enabled
     }
 
+    internal fun updateCurrentSpeedPlayback(item: SpeedPlaybackItem) {
+        currentSpeedPlayback = item
+    }
+
     private fun setupSeekButtons() {
         rewButton?.setOnClickListener {
             if (!isLocked.value) {
@@ -374,16 +356,13 @@ class VideoPlayerController(
         }
 
         val absoluteSeconds = (abs(accumulatedSeekMs) / 1000L).toInt()
-        seekState.value = SeekIndicatorState(
+        seekChipState.value = VideoPlayerOverlayChipState.Seek(
             seconds = absoluteSeconds,
             isForward = accumulatedSeekMs > 0,
         )
 
-        seekHandler.removeCallbacks(hideSeekIndicatorRunnable)
-        seekHandler.postDelayed(
-            hideSeekIndicatorRunnable,
-            SEEK_INDICATOR_HIDE_DELAY.inWholeMilliseconds
-        )
+        seekHandler.removeCallbacks(hideSeekChipRunnable)
+        seekHandler.postDelayed(hideSeekChipRunnable, SEEK_CHIP_HIDE_DELAY.inWholeMilliseconds)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -408,6 +387,7 @@ class VideoPlayerController(
                     distanceX: Float,
                     distanceY: Float,
                 ): Boolean {
+                    if (isLongPressActive) return true
                     if (zoomLevel > 1 && !isLocked.value) {
                         translationX -= distanceX
                         translationY -= distanceY
@@ -437,10 +417,38 @@ class VideoPlayerController(
             })
 
         playerComposeView.setOnTouchListener { _, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (isGesturesEnabled && !isLocked.value) {
+                        longPressHandler.postDelayed(
+                            startLongPressRunnable,
+                            LONG_PRESS_TIMEOUT_MS,
+                        )
+                    }
+                }
+
+                MotionEvent.ACTION_POINTER_DOWN -> {
+                    longPressHandler.removeCallbacks(startLongPressRunnable)
+                }
+
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    longPressHandler.removeCallbacks(startLongPressRunnable)
+                    if (isLongPressActive) {
+                        releaseLongPress()
+                    }
+                }
+            }
             scaleGestureDetector?.onTouchEvent(event)
             gestureDetector?.onTouchEvent(event)
             true
         }
+    }
+
+    private fun releaseLongPress() {
+        isLongPressActive = false
+        longPressChipState.value = null
+        longPressSavedSpeed?.let { onLongPressSpeedChange(it) }
+        longPressSavedSpeed = null
     }
 
     private fun updateTransformations() {
@@ -476,9 +484,13 @@ class VideoPlayerController(
         rewButton?.setOnClickListener(null)
         ffwdButton?.setOnClickListener(null)
 
-        seekHandler.removeCallbacks(hideSeekIndicatorRunnable)
-        seekState.value = null
-        playerComposeView.removeView(seekIndicatorView)
+        seekHandler.removeCallbacks(hideSeekChipRunnable)
+        seekChipState.value = null
+        playerComposeView.removeView(seekChipView)
+
+        longPressHandler.removeCallbacks(startLongPressRunnable)
+        if (isLongPressActive) releaseLongPress()
+        playerComposeView.removeView(longPressChipView)
 
         playerComposeView?.setOnTouchListener(null)
         scaleGestureDetector = null
@@ -487,12 +499,17 @@ class VideoPlayerController(
 
     companion object {
         private val SEEK_STEP = 15.seconds
-        private val SEEK_INDICATOR_HIDE_DELAY = 3.seconds
+        private val SEEK_CHIP_HIDE_DELAY = 3.seconds
 
-        // Portrait: positions overlay above the controller bar (~128 dp tall, 30 dp margin).
-        private const val SEEK_INDICATOR_BOTTOM_MARGIN_PORT_DP = 145
+        // Portrait: positions seek chip above the controller bar (~128 dp tall, 30 dp margin).
+        private const val SEEK_CHIP_BOTTOM_MARGIN_PORT_DP = 145
 
-        // Landscape: centers overlay between the timebar (~75 dp from bottom) and the play/pause button (screen center).
-        private const val SEEK_INDICATOR_BOTTOM_MARGIN_LAND_DP = 110
+        // Landscape: centers seek chip between the timebar and the play/pause button.
+        private const val SEEK_CHIP_BOTTOM_MARGIN_LAND_DP = 110
+
+        // Positions long-press chip 30dp above the seek chip in portrait (per design spec).
+        private const val LONG_PRESS_CHIP_PORTRAIT_EXTRA_DP = 30
+        // Fires 300ms after touch-down — faster than the system default (~500ms) for a snappier feel.
+        private const val LONG_PRESS_TIMEOUT_MS = 300L
     }
 }

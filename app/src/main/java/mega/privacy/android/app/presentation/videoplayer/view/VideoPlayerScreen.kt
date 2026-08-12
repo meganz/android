@@ -408,6 +408,7 @@ internal fun VideoPlayerScreen(
 
     LaunchedEffect(uiState.currentSpeedPlayback) {
         videoPlayerController?.updateSpeedPlaybackButtonIcon(uiState.currentSpeedPlayback.text)
+        videoPlayerController?.updateCurrentSpeedPlayback(uiState.currentSpeedPlayback)
     }
 
     LaunchedEffect(uiState.repeatToggleMode) {
@@ -584,6 +585,19 @@ internal fun VideoPlayerScreen(
                                     resetAutoHideTimer = {
                                         if (isPlaying && isControllerViewVisible && !uiState.isLocked) {
                                             scheduleAutoHide(true)
+                                        }
+                                    },
+                                    onLongPressSpeedChange = { item ->
+                                        viewModel.updateCurrentSpeedPlaybackItem(item)
+                                    },
+                                    onLongPressActivated = {
+                                        autoHideJob?.cancel()
+                                        if (isControllerViewVisible) {
+                                            isControllerViewVisible = false
+                                            if (!uiState.isLocked) {
+                                                systemUiController.isSystemBarsVisible = false
+                                            }
+                                            playerComposeView.hideWithFade()
                                         }
                                     },
                                 ).also { controller ->
