@@ -463,6 +463,10 @@
     <string name="chat_recent_list_empty_title">Keep conversations private</string>
     <!--Subtitle text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <!-- Title shown on the chat list when a search returns no matching chats or meetings -->
+    <string name="chat_list_search_no_results_title">No results found</string>
+    <!-- Description shown on the chat list when a search returns no matching chats or meetings -->
+    <string name="chat_list_search_no_results_description">Try a different search term</string>
     <!-- Label of the action button of inviting a friend from contact screen -->
     <string name="chat_recent_invite_friend">Invite a friend</string>
     <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->

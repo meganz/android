@@ -15,6 +15,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
+import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import org.junit.jupiter.api.AfterEach
@@ -96,10 +97,80 @@ class ChatListViewModelTest {
             underTest.uiState.test {
                 val actual = awaitDataState()
 
-                assertThat(actual.chats).containsExactly(chatUiItem)
-                assertThat(actual.meetings).containsExactly(meetingUiItem)
+                assertThat(actual.chats.items()).containsExactly(chatUiItem)
+                assertThat(actual.meetings.items()).containsExactly(meetingUiItem)
             }
         }
+
+    @Test
+    fun `test that a tab with no chat rooms is Empty when there is no search query`() = runTest {
+        stubChatRooms(chats = emptyList(), meetings = emptyList())
+
+        underTest.uiState.test {
+            val actual = awaitDataState()
+
+            assertThat(actual.chats).isEqualTo(ChatListTabState.Empty)
+            assertThat(actual.meetings).isEqualTo(ChatListTabState.Empty)
+        }
+    }
+
+    @Test
+    fun `test that onSearchQueryChange filters chats by title`() = runTest {
+        stubSearchableChats()
+
+        underTest.uiState.test {
+            awaitDataState()
+
+            underTest.onSearchQueryChange("ali")
+
+            val actual = awaitDataState()
+            assertThat(actual.chats.items()).containsExactly(aliceUiItem)
+        }
+    }
+
+    @Test
+    fun `test that onSearchQueryChange filters chats by last message`() = runTest {
+        stubSearchableChats()
+
+        underTest.uiState.test {
+            awaitDataState()
+
+            underTest.onSearchQueryChange("dinner")
+
+            val actual = awaitDataState()
+            assertThat(actual.chats.items()).containsExactly(bobUiItem)
+        }
+    }
+
+    @Test
+    fun `test that a blank search query restores the full chat list`() = runTest {
+        stubSearchableChats()
+
+        underTest.uiState.test {
+            awaitDataState()
+            underTest.onSearchQueryChange("ali")
+            awaitDataState()
+
+            underTest.onSearchQueryChange(null)
+
+            val actual = awaitDataState()
+            assertThat(actual.chats.items()).containsExactly(aliceUiItem, bobUiItem)
+        }
+    }
+
+    @Test
+    fun `test that a search query with no matches emits NoSearchResults`() = runTest {
+        stubSearchableChats()
+
+        underTest.uiState.test {
+            awaitDataState()
+
+            underTest.onSearchQueryChange("zzz")
+
+            val actual = awaitDataState()
+            assertThat(actual.chats).isEqualTo(ChatListTabState.NoSearchResults)
+        }
+    }
 
     @Test
     fun `test that last message lambda returns the last message from getChatListItemUseCase`() =
@@ -147,19 +218,22 @@ class ChatListViewModelTest {
         assertThat(capturedHeaderTimeMapper?.invoke(chatRoomItem, null)).isNull()
     }
 
-    private fun stubChatRooms() {
+    private fun stubChatRooms(
+        chats: List<ChatRoomItem> = listOf(chatRoomItem),
+        meetings: List<ChatRoomItem> = listOf(meetingRoomItem),
+    ) {
         getChatsUseCase.stub {
             on { invoke(eq(ChatRoomType.NON_MEETINGS), any(), any(), any(), any()) } doAnswer { invocation ->
                 captureMappers(invocation)
                 flow {
-                    emit(listOf(chatRoomItem))
+                    emit(chats)
                     awaitCancellation()
                 }
             }
             on { invoke(eq(ChatRoomType.MEETINGS), any(), any(), any(), any()) } doAnswer { invocation ->
                 captureMappers(invocation)
                 flow {
-                    emit(listOf(meetingRoomItem))
+                    emit(meetings)
                     awaitCancellation()
                 }
             }
@@ -167,6 +241,14 @@ class ChatListViewModelTest {
         chatRoomUiItemMapper.stub {
             on { invoke(chatRoomItem) } doReturn chatUiItem
             on { invoke(meetingRoomItem) } doReturn meetingUiItem
+        }
+    }
+
+    private fun stubSearchableChats() {
+        stubChatRooms(chats = listOf(aliceRoomItem, bobRoomItem), meetings = emptyList())
+        chatRoomUiItemMapper.stub {
+            on { invoke(aliceRoomItem) } doReturn aliceUiItem
+            on { invoke(bobRoomItem) } doReturn bobUiItem
         }
     }
 
@@ -179,10 +261,14 @@ class ChatListViewModelTest {
             invocation.getArgument<Any>(4) as (ChatRoomItem, ChatRoomItem?) -> String?
     }
 
-    private fun chatRoomUiItem(chatId: Long, title: String) = ChatRoomUiItem(
+    private fun chatRoomUiItem(
+        chatId: Long,
+        title: String,
+        lastMessage: String? = null,
+    ) = ChatRoomUiItem(
         chatId = chatId,
         title = title,
-        lastMessage = null,
+        lastMessage = lastMessage,
         lastTimestampFormatted = null,
         scheduledTimestampFormatted = null,
         unreadCount = 0,
@@ -197,6 +283,9 @@ class ChatListViewModelTest {
         status = ContactItemStatus.Unknown,
     )
 
+    private fun ChatListTabState.items(): List<ChatRoomUiItem> =
+        (this as ChatListTabState.Results).items
+
     private suspend fun ReceiveTurbine<ChatListUiState>.awaitDataState(): ChatListUiState.Data {
         var item = awaitItem()
         while (item !is ChatListUiState.Data) {
@@ -204,4 +293,22 @@ class ChatListViewModelTest {
         }
         return item
     }
+
+    private companion object {
+        private val aliceRoomItem = ChatRoomItem.IndividualChatRoomItem(
+            chatId = 10L,
+            title = "Alice",
+        )
+        private val bobRoomItem = ChatRoomItem.IndividualChatRoomItem(
+            chatId = 11L,
+            title = "Bob",
+        )
+    }
+
+    private val aliceUiItem = chatRoomUiItem(chatId = 10L, title = "Alice")
+    private val bobUiItem = chatRoomUiItem(
+        chatId = 11L,
+        title = "Bob",
+        lastMessage = "Dinner at 8?",
+    )
 }

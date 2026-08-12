@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.chat.list.model
 
 import androidx.compose.runtime.Stable
-import kotlinx.collections.immutable.ImmutableList
 
 /**
  * UI state for the chat list screen.
@@ -10,18 +9,18 @@ import kotlinx.collections.immutable.ImmutableList
 sealed interface ChatListUiState {
 
     /**
-     * Chats and meetings are still loading.
+     * Chats and meetings are still loading for the first time.
      */
     data object Loading : ChatListUiState
 
     /**
      * Chats and meetings are loaded.
      *
-     * @property chats Chat rooms of the Chats tab.
-     * @property meetings Chat rooms of the Meetings tab.
+     * @property chats Content of the Chats tab, already reflecting the active search query.
+     * @property meetings Content of the Meetings tab, already reflecting the active search query.
      */
     data class Data(
-        val chats: ImmutableList<ChatRoomUiItem>,
-        val meetings: ImmutableList<ChatRoomUiItem>,
+        val chats: ChatListTabState,
+        val meetings: ChatListTabState,
     ) : ChatListUiState
 }

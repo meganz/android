@@ -36,6 +36,7 @@ fun ChatListEntry(
         onItemClick = { chatId ->
             navigationHandler.navigate(ShowChatMessagesNavKey(chatId))
         },
+        onSearchQueryChange = viewModel::onSearchQueryChange,
     )
 }
 
