@@ -1,11 +1,10 @@
 package mega.privacy.android.feature.sync.ui.synclist.stalledissues
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Divider
+import mega.android.core.ui.components.divider.SubtleDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -22,8 +21,8 @@ import mega.privacy.android.feature.sync.ui.synclist.BOTTOM_PADDING
 import mega.privacy.android.feature.sync.ui.views.StalledIssueCard
 import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 
 @Composable
 internal fun StalledIssuesScreen(
@@ -71,7 +70,7 @@ private fun StalledIssuesScreenContent(
                     shouldShowMoreIcon = issue.actions.isNotEmpty(),
                     nodePath = issue.displayedPath,
                 )
-                Divider(Modifier.padding(start = 72.dp))
+                SubtleDivider(Modifier.padding(start = 72.dp))
             }
         }
     }
@@ -80,7 +79,7 @@ private fun StalledIssuesScreenContent(
 @CombinedThemePreviews
 @Composable
 internal fun StalledIssuesScreenEmptyStatePreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         StalledIssuesScreen(
             stalledIssues = emptyList(),
             moreClicked = {},
@@ -91,7 +90,7 @@ internal fun StalledIssuesScreenEmptyStatePreview() {
 @CombinedThemePreviews
 @Composable
 internal fun StalledIssuesScreenPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         val detailedInfo = StalledIssueDetailedInfo(
             title = "Conflict title",
             explanation = "Conflict explanation",

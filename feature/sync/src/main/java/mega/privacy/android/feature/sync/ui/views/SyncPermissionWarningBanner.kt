@@ -9,12 +9,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import mega.android.core.ui.components.banner.InlineWarningBanner
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import java.util.concurrent.TimeUnit
 
@@ -45,9 +45,9 @@ internal fun SyncPermissionWarningBanner(
     if (isDisableBatteryOptimizationEnabled) {
         hasUnrestrictedBatteryUsage?.let { hasUnrestrictedBatteryUsageValue ->
             if (hasUnrestrictedBatteryUsageValue.not()) {
-                WarningBanner(
-                    textString = stringResource(id = R.string.sync_battery_optimisation_banner),
-                    onCloseClick = null,
+                InlineWarningBanner(
+                    body = stringResource(id = R.string.sync_battery_optimisation_banner),
+                    showCancelButton = false,
                     modifier = Modifier.clickable {
                         syncPermissionsManager.launchAppSettingBatteryOptimisation()
                     },

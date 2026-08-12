@@ -5,14 +5,12 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +22,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.banner.InlineWarningBanner
+import mega.android.core.ui.components.divider.SubtleDivider
+import mega.android.core.ui.components.surface.CardSurface
+import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
@@ -39,18 +45,7 @@ import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaButtonWithIconAndText
-import mega.privacy.android.shared.original.core.ui.controls.cards.MegaCard
-import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
-import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.shared.original.core.ui.controls.status.MegaStatusIndicator
-import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.SyncCardIssuesInfoButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardOpenDeviceFolderButtonPressedEvent
@@ -78,7 +73,9 @@ internal fun SyncCard(
     syncPauseReason: SyncPauseReason? = null,
     onLocalFolderSelected: (Uri) -> Unit = {},
 ) {
-    MegaCard(
+    CardSurface(
+        surfaceColor = SurfaceColor.Surface1,
+        modifier = modifier.clickable { expandClicked() },
         content = {
             SyncCardHeader(
                 syncType = sync.syncType,
@@ -94,9 +91,9 @@ internal fun SyncCard(
             )
 
             if (errorRes != null && errorRes != sharedR.string.general_sync_storage_overquota && sync.isLocalRootChangeNeeded.not()) {
-                WarningBanner(
-                    textString = stringResource(errorRes),
-                    onCloseClick = null,
+                InlineWarningBanner(
+                    body = stringResource(errorRes),
+                    showCancelButton = false,
                     modifier = Modifier.padding(top = 16.dp)
                 )
             }
@@ -135,8 +132,6 @@ internal fun SyncCard(
                 onLocalFolderSelected = onLocalFolderSelected
             )
         },
-        onClicked = expandClicked,
-        modifier = modifier,
     )
 }
 
@@ -188,9 +183,9 @@ private fun SyncCardHeader(
                 MegaText(
                     text = folderPairName,
                     textColor = TextColor.Primary,
-                    style = MaterialTheme.typography.subtitle1medium
+                    style = AppTheme.typography.titleMedium
                 )
-                MegaStatusIndicator(
+                SyncStatusIndicator(
                     modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
                     statusText = when {
                         isLocalRootChangeNeeded -> stringResource(id = sharedR.string.device_center_list_view_item_status_error)
@@ -218,19 +213,19 @@ private fun SyncCardHeader(
                         else -> coreR.drawable.ic_check_circle
                     },
                     statusColor = when {
-                        isLocalRootChangeNeeded -> StatusColor.Error
-                        hasStalledIssues -> StatusColor.Error
-                        status == SyncStatus.SYNCING -> StatusColor.Info
+                        isLocalRootChangeNeeded -> SupportColor.Error
+                        hasStalledIssues -> SupportColor.Error
+                        status == SyncStatus.SYNCING -> SupportColor.Info
                         status == SyncStatus.PAUSED -> null
-                        status == SyncStatus.ERROR -> StatusColor.Error
-                        status == SyncStatus.DISABLED -> StatusColor.Warning
-                        else -> StatusColor.Success
+                        status == SyncStatus.ERROR -> SupportColor.Error
+                        status == SyncStatus.DISABLED -> SupportColor.Warning
+                        else -> SupportColor.Success
                     },
                 )
                 MegaText(
                     text = method,
                     textColor = TextColor.Secondary,
-                    style = MaterialTheme.typography.caption,
+                    style = AppTheme.typography.bodySmall,
                 )
             }
         }
@@ -260,7 +255,7 @@ private fun SyncCardDetailedInfo(
                         Analytics.tracker.trackEvent(SyncCardOpenDeviceFolderButtonPressedEvent)
                         onOpenDeviceFolderClicked(uriPath.value)
                     },
-                    style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium)
+                    style = AppTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium)
                 )
             }, modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -333,7 +328,7 @@ private fun InfoRow(
             MegaText(
                 text = info,
                 textColor = TextColor.Secondary,
-                style = MaterialTheme.typography.caption,
+                style = AppTheme.typography.bodySmall,
             )
         },
         modifier = modifier,
@@ -350,7 +345,7 @@ private fun InfoRow(
         MegaText(
             text = title,
             textColor = TextColor.Primary,
-            style = MaterialTheme.typography.subtitle2,
+            style = AppTheme.typography.titleSmall,
         )
         info()
     }
@@ -379,10 +374,9 @@ private fun SyncCardFooter(
         },
     )
     when {
-        isError && !expanded -> MegaDivider(dividerType = DividerType.Centered)
-        else -> MegaDivider(
-            dividerType = DividerType.Centered,
-            modifier = Modifier.padding(top = 16.dp)
+        isError && !expanded -> SubtleDivider(modifier = Modifier.padding(horizontal = 16.dp))
+        else -> SubtleDivider(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
         )
     }
 
@@ -393,7 +387,7 @@ private fun SyncCardFooter(
                 .padding(end = 16.dp, top = 16.dp, bottom = 16.dp)
         ) {
             if (hasStalledIssues) {
-                MegaButtonWithIconAndText(
+                SyncCardActionButton(
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
@@ -407,7 +401,7 @@ private fun SyncCardFooter(
                     text = stringResource(id = R.string.sync_card_sync_issues_info)
                 )
             }
-            MegaButtonWithIconAndText(
+            SyncCardActionButton(
                 modifier = Modifier
                     .padding(end = 8.dp)
                     .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
@@ -419,7 +413,7 @@ private fun SyncCardFooter(
                 text = stringResource(id = sharedR.string.general_open_button),
             )
             if (syncType == SyncType.TYPE_CAMERA_UPLOADS || syncType == SyncType.TYPE_MEDIA_UPLOADS) {
-                MegaButtonWithIconAndText(
+                SyncCardActionButton(
                     modifier = Modifier
                         .padding(end = 8.dp)
                         .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
@@ -428,7 +422,7 @@ private fun SyncCardFooter(
                     text = stringResource(id = sharedR.string.general_settings),
                 )
             } else {
-                MegaButtonWithIconAndText(
+                SyncCardActionButton(
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
@@ -454,7 +448,7 @@ private fun SyncCardFooter(
                     iconColor = if (isLocalRootChangeNeeded) SupportColor.Error else null,
                     textColor = if (isLocalRootChangeNeeded) TextColor.Error else TextColor.Primary,
                 )
-                MegaButtonWithIconAndText(
+                SyncCardActionButton(
                     modifier = Modifier
                         .padding(end = 8.dp)
                         .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
@@ -478,7 +472,7 @@ private fun SyncCardFooter(
 private fun SyncCardExpandedPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncCard(
             SyncUiItem(
                 id = 1234L,
@@ -515,7 +509,7 @@ private fun SyncCardExpandedPreview(
 private fun SyncCardExpandedWithBannerPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncCard(
             SyncUiItem(
                 id = 1234L,
@@ -552,7 +546,7 @@ private fun SyncCardExpandedWithBannerPreview(
 private fun SyncCardCollapsedPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncCard(
             SyncUiItem(
                 id = 1234L,
@@ -589,7 +583,7 @@ private fun SyncCardCollapsedPreview(
 private fun SyncCardCollapsedWithBannerPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncCard(
             SyncUiItem(
                 id = 1234L,

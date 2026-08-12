@@ -3,24 +3,23 @@ package mega.privacy.android.feature.sync.ui.views
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun SyncListNoItemsPlaceHolder(
@@ -44,7 +43,7 @@ internal fun SyncListNoItemsPlaceHolder(
             text = placeholderText,
             textColor = TextColor.Secondary,
             modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.subtitle2,
+            style = AppTheme.typography.titleSmall,
         )
     }
 }
@@ -52,7 +51,7 @@ internal fun SyncListNoItemsPlaceHolder(
 @CombinedThemePreviews
 @Composable
 private fun SyncListNoItemsPlaceholderPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncListNoItemsPlaceHolder(
             placeholderText = "No issues",
             placeholderIcon = iconPackR.drawable.ic_check_circle_color,

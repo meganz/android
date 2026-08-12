@@ -1,14 +1,13 @@
 package mega.privacy.android.feature.sync.ui.views
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,17 +15,17 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
-import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
-import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun StalledIssueCard(
@@ -46,13 +45,12 @@ internal fun StalledIssueCard(
             verticalAlignment = Alignment.CenterVertically,
         )
         {
-            ThumbnailView(
+            Image(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .testTag(TEST_TAG_STALLED_ISSUE_CARD_ICON_NODE_THUMBNAIL),
-                data = null,
-                defaultImage = icon,
+                painter = painterResource(icon),
                 contentDescription = "Node thumbnail"
             )
 
@@ -66,9 +64,10 @@ internal fun StalledIssueCard(
                         .padding(top = 1.dp)
                         .testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_NAME),
                     text = nodeName,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = AppTheme.typography.bodyLarge,
                     textColor = TextColor.Primary,
-                    overflow = LongTextBehaviour.MiddleEllipsis,
+                    overflow = TextOverflow.MiddleEllipsis,
+                    maxLines = 1,
                 )
                 if (nodePath.isNotEmpty()) {
                     MegaText(
@@ -76,17 +75,19 @@ internal fun StalledIssueCard(
                             .padding(top = 1.dp)
                             .testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_PATH),
                         text = nodePath,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = AppTheme.typography.bodyMedium,
                         textColor = TextColor.Secondary,
-                        overflow = LongTextBehaviour.MiddleEllipsis,
+                        overflow = TextOverflow.MiddleEllipsis,
+                        maxLines = 1,
                     )
                 }
                 MegaText(
                     modifier = Modifier.testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_CONFLICT_NAME),
                     text = conflictName,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = AppTheme.typography.bodySmall,
                     textColor = TextColor.Brand,
-                    overflow = LongTextBehaviour.MiddleEllipsis,
+                    overflow = TextOverflow.MiddleEllipsis,
+                    maxLines = 1,
                 )
             }
             MegaIcon(
@@ -105,7 +106,7 @@ internal fun StalledIssueCard(
 @CombinedThemePreviews
 @Composable
 private fun StalledIssueCardPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         StalledIssueCard(
             nodeName = "Some folder",
             nodePath = "Some path",

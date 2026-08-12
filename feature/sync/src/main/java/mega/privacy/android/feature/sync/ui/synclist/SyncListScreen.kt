@@ -38,6 +38,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.banner.InlineWarningBanner
+import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.R
@@ -64,13 +66,11 @@ import mega.privacy.android.feature.sync.ui.views.SyncStorageQuotaExceedWarning
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaMultiFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloatingActionButtonItem
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloatingActionButtonState
 import mega.privacy.android.shared.original.core.ui.controls.buttons.rememberMultiFloatingActionButtonState
 import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
-import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
@@ -340,9 +340,9 @@ private fun SyncListScreenContent(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             if (syncFoldersUiState.syncUiItems.isNotEmpty() && syncFoldersUiState.isLowBatteryLevel) {
-                WarningBanner(
-                    textString = stringResource(id = sharedR.string.general_message_sync_paused_low_battery_level),
-                    onCloseClick = null
+                InlineWarningBanner(
+                    body = stringResource(id = sharedR.string.general_message_sync_paused_low_battery_level),
+                    showCancelButton = false,
                 )
             }
         }
@@ -404,10 +404,11 @@ private fun HeaderChips(
             selected = selectedChip == SYNC_FOLDERS,
             text = stringResource(id = R.string.sync_folders),
             modifier = modifier.testTag(SYNC_FOLDERS_CHIP_TEST_TAG),
-        ) {
-            Analytics.tracker.trackEvent(SyncListFoldersButtonPressedEvent)
-            onChipSelected(SYNC_FOLDERS)
-        }
+            onClick = {
+                Analytics.tracker.trackEvent(SyncListFoldersButtonPressedEvent)
+                onChipSelected(SYNC_FOLDERS)
+            },
+        )
         MegaChip(
             selected = selectedChip == STALLED_ISSUES,
             text = if (stalledIssuesCount > 0) {
@@ -416,18 +417,20 @@ private fun HeaderChips(
                 stringResource(id = R.string.sync_stalled_issue_zero)
             },
             modifier = modifier.testTag(STALLED_ISSUES_CHIP_TEST_TAG),
-        ) {
-            Analytics.tracker.trackEvent(SyncListIssuesButtonPressedEvent)
-            onChipSelected(STALLED_ISSUES)
-        }
+            onClick = {
+                Analytics.tracker.trackEvent(SyncListIssuesButtonPressedEvent)
+                onChipSelected(STALLED_ISSUES)
+            },
+        )
         MegaChip(
             selected = selectedChip == SOLVED_ISSUES,
             text = stringResource(id = sharedR.string.device_center_sync_solved_issues_chip_text),
             modifier = modifier.testTag(SOLVED_ISSUES_CHIP_TEST_TAG),
-        ) {
-            Analytics.tracker.trackEvent(SyncListSolvedIssuesButtonPressedEvent)
-            onChipSelected(SOLVED_ISSUES)
-        }
+            onClick = {
+                Analytics.tracker.trackEvent(SyncListSolvedIssuesButtonPressedEvent)
+                onChipSelected(SOLVED_ISSUES)
+            },
+        )
     }
 }
 

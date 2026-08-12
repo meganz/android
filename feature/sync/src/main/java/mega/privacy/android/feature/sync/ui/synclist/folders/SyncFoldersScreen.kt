@@ -3,7 +3,6 @@ package mega.privacy.android.feature.sync.ui.synclist.folders
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -27,7 +25,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.tabs.LocalTabContentModifier
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.NodeId
@@ -39,15 +42,10 @@ import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.BOTTOM_PADDING
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.CardExpanded
+import mega.privacy.android.feature.sync.ui.views.SyncCardLoadingSkeleton
 import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.views.SyncTypePreviewProvider
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
-import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.skeleton.CardItemLoadingSkeleton
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
 import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
@@ -164,7 +162,7 @@ private fun SyncFoldersScreenEmptyState(
             text = stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_title),
             textColor = TextColor.Primary,
             modifier = Modifier.padding(top = 32.dp),
-            style = MaterialTheme.typography.h6Medium,
+            style = AppTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
         )
         MegaText(
@@ -173,11 +171,11 @@ private fun SyncFoldersScreenEmptyState(
             modifier = Modifier
                 .padding(top = 16.dp)
                 .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT),
-            style = MaterialTheme.typography.subtitle2,
+            style = AppTheme.typography.titleSmall,
             textAlign = TextAlign.Center,
         )
-        RaisedDefaultMegaButton(
-            textId = sharedResR.string.device_center_sync_add_new_syn_button_option,
+        PrimaryFilledButton(
+            text = stringResource(id = sharedResR.string.device_center_sync_add_new_syn_button_option),
             onClick = onAddNewSyncClicked,
             enabled = buttonsEnabled,
             modifier = Modifier
@@ -185,8 +183,8 @@ private fun SyncFoldersScreenEmptyState(
                 .defaultMinSize(minWidth = 232.dp)
                 .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON),
         )
-        RaisedDefaultMegaButton(
-            textId = sharedResR.string.device_center_sync_add_new_backup_button_option,
+        PrimaryFilledButton(
+            text = stringResource(id = sharedResR.string.device_center_sync_add_new_backup_button_option),
             onClick = onAddNewBackupClicked,
             enabled = buttonsEnabled,
             modifier = Modifier
@@ -206,7 +204,7 @@ private fun SyncFoldersScreenLoadingState() {
         modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE),
         content = {
             for (i in 1..4) {
-                CardItemLoadingSkeleton(
+                SyncCardLoadingSkeleton(
                     modifier = Modifier.padding(
                         vertical = 8.dp,
                         horizontal = 16.dp
@@ -222,7 +220,7 @@ private fun SyncFoldersScreenLoadingState() {
 @Preview(name = "5-inch Device Portrait", widthDp = 360, heightDp = 640)
 @Preview(name = "5-inch Device Portrait", widthDp = 640, heightDp = 360)
 private fun SyncFoldersScreenEmptyStatePreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncFoldersScreen(
             syncUiItems = emptyList(),
             cardExpanded = {},
@@ -248,7 +246,7 @@ private fun SyncFoldersScreenEmptyStatePreview() {
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenLoadingStatePreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncFoldersScreen(
             syncUiItems = emptyList(),
             cardExpanded = {},
@@ -273,7 +271,7 @@ private fun SyncFoldersScreenLoadingStatePreview() {
 private fun SyncFoldersScreenSyncingPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncFoldersScreen(
             listOf(
                 SyncUiItem(
@@ -311,7 +309,7 @@ private fun SyncFoldersScreenSyncingPreview(
 private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncFoldersScreen(
             listOf(
                 SyncUiItem(

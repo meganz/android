@@ -1,14 +1,13 @@
 package mega.privacy.android.feature.sync.ui.views
 
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.shared.resources.R
 
 /**
@@ -34,7 +33,7 @@ internal fun SyncStorageQuotaExceedWarning(
 @CombinedThemePhoneLandscapePreviews
 @Composable
 private fun SyncPromotionBottomSheetPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncStorageQuotaExceedWarning(
             onUpgradeClick = {},
         )

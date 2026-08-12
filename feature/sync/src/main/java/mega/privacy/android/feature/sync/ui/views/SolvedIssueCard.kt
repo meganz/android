@@ -2,30 +2,29 @@ package mega.privacy.android.feature.sync.ui.views
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
-import mega.privacy.android.shared.original.core.ui.controls.status.getStatusIconColor
-import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Test Tags for the Solved Issue Card
@@ -50,8 +49,8 @@ internal const val SOLVED_ISSUE_BODY = "solved_issue_card:text_body"
  * @param modifier The [Modifier] object
  * @param subTitle An optional Subtitle
  * @param bodyIcon The Icon displayed on the left side of the [body], which does not exist by default
- * @param bodyColor The Text [Color] applied to the [body], which defaults to [TextColor.Secondary]
- * @param statusColor The [StatusColor] applied to the [bodyIcon] and the [body] text, which defaults to [StatusColor.Success]
+ * @param bodyColor The Text [Color] applied to the [body], which defaults to [TextColor.Success]
+ * @param statusColor The [SupportColor] applied to the [bodyIcon] and the [body] text, which defaults to [SupportColor.Success]
  * @param nodeIconColor The Node Icon [Color]. By default, no [Color] is applied
  */
 @Composable
@@ -62,8 +61,8 @@ fun SolvedIssueCard(
     modifier: Modifier = Modifier,
     subTitle: String? = null,
     @DrawableRes bodyIcon: Int? = CoreUiR.drawable.ic_check_circle,
-    bodyColor: TextColor = TextColor.Secondary,
-    statusColor: StatusColor = StatusColor.Success,
+    bodyColor: TextColor = TextColor.Success,
+    statusColor: SupportColor = SupportColor.Success,
     nodeIconColor: Color? = null,
 ) {
     Row(
@@ -88,29 +87,31 @@ fun SolvedIssueCard(
             MegaText(
                 modifier = Modifier.testTag(SOLVED_ISSUE_NODE_TITLE),
                 text = title,
-                style = MaterialTheme.typography.bodyLarge,
+                style = AppTheme.typography.bodyLarge,
                 textColor = TextColor.Primary,
-                overflow = LongTextBehaviour.MiddleEllipsis,
+                overflow = TextOverflow.MiddleEllipsis,
+                maxLines = 1,
             )
             subTitle?.let {
                 MegaText(
                     modifier = Modifier.testTag(SOLVED_ISSUE_NODE_SUBTITLE),
                     text = subTitle,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = AppTheme.typography.bodyMedium,
                     textColor = TextColor.Secondary,
-                    overflow = LongTextBehaviour.MiddleEllipsis,
+                    overflow = TextOverflow.MiddleEllipsis,
+                    maxLines = 1,
                 )
             }
             Row {
                 bodyIcon?.let { nonNullBodyIcon ->
-                    Icon(
+                    MegaIcon(
                         modifier = Modifier
                             .testTag(SOLVED_ISSUE_BODY_ICON)
                             .padding(top = 2.dp, end = 4.dp)
                             .size(16.dp),
                         painter = painterResource(nonNullBodyIcon),
                         contentDescription = "Body Icon",
-                        tint = statusColor.getStatusIconColor(),
+                        supportTint = statusColor,
                     )
                 }
                 MegaText(
@@ -118,9 +119,10 @@ fun SolvedIssueCard(
                         .testTag(SOLVED_ISSUE_BODY)
                         .padding(top = 2.dp),
                     text = body,
-                    style = MaterialTheme.typography.bodySmall,
-                    textColor = TextColor.Success,
-                    overflow = LongTextBehaviour.MiddleEllipsis,
+                    style = AppTheme.typography.bodySmall,
+                    textColor = bodyColor,
+                    overflow = TextOverflow.MiddleEllipsis,
+                    maxLines = 1,
                 )
             }
         }
@@ -133,7 +135,7 @@ fun SolvedIssueCard(
 @CombinedThemePreviews
 @Composable
 private fun SolvedIssueCardPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SolvedIssueCard(
             title = "Node Title",
             body = "Node Body",
@@ -145,7 +147,7 @@ private fun SolvedIssueCardPreview() {
 @CombinedThemePreviews
 @Composable
 private fun SolvedIssueCardWithVeryLongTitlePreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SolvedIssueCard(
             title = "This is a very long Title that exceeds the maximum number of two lines. An ellipsis is added for additional text",
             subTitle = "This is a very long SubTitle that exceeds the maximum number of two lines. An ellipsis is added for additional text",
@@ -161,7 +163,7 @@ private fun SolvedIssueCardWithVeryLongTitlePreview() {
 @CombinedThemePreviews
 @Composable
 private fun SolvedIssueCardWithBodyIconPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SolvedIssueCard(
             title = "Node Title",
             subTitle = "Subtitle",
@@ -179,7 +181,7 @@ private fun SolvedIssueCardWithBodyIconPreview() {
 @CombinedThemePreviews
 @Composable
 private fun SolvedIssueCardWithVeryLongBodyPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SolvedIssueCard(
             title = "Backup Folder",
             body = "Sync or backup has been stopped as you've logged out or closed the session. To re-enable, go to Settings in the desktop app, select the Sync or Backup tab, and check the relevant folder.",
@@ -197,7 +199,7 @@ private fun SolvedIssueCardWithVeryLongBodyPreview() {
 @CombinedThemePreviews
 @Composable
 private fun SolvedIssueCardWithBodyIconAndVeryLongBodyPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SolvedIssueCard(
             title = "Backup Folder",
             subTitle = "Subtitle",

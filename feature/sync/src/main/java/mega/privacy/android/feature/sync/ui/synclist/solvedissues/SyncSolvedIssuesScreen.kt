@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.synclist.solvedissues
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,8 +15,8 @@ import mega.privacy.android.feature.sync.ui.synclist.BOTTOM_PADDING
 import mega.privacy.android.feature.sync.ui.views.SolvedIssueCard
 import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
@@ -54,7 +53,7 @@ internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
 @CombinedThemePreviews
 @Composable
 internal fun SyncSolvedIssuesScreenEmptyStatePreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncSolvedIssuesScreen(solvedIssues = emptyList())
     }
 }
@@ -62,7 +61,7 @@ internal fun SyncSolvedIssuesScreenEmptyStatePreview() {
 @CombinedThemePreviews
 @Composable
 internal fun SyncSolvedIssuesScreenPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncSolvedIssuesScreen(
             listOf(
                 SolvedIssueUiItem(
