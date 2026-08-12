@@ -23,20 +23,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.components.chip.SelectionChipStyle
 import mega.android.core.ui.components.list.SecondaryHeaderListItem
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
+import mega.android.core.ui.components.surface.BoxSurface
+import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
-import mega.privacy.android.icon.pack.R as IconPackR
 
 @Composable
 internal fun PhotosNodeListCardListView(
@@ -82,7 +82,12 @@ internal fun PhotosNodeListCardListView(
                     .clip(shape = RoundedCornerShape(16.dp))
             ) {
                 val context = LocalContext.current
-                val request = remember(photo.id) {
+                val request = remember(
+                    photo.id,
+                    photo.thumbnailFilePath,
+                    photo.previewFilePath,
+                    photo.extension,
+                ) {
                     ImageRequest.Builder(context)
                         .data(
                             MediaThumbnailRequest(
@@ -98,7 +103,7 @@ internal fun PhotosNodeListCardListView(
                         .build()
                 }
                 val isSensitiveBlur = isHiddenNodesEnabled && photo.isSensitive
-                AsyncImage(
+                BoxSurface(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(4f / 3f)
@@ -108,12 +113,15 @@ internal fun PhotosNodeListCardListView(
                                 .blur(16.dp)
                         }
                         .testTag(PHOTOS_NODE_LIST_CARD_LIST_VIEW_IMAGE_TAG),
-                    model = request,
-                    contentDescription = null,
-                    placeholder = rememberAsyncImagePainter(model = IconPackR.drawable.ic_image_medium_solid),
-                    error = rememberAsyncImagePainter(model = IconPackR.drawable.ic_image_medium_solid),
-                    contentScale = ContentScale.Crop
-                )
+                    surfaceColor = SurfaceColor.Surface1,
+                ) {
+                    AsyncImage(
+                        modifier = Modifier.fillMaxSize(),
+                        model = request,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                    )
+                }
 
                 if (photo.period == PhotosNodeListCardPeriod.Day && photo.count > 1) {
                     MegaChip(

@@ -54,7 +54,6 @@ import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH_WITH_DAY
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_YEAR_WITH_MONTH
 import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
@@ -72,7 +71,6 @@ internal fun PhotosGridView(
     selectedPhotoIds: Set<Long>,
     mediaListItemList: List<MediaListItem>,
     shouldApplySensitiveMode: Boolean,
-    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     endSpacing: Dp = 56.dp,
@@ -157,7 +155,6 @@ internal fun PhotosGridView(
                                 alpha = if (isBlurUnselectItem && !isSelected) 0.4f else 1.0f,
                                 shouldApplySensitiveMode = shouldApplySensitiveMode,
                                 showOverlayOnSuccess = false,
-                                fileTypeIconMapper = fileTypeIconMapper
                             )
                         }
                     )
@@ -182,7 +179,6 @@ internal fun PhotosGridView(
                                 alpha = if (isBlurUnselectItem && !isSelected) 0.4f else 1.0f,
                                 shouldApplySensitiveMode = shouldApplySensitiveMode,
                                 showOverlayOnSuccess = true,
-                                fileTypeIconMapper = fileTypeIconMapper
                             )
                         }
                     )

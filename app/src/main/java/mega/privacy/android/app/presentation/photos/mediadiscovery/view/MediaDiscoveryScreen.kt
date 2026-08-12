@@ -56,7 +56,6 @@ import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
 import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
@@ -65,7 +64,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MediaDiscoveryScreen(
-    fileTypeIconMapper: FileTypeIconMapper,
     screenTitle: String? = null,
     viewModel: MediaDiscoveryViewModel = hiltViewModel(),
     mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = hiltViewModel(),
@@ -200,7 +198,6 @@ fun MediaDiscoveryScreen(
                         },
                         onZoomIn = mediaDiscoveryGlobalStateViewModel::zoomIn,
                         onZoomOut = mediaDiscoveryGlobalStateViewModel::zoomOut,
-                        fileTypeIconMapper = fileTypeIconMapper
                     )
                 } else {
                     EmptyView(uiState.currentMediaType)
@@ -413,7 +410,6 @@ private fun MediaDiscoveryContent(
     shouldApplySensitiveMode: Boolean,
     selectedPhotoIds: Set<Long>,
     onPhotoDownload: PhotoDownload,
-    fileTypeIconMapper: FileTypeIconMapper,
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     selectedTimeBarTab: TimeBarTab = TimeBarTab.All,
     yearsCardList: List<DateCard> = emptyList(),
@@ -446,7 +442,6 @@ private fun MediaDiscoveryContent(
                     selectedPhotoIds = selectedPhotoIds,
                     mediaListItemList = mediaListItems,
                     shouldApplySensitiveMode = shouldApplySensitiveMode,
-                    fileTypeIconMapper = fileTypeIconMapper
                 )
             } else {
                 val dateCards = when (selectedTimeBarTab) {

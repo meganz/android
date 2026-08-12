@@ -40,7 +40,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import java.io.File
@@ -60,9 +59,6 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
      */
     @Inject
     lateinit var megaNavigator: MegaNavigator
-
-    @Inject
-    lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     private val mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel by viewModels()
     private val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()
@@ -105,7 +101,6 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                     onPhotoClicked = this::onClick,
                     onPhotoLongPressed = this::onLongPress,
                     onImportClicked = this::importNode,
-                    fileTypeIconMapper = fileTypeIconMapper
                 )
             }
         }

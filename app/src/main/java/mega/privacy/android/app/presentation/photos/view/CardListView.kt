@@ -33,14 +33,12 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.DateCardCount
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 
 @Composable
@@ -112,25 +110,28 @@ fun CardListView(
                         }
                     }
 
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(imageState.value)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = null,
-                        placeholder = rememberAsyncImagePainter(model = IconPackR.drawable.ic_image_medium_solid),
-                        error = rememberAsyncImagePainter(model = IconPackR.drawable.ic_image_medium_solid),
-                        contentScale = ContentScale.Crop,
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f)
+                            .background(colorResource(id = R.color.grey_050_grey_700))
                             .alpha(0.5f.takeIf {
                                 shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
                             } ?: 1f)
                             .blur(16.dp.takeIf {
                                 shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
                             } ?: 0.dp)
-                    )
+                    ) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(imageState.value)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                     Box(
                         modifier = Modifier
                             .matchParentSize()

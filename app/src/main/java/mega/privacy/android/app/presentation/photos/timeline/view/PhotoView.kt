@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -53,7 +51,6 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.icon.pack.IconPack
@@ -71,7 +68,6 @@ fun PhotoView(
     onLongPress: (Photo) -> Unit,
     downloadPhoto: PhotoDownload,
     isPreview: Boolean,
-    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
 ) {
     val configuration = LocalConfiguration.current
@@ -130,7 +126,6 @@ fun PhotoView(
                     onLongClick = { onLongPress(photo) }
                 ),
             isPreview = isPreview,
-            fileTypeIconMapper = fileTypeIconMapper,
         )
         if (isSelected) {
             SelectedIconView(
@@ -175,7 +170,6 @@ private fun PhotoCoverView(
     currentZoomLevel: ZoomLevel,
     downloadPhoto: PhotoDownload,
     isPreview: Boolean,
-    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
 ) {
     val spacing = LocalSpacing.current
@@ -191,7 +185,6 @@ private fun PhotoCoverView(
                     downloadPhoto = downloadPhoto,
                     shouldApplySensitiveMode = shouldApplySensitiveMode,
                     showOverlayOnSuccess = false,
-                    fileTypeIconMapper = fileTypeIconMapper
                 )
                 if (photo.isFavourite) {
                     Image(
@@ -211,7 +204,6 @@ private fun PhotoCoverView(
                     isPreview = isPreview,
                     downloadPhoto = downloadPhoto,
                     showOverlayOnSuccess = true,
-                    fileTypeIconMapper = fileTypeIconMapper
                 )
 
                 Text(
@@ -247,7 +239,6 @@ fun PhotoImageView(
     isPreview: Boolean,
     downloadPhoto: PhotoDownload,
     showOverlayOnSuccess: Boolean = false,
-    fileTypeIconMapper: FileTypeIconMapper,
     alpha: Float = DefaultAlpha,
 ) {
     var showOverlayState by remember { mutableStateOf(false) }
@@ -262,25 +253,26 @@ fun PhotoImageView(
             }
         }
     }
-    val defaultIcon = painterResource(fileTypeIconMapper(photo.fileTypeInfo.extension))
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.grey_050_grey_700)
     ) {
-        imageState.value?.let {
+        // No fallback icon: the grey background is the entire loading state.
+        // Drawing one would flicker an oversized icon into every grid cell.
+        imageState.value?.let { filePath ->
             AsyncImage(
                 model = ImageRequest
                     .Builder(LocalContext.current)
-                    .data(imageState.value)
+                    .data(filePath)
                     .crossfade(true)
                     .diskCachePolicy(CachePolicy.ENABLED)
                     .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 onSuccess = {
-                    if (showOverlayOnSuccess && imageState.value != null) {
+                    if (showOverlayOnSuccess) {
                         showOverlayState = true
                     }
                 },
@@ -293,15 +285,7 @@ fun PhotoImageView(
                             .blur(16.dp)
                     }
             )
-        } ?: Image(
-            modifier = Modifier
-                .height(172.dp)
-                .fillMaxWidth()
-                .padding(vertical = 34.dp),
-            painter = defaultIcon,
-            contentDescription = "default icon",
-            contentScale = ContentScale.Fit,
-        )
+        }
         if (showOverlayState)
             Spacer(
                 modifier = Modifier
