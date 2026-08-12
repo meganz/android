@@ -1249,6 +1249,8 @@
     <string name="settings_sync_power_always_title">Sync always</string>
     <!-- Sync only when charging label for sync power options -->
     <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
+    <!-- Title of the sync and backup settings screen -->
+    <string name="settings_sync_and_backup_title">Sync and backup</string>
     <!-- Settings title for the sync and backup battery usage options -->
     <string name="settings_sync_battery_usage_title">Battery usage</string>
     <!-- Description shown in the sync and backup battery usage options dialog -->

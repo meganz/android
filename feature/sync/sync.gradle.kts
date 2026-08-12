@@ -6,10 +6,13 @@ plugins {
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
     id("kotlin-parcelize")
 }
 
 android {
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
+
     lint {
         abortOnError = true
     }
@@ -62,6 +65,12 @@ dependencies {
     implementation(androidx.hilt.work)
     implementation(lib.compose.state.events)
     implementation(lib.kotlin.serialisation)
+    implementation(lib.kotlinx.collections.immutable)
+
+    // screenshot tests
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
     implementation(google.guava)
     implementation(androidx.material3)
     implementation(androidx.navigation3.runtime)

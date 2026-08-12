@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.settings
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,10 +17,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.list.FlexibleLineListItem
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
 import mega.privacy.android.shared.resources.R
 
@@ -36,12 +35,12 @@ internal fun SyncDebrisView(
             modifier = modifier.testTag(SETTINGS_SYNC_SYNC_DEBRIS_VIEW)
         )
     } else {
-        GenericTwoLineListItem(
+        FlexibleLineListItem(
             modifier = modifier.testTag(SETTINGS_SYNC_SYNC_DEBRIS_VIEW),
             title = stringResource(R.string.settings_sync_clear_debris_item_title),
             subtitle = formatFileSize(size, LocalContext.current),
-            showEntireSubtitle = true,
-            onItemClicked = clearDebrisClicked,
+            enableClick = true,
+            onClickListener = clearDebrisClicked,
         )
     }
 }
@@ -87,7 +86,7 @@ private fun SyncDebrisLoadingView(
 @Composable
 @CombinedThemePreviews
 private fun SyncDebrisViewLoadedPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncDebrisView(
             size = 1024 * 1024 * 1024,
             clearDebrisClicked = {},
@@ -98,7 +97,7 @@ private fun SyncDebrisViewLoadedPreview() {
 @Composable
 @CombinedThemePreviews
 private fun SyncDebrisViewLoadingPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncDebrisView(
             size = null,
             clearDebrisClicked = {},

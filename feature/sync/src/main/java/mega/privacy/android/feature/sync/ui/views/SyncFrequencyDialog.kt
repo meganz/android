@@ -1,14 +1,18 @@
 package mega.privacy.android.feature.sync.ui.views
 
-import mega.privacy.android.shared.resources.R as sharedRes
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import mega.android.core.ui.components.dialogs.BasicDialogButton
+import mega.android.core.ui.components.dialogs.BasicDialogRadioOption
+import mega.android.core.ui.components.dialogs.BasicRadioDialog
+import mega.android.core.ui.components.text.SpannableText
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.sync.ui.model.SyncFrequency
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedRes
 
 @Composable
 internal fun SyncFrequencyDialog(
@@ -17,19 +21,25 @@ internal fun SyncFrequencyDialog(
     selectedSyncFrequency: SyncFrequency,
     modifier: Modifier = Modifier,
 ) {
-    ConfirmationDialogWithRadioButtons(
-        radioOptions = SyncFrequency.entries,
-        onOptionSelected = {
-            onSyncFrequencyClicked(it)
-        },
-        initialSelectedOption = selectedSyncFrequency,
-        cancelButtonText = stringResource(sharedRes.string.general_dialog_cancel_button),
+    val options = SyncFrequency.entries
+        .map { BasicDialogRadioOption(ordinal = it.ordinal, text = frequencyToString(it)) }
+        .toImmutableList()
+
+    BasicRadioDialog(
+        modifier = modifier,
         onDismissRequest = onDismiss,
-        optionDescriptionMapper = { syncFrequency ->
-            frequencyToString(syncFrequency)
+        title = SpannableText("Sync frequency"),
+        options = options,
+        selectedOption = options.firstOrNull { it.ordinal == selectedSyncFrequency.ordinal },
+        onOptionSelected = { option ->
+            onSyncFrequencyClicked(SyncFrequency.entries.first { it.ordinal == option.ordinal })
         },
-        titleText = "Sync frequency",
-        modifier = modifier
+        buttons = persistentListOf(
+            BasicDialogButton(
+                text = stringResource(sharedRes.string.general_dialog_cancel_button),
+                onClick = onDismiss,
+            )
+        ),
     )
 }
 
@@ -44,12 +54,12 @@ private fun frequencyToString(syncFrequency: SyncFrequency): String {
 
 @CombinedThemePreviews
 @Composable
-private fun SyncOptionsDialogPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+private fun SyncFrequencyDialogPreview() {
+    AndroidThemeForPreviews {
         SyncFrequencyDialog(
             onDismiss = {},
             onSyncFrequencyClicked = {},
-            selectedSyncFrequency = SyncFrequency.EVERY_15_MINUTES,
+            selectedSyncFrequency = SyncFrequency.EVERY_15_MINUTES
         )
     }
 }

@@ -1,43 +1,35 @@
 package mega.privacy.android.feature.sync.ui.views
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.shared.resources.R
 
-/**
- * Clear sync debris dialog shown when user wants to clear the debris left by sync
- *
- * @param onDismiss - Callback when dialog is dismissed by clicks outside the dialog or cancel button
- * @param onConfirm - Callback when dialog is confirmed
- */
 @Composable
 internal fun ClearSyncDebrisDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ConfirmationDialog(
+    BasicDialog(
+        modifier = modifier,
         title = stringResource(R.string.settings_sync_clear_debris_dialog_title),
-        text = stringResource(R.string.settings_sync_clear_debris_dialog_body),
-        confirmButtonText = stringResource(R.string.settings_sync_clear_debris_dialog_continue),
-        cancelButtonText = stringResource(R.string.general_dialog_cancel_button),
-        onConfirm = onConfirm,
+        description = stringResource(R.string.settings_sync_clear_debris_dialog_body),
+        positiveButtonText = stringResource(R.string.settings_sync_clear_debris_dialog_continue),
+        onPositiveButtonClicked = onConfirm,
+        negativeButtonText = stringResource(R.string.general_dialog_cancel_button),
+        onNegativeButtonClicked = onDismiss,
         onDismiss = onDismiss,
-        modifier = modifier
     )
 }
 
-@Composable
-@Preview
 @CombinedThemePreviews
+@Composable
 private fun ClearSyncDebrisDialogPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         ClearSyncDebrisDialog(
             onDismiss = {},
             onConfirm = {},

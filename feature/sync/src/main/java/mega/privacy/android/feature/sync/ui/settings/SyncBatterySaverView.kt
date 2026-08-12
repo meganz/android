@@ -1,16 +1,15 @@
 package mega.privacy.android.feature.sync.ui.settings
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
+import mega.android.core.ui.components.list.FlexibleLineListItem
+import mega.android.core.ui.components.toggle.Toggle
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -19,17 +18,18 @@ internal fun SyncBatterySaverView(
     modifier: Modifier = Modifier,
     pauseSyncOnBatterySaverChanged: (Boolean) -> Unit,
 ) {
-    GenericTwoLineListItem(
+    FlexibleLineListItem(
         modifier = modifier.testTag(SETTINGS_SYNC_BATTERY_SAVER_VIEW),
         title = stringResource(sharedR.string.settings_sync_battery_pause_on_battery_saver_title),
-        trailingIcons = {
-            MegaSwitch(
+        trailingElement = {
+            Toggle(
                 modifier = Modifier.testTag(SETTINGS_SYNC_BATTERY_SAVER_SWITCH),
-                checked = pauseSyncOnBatterySaver,
+                isChecked = pauseSyncOnBatterySaver,
                 onCheckedChange = pauseSyncOnBatterySaverChanged,
             )
         },
-        onItemClicked = { pauseSyncOnBatterySaverChanged(!pauseSyncOnBatterySaver) },
+        enableClick = true,
+        onClickListener = { pauseSyncOnBatterySaverChanged(!pauseSyncOnBatterySaver) },
     )
 }
 
@@ -38,7 +38,7 @@ internal fun SyncBatterySaverView(
 private fun SyncBatterySaverViewPreview(
     @PreviewParameter(BooleanProvider::class) pauseSyncOnBatterySaver: Boolean,
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncBatterySaverView(
             pauseSyncOnBatterySaver = pauseSyncOnBatterySaver,
             pauseSyncOnBatterySaverChanged = {},

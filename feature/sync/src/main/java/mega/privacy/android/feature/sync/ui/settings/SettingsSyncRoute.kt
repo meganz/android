@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,9 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.feature.sync.ui.model.SyncConnectionType
 import mega.privacy.android.feature.sync.ui.model.SyncFrequency
 import mega.privacy.android.feature.sync.ui.model.SyncPowerOption
@@ -27,10 +30,6 @@ import mega.privacy.android.feature.sync.ui.views.ClearSyncDebrisDialog
 import mega.privacy.android.feature.sync.ui.views.SyncConnectionTypesDialog
 import mega.privacy.android.feature.sync.ui.views.SyncFrequencyDialog
 import mega.privacy.android.feature.sync.ui.views.SyncPowerOptionsDialog
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R
 
 @Composable
@@ -61,6 +60,7 @@ internal fun SettingsSyncRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SettingSyncScreen(
     uiState: SettingsSyncUiState,
@@ -71,22 +71,20 @@ internal fun SettingSyncScreen(
     syncFrequencySelected: (SyncFrequency) -> Unit,
     snackbarShown: () -> Unit,
 ) {
-    val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var showSyncConnectionTypeDialog by rememberSaveable { mutableStateOf(false) }
     var showSyncPowerOptionsDialog by rememberSaveable { mutableStateOf(false) }
     var showClearSyncDebrisDialog by rememberSaveable { mutableStateOf(false) }
     var showSyncFrequencyDialog by rememberSaveable { mutableStateOf(false) }
 
-    MegaScaffold(
-        scaffoldState = scaffoldState,
+    MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
-            MegaAppBar(
+            MegaTopAppBar(
                 modifier = Modifier.testTag(SETTINGS_SYNC_TOOLBAR),
-                title = stringResource(R.string.settings_section_sync),
-                appBarType = AppBarType.BACK_NAVIGATION,
-                onNavigationPressed = { onBackPressedDispatcher?.onBackPressed() },
-                elevation = 0.dp
+                title = stringResource(R.string.settings_sync_and_backup_title),
+                navigationType = AppBarNavigationType.Back {
+                    onBackPressedDispatcher?.onBackPressed()
+                },
             )
         },
         content = { padding ->
@@ -177,10 +175,11 @@ internal fun SettingSyncScreen(
         )
     }
     val resources = LocalResources.current
+    val snackbarHostState = LocalSnackBarHostState.current
     LaunchedEffect(key1 = uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { message ->
             try {
-                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                snackbarHostState?.showSnackbar(
                     message.joinToString(separator = " ") { resources.getString(it) }
                 )
             } finally {

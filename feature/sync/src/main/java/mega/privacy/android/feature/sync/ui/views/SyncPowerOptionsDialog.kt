@@ -1,14 +1,19 @@
 package mega.privacy.android.feature.sync.ui.views
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import mega.android.core.ui.components.dialogs.BasicDialogButton
+import mega.android.core.ui.components.dialogs.BasicDialogRadioOption
+import mega.android.core.ui.components.dialogs.BasicRadioDialog
+import mega.android.core.ui.components.text.SpannableText
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.ui.model.SyncPowerOption
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedRes
 import mega.privacy.mobile.analytics.event.SyncPowerOptionSelected
 import mega.privacy.mobile.analytics.event.SyncPowerOptionSelectedEvent
@@ -20,51 +25,50 @@ internal fun SyncPowerOptionsDialog(
     selectedOption: SyncPowerOption,
     modifier: Modifier = Modifier,
 ) {
-    ConfirmationDialogWithRadioButtons(
-        radioOptions = listOf(
-            SyncPowerOption.SyncAlways,
-            SyncPowerOption.SyncOnlyWhenCharging,
-        ),
-        onOptionSelected = {
-            onSyncPowerOptionsClicked(it)
-            when (it) {
-                SyncPowerOption.SyncAlways -> {
-                    Analytics.tracker.trackEvent(
-                        SyncPowerOptionSelectedEvent(SyncPowerOptionSelected.SelectionType.SyncAlways)
-                    )
-                }
+    val resources = LocalResources.current
+    val options = SyncPowerOption.entries
+        .map { BasicDialogRadioOption(ordinal = it.ordinal, text = resources.getString(it.labelId)) }
+        .toImmutableList()
 
-                SyncPowerOption.SyncOnlyWhenCharging -> {
-                    Analytics.tracker.trackEvent(
-                        SyncPowerOptionSelectedEvent(SyncPowerOptionSelected.SelectionType.SyncOnlyWhenCharging)
-                    )
-                }
-            }
-        },
-        initialSelectedOption = selectedOption,
+    BasicRadioDialog(
+        modifier = modifier,
         onDismissRequest = onDismiss,
-        cancelButtonText = stringResource(sharedRes.string.general_dialog_cancel_button),
-        optionDescriptionMapper = { syncPowerOption ->
-            when (syncPowerOption) {
-                SyncPowerOption.SyncAlways -> stringResource(
-                    id = sharedRes.string.settings_sync_power_always_title
+        title = SpannableText(stringResource(sharedRes.string.settings_sync_battery_usage_title)),
+        description = SpannableText(stringResource(sharedRes.string.settings_sync_battery_usage_description)),
+        options = options,
+        selectedOption = options.firstOrNull { it.ordinal == selectedOption.ordinal },
+        onOptionSelected = { option ->
+            val selected = SyncPowerOption.entries.first { it.ordinal == option.ordinal }
+            onSyncPowerOptionsClicked(selected)
+            when (selected) {
+                SyncPowerOption.SyncAlways -> Analytics.tracker.trackEvent(
+                    SyncPowerOptionSelectedEvent(SyncPowerOptionSelected.SelectionType.SyncAlways)
                 )
 
-                SyncPowerOption.SyncOnlyWhenCharging -> stringResource(
-                    id = sharedRes.string.settings_sync_battery_sync_only_when_charging_title
+                SyncPowerOption.SyncOnlyWhenCharging -> Analytics.tracker.trackEvent(
+                    SyncPowerOptionSelectedEvent(SyncPowerOptionSelected.SelectionType.SyncOnlyWhenCharging)
                 )
             }
         },
-        titleText = stringResource(sharedRes.string.settings_sync_battery_usage_title),
-        subTitleText = stringResource(sharedRes.string.settings_sync_battery_usage_description),
-        modifier = modifier
+        buttons = persistentListOf(
+            BasicDialogButton(
+                text = stringResource(sharedRes.string.general_dialog_cancel_button),
+                onClick = onDismiss,
+            )
+        ),
     )
 }
+
+private val SyncPowerOption.labelId: Int
+    get() = when (this) {
+        SyncPowerOption.SyncAlways -> sharedRes.string.settings_sync_power_always_title
+        SyncPowerOption.SyncOnlyWhenCharging -> sharedRes.string.settings_sync_battery_sync_only_when_charging_title
+    }
 
 @CombinedThemePreviews
 @Composable
 private fun SyncPowerOptionsDialogPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncPowerOptionsDialog(
             onDismiss = {},
             onSyncPowerOptionsClicked = {},

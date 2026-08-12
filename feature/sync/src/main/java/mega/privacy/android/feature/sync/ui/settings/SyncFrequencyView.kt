@@ -3,8 +3,8 @@ package mega.privacy.android.feature.sync.ui.settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.privacy.android.feature.sync.ui.model.SyncFrequency
-import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 
 @Composable
 internal fun SyncFrequencyView(
@@ -12,12 +12,12 @@ internal fun SyncFrequencyView(
     syncFrequencyClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    GenericTwoLineListItem(
+    FlexibleLineListItem(
         modifier = modifier.testTag(SETTINGS_SYNC_SYNC_FREQUENCY_VIEW),
         title = "Sync frequency (QA option)",
         subtitle = frequencyToString(currentSyncFrequency),
-        showEntireSubtitle = true,
-        onItemClicked = syncFrequencyClicked,
+        enableClick = true,
+        onClickListener = syncFrequencyClicked,
     )
 }
 
