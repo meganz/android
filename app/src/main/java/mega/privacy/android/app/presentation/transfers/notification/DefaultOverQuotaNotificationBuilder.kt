@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -15,7 +14,6 @@ import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.LoginNavKey
@@ -37,7 +35,6 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val getAccountTypeUseCase: GetAccountTypeUseCase,
-    private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
     private val megaNavigator: MegaNavigator,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : OverQuotaNotificationBuilder {
@@ -80,15 +77,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             setStyle(NotificationCompat.BigTextStyle())
             addAction(iconPackR.drawable.ic_stat_notify, upgradeButtonText, actionPendingIntent)
             setContentTitle(context.getString(R.string.label_transfer_over_quota))
-            setContentText(
-                context.getString(
-                    R.string.current_text_depleted_transfer_overquota,
-                    TimeUtils.getHumanizedTime(
-                        getBandwidthOverQuotaDelayUseCase().inWholeSeconds,
-                        context
-                    )
-                )
-            )
+            setContentText(context.getString(sharedR.string.transfers_over_quota_notification_message))
             setContentIntent(clickPendingIntent)
             setOngoing(false)
             setAutoCancel(true)
