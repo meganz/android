@@ -1241,6 +1241,9 @@ class FakeMegaApiGateway(
             listOf(listener),
             listener,
             MegaRequest.TYPE_ACCOUNT_DETAILS,
+            defaultRequest = accountDetailsRequest(
+                DETAILS_FLAG_STORAGE or DETAILS_FLAG_TRANSFER or DETAILS_FLAG_PRO
+            ),
         )
     }
 

@@ -24,6 +24,8 @@ import mega.privacy.android.app.appstate.global.initialisation.appcreate.Notific
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.PasscodeInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.RemoteConfigInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.SdkSetupInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.appcreate.SessionCheckState
+import mega.privacy.android.app.appstate.global.initialisation.appcreate.SessionCheckStateInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.StaticContextInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.SyncMonitorInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.ThemeInitialiser
@@ -53,6 +55,7 @@ internal class AppCreateInitialisersModule {
         cameraUploadsWorkerNotificationInitialiser: CameraUploadsWorkerNotificationInitialiser,
         syncMonitorInitialiser: SyncMonitorInitialiser,
         cloudDriveDocumentProviderInitialiser: CloudDriveDocumentProviderInitialiser,
+        sessionCheckStateInitialiser: SessionCheckStateInitialiser,
     ): Set<@JvmSuppressWildcards AsyncAppCreateInitialiser> = setOf(
         miscFlagsInitialiser,
         apiServerInitialiser,
@@ -65,7 +68,13 @@ internal class AppCreateInitialisersModule {
         cameraUploadsWorkerNotificationInitialiser,
         syncMonitorInitialiser,
         cloudDriveDocumentProviderInitialiser,
+        sessionCheckStateInitialiser,
     )
+
+    @Provides
+    fun provideSessionCheckState(
+        initialiser: SessionCheckStateInitialiser,
+    ): SessionCheckState = initialiser
 
     @Provides
     fun provideSyncAppCreateInitialisers(

@@ -30,10 +30,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.appstate.MegaActivityInternalLauncher
+import mega.privacy.android.app.appstate.global.initialisation.appcreate.SessionCheckState
 import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.LAUNCH_INTENT
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
@@ -83,7 +83,6 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorSslVerificationFailedUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
@@ -144,13 +143,13 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     lateinit var getAccountDetailsUseCase: GetAccountDetailsUseCase
 
     @Inject
+    lateinit var sessionCheckState: SessionCheckState
+
+    @Inject
     lateinit var monitorCookieSettingsSavedUseCase: MonitorCookieSettingsSavedUseCase
 
     @Inject
     lateinit var monitorSslVerificationFailedUseCase: MonitorSslVerificationFailedUseCase
-
-    @Inject
-    lateinit var getAccountCredentialsUseCase: GetAccountCredentialsUseCase
 
     @Inject
     lateinit var saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase
@@ -835,7 +834,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     @JvmOverloads
     protected fun shouldRefreshSessionDueToSDK(keepCurrentActivity: Boolean = false): Boolean {
-        if (megaApi.rootNode == null) {
+        if (rootNodeDoesNotExist()) {
             Timber.w("Refresh session - sdk")
             refreshSession(keepCurrentActivity)
             return true
@@ -843,7 +842,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         return false
     }
 
-    protected fun rootNodeDoesNotExist() = megaApi.rootNode == null
+    protected fun rootNodeDoesNotExist() = sessionCheckState.rootNodeExists.value != true
 
     /**
      * Checks if should refresh session due to karere or init megaChatAp if the init state is not
@@ -856,8 +855,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
         if (state == MegaChatApi.INIT_ERROR || state == MegaChatApi.INIT_NOT_DONE) {
             Timber.w("MegaChatApi state: %s", state)
-            val credentials =
-                runBlocking { runCatching { getAccountCredentialsUseCase() }.getOrNull() }
+            val credentials = sessionCheckState.userCredentials.value
             state = megaChatApi.init(credentials?.session)
             Timber.d("result of init ---> %s", state)
 

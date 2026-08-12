@@ -53,7 +53,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
@@ -512,11 +511,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         )
         setContentView(binding.root)
         viewModel.initCloudExplorerState(intent.getLongArrayExtra("MOVE_FROM"))
-        credentials = runBlocking {
-            runCatching {
-                getAccountCredentialsUseCase()
-            }.getOrNull()
-        }
+        credentials = sessionCheckState.userCredentials.value
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         createChatLauncher =

@@ -43,7 +43,6 @@ import de.palm.composestateevents.consumed
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
@@ -207,11 +206,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
     private var tempNodeId: NodeId? = null
 
     private val credentials by lazy {
-        runBlocking {
-            runCatching { getAccountCredentialsUseCase() }
-                .onFailure { Timber.e(it) }
-                .getOrNull()
-        }
+        sessionCheckState.userCredentials.value
     }
 
     private val nameCollisionActivityContract = registerForActivityResult(
