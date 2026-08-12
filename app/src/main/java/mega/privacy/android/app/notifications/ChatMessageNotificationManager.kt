@@ -27,8 +27,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.destination.ChatListNavKey
-import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.toFormattedText
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import nz.mega.sdk.MegaApiJava
@@ -94,7 +93,7 @@ class ChatMessageNotificationManager @Inject constructor(
 
         val pendingIntent = MegaActivity.getPendingIntentWithExtraDestinations(
             context,
-            listOf(ChatListNavKey(), ChatNavKey(chat.chatId, null))
+            listOf(ShowChatMessagesNavKey(chatId = chat.chatId, openFromList = true))
         )
 
         val notificationColor = ContextCompat.getColor(context, R.color.red_600_red_300)

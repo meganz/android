@@ -75,7 +75,13 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         Timber.d("ChatActivity.onCreate: intent.action=${intent.action}")
-        val initialKey = intent.toChatNavKey()
+        val requestedKey = intent.toChatNavKey()
+        // When opened from outside the chat list (e.g. a notification), seed the tabs as the root
+        // and stack the conversation on top, so pressing back from the room returns to the list.
+        val stackConversationOnList =
+            intent.getBooleanExtra(EXTRA_OPEN_FROM_LIST, false) && requestedKey is ChatLegacyContainerNavKey
+        val initialKey = if (stackConversationOnList) ChatTabsContainerNavKey() else requestedKey
+        val conversationToStack = requestedKey.takeIf { stackConversationOnList } as? ChatLegacyContainerNavKey
 
         setContent {
             val mode by monitorThemeModeUseCase()
@@ -96,6 +102,7 @@ class ChatActivity : AppCompatActivity() {
                 onEmptyBackStack = { if (!isFinishing) finish() },
                 overlayContent = { navigationHandler ->
                     LaunchedEffect(navigationHandler) {
+                        conversationToStack?.let { navigationHandler.openChatConversation(it) }
                         for (newIntent in newIntents) {
                             when (val key = newIntent.toChatNavKey()) {
                                 is ChatLegacyContainerNavKey ->
@@ -135,5 +142,6 @@ class ChatActivity : AppCompatActivity() {
         const val OPEN_CHAT_LIST = "open_chat_list"
         const val CREATE_NEW_CHAT = "create_new_chat"
         const val EXTRA_SHOW_MEETING_TAB = "EXTRA_SHOW_MEETING_TAB"
+        const val EXTRA_OPEN_FROM_LIST = "EXTRA_OPEN_FROM_LIST"
     }
 }

@@ -24,7 +24,9 @@ import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
+import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -308,6 +310,63 @@ class MegaNavigatorImplTest {
             )
 
             verify(context).startActivity(any())
+        }
+
+    @Test
+    fun `test that openChatAfterSharing opens the chat room for a single chat`() = runTest {
+        whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+        underTest.openChatAfterSharing(context = context, chatIds = listOf(123L))
+
+        verify(navigationQueue).emit(
+            argThat<List<NavKey>> { navKeys ->
+                navKeys.size == 1 &&
+                        navKeys[0] is ShowChatMessagesNavKey &&
+                        (navKeys[0] as ShowChatMessagesNavKey).chatId == 123L
+            },
+            eq(NavPriority.Default),
+            isNull(),
+        )
+    }
+
+    @Test
+    fun `test that openChatAfterSharing opens the chat list for multiple chats`() = runTest {
+        whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+        underTest.openChatAfterSharing(context = context, chatIds = listOf(1L, 2L))
+
+        verify(navigationQueue).emit(
+            argThat<List<NavKey>> { navKeys ->
+                navKeys.size == 1 && navKeys[0] is ChatListNavKey
+            },
+            eq(NavPriority.Default),
+            isNull(),
+        )
+    }
+
+    @Test
+    fun `test that openChatAfterSharing opens the chat list when no chats are provided`() = runTest {
+        whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+        underTest.openChatAfterSharing(context = context, chatIds = emptyList())
+
+        verify(navigationQueue).emit(
+            argThat<List<NavKey>> { navKeys ->
+                navKeys.size == 1 && navKeys[0] is ChatListNavKey
+            },
+            eq(NavPriority.Default),
+            isNull(),
+        )
+    }
+
+    @Test
+    fun `test that openChatAfterSharing launches the main navigation shell as base when not already in MegaActivity`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(null)
+
+            underTest.openChatAfterSharing(context = context, chatIds = listOf(123L))
+
+            verify(context, atLeastOnce()).startActivity(any())
         }
 
     @Test

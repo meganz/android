@@ -38,18 +38,19 @@ fun EntryProviderScope<NavKey>.showChatMessagesDestination(navigationHandler: Na
     ) { key ->
         val context = LocalContext.current
         LaunchedEffect(Unit) {
-            context.startActivity(createShowMessagesIntent(context, key.chatId))
+            context.startActivity(createShowMessagesIntent(context, key.chatId, key.openFromList))
             navigationHandler.remove(key)
         }
     }
 }
 
 @Suppress("DEPRECATION") // The activity is launched via the legacy intent action.
-private fun createShowMessagesIntent(context: Context, chatId: Long): Intent =
+private fun createShowMessagesIntent(context: Context, chatId: Long, openFromList: Boolean): Intent =
     Intent(context, ChatActivity::class.java).apply {
         action = Constants.ACTION_CHAT_SHOW_MESSAGES
         putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
         putExtra(EXTRA_ACTION, Constants.ACTION_CHAT_SHOW_MESSAGES)
+        putExtra(ChatActivity.EXTRA_OPEN_FROM_LIST, openFromList)
     }
 
 /**

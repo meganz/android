@@ -104,6 +104,7 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.AuthenticityCredentialsNavKey
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.ContactAttachmentNavKey
@@ -120,6 +121,7 @@ import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
+import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
@@ -252,6 +254,16 @@ internal class MegaNavigatorImpl @Inject constructor(
             )
             context.startActivity(intent)
         }
+    }
+
+    override fun openChatAfterSharing(context: Context, chatIds: List<Long>) {
+        val singleChatId = chatIds.singleOrNull()
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = singleChatId?.let {
+                ShowChatMessagesNavKey(chatId = it)
+            } ?: ChatListNavKey(),
+        )
     }
 
     override fun openUpgradeAccount(context: Context, source: UpgradeAccountSource) {

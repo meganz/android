@@ -93,10 +93,16 @@ data class ChatNavKey(
  * chat id. Prefer this over [ChatNavKey] with an explicit action string.
  *
  * @param chatId Chat ID to open.
+ * @param openFromList When true, the chat list is placed beneath the chat room so pressing back
+ * from the room returns to the list. Use when opening a chat outside the list context (e.g. from a
+ * notification) where the list would otherwise not be on the back stack.
  */
 @Serializable
 @Parcelize
-data class ShowChatMessagesNavKey(val chatId: Long) : NoSessionNavKey.Optional, Parcelable
+data class ShowChatMessagesNavKey(
+    val chatId: Long,
+    val openFromList: Boolean = false,
+) : NoSessionNavKey.Optional, Parcelable
 
 /**
  * Navigation key for Chat List

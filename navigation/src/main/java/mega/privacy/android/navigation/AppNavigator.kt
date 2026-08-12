@@ -90,6 +90,17 @@ interface AppNavigator {
     )
 
     /**
+     * Navigates to the chat(s) content was just shared to, over the main navigation shell so
+     * pressing back returns to it. A single chat opens its chat room; multiple (or none) open the
+     * chat list. How each destination renders (Compose or legacy activity) is decided by the
+     * destination graph, not the caller.
+     *
+     * @param context context to launch from
+     * @param chatIds the chats the content was shared to
+     */
+    fun openChatAfterSharing(context: Context, chatIds: List<Long>)
+
+    /**
      * Navigates to the new [mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivityV2]
      *
      * @param context The context that call this method

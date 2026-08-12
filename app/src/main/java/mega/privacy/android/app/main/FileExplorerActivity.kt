@@ -92,7 +92,6 @@ import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
-import mega.privacy.android.app.menu.presentation.MenuHomeScreen
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.presentation.container.MegaAppContainer
@@ -142,8 +141,6 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
-import mega.privacy.android.navigation.destination.ChatListNavKey
-import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.CopyResult
@@ -2789,15 +2786,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun navigateToChat() {
-        val singleChatId = chatListItems.singleOrNull()?.chatId
-        launchMegaActivityWithDestinations(
-            destinations = listOfNotNull(
-                HomeScreensNavKey(MenuHomeScreen),
-                ChatListNavKey(),
-                singleChatId?.let {
-                    ChatNavKey(chatId = singleChatId, action = null)
-                },
-            ),
+        megaNavigator.openChatAfterSharing(
+            context = this,
+            chatIds = chatListItems.map { it.chatId },
         )
         finish()
     }
