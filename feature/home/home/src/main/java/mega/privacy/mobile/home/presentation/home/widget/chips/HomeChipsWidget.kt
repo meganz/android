@@ -77,7 +77,7 @@ internal object HomeChipSectionIds {
 }
 
 @Composable
-private fun HomeChips(
+internal fun HomeChips(
     hiddenSectionIds: Set<String>,
     onNavigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,

@@ -3,6 +3,7 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
 }
 
 android {
@@ -11,6 +12,9 @@ android {
         abortOnError = true
     }
     namespace = "mega.privacy.android.feature.home"
+
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
+
     testOptions {
         unitTests {
             targetSdk = 34
@@ -57,4 +61,9 @@ dependencies {
     testImplementation(testlib.bundles.ui.test)
     testImplementation(androidx.paging.testing)
     testRuntimeOnly(testlib.junit.jupiter.engine)
+
+    // screenshot tests
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
 }

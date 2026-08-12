@@ -2,11 +2,14 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
     id("kotlin-parcelize")
 }
 
 android {
     namespace = "mega.privacy.android.navigation.snowflake"
+
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
 dependencies {
@@ -35,4 +38,9 @@ dependencies {
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
     testImplementation(lib.kotlin.serialisation)
+
+    // screenshot tests
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
 }

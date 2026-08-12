@@ -1,18 +1,30 @@
 package mega.privacy.android.app.presentation.settings.customisenavigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.android.tools.screenshot.PreviewTest
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.spacing.LocalSpacing
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.app.presentation.settings.customisenavigation.model.CustomiseNavigationUiState
+import mega.privacy.android.app.presentation.settings.customisenavigation.model.MaxSelectableNavigationItems
+import mega.privacy.android.app.presentation.settings.customisenavigation.model.MinSelectableNavigationItems
 import mega.privacy.android.app.presentation.settings.customisenavigation.model.NavigationItemUiModel
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Baselines for [CustomiseNavigationScreen]: the default arrangement and the full
- * selection with the counter in its error state.
+ * Baselines for [CustomiseNavigationScreen]: the default arrangement, the full
+ * selection with the counter in its error state, and the max/min-items snackbars
+ * shown when saving an invalid selection.
  */
 class CustomiseNavigationScreenScreenshotTest {
 
@@ -45,6 +57,83 @@ class CustomiseNavigationScreenScreenshotTest {
                 onBackPressed = {},
                 onSave = {},
             )
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun CustomiseNavigationScreenMaxItemsSnackbar() {
+        AndroidThemeForPreviews {
+            ScreenWithSnackbar(
+                message = stringResource(
+                    sharedR.string.settings_customise_navigation_max_items_snackbar,
+                    MaxSelectableNavigationItems,
+                ),
+            ) {
+                CustomiseNavigationScreen(
+                    state = data(
+                        selected = listOf(home, drive, media, chat, shares),
+                        available = emptyList(),
+                    ),
+                    onBackPressed = {},
+                    onSave = {},
+                )
+            }
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun CustomiseNavigationScreenMinItemsSnackbar() {
+        AndroidThemeForPreviews {
+            ScreenWithSnackbar(
+                message = stringResource(
+                    sharedR.string.settings_customise_navigation_min_items_snackbar,
+                    MinSelectableNavigationItems,
+                ),
+            ) {
+                CustomiseNavigationScreen(
+                    state = data(
+                        selected = listOf(home, drive),
+                        available = listOf(media, chat, shares),
+                    ),
+                    onBackPressed = {},
+                    onSave = {},
+                )
+            }
+        }
+    }
+
+    /**
+     * Renders [content] with a MEGA-styled snackbar pinned to the bottom.
+     *
+     * The production snackbar goes through a [androidx.compose.material3.SnackbarHost]
+     * that shows nothing until a `showSnackbar` call animates it in, so it cannot be
+     * captured in a static preview. This mirrors core-ui `MegaSnackbar` styling on a
+     * plain slot-based [Snackbar] instead.
+     */
+    @Composable
+    private fun ScreenWithSnackbar(
+        message: String,
+        content: @Composable () -> Unit,
+    ) {
+        Box {
+            content()
+            Snackbar(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(
+                        start = LocalSpacing.current.x8,
+                        end = LocalSpacing.current.x8,
+                        bottom = LocalSpacing.current.x12,
+                    ),
+                containerColor = DSTokens.colors.components.toastBackground,
+                contentColor = DSTokens.colors.text.inverse,
+            ) {
+                Text(text = message)
+            }
         }
     }
 
