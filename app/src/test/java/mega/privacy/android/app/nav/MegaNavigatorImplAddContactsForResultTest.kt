@@ -23,7 +23,7 @@ import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.Test
@@ -60,9 +60,9 @@ class MegaNavigatorImplAddContactsForResultTest {
     )
 
     @Test
-    fun `test that openAddContactsForResult launches the Compose host when the ContactsComposeUI flag is enabled`() =
+    fun `test that openAddContactsForResult launches the Compose host when the ContactComposeFeature flag is enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             val launcher = mock<ActivityResultLauncher<Intent>>()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
@@ -89,7 +89,7 @@ class MegaNavigatorImplAddContactsForResultTest {
     @Test
     fun `test that openAddContactsForResult launches the legacy AddContactActivity with the preselected emails when the flag is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
             val launcher = mock<ActivityResultLauncher<Intent>>()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 

@@ -34,7 +34,7 @@ import javax.inject.Inject
  * [AddContactActivity] contract (`RESULT_OK` + [AddContactActivity.EXTRA_CONTACTS]) so existing
  * result handling is unchanged.
  *
- * Launch it only when `ContactsComposeUI` is enabled; the caller keeps launching
+ * Launch it only when `ContactComposeFeature` is enabled; the caller keeps launching
  * [AddContactActivity] when the flag is off.
  */
 @AndroidEntryPoint

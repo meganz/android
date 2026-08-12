@@ -34,7 +34,7 @@ import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = ShareRecipientsViewModel.Factory::class)
@@ -99,13 +99,13 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
 
     /**
      * Called when the user chooses to add contacts to the shared folder. On the Compose picker path
-     * ([AppFeatures.ContactsComposeUI]) a hidden/sensitive-node warning is shown first when needed;
+     * ([ApiFeatures.ContactComposeFeature]) a hidden/sensitive-node warning is shown first when needed;
      * the legacy picker warns itself, so no warning is surfaced here for it.
      */
     fun onAddContactClicked() {
         viewModelScope.launch {
             val isComposeContactsPicker = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
             }.getOrDefault(false)
             val warning = if (isComposeContactsPicker) {
                 runCatching {

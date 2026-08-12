@@ -7,13 +7,13 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.feature.contact.navigation.AddContactToShareEntry
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 
 /**
- * Registers the [AddContactToShareNavKey] destination. Behind [AppFeatures.ContactsComposeUI]
+ * Registers the [AddContactToShareNavKey] destination. Behind [ApiFeatures.ContactComposeFeature]
  * either renders the Compose [AddContactToShareEntry] picker (flag on) or launches the legacy
  * [AddContactActivity] (flag off). Both paths publish the selected contact emails as a
  * `List<String>` under [AddContactToShareNavKey.KEY].
@@ -21,7 +21,7 @@ import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 fun EntryProviderScope<NavKey>.addContactLegacyDestination(navigationHandler: NavigationHandler) {
     entry<AddContactToShareNavKey> { addContactToShare ->
         FeatureFlagGate(
-            feature = AppFeatures.ContactsComposeUI,
+            feature = ApiFeatures.ContactComposeFeature,
             disabled = {
                 LegacyAddContactToShareEntry(
                     addContactToShare = addContactToShare,

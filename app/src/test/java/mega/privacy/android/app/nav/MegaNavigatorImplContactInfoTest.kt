@@ -22,7 +22,7 @@ import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import nz.mega.sdk.MegaChatApiJava
@@ -72,9 +72,9 @@ class MegaNavigatorImplContactInfoTest {
     private fun nextStartedIntent() = shadowOf(activity).nextStartedActivity
 
     @Test
-    fun `test that openContactInfoActivity by email launches the Compose host when ContactInfoComposeUI is enabled`() =
+    fun `test that openContactInfoActivity by email launches the Compose host when ContactComposeFeature is enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactInfoComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
             navigator.openContactInfoActivity(context(), "contact@mega.co.nz")
@@ -88,9 +88,9 @@ class MegaNavigatorImplContactInfoTest {
         }
 
     @Test
-    fun `test that openContactInfoActivity by email launches the legacy ContactInfoActivity when ContactInfoComposeUI is disabled`() =
+    fun `test that openContactInfoActivity by email launches the legacy ContactInfoActivity when ContactComposeFeature is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactInfoComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
             navigator.openContactInfoActivity(context(), "contact@mega.co.nz")
@@ -104,9 +104,9 @@ class MegaNavigatorImplContactInfoTest {
         }
 
     @Test
-    fun `test that openContactInfoActivity by chatId launches the Compose host when ContactInfoComposeUI is enabled`() =
+    fun `test that openContactInfoActivity by chatId launches the Compose host when ContactComposeFeature is enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactInfoComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
             navigator.openContactInfoActivity(context(), 123L)
@@ -121,9 +121,9 @@ class MegaNavigatorImplContactInfoTest {
         }
 
     @Test
-    fun `test that openContactInfoActivity by chatId launches the legacy ContactInfoActivity when ContactInfoComposeUI is disabled`() =
+    fun `test that openContactInfoActivity by chatId launches the legacy ContactInfoActivity when ContactComposeFeature is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactInfoComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
             navigator.openContactInfoActivity(context(), 123L)

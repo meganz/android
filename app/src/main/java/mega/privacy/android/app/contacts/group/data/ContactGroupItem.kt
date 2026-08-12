@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
  * @property lastUser   Last contact of the group
  * @property isPublic   Flag to know if the group is public
  */
-@Deprecated("Legacy logic. Will be deleted with [mega.privacy.android.feature_flags.AppFeatures.ContactsComposeUI]")
+@Deprecated("Legacy logic. Will be deleted with [mega.privacy.android.domain.featuretoggle.ApiFeatures.ContactComposeFeature]")
 data class ContactGroupItem constructor(
     val chatId: Long,
     val title: String,

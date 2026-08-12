@@ -25,7 +25,7 @@ import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -477,7 +477,7 @@ class ShareRecipientsViewModelTest {
         runTest {
             stubForData()
             getFeatureFlagValueUseCase.stub {
-                on { invoke(AppFeatures.ContactsComposeUI) } doReturn false
+                on { invoke(ApiFeatures.ContactComposeFeature) } doReturn false
             }
             initUnderTest()
 
@@ -498,7 +498,7 @@ class ShareRecipientsViewModelTest {
         runTest {
             stubForData()
             getFeatureFlagValueUseCase.stub {
-                on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+                on { invoke(ApiFeatures.ContactComposeFeature) } doReturn true
             }
             getShareFolderSensitiveWarningUseCase.stub {
                 on { invoke(any()) } doReturn SensitiveNodeShareWarning.None
@@ -521,7 +521,7 @@ class ShareRecipientsViewModelTest {
     fun `test that warning is shown when onAddContactClicked and folder is sensitive`() = runTest {
         stubForData()
         getFeatureFlagValueUseCase.stub {
-            on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+            on { invoke(ApiFeatures.ContactComposeFeature) } doReturn true
         }
         getShareFolderSensitiveWarningUseCase.stub {
             on { invoke(any()) } doReturn SensitiveNodeShareWarning.Folder
@@ -544,7 +544,7 @@ class ShareRecipientsViewModelTest {
         runTest {
             stubForData()
             getFeatureFlagValueUseCase.stub {
-                on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+                on { invoke(ApiFeatures.ContactComposeFeature) } doReturn true
             }
             getShareFolderSensitiveWarningUseCase.stub {
                 on { invoke(any()) } doReturn SensitiveNodeShareWarning.Folder
@@ -569,7 +569,7 @@ class ShareRecipientsViewModelTest {
     fun `test that dismissing the warning clears it without navigating`() = runTest {
         stubForData()
         getFeatureFlagValueUseCase.stub {
-            on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+            on { invoke(ApiFeatures.ContactComposeFeature) } doReturn true
         }
         getShareFolderSensitiveWarningUseCase.stub {
             on { invoke(any()) } doReturn SensitiveNodeShareWarning.Folders

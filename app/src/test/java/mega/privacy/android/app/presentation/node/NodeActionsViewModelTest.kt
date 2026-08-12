@@ -65,7 +65,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -646,9 +646,9 @@ class NodeActionsViewModelTest {
     }
 
     @Test
-    fun `test that verifyShareFolder triggers the picker event without a sensitive check when the ContactsComposeUI flag is off`() =
+    fun `test that verifyShareFolder triggers the picker event without a sensitive check when the ContactComposeFeature flag is off`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
 
             viewModel.verifyShareFolder(listOf(1L, 2L))
             advanceUntilIdle()
@@ -663,7 +663,7 @@ class NodeActionsViewModelTest {
     @Test
     fun `test that verifyShareFolder triggers the picker event when the warning is None`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             whenever(getShareFolderSensitiveWarningUseCase(listOf(NodeId(1L))))
                 .thenReturn(SensitiveNodeShareWarning.None)
 
@@ -681,7 +681,7 @@ class NodeActionsViewModelTest {
     @Test
     fun `test that verifyShareFolder triggers the warning event instead of the picker when the warning is Folder`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             whenever(getShareFolderSensitiveWarningUseCase(listOf(NodeId(1L))))
                 .thenReturn(SensitiveNodeShareWarning.Folder)
 
@@ -700,7 +700,7 @@ class NodeActionsViewModelTest {
     @Test
     fun `test that verifyShareFolder triggers the warning event with the plural flag when the warning is Folders`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             whenever(getShareFolderSensitiveWarningUseCase(listOf(NodeId(1L), NodeId(2L))))
                 .thenReturn(SensitiveNodeShareWarning.Folders)
 
@@ -727,7 +727,7 @@ class NodeActionsViewModelTest {
 
     @Test
     fun `test that markShareHiddenNodeWarningEventConsumed resets the warning event`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
         whenever(getShareFolderSensitiveWarningUseCase(listOf(NodeId(1L))))
             .thenReturn(SensitiveNodeShareWarning.Folder)
         viewModel.verifyShareFolder(listOf(1L))

@@ -19,7 +19,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * Add contacts entry. Renders the Compose MEGA-contacts multi-select picker and publishes the
  * selected contact emails as a `List<String>` under [AddContactsNavKey.KEY] when confirmed.
  *
- * Hosted by the app module's gated `AddContactsNavKey` destination (behind `ContactsComposeUI`).
+ * Hosted by the app module's gated `AddContactsNavKey` destination (behind `ContactComposeFeature`).
  *
  * @param navigationHandler
  * @param preselectedHandles handles of contacts to pre-select when the picker opens.
@@ -115,7 +115,7 @@ fun AddContactToShareEntry(
  * are not yet participants of [chatId], and publishes the selected emails as a `List<String>` under
  * [AddChatParticipantsNavKey.KEY] when confirmed.
  *
- * Hosted by the app module's gated `AddChatParticipantsNavKey` destination (behind `ContactsComposeUI`).
+ * Hosted by the app module's gated `AddChatParticipantsNavKey` destination (behind `ContactComposeFeature`).
  *
  * @param navigationHandler
  * @param chatId the chat whose existing participants are excluded from the picker.
@@ -159,7 +159,7 @@ fun AddChatParticipantsEntry(
  * the picker additionally surfaces the call user-limit warning. Publishes the selected emails as a
  * `List<String>` under [AddMeetingParticipantsNavKey.KEY] when confirmed.
  *
- * Hosted by the app module's gated `AddMeetingParticipantsNavKey` destination (behind `ContactsComposeUI`).
+ * Hosted by the app module's gated `AddMeetingParticipantsNavKey` destination (behind `ContactComposeFeature`).
  *
  * @param navigationHandler
  * @param chatId the meeting chat whose existing participants are excluded and whose call is monitored.

@@ -24,7 +24,7 @@ import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.Test
@@ -66,9 +66,9 @@ class MegaNavigatorImplNewChatForResultTest {
         Robolectric.buildActivity(Activity::class.java).setup().get()
 
     @Test
-    fun `test that openNewChatForResult with requestCode launches the Compose host when the ContactsComposeUI flag is enabled`() =
+    fun `test that openNewChatForResult with requestCode launches the Compose host when the ContactComposeFeature flag is enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             val activity = buildActivity()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
@@ -90,9 +90,9 @@ class MegaNavigatorImplNewChatForResultTest {
         }
 
     @Test
-    fun `test that openNewChatForResult with requestCode launches the legacy AddContactActivity with the MEGA contact type when the ContactsComposeUI flag is disabled`() =
+    fun `test that openNewChatForResult with requestCode launches the legacy AddContactActivity with the MEGA contact type when the ContactComposeFeature flag is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
             val activity = buildActivity()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
@@ -120,9 +120,9 @@ class MegaNavigatorImplNewChatForResultTest {
         }
 
     @Test
-    fun `test that openNewChatForResult with launcher launches the Compose host when the ContactsComposeUI flag is enabled`() =
+    fun `test that openNewChatForResult with launcher launches the Compose host when the ContactComposeFeature flag is enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             val launcher = mock<ActivityResultLauncher<Intent>>()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
@@ -144,9 +144,9 @@ class MegaNavigatorImplNewChatForResultTest {
         }
 
     @Test
-    fun `test that openNewChatForResult with launcher launches the legacy AddContactActivity with the MEGA contact type when the ContactsComposeUI flag is disabled`() =
+    fun `test that openNewChatForResult with launcher launches the legacy AddContactActivity with the MEGA contact type when the ContactComposeFeature flag is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
             val launcher = mock<ActivityResultLauncher<Intent>>()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 

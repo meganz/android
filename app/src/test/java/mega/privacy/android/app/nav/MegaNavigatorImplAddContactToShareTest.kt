@@ -23,7 +23,7 @@ import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.Test
@@ -60,9 +60,9 @@ class MegaNavigatorImplAddContactToShareTest {
     )
 
     @Test
-    fun `test that openAddContactToShare launches the Compose host when the ContactsComposeUI flag is enabled`() =
+    fun `test that openAddContactToShare launches the Compose host when the ContactComposeFeature flag is enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             val launcher = mock<ActivityResultLauncher<Intent>>()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
@@ -87,7 +87,7 @@ class MegaNavigatorImplAddContactToShareTest {
     @Test
     fun `test that openAddContactToShare launches the legacy AddContactActivity with single-select extras when the flag is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
             val launcher = mock<ActivityResultLauncher<Intent>>()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
@@ -118,7 +118,7 @@ class MegaNavigatorImplAddContactToShareTest {
     @Test
     fun `test that openAddContactToShare launches the legacy AddContactActivity with multi-select extras for multiple handles`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
             val launcher = mock<ActivityResultLauncher<Intent>>()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 

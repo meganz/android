@@ -32,7 +32,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.contact.info.navigation.ContactInfoEntry
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
@@ -44,14 +44,14 @@ import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 import nz.mega.sdk.MegaChatApiJava
 
 /**
- * Registers the [ContactInfoNavKey] destination. Behind [AppFeatures.ContactInfoComposeUI] either
+ * Registers the [ContactInfoNavKey] destination. Behind [ApiFeatures.ContactComposeFeature] either
  * renders the Compose [ContactInfoEntry] contact info screen (flag on) or launches the legacy
  * [ContactInfoActivity] and pops itself (flag off).
  */
 fun EntryProviderScope<NavKey>.contactInfoDestination(navigationHandler: NavigationHandler) {
     entry<ContactInfoNavKey> { navKey ->
         FeatureFlagGate(
-            feature = AppFeatures.ContactInfoComposeUI,
+            feature = ApiFeatures.ContactComposeFeature,
             disabled = {
                 val context = LocalContext.current
                 LaunchedEffect(Unit) {

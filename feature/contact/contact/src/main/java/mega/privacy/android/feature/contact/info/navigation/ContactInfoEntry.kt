@@ -30,7 +30,7 @@ import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
  * from [email] (contact list entry point) or from [chatId] (1:1 chat entry point). Pops itself
  * when the contact cannot be resolved.
  *
- * Hosted by the app module's gated `ContactInfoNavKey` destination (behind `ContactInfoComposeUI`).
+ * Hosted by the app module's gated `ContactInfoNavKey` destination (behind `ContactComposeFeature`).
  *
  * @param navigationHandler
  * @param email email of the contact, or null when entering from a chat.

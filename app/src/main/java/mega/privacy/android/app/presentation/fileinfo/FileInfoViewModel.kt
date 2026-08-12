@@ -99,7 +99,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
 import mega.privacy.android.shared.contact.mapper.ContactPermissionUiStateMapper
 import mega.privacy.android.shared.contact.model.ContactPermissionUiState
@@ -1201,13 +1201,13 @@ class FileInfoViewModel @Inject constructor(
 
     /**
      * Called when the user chooses to share the folder with contacts. On the Compose picker path
-     * ([AppFeatures.ContactsComposeUI]) a hidden/sensitive-node warning is shown first when needed;
+     * ([ApiFeatures.ContactComposeFeature]) a hidden/sensitive-node warning is shown first when needed;
      * the legacy picker warns itself, so no warning is surfaced here for it.
      */
     fun shareFolderWithContactsClicked() {
         viewModelScope.launch {
             val isComposeContactsPicker = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
             }.getOrDefault(false)
             val warning = if (isComposeContactsPicker) {
                 getShareFolderSensitiveWarningUseCase(listOf(nodeId))

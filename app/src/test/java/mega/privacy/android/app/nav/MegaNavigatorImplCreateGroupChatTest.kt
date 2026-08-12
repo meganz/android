@@ -24,7 +24,7 @@ import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.Test
@@ -66,9 +66,9 @@ class MegaNavigatorImplCreateGroupChatTest {
         Robolectric.buildActivity(Activity::class.java).setup().get()
 
     @Test
-    fun `test that openCreateGroupChatForResult with requestCode launches the Compose host when the ContactsComposeUI flag is enabled`() =
+    fun `test that openCreateGroupChatForResult with requestCode launches the Compose host when the ContactComposeFeature flag is enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             val activity = buildActivity()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
@@ -91,9 +91,9 @@ class MegaNavigatorImplCreateGroupChatTest {
         }
 
     @Test
-    fun `test that openCreateGroupChatForResult with requestCode launches the legacy AddContactActivity in only-create-group mode when the ContactsComposeUI flag is disabled`() =
+    fun `test that openCreateGroupChatForResult with requestCode launches the legacy AddContactActivity in only-create-group mode when the ContactComposeFeature flag is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
             val activity = buildActivity()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
@@ -128,9 +128,9 @@ class MegaNavigatorImplCreateGroupChatTest {
         }
 
     @Test
-    fun `test that openCreateGroupChatForResult with launcher launches the Compose host when the ContactsComposeUI flag is enabled`() =
+    fun `test that openCreateGroupChatForResult with launcher launches the Compose host when the ContactComposeFeature flag is enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             val launcher = mock<ActivityResultLauncher<Intent>>()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
@@ -153,9 +153,9 @@ class MegaNavigatorImplCreateGroupChatTest {
         }
 
     @Test
-    fun `test that openCreateGroupChatForResult with launcher launches the legacy AddContactActivity in only-create-group mode when the ContactsComposeUI flag is disabled`() =
+    fun `test that openCreateGroupChatForResult with launcher launches the legacy AddContactActivity in only-create-group mode when the ContactComposeFeature flag is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
             val launcher = mock<ActivityResultLauncher<Intent>>()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
@@ -184,9 +184,9 @@ class MegaNavigatorImplCreateGroupChatTest {
         }
 
     @Test
-    fun `test that openCreateGroupChatForResult with allowEmptyGroup sets EXTRA_IS_START_CONVERSATION on the legacy intent when the ContactsComposeUI flag is disabled`() =
+    fun `test that openCreateGroupChatForResult with allowEmptyGroup sets EXTRA_IS_START_CONVERSATION on the legacy intent when the ContactComposeFeature flag is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
             val launcher = mock<ActivityResultLauncher<Intent>>()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 
@@ -218,9 +218,9 @@ class MegaNavigatorImplCreateGroupChatTest {
         }
 
     @Test
-    fun `test that openCreateGroupChatForResult with allowEmptyGroup launches the Compose host when the ContactsComposeUI flag is enabled`() =
+    fun `test that openCreateGroupChatForResult with allowEmptyGroup launches the Compose host when the ContactComposeFeature flag is enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             val launcher = mock<ActivityResultLauncher<Intent>>()
             val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
 

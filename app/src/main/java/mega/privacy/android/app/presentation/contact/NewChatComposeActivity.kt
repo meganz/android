@@ -36,7 +36,7 @@ import javax.inject.Inject
  * and [AddContactActivity.ALLOW_ADD_PARTICIPANTS]. The caller branches on the selected-contact count, so
  * existing new-chat result handling is unchanged.
  *
- * Launch it only when `ContactsComposeUI` is enabled; the caller keeps launching [AddContactActivity]
+ * Launch it only when `ContactComposeFeature` is enabled; the caller keeps launching [AddContactActivity]
  * when the flag is off.
  */
 @AndroidEntryPoint

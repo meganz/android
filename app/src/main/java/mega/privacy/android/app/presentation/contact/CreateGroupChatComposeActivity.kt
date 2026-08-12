@@ -36,7 +36,7 @@ import javax.inject.Inject
  * [AddContactActivity.EXTRA_GROUP_CHAT] / [AddContactActivity.EXTRA_ONLY_CREATE_GROUP] flags — so
  * existing group-chat result handling is unchanged.
  *
- * Launch it only when `ContactsComposeUI` is enabled; the caller keeps launching
+ * Launch it only when `ContactComposeFeature` is enabled; the caller keeps launching
  * [AddContactActivity] when the flag is off.
  */
 @AndroidEntryPoint

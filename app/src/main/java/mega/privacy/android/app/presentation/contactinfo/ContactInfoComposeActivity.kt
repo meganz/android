@@ -27,7 +27,7 @@ import javax.inject.Inject
  * info screen on its own task, so Back returns to the caller rather than the single-activity Menu
  * root. It renders the [ContactInfoNavKey] destination via [LegacyActivityScaffold].
  *
- * Launch it only when `ContactInfoComposeUI` is enabled; the caller keeps launching the legacy
+ * Launch it only when `ContactComposeFeature` is enabled; the caller keeps launching the legacy
  * [ContactInfoActivity] when the flag is off.
  */
 @AndroidEntryPoint

@@ -108,7 +108,7 @@ import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicL
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
@@ -317,7 +317,7 @@ class NodeOptionsActionViewModelTest {
             on { invoke(any()) } doReturn SensitiveNodeShareWarning.None
         }
         getFeatureFlagValueUseCase.stub {
-            on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+            on { invoke(ApiFeatures.ContactComposeFeature) } doReturn true
         }
     }
 
@@ -1839,13 +1839,13 @@ class NodeOptionsActionViewModelTest {
         }
 
     @Test
-    fun `test verifyShareFolderAction skips the sensitive-node warning and proceeds when ContactsComposeUI is off`() =
+    fun `test verifyShareFolderAction skips the sensitive-node warning and proceeds when ContactComposeFeature is off`() =
         runTest {
             val mockFolderNode = mock<TypedFolderNode>().stub {
                 on { id } doReturn NodeId(123L)
             }
 
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
             whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
             whenever(checkBackupNodeTypeUseCase(mockFolderNode))
                 .thenReturn(BackupNodeType.NonBackupNode)

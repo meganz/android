@@ -34,7 +34,7 @@ import javax.inject.Inject
  * plus the [AddContactActivity.EXTRA_NODE_HANDLE] and `MULTISELECT` extras it was launched with — so
  * existing share-folder result handling is unchanged.
  *
- * Launch it only when `ContactsComposeUI` is enabled; the caller keeps launching
+ * Launch it only when `ContactComposeFeature` is enabled; the caller keeps launching
  * [AddContactActivity] when the flag is off.
  */
 @AndroidEntryPoint

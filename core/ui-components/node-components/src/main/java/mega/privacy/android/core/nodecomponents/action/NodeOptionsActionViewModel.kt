@@ -106,6 +106,7 @@ import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicL
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
@@ -604,14 +605,14 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     /**
      * Resolves the hidden/sensitive-node share warning for [folderNodes].
      *
-     * When [AppFeatures.ContactsComposeUI] is off the legacy `AddContactActivity` runs its own
+     * When [ApiFeatures.ContactComposeFeature] is off the legacy `AddContactActivity` runs its own
      * hidden-node check, so this warning is skipped to avoid showing it twice.
      */
     private suspend fun getShareFolderSensitiveWarning(
         folderNodes: List<TypedFolderNode>,
     ): SensitiveNodeShareWarning {
         val contactsComposeUIEnabled = runCatching {
-            getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
         }.getOrDefault(false)
         if (!contactsComposeUIEnabled) return SensitiveNodeShareWarning.None
 

@@ -24,7 +24,7 @@ import mega.privacy.android.navigation.destination.InviteContactNavKey
  * returned to the achievements caller as a sent-count via [NavigationHandler.returnResult] or surfaced
  * as a snackbar through [onShowInviteSnackbar]; the SMS request is delegated to [onSendSms].
  *
- * Hosted by the app module's gated `InviteContactNavKey` destination (behind `ContactsComposeUI`).
+ * Hosted by the app module's gated `InviteContactNavKey` destination (behind `ContactComposeFeature`).
  *
  * @param navigationHandler
  * @param isFromAchievement whether the flow was launched from the achievements screen.

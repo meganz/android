@@ -322,6 +322,18 @@ enum class ApiFeatures(
         description = "Enable customisable bottom navigation",
         singleCheckPerRun = true,
         defaultValue = false,
+    ),
+
+    /**
+     * Contact Compose UI (AND-24495).
+     * When enabled, the contact surfaces (list, add, groups, info, invite, requests) render their
+     * Compose implementations instead of the legacy Activities. Replaces the two former local
+     * AppFeatures flags that separately gated the contact-info screen and the rest of the contacts UI.
+     */
+    ContactComposeFeature(
+        experimentName = "ccont",
+        description = "Enable the Compose version of the contact screens",
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {

@@ -24,7 +24,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.FolderTreeInfo
@@ -594,7 +594,7 @@ internal class FileInfoViewModelTest {
     fun `test that LaunchShareContactPicker is triggered when shareFolderWithContactsClicked and compose picker disabled`() =
         runTest {
             underTest.setNode(node.handle, true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(false)
 
             underTest.shareFolderWithContactsClicked()
 
@@ -607,7 +607,7 @@ internal class FileInfoViewModelTest {
     fun `test that LaunchShareContactPicker is triggered when shareFolderWithContactsClicked and no sensitive warning`() =
         runTest {
             underTest.setNode(node.handle, true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             whenever(getShareFolderSensitiveWarningUseCase(any()))
                 .thenReturn(SensitiveNodeShareWarning.None)
 
@@ -622,7 +622,7 @@ internal class FileInfoViewModelTest {
     fun `test that warning is set when shareFolderWithContactsClicked and folder is sensitive`() =
         runTest {
             underTest.setNode(node.handle, true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             whenever(getShareFolderSensitiveWarningUseCase(any()))
                 .thenReturn(SensitiveNodeShareWarning.Folder)
 
@@ -638,7 +638,7 @@ internal class FileInfoViewModelTest {
     fun `test that confirming the warning triggers LaunchShareContactPicker and clears the warning`() =
         runTest {
             underTest.setNode(node.handle, true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             whenever(getShareFolderSensitiveWarningUseCase(any()))
                 .thenReturn(SensitiveNodeShareWarning.Folder)
             underTest.shareFolderWithContactsClicked()
@@ -654,7 +654,7 @@ internal class FileInfoViewModelTest {
     fun `test that dismissing the warning clears it without launching the picker`() =
         runTest {
             underTest.setNode(node.handle, true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)).thenReturn(true)
             whenever(getShareFolderSensitiveWarningUseCase(any()))
                 .thenReturn(SensitiveNodeShareWarning.Folders)
             underTest.shareFolderWithContactsClicked()

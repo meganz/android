@@ -17,7 +17,7 @@ import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
  * [CreateGroupChatNavKey.KEY]. The screen reports the selection and settings; the consuming caller
  * performs the actual group creation, mirroring the legacy `AddContactActivity` group-mode contract.
  *
- * Hosted by the app module's gated `CreateGroupChatNavKey` destination (behind `ContactsComposeUI`).
+ * Hosted by the app module's gated `CreateGroupChatNavKey` destination (behind `ContactComposeFeature`).
  *
  * @param navigationHandler
  * @param allowEmptyGroup When true the group may be confirmed with no other participants.

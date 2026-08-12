@@ -18,7 +18,7 @@ import mega.privacy.android.navigation.destination.NewChatNavKey
  * more yields a group result carrying the chosen settings. The consuming caller creates the chat and
  * sends its content into it, mirroring the legacy `AddContactActivity` new-chat contract.
  *
- * Hosted by the app module's gated `NewChatNavKey` destination (behind `ContactsComposeUI`).
+ * Hosted by the app module's gated `NewChatNavKey` destination (behind `ContactComposeFeature`).
  *
  * @param navigationHandler
  */

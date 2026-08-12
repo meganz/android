@@ -7,20 +7,20 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 
 /**
- * Registers the [InviteContactNavKey] destination. Behind [AppFeatures.ContactsComposeUI] either
+ * Registers the [InviteContactNavKey] destination. Behind [ApiFeatures.ContactComposeFeature] either
  * renders the Compose [InviteContactAppHost] invite screen (flag on) or launches the legacy
  * [InviteContactActivity] and pops itself (flag off).
  */
 fun EntryProviderScope<NavKey>.inviteContactLegacyDestination(navigationHandler: NavigationHandler) {
     entry<InviteContactNavKey> { navKey ->
         FeatureFlagGate(
-            feature = AppFeatures.ContactsComposeUI,
+            feature = ApiFeatures.ContactComposeFeature,
             disabled = {
                 val context = LocalContext.current
                 LaunchedEffect(Unit) {

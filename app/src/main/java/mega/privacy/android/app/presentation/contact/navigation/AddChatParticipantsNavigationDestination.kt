@@ -13,13 +13,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.feature.contact.navigation.AddChatParticipantsEntry
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.destination.AddChatParticipantsNavKey
 
 /**
- * Registers the [AddChatParticipantsNavKey] destination. Behind [AppFeatures.ContactsComposeUI] either
+ * Registers the [AddChatParticipantsNavKey] destination. Behind [ApiFeatures.ContactComposeFeature] either
  * renders the Compose [AddChatParticipantsEntry] picker (flag on) or launches the legacy
  * [AddContactActivity] in add-chat-participants mode (flag off). Both paths publish the selected
  * contact emails as a `List<String>` under [AddChatParticipantsNavKey.KEY].
@@ -29,7 +29,7 @@ import mega.privacy.android.navigation.destination.AddChatParticipantsNavKey
 fun EntryProviderScope<NavKey>.addChatParticipantsDestination(navigationHandler: NavigationHandler) {
     entry<AddChatParticipantsNavKey> { key ->
         FeatureFlagGate(
-            feature = AppFeatures.ContactsComposeUI,
+            feature = ApiFeatures.ContactComposeFeature,
             disabled = {
                 LegacyAddChatParticipantsEntry(
                     chatId = key.chatId,

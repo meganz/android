@@ -13,13 +13,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.feature.contact.navigation.AddContactsEntry
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.destination.AddContactsNavKey
 
 /**
- * Registers the [AddContactsNavKey] destination. Behind [AppFeatures.ContactsComposeUI] either
+ * Registers the [AddContactsNavKey] destination. Behind [ApiFeatures.ContactComposeFeature] either
  * renders the Compose [AddContactsEntry] MEGA-contacts picker (flag on) or launches the legacy
  * [AddContactActivity] in MEGA-contacts mode (flag off). Both paths publish the selected contact
  * emails as a `List<String>` under [AddContactsNavKey.KEY].
@@ -29,7 +29,7 @@ import mega.privacy.android.navigation.destination.AddContactsNavKey
 fun EntryProviderScope<NavKey>.addContactsDestination(navigationHandler: NavigationHandler) {
     entry<AddContactsNavKey> { navKey ->
         FeatureFlagGate(
-            feature = AppFeatures.ContactsComposeUI,
+            feature = ApiFeatures.ContactComposeFeature,
             disabled = {
                 LegacyAddContactsEntry(
                     onResult = { emails ->

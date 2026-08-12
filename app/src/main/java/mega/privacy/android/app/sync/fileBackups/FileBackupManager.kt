@@ -28,7 +28,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaNode
@@ -161,7 +161,7 @@ class FileBackupManager(
 
     /**
      * Warns before sharing hidden/sensitive [nodeIds] with contacts, then invokes [onProceed]. On
-     * the Compose picker path ([AppFeatures.ContactsComposeUI]) the warning is shown when needed;
+     * the Compose picker path ([ApiFeatures.ContactComposeFeature]) the warning is shown when needed;
      * the legacy picker warns itself, so it is skipped there to avoid double-warning.
      */
     private suspend fun warnBeforeSharingHiddenFolders(
@@ -169,7 +169,7 @@ class FileBackupManager(
         onProceed: () -> Unit,
     ) {
         val warning = runCatching {
-            if (getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)) {
+            if (getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)) {
                 getShareFolderSensitiveWarningUseCase(nodeIds)
             } else {
                 SensitiveNodeShareWarning.None

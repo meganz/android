@@ -15,7 +15,7 @@ import mega.privacy.android.navigation.destination.ContactRequestsNavKey
  * Contact requests entry. Renders the Compose contact requests screen, seeding the initially
  * selected tab from the [navType] the destination was opened on.
  *
- * Hosted by the app module's gated `ContactRequestsNavKey` destination (behind `ContactsComposeUI`).
+ * Hosted by the app module's gated `ContactRequestsNavKey` destination (behind `ContactComposeFeature`).
  *
  * @param navigationHandler
  * @param navType the request type the screen opens on.

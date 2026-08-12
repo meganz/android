@@ -13,13 +13,13 @@ import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.contact.group.create.navigation.NewChatEntry
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.destination.NewChatNavKey
 
 /**
- * Registers the [NewChatNavKey] destination. Behind [AppFeatures.ContactsComposeUI] either renders the
+ * Registers the [NewChatNavKey] destination. Behind [ApiFeatures.ContactComposeFeature] either renders the
  * Compose [NewChatEntry] screen (flag on) or launches the legacy [AddContactActivity] new-chat picker
  * (flag off). Both paths publish the chosen [NewChatNavKey.NewChatResult] under [NewChatNavKey.KEY]; the
  * consuming caller creates the chat and sends its content into it.
@@ -27,7 +27,7 @@ import mega.privacy.android.navigation.destination.NewChatNavKey
 fun EntryProviderScope<NavKey>.newChatLegacyDestination(navigationHandler: NavigationHandler) {
     entry<NewChatNavKey> {
         FeatureFlagGate(
-            feature = AppFeatures.ContactsComposeUI,
+            feature = ApiFeatures.ContactComposeFeature,
             disabled = {
                 LegacyNewChatEntry(
                     onResult = { result ->

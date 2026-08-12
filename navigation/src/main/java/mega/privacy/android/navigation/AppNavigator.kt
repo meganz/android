@@ -332,7 +332,7 @@ interface AppNavigator {
 
     /**
      * Opens the "add contacts to a shared folder" picker for a result. Behind
-     * `ContactsComposeUI`, launches the Compose picker (with phone contacts) when the flag is on
+     * `ContactComposeFeature`, launches the Compose picker (with phone contacts) when the flag is on
      * and the legacy add-contact screen when it is off; both return the legacy result shape into
      * [launcher].
      *
@@ -622,7 +622,7 @@ interface AppNavigator {
 
     /**
      * Opens the meeting "add participants" picker for a result, choosing the Compose contacts UI
-     * or the legacy AddContactActivity based on the ContactsComposeUI flag. The result is delivered
+     * or the legacy AddContactActivity based on the ContactComposeFeature flag. The result is delivered
      * to [activity]'s onActivityResult under [requestCode], mirroring the legacy AddContactActivity
      * contract (RESULT_OK + EXTRA_CONTACTS).
      */
@@ -635,7 +635,7 @@ interface AppNavigator {
 
     /**
      * Opens the chat "add participants" picker for a result, choosing the Compose contacts UI or
-     * the legacy AddContactActivity based on the ContactsComposeUI flag. The result is delivered to
+     * the legacy AddContactActivity based on the ContactComposeFeature flag. The result is delivered to
      * [activity]'s onActivityResult under [requestCode], mirroring the legacy AddContactActivity
      * contract (RESULT_OK + EXTRA_CONTACTS).
      */
@@ -647,7 +647,7 @@ interface AppNavigator {
 
     /**
      * Opens the chat "add participants" picker for a result, choosing the Compose contacts UI or
-     * the legacy AddContactActivity based on the ContactsComposeUI flag. The result is delivered to
+     * the legacy AddContactActivity based on the ContactComposeFeature flag. The result is delivered to
      * [launcher], mirroring the legacy AddContactActivity contract (RESULT_OK + EXTRA_CONTACTS).
      */
     fun openAddChatParticipantsForResult(
@@ -658,7 +658,7 @@ interface AppNavigator {
 
     /**
      * Opens the "create group chat" flow for a result, choosing the Compose contacts UI or the
-     * legacy AddContactActivity ("only create group" mode) based on the ContactsComposeUI flag. The
+     * legacy AddContactActivity ("only create group" mode) based on the ContactComposeFeature flag. The
      * result is delivered to [activity]'s onActivityResult under [requestCode], mirroring the legacy
      * AddContactActivity contract (RESULT_OK + EXTRA_CONTACTS plus the group-chat extras).
      *
@@ -673,7 +673,7 @@ interface AppNavigator {
 
     /**
      * Opens the "create group chat" flow for a result, choosing the Compose contacts UI or the
-     * legacy AddContactActivity ("only create group" mode) based on the ContactsComposeUI flag. The
+     * legacy AddContactActivity ("only create group" mode) based on the ContactComposeFeature flag. The
      * result is delivered to [launcher], mirroring the legacy AddContactActivity contract (RESULT_OK
      * + EXTRA_CONTACTS plus the group-chat extras).
      *
@@ -688,7 +688,7 @@ interface AppNavigator {
 
     /**
      * Opens the "new chat" flow (the share/forward target pickers' new-chat entry) for a result,
-     * choosing the Compose contacts UI or the legacy AddContactActivity based on the ContactsComposeUI
+     * choosing the Compose contacts UI or the legacy AddContactActivity based on the ContactComposeFeature
      * flag. The result is delivered to [activity]'s onActivityResult under [requestCode], mirroring the
      * legacy AddContactActivity contract: RESULT_OK + EXTRA_CONTACTS, plus the group-chat extras when
      * two or more contacts are selected.
@@ -700,7 +700,7 @@ interface AppNavigator {
 
     /**
      * Opens the "new chat" flow (the share/forward target pickers' new-chat entry) for a result,
-     * choosing the Compose contacts UI or the legacy AddContactActivity based on the ContactsComposeUI
+     * choosing the Compose contacts UI or the legacy AddContactActivity based on the ContactComposeFeature
      * flag. The result is delivered to [launcher], mirroring the legacy AddContactActivity contract:
      * RESULT_OK + EXTRA_CONTACTS, plus the group-chat extras when two or more contacts are selected.
      */
@@ -712,7 +712,7 @@ interface AppNavigator {
     /**
      * Opens the "add contacts" picker for a result with the already-chosen participants
      * pre-selected, choosing the Compose contacts UI or the legacy AddContactActivity based on the
-     * ContactsComposeUI flag. The result is delivered to [launcher], mirroring the legacy
+     * ContactComposeFeature flag. The result is delivered to [launcher], mirroring the legacy
      * AddContactActivity contract (RESULT_OK + EXTRA_CONTACTS).
      *
      * The flag boundary is crossed with both [preselectedHandles] (used by the Compose path, which

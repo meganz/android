@@ -10,7 +10,7 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.feature.contact.list.view.ContactListScreen
 import mega.privacy.android.feature.contact.navigation.ContactsEntry
 import mega.privacy.android.feature.contact.requests.navigation.ContactRequestsEntry
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.metadata.buildMetadata
@@ -20,7 +20,7 @@ import mega.privacy.mobile.analytics.event.ContactListScreenEvent
 
 /**
  * Navigation destination for the contacts list. Behind
- * [AppFeatures.ContactsComposeUI] either renders the Compose
+ * [ApiFeatures.ContactComposeFeature] either renders the Compose
  * [ContactListScreen] inline (flag on) or launches the legacy
  * [ContactsActivity] and pops the entry (flag off).
  *
@@ -35,7 +35,7 @@ fun EntryProviderScope<NavKey>.contactsListDestination(
         }
     ) { key ->
         FeatureFlagGate(
-            feature = AppFeatures.ContactsComposeUI,
+            feature = ApiFeatures.ContactComposeFeature,
             disabled = {
                 LegacyContactsEntry({ navigationHandler.remove(key) })
             },
@@ -64,7 +64,7 @@ private fun LegacyContactsEntry(removeDestination: () -> Unit) {
 
 /**
  * Navigation destination for the contact requests screen. Behind
- * [AppFeatures.ContactsComposeUI] either renders the Compose contact requests screen inline
+ * [ApiFeatures.ContactComposeFeature] either renders the Compose contact requests screen inline
  * (flag on) or launches the legacy [ContactsActivity] requests entry points and pops the entry
  * (flag off):
  * - SentRequests: Shows sent contact requests
@@ -75,7 +75,7 @@ fun EntryProviderScope<NavKey>.contactRequestsDestination(
 ) {
     entry<ContactRequestsNavKey> { key ->
         FeatureFlagGate(
-            feature = AppFeatures.ContactsComposeUI,
+            feature = ApiFeatures.ContactComposeFeature,
             disabled = {
                 LegacyContactRequestsEntry(
                     navType = key.navType,

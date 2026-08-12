@@ -97,7 +97,7 @@ import mega.privacy.android.feature.payment.presentation.cancelaccountplan.Cance
 import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountActivity
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
@@ -633,10 +633,10 @@ internal class MegaNavigatorImpl @Inject constructor(
         nodeHandles: List<Long>,
     ) {
         applicationScope.launch {
-            val isContactsComposeUIEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            val isContactComposeFeatureEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
             }.getOrDefault(false)
-            val intent = if (isContactsComposeUIEnabled) {
+            val intent = if (isContactComposeFeatureEnabled) {
                 AddContactToShareComposeActivity.getIntent(
                     context = context,
                     nodeHandles = nodeHandles,
@@ -966,10 +966,10 @@ internal class MegaNavigatorImpl @Inject constructor(
         navigateIfInSingleActivity(
             singleActivityDestination = ContactInfoNavKey(email = email)
         ) {
-            val isContactInfoComposeUIEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.ContactInfoComposeUI)
+            val isContactComposeFeatureEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
             }.getOrDefault(false)
-            val intent = if (isContactInfoComposeUIEnabled) {
+            val intent = if (isContactComposeFeatureEnabled) {
                 ContactInfoComposeActivity.getIntent(context, email)
             } else {
                 Intent(context, ContactInfoActivity::class.java)
@@ -983,10 +983,10 @@ internal class MegaNavigatorImpl @Inject constructor(
         navigateIfInSingleActivity(
             singleActivityDestination = ContactInfoNavKey(chatId = chatId)
         ) {
-            val isContactInfoComposeUIEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.ContactInfoComposeUI)
+            val isContactComposeFeatureEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
             }.getOrDefault(false)
-            val intent = if (isContactInfoComposeUIEnabled) {
+            val intent = if (isContactComposeFeatureEnabled) {
                 ContactInfoComposeActivity.getIntent(context, chatId)
             } else {
                 Intent(context, ContactInfoActivity::class.java)
@@ -1014,10 +1014,10 @@ internal class MegaNavigatorImpl @Inject constructor(
         requestCode: Int,
     ) {
         applicationScope.launch {
-            val isContactsComposeUIEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            val isContactComposeFeatureEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
             }.getOrDefault(false)
-            val intent = if (isContactsComposeUIEnabled) {
+            val intent = if (isContactComposeFeatureEnabled) {
                 AddParticipantsComposeActivity.getMeetingIntent(
                     context = activity,
                     chatId = chatId,
@@ -1050,10 +1050,10 @@ internal class MegaNavigatorImpl @Inject constructor(
         requestCode: Int,
     ) {
         applicationScope.launch {
-            val isContactsComposeUIEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            val isContactComposeFeatureEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
             }.getOrDefault(false)
-            val intent = if (isContactsComposeUIEnabled) {
+            val intent = if (isContactComposeFeatureEnabled) {
                 AddParticipantsComposeActivity.getChatIntent(
                     context = activity,
                     chatId = chatId,
@@ -1083,10 +1083,10 @@ internal class MegaNavigatorImpl @Inject constructor(
         chatId: Long,
     ) {
         applicationScope.launch {
-            val isContactsComposeUIEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            val isContactComposeFeatureEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
             }.getOrDefault(false)
-            val intent = if (isContactsComposeUIEnabled) {
+            val intent = if (isContactComposeFeatureEnabled) {
                 AddParticipantsComposeActivity.getChatIntent(
                     context = context,
                     chatId = chatId,
@@ -1115,10 +1115,10 @@ internal class MegaNavigatorImpl @Inject constructor(
         preselectedEmails: List<String>,
     ) {
         applicationScope.launch {
-            val isContactsComposeUIEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            val isContactComposeFeatureEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
             }.getOrDefault(false)
-            val intent = if (isContactsComposeUIEnabled) {
+            val intent = if (isContactComposeFeatureEnabled) {
                 AddContactsComposeActivity.getIntent(
                     context = context,
                     preselectedHandles = preselectedHandles,
@@ -1176,10 +1176,10 @@ internal class MegaNavigatorImpl @Inject constructor(
         context: Context,
         allowEmptyGroup: Boolean,
     ): Intent {
-        val isContactsComposeUIEnabled = runCatching {
-            getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+        val isContactComposeFeatureEnabled = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
         }.getOrDefault(false)
-        return if (isContactsComposeUIEnabled) {
+        return if (isContactComposeFeatureEnabled) {
             CreateGroupChatComposeActivity.getIntent(context, allowEmptyGroup = allowEmptyGroup)
         } else {
             Intent(context, AddContactActivity::class.java).apply {
@@ -1219,10 +1219,10 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     private suspend fun newChatIntent(context: Context): Intent {
-        val isContactsComposeUIEnabled = runCatching {
-            getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+        val isContactComposeFeatureEnabled = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.ContactComposeFeature)
         }.getOrDefault(false)
-        return if (isContactsComposeUIEnabled) {
+        return if (isContactComposeFeatureEnabled) {
             NewChatComposeActivity.getIntent(context)
         } else {
             Intent(context, AddContactActivity::class.java).apply {

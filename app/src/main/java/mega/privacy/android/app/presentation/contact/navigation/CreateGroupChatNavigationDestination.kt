@@ -13,13 +13,13 @@ import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.contact.group.create.navigation.CreateGroupChatEntry
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 
 /**
- * Registers the [CreateGroupChatNavKey] destination. Behind [AppFeatures.ContactsComposeUI] either
+ * Registers the [CreateGroupChatNavKey] destination. Behind [ApiFeatures.ContactComposeFeature] either
  * renders the Compose [CreateGroupChatEntry] screen (flag on) or launches the legacy
  * [AddContactActivity] in "only create group" mode (flag off). Both paths publish the chosen
  * [CreateGroupChatNavKey.NewGroupChatResult] under [CreateGroupChatNavKey.KEY]; the consuming caller
@@ -30,7 +30,7 @@ import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 fun EntryProviderScope<NavKey>.createGroupChatLegacyDestination(navigationHandler: NavigationHandler) {
     entry<CreateGroupChatNavKey> { key ->
         FeatureFlagGate(
-            feature = AppFeatures.ContactsComposeUI,
+            feature = ApiFeatures.ContactComposeFeature,
             disabled = {
                 LegacyCreateGroupChatEntry(
                     allowEmptyGroup = key.allowEmptyGroup,

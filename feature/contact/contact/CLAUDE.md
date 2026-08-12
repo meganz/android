@@ -44,5 +44,5 @@ Run: `./gradlew feature:contact:contact:testDebugUnitTest`
 ## Notes & Gotchas
 - Presentation-only: add new business logic as use cases in `:domain`, not here.
 - Cross-feature navigation goes through `NavigationHandler` using nav keys defined in `:navigation`; only screens owned by this feature (e.g. `ContactGroupsNavKey`) define keys locally, and those are `internal`.
-- The contacts Compose UI is feature-flag gated (`ContactsComposeUI`) and hosted by the app module — destinations here are contributed, not self-registered.
+- The contacts Compose UI is feature-flag gated (`ContactComposeFeature`) and hosted by the app module — destinations here are contributed, not self-registered.
 - Inter-screen results (e.g. created group chat from `CreateGroupChatNavKey`) are delivered via `monitorResult`; remember to `clearResult` after consuming to avoid re-processing.
