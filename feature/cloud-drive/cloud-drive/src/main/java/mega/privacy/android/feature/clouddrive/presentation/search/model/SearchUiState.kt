@@ -37,6 +37,7 @@ data class SearchUiState(
     val dateModifiedFilterOption: DateFilterOption? = null,
     val dateAddedFilterOption: DateFilterOption? = null,
     val navigateToFolderEvent: StateEventWithContent<TypedNode> = consumed(),
+    val folderLinkUrl: String? = null,
     val openedFileNode: TypedFileNode? = null,
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
@@ -121,6 +122,7 @@ data class SearchUiState(
     /**
      * True if search filters can be applied in the current node source type
      */
-    val isFilterAllowed =
-        nodeSourceType == NodeSourceType.CLOUD_DRIVE || nodeSourceType == NodeSourceType.HOME
+    val isFilterAllowed = nodeSourceType == NodeSourceType.CLOUD_DRIVE ||
+            nodeSourceType == NodeSourceType.HOME ||
+            nodeSourceType == NodeSourceType.FOLDER_LINK
 }

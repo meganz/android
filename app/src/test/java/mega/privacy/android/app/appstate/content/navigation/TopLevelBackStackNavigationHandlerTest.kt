@@ -223,4 +223,46 @@ class TopLevelBackStackNavigationHandlerTest {
             ParameterizedDestination("new"),
         ).inOrder()
     }
+
+    @Test
+    fun `test that navigate with popUpTo pops to the most recent matching destination by default`() {
+        underTest.navigate(ParameterizedDestination("A"))
+        underTest.navigate(Destination1)
+        underTest.navigate(ParameterizedDestination("B"))
+
+        val options = navOptions {
+            popUpTo<ParameterizedDestination> {
+                inclusive = true
+            }
+        }
+        underTest.navigate(ParameterizedDestination("C"), options)
+
+        assertThat(backStack.backStack).containsExactly(
+            StartKey,
+            ParameterizedDestination("A"),
+            Destination1,
+            ParameterizedDestination("C"),
+        ).inOrder()
+    }
+
+    @Test
+    fun `test that navigate with popUpTo firstOccurrence pops to the oldest matching destination`() {
+        underTest.navigate(ParameterizedDestination("A"))
+        underTest.navigate(Destination1)
+        underTest.navigate(ParameterizedDestination("B"))
+
+        val options = navOptions {
+            popUpTo<ParameterizedDestination> {
+                inclusive = true
+                firstOccurrence = true
+            }
+        }
+        underTest.navigate(ParameterizedDestination("C"), options)
+
+        assertThat(backStack.backStack).containsExactly(
+            StartKey,
+            ParameterizedDestination("C"),
+        ).inOrder()
+    }
+
 }

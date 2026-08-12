@@ -414,6 +414,49 @@ class SearchUseCaseTest {
     }
 
     @Test
+    fun `test that searchInFolderLink is called when query is empty and source type is folder link`() =
+        runTest {
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            val searchParameters = SearchParameters(
+                query = "",
+                searchCategory = SearchCategory.ALL,
+            )
+            underTest(
+                parentHandle = NodeId(123456),
+                nodeSourceType = NodeSourceType.FOLDER_LINK,
+                searchParameters = searchParameters,
+            )
+            verify(searchRepository).searchInFolderLink(
+                nodeId = NodeId(123456),
+                order = getCloudSortOrder(),
+                parameters = searchParameters,
+            )
+        }
+
+    @Test
+    fun `test that searchInFolderLink is called when query is not empty and source type is folder link`() =
+        runTest {
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            val searchParameters = SearchParameters(
+                query = "test",
+                searchCategory = SearchCategory.ALL,
+                tag = "test",
+            )
+            underTest(
+                parentHandle = NodeId(123456),
+                nodeSourceType = NodeSourceType.FOLDER_LINK,
+                searchParameters = searchParameters,
+            )
+            verify(searchRepository).searchInFolderLink(
+                nodeId = NodeId(123456),
+                order = getCloudSortOrder(),
+                parameters = searchParameters,
+            )
+        }
+
+    @Test
     fun `test that root incoming share search results are wrapped as share nodes while inner results stay plain`() =
         runTest {
             val rootNode = mock<TypedFolderNode> {

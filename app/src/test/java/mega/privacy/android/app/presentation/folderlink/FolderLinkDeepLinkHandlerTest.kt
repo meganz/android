@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.navigation.destination.FolderLinkNavKey
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -36,6 +37,15 @@ class FolderLinkDeepLinkHandlerTest {
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.FOLDER_LINK, isLoggedIn)
 
         assertThat(actual).containsExactly(expected)
+    }
+
+    @Test
+    fun `test that navOptions pops inclusively to the first folder link on the back stack`() {
+        val popUpTo = underTest.navOptions.popUpTo
+
+        assertThat(popUpTo?.routeClass).isEqualTo(FolderLinkNavKey::class)
+        assertThat(popUpTo?.inclusive).isTrue()
+        assertThat(popUpTo?.firstOccurrence).isTrue()
     }
 
     @ParameterizedTest

@@ -37,6 +37,18 @@ interface SearchRepository {
     ): List<UnTypedNode>
 
     /**
+     * Search nodes in a folder link and return list of [UnTypedNode]
+     * @param nodeId [NodeId] place to be searched
+     * @param order [SortOrder] locally saved user selected sort order
+     * @param parameters [SearchParameters] additional search parameters
+     */
+    suspend fun searchInFolderLink(
+        nodeId: NodeId?,
+        order: SortOrder,
+        parameters: SearchParameters,
+    ): List<UnTypedNode>
+
+    /**
      * get incoming shares node list
      */
     suspend fun getInShares(): List<UnTypedNode>

@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.dao.RecentSearchDao
 import mega.privacy.android.data.database.entity.RecentSearchEntity
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
@@ -44,6 +45,7 @@ class SearchRepositoryImplTest {
     private lateinit var underTest: SearchRepository
     private val nodeMapper: NodeMapper = mock()
     private val megaApiGateway: MegaApiGateway = mock()
+    private val megaApiFolderGateway: MegaApiFolderGateway = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val cancelTokenProvider: CancelTokenProvider = mock()
     private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase = mock()
@@ -67,6 +69,7 @@ class SearchRepositoryImplTest {
         underTest = SearchRepositoryImpl(
             nodeMapper = nodeMapper,
             megaApiGateway = megaApiGateway,
+            megaApiFolderGateway = megaApiFolderGateway,
             ioDispatcher = ioDispatcher,
             cancelTokenProvider = cancelTokenProvider,
             getLinksSOrtOrderUseCase = getLinksSortOrderUseCase,
@@ -200,6 +203,39 @@ class SearchRepositoryImplTest {
                 sortOrderIntMapper(SortOrder.ORDER_NONE),
                 megaCancelToken
             )
+        }
+
+    @Test
+    fun `test that searchInFolderLink searches through the folder api and maps nodes as folder link nodes`() =
+        runTest {
+            whenever(sortOrderIntMapper(any(), any())).thenReturn(0)
+            val nodeID = NodeId(123456L)
+            val query = "Some query"
+            val filter = mock<MegaSearchFilter>()
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(megaCancelToken)
+            whenever(
+                megsSearchFilterMapper(
+                    searchQuery = query,
+                    parentHandle = nodeID,
+                    searchCategory = SearchCategory.ALL,
+                )
+            ).thenReturn(filter)
+            whenever(
+                megaApiFolderGateway.search(
+                    filter = filter,
+                    order = 0,
+                    megaCancelToken = megaCancelToken,
+                )
+            ).thenReturn(listOf(megaNode))
+            whenever(nodeMapper(megaNode, fromFolderLink = true)).thenReturn(typedNode)
+
+            val actual = underTest.searchInFolderLink(
+                nodeId = nodeID,
+                order = SortOrder.ORDER_NONE,
+                parameters = SearchParameters(query = query),
+            )
+
+            assertThat(actual.first().id).isEqualTo(nodeId)
         }
 
     @Test

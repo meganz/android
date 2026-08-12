@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.GetAllNodeTagsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -65,11 +66,13 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -96,6 +99,7 @@ class SearchViewModelTest {
     private val clearRecentSearchesUseCase: ClearRecentSearchesUseCase = mock()
     private val getAllNodeTagsUseCase: GetAllNodeTagsUseCase = mock()
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase = mock()
+    private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase = mock()
     private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
     private val parentHandle = 123L
     private val args = SearchViewModel.Args(
@@ -115,7 +119,9 @@ class SearchViewModelTest {
             monitorRecentSearchesUseCase,
             clearRecentSearchesUseCase,
             getAllNodeTagsUseCase,
-            getRootNodeIdUseCase
+            getRootNodeIdUseCase,
+            getPublicChildNodeFromIdUseCase,
+            getNodeInfoByIdUseCase,
         )
     }
 
@@ -143,6 +149,7 @@ class SearchViewModelTest {
         clearRecentSearchesUseCase = clearRecentSearchesUseCase,
         getAllNodeTagsUseCase = getAllNodeTagsUseCase,
         getRootNodeIdUseCase = getRootNodeIdUseCase,
+        getPublicChildNodeFromIdUseCase = getPublicChildNodeFromIdUseCase,
     )
 
     private fun setupTestData(
@@ -774,6 +781,110 @@ class SearchViewModelTest {
         }
     }
 
+
+    @Test
+    fun `test that ItemClicked action on a folder triggers folder navigation when source type is folder link`() =
+        runTest {
+            setupTestData()
+            val underTest = createViewModel(
+                args = SearchViewModel.Args(
+                    parentHandle = parentHandle,
+                    nodeSourceType = NodeSourceType.FOLDER_LINK,
+                    folderLinkUrl = "https://mega.nz/folder/abc#key",
+                )
+            )
+
+            val folderNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(456L))
+            }
+            underTest.processAction(
+                SearchUiAction.ItemClicked(NodeUiItem(node = folderNode, isSelected = false))
+            )
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.navigateToFolderEvent).isEqualTo(triggered(folderNode))
+                assertThat(state.folderLinkUrl).isEqualTo("https://mega.nz/folder/abc#key")
+            }
+        }
+
+    @Test
+    fun `test that search maps items as public nodes when source type is folder link`() =
+        runTest {
+            val typedFileNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(123L))
+                on { name }.thenReturn("file.txt")
+            }
+            setupTestData(listOf(typedFileNode))
+            whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(SearchCategory.ALL)
+            val underTest = createViewModel(
+                args = SearchViewModel.Args(
+                    parentHandle = parentHandle,
+                    nodeSourceType = NodeSourceType.FOLDER_LINK,
+                    folderLinkUrl = "https://mega.nz/folder/abc#key",
+                )
+            )
+
+            underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+            advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+            advanceUntilIdle()
+
+            verify(nodeUiItemMapper)(
+                nodeList = any(),
+                existingItems = anyOrNull(),
+                nodeSourceType = eq(NodeSourceType.FOLDER_LINK),
+                isPublicNodes = eq(true),
+                showPublicLinkCreationTime = any(),
+                highlightedNodeId = anyOrNull(),
+                highlightedNames = anyOrNull(),
+                isContactVerificationOn = any(),
+            )
+        }
+
+    @Test
+    fun `test that search placeholder is resolved from public node when source type is folder link`() =
+        runTest {
+            setupTestData()
+            val underTest = createViewModel(
+                args = SearchViewModel.Args(
+                    parentHandle = parentHandle,
+                    nodeSourceType = NodeSourceType.FOLDER_LINK,
+                    folderLinkUrl = "https://mega.nz/folder/abc#key",
+                )
+            )
+            advanceUntilIdle()
+
+            verify(getPublicChildNodeFromIdUseCase)(NodeId(parentHandle))
+            verify(getNodeInfoByIdUseCase, never())(any())
+            underTest.uiState.test {
+                awaitItem()
+            }
+        }
+
+    @Test
+    fun `test that hidden node settings are not monitored and hidden nodes are shown when source type is folder link`() =
+        runTest {
+            setupTestData()
+            // Not covered by tearDown; clear interactions leaked from earlier tests
+            reset(monitorHiddenNodesEnabledUseCase, monitorShowHiddenItemsUseCase)
+            val underTest = createViewModel(
+                args = SearchViewModel.Args(
+                    parentHandle = parentHandle,
+                    nodeSourceType = NodeSourceType.FOLDER_LINK,
+                    folderLinkUrl = "https://mega.nz/folder/abc#key",
+                )
+            )
+            advanceUntilIdle()
+
+            verifyNoInteractions(monitorHiddenNodesEnabledUseCase)
+            verifyNoInteractions(monitorShowHiddenItemsUseCase)
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isHiddenNodeSettingsLoading).isFalse()
+                assertThat(state.isHiddenNodesEnabled).isFalse()
+                assertThat(state.showHiddenNodes).isTrue()
+            }
+        }
 
     @Test
     fun `test that OpenedFileNodeHandled action clear event`() = runTest {

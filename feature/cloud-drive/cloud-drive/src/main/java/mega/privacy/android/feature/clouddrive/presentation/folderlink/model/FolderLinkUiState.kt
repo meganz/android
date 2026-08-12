@@ -30,6 +30,7 @@ data class FolderLinkUiState(
     val hasMediaItems: Boolean = false,
     val isGuestBannerDismissed: Boolean = false,
     val shouldShowAdsForLink: Boolean = false,
+    val isOpenedAtEntryFolder: Boolean = false,
 ) {
     /**
      * True when the guest banner should be shown: the user is not authenticated,
@@ -39,9 +40,12 @@ data class FolderLinkUiState(
         !hasCredentials && contentState is FolderLinkContentState.Loaded && !isGuestBannerDismissed
 
     /**
-     * True if current folder if the root directory of folder link
+     * True if current folder if the root directory of folder link. A screen opened at an entry
+     * folder is never treated as root, so it doesn't flash the root branding (MEGA title,
+     * folder link subtitle, close icon) while both nodes are still null during loading.
      */
-    val isRootFolder = rootNode?.id?.longValue == currentFolderNode?.id?.longValue
+    val isRootFolder = !isOpenedAtEntryFolder &&
+            rootNode?.id?.longValue == currentFolderNode?.id?.longValue
 
     /**
      * Get title based on current folder

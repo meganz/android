@@ -2,6 +2,7 @@ package mega.privacy.android.feature.clouddrive.presentation.folderlink
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -36,6 +38,7 @@ import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderSortOrderUseCase
 import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTypeUseCase
@@ -81,6 +84,7 @@ internal class FolderLinkViewModelTest {
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase = mock()
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
+    private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase = mock()
     private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
@@ -113,6 +117,7 @@ internal class FolderLinkViewModelTest {
             fetchFolderNodesUseCase = fetchFolderNodesUseCase,
             getFolderLinkChildrenNodesUseCase = getFolderLinkChildrenNodesUseCase,
             getFolderParentNodeUseCase = getFolderParentNodeUseCase,
+            getPublicChildNodeFromIdUseCase = getPublicChildNodeFromIdUseCase,
             containsMediaItemUseCase = containsMediaItemUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
@@ -143,6 +148,7 @@ internal class FolderLinkViewModelTest {
             fetchFolderNodesUseCase,
             getFolderLinkChildrenNodesUseCase,
             getFolderParentNodeUseCase,
+            getPublicChildNodeFromIdUseCase,
             containsMediaItemUseCase,
             nodeUiItemMapper,
             monitorSortCloudOrderUseCase,
@@ -230,6 +236,52 @@ internal class FolderLinkViewModelTest {
         }
         verifyNoInteractions(loginToFolderUseCase)
     }
+
+    @Test
+    fun `test that init opens child folder without folder login when entryFolderHandle is provided`() =
+        runTest {
+            val entryFolderHandle = 456L
+            val childFolder = mock<PublicLinkFolder> {
+                on { id } doReturn NodeId(entryFolderHandle)
+                on { name } doReturn "child"
+            }
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(getPublicChildNodeFromIdUseCase(NodeId(entryFolderHandle))).thenReturn(childFolder)
+            whenever(getFolderLinkChildrenNodesUseCase(any(), anyOrNull())).thenReturn(emptyList())
+            whenever(containsMediaItemUseCase(any())).thenReturn(false)
+            stubNodeUiItemMapper()
+            initViewModel(
+                FolderLinkViewModel.Args(
+                    uriString = "https://mega.nz/folder/abc",
+                    entryFolderHandle = entryFolderHandle,
+                )
+            )
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.contentState).isEqualTo(FolderLinkContentState.Loaded)
+                assertThat(state.currentFolderNode?.id).isEqualTo(NodeId(entryFolderHandle))
+            }
+            verifyNoInteractions(loginToFolderUseCase)
+        }
+
+    @Test
+    fun `test that init falls back to folder login when entryFolderHandle cannot be resolved`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(getPublicChildNodeFromIdUseCase(any())).thenReturn(null)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult()
+            )
+            stubNodeUiItemMapper()
+            initViewModel(FolderLinkViewModel.Args(uriString = url, entryFolderHandle = 456L))
+            advanceUntilIdle()
+
+            verify(loginToFolderUseCase)(url)
+        }
 
     @Test
     fun `test that init emits Loaded with hasCredentials true when login succeeds`() = runTest {
@@ -739,6 +791,78 @@ internal class FolderLinkViewModelTest {
             assertThat(state.title).isEqualTo(LocalizedText.Literal("Root"))
         }
     }
+
+    @Test
+    fun `test that back press triggers navigateBackEvent when on the folder the screen was opened with`() =
+        runTest {
+            val entryFolderHandle = 456L
+            val childFolder = mock<PublicLinkFolder> {
+                on { id } doReturn NodeId(entryFolderHandle)
+                on { name } doReturn "child"
+            }
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(getPublicChildNodeFromIdUseCase(NodeId(entryFolderHandle))).thenReturn(childFolder)
+            whenever(getFolderLinkChildrenNodesUseCase(any(), anyOrNull())).thenReturn(emptyList())
+            whenever(containsMediaItemUseCase(any())).thenReturn(false)
+            stubNodeUiItemMapper()
+            initViewModel(
+                FolderLinkViewModel.Args(
+                    uriString = "https://mega.nz/folder/abc",
+                    entryFolderHandle = entryFolderHandle,
+                )
+            )
+            advanceUntilIdle()
+
+            underTest.processAction(FolderLinkAction.BackPressed)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().navigateBackEvent).isEqualTo(triggered)
+            }
+            verifyNoInteractions(getFolderParentNodeUseCase)
+        }
+
+    @Test
+    fun `test that back press navigates up to the entry folder when deeper in a child folder screen`() =
+        runTest {
+            val entryFolderHandle = 456L
+            val childFolder = mock<PublicLinkFolder> {
+                on { id } doReturn NodeId(entryFolderHandle)
+                on { name } doReturn "child"
+            }
+            val subFolder = mockFolderNode(id = 10L, name = "SubFolder")
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(getPublicChildNodeFromIdUseCase(NodeId(entryFolderHandle))).thenReturn(childFolder)
+            whenever(getFolderLinkChildrenNodesUseCase(any(), anyOrNull())).thenReturn(emptyList())
+            whenever(containsMediaItemUseCase(any())).thenReturn(false)
+            whenever(getFolderParentNodeUseCase(NodeId(10L))).thenReturn(childFolder)
+            stubNodeUiItemMapper()
+            initViewModel(
+                FolderLinkViewModel.Args(
+                    uriString = "https://mega.nz/folder/abc",
+                    entryFolderHandle = entryFolderHandle,
+                )
+            )
+            advanceUntilIdle()
+
+            underTest.processAction(FolderLinkAction.ItemClicked(mockFolderNodeUiItem(subFolder)))
+            advanceUntilIdle()
+            underTest.processAction(FolderLinkAction.BackPressed)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.currentFolderNode?.id).isEqualTo(NodeId(entryFolderHandle))
+                assertThat(state.navigateBackEvent).isEqualTo(consumed)
+            }
+
+            underTest.processAction(FolderLinkAction.BackPressed)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().navigateBackEvent).isEqualTo(triggered)
+            }
+        }
 
     @Test
     fun `test that back press triggers navigateBackEvent when getFolderParentNodeUseCase fails`() =

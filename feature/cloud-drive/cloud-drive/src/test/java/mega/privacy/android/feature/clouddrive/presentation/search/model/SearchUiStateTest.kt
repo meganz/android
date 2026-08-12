@@ -3,6 +3,7 @@ package mega.privacy.android.feature.clouddrive.presentation.search.model
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -11,6 +12,19 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
 class SearchUiStateTest {
+
+    @Test
+    fun `test that isFilterAllowed returns true for cloud drive, home and folder link source types`() {
+        val allowed = listOf(
+            NodeSourceType.CLOUD_DRIVE,
+            NodeSourceType.HOME,
+            NodeSourceType.FOLDER_LINK,
+        )
+        NodeSourceType.entries.forEach { sourceType ->
+            val state = SearchUiState(nodeSourceType = sourceType)
+            assertThat(state.isFilterAllowed).isEqualTo(sourceType in allowed)
+        }
+    }
 
     @Test
     fun `test that visibleItemsCount returns total count when all items are visible`() {

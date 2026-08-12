@@ -89,12 +89,16 @@ data object AudioNavKey : NavKey
 
 /**
  * Search route args
+ * @property nodeSourceType the source type of the nodes to search
+ * @property parentHandle the handle of the folder to search in
+ * @property folderLinkUrl the public folder link URL, only set when searching a folder link
  */
 @Serializable
 data class SearchNavKey(
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val parentHandle: Long,
-) : NavKey
+    val folderLinkUrl: String? = null,
+) : NoSessionNavKey.Optional
 
 /**
  * @isOverQuota whether the user is over quota (red) or near quota (orange)
@@ -110,10 +114,14 @@ data class OverQuotaDialogNavKey(
 /**
  * NavKey for folder link screen
  * @param uriString the uri string of the folder link
+ * @param entryFolderHandle handle of a folder inside an already opened folder link to open the
+ * screen at, reusing the existing folder session (e.g. opening a folder from search results);
+ * pressing back on this folder leaves the screen instead of climbing to its parent
  */
 @Serializable
 data class FolderLinkNavKey(
     val uriString: String? = null,
+    val entryFolderHandle: Long? = null,
 ) : NoSessionNavKey.Optional
 
 /**

@@ -65,7 +65,9 @@ import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.Expi
 import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.UnavailableLinkView
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.transition.fadeTransition
+import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.ads.NewAdsContainer
@@ -151,6 +153,18 @@ internal fun FolderLinkScreen(
                         }
                     },
                     actions = buildList {
+                        if (isLoaded && uiState.items.isNotEmpty()) {
+                            add(MenuActionWithClick(CommonMenuAction.Search) {
+                                onNavigate(
+                                    SearchNavKey(
+                                        nodeSourceType = NodeSourceType.FOLDER_LINK,
+                                        parentHandle = uiState.currentFolderNode?.id?.longValue
+                                            ?: -1L,
+                                        folderLinkUrl = uiState.url,
+                                    )
+                                )
+                            })
+                        }
                         if (isLoaded && uiState.isRootFolder) {
                             add(MenuActionWithClick(PublicLinkShareAction) {
                                 context.startPublicLinkShareIntent(

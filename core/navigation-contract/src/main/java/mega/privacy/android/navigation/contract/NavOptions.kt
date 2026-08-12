@@ -23,6 +23,7 @@ class NavOptions internal constructor(
     class PopUpTo internal constructor(
         val routeClass: KClass<*>?,
         val inclusive: Boolean,
+        val firstOccurrence: Boolean,
     ) {
 
         /**
@@ -36,7 +37,15 @@ class NavOptions internal constructor(
              */
             var inclusive: Boolean = false
 
-            fun build() = PopUpTo(routeClass, inclusive)
+            /**
+             * Whether to pop to the first (oldest) matching destination instead of the most
+             * recent one. Use when the back stack can hold several instances of [routeClass]
+             * and the whole cluster should be cleared, e.g. folder link screens stacked
+             * through search results.
+             */
+            var firstOccurrence: Boolean = false
+
+            fun build() = PopUpTo(routeClass, inclusive, firstOccurrence)
         }
     }
 

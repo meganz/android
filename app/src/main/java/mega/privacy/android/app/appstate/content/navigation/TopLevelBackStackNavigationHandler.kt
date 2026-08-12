@@ -88,10 +88,10 @@ class TopLevelBackStackNavigationHandler(
     }
 
     private fun findPopUpToKey(popUpTo: NavOptions.PopUpTo): NavKey? =
-        if (popUpTo.routeClass == null) {
-            backStack.backStack.firstOrNull()
-        } else {
-            backStack.backStack.lastOrNull { it::class == popUpTo.routeClass }
+        when {
+            popUpTo.routeClass == null -> backStack.backStack.firstOrNull()
+            popUpTo.firstOccurrence -> backStack.backStack.firstOrNull { it::class == popUpTo.routeClass }
+            else -> backStack.backStack.lastOrNull { it::class == popUpTo.routeClass }
         }
 
     /**

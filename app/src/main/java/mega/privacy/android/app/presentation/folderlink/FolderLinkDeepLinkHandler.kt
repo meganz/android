@@ -18,8 +18,10 @@ class FolderLinkDeepLinkHandler @Inject constructor(
 ) : DeepLinkHandler(snackbarEventQueue) {
 
     override val navOptions: NavOptions = navOptions {
+        // Clear all folder link navkey
         popUpTo<FolderLinkNavKey> {
             inclusive = true
+            firstOccurrence = true
         }
     }
 

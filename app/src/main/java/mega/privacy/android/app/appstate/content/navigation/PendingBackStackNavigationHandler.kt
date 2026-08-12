@@ -315,10 +315,10 @@ class PendingBackStackNavigationHandler(
     }
 
     private fun findPopUpToKey(popUpTo: NavOptions.PopUpTo): NavKey? =
-        if (popUpTo.routeClass == null) {
-            backstack.firstOrNull()
-        } else {
-            backstack.lastOrNull { it::class == popUpTo.routeClass }
+        when {
+            popUpTo.routeClass == null -> backstack.firstOrNull()
+            popUpTo.firstOccurrence -> backstack.firstOrNull { it::class == popUpTo.routeClass }
+            else -> backstack.lastOrNull { it::class == popUpTo.routeClass }
         }
 
     /**

@@ -30,6 +30,7 @@ import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -38,6 +39,7 @@ import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchU
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.FolderLinkNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.components.NodesView
@@ -188,13 +190,22 @@ fun SearchScreen(
         event = uiState.navigateToFolderEvent,
         onConsumed = { viewModel.processAction(SearchUiAction.NavigateToFolderEventConsumed) }
     ) { node ->
-        navigationHandler.navigate(
-            CloudDriveNavKey(
-                nodeHandle = node.id.longValue,
-                nodeName = node.name,
-                nodeSourceType = uiState.nodeSourceType
+        if (uiState.nodeSourceType == NodeSourceType.FOLDER_LINK) {
+            navigationHandler.navigate(
+                FolderLinkNavKey(
+                    uriString = uiState.folderLinkUrl,
+                    entryFolderHandle = node.id.longValue,
+                )
             )
-        )
+        } else {
+            navigationHandler.navigate(
+                CloudDriveNavKey(
+                    nodeHandle = node.id.longValue,
+                    nodeName = node.name,
+                    nodeSourceType = uiState.nodeSourceType
+                )
+            )
+        }
     }
 
     EventEffect(
@@ -231,7 +242,11 @@ fun SearchScreen(
             snackBarHostState = snackbarHostState,
             coroutineScope = coroutineScope,
             onActionHandled = { viewModel.processAction(SearchUiAction.OpenedFileNodeHandled) },
-            nodeSourceData = NodeSourceData.Default(uiState.nodeSourceType),
+            nodeSourceData = if (uiState.nodeSourceType == NodeSourceType.FOLDER_LINK) {
+                NodeSourceData.FolderLink(url = uiState.folderLinkUrl)
+            } else {
+                NodeSourceData.Default(uiState.nodeSourceType)
+            },
             onDownloadEvent = onTransfer,
             sortOrder = uiState.selectedSortOrder,
             onNavigate = navigationHandler::navigate,

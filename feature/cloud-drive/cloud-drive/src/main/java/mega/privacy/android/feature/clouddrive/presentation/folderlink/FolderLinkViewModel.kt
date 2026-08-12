@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -44,6 +45,7 @@ import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderSortOrderUseCase
 import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTypeUseCase
@@ -73,6 +75,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase,
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
+    private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
@@ -95,7 +98,10 @@ internal class FolderLinkViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        FolderLinkUiState(url = args.uriString)
+        FolderLinkUiState(
+            url = args.uriString,
+            isOpenedAtEntryFolder = args.entryFolderHandle != null,
+        )
     )
     val uiState: StateFlow<FolderLinkUiState> = _uiState.asStateFlow()
     private var browseFolderJob: Job? = null
@@ -112,7 +118,38 @@ internal class FolderLinkViewModel @AssistedInject constructor(
         monitorSortOrder()
         viewModelScope.launch {
             checkCredentials()
-            if (args.uriString != null) loginToFolder(args.uriString)
+            when {
+                args.entryFolderHandle != null -> openEntryFolder(args.entryFolderHandle)
+                args.uriString != null -> loginToFolder(args.uriString)
+            }
+        }
+    }
+
+    /**
+     * Open a folder of an already opened folder link directly, reusing the existing folder
+     * session instead of logging into the link again. Falls back to a fresh folder login when
+     * the session is gone (e.g. after process death).
+     */
+    private suspend fun openEntryFolder(entryFolderHandle: Long) {
+        _uiState.update { it.copy(contentState = FolderLinkContentState.Loading) }
+        val childFolder = runCatching {
+            getPublicChildNodeFromIdUseCase(NodeId(entryFolderHandle)) as? TypedFolderNode
+        }.onFailure { Timber.e(it) }.getOrNull()
+        when {
+            childFolder != null -> {
+                _uiState.update {
+                    it.copy(
+                        isFolderLoggedIn = true,
+                        currentFolderNode = childFolder,
+                    )
+                }
+                refreshCurrentFolder()
+                queryAds(entryFolderHandle)
+            }
+
+            args.uriString != null -> loginToFolder(args.uriString)
+
+            else -> _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
         }
     }
 
@@ -393,6 +430,13 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                     }
                 }
                 result.currentNodeId?.let { queryAds(it.longValue) }
+                // Reached only on the openEntryFolder fallback: after logging in again,
+                // continue into the requested child folder
+                args.entryFolderHandle?.let { entryFolderHandle ->
+                    runCatching {
+                        getPublicChildNodeFromIdUseCase(NodeId(entryFolderHandle)) as? TypedFolderNode
+                    }.getOrNull()?.let { openFolder(it) }
+                }
             }.onFailure { throwable ->
                 if (throwable is FetchFolderNodesException.Expired) {
                     _uiState.update { it.copy(contentState = FolderLinkContentState.Expired) }
@@ -511,8 +555,10 @@ internal class FolderLinkViewModel @AssistedInject constructor(
         browseFolderJob?.cancel()
         browseFolderJob = viewModelScope.launch {
             val currentFolderNode = _uiState.value.currentFolderNode
-            if (currentFolderNode == null) {
-                // Pressed back before loading link folder, navigate back
+            if (currentFolderNode == null || currentFolderNode.id.longValue == args.entryFolderHandle) {
+                // Pressed back before loading link folder, or on the folder this screen was
+                // opened with (e.g. from search results) — leave the screen instead of
+                // climbing to its parent
                 _uiState.update { it.copy(navigateBackEvent = triggered) }
                 return@launch
             }
@@ -555,5 +601,6 @@ internal class FolderLinkViewModel @AssistedInject constructor(
 
     data class Args(
         val uriString: String?,
+        val entryFolderHandle: Long? = null,
     )
 }

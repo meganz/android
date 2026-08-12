@@ -49,6 +49,13 @@ class SearchUseCase @Inject constructor(
         val (query, searchTarget, searchCategory, modificationDate, creationDate, description, tag) = searchParameters
         val invalidNodeHandle = searchRepository.getInvalidHandle()
         val searchList = when {
+            // Folder Link (browses and searches through the folder link api)
+            nodeSourceType == NodeSourceType.FOLDER_LINK -> searchRepository.searchInFolderLink(
+                nodeId = parentHandle,
+                order = getCloudSortOrder(),
+                parameters = searchParameters,
+            )
+
             // Favourites Root (No Search applied)
             query.isEmpty() && parentHandle == invalidNodeHandle && nodeSourceType == NodeSourceType.FAVOURITES ->
                 sortFavouritesUseCase(favouritesRepository.getAllFavorites())

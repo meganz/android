@@ -24,6 +24,18 @@ class FolderLinkUiStateTest {
     }
 
     @Test
+    fun `test that isRootFolder returns false when opened at an entry folder and both nodes are null`() {
+        val underTest = FolderLinkUiState(
+            rootNode = null,
+            currentFolderNode = null,
+            isOpenedAtEntryFolder = true,
+        )
+
+        assertThat(underTest.isRootFolder).isFalse()
+        assertThat(underTest.subTitle).isNull()
+    }
+
+    @Test
     fun `test that isRootFolder returns true when rootNode and currentFolderNode have same id`() {
         val node = mockFolderNode(id = 1L, name = "Folder")
         val underTest = FolderLinkUiState(

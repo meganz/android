@@ -9,6 +9,7 @@ import mega.privacy.android.data.constant.SortOrderSource
 import mega.privacy.android.data.database.dao.RecentSearchDao
 import mega.privacy.android.data.database.entity.RecentSearchEntity
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
@@ -39,6 +40,7 @@ internal class SearchRepositoryImpl @Inject constructor(
     private val cancelTokenProvider: CancelTokenProvider,
     private val getLinksSOrtOrderUseCase: GetLinksSortOrderUseCase,
     private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
@@ -103,6 +105,31 @@ internal class SearchRepositoryImpl @Inject constructor(
             )
         }
         mapMegaNodesToUnTypedNodes(searchList.await(), offlineItems.await())
+    }
+
+    override suspend fun searchInFolderLink(
+        nodeId: NodeId?,
+        order: SortOrder,
+        parameters: SearchParameters,
+    ): List<UnTypedNode> = withContext(ioDispatcher) {
+        val (query, searchTarget, searchCategory, modificationDate, creationDate, description, tag) = parameters
+        val filter = megaSearchFilterMapper(
+            searchQuery = query,
+            parentHandle = nodeId ?: NodeId(-1L),
+            searchTarget = searchTarget,
+            searchCategory = searchCategory,
+            modificationDate = modificationDate,
+            creationDate = creationDate,
+            description = description,
+            tag = tag,
+            useAndForTextQuery = parameters.useAndForTextQuery
+                ?: (description == null && tag == null),
+        )
+        megaApiFolderGateway.search(
+            filter = filter,
+            order = sortOrderIntMapper(order),
+            megaCancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+        ).mapNotNull { nodeMapper(megaNode = it, fromFolderLink = true) }
     }
 
     private suspend fun getAllOfflineNodeHandle() =
