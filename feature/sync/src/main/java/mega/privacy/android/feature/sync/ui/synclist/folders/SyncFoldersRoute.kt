@@ -71,6 +71,7 @@ internal fun SyncFoldersRoute(
         isStorageOverQuota = uiState.isStorageOverQuota,
         isLoading = uiState.isLoading,
         deviceName = deviceName,
+        syncPauseReason = uiState.syncPauseReason,
         onLocalFolderSelected = { sync, uri ->
             viewModel.handleAction(
                 SyncFoldersAction.LocalFolderSelected(

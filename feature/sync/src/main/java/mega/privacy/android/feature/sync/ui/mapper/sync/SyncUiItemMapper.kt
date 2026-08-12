@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.feature.sync.data.mapper.SyncStatusMapper
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import javax.inject.Inject
@@ -18,6 +19,7 @@ internal class SyncUiItemMapper @Inject constructor(
     private val deviceFolderUINodeErrorMessageMapper: DeviceFolderUINodeErrorMessageMapper,
     private val syncStatusMapper: SyncStatusMapper,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
+    private val isSyncPausedByTheUserUseCase: IsSyncPausedByTheUserUseCase,
 ) {
 
     suspend operator fun invoke(folderPairs: List<FolderPair>): List<SyncUiItem> =
@@ -53,7 +55,8 @@ internal class SyncUiItemMapper @Inject constructor(
                 deviceFolderUINodeErrorMessageMapper(folderPair.syncError)
             } else null,
             isLocalRootChangeNeeded = folderPair.isLocalPathUri.not() || folderPair.syncError == SyncError.COULD_NOT_CREATE_IGNORE_FILE,
-            uriPath = UriPath(folderPair.localFolderPath)
+            uriPath = UriPath(folderPair.localFolderPath),
+            isPausedByTheUser = isSyncPausedByTheUserUseCase(folderPair.id),
         )
     }
 

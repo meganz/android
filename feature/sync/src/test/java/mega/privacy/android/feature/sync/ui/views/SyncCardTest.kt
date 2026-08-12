@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.views
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -13,6 +14,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.shared.resources.R as sharedR
@@ -953,5 +955,97 @@ internal class SyncCardTest {
         }
         composeTestRule.onNodeWithText(deviceStoragePath).performClick()
         assertThat(clicked).isTrue()
+    }
+
+    @Test
+    fun `test that the battery saver pause reason is named on a paused card`() {
+        composeTestRule.setContentWithPausedSyncCard(syncPauseReason = SyncPauseReason.BatterySaver)
+
+        composeTestRule
+            .onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_list_sync_state_paused_battery_saver))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the low battery pause reason is named on a paused card`() {
+        composeTestRule.setContentWithPausedSyncCard(syncPauseReason = SyncPauseReason.LowBattery)
+
+        composeTestRule
+            .onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_list_sync_state_paused_low_battery))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the no wifi pause reason is named on a paused card`() {
+        composeTestRule.setContentWithPausedSyncCard(syncPauseReason = SyncPauseReason.NoWifi)
+
+        composeTestRule
+            .onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_list_sync_state_paused_no_wifi))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that a plain paused status is shown when the reason is not charging`() {
+        composeTestRule.setContentWithPausedSyncCard(syncPauseReason = SyncPauseReason.NotCharging)
+
+        composeTestRule
+            .onNodeWithText(composeTestRule.activity.getString(R.string.sync_list_sync_state_paused))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that a plain paused status is shown when there is no pause reason`() {
+        composeTestRule.setContentWithPausedSyncCard(syncPauseReason = null)
+
+        composeTestRule
+            .onNodeWithText(composeTestRule.activity.getString(R.string.sync_list_sync_state_paused))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that a plain paused status is shown when the user paused the sync`() {
+        composeTestRule.setContentWithPausedSyncCard(
+            syncPauseReason = SyncPauseReason.BatterySaver,
+            isPausedByTheUser = true,
+        )
+
+        composeTestRule
+            .onNodeWithText(composeTestRule.activity.getString(R.string.sync_list_sync_state_paused))
+            .assertIsDisplayed()
+    }
+
+    private fun AndroidComposeTestRule<*, ComponentActivity>.setContentWithPausedSyncCard(
+        syncPauseReason: SyncPauseReason?,
+        isPausedByTheUser: Boolean = false,
+    ) {
+        setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_TWOWAY,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.PAUSED,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = false,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM"),
+                    isPausedByTheUser = isPausedByTheUser,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                isStorageOverQuota = false,
+                errorRes = null,
+                deviceName = "Device Name",
+                syncPauseReason = syncPauseReason,
+            )
+        }
     }
 }

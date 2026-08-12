@@ -52,7 +52,8 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUse
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase.Companion.LOW_BATTERY_LEVEL
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncPauseReasonUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncPauseReasonUseCase.Companion.LOW_BATTERY_LEVEL
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.StopBackupOption
@@ -98,6 +99,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val changeSyncLocalRootUseCase: ChangeSyncLocalRootUseCase,
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase,
     private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase,
+    private val monitorSyncPauseReasonUseCase: MonitorSyncPauseReasonUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
@@ -119,6 +121,15 @@ internal class SyncFoldersViewModel @Inject constructor(
         }
 
         getAndMonitorBatteryInfo()
+
+        viewModelScope.launch {
+            monitorSyncPauseReasonUseCase()
+                .distinctUntilChanged()
+                .catch { Timber.e(it) }
+                .collect { reason ->
+                    _uiState.update { state -> state.copy(syncPauseReason = reason) }
+                }
+        }
 
         viewModelScope.launch {
             monitorAccountDetailUseCase()

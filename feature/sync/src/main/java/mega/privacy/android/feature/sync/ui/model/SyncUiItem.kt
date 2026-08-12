@@ -25,6 +25,7 @@ internal data class SyncUiItem(
     val creationTime: Long = 0,
     val isLocalRootChangeNeeded: Boolean = false,
     val uriPath: UriPath,
+    val isPausedByTheUser: Boolean = false,
 ) {
     @get:StringRes
     val method: Int

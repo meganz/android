@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.icon.pack.R as IconPackR
@@ -74,6 +75,7 @@ internal fun SyncCard(
     @StringRes errorRes: Int?,
     deviceName: String,
     modifier: Modifier = Modifier,
+    syncPauseReason: SyncPauseReason? = null,
     onLocalFolderSelected: (Uri) -> Unit = {},
 ) {
     MegaCard(
@@ -88,6 +90,7 @@ internal fun SyncCard(
                 hasStalledIssues = sync.hasStalledIssues,
                 method = stringResource(id = sync.method),
                 isLocalRootChangeNeeded = sync.isLocalRootChangeNeeded,
+                pausedStatusRes = sync.pausedStatusRes(syncPauseReason),
             )
 
             if (errorRes != null && errorRes != sharedR.string.general_sync_storage_overquota && sync.isLocalRootChangeNeeded.not()) {
@@ -137,6 +140,20 @@ internal fun SyncCard(
     )
 }
 
+/**
+ * The paused status names the condition holding the sync back, unless the user paused it
+ * themselves, in which case a bare "Paused" is what they expect to see. NotCharging has no
+ * named status in the design, so it also falls back to the bare "Paused".
+ */
+@StringRes
+private fun SyncUiItem.pausedStatusRes(syncPauseReason: SyncPauseReason?): Int =
+    when (syncPauseReason.takeUnless { isPausedByTheUser }) {
+        SyncPauseReason.LowBattery -> sharedR.string.sync_list_sync_state_paused_low_battery
+        SyncPauseReason.BatterySaver -> sharedR.string.sync_list_sync_state_paused_battery_saver
+        SyncPauseReason.NoWifi -> sharedR.string.sync_list_sync_state_paused_no_wifi
+        SyncPauseReason.NotCharging, null -> R.string.sync_list_sync_state_paused
+    }
+
 @Composable
 private fun SyncCardHeader(
     syncType: SyncType,
@@ -144,6 +161,7 @@ private fun SyncCardHeader(
     status: SyncStatus,
     hasStalledIssues: Boolean,
     method: String,
+    @StringRes pausedStatusRes: Int,
     isLocalRootChangeNeeded: Boolean = false,
 ) {
     Row(
@@ -185,7 +203,7 @@ private fun SyncCardHeader(
                             else -> stringResource(id = sharedR.string.sync_list_sync_state_updating)
                         }
 
-                        status == SyncStatus.PAUSED -> stringResource(id = R.string.sync_list_sync_state_paused)
+                        status == SyncStatus.PAUSED -> stringResource(id = pausedStatusRes)
                         status == SyncStatus.ERROR -> stringResource(id = sharedR.string.device_center_list_view_item_status_error)
                         status == SyncStatus.DISABLED -> stringResource(id = sharedR.string.sync_list_sync_state_disabled)
                         else -> stringResource(id = sharedR.string.sync_list_sync_state_up_to_date)

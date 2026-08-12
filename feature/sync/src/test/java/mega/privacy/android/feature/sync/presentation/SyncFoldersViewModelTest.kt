@@ -45,6 +45,7 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
+import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.ChangeSyncLocalRootUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
@@ -55,6 +56,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUse
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncPauseReasonUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.StopBackupOption
@@ -68,6 +70,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -115,6 +119,7 @@ internal class SyncFoldersViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase = mock()
     private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase = mock()
+    private val monitorSyncPauseReasonUseCase: MonitorSyncPauseReasonUseCase = mock()
     private lateinit var underTest: SyncFoldersViewModel
 
     private val folderPairs = listOf(
@@ -198,6 +203,7 @@ internal class SyncFoldersViewModelTest {
 
         whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(stalledIssues))
         whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow { awaitCancellation() })
+        whenever(monitorSyncPauseReasonUseCase()).thenReturn(flowOf(null))
     }
 
     @AfterEach
@@ -230,6 +236,7 @@ internal class SyncFoldersViewModelTest {
             monitorSelectedMegaFolderUseCase,
             clearSelectedMegaFolderUseCase,
             getCompleteFolderInfoUseCase,
+            monitorSyncPauseReasonUseCase,
         )
     }
 
@@ -550,6 +557,28 @@ internal class SyncFoldersViewModelTest {
         }
     }
 
+    @ParameterizedTest(name = "reason: {0}")
+    @EnumSource(SyncPauseReason::class)
+    fun `test that the sync pause reason is exposed in the state`(reason: SyncPauseReason) =
+        runTest {
+            whenever(monitorSyncPauseReasonUseCase()).thenReturn(flowOf(reason))
+            initViewModel()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().syncPauseReason).isEqualTo(reason)
+            }
+        }
+
+    @Test
+    fun `test that the sync pause reason is null when sync is allowed`() = runTest {
+        whenever(monitorSyncPauseReasonUseCase()).thenReturn(flowOf(null))
+        initViewModel()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().syncPauseReason).isNull()
+        }
+    }
+
     @Test
     fun `test that feature flag for disable battery optimization is loaded`() = runTest {
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
@@ -738,7 +767,8 @@ internal class SyncFoldersViewModelTest {
             changeSyncLocalRootUseCase = changeSyncLocalRootUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorSelectedMegaFolderUseCase = monitorSelectedMegaFolderUseCase,
-            clearSelectedMegaFolderUseCase = clearSelectedMegaFolderUseCase
+            clearSelectedMegaFolderUseCase = clearSelectedMegaFolderUseCase,
+            monitorSyncPauseReasonUseCase = monitorSyncPauseReasonUseCase,
         )
     }
 }

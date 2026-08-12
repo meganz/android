@@ -1257,6 +1257,12 @@
     <string name="settings_sync_battery_usage_description">Syncs and backups pause below 20% battery when not charging.</string>
     <!-- Settings toggle to pause syncs and backups while the device battery saver is on -->
     <string name="settings_sync_battery_pause_on_battery_saver_title">Pause when battery saver is on</string>
+    <!-- Status shown on a sync card when the sync is paused because the device battery saver is on -->
+    <string name="sync_list_sync_state_paused_battery_saver">Paused, battery saver</string>
+    <!-- Status shown on a sync card when the sync is paused because the device battery is low -->
+    <string name="sync_list_sync_state_paused_low_battery">Paused, low battery</string>
+    <!-- Status shown on a sync card when the sync is paused because the device is not connected to Wi-Fi -->
+    <string name="sync_list_sync_state_paused_no_wifi">Paused, no Wi-Fi</string>
     <!-- Message shown when uploading edited image as a new file -->
     <string name="photo_editor_upload_message">Uploading edits as a new file</string>
     <!-- Dialog title asking user to discard changes -->

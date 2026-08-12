@@ -1,12 +1,14 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
 import androidx.annotation.StringRes
+import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 
 internal data class SyncFoldersUiState(
     val syncUiItems: List<SyncUiItem>,
     val isRefreshing: Boolean = false,
     val isLowBatteryLevel: Boolean = false,
+    val syncPauseReason: SyncPauseReason? = null,
     val isStorageOverQuota: Boolean = false,
     val isLoading: Boolean = false,
     val showConfirmRemoveSyncFolderDialog: Boolean = false,

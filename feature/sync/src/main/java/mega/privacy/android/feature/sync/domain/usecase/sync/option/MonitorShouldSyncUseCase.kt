@@ -1,17 +1,8 @@
 package mega.privacy.android.feature.sync.domain.usecase.sync.option
 
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.sample
-import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
-import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.domain.usecase.environment.MonitorPowerSaveModeUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import timber.log.Timber
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Use case for determining if sync should be allowed based on all conditions:
@@ -19,13 +10,7 @@ import kotlin.time.Duration.Companion.seconds
  * and power save mode (battery saver)
  */
 class MonitorShouldSyncUseCase @Inject constructor(
-    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
-    private val monitorSyncByChargingUseCase: MonitorSyncByChargingUseCase,
-    private val monitorPauseSyncOnBatterySaverUseCase: MonitorPauseSyncOnBatterySaverUseCase,
-    private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
-    private val monitorPowerSaveModeUseCase: MonitorPowerSaveModeUseCase,
-    private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val monitorSyncPauseReasonUseCase: MonitorSyncPauseReasonUseCase,
 ) {
 
     /**
@@ -34,70 +19,5 @@ class MonitorShouldSyncUseCase @Inject constructor(
      *
      * @return Flow<Boolean> indicating if sync should be allowed
      */
-    @OptIn(FlowPreview::class)
-    operator fun invoke(): Flow<Boolean> = combine(
-        monitorBatteryInfoUseCase().distinctUntilChanged(),
-        monitorSyncByWiFiUseCase().distinctUntilChanged(),
-        monitorSyncByChargingUseCase().distinctUntilChanged(),
-        monitorBatterySaverPause(),
-        monitorConnectivityUseCase().sample(1.seconds)
-    ) { batteryInfo, wiFiOnly, chargingOnly, batterySaverPause, isNetworkChanged ->
-        val isUserOnWifi = runCatching { isOnWifiNetworkUseCase() }.getOrDefault(false)
-        val wifiAllowed = checkWifiSettings(isUserOnWifi, wiFiOnly)
-        val batteryAllowed = checkBatterySettings(batteryInfo.isCharging, chargingOnly)
-        val batteryLevelAllowed = checkBatteryLevel(batteryInfo)
-        // Charging exempts battery saver, as it does the low battery level
-        val batterySaverAllowed = !batterySaverPause || batteryInfo.isCharging
-        Timber.d("MonitorShouldSyncUseCase: wifiAllowed=$wifiAllowed, batteryAllowed=$batteryAllowed, batteryLevelAllowed=$batteryLevelAllowed, batterySaverAllowed=$batterySaverAllowed isNetworkChanged = $isNetworkChanged")
-
-        wifiAllowed && batteryAllowed && batteryLevelAllowed && batterySaverAllowed
-    }
-
-    private fun monitorBatterySaverPause(): Flow<Boolean> = combine(
-        monitorPauseSyncOnBatterySaverUseCase().distinctUntilChanged(),
-        monitorPowerSaveModeUseCase().distinctUntilChanged(),
-    ) { pauseOnBatterySaver, isInPowerSaveMode ->
-        pauseOnBatterySaver && isInPowerSaveMode
-    }
-
-    /**
-     * Checks if sync is allowed based on WiFi settings
-     */
-    private fun checkWifiSettings(isOnWiFi: Boolean, wiFiOnly: Boolean): Boolean {
-        return if (wiFiOnly) {
-            isOnWiFi // Only allow sync on WiFi
-        } else {
-            true // Allow sync on both WiFi and mobile data
-        }
-    }
-
-    /**
-     * Checks if sync is allowed based on battery settings
-     */
-    private fun checkBatterySettings(
-        isCharging: Boolean,
-        chargingOnly: Boolean,
-    ): Boolean {
-        // If charging-only is enabled, must be charging
-        return if (chargingOnly) {
-            isCharging
-        } else {
-            true // Allow sync regardless of charging state
-        }
-    }
-
-    /**
-     * Checks if sync is allowed based on battery level
-     */
-    private fun checkBatteryLevel(batteryInfo: mega.privacy.android.domain.entity.BatteryInfo): Boolean {
-        val isLowBattery = batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging
-        return !isLowBattery
-    }
-
-    companion object {
-        /**
-         * Low battery level threshold
-         */
-        const val LOW_BATTERY_LEVEL = 20
-    }
+    operator fun invoke(): Flow<Boolean> = monitorSyncPauseReasonUseCase().map { it == null }
 }

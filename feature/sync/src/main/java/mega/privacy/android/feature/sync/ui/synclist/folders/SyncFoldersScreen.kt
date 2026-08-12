@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.BOTTOM_PADDING
@@ -68,6 +69,7 @@ internal fun SyncFoldersScreen(
     isLoading: Boolean,
     deviceName: String,
     modifier: Modifier = Modifier,
+    syncPauseReason: SyncPauseReason? = null,
     onLocalFolderSelected: (SyncUiItem, Uri) -> Unit = { _, _ -> },
 ) {
     Box(
@@ -121,6 +123,7 @@ internal fun SyncFoldersScreen(
                         isStorageOverQuota = isStorageOverQuota,
                         errorRes = syncUiItems[itemIndex].error,
                         deviceName = deviceName,
+                        syncPauseReason = syncPauseReason,
                         onLocalFolderSelected = onLocalFolderSelected
                     )
                 }

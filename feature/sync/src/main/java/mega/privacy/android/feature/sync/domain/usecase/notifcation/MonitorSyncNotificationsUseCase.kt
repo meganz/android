@@ -10,7 +10,7 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase.Companion.LOW_BATTERY_LEVEL
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncPauseReasonUseCase.Companion.LOW_BATTERY_LEVEL
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByChargingUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import javax.inject.Inject

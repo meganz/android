@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 
 @Composable
@@ -23,6 +24,7 @@ internal fun SyncItemView(
     isStorageOverQuota: Boolean,
     deviceName: String,
     @StringRes errorRes: Int? = null,
+    syncPauseReason: SyncPauseReason? = null,
     onLocalFolderSelected: (SyncUiItem, Uri) -> Unit = { _, _ -> },
 ) {
     val sync = syncUiItems[itemIndex]
@@ -48,6 +50,7 @@ internal fun SyncItemView(
         isStorageOverQuota = isStorageOverQuota,
         errorRes = errorRes,
         deviceName = deviceName,
+        syncPauseReason = syncPauseReason,
         onLocalFolderSelected = {
             onLocalFolderSelected(sync, it)
         },

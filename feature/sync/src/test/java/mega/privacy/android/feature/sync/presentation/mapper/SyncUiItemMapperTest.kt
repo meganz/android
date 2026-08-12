@@ -13,13 +13,18 @@ import mega.privacy.android.feature.sync.data.mapper.SyncStatusMapper
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -32,10 +37,12 @@ class SyncUiItemMapperTest {
     private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper = mock()
     private val syncStatusMapper: SyncStatusMapper = mock()
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase = mock()
+    private val isSyncPausedByTheUserUseCase: IsSyncPausedByTheUserUseCase = mock()
     private val underTest = SyncUiItemMapper(
         deviceFolderUINodeErrorMessageMapper = deviceFolderUINodeErrorMessageMapper,
         syncStatusMapper = syncStatusMapper,
-        getPathByDocumentContentUriUseCase = getPathByDocumentContentUriUseCase
+        getPathByDocumentContentUriUseCase = getPathByDocumentContentUriUseCase,
+        isSyncPausedByTheUserUseCase = isSyncPausedByTheUserUseCase,
     )
 
     private val folderPair = FolderPair(
@@ -51,13 +58,19 @@ class SyncUiItemMapperTest {
         folderPair
     )
 
+    @BeforeEach
+    fun setUp() = runTest {
+        whenever(isSyncPausedByTheUserUseCase(any())).thenReturn(false)
+    }
+
     @AfterEach
     fun tearDown() {
         reset(
             deviceFolderUINodeErrorMessageMapper,
             backupInfoTypeIntMapper,
             syncStatusMapper,
-            getPathByDocumentContentUriUseCase
+            getPathByDocumentContentUriUseCase,
+            isSyncPausedByTheUserUseCase,
         )
     }
 
@@ -137,4 +150,16 @@ class SyncUiItemMapperTest {
 
         assertThat(underTest(listOf(folderPairWithError))).isEqualTo(listOf(expectedSyncUiItem))
     }
+
+    @ParameterizedTest(name = "paused by the user: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isPausedByTheUser is mapped from the sync id`(isPausedByTheUser: Boolean) =
+        runTest {
+            whenever(deviceFolderUINodeErrorMessageMapper(folderPair.syncError)).thenReturn(null)
+            whenever(getPathByDocumentContentUriUseCase(folderPair.localFolderPath))
+                .thenReturn("/path/to/DCIM")
+            whenever(isSyncPausedByTheUserUseCase(folderPair.id)).thenReturn(isPausedByTheUser)
+
+            assertThat(underTest(folderPair).isPausedByTheUser).isEqualTo(isPausedByTheUser)
+        }
 }
