@@ -32,6 +32,7 @@ internal class SubscriptionOptionListMapperTest {
         on { getMobileOfferExpiryTimestamp(0) }.thenReturn(1787464050)
         on { getMobileOfferFlags(0) }.thenReturn(5)
         on { getMobileOfferReshowInterval(0) }.thenReturn(86400)
+        on { getMobileOfferCampaignId(0) }.thenReturn(90210)
     }
 
     private val currency = mock<MegaCurrency> {
@@ -62,6 +63,7 @@ internal class SubscriptionOptionListMapperTest {
         offerValidUntil = 1787464050,
         offerFlags = 5,
         offerReshowInterval = 86400,
+        offerCampaignId = 90210,
     )
 
     private val underTest = SubscriptionOptionListMapper(
@@ -76,6 +78,7 @@ internal class SubscriptionOptionListMapperTest {
         whenever(pricing.hasMobileOffers(0)).thenReturn(false)
         whenever(pricing.getMobileOfferExpiryTimestamp(0)).thenReturn(1787464050)
         whenever(pricing.getMobileOfferFlags(0)).thenReturn(5)
+        whenever(pricing.getMobileOfferCampaignId(0)).thenReturn(90210)
         val actual = underTest(request)
         assertThat(actual.size).isEqualTo(1)
         assertThat(actual).isEqualTo(listOf(subscriptionOption))
@@ -111,6 +114,22 @@ internal class SubscriptionOptionListMapperTest {
         whenever(pricing.getMobileOfferReshowInterval(0)).thenReturn(0)
         val actual = underTest(request)
         assertThat(actual.single().offerReshowInterval).isNull()
+    }
+
+    @Test
+    fun `test that offerCampaignId is mapped when the mobile offer belongs to a campaign`() {
+        whenever(accountTypeMapper(1)).thenReturn(subscriptionOption.accountType)
+        whenever(pricing.getMobileOfferCampaignId(0)).thenReturn(90210)
+        val actual = underTest(request)
+        assertThat(actual.single().offerCampaignId).isEqualTo(90210)
+    }
+
+    @Test
+    fun `test that offerCampaignId is null when the mobile offer belongs to no campaign`() {
+        whenever(accountTypeMapper(1)).thenReturn(subscriptionOption.accountType)
+        whenever(pricing.getMobileOfferCampaignId(0)).thenReturn(0)
+        val actual = underTest(request)
+        assertThat(actual.single().offerCampaignId).isNull()
     }
 
     @Test

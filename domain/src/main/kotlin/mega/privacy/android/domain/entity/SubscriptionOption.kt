@@ -20,6 +20,9 @@ import mega.privacy.android.domain.entity.account.CurrencyPoint
  * surfaces (Home banner, menu banner, offer landing screen); absent flags mean opted out
  * @property offerReshowInterval Time in seconds that must pass before the mobile offer may be shown
  * again (utqa "mo.r"), or null when the offer must not be shown again
+ * @property offerCampaignId Campaign group the mobile offer belongs to (utqa "mo.c"), or null when
+ * the offer belongs to no campaign group. Offers of the same campaign share this identifier, so
+ * they are advertised and dismissed as one
  */
 data class SubscriptionOption(
     val sku: String,
@@ -35,4 +38,5 @@ data class SubscriptionOption(
     val offerValidUntil: Long? = null,
     val offerFlags: Long? = null,
     val offerReshowInterval: Long? = null,
+    val offerCampaignId: Long? = null,
 )
