@@ -74,6 +74,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.VideoPlayerScreenEvent
@@ -93,6 +94,9 @@ class VideoPlayerActivity : AppCompatActivity(), MegaSnackbarShower {
 
     @Inject
     lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
+
+    @Inject
+    lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
 
     @Inject
     lateinit var snackbarEventQueue: SnackbarEventQueue
@@ -221,6 +225,7 @@ class VideoPlayerActivity : AppCompatActivity(), MegaSnackbarShower {
                 initialKey = VideoPlayerScreenNavKey,
                 navigationResultManager = navigationResultManager,
                 featureDestinations = featureDestinations,
+                appDialogDestinations = appDialogDestinations,
             ) { navigationHandler, transferHandler ->
                 videoPlayerEntryProvider(
                     navigationHandler = navigationHandler,

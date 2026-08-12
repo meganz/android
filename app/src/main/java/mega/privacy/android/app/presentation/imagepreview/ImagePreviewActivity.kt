@@ -109,6 +109,7 @@ import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.transition.opaqueFadeBackwardTransition
 import mega.privacy.android.navigation.contract.transition.opaqueFadeForwardTransition
 import mega.privacy.android.navigation.destination.VideoEditorScreenNavKey
@@ -140,6 +141,9 @@ class ImagePreviewActivity : BaseActivity() {
 
     @Inject
     lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
+
+    @Inject
+    lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
 
     @Inject
     lateinit var nodeLabelBottomSheetDialogFragmentFactory: NodeLabelBottomSheetDialogFragmentFactory
@@ -224,6 +228,7 @@ class ImagePreviewActivity : BaseActivity() {
                 initialKey = ImagePreviewNavKey,
                 navigationResultManager = navigationResultManager,
                 featureDestinations = featureDestinations,
+                appDialogDestinations = appDialogDestinations,
                 onEmptyBackStack = ::finish,
                 // The Activity window is translucent (to support flick-to-dismiss), so the default
                 // crossfade would briefly reveal the Activity behind it. These keep the screen

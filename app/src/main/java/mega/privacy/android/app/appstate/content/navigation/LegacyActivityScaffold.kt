@@ -46,7 +46,10 @@ import kotlin.reflect.KClass
  * @param initialKey root destination used as the back stack root.
  * @param navigationResultManager shared result bus used by [NavigationHandler].
  * @param featureDestinations feature graphs to register alongside the activity's own entries.
- * @param appDialogDestinations app-level dialog graphs to register.
+ * @param appDialogDestinations app-level dialog graphs to register. Every host needs them: any
+ * graph it registers may navigate to a
+ * [mega.privacy.android.navigation.contract.dialog.DialogNavKey], and an unregistered key makes
+ * [NavDisplay] throw `Unknown screen`.
  * @param onEmptyBackStack invoked when a back op would leave the back stack empty.
  * @param excludeOwnDestination feature destination class whose `navigationGraph` should NOT be
  * registered — the activity provides its own entry in [entryContent].
@@ -64,7 +67,7 @@ fun LegacyActivityScaffold(
     initialKey: NavKey,
     navigationResultManager: NavigationResultManager,
     featureDestinations: Set<FeatureDestination> = emptySet(),
-    appDialogDestinations: Set<AppDialogDestinations> = emptySet(),
+    appDialogDestinations: Set<AppDialogDestinations>,
     onEmptyBackStack: () -> Unit = {},
     excludeOwnDestination: KClass<out FeatureDestination>? = null,
     overlayContent: @Composable (handler: NavigationHandler) -> Unit = {},
