@@ -30,9 +30,9 @@ import mega.privacy.android.data.test.gateway.FakeMegaApiGateway
 import mega.privacy.android.data.test.gateway.FakeMegaChatApiGateway
 import mega.privacy.android.data.test.stub.StubMegaChatRoom
 import mega.privacy.android.data.test.stub.StubMegaUser
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.ChatNavKey
 import nz.mega.sdk.MegaChatRoom
@@ -47,11 +47,11 @@ import javax.inject.Inject
  * Instrumented regression test for AND-24534: opening Contact info from a 1:1 chat room must launch
  * the contact-info screen on the chat's own task (so Back returns to the chat room) and must NOT
  * bounce through [MegaActivity] (the single-activity Menu root, the pre-fix behaviour) — for both
- * `ContactInfoComposeUI` flag states.
+ * `ContactComposeFeature` flag states.
  *
  * The whole app runs as in production (real navigation, activities, ViewModels) with only the SDK
  * gateways faked via `:data-test` (see [mega.privacy.android.app.di.FakeSdkGatewayModule]) and the
- * `ContactInfoComposeUI` flag forced through [FakeFeatureFlagValueProvider].
+ * `ContactComposeFeature` flag forced through [FakeFeatureFlagValueProvider].
  *
  * Contact info is triggered through the production navigator
  * ([MegaNavigator.openContactInfoActivity]) — the exact call the chat three-dot "Contact info"
@@ -118,7 +118,7 @@ class ContactInfoBackNavigationTest {
 
     @Test
     fun contactInfoOpensOnChatTaskWhenComposeUiEnabled() {
-        fakeFlags.set(AppFeatures.ContactInfoComposeUI, true)
+        fakeFlags.set(ApiFeatures.ContactComposeFeature, true)
 
         assertContactInfoLaunchedOnChatTask(
             expectedComponent = ContactInfoComposeActivity::class.java,
@@ -127,7 +127,7 @@ class ContactInfoBackNavigationTest {
 
     @Test
     fun contactInfoOpensOnChatTaskWhenComposeUiDisabled() {
-        fakeFlags.set(AppFeatures.ContactInfoComposeUI, false)
+        fakeFlags.set(ApiFeatures.ContactComposeFeature, false)
 
         assertContactInfoLaunchedOnChatTask(
             expectedComponent = ContactInfoActivity::class.java,

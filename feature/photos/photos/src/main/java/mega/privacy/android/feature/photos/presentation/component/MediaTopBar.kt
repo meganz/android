@@ -71,6 +71,7 @@ internal fun MediaTopBar(
     onFilterActionClick: () -> Unit,
     onSortActionClick: () -> Unit,
     navigateToRecentlyWatched: () -> Unit,
+    onBack: (() -> Unit)?,
     onSearchingModeChanged: (Boolean) -> Unit = { },
 ) {
     val shouldShowTimelineActions by remember(
@@ -169,7 +170,8 @@ internal fun MediaTopBar(
         }
 
         else -> MegaTopAppBar(
-            navigationType = AppBarNavigationType.None,
+            navigationType = onBack?.let { AppBarNavigationType.Back(it) }
+                ?: AppBarNavigationType.None,
             title = stringResource(SharedR.string.media_feature_title),
             subtitle = when {
                 currentTabIndex == MediaScreen.Timeline.ordinal -> {

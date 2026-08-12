@@ -1,15 +1,18 @@
 package mega.privacy.android.app.menu.presentation
 
 import android.R
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.unit.sp
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -20,9 +23,14 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.appstate.content.navigation.MainNavigationBarReconciler
 import mega.privacy.android.app.menu.navigation.AchievementsItem
 import mega.privacy.android.app.menu.navigation.CurrentPlanItem
+import mega.privacy.android.app.menu.navigation.DeviceCentreItem
+import mega.privacy.android.app.menu.navigation.MenuItemPlaceholder
+import mega.privacy.android.app.menu.navigation.OfflineFilesItem
 import mega.privacy.android.app.menu.navigation.RubbishBinItem
+import mega.privacy.android.app.menu.navigation.SharedItemsItem
 import mega.privacy.android.app.menu.navigation.StorageItem
 import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
@@ -38,7 +46,9 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.preference.NavigationItemsPreference
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
@@ -52,17 +62,29 @@ import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferMenuB
 import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferUseCase
 import mega.privacy.android.domain.usecase.billing.SetSubscriptionOfferMenuBannerClosedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
+import mega.privacy.android.domain.usecase.preference.MonitorNavigationItemsPreferenceUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
 import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
 import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.NavigationUiController
+import mega.privacy.android.navigation.contract.PreferredSlot
+import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.destination.OfflineNavKey
+import mega.privacy.android.navigation.destination.SharesNavKey
 import mega.privacy.android.shared.resources.R as SharedR
+import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper
 import mega.privacy.mobile.home.presentation.home.widget.banner.model.SubscriptionOfferBannerUiModel
 import org.junit.jupiter.api.AfterAll
@@ -115,9 +137,20 @@ class MenuViewModelTest {
     private val setSubscriptionOfferMenuBannerClosedUseCase =
         mock<SetSubscriptionOfferMenuBannerClosedUseCase>()
     private val subscriptionOfferBannerMapper = mock<SubscriptionOfferBannerMapper>()
+    private val getEnabledFlaggedItemsUseCase = mock<GetEnabledFlaggedItemsUseCase>()
+    private val monitorNavigationItemsPreferenceUseCase =
+        mock<MonitorNavigationItemsPreferenceUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val mainNavigationBarReconciler = MainNavigationBarReconciler()
     private val testDispatcher = UnconfinedTestDispatcher()
 
     private object TestDestination : NavKey
+
+    private object HomeTestNavKey : MainNavItemNavKey
+    private object DriveTestNavKey : MainNavItemNavKey
+    private object MediaTestNavKey : MainNavItemNavKey
+    private object FavouritesTestNavKey : MainNavItemNavKey
+    private object MenuTestNavKey : MainNavItemNavKey
 
     @BeforeAll
     fun initialisation() {
@@ -154,6 +187,9 @@ class MenuViewModelTest {
             monitorSubscriptionOfferMenuBannerClosedUseCase,
             setSubscriptionOfferMenuBannerClosedUseCase,
             subscriptionOfferBannerMapper,
+            getEnabledFlaggedItemsUseCase,
+            monitorNavigationItemsPreferenceUseCase,
+            getFeatureFlagValueUseCase,
         )
         stubOfferBannerNotClosed()
         whenever(monitorSubscriptionOfferUseCase()).thenReturn(flowOf(Result.success(null)))
@@ -235,7 +271,7 @@ class MenuViewModelTest {
                 val state = awaitItem()
                 assertThat(state.myAccountItems).hasSize(1)
                 assertThat(state.privacySuiteItems).hasSize(1)
-                assertThat(state.myAccountItems[1]?.title).isEqualTo(R.string.ok)
+                assertThat(state.myAccountItems.single().title).isEqualTo(R.string.ok)
                 assertThat(state.privacySuiteItems[2]?.title).isEqualTo(R.string.cancel)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -633,13 +669,13 @@ class MenuViewModelTest {
             val state = awaitItem()
 
             assertThat(state.myAccountItems).hasSize(3)
-            assertThat(state.myAccountItems[10]).isNotNull()
-            assertThat(state.myAccountItems[20]).isNotNull()
-            assertThat(state.myAccountItems[90]).isNotNull()
+            assertThat(state.myAccountItems.itemFor(CurrentPlanItem)).isNotNull()
+            assertThat(state.myAccountItems.itemFor(StorageItem)).isNotNull()
+            assertThat(state.myAccountItems.itemFor(RubbishBinItem)).isNotNull()
 
-            val currentPlanItem = state.myAccountItems[10]
-            val storageItem = state.myAccountItems[20]
-            val rubbishBinItem = state.myAccountItems[90]
+            val currentPlanItem = state.myAccountItems.itemFor(CurrentPlanItem)
+            val storageItem = state.myAccountItems.itemFor(StorageItem)
+            val rubbishBinItem = state.myAccountItems.itemFor(RubbishBinItem)
 
             currentPlanItem?.subTitle?.test {
                 assertThat(awaitItem()).isEqualTo("Pro I")
@@ -701,7 +737,7 @@ class MenuViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
 
-                state.myAccountItems[20]?.subTitle?.test {
+                state.myAccountItems.itemFor(StorageItem)?.subTitle?.test {
                     assertThat(awaitItem()).isEqualTo("10 GB used")
                 }
                 cancelAndIgnoreRemainingEvents()
@@ -752,7 +788,7 @@ class MenuViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
 
-                state.myAccountItems[20]?.subTitle?.test {
+                state.myAccountItems.itemFor(StorageItem)?.subTitle?.test {
                     assertThat(awaitItem()).isEqualTo("5 GB used")
                 }
                 cancelAndIgnoreRemainingEvents()
@@ -813,7 +849,7 @@ class MenuViewModelTest {
 
                 assertThat(state.myAccountItems).hasSize(3)
 
-                state.myAccountItems[10]?.subTitle?.test {
+                state.myAccountItems.itemFor(CurrentPlanItem)?.subTitle?.test {
                     assertThat(awaitItem()).isEqualTo("Free")
                 }
 
@@ -864,9 +900,9 @@ class MenuViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
 
-            val currentPlanItem = state.myAccountItems[10]
-            val storageItem = state.myAccountItems[20]
-            val rubbishBinItem = state.myAccountItems[90]
+            val currentPlanItem = state.myAccountItems.itemFor(CurrentPlanItem)
+            val storageItem = state.myAccountItems.itemFor(StorageItem)
+            val rubbishBinItem = state.myAccountItems.itemFor(RubbishBinItem)
 
             verify(fileSizeStringMapper, times(2)).invoke(0L)
             verify(accountTypeNameMapper).invoke(AccountType.FREE)
@@ -985,6 +1021,19 @@ class MenuViewModelTest {
         getStringFromStringResMapper.stub {
             on { invoke(any()) }.thenReturn("")
             on { invoke(any(), any()) }.thenReturn("")
+        }
+
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+            .thenReturn(false)
+
+        getEnabledFlaggedItemsUseCase.stub {
+            on { invoke(any<Set<MainNavItem>>()) }.thenAnswer { invocation ->
+                flowOf(invocation.arguments[0])
+            }
+        }
+
+        monitorNavigationItemsPreferenceUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(null))
         }
     }
 
@@ -1117,9 +1166,11 @@ class MenuViewModelTest {
 
     private fun initUnderTest(
         menuItems: Map<Int, NavDrawerItem> = emptyMap(),
+        mainNavItems: Set<MainNavItem> = emptySet(),
     ) {
         underTest = MenuViewModel(
             menuItems = menuItems,
+            mainNavItems = mainNavItems,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorMyAvatarFile = monitorMyAvatarFile,
@@ -1143,9 +1194,22 @@ class MenuViewModelTest {
             monitorSubscriptionOfferMenuBannerClosedUseCase = monitorSubscriptionOfferMenuBannerClosedUseCase,
             setSubscriptionOfferMenuBannerClosedUseCase = setSubscriptionOfferMenuBannerClosedUseCase,
             subscriptionOfferBannerMapper = subscriptionOfferBannerMapper,
+            getEnabledFlaggedItemsUseCase = getEnabledFlaggedItemsUseCase,
+            monitorNavigationItemsPreferenceUseCase = monitorNavigationItemsPreferenceUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            mainNavigationBarReconciler = mainNavigationBarReconciler,
             ioDispatcher = testDispatcher,
         )
     }
+
+    /**
+     * Finds the rendered account row that originated from [original], matched by destination. The
+     * view model re-wraps some items into fresh instances, so identity/type checks don't hold; the
+     * destination is stable across the wrapping.
+     */
+    private fun ImmutableList<NavDrawerItem.Account>.itemFor(
+        original: NavDrawerItem.Account,
+    ): NavDrawerItem.Account? = firstOrNull { it.destination == original.destination }
 
     @Test
     fun `test that getUserFullNameUseCase is called and updates state correctly`() = runTest {
@@ -1324,10 +1388,10 @@ class MenuViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.myAccountItems).hasSize(4)
-            assertThat(state.myAccountItems[10]).isNotNull()
-            assertThat(state.myAccountItems[20]).isNotNull()
-            assertThat(state.myAccountItems[40]).isNotNull() // AchievementsItem should be included
-            assertThat(state.myAccountItems[90]).isNotNull()
+            assertThat(state.myAccountItems.itemFor(CurrentPlanItem)).isNotNull()
+            assertThat(state.myAccountItems.itemFor(StorageItem)).isNotNull()
+            assertThat(state.myAccountItems.itemFor(AchievementsItem)).isNotNull() // AchievementsItem should be included
+            assertThat(state.myAccountItems.itemFor(RubbishBinItem)).isNotNull()
             verify(isAchievementsEnabledUseCase).invoke()
             cancelAndIgnoreRemainingEvents()
         }
@@ -1350,10 +1414,10 @@ class MenuViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.myAccountItems).hasSize(3)
-            assertThat(state.myAccountItems[10]).isNotNull()
-            assertThat(state.myAccountItems[20]).isNotNull()
-            assertThat(state.myAccountItems[40]).isNull() // AchievementsItem should be filtered out
-            assertThat(state.myAccountItems[90]).isNotNull()
+            assertThat(state.myAccountItems.itemFor(CurrentPlanItem)).isNotNull()
+            assertThat(state.myAccountItems.itemFor(StorageItem)).isNotNull()
+            assertThat(state.myAccountItems.itemFor(AchievementsItem)).isNull() // AchievementsItem should be filtered out
+            assertThat(state.myAccountItems.itemFor(RubbishBinItem)).isNotNull()
             verify(isAchievementsEnabledUseCase).invoke()
             cancelAndIgnoreRemainingEvents()
         }
@@ -1378,10 +1442,10 @@ class MenuViewModelTest {
                 val state = awaitItem()
                 // Should default to enabled (true) when exception occurs
                 assertThat(state.myAccountItems).hasSize(3)
-                assertThat(state.myAccountItems[10]).isNotNull()
-                assertThat(state.myAccountItems[20]).isNotNull()
-                assertThat(state.myAccountItems[40]).isNull() // AchievementsItem should not be included
-                assertThat(state.myAccountItems[90]).isNotNull()
+                assertThat(state.myAccountItems.itemFor(CurrentPlanItem)).isNotNull()
+                assertThat(state.myAccountItems.itemFor(StorageItem)).isNotNull()
+                assertThat(state.myAccountItems.itemFor(AchievementsItem)).isNull() // AchievementsItem should not be included
+                assertThat(state.myAccountItems.itemFor(RubbishBinItem)).isNotNull()
                 verify(isAchievementsEnabledUseCase).invoke()
                 cancelAndIgnoreRemainingEvents()
             }
@@ -1406,10 +1470,10 @@ class MenuViewModelTest {
                 val state = awaitItem()
                 // Should default to enabled (false) when null is returned
                 assertThat(state.myAccountItems).hasSize(3)
-                assertThat(state.myAccountItems[10]).isNotNull()
-                assertThat(state.myAccountItems[20]).isNotNull()
-                assertThat(state.myAccountItems[40]).isNull() // AchievementsItem should not be included
-                assertThat(state.myAccountItems[90]).isNotNull()
+                assertThat(state.myAccountItems.itemFor(CurrentPlanItem)).isNotNull()
+                assertThat(state.myAccountItems.itemFor(StorageItem)).isNotNull()
+                assertThat(state.myAccountItems.itemFor(AchievementsItem)).isNull() // AchievementsItem should not be included
+                assertThat(state.myAccountItems.itemFor(RubbishBinItem)).isNotNull()
                 verify(isAchievementsEnabledUseCase).invoke()
                 cancelAndIgnoreRemainingEvents()
             }
@@ -1449,7 +1513,7 @@ class MenuViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.myAccountItems).hasSize(1)
-                assertThat(state.myAccountItems[40]).isNotNull() // AchievementsItem should be included
+                assertThat(state.myAccountItems.itemFor(AchievementsItem)).isNotNull() // AchievementsItem should be included
                 verify(isAchievementsEnabledUseCase).invoke()
                 cancelAndIgnoreRemainingEvents()
             }
@@ -1900,7 +1964,7 @@ class MenuViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            val currentPlanItem = state.myAccountItems[10]
+            val currentPlanItem = state.myAccountItems.itemFor(CurrentPlanItem)
             assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.ShieldLite)
             cancelAndIgnoreRemainingEvents()
         }
@@ -1922,7 +1986,7 @@ class MenuViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            val currentPlanItem = state.myAccountItems[10]
+            val currentPlanItem = state.myAccountItems.itemFor(CurrentPlanItem)
             assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield01)
             cancelAndIgnoreRemainingEvents()
         }
@@ -1944,7 +2008,7 @@ class MenuViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            val currentPlanItem = state.myAccountItems[10]
+            val currentPlanItem = state.myAccountItems.itemFor(CurrentPlanItem)
             assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield02)
             cancelAndIgnoreRemainingEvents()
         }
@@ -1966,7 +2030,7 @@ class MenuViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            val currentPlanItem = state.myAccountItems[10]
+            val currentPlanItem = state.myAccountItems.itemFor(CurrentPlanItem)
             assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield03)
             cancelAndIgnoreRemainingEvents()
         }
@@ -1988,7 +2052,7 @@ class MenuViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            val currentPlanItem = state.myAccountItems[10]
+            val currentPlanItem = state.myAccountItems.itemFor(CurrentPlanItem)
             assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
             cancelAndIgnoreRemainingEvents()
         }
@@ -2010,7 +2074,7 @@ class MenuViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            val currentPlanItem = state.myAccountItems[10]
+            val currentPlanItem = state.myAccountItems.itemFor(CurrentPlanItem)
             assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
             cancelAndIgnoreRemainingEvents()
         }
@@ -2032,7 +2096,7 @@ class MenuViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            val currentPlanItem = state.myAccountItems[10]
+            val currentPlanItem = state.myAccountItems.itemFor(CurrentPlanItem)
             assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
             cancelAndIgnoreRemainingEvents()
         }
@@ -2055,7 +2119,7 @@ class MenuViewModelTest {
 
             underTest.uiState.test {
                 val state = awaitItem()
-                val currentPlanItem = state.myAccountItems[10]
+                val currentPlanItem = state.myAccountItems.itemFor(CurrentPlanItem)
                 assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -2079,13 +2143,13 @@ class MenuViewModelTest {
 
             underTest.uiState.test {
                 val initialState = awaitItem()
-                assertThat(initialState.myAccountItems[10]?.icon).isEqualTo(CurrentPlanItem.icon)
+                assertThat(initialState.myAccountItems.itemFor(CurrentPlanItem)?.icon).isEqualTo(CurrentPlanItem.icon)
 
                 // Update account type to PRO_I
                 accountDetailFlow.emit(createAccountDetail(accountType = AccountType.PRO_I))
 
                 val updatedState = awaitItem()
-                assertThat(updatedState.myAccountItems[10]?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield01)
+                assertThat(updatedState.myAccountItems.itemFor(CurrentPlanItem)?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield01)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -2108,14 +2172,248 @@ class MenuViewModelTest {
 
             underTest.uiState.test {
                 val initialState = awaitItem()
-                assertThat(initialState.myAccountItems[10]?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield02)
+                assertThat(initialState.myAccountItems.itemFor(CurrentPlanItem)?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield02)
 
                 // Update account type to PRO_III
                 accountDetailFlow.emit(createAccountDetail(accountType = AccountType.PRO_III))
 
                 val updatedState = awaitItem()
-                assertThat(updatedState.myAccountItems[10]?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield03)
+                assertThat(updatedState.myAccountItems.itemFor(CurrentPlanItem)?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield03)
                 cancelAndIgnoreRemainingEvents()
             }
         }
-} 
+
+    @Test
+    fun `test that no hidden section rows are added when the customisation flag is disabled`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+                .thenReturn(false)
+            monitorNavigationItemsPreferenceUseCase.stub {
+                on { invoke() }.thenReturn(
+                    flowOf(NavigationItemsPreference(orderedVisibleItemIds = listOf("drive")))
+                )
+            }
+            val menuItems = mapOf(40 to AchievementsItem, 60 to DeviceCentreItem)
+
+            initUnderTest(menuItems = menuItems, mainNavItems = createMainNavItems())
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.myAccountItems.map { it.destination })
+                    .containsExactly(AchievementsItem.destination, DeviceCentreItem.destination)
+                    .inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that a favourites row is added when the customisation flag is on with the default bar`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+                .thenReturn(true)
+            val menuItems = mapOf(56 to MenuItemPlaceholder, 60 to DeviceCentreItem)
+
+            initUnderTest(menuItems = menuItems, mainNavItems = createMainNavItems())
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.myAccountItems.map { it.destination })
+                    .containsExactly(FavouritesTestNavKey, DeviceCentreItem.destination)
+                    .inOrder()
+                val favouritesRow = state.myAccountItems.first()
+                assertThat(favouritesRow.destination).isEqualTo(FavouritesTestNavKey)
+                assertThat(favouritesRow.title).isEqualTo(R.string.paste)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that hidden section rows appear before the device centre row when the preference hides default items`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+                .thenReturn(true)
+            monitorNavigationItemsPreferenceUseCase.stub {
+                on { invoke() }.thenReturn(
+                    flowOf(
+                        NavigationItemsPreference(
+                            orderedVisibleItemIds = listOf("drive", "favourites")
+                        )
+                    )
+                )
+            }
+            val menuItems = mapOf(
+                40 to AchievementsItem,
+                56 to MenuItemPlaceholder,
+                60 to DeviceCentreItem,
+            )
+
+            initUnderTest(menuItems = menuItems, mainNavItems = createMainNavItems())
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.myAccountItems.map { it.destination }).containsExactly(
+                    AchievementsItem.destination,
+                    HomeTestNavKey,
+                    MediaTestNavKey,
+                    DeviceCentreItem.destination,
+                ).inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that sections with static menu rows are not duplicated when hidden from the bar`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+                .thenReturn(true)
+            monitorNavigationItemsPreferenceUseCase.stub {
+                on { invoke() }.thenReturn(
+                    flowOf(
+                        NavigationItemsPreference(
+                            orderedVisibleItemIds = listOf("home", "drive", "media", "favourites")
+                        )
+                    )
+                )
+            }
+            val mainNavItems = createMainNavItems() + setOf(
+                createMainNavItem(
+                    id = "offline",
+                    destination = OfflineNavKey(),
+                    preferredSlot = PreferredSlot.None,
+                    label = R.string.selectAll,
+                ),
+                createMainNavItem(
+                    id = "shares",
+                    destination = SharesNavKey,
+                    preferredSlot = PreferredSlot.None,
+                    label = R.string.selectTextMode,
+                ),
+            )
+            val menuItems = mapOf(50 to SharedItemsItem, 80 to OfflineFilesItem)
+
+            initUnderTest(menuItems = menuItems, mainNavItems = mainNavItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.myAccountItems.map { it.destination })
+                    .containsExactly(SharedItemsItem.destination, OfflineFilesItem.destination)
+                    .inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that static menu rows are kept when monitoring hidden sections fails`() = runTest {
+        stubDefaultDependencies()
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+            .thenThrow(RuntimeException("Feature flag error"))
+        val menuItems = mapOf(60 to DeviceCentreItem)
+
+        initUnderTest(menuItems = menuItems, mainNavItems = createMainNavItems())
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.myAccountItems.map { it.destination })
+                .containsExactly(DeviceCentreItem.destination)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that many hidden section rows all precede the device centre row without displacing it`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+                .thenReturn(true)
+            monitorNavigationItemsPreferenceUseCase.stub {
+                on { invoke() }.thenReturn(
+                    flowOf(NavigationItemsPreference(orderedVisibleItemIds = listOf("drive")))
+                )
+            }
+            val extraHiddenItems = (0 until 5).map { index ->
+                createMainNavItem(
+                    id = "extra$index",
+                    destination = object : MainNavItemNavKey {},
+                    preferredSlot = PreferredSlot.None,
+                    label = R.string.ok,
+                )
+            }
+            val menuItems = mapOf(56 to MenuItemPlaceholder, 60 to DeviceCentreItem)
+
+            initUnderTest(
+                menuItems = menuItems,
+                mainNavItems = createMainNavItems() + extraHiddenItems,
+            )
+
+            underTest.uiState.test {
+                val destinations = awaitItem().myAccountItems.map { it.destination }
+                // home, media, favourites + 5 extras = 8 hidden rows, then Device Centre. With the
+                // old fixed-key scheme the 4th hidden row onwards collided with key 60 and dropped
+                // the Device Centre row.
+                assertThat(destinations).hasSize(9)
+                assertThat(destinations.last()).isEqualTo(DeviceCentreItem.destination)
+                assertThat(destinations).containsAtLeast(
+                    HomeTestNavKey,
+                    MediaTestNavKey,
+                    FavouritesTestNavKey,
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    private fun createMainNavItems(): Set<MainNavItem> = setOf(
+        createMainNavItem(
+            id = "home",
+            destination = HomeTestNavKey,
+            preferredSlot = PreferredSlot.Ordered(0),
+            label = R.string.ok,
+        ),
+        createMainNavItem(
+            id = "drive",
+            destination = DriveTestNavKey,
+            preferredSlot = PreferredSlot.Ordered(1),
+            label = R.string.cancel,
+        ),
+        createMainNavItem(
+            id = "media",
+            destination = MediaTestNavKey,
+            preferredSlot = PreferredSlot.Ordered(2),
+            label = R.string.copy,
+        ),
+        createMainNavItem(
+            id = "favourites",
+            destination = FavouritesTestNavKey,
+            preferredSlot = PreferredSlot.None,
+            label = R.string.paste,
+        ),
+        createMainNavItem(
+            id = "menu",
+            destination = MenuTestNavKey,
+            preferredSlot = PreferredSlot.Last,
+            label = R.string.cut,
+        ),
+    )
+
+    private fun createMainNavItem(
+        id: String,
+        destination: MainNavItemNavKey,
+        preferredSlot: PreferredSlot,
+        @StringRes label: Int,
+    ): MainNavItem = object : MainNavItem {
+        override val id: String = id
+        override val destination: MainNavItemNavKey = destination
+        override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
+            { _, _, _ -> }
+        override val icon = Icons.Default.Home
+        override val selectedIcon = null
+        override val badge = null
+        override val label: Int = label
+        override val preferredSlot: PreferredSlot = preferredSlot
+        override val availableOffline: Boolean = false
+        override val analyticsEventIdentifier: NavigationEventIdentifier = mock()
+    }
+}

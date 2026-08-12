@@ -14,6 +14,7 @@ import mega.privacy.android.app.menu.navigation.CurrentPlanItem
 import mega.privacy.android.app.menu.navigation.DeviceCentreItem
 import mega.privacy.android.app.menu.navigation.MegaPassItem
 import mega.privacy.android.app.menu.navigation.MegaVpnItem
+import mega.privacy.android.app.menu.navigation.MenuItemPlaceholder
 import mega.privacy.android.app.menu.navigation.MenuNavItem
 import mega.privacy.android.app.menu.navigation.OfflineFilesItem
 import mega.privacy.android.app.menu.navigation.RubbishBinItem
@@ -74,6 +75,11 @@ class NavigationModule {
         getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
         monitorActiveCallUseCase: MonitorActiveCallUseCase,
     ): NavDrawerItem = ChatItem(getNumUnreadChatsUseCase, monitorActiveCallUseCase)
+
+    @Provides
+    @IntoMap
+    @IntKey(56)
+    fun provideMenuSectionAnchorItem(): NavDrawerItem = MenuItemPlaceholder
 
     @Provides
     @IntoMap

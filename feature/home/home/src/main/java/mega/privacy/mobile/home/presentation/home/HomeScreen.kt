@@ -54,6 +54,7 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.contract.state.isPushedMainNavScreen
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
@@ -159,7 +160,11 @@ internal fun HomeScreen(
             MegaTopAppBar(
                 modifier = Modifier.testTag(HOME_MAIN_APP_BAR_TAG),
                 title = stringResource(sharedR.string.general_section_home),
-                navigationType = AppBarNavigationType.None,
+                navigationType = if (isPushedMainNavScreen(Home::class)) {
+                    AppBarNavigationType.Back { navigationHandler.back() }
+                } else {
+                    AppBarNavigationType.None
+                },
                 trailingIcons = {
                     TransfersToolbarWidget {
                         navigationHandler.navigate(TransfersNavKey())

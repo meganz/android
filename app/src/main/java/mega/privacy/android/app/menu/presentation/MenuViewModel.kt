@@ -6,14 +6,18 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -24,8 +28,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.appstate.content.navigation.MainNavigationBarReconciler
 import mega.privacy.android.app.menu.navigation.AchievementsItem
 import mega.privacy.android.app.menu.navigation.CurrentPlanItem
+import mega.privacy.android.app.menu.navigation.MenuItemPlaceholder
 import mega.privacy.android.app.menu.navigation.RubbishBinItem
 import mega.privacy.android.app.menu.navigation.StorageItem
 import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
@@ -33,7 +39,9 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.core.formatter.stripLinkAnnotations
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.preference.NavigationItemsPreference
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
@@ -48,13 +56,18 @@ import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferMenuB
 import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferUseCase
 import mega.privacy.android.domain.usecase.billing.SetSubscriptionOfferMenuBannerClosedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
+import mega.privacy.android.domain.usecase.preference.MonitorNavigationItemsPreferenceUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
 import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper
 import timber.log.Timber
@@ -64,6 +77,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MenuViewModel @Inject constructor(
     val menuItems: Map<Int, @JvmSuppressWildcards NavDrawerItem>,
+    private val mainNavItems: Set<@JvmSuppressWildcards MainNavItem>,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
@@ -87,6 +101,10 @@ class MenuViewModel @Inject constructor(
     private val monitorSubscriptionOfferMenuBannerClosedUseCase: MonitorSubscriptionOfferMenuBannerClosedUseCase,
     private val setSubscriptionOfferMenuBannerClosedUseCase: SetSubscriptionOfferMenuBannerClosedUseCase,
     private val subscriptionOfferBannerMapper: SubscriptionOfferBannerMapper,
+    private val getEnabledFlaggedItemsUseCase: GetEnabledFlaggedItemsUseCase,
+    private val monitorNavigationItemsPreferenceUseCase: MonitorNavigationItemsPreferenceUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val mainNavigationBarReconciler: MainNavigationBarReconciler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     // Flows for items that need dynamic subtitles
@@ -171,9 +189,14 @@ class MenuViewModel @Inject constructor(
                 flow { emit(isAchievementsEnabledUseCase()) }.catch { emit(false) },
                 monitorAccountDetailUseCase().map { it.levelDetail?.accountType }
                     .catch { emit(null) }
-                    .distinctUntilChanged()
-            ) { isAchievementsEnabled, accountType ->
-                filterMyAccountItems(isAchievementsEnabled, accountType ?: AccountType.FREE)
+                    .distinctUntilChanged(),
+                monitorHiddenSectionRows(),
+            ) { isAchievementsEnabled, accountType, hiddenSectionRows ->
+                buildAccountItems(
+                    isAchievementsEnabled = isAchievementsEnabled,
+                    accountType = accountType ?: AccountType.FREE,
+                    hiddenSectionRows = hiddenSectionRows,
+                )
             }.collect { myAccountItems ->
                 _uiState.update {
                     it.copy(myAccountItems = myAccountItems, privacySuiteItems = privacySuiteItems)
@@ -182,12 +205,86 @@ class MenuViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Emits a Menu row for every enabled main navigation section that is hidden from the user's
+     * bottom navigation bar and has no static Menu row, derived from the nav items themselves.
+     * Emits an empty list when the customisable bottom navigation feature is disabled.
+     */
+    private fun monitorHiddenSectionRows(): Flow<List<NavDrawerItem.Account>> = flow {
+        if (getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation)) {
+            emitAll(
+                combine(
+                    getEnabledFlaggedItemsUseCase(mainNavItems),
+                    monitorNavigationItemsPreferenceUseCase(),
+                ) { enabledItems, preference -> hiddenSectionRows(enabledItems, preference) }
+            )
+        } else {
+            emit(emptyList())
+        }
+    }.catch {
+        Timber.e(it, "Error monitoring sections hidden from the navigation bar")
+        emit(emptyList())
+    }
+
+    private fun hiddenSectionRows(
+        enabledItems: Set<MainNavItem>,
+        preference: NavigationItemsPreference?,
+    ): List<NavDrawerItem.Account> {
+        val barItemIds = mainNavigationBarReconciler(
+            enabledItems = enabledItems,
+            preference = preference,
+            isCustomisationEnabled = true,
+        ).items.map { it.id }.toSet()
+        val staticRowDestinations = menuItems.values.map { it.destination::class }.toSet()
+        return enabledItems
+            .filterNot { it.preferredSlot is PreferredSlot.Last }
+            .filterNot { it.id in barItemIds }
+            .filterNot { it.destination::class in staticRowDestinations }
+            .sortedBy { (it.preferredSlot as? PreferredSlot.Ordered)?.slot ?: Int.MAX_VALUE }
+            .map { item ->
+                NavDrawerItem.Account(
+                    destination = item.destination,
+                    icon = item.icon,
+                    title = item.label,
+                    badge = item.badge,
+                    availableOffline = item.availableOffline,
+                    analyticsEventIdentifier = item.analyticsEventIdentifier,
+                )
+            }
+    }
+
+    /**
+     * Builds the ordered account section: the static rows interleaved with the dynamically-derived
+     * hidden-section rows. Order is expressed as a `(primary, secondary)` pair rather than a single
+     * numeric key so the hidden rows always sort within the anchor's slot and can never overrun the
+     * following static row, regardless of how many there are. The anchor's key is read from the
+     * menu items map, so this stays correct even if the static keys are renumbered.
+     */
+    private fun buildAccountItems(
+        isAchievementsEnabled: Boolean,
+        accountType: AccountType,
+        hiddenSectionRows: List<NavDrawerItem.Account>,
+    ): ImmutableList<NavDrawerItem.Account> {
+        val staticRows = filterMyAccountItems(isAchievementsEnabled, accountType)
+            .map { (key, item) -> Triple(key, 0, item) }
+        val hiddenRows = if (hiddenSectionRows.isEmpty()) {
+            emptyList()
+        } else {
+            val anchorKey = menuItems.entries.first { it.value is MenuItemPlaceholder }.key
+            hiddenSectionRows.mapIndexed { index, row -> Triple(anchorKey, index + 1, row) }
+        }
+        return (staticRows + hiddenRows)
+            .sortedWith(compareBy({ it.first }, { it.second }))
+            .map { it.third }
+            .toImmutableList()
+    }
+
     private fun filterMyAccountItems(
         isAchievementsEnabled: Boolean,
         accountType: AccountType?,
     ): Map<Int, NavDrawerItem.Account> =
         menuItems
-            .filterValues { it is NavDrawerItem.Account && (it !is AchievementsItem || isAchievementsEnabled) }
+            .filterValues { it is NavDrawerItem.Account && it !is MenuItemPlaceholder && (it !is AchievementsItem || isAchievementsEnabled) }
             .mapValues {
                 val item = it.value as NavDrawerItem.Account
                 when (item) {

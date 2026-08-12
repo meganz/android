@@ -97,8 +97,10 @@ import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
+import mega.privacy.android.navigation.contract.state.isPushedMainNavScreen
 import mega.privacy.android.navigation.destination.CreateAlbumDialogNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
+import mega.privacy.android.navigation.destination.MediaMainNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.destination.VideoRecentlyWatchedNavKey
@@ -617,6 +619,11 @@ fun MediaMainScreen(
                 },
                 navigateToRecentlyWatched = {
                     navigationHandler.navigate(VideoRecentlyWatchedNavKey)
+                },
+                onBack = if (isPushedMainNavScreen(MediaMainNavKey::class)) {
+                    navigationHandler::back
+                } else {
+                    null
                 },
                 onSearchingModeChanged = {
                     isSearchModeForVideosOrPlaylists = it

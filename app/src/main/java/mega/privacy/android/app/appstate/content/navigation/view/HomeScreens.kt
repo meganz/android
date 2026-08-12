@@ -43,6 +43,7 @@ import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.shared.LocalSharedViewModelStoreOwner
 import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
 import mega.privacy.android.navigation.contract.state.LocalSelectionModeController
+import mega.privacy.android.navigation.contract.state.LocalTopLevelNavKeyClass
 import mega.privacy.android.navigation.contract.state.SelectionModeController
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.CustomiseNavigationNavKey
@@ -146,6 +147,7 @@ fun HomeScreens(
                             CompositionLocalProvider(
                                 LocalSelectionModeController provides selectionModeController,
                                 LocalSharedViewModelStoreOwner provides homeScreensOwner,
+                                LocalTopLevelNavKeyClass provides homeScreenStacks.topLevelKey::class,
                             ) {
                                 NavDisplay(
                                     modifier = Modifier

@@ -51,7 +51,9 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
+import mega.privacy.android.navigation.contract.state.isPushedMainNavScreen
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
@@ -145,6 +147,12 @@ internal fun DriveSyncScreen(
         selectionState.deselectAll()
     }
 
+    val mainTopBarNavigationType = if (isPushedMainNavScreen(DriveSyncNavKey::class)) {
+        AppBarNavigationType.Back(navigationHandler::back)
+    } else {
+        AppBarNavigationType.None
+    }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
@@ -154,7 +162,7 @@ internal fun DriveSyncScreen(
                 is CloudDriveUiState.Loading -> {
                     MegaTopAppBar(
                         modifier = Modifier.testTag(DRIVE_SYNCS_MAIN_APP_BAR_TAG),
-                        navigationType = AppBarNavigationType.None,
+                        navigationType = mainTopBarNavigationType,
                         title = stringResource(sharedR.string.general_drive),
                         trailingIcons = {
                             TransfersToolbarWidget {
@@ -180,7 +188,7 @@ internal fun DriveSyncScreen(
                     } else {
                         MegaTopAppBar(
                             modifier = Modifier.testTag(DRIVE_SYNCS_MAIN_APP_BAR_TAG),
-                            navigationType = AppBarNavigationType.None,
+                            navigationType = mainTopBarNavigationType,
                             title = stringResource(sharedR.string.general_drive),
                             trailingIcons = {
                                 TransfersToolbarWidget {

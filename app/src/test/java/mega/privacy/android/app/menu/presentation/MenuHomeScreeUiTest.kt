@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.parcelize.Parcelize
 import mega.android.core.ui.model.LocalizedText
@@ -71,15 +72,15 @@ class MenuHomeScreeUiTest {
 
     val badgeFlow = MutableStateFlow<MainNavItemBadge?>(null)
 
-    val myAccountItems = mapOf(
-        1 to NavDrawerItem.Account(
+    val myAccountItems = persistentListOf(
+        NavDrawerItem.Account(
             destination = TestDestination,
             icon = Icons.Default.Home,
             title = android.R.string.ok,
             subTitle = MutableStateFlow("Storage"),
             actionLabel = android.R.string.copy
         ),
-        2 to NavDrawerItem.Account(
+        NavDrawerItem.Account(
             destination = TestDestination,
             icon = Icons.Default.Settings,
             title = android.R.string.cancel,
@@ -282,7 +283,7 @@ class MenuHomeScreeUiTest {
     fun `test that UI displays correctly with empty account items`() {
         setupRule(
             uiState = createDefaultMenuUiState().copy(
-                myAccountItems = emptyMap()
+                myAccountItems = persistentListOf()
             )
         )
         composeRule.onNodeWithTag(TOOLBAR).assertIsDisplayed()

@@ -268,7 +268,7 @@ fun MenuHomeScreenUi(
             }
 
             items(
-                items = uiState.myAccountItems.values.toList()
+                items = uiState.myAccountItems
             ) { item ->
                 AccountItem(
                     item = item,
