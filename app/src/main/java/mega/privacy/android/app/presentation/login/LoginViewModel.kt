@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
+import mega.privacy.android.app.presentation.login.model.PasswordCredential
 import mega.privacy.android.app.presentation.login.model.RkLink
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.isValid2FA
 import mega.privacy.android.app.utils.Constants
@@ -57,6 +58,7 @@ import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.account.CreateAccountException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
@@ -71,6 +73,7 @@ import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.featureflag.ClearPersistedFeatureFlagsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.DecodeGoogleIdTokenUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
@@ -138,6 +141,7 @@ class LoginViewModel @Inject constructor(
     private val createAccountUseCase: CreateAccountUseCase,
     private val clearPersistedFeatureFlagsUseCase: ClearPersistedFeatureFlagsUseCase,
     private val sendFirebaseAnalyticsEventUseCase: SendFirebaseAnalyticsEventUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val is2FARequited = savedStateHandle[IS_2FA_REQUIRED] ?: false
 
@@ -176,6 +180,14 @@ class LoginViewModel @Inject constructor(
                     it.copy(miscFlagLoaded = true)
                 }
             }
+        }
+        viewModelScope.launch {
+            runCatching { getFeatureFlagValueUseCase(ApiFeatures.CredentialManager) }
+                .onSuccess { enabled ->
+                    _state.update { it.copy(isCredentialManagerEnabled = enabled) }
+                }.onFailure {
+                    Timber.e(it)
+                }
         }
         setupInitialState()
         getStartScreen()
@@ -531,10 +543,16 @@ class LoginViewModel @Inject constructor(
      */
     fun checkTemporalCredentials(): Boolean {
         val ephemeralCredentials = ephemeralCredentialManager.getEphemeralCredential()
-        return if (ephemeralCredentials != null && !ephemeralCredentials.email.isNullOrEmpty() && !ephemeralCredentials.password.isNullOrEmpty()) {
+        val email = ephemeralCredentials?.email
+        val password = ephemeralCredentials?.password
+        return if (!email.isNullOrEmpty() && !password.isNullOrEmpty()) {
             // Required for Firebase A/B testing
             sendFirebaseAnalyticsEventUseCase(FirebaseAnalyticsEvent.CreateNewAccount)
-            performLogin(ephemeralCredentials.email, ephemeralCredentials.password)
+            performLogin(
+                typedEmail = email,
+                typedPassword = password,
+                savePasswordCredential = PasswordCredential(email = email, password = password),
+            )
             true
         } else {
             false
@@ -662,8 +680,17 @@ class LoginViewModel @Inject constructor(
 
     /**
      * Login.
+     *
+     * @param savePasswordCredential Credential to offer to the user's password manager on
+     * success. Only set for the first login of a newly created account; regular logins rely
+     * on the platform autofill save prompt instead. Only offered when
+     * [ApiFeatures.CredentialManager] is enabled.
      */
-    private fun performLogin(typedEmail: String? = null, typedPassword: String? = null) {
+    private fun performLogin(
+        typedEmail: String? = null,
+        typedPassword: String? = null,
+        savePasswordCredential: PasswordCredential? = null,
+    ) {
         if (loginMutex.isLocked) {
             return
         }
@@ -698,7 +725,12 @@ class LoginViewModel @Inject constructor(
                         email,
                         password,
                         disableChatApi = true
-                    ).collectLatest { status -> status.checkStatus(email = email) }
+                    ).collectLatest { status ->
+                        status.checkStatus(
+                            email = email,
+                            savePasswordCredential = savePasswordCredential,
+                        )
+                    }
                 }.onFailure { exception ->
                     if (exception !is LoginException) return@onFailure
 
@@ -789,6 +821,7 @@ class LoginViewModel @Inject constructor(
 
     private suspend fun LoginStatus.checkStatus(
         email: String? = null,
+        savePasswordCredential: PasswordCredential? = null,
     ) = when (this) {
         LoginStatus.LoginStarted -> {
             Timber.d("Login started")
@@ -797,12 +830,16 @@ class LoginViewModel @Inject constructor(
         LoginStatus.LoginSucceed -> {
             Timber.d("Login finished")
             ephemeralCredentialManager.setEphemeralCredential(null)
-            _state.update {
-                it.copy(
+            _state.update { state ->
+                state.copy(
                     isLoginInProgress = false,
                     isLoginRequired = false,
                     is2FARequired = false,
-                    multiFactorAuthState = null
+                    multiFactorAuthState = null,
+                    savePasswordCredentialEvent = savePasswordCredential
+                        ?.takeIf { state.isCredentialManagerEnabled }
+                        ?.let(::triggered)
+                        ?: state.savePasswordCredentialEvent,
                 )
             }
             clearFeatureFlagCache()
@@ -857,6 +894,12 @@ class LoginViewModel @Inject constructor(
      */
     fun onSnackbarMessageConsumed() =
         _state.update { state -> state.copy(snackbarMessage = consumed()) }
+
+    /**
+     * Sets savePasswordCredentialEvent in state as consumed.
+     */
+    fun onSavePasswordCredentialEventConsumed() =
+        _state.update { state -> state.copy(savePasswordCredentialEvent = consumed()) }
 
     /**
      * Updates 2FA code in state.

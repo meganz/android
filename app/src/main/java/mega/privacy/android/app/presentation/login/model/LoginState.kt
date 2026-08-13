@@ -33,6 +33,9 @@ import mega.privacy.android.domain.exception.LoginException
  * @property resendVerificationEmailEvent
  * @property checkRecoveryKeyEvent
  * @property openUrlEvent
+ * @property savePasswordCredentialEvent Event to offer saving the credentials of a successful
+ *                                       password login to the user's password manager.
+ * @property isCredentialManagerEnabled Whether the Credential Manager feature flag is enabled.
  * @property miscFlagLoaded
  * @property recoveryKeyLink
  */
@@ -57,6 +60,8 @@ data class LoginState(
     val resendVerificationEmailEvent: StateEventWithContent<Boolean> = consumed(),
     val checkRecoveryKeyEvent: StateEventWithContent<Result<RkLink>> = consumed(),
     val openUrlEvent: StateEventWithContent<String> = consumed(),
+    val savePasswordCredentialEvent: StateEventWithContent<PasswordCredential> = consumed(),
+    val isCredentialManagerEnabled: Boolean = false,
     val miscFlagLoaded: Boolean = false,
     val recoveryKeyLink: String? = null,
 )

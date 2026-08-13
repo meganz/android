@@ -83,4 +83,11 @@ data class CreateAccountUIState(
      * Theme mode of the application
      */
     val themeMode: ThemeMode = ThemeMode.System,
+
+    /**
+     * Whether the Credential Manager feature flag is enabled. When enabled, the credentials
+     * are offered to the user's password manager via Credential Manager after signup, so the
+     * platform autofill save prompt is suppressed to avoid a duplicate prompt.
+     */
+    val isCredentialManagerEnabled: Boolean = false,
 )

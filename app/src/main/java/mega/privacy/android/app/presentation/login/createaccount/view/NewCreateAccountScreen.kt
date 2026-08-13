@@ -32,6 +32,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -42,6 +43,7 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -206,6 +208,7 @@ internal fun NewCreateAccountScreen(
         uiState.passwordStrength == PasswordStrength.VERY_WEAK
     var showAccountExistsMessage by rememberSaveable { mutableStateOf(false) }
     val softKeyboard = LocalSoftwareKeyboardController.current
+    val autofillManager = LocalAutofillManager.current
 
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
     val isPhoneLandscape =
@@ -249,6 +252,13 @@ internal fun NewCreateAccountScreen(
     ) { createAccountStatus ->
         when (createAccountStatus) {
             is CreateAccountStatus.Success -> {
+                if (uiState.isCredentialManagerEnabled) {
+                    // The password is offered to the user's password manager via Credential
+                    // Manager once the account is confirmed and the first login succeeds. Cancel
+                    // the autofill session so the platform doesn't also prompt to save when the
+                    // fields leave the composition.
+                    autofillManager?.cancel()
+                }
                 onCreateAccountSuccess(createAccountStatus.credentials)
             }
 
@@ -445,7 +455,8 @@ internal fun NewCreateAccountScreen(
                         uiState.isEmailValid == false -> stringResource(id = sharedR.string.login_invalid_email_error_message)
                         else -> null
                     },
-                    textFieldValue = email
+                    textFieldValue = email,
+                    contentType = ContentType.EmailAddress
                 )
 
                 PasswordTextInputField(
@@ -479,7 +490,8 @@ internal fun NewCreateAccountScreen(
                         !isPasswordFocus && (isMinimumCharacterError || isWeakPassword) -> ""
                         else -> null
                     },
-                    text = password
+                    text = password,
+                    contentType = ContentType.NewPassword
                 )
 
                 PasswordHint(
@@ -541,7 +553,8 @@ internal fun NewCreateAccountScreen(
                         uiState.isConfirmPasswordMatched == false -> stringResource(id = sharedR.string.sign_up_confirm_password_not_match_error_message)
                         else -> null
                     },
-                    text = confirmPassword
+                    text = confirmPassword,
+                    contentType = ContentType.NewPassword
                 )
 
                 Row(

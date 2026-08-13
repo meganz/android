@@ -22,6 +22,15 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * Enable Android credential manager
+     */
+    CredentialManager(
+        experimentName = "andcm",
+        description = "Feature flag for Android credential manager to prompt auto save password after signup",
+        defaultValue = false,
+    ),
+
+    /**
      * Video Player gesture seek controls.
      * When enabled, shows a seek-seconds overlay when the user taps the forward/backward
      * buttons or double-taps the left/right side of the screen.

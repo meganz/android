@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login
 
+import android.text.TextUtils
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -21,13 +22,13 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
-import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.mapper.AccountBlockedTypeStringMapper
 import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginScreen
+import mega.privacy.android.app.presentation.login.model.PasswordCredential
 import mega.privacy.android.app.presentation.login.model.RkLink
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountBlockedEvent
@@ -39,25 +40,25 @@ import mega.privacy.android.domain.entity.login.GoogleSignInResult
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginBlockedAccount
-import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
 import mega.privacy.android.domain.exception.LoginRequireValidation
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.account.CreateAccountException
-import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
+import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
 import mega.privacy.android.domain.usecase.analytics.SendFirebaseAnalyticsEventUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
-import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
-import mega.privacy.android.domain.usecase.featureflag.ClearPersistedFeatureFlagsUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
+import mega.privacy.android.domain.usecase.featureflag.ClearPersistedFeatureFlagsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.DecodeGoogleIdTokenUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
@@ -82,9 +83,8 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.Mockito
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -138,6 +138,7 @@ internal class LoginViewModelTest {
     private val createAccountUseCase: CreateAccountUseCase = mock()
     private val clearPersistedFeatureFlagsUseCase = mock<ClearPersistedFeatureFlagsUseCase>()
     private val sendFirebaseAnalyticsEventUseCase = mock<SendFirebaseAnalyticsEventUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun setUp() = runTest {
@@ -182,6 +183,7 @@ internal class LoginViewModelTest {
             createAccountUseCase = createAccountUseCase,
             clearPersistedFeatureFlagsUseCase = clearPersistedFeatureFlagsUseCase,
             sendFirebaseAnalyticsEventUseCase = sendFirebaseAnalyticsEventUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -218,6 +220,7 @@ internal class LoginViewModelTest {
             monitorMiscLoadedUseCase,
             decodeGoogleIdTokenUseCase,
             createAccountUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -430,7 +433,7 @@ internal class LoginViewModelTest {
         verify(getHistoricalProcessExitReasonsUseCase).invoke()
     }
 
-@Test
+    @Test
     fun `test that resend Verification Email UseCase should be triggered when resend email is clicked`() =
         runTest {
             underTest.resendVerificationEmail()
@@ -687,6 +690,122 @@ internal class LoginViewModelTest {
             verify(accountBlockedTypeStringMapper).invoke(any())
         }
 
+    // region Save password credential tests
+
+    private val signupEphemeralCredentials = EphemeralCredentials(
+        email = "test@test.com",
+        password = "Password",
+        session = "session",
+        firstName = "First",
+        lastName = "Last",
+    )
+
+    @Test
+    fun `test that savePasswordCredentialEvent is triggered when post-signup login succeeds`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CredentialManager)).thenReturn(true)
+            whenever(ephemeralCredentialManager.getEphemeralCredential())
+                .thenReturn(signupEphemeralCredentials)
+            whenever(loginUseCase(eq("test@test.com"), eq("Password"), any()))
+                .thenReturn(flowOf(LoginStatus.LoginSucceed))
+            initViewModel()
+
+            underTest.checkTemporalCredentials()
+            advanceUntilIdle()
+
+            val event =
+                underTest.state.value.savePasswordCredentialEvent as? StateEventWithContentTriggered
+            assertThat(event?.content).isEqualTo(
+                PasswordCredential(email = "test@test.com", password = "Password")
+            )
+        }
+
+    @Test
+    fun `test that savePasswordCredentialEvent is not triggered when CredentialManager feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CredentialManager)).thenReturn(false)
+            whenever(ephemeralCredentialManager.getEphemeralCredential())
+                .thenReturn(signupEphemeralCredentials)
+            whenever(loginUseCase(eq("test@test.com"), eq("Password"), any()))
+                .thenReturn(flowOf(LoginStatus.LoginSucceed))
+            initViewModel()
+
+            underTest.checkTemporalCredentials()
+            advanceUntilIdle()
+
+            assertThat(underTest.state.value.savePasswordCredentialEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+
+    @Test
+    fun `test that savePasswordCredentialEvent is not triggered when manual login succeeds`() =
+        runTest {
+            whenever(ongoingTransfersExistUseCase()).thenReturn(false)
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            whenever(loginUseCase(eq("test@test.com"), eq("Password"), any()))
+                .thenReturn(flowOf(LoginStatus.LoginSucceed))
+
+            with(underTest) {
+                onEmailChanged("test@test.com")
+                onPasswordChanged("Password")
+                onLoginClicked(false)
+                advanceUntilIdle()
+
+                verify(loginUseCase).invoke(eq("test@test.com"), eq("Password"), any())
+                assertThat(state.value.savePasswordCredentialEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that savePasswordCredentialEvent is not triggered when 2FA login succeeds`() =
+        runTest {
+            Mockito.mockStatic(TextUtils::class.java).use {
+                whenever(TextUtils.isDigitsOnly("123456")).thenReturn(true)
+                whenever(
+                    loginWith2FAUseCase(eq("test@test.com"), eq("Password"), eq("123456"), any())
+                ).thenReturn(flowOf(LoginStatus.LoginSucceed))
+
+                with(underTest) {
+                    onEmailChanged("test@test.com")
+                    onPasswordChanged("Password")
+                    on2FAChanged("123456")
+                    advanceUntilIdle()
+
+                    verify(loginWith2FAUseCase).invoke(
+                        eq("test@test.com"),
+                        eq("Password"),
+                        eq("123456"),
+                        any(),
+                    )
+                    assertThat(state.value.savePasswordCredentialEvent)
+                        .isInstanceOf(StateEventWithContentConsumed::class.java)
+                }
+            }
+        }
+
+    @Test
+    fun `test that onSavePasswordCredentialEventConsumed sets savePasswordCredentialEvent as consumed`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CredentialManager)).thenReturn(true)
+            whenever(ephemeralCredentialManager.getEphemeralCredential())
+                .thenReturn(signupEphemeralCredentials)
+            whenever(loginUseCase(eq("test@test.com"), eq("Password"), any()))
+                .thenReturn(flowOf(LoginStatus.LoginSucceed))
+            initViewModel()
+
+            with(underTest) {
+                checkTemporalCredentials()
+                advanceUntilIdle()
+                onSavePasswordCredentialEventConsumed()
+
+                assertThat(state.value.savePasswordCredentialEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    // endregion
+
     // region Google Sign-In tests
 
     private val googleResult = GoogleSignInResult(
@@ -708,6 +827,20 @@ internal class LoginViewModelTest {
         verify(loginUseCase).invoke(eq(googleResult.email), eq(googleResult.sub), any())
         verifyNoInteractions(createAccountUseCase)
     }
+
+    @Test
+    fun `test that savePasswordCredentialEvent is not triggered when Google sign-in login succeeds`() =
+        runTest {
+            whenever(decodeGoogleIdTokenUseCase("fake.jwt.token")).thenReturn(googleResult)
+            whenever(loginUseCase(eq(googleResult.email), eq(googleResult.sub), any()))
+                .thenReturn(flowOf(LoginStatus.LoginSucceed))
+
+            underTest.onGoogleSignIn("fake.jwt.token")
+            advanceUntilIdle()
+
+            assertThat(underTest.state.value.savePasswordCredentialEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
 
     @Test
     fun `test that clearPersistedFeatureFlagsUseCase is invoked on login success`() = runTest {

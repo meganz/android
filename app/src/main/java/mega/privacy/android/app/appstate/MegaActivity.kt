@@ -63,6 +63,7 @@ import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
+import mega.privacy.android.app.presentation.login.savePasswordCredential
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
@@ -256,6 +257,16 @@ class MegaActivity : FragmentActivity() {
                 if (globalState !is GlobalState.Loading && navGraphState !is NavigationGraphState.Loading) {
                     keepSplashScreen = false
                 }
+            }
+
+            // Consumed here rather than in a login screen because the post-signup auto-login
+            // succeeds while the ConfirmEmail screen is showing, and the prompt must survive
+            // the navigation to the logged-in content that immediately follows.
+            EventEffect(
+                event = loginState.savePasswordCredentialEvent,
+                onConsumed = loginViewModel::onSavePasswordCredentialEventConsumed,
+            ) { credential ->
+                savePasswordCredential(credential)
             }
 
             if (!keepSplashScreen) {

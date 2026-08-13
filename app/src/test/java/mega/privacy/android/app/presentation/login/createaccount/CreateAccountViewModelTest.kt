@@ -28,10 +28,12 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.account.CreateAccountException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
@@ -66,6 +68,7 @@ class CreateAccountViewModelTest {
         mock()
     private val doesTextContainNumericUseCase: DoesTextContainNumericUseCase = mock()
     private val doesTextContainMixedCaseUseCase: DoesTextContainMixedCaseUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val savedStateHandle = SavedStateHandle()
     private val connectivityFlow = MutableStateFlow(true)
 
@@ -93,7 +96,8 @@ class CreateAccountViewModelTest {
             doesTextContainSpecialCharacterUseCase = doesTextContainSpecialCharacterUseCase,
             doesTextContainNumericUseCase = doesTextContainNumericUseCase,
             doesTextContainMixedCaseUseCase = doesTextContainMixedCaseUseCase,
-            monitorThemeModeUseCase = monitorThemeModeUseCase
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -110,6 +114,7 @@ class CreateAccountViewModelTest {
             doesTextContainSpecialCharacterUseCase,
             doesTextContainNumericUseCase,
             doesTextContainMixedCaseUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -1162,6 +1167,30 @@ class CreateAccountViewModelTest {
             assertThat(state.isLastNameLengthExceeded).isFalse()
         }
     }
+
+    @Test
+    fun `test that isCredentialManagerEnabled is updated in state when CredentialManager feature flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CredentialManager)).thenReturn(true)
+            whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+            initViewModel()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isCredentialManagerEnabled).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that isCredentialManagerEnabled is false in state when CredentialManager feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CredentialManager)).thenReturn(false)
+            whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+            initViewModel()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isCredentialManagerEnabled).isFalse()
+            }
+        }
 
     private suspend fun initInputFields() {
         underTest.onFirstNameInputChanged("first Name")

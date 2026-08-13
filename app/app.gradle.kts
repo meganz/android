@@ -307,6 +307,8 @@ dependencies {
     implementation(androidx.cardview)
     implementation(androidx.constraintlayout)
     implementation(androidx.constraintlayout.compose)
+    implementation(androidx.credentials)
+    implementation(androidx.credentials.play)
     implementation(androidx.datastore.preferences)
     implementation(androidx.security.crypto)
     implementation(androidx.emoji2)

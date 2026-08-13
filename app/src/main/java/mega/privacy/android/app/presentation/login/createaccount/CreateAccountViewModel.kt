@@ -20,11 +20,13 @@ import mega.privacy.android.app.presentation.login.createaccount.model.CreateAcc
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.account.CreateAccountException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
@@ -49,6 +51,7 @@ class CreateAccountViewModel @Inject constructor(
     private val doesTextContainMixedCaseUseCase: DoesTextContainMixedCaseUseCase,
     private val doesTextContainSpecialCharacterUseCase: DoesTextContainSpecialCharacterUseCase,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateAccountUIState())
@@ -61,6 +64,18 @@ class CreateAccountViewModel @Inject constructor(
     init {
         monitorConnectivity()
         monitorThemeMode()
+        getCredentialManagerFlag()
+    }
+
+    private fun getCredentialManagerFlag() {
+        viewModelScope.launch {
+            runCatching { getFeatureFlagValueUseCase(ApiFeatures.CredentialManager) }
+                .onSuccess { enabled ->
+                    _uiState.update { it.copy(isCredentialManagerEnabled = enabled) }
+                }.onFailure {
+                    Timber.e(it)
+                }
+        }
     }
 
     private fun monitorThemeMode() {
