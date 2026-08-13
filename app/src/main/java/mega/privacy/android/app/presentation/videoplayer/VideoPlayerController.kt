@@ -372,8 +372,34 @@ class VideoPlayerController(
             object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 override fun onScale(detector: ScaleGestureDetector): Boolean {
                     if (!isLocked.value) {
-                        zoomLevel = (zoomLevel * detector.scaleFactor).coerceIn(1.0f, maxZoom)
-                        updateTransformations()
+                        val scaleFactor = detector.scaleFactor
+                        if (isGesturesEnabled) {
+                            when {
+                                !isFullscreen.value && scaleFactor > 1.0f -> {
+                                    isFullscreen.value = true
+                                    zoomLevel = 1.0f
+                                    translationX = 0f
+                                    translationY = 0f
+                                    fullscreenClickedCallback(true)
+                                }
+
+                                isFullscreen.value && zoomLevel <= 1.0f && scaleFactor < 1.0f -> {
+                                    zoomLevel = 1.0f
+                                    translationX = 0f
+                                    translationY = 0f
+                                    isFullscreen.value = false
+                                    fullscreenClickedCallback(false)
+                                }
+
+                                else -> {
+                                    zoomLevel = (zoomLevel * scaleFactor).coerceIn(1.0f, maxZoom)
+                                    updateTransformations()
+                                }
+                            }
+                        } else {
+                            zoomLevel = (zoomLevel * scaleFactor).coerceIn(1.0f, maxZoom)
+                            updateTransformations()
+                        }
                     }
                     return true
                 }

@@ -3,15 +3,16 @@ package mega.privacy.android.app.presentation.videoplayer
 import android.os.Build
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.OptIn
-import com.google.common.truth.Truth.assertThat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
@@ -48,6 +49,7 @@ class VideoPlayerControllerTest {
 
     private val onLongPressSpeedChange = mock<(SpeedPlaybackItem) -> Unit>()
     private val onLongPressActivated = mock<() -> Unit>()
+    private val fullscreenClickedCallback = mock<(Boolean) -> Unit>()
     private val playerViewClicked = mock<() -> Unit>()
 
     private lateinit var activity: AppCompatActivity
@@ -94,18 +96,22 @@ class VideoPlayerControllerTest {
     private fun createController(
         currentSpeedPlayback: SpeedPlaybackItem = VideoSpeedPlaybackItem.PlaybackSpeed_1X,
         isGesturesEnabled: Boolean = true,
+        isFullscreen: Boolean = false,
+        isLocked: Boolean = false,
     ) = VideoPlayerController(
         context = activity,
         uiState = VideoPlayerUiState(
             currentSpeedPlayback = currentSpeedPlayback,
             isGesturesEnabled = isGesturesEnabled,
+            isFullscreen = isFullscreen,
+            isLocked = isLocked,
         ),
         container = mockContainer,
         updateRepeatToggleMode = {},
         updateIsVideoOptionPopupShown = {},
         updateIsSpeedOptionsShown = {},
         updateLockStatus = {},
-        fullscreenClickedCallback = {},
+        fullscreenClickedCallback = fullscreenClickedCallback,
         lockStateChanged = {},
         playerViewClicked = playerViewClicked,
         onSnapshotSelected = {},
@@ -130,6 +136,12 @@ class VideoPlayerControllerTest {
         val field = VideoPlayerController::class.java.getDeclaredField("zoomLevel")
         field.isAccessible = true
         field.setFloat(this, level)
+    }
+
+    private fun VideoPlayerController.getZoomLevel(): Float {
+        val field = VideoPlayerController::class.java.getDeclaredField("zoomLevel")
+        field.isAccessible = true
+        return field.getFloat(this)
     }
 
     private fun VideoPlayerController.getTranslationX(): Float {
@@ -172,6 +184,18 @@ class VideoPlayerControllerTest {
         } finally {
             event.recycle()
         }
+    }
+
+    private fun VideoPlayerController.callOnScale(scaleFactor: Float) {
+        val sgdField = VideoPlayerController::class.java.getDeclaredField("scaleGestureDetector")
+        sgdField.isAccessible = true
+        val sgd = sgdField.get(this) as ScaleGestureDetector
+        val listenerField = ScaleGestureDetector::class.java.getDeclaredField("mListener")
+        listenerField.isAccessible = true
+        val listener = listenerField.get(sgd) as ScaleGestureDetector.OnScaleGestureListener
+        val mockDetector = mock<ScaleGestureDetector>()
+        whenever(mockDetector.scaleFactor).thenReturn(scaleFactor)
+        listener.onScale(mockDetector)
     }
 
     @Test
@@ -251,5 +275,54 @@ class VideoPlayerControllerTest {
         val controller = createController()
         controller.callOnSingleTapConfirmed()
         verify(playerViewClicked).invoke()
+    }
+
+    @Test
+    fun `test that onScale enters fullscreen when not in fullscreen and scale factor is greater than 1`() {
+        val controller = createController()
+        controller.callOnScale(scaleFactor = 1.1f)
+        verify(fullscreenClickedCallback).invoke(true)
+    }
+
+    @Test
+    fun `test that onScale exits fullscreen when in fullscreen at minimum zoom and scale factor is less than 1`() {
+        val controller = createController(isFullscreen = true)
+        controller.callOnScale(scaleFactor = 0.9f)
+        verify(fullscreenClickedCallback).invoke(false)
+    }
+
+    @Test
+    fun `test that onScale does not trigger fullscreen callback when gestures are disabled`() {
+        val controller = createController(isGesturesEnabled = false)
+        controller.callOnScale(scaleFactor = 1.1f)
+        verify(fullscreenClickedCallback, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScale applies zoom when gestures are disabled`() {
+        val controller = createController(isGesturesEnabled = false, isFullscreen = true)
+        controller.callOnScale(scaleFactor = 1.5f)
+        assertThat(controller.getZoomLevel()).isGreaterThan(1.0f)
+    }
+
+    @Test
+    fun `test that onScale does not trigger fullscreen callback when locked`() {
+        val controller = createController(isLocked = true)
+        controller.callOnScale(scaleFactor = 1.1f)
+        verify(fullscreenClickedCallback, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScale does not trigger fullscreen callback when in fullscreen and scale factor is greater than 1`() {
+        val controller = createController(isFullscreen = true)
+        controller.callOnScale(scaleFactor = 1.5f)
+        verify(fullscreenClickedCallback, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScale updates zoom level when in fullscreen and scale factor is greater than 1`() {
+        val controller = createController(isFullscreen = true)
+        controller.callOnScale(scaleFactor = 1.5f)
+        assertThat(controller.getZoomLevel()).isGreaterThan(1.0f)
     }
 }
