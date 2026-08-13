@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Thin wrapper around lease.py (mirrors tools/jira/jira -> jira_cli.py).
+# Usage: tools/device/lease {acquire|release|renew|list|reap|steal|whoami|gate} [args]
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec python3 "$HERE/lease.py" "$@"

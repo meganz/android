@@ -183,9 +183,15 @@ hand-wave a failing build/test.
 
 ### Step 7 — Verify on a device (mobile-mcp)
 
-1. List devices with `mcp__mobile-mcp__mobile_list_available_devices`. If
-   exactly one device is connected, use it; if several, ask the developer
-   which one to use.
+1. **Reserve a device** so concurrent agents don't collide: `SERIAL=$(tools/device/lease
+   acquire)`. This hands back one free connected device — or, if every attached
+   device is busy (or none is connected) and the repro doesn't need real hardware,
+   boots a capped headless emulator. Add `--physical-required` when the bug needs
+   real hardware, or `--serial <s>` to demand a specific device. On exit 3 (nothing
+   free), ask the developer whether to wait, steal a stale lease (`tools/device/lease
+   steal --serial <s>`), or try another device. Point mobile-mcp at the leased serial
+   (its device-select tool) so screenshots/taps hit the reserved device, and pass
+   `ANDROID_SERIAL=$SERIAL` to any `adb` / `connected*AndroidTest` command.
 2. Install the freshly built APK from `app/build/outputs/apk/gms/debug/`
    (`mcp__mobile-mcp__mobile_install_app`).
 3. Walk the reproduction steps from the ticket step by step (launch, tap,
@@ -219,8 +225,13 @@ MR is merged (or the work is abandoned), offer to remove the worktree. Do **not*
 remove it while the MR is still open or unmerged.
 
 ```bash
-git worktree remove "$PARENT_DIR/$DIR"   # the directory created in Step 2
+tools/device/lease release               # free the device reserved in Step 7
+git worktree remove "$PARENT_DIR/$DIR"    # the directory created in Step 2
 ```
+
+(The lease also auto-expires via TTL and is reclaimed by the next `acquire`, so
+a missed release never deadlocks — but releasing promptly frees the device, and
+tears down any coordinator-booted emulator, right away.)
 
 ## Red Flags — STOP and Ask the Developer
 
