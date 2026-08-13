@@ -539,8 +539,8 @@ class TransferManagerTest {
     // endregion
 
     private companion object {
-        const val LAUNCH_TIMEOUT = 30_000L
-        const val LOAD_TIMEOUT = 15_000L
+        const val LAUNCH_TIMEOUT = 60_000L
+        const val LOAD_TIMEOUT = 30_000L
         const val POLL_INTERVAL_MS = 100L
 
         const val FILE_A = "transfer_a.bin"

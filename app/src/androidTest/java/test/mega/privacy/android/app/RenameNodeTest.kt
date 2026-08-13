@@ -8,7 +8,6 @@ import androidx.test.uiautomator.BySelector
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
@@ -136,9 +135,11 @@ class RenameNodeTest {
         awaitObject(RENAME_CONFIRM, LOAD_TIMEOUT, "rename-confirm")
         device.findObject(RENAME_CONFIRM).click()
 
-        // Production code has now called renameNode. Apply the SDK-side effect (rename in the fake
-        // tree + OnNodesUpdate broadcast) with the new `:data-test` mutating helper.
-        assertThat(fakeMegaApi.invocations.any { it.methodName == "renameNode" }).isTrue()
+        // The confirm click only enqueues the rename; renameNode is called from a coroutine, so
+        // wait for the gateway invocation instead of asserting instantly — an instant assertion
+        // races against that coroutine on slow machines. Then apply the SDK-side effect (rename
+        // in the fake tree + OnNodesUpdate broadcast) with the `:data-test` mutating helper.
+        awaitInvocation("renameNode", LOAD_TIMEOUT)
         runBlocking { fakeMegaApi.nodeTree.rename(FILE_HANDLE, NEW_NAME) }
 
         // The list refreshes and the row shows the new name.
@@ -164,6 +165,19 @@ class RenameNodeTest {
     }
 
     /**
+     * Waits until the fake gateway records an invocation of [methodName], polling because the
+     * production call happens in a coroutine that the UI click only enqueues.
+     */
+    private fun awaitInvocation(methodName: String, timeout: Long) {
+        val deadline = System.currentTimeMillis() + timeout
+        while (System.currentTimeMillis() < deadline) {
+            if (fakeMegaApi.invocations.any { it.methodName == methodName }) return
+            Thread.sleep(INVOCATION_POLL_INTERVAL_MS)
+        }
+        throw AssertionError("Timed out after ${timeout}ms waiting for gateway call $methodName")
+    }
+
+    /**
      * Waits for [selector]; on timeout, writes the window hierarchy to logcat (tag `UiDump`,
      * chunked — it survives the post-test uninstall) before failing.
      */
@@ -180,10 +194,11 @@ class RenameNodeTest {
     }
 
     private companion object {
-        const val LAUNCH_TIMEOUT = 30_000L
-        const val LOAD_TIMEOUT = 15_000L
+        const val LAUNCH_TIMEOUT = 60_000L
+        const val LOAD_TIMEOUT = 30_000L
         const val MAX_SCROLL_ATTEMPTS = 10
         const val SCROLL_PERCENT = 0.8f
+        const val INVOCATION_POLL_INTERVAL_MS = 100L
 
         const val FILE_HANDLE = 100L
         const val ORIGINAL_NAME = "before.txt"

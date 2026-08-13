@@ -80,6 +80,18 @@ android {
 
     testOptions {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        managedDevices {
+            localDevices {
+                create("ciPixel") {
+                    device = "Pixel 10"
+                    apiLevel = 36
+                    systemImageSource = "google"
+                    // Pinned so GMD never falls back to the x86_64 image on a mismatched
+                    // host; CI runs this device on Apple Silicon agents only.
+                    testedAbi = "arm64-v8a"
+                }
+            }
+        }
     }
 
     val debugKeyStoreFile = file("debug.keystore")

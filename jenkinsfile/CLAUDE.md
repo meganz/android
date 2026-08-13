@@ -12,7 +12,7 @@ This directory contains Jenkins CI/CD pipeline scripts (Groovy) for the MEGA And
 |------|---------|
 | `common.groovy` | Shared utility library loaded by all other pipelines via `load('jenkinsfile/common.groovy')` |
 | `android_build_status.groovy` | CI pipeline — runs on every MR push; builds GMS+QA APKs, unit tests with coverage, and lint in parallel |
-| `android_upload.groovy` | CD pipeline — triggered by MR comments (`deliver_qa`, `upload_coverage`) or push to develop |
+| `android_upload.groovy` | CD pipeline — triggered by MR comments (`deliver_qa`, `upload_coverage`, `device_test`) or push to develop |
 | `android_release.groovy` | CD release pipeline — triggered by MR comments on `release/*` branches (`deliver_appStore`, `upload_symbol`, etc.) |
 | `android_release_internal.groovy` | Scheduled daily CD — builds and uploads to Google Play Internal + Firebase |
 | `android_release_internal_app_sharing.groovy` | CD pipeline — triggered by `deliver_internalAppSharing` MR comment |

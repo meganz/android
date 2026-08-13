@@ -263,8 +263,8 @@ class CloudDriveUploadTest {
     }
 
     private companion object {
-        const val LAUNCH_TIMEOUT = 30_000L
-        const val LOAD_TIMEOUT = 15_000L
+        const val LAUNCH_TIMEOUT = 60_000L
+        const val LOAD_TIMEOUT = 30_000L
         const val UPLOADED_FILE_NAME = "hello.txt"
         const val UPLOADED_NODE_HANDLE = 100L
 

@@ -304,8 +304,8 @@ class ChatRoomTest {
     // endregion
 
     private companion object {
-        const val LAUNCH_TIMEOUT = 30_000L
-        const val LOAD_TIMEOUT = 15_000L
+        const val LAUNCH_TIMEOUT = 60_000L
+        const val LOAD_TIMEOUT = 30_000L
         const val POLL_INTERVAL_MS = 100L
 
         const val CHAT_ID = 1_001L
