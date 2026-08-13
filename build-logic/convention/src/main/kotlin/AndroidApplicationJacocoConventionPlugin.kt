@@ -210,6 +210,11 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
         "**/domain/entity/*",
         // model in data layer
         "**/data/model/*",
+        // navigation safe args
+        "**/*FragmentArgs*.*",
+        "**/*FragmentDirections*.*",
+        // compose preview tooling
+        "**/*PreviewParameterProvider*.*",
     )
 
 }

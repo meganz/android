@@ -178,6 +178,13 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
         "**/*JsonAdapter.*",
         //entity in domain layer
         "**/domain/entity/*",
+        // model in the data module ("**/data/model/**" would also hit feature modules' data.model packages)
+        "**/mega/privacy/android/data/model/**",
+        // room
+        "**/*_Impl*.*",
+        "**/*_AutoMigration_*",
+        // compose preview tooling
+        "**/*PreviewParameterProvider*.*",
     )
 
 
