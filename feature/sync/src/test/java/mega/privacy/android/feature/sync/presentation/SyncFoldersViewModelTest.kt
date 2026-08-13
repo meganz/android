@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.sync.presentation
 
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -141,7 +143,7 @@ internal class SyncFoldersViewModelTest {
         )
     )
 
-    private val syncUiItems = listOf(
+    private val syncUiItems = persistentListOf(
         SyncUiItem(
             id = 3L,
             syncType = SyncType.TYPE_TWOWAY,
@@ -245,7 +247,8 @@ internal class SyncFoldersViewModelTest {
         whenever(isStorageOverQuotaUseCase()).thenReturn(false)
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val expectedState = SyncFoldersUiState(
-            syncUiItems.map { if (it == syncUiItems.first()) it.copy(expanded = true) else it },
+            syncUiItems.map { if (it == syncUiItems.first()) it.copy(expanded = true) else it }
+                .toImmutableList(),
             stalledIssueCount = stalledIssues.size
         )
 

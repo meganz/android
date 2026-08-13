@@ -3,6 +3,8 @@ package mega.privacy.android.feature.sync.ui.synclist.folders
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -102,7 +104,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val monitorSyncPauseReasonUseCase: MonitorSyncPauseReasonUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
+    private val _uiState = MutableStateFlow(SyncFoldersUiState(persistentListOf()))
     val uiState: StateFlow<SyncFoldersUiState> = _uiState.asStateFlow()
 
     private var loadSyncsJob: Job? = null
@@ -207,7 +209,7 @@ internal class SyncFoldersViewModel @Inject constructor(
         ) { syncs, cameraUploadsBackup ->
             _uiState.update {
                 it.copy(
-                    syncUiItems = cameraUploadsBackup + syncs.first,
+                    syncUiItems = (cameraUploadsBackup + syncs.first).toImmutableList(),
                     isRefreshing = false,
                     isLoading = false,
                     stalledIssueCount = syncs.second
@@ -337,7 +339,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                         } else {
                             it
                         }
-                    })
+                    }.toImmutableList())
                 }
             }
 

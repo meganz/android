@@ -2,23 +2,26 @@ package mega.privacy.android.feature.sync.ui.synclist
 
 import android.content.res.Configuration
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.ScaffoldDefaults
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -38,9 +41,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.banner.InlineWarningBanner
 import mega.android.core.ui.components.chip.MegaChip
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
@@ -52,6 +61,7 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncChip.STALLED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
+import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesRoute
@@ -64,15 +74,10 @@ import mega.privacy.android.feature.sync.ui.views.SyncNotificationWarningBanner
 import mega.privacy.android.feature.sync.ui.views.SyncPermissionWarningBanner
 import mega.privacy.android.feature.sync.ui.views.SyncStorageQuotaExceedWarning
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaMultiFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloatingActionButtonItem
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloatingActionButtonState
 import mega.privacy.android.shared.original.core.ui.controls.buttons.rememberMultiFloatingActionButtonState
-import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.shared.resources.R as sharedR
@@ -84,6 +89,7 @@ import mega.privacy.mobile.analytics.event.SyncListFoldersButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncListIssuesButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncListSolvedIssuesButtonPressedEvent
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SyncListScreen(
     stalledIssuesCount: Int,
@@ -92,7 +98,6 @@ internal fun SyncListScreen(
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
     actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction, isApplyToAll: Boolean) -> Unit,
-    snackBarHostState: SnackbarHostState,
     syncPermissionsManager: SyncPermissionsManager,
     actions: List<MenuAction>,
     onActionPressed: (MenuAction) -> Unit,
@@ -106,196 +111,217 @@ internal fun SyncListScreen(
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
+    onStalledIssueMoreClicked: ((issueId: String) -> Unit)? = null,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     var sheetContent by remember { mutableStateOf<SyncModalSheetContent?>(null) }
 
-    val coroutineScope = rememberCoroutineScope()
-
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    val modalSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        confirmValueChange = { _ -> true },
-        skipHalfExpanded = isLandscape
-    )
-
-    val scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState)
+    val modalSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = isLandscape)
 
     val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
     val syncStalledIssueState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
 
-    BottomSheet(
-        modalSheetState = modalSheetState,
-        expandedRoundedCorners = true,
-        sheetBody = {
-            when (val content = sheetContent) {
-                is SyncModalSheetContent.IssueResolutions -> {
-                    IssuesResolutionDialog(
-                        icon = content.stalledIssueUiItem.icon,
-                        conflictName = content.stalledIssueUiItem.conflictName,
-                        nodeName = content.stalledIssueUiItem.displayedName,
-                        actions = content.stalledIssueUiItem.actions,
-                        actionSelected = { action ->
-                            // Show ApplyToAllDialog instead of immediately resolving
-                            sheetContent = SyncModalSheetContent.ApplyToAllDialog(
-                                stalledIssueUiItem = content.stalledIssueUiItem,
-                                selectedAction = action
-                            )
-                            coroutineScope.launch {
-                                modalSheetState.hide()
-                            }
-                        }
-                    )
-                }
+    var isWarningBannerDisplayed by rememberSaveable { mutableStateOf(false) }
+    ComposableLifecycle { event ->
+        if (event == Lifecycle.Event.ON_RESUME) {
+            isWarningBannerDisplayed =
+                syncPermissionsManager.isDisableBatteryOptimizationGranted().not()
+        }
+    }
 
-                is SyncModalSheetContent.ApplyToAllDialog -> {
-                    ApplyToAllDialog(
-                        fileName = content.stalledIssueUiItem.displayedName,
-                        selectedAction = content.selectedAction,
-                        onApplyToCurrent = {
-                            actionSelected(
-                                content.stalledIssueUiItem,
-                                content.selectedAction,
-                                false
-                            )
-                            sheetContent = null
-                        },
-                        onApplyToAll = {
-                            actionSelected(content.stalledIssueUiItem, content.selectedAction, true)
-                            sheetContent = null
-                        },
-                        onCancel = {
-                            sheetContent = null
-                        },
-                        shouldShowApplyToAllOption = syncStalledIssueState.stalledIssues.size > 1,
-                    )
-                }
+    val multiFabState = rememberMultiFloatingActionButtonState()
 
-                else -> {
+    DisposableEffect(multiFabState.value) {
+        onFabExpanded(multiFabState.value == MultiFloatingActionButtonState.EXPANDED)
+        onDispose { }
+    }
 
-                }
+    MegaScaffold(
+        contentWindowInsets = if (isInCloudDrive) WindowInsets(0.dp) else ScaffoldDefaults.contentWindowInsets,
+        topBar = {
+            if (!isInCloudDrive) {
+                MegaTopAppBar(
+                    title = title.ifEmpty { stringResource(R.string.sync_toolbar_title) },
+                    navigationType = AppBarNavigationType.Back {
+                        onBackPressedDispatcher?.onBackPressed()
+                    },
+                    actions = actions.map { action ->
+                        MenuActionWithClick(action) { onActionPressed(action) }
+                    },
+                    // M3 draws the separator from scroll state rather than a fixed elevation.
+                    drawBottomLineOnScrolledContent = isWarningBannerDisplayed ||
+                            syncFoldersState.isWarningBannerDisplayed,
+                )
             }
-        }
-    ) {
-        var isWarningBannerDisplayed by rememberSaveable { mutableStateOf(false) }
-        ComposableLifecycle { event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                isWarningBannerDisplayed =
-                    syncPermissionsManager.isDisableBatteryOptimizationGranted().not()
-            }
-        }
-
-        val multiFabState = rememberMultiFloatingActionButtonState()
-
-        DisposableEffect(multiFabState.value) {
-            onFabExpanded(multiFabState.value == MultiFloatingActionButtonState.EXPANDED)
-            onDispose { }
-        }
-
-        val appBarWindowInsets = WindowInsets.statusBars
-
-        MegaScaffold(
-            scaffoldState = scaffoldState,
-            contentWindowInsets = if (isInCloudDrive) WindowInsets(0.dp) else ScaffoldDefaults.contentWindowInsets,
-            topBar = {
-                if (!isInCloudDrive) {
-                    MegaAppBar(
-                        title = title.ifEmpty { stringResource(R.string.sync_toolbar_title) },
-                        appBarType = AppBarType.BACK_NAVIGATION,
-                        onNavigationPressed = {
-                            onBackPressedDispatcher?.onBackPressed()
-                        },
-                        actions = actions,
-                        onActionPressed = onActionPressed,
-                        elevation = if (isWarningBannerDisplayed || syncFoldersState.isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
-                        windowInsets = appBarWindowInsets,
-                    )
-                }
-            },
-            floatingActionButton = {
-                if ((syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) && syncFoldersState.isStorageOverQuota.not()) {
-                    MegaMultiFloatingActionButton(
-                        items = listOf(
-                            MultiFloatingActionButtonItem(
-                                icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
-                                label = stringResource(id = R.string.sync_toolbar_title),
-                                onClicked = {
-                                    Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
-                                    onSyncFolderClicked()
-                                    multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
-                                },
-                            ),
-                            MultiFloatingActionButtonItem(
-                                icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
-                                label = stringResource(id = sharedR.string.sync_add_new_backup_toolbar_title),
-                                onClicked = {
-                                    Analytics.tracker.trackEvent(AndroidBackupFABButtonPressedEvent)
-                                    onBackupFolderClicked()
-                                    multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
-                                },
-                            ),
+        },
+        floatingActionButton = {
+            if ((syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) && syncFoldersState.isStorageOverQuota.not()) {
+                MegaMultiFloatingActionButton(
+                    items = listOf(
+                        MultiFloatingActionButtonItem(
+                            icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
+                            label = stringResource(id = R.string.sync_toolbar_title),
+                            onClicked = {
+                                Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
+                                onSyncFolderClicked()
+                                multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
+                            },
                         ),
-                        modifier = Modifier
-                            .testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
-                            .navigationBarsPadding(),
-                        multiFabState = multiFabState,
-                        onStateChanged = { state ->
-                            if (state == MultiFloatingActionButtonState.EXPANDED) {
-                                Analytics.tracker.trackEvent(
-                                    AndroidSyncMultiFABButtonPressedEvent
-                                )
-                            }
-                            onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
-                            multiFabState.value = state
-                        },
-                        isCircular = false,
-                    )
-                }
-            },
-            blurContent = if (multiFabState.value == MultiFloatingActionButtonState.EXPANDED) { ->
-                multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
-            } else {
-                null
-            },
-            content = { paddingValues ->
-                SyncListScreenContent(
+                        MultiFloatingActionButtonItem(
+                            icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
+                            label = stringResource(id = sharedR.string.sync_add_new_backup_toolbar_title),
+                            onClicked = {
+                                Analytics.tracker.trackEvent(AndroidBackupFABButtonPressedEvent)
+                                onBackupFolderClicked()
+                                multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
+                            },
+                        ),
+                    ),
                     modifier = Modifier
-                        .padding(paddingValues),
-                    stalledIssuesCount = stalledIssuesCount,
-                    moreClicked = { stalledIssueItem ->
-                        sheetContent = SyncModalSheetContent.IssueResolutions(stalledIssueItem)
-                        coroutineScope.launch {
-                            modalSheetState.show()
+                        .testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
+                        .navigationBarsPadding(),
+                    multiFabState = multiFabState,
+                    onStateChanged = { state ->
+                        if (state == MultiFloatingActionButtonState.EXPANDED) {
+                            Analytics.tracker.trackEvent(
+                                AndroidSyncMultiFABButtonPressedEvent
+                            )
+                        }
+                        onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
+                        multiFabState.value = state
+                    },
+                    isCircular = false,
+                )
+            }
+        },
+        content = { paddingValues ->
+            SyncListScreenContent(
+                syncFoldersUiState = syncFoldersState,
+                syncStalledIssuesState = syncStalledIssueState,
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .conditional(multiFabState.value == MultiFloatingActionButtonState.EXPANDED) {
+                        clickable(
+                            interactionSource = null,
+                            indication = null,
+                        ) {
+                            multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
                         }
                     },
-                    onAddNewSyncClicked = onSyncFolderClicked,
-                    onAddNewBackupClicked = onBackupFolderClicked,
-                    onOpenMegaFolderClicked = onOpenMegaFolderClicked,
-                    syncPermissionsManager = syncPermissionsManager,
-                    onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
-                    onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
-                    onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
-                    syncFoldersViewModel = syncFoldersViewModel,
-                    syncStalledIssuesViewModel = syncStalledIssuesViewModel,
-                    syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
-                    syncIssueNotificationViewModel = syncIssueNotificationViewModel,
-                    deviceName = title,
-                    selectedChip = selectedChip,
-                    snackBarHostState = scaffoldState.snackbarHostState,
-                )
-            },
+                stalledIssuesCount = stalledIssuesCount,
+                moreClicked = { stalledIssueItem ->
+                    onStalledIssueMoreClicked?.invoke(stalledIssueItem.id)
+                        ?: run { sheetContent = SyncModalSheetContent.IssueResolutions(stalledIssueItem) }
+                },
+                onAddNewSyncClicked = onSyncFolderClicked,
+                onAddNewBackupClicked = onBackupFolderClicked,
+                onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+                syncPermissionsManager = syncPermissionsManager,
+                onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
+                onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
+                onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
+                syncFoldersViewModel = syncFoldersViewModel,
+                syncStalledIssuesViewModel = syncStalledIssuesViewModel,
+                syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
+                syncIssueNotificationViewModel = syncIssueNotificationViewModel,
+                deviceName = title,
+                selectedChip = selectedChip,
+            )
+        },
+    )
+
+    // SyncHostActivity's classic NavHost has neither Nav3 scene strategies nor a
+    // NavigationHandler, so hosts that cannot navigate keep these inline. Hosts that can pass
+    // onStalledIssueMoreClicked and reach the destinations in SyncScreenDestination instead.
+    // Remove this branch once that activity is retired and every host navigates.
+    if (onStalledIssueMoreClicked == null) {
+        LegacyStalledIssueResolution(
+            sheetContent = sheetContent,
+            sheetState = modalSheetState,
+            hasMultipleStalledIssues = syncStalledIssueState.stalledIssues.size > 1,
+            onSheetContentChanged = { sheetContent = it },
+            actionSelected = actionSelected,
         )
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
+/**
+ * The stalled issue resolution flow for hosts that cannot navigate.
+ *
+ * Only the resolution list is sheet content; [ApplyToAllDialog] wraps a ConfirmationDialog and is a
+ * dialog window in its own right, so the two are rendered separately rather than swapped through one
+ * slot. The Material 2 ModalBottomSheetLayout this replaced kept its body composed while hidden,
+ * which is what let both share a slot before.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun LegacyStalledIssueResolution(
+    sheetContent: SyncModalSheetContent?,
+    sheetState: SheetState,
+    hasMultipleStalledIssues: Boolean,
+    onSheetContentChanged: (SyncModalSheetContent?) -> Unit,
+    actionSelected: (StalledIssueUiItem, StalledIssueResolutionAction, Boolean) -> Unit,
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+    when (sheetContent) {
+        is SyncModalSheetContent.IssueResolutions -> {
+            MegaModalBottomSheet(
+                sheetState = sheetState,
+                bottomSheetBackground = MegaModalBottomSheetBackground.PageBackground,
+                onDismissRequest = { onSheetContentChanged(null) },
+            ) {
+                IssuesResolutionDialog(
+                    icon = sheetContent.stalledIssueUiItem.icon,
+                    conflictName = sheetContent.stalledIssueUiItem.conflictName,
+                    nodeName = sheetContent.stalledIssueUiItem.displayedName,
+                    actions = sheetContent.stalledIssueUiItem.actions,
+                    actionSelected = { action ->
+                        // Let the sheet animate away before the dialog takes over.
+                        coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
+                            onSheetContentChanged(
+                                SyncModalSheetContent.ApplyToAllDialog(
+                                    stalledIssueUiItem = sheetContent.stalledIssueUiItem,
+                                    selectedAction = action,
+                                )
+                            )
+                        }
+                    },
+                )
+            }
+        }
+
+        is SyncModalSheetContent.ApplyToAllDialog -> {
+            ApplyToAllDialog(
+                fileName = sheetContent.stalledIssueUiItem.displayedName,
+                selectedAction = sheetContent.selectedAction,
+                onApplyToCurrent = {
+                    actionSelected(sheetContent.stalledIssueUiItem, sheetContent.selectedAction, false)
+                    onSheetContentChanged(null)
+                },
+                onApplyToAll = {
+                    actionSelected(sheetContent.stalledIssueUiItem, sheetContent.selectedAction, true)
+                    onSheetContentChanged(null)
+                },
+                onCancel = { onSheetContentChanged(null) },
+                shouldShowApplyToAllOption = hasMultipleStalledIssues,
+            )
+        }
+
+        null -> Unit
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 private fun SyncListScreenContent(
     modifier: Modifier,
-    snackBarHostState: SnackbarHostState,
+    syncFoldersUiState: SyncFoldersUiState,
+    syncStalledIssuesState: SyncStalledIssuesState,
     stalledIssuesCount: Int,
     moreClicked: (StalledIssueUiItem) -> Unit,
     onAddNewSyncClicked: () -> Unit,
@@ -314,16 +340,9 @@ private fun SyncListScreenContent(
 ) {
     var checkedChip by rememberSaveable { mutableStateOf(selectedChip) }
 
-    val syncFoldersUiState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
-    val syncStalledIssuesState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
     val syncSolvedIssuesState by syncSolvedIssuesViewModel.state.collectAsStateWithLifecycle()
     val issueNotificationState by syncIssueNotificationViewModel.state.collectAsStateWithLifecycle()
 
-    val pullToRefreshState = rememberPullRefreshState(
-        refreshing = syncFoldersUiState.isRefreshing,
-        onRefresh = {
-            syncFoldersViewModel.onSyncRefresh()
-        })
     val isSyncNotEmpty = syncFoldersUiState.syncUiItems.isNotEmpty()
 
     Column(modifier) {
@@ -356,12 +375,12 @@ private fun SyncListScreenContent(
             }
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .conditional(isSyncNotEmpty) {
-                    pullRefresh(pullToRefreshState)
-                }
+        PullToRefreshBox(
+            modifier = Modifier.fillMaxSize(),
+            isRefreshing = isSyncNotEmpty && syncFoldersUiState.isRefreshing,
+            onRefresh = {
+                if (isSyncNotEmpty) syncFoldersViewModel.onSyncRefresh()
+            },
         ) {
             SelectedChipScreen(
                 onAddNewSyncClicked = onAddNewSyncClicked,
@@ -378,16 +397,8 @@ private fun SyncListScreenContent(
                 syncFoldersViewModel = syncFoldersViewModel,
                 syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
                 syncFoldersUiState = syncFoldersUiState,
-                snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
             )
-            if (isSyncNotEmpty) {
-                PullRefreshIndicator(
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    refreshing = syncFoldersUiState.isRefreshing,
-                    state = pullToRefreshState
-                )
-            }
         }
     }
 }
@@ -399,7 +410,15 @@ private fun HeaderChips(
     onChipSelected: (SyncChip) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ChipBar(modifier = modifier.padding(vertical = 8.dp)) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .horizontalScroll(rememberScrollState())
+            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .selectableGroup(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
         MegaChip(
             selected = selectedChip == SYNC_FOLDERS,
             text = stringResource(id = R.string.sync_folders),
@@ -448,7 +467,6 @@ private fun SelectedChipScreen(
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
     syncFoldersUiState: SyncFoldersUiState,
-    snackBarHostState: SnackbarHostState,
     deviceName: String,
 ) {
     when (checkedChip) {
@@ -460,7 +478,6 @@ private fun SelectedChipScreen(
                 issuesInfoClicked = issuesInfoClicked,
                 viewModel = syncFoldersViewModel,
                 uiState = syncFoldersUiState,
-                snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
                 onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                 onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,

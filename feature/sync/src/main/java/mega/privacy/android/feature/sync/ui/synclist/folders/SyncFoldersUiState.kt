@@ -1,11 +1,12 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
 import androidx.annotation.StringRes
+import kotlinx.collections.immutable.ImmutableList
 import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 
 internal data class SyncFoldersUiState(
-    val syncUiItems: List<SyncUiItem>,
+    val syncUiItems: ImmutableList<SyncUiItem>,
     val isRefreshing: Boolean = false,
     val isLowBatteryLevel: Boolean = false,
     val syncPauseReason: SyncPauseReason? = null,

@@ -237,8 +237,27 @@ data object SyncMegaPickerNavKey : NavKey
 @Serializable
 data object SyncEmptyRouteNavKey : NavKey
 
+/**
+ * Bottom sheet listing the resolutions available for a stalled sync issue.
+ *
+ * @param issueId id of the stalled issue. The issue itself is resolved from the shared
+ * stalled issues state rather than carried whole, so the key stays serializable.
+ */
 @Serializable
-data object SyncPromotionNavKey : NavKey
+data class SyncStalledIssueResolutionNavKey(val issueId: String) : NavKey
+
+/**
+ * Dialog asking whether a chosen resolution applies to one issue or to all of them.
+ *
+ * @param issueId id of the stalled issue being resolved
+ * @param actionType name of the selected resolution action. The type is internal to the sync
+ * feature, so it travels as its enum name and is resolved at the destination.
+ */
+@Serializable
+data class SyncApplyToAllNavKey(
+    val issueId: String,
+    val actionType: String,
+) : NavKey
 
 @Serializable
 @Parcelize

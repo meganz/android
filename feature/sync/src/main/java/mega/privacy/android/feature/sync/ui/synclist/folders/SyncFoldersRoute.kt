@@ -2,8 +2,6 @@ package mega.privacy.android.feature.sync.ui.synclist.folders
 
 import android.content.Intent
 import android.provider.DocumentsContract
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -20,9 +18,10 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.P
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.RemoveFolderClicked
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.SnackBarShown
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.feature.sync.ui.extension.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
@@ -35,11 +34,11 @@ internal fun SyncFoldersRoute(
     onCameraUploadsSettingsClicked: () -> Unit,
     viewModel: SyncFoldersViewModel,
     uiState: SyncFoldersUiState,
-    snackBarHostState: SnackbarHostState,
     deviceName: String,
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
+    val snackBarHostState = LocalSnackBarHostState.current
 
     SyncFoldersScreen(
         syncUiItems = uiState.syncUiItems,
@@ -129,7 +128,7 @@ internal fun SyncFoldersRoute(
             val message =
                 uiState.snackbarMessage.let { resources.getString(resId, uiState.movedFolderName) }
             try {
-                snackBarHostState.showAutoDurationSnackbar(message)
+                snackBarHostState?.showAutoDurationSnackbar(message)
             } finally {
                 viewModel.handleAction(SnackBarShown)
             }
@@ -156,7 +155,7 @@ internal fun StopSyncConfirmDialog(
 @CombinedThemePreviews
 @Composable
 private fun RemoveSyncFolderConfirmDialogPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         StopSyncConfirmDialog(
             onConfirm = {},
             onDismiss = {},

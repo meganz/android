@@ -11,8 +11,7 @@ import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 @Composable
 internal fun SyncItemView(
     modifier: Modifier,
-    syncUiItems: List<SyncUiItem>,
-    itemIndex: Int,
+    sync: SyncUiItem,
     cardExpanded: (SyncUiItem, Boolean) -> Unit,
     pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (SyncUiItem) -> Unit,
@@ -27,7 +26,6 @@ internal fun SyncItemView(
     syncPauseReason: SyncPauseReason? = null,
     onLocalFolderSelected: (SyncUiItem, Uri) -> Unit = { _, _ -> },
 ) {
-    val sync = syncUiItems[itemIndex]
     SyncCard(
         modifier = modifier.testTag(TEST_TAG_SYNC_ITEM_VIEW),
         sync = sync,

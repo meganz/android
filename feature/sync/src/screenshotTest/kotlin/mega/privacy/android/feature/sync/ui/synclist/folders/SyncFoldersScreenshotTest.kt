@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
+import kotlinx.collections.immutable.persistentListOf
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -18,7 +19,7 @@ class SyncFoldersScreenshotTest {
     fun SyncFoldersScreenEmpty() {
         AndroidThemeForPreviews {
             SyncFoldersScreen(
-                syncUiItems = emptyList(),
+                syncUiItems = persistentListOf(),
                 cardExpanded = {},
                 pauseRunClicked = {},
                 removeFolderClicked = {},
@@ -42,7 +43,7 @@ class SyncFoldersScreenshotTest {
     fun SyncFoldersScreenLoading() {
         AndroidThemeForPreviews {
             SyncFoldersScreen(
-                syncUiItems = emptyList(),
+                syncUiItems = persistentListOf(),
                 cardExpanded = {},
                 pauseRunClicked = {},
                 removeFolderClicked = {},
@@ -66,7 +67,7 @@ class SyncFoldersScreenshotTest {
     fun SyncFoldersScreenWithSyncs() {
         AndroidThemeForPreviews {
             SyncFoldersScreen(
-                syncUiItems = listOf(
+                syncUiItems = persistentListOf(
                     syncUiItem(1L, "Competitors documentation", SyncStatus.SYNCED),
                     syncUiItem(2L, "Product roadmap", SyncStatus.SYNCING),
                 ),

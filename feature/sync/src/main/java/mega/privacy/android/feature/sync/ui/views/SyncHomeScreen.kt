@@ -2,7 +2,6 @@ package mega.privacy.android.feature.sync.ui.views
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,9 +26,9 @@ import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIs
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.sync.ui.SyncEmptyState
@@ -136,17 +135,12 @@ internal fun AndroidSyncFeatureNavigation(
 internal fun SyncNoNetworkState(
     onBackPressed: () -> Unit,
 ) {
-    val scaffoldState = rememberScaffoldState()
-
     MegaScaffold(
-        scaffoldState = scaffoldState,
         topBar = {
-            MegaAppBar(
+            MegaTopAppBar(
                 modifier = Modifier.testTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR),
-                appBarType = AppBarType.BACK_NAVIGATION,
+                navigationType = AppBarNavigationType.Back(onBackPressed),
                 title = stringResource(R.string.sync_toolbar_title),
-                onNavigationPressed = onBackPressed,
-                elevation = 0.dp
             )
         }, content = { _ ->
             SyncEmptyState(

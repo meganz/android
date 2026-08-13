@@ -32,7 +32,7 @@ internal fun SyncStorageQuotaExceedWarning(
 @CombinedThemePreviews
 @CombinedThemePhoneLandscapePreviews
 @Composable
-private fun SyncPromotionBottomSheetPreview() {
+private fun SyncStorageQuotaExceedWarningPreview() {
     AndroidThemeForPreviews {
         SyncStorageQuotaExceedWarning(
             onUpgradeClick = {},

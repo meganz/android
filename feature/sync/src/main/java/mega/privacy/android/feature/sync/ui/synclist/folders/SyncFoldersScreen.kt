@@ -39,6 +39,8 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncPauseReason
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.BOTTOM_PADDING
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.CardExpanded
@@ -52,7 +54,7 @@ import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
 
 @Composable
 internal fun SyncFoldersScreen(
-    syncUiItems: List<SyncUiItem>,
+    syncUiItems: ImmutableList<SyncUiItem>,
     cardExpanded: (CardExpanded) -> Unit,
     pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (SyncUiItem) -> Unit,
@@ -103,8 +105,7 @@ internal fun SyncFoldersScreen(
                 }) { itemIndex ->
                     SyncItemView(
                         modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
-                        syncUiItems = syncUiItems,
-                        itemIndex = itemIndex,
+                        sync = syncUiItems[itemIndex],
                         cardExpanded = { syncUiItem, expanded ->
                             if (expanded) {
                                 Analytics.tracker.trackEvent(SyncCardExpandedEvent)
@@ -222,7 +223,7 @@ private fun SyncFoldersScreenLoadingState() {
 private fun SyncFoldersScreenEmptyStatePreview() {
     AndroidThemeForPreviews {
         SyncFoldersScreen(
-            syncUiItems = emptyList(),
+            syncUiItems = persistentListOf(),
             cardExpanded = {},
             pauseRunClicked = {},
             removeFolderClicked = {},
@@ -248,7 +249,7 @@ private fun SyncFoldersScreenEmptyStatePreview() {
 private fun SyncFoldersScreenLoadingStatePreview() {
     AndroidThemeForPreviews {
         SyncFoldersScreen(
-            syncUiItems = emptyList(),
+            syncUiItems = persistentListOf(),
             cardExpanded = {},
             pauseRunClicked = {},
             removeFolderClicked = {},
@@ -273,7 +274,7 @@ private fun SyncFoldersScreenSyncingPreview(
 ) {
     AndroidThemeForPreviews {
         SyncFoldersScreen(
-            listOf(
+            persistentListOf(
                 SyncUiItem(
                     id = 1,
                     syncType = syncType,
@@ -311,7 +312,7 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
 ) {
     AndroidThemeForPreviews {
         SyncFoldersScreen(
-            listOf(
+            persistentListOf(
                 SyncUiItem(
                     id = 1,
                     syncType = syncType,

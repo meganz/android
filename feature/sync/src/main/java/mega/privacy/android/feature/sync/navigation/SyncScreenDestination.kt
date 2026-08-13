@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.navigation
 
 import android.content.Intent
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -8,16 +9,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
+import mega.android.core.ui.theme.thememode.LocalIsDark
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
-import mega.privacy.android.feature.sync.ui.isDarkMode
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerViewModel
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
@@ -25,25 +27,31 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRou
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncRoute
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip
+import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
-import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
+import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
+import mega.privacy.android.feature.sync.ui.views.ApplyToAllDialog
+import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.bottomsheet.bottomSheetMetadata
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.SelectSyncFolderNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
+import mega.privacy.android.navigation.destination.SyncApplyToAllNavKey
 import mega.privacy.android.navigation.destination.SyncEmptyRouteNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
 import mega.privacy.android.navigation.destination.SyncMegaPickerNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
-import mega.privacy.android.navigation.destination.SyncPromotionNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.SyncSettingsNavKey
+import mega.privacy.android.navigation.destination.SyncStalledIssueResolutionNavKey
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncGetStartedButtonEvent
@@ -53,19 +61,22 @@ fun EntryProviderScope<NavKey>.syncScreens(
     navigationHandler: NavigationHandler,
     fileTypeIconMapper: FileTypeIconMapper,
     syncPermissionsManager: SyncPermissionsManager,
-    monitorThemeModeUseCase: MonitorThemeModeUseCase,
     getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     openUpgradeAccountPage: () -> Unit,
 ) {
     entry<SyncListNavKey> {
-        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val useCloudExplorerPicker by produceState(initialValue = false) {
             value = runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
             }.getOrDefault(false)
         }
-        OriginalTheme(isDark = themeMode.isDarkMode()) {
+        SyncLegacyTheme {
             SyncListRoute(
+                onStalledIssueMoreClicked = { issueId ->
+                    navigationHandler.navigate(
+                        SyncStalledIssueResolutionNavKey(issueId = issueId)
+                    )
+                },
                 syncPermissionsManager = syncPermissionsManager,
                 onSyncFolderClicked = {
                     navigationHandler.navigate(SyncNewFolderNavKey(syncType = SyncType.TYPE_TWOWAY))
@@ -98,7 +109,6 @@ fun EntryProviderScope<NavKey>.syncScreens(
     }
 
     entry<SyncNewFolderNavKey> { navKey ->
-        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val useCloudExplorerPicker by produceState(initialValue = false) {
             value = runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
@@ -131,7 +141,7 @@ fun EntryProviderScope<NavKey>.syncScreens(
             },
         )
 
-        OriginalTheme(isDark = themeMode.isDarkMode()) {
+        SyncLegacyTheme {
             SyncNewFolderScreenRoute(
                 viewModel = viewModel,
                 syncPermissionsManager = syncPermissionsManager,
@@ -162,12 +172,11 @@ fun EntryProviderScope<NavKey>.syncScreens(
     }
 
     entry<SyncMegaPickerNavKey> {
-        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val viewModel =
             hiltViewModel<MegaPickerViewModel, MegaPickerViewModel.MegaPickerViewModelFactory> { factory ->
                 factory.create(isStopBackup = false, folderName = "")
             }
-        OriginalTheme(isDark = themeMode.isDarkMode()) {
+        SyncLegacyTheme {
             MegaPickerRoute(
                 viewModel = viewModel,
                 syncPermissionsManager = syncPermissionsManager,
@@ -179,12 +188,11 @@ fun EntryProviderScope<NavKey>.syncScreens(
     }
 
     entry<SyncSelectStopBackupDestinationNavKey> { navKey ->
-        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val viewModel =
             hiltViewModel<MegaPickerViewModel, MegaPickerViewModel.MegaPickerViewModelFactory> { factory ->
                 factory.create(isStopBackup = true, folderName = navKey.folderName)
             }
-        OriginalTheme(isDark = themeMode.isDarkMode()) {
+        SyncLegacyTheme {
             MegaPickerRoute(
                 viewModel = viewModel,
                 syncPermissionsManager = syncPermissionsManager,
@@ -197,11 +205,10 @@ fun EntryProviderScope<NavKey>.syncScreens(
     }
 
     entry<SyncEmptyRouteNavKey> {
-        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         LaunchedEffect(Unit) {
             Analytics.tracker.trackEvent(AddSyncScreenEvent)
         }
-        OriginalTheme(isDark = themeMode.isDarkMode()) {
+        SyncLegacyTheme {
             SyncEmptyScreen {
                 Analytics.tracker.trackEvent(AndroidSyncGetStartedButtonEvent)
                 navigationHandler.navigate(SyncNewFolderNavKey())
@@ -210,30 +217,88 @@ fun EntryProviderScope<NavKey>.syncScreens(
     }
 
     entry<SyncSettingsNavKey> {
-        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-        OriginalTheme(isDark = themeMode.isDarkMode()) {
+        SyncLegacyTheme {
             SettingsSyncRoute()
         }
     }
 
-    entry<SyncPromotionNavKey>(metadata = bottomSheetMetadata()) {
-        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-        val context = LocalContext.current
-        OriginalTheme(isDark = themeMode.isDarkMode()) {
-            SyncPromotionBottomSheet(
-                onSyncFoldersClicked = {
-                    navigationHandler.navigate(SyncNewFolderNavKey(syncType = SyncType.TYPE_TWOWAY))
-                },
-                onBackUpFoldersClicked = {
-                    navigationHandler.navigate(SyncNewFolderNavKey(syncType = SyncType.TYPE_BACKUP))
-                },
-                onLearnMoreClicked = { url ->
-                    context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
-                },
-                hideSheet = {
-                    navigationHandler.remove(SyncPromotionNavKey)
-                },
-            )
+    entry<SyncStalledIssueResolutionNavKey>(metadata = bottomSheetMetadata()) { key ->
+        val viewModel: SyncStalledIssuesViewModel =
+            hiltViewModel(viewModelStoreOwner = sharedViewModelStoreOwner())
+        val state by viewModel.state.collectAsStateWithLifecycle()
+
+        SyncLegacyTheme {
+            state.stalledIssues.firstOrNull { it.id == key.issueId }?.let { issue ->
+                IssuesResolutionDialog(
+                    icon = issue.icon,
+                    conflictName = issue.conflictName,
+                    nodeName = issue.displayedName,
+                    actions = issue.actions,
+                    actionSelected = { action ->
+                        navigationHandler.navigate(
+                            SyncApplyToAllNavKey(
+                                issueId = issue.id,
+                                actionType = action.resolutionActionType.name,
+                            ),
+                            navOptions {
+                                popUpTo<SyncStalledIssueResolutionNavKey> { inclusive = true }
+                            },
+                        )
+                    },
+                )
+            }
         }
     }
+
+    entry<SyncApplyToAllNavKey>(metadata = DialogSceneStrategy.dialog()) { key ->
+        val viewModel: SyncStalledIssuesViewModel =
+            hiltViewModel(viewModelStoreOwner = sharedViewModelStoreOwner())
+        val state by viewModel.state.collectAsStateWithLifecycle()
+        val issue = state.stalledIssues.firstOrNull { it.id == key.issueId }
+        val action = issue?.actions?.firstOrNull { it.resolutionActionType.name == key.actionType }
+
+        SyncLegacyTheme {
+            if (issue != null && action != null) {
+                ApplyToAllDialog(
+                    fileName = issue.displayedName,
+                    selectedAction = action,
+                    onApplyToCurrent = {
+                        viewModel.handleAction(
+                            SyncListAction.ResolveStalledIssue(issue, action, isApplyToAll = false)
+                        )
+                        navigationHandler.remove(key)
+                    },
+                    onApplyToAll = {
+                        viewModel.handleAction(
+                            SyncListAction.ResolveStalledIssue(issue, action, isApplyToAll = true)
+                        )
+                        navigationHandler.remove(key)
+                    },
+                    onCancel = { navigationHandler.remove(key) },
+                    shouldShowApplyToAllOption = state.stalledIssues.size > 1,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * The stalled issues view model is shared with the sync list, so both must resolve it against the
+ * same store owner. Mirrors what [mega.privacy.android.feature.sync.ui.synclist.SyncListRoute] does.
+ */
+@Composable
+private fun sharedViewModelStoreOwner(): ViewModelStoreOwner =
+    LocalContext.current.findFragmentActivity() ?: checkNotNull(LocalViewModelStoreOwner.current)
+
+/**
+ * Supplies the Material 2 theme that the not-yet-migrated original-core-ui composables still read.
+ *
+ * The root [mega.android.core.ui.theme.AndroidTheme] in MegaActivity already themes the whole nav
+ * display and publishes the resolved mode as [LocalIsDark], so entries reuse that instead of each
+ * subscribing to the theme preference again. Delete the wrapper from an entry once its content is
+ * fully core-ui.
+ */
+@Composable
+private fun SyncLegacyTheme(content: @Composable () -> Unit) {
+    OriginalTheme(isDark = LocalIsDark.current, content = content)
 }

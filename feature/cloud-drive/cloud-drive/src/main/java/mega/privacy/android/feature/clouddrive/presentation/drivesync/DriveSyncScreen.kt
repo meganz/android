@@ -58,6 +58,7 @@ import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
+import mega.privacy.android.navigation.destination.SyncStalledIssueResolutionNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.SyncSettingsNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
@@ -303,6 +304,11 @@ internal fun DriveSyncScreen(
                 ) {
                     SyncListRoute(
                         isInCloudDrive = true,
+                        onStalledIssueMoreClicked = { issueId ->
+                            navigationHandler.navigate(
+                                SyncStalledIssueResolutionNavKey(issueId = issueId)
+                            )
+                        },
                         syncPermissionsManager = viewModel.syncPermissionsManager,
                         onSyncFolderClicked = {
                             navigationHandler.navigate(

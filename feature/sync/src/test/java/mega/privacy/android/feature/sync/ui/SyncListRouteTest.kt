@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.ui
 
 import androidx.activity.ComponentActivity
+import kotlinx.collections.immutable.toImmutableList
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -98,7 +99,7 @@ internal class SyncListRouteTest {
         )
         whenever(syncFoldersUiState.value).thenReturn(
             SyncFoldersUiState(
-                syncUiItems = synUiItems,
+                syncUiItems = synUiItems.toImmutableList(),
             )
         )
         whenever(syncFoldersViewModel.uiState).thenReturn(syncFoldersUiState)
@@ -200,7 +201,7 @@ internal class SyncListRouteTest {
     fun `test that sync folders SnackBarShown is dispatched when route leaves composition mid snackbar`() {
         whenever(syncFoldersUiState.value).thenReturn(
             SyncFoldersUiState(
-                syncUiItems = synUiItems,
+                syncUiItems = synUiItems.toImmutableList(),
                 snackbarMessage = sharedR.string.sync_snackbar_message_confirm_sync_stopped,
             )
         )

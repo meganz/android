@@ -1,8 +1,8 @@
 package mega.privacy.android.feature.sync.ui
 
+import kotlinx.collections.immutable.persistentListOf
 import android.content.Context
 import androidx.activity.ComponentActivity
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -65,8 +65,7 @@ class SyncFoldersScreenTest {
     @Test
     fun `test that folders list is displayed when there are folders`() {
         val folderName = "Folder name"
-        val syncFoldersUiState = SyncFoldersUiState(
-            listOf(
+        val syncFoldersUiState = SyncFoldersUiState(persistentListOf(
                 SyncUiItem(
                     id = 1L,
                     syncType = SyncType.TYPE_TWOWAY,
@@ -95,7 +94,6 @@ class SyncFoldersScreenTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 uiState = syncFoldersUiState,
-                snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
             )
         }
@@ -107,7 +105,7 @@ class SyncFoldersScreenTest {
     @Test
     fun `test that folders list empty state is properly displayed when there are no synced folders`() {
         val syncFoldersUiState = SyncFoldersUiState(
-            syncUiItems = emptyList(),
+            syncUiItems = persistentListOf(),
         )
         whenever(state.value).thenReturn(syncFoldersUiState)
         whenever(viewModel.uiState).thenReturn(state)
@@ -119,7 +117,6 @@ class SyncFoldersScreenTest {
                 onSelectStopBackupDestinationClicked = {},
                 issuesInfoClicked = {},
                 uiState = syncFoldersUiState,
-                snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
@@ -140,7 +137,7 @@ class SyncFoldersScreenTest {
     @Test
     fun `test that click the empty state buttons don't send any analytics tracker event`() {
         val syncFoldersUiState = SyncFoldersUiState(
-            syncUiItems = emptyList(),
+            syncUiItems = persistentListOf(),
         )
         whenever(state.value).thenReturn(syncFoldersUiState)
         whenever(viewModel.uiState).thenReturn(state)
@@ -152,7 +149,6 @@ class SyncFoldersScreenTest {
                 onSelectStopBackupDestinationClicked = {},
                 issuesInfoClicked = {},
                 uiState = syncFoldersUiState,
-                snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
@@ -170,7 +166,7 @@ class SyncFoldersScreenTest {
     fun `test that the loading screen is shown`() {
         composeTestRule.setContent {
             SyncFoldersScreen(
-                syncUiItems = emptyList(),
+                syncUiItems = persistentListOf(),
                 cardExpanded = {},
                 pauseRunClicked = {},
                 removeFolderClicked = {},
@@ -242,7 +238,7 @@ class SyncFoldersScreenTest {
     fun `test that display the list of Sync Folders send the right analytics tracker event`() {
         composeTestRule.setContent {
             SyncFoldersScreen(
-                syncUiItems = listOf(
+                syncUiItems = persistentListOf(
                     SyncUiItem(
                         id = 1L,
                         syncType = SyncType.TYPE_TWOWAY,
@@ -290,7 +286,7 @@ class SyncFoldersScreenTest {
     fun `test that expand a Sync card sends the right analytics tracker event`() {
         composeTestRule.setContent {
             SyncFoldersScreen(
-                syncUiItems = listOf(
+                syncUiItems = persistentListOf(
                     SyncUiItem(
                         id = 1L,
                         syncType = SyncType.TYPE_TWOWAY,
@@ -327,7 +323,7 @@ class SyncFoldersScreenTest {
     fun `test that collapse a Sync card does not send any analytics tracker event `() {
         composeTestRule.setContent {
             SyncFoldersScreen(
-                syncUiItems = listOf(
+                syncUiItems = persistentListOf(
                     SyncUiItem(
                         id = 1L,
                         syncType = SyncType.TYPE_TWOWAY,

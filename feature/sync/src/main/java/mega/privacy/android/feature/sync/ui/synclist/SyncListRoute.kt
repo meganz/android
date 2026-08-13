@@ -1,16 +1,15 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
@@ -19,7 +18,7 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssu
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
-import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.feature.sync.ui.extension.showAutoDurationSnackbar
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLocalFileEvent
@@ -58,6 +57,7 @@ fun SyncListRoute(
     onSyncSettingsClicked: (() -> Unit)? = null,
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
+    onStalledIssueMoreClicked: ((issueId: String) -> Unit)? = null,
 ) {
     val fragmentActivity = LocalContext.current.findFragmentActivity()
     val viewModelStoreOwner =
@@ -80,6 +80,7 @@ fun SyncListRoute(
         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
         onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         onFabExpanded = onFabExpanded,
+        onStalledIssueMoreClicked = onStalledIssueMoreClicked,
     )
 }
 
@@ -101,11 +102,10 @@ internal fun SyncListRoute(
     viewModel: SyncListViewModel = hiltViewModel(),
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
+    onStalledIssueMoreClicked: ((issueId: String) -> Unit)? = null,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val stalledIssueState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
-
-    val snackBarHostState = remember { SnackbarHostState() }
 
     SyncListScreen(
         isInCloudDrive = isInCloudDrive,
@@ -156,7 +156,6 @@ internal fun SyncListRoute(
                 )
             )
         },
-        snackBarHostState = snackBarHostState,
         syncPermissionsManager = syncPermissionsManager,
         actions = listOfNotNull(onSyncSettingsClicked?.let { CommonMenuAction.Settings }),
         onActionPressed = {
@@ -173,15 +172,17 @@ internal fun SyncListRoute(
         syncIssueNotificationViewModel = syncIssueNotificationViewModel,
         selectedChip = selectedChip,
         onFabExpanded = onFabExpanded,
+        onStalledIssueMoreClicked = onStalledIssueMoreClicked,
     )
 
     val resources = LocalResources.current
+    val snackBarHostState = LocalSnackBarHostState.current
     EventEffect(
         stalledIssueState.snackbarMessageContent,
         onConsumed = {}
     ) { content ->
         try {
-            snackBarHostState.showAutoDurationSnackbar(
+            snackBarHostState?.showAutoDurationSnackbar(
                 resources.getString(content)
             )
         } finally {

@@ -15,7 +15,6 @@ import javax.inject.Inject
 class SyncFeatureDestination @Inject constructor(
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val syncPermissionsManager: SyncPermissionsManager,
-    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
@@ -24,7 +23,6 @@ class SyncFeatureDestination @Inject constructor(
                 navigationHandler = navigationHandler,
                 fileTypeIconMapper = fileTypeIconMapper,
                 syncPermissionsManager = syncPermissionsManager,
-                monitorThemeModeUseCase = monitorThemeModeUseCase,
                 getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
                 openUpgradeAccountPage = {
                     navigationHandler.navigate(UpgradeAccountNavKey())
