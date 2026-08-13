@@ -210,11 +210,14 @@ recover with `git log --all -- <path>` / `git show <sha>:<path>`, don't rewrite 
 - Upload approved release notes to WebLate (skip if default notes). Use the
   `weblate` skill. Get content team approval in `#android`.
 - **preRelease:** `./gradlew preRelease --rv "<X.Y>" --sdk "<SDK_TAG>" --chat "<CHAT_TAG>"`
-  (~3 min). Creates branch `task/pre-release/v<X.Y>` + MR, **already assigned to you**,
+  (~3 min; the task itself checks out the SDK tags — step 2293). ⚠️ `--sdk`/`--chat` belong to
+  **this** run only: once `release/v<X.Y>` exists, a new SDK RC is handled on the release branch
+  instead (§1.6, step 2344). Creates branch `task/pre-release/v<X.Y>` + MR, **already assigned to you**,
   **squash ON** (correct for the pre-release MR), 3 commits: Update SDKs / Update App
   version / Update strings. The bot's **"Code Review Failed — Diff too large"** note is
   expected (translations bloat the diff) and **non-blocking**.
-- **Pre-built SDK (MR comment):** `build sdk-aar --lib-type=rel --sdk-branch=<SDK_TAG> --chat-branch=<CHAT_TAG>`.
+- **Pre-built SDK — comment on the PRE-RELEASE MR** (steps 2450–2453; the MR `preRelease` just
+  created, targeting `develop`): `build sdk-aar --lib-type=rel --sdk-branch=<SDK_TAG> --chat-branch=<CHAT_TAG>`.
   The result does **NOT** reply on the MR — it posts (~15–60 min; ~13 min observed) to
   **#sdk-android-pipeline** as `:rocket: Prebuilt SDK is published to Artifactory
   Successfully!` with `SDK Branch`, `Chat SDK Branch`, `Version: <YYYYMMDD.HHMMSS-rel>`, an AAR
@@ -312,21 +315,40 @@ recover with `git log --all -- <path>` / `git show <sha>:<path>`, don't rewrite 
 - Monitor Play Console for Google approval; watch Crashlytics for new crashes/ANRs.
 
 ### 1.6 New Release Candidate builds
-Each round, devs cherry-pick TC fixes to `release/v<X.Y>` (RC verifies). To roll a new RC:
-- **If there's a new SDK/MEGAChat RC** (check `#sdk` / `#megachat_native` thread for the
-  new tag targeting Android `<X.Y>` — often only one of them bumps; **pass BOTH tags anyway**):
-  1. Re-apply the **GitLab redirect (step 2669)** — `checkout -B`/branch switches reset
-     `.gitmodules` back to GitHub, so the new rc tag won't fetch until you redo it +
-     `submodule sync && submodule update --remote`. Verify `git -C …/mega/sdk tag -l <NEW_TAG>` resolves.
-  2. On `develop`: `./gradlew preRelease --rv "<X.Y>" --sdk "<NEW_SDK_TAG>" --chat "<CHAT_TAG>"`
-     → new **pre-release MR** (strings + SDK submodule bump). Note: develop's `appVersion`
-     stays `<X.Y>` through QA (only the Jira fixVersion moved to NEXT), so `--rv "<X.Y>"` is right.
-  3. **`build sdk-aar … in the PRE-RELEASE MR`** (NOT the release MR) — the result posts to
-     **#sdk-android-pipeline** with `Version: <…-rel>`. Read it there (no GitLab token needed).
-  4. Set `megaSdkVersion` to that `-rel` value in the pre-release MR (commit only `build.gradle.kts`), push.
-  5. Get the pre-release MR **2 approvals + green pipeline → merge to develop** (squash), then
-     **cherry-pick the squashed merge commit** onto `release/v<X.Y>` (next bullet).
-- **Monitoring the merge without a GitLab token** (the merge is reviewer-gated; you wait on it):
+Each round, devs cherry-pick TC fixes to `release/v<X.Y>` (RC verifies). Order per Confluence
+steps 2339 → 2459: **strings via develop, SDK patch directly on the release branch.**
+
+> ✅ **Standing authorization (RC, 2026-08-13): don't ask for this round-trip.** Once the
+> prebuilt SDK for a new SDK/MEGAChat RC is published, **commit + push the pin to
+> `release/v<X.Y>` and post `deliver_appStore` straight away** — no confirmation prompt. Still
+> confirm before anything broadcast or irreversible: Slack posts, `#devops-cicd` promotion
+> requests, `postRelease`. And still verify first that the pin commit is not already on the
+> branch (someone else may have pushed it) and that the `-rel` build report matches the tags.
+- **2339** Verify all TC fixes are cherry-picked to `release/v<X.Y>`.
+- **2340 Strings round — on `develop`: `./gradlew preRelease --rv "<X.Y>"`.**
+  ⛔ **NO `--sdk` / `--chat` here** — those belong only to the §1.4 code-freeze run. develop's
+  `appVersion` stays `<X.Y>` through QA (only the Jira fixVersion moved to NEXT), so `--rv "<X.Y>"`
+  is right. **2342** merge the pre-release MR → develop (squash); **2343** cherry-pick onto release.
+- **2344 New SDK / MEGAChat patch → all of this happens on `release/v<X.Y>` + its MR**, never
+  through develop. **Why (from the checklist):** develop may already sit on a *newer* SDK built
+  from SDK `develop` with more features than the SDK release/hotfix; merging the SDK release build
+  into develop can break develop's compilation.
+  1. Get the tag(s) from `#sdk` / `#megachat_native` whose *Target apps* lists Android `<X.Y>`.
+  2. **On the RELEASE MR** (not the pre-release MR):
+     `build sdk-aar --lib-type=rel --sdk-branch=<SDK_TAG> --chat-branch=<MEGACHAT_TAG>`
+     — **always pass BOTH** even if only one was patched, else CI builds the other from its
+     `develop`. Takes ~1 h; the `<YYYYMMDD.HHMMSS-rel>` version is in the build report (also
+     posted to **#sdk-android-pipeline** with `Triggered from: <MR>` — read it there, no
+     GitLab token needed; match the MR).
+  3. On `release/v<X.Y>`: set `extra["megaSdkVersion"]` in root `build.gradle.kts` to that `-rel` value.
+  4. Point the patched submodule(s) at the tag: `git checkout <SDK_TAG>` in
+     `sdk/src/main/jni/mega/sdk` and/or `git checkout <MEGACHAT_TAG>` in `sdk/src/main/jni/megachat/sdk`.
+     `error: pathspec … did not match` → apply the **GitLab redirect (step 2669)** first
+     (`.gitmodules` → GitLab urls + `submodule sync && submodule update --init --recursive --remote`,
+     then `git fetch`); branch switches reset it back to GitHub, so re-apply each round.
+     Verify `git -C sdk/src/main/jni/mega/sdk tag -l <SDK_TAG>` resolves.
+  5. Commit (`megaSdkVersion` + gitlink) on the release branch and push.
+- **Monitoring the pre-release merge without a GitLab token** (reviewer-gated; you wait on it):
   background-poll the remote over SSH (no token needed) and auto-continue when it fires. Two
   definitive signals — the source branch is deleted on merge (`force_remove_source_branch`), and
   the squash lands on develop:
@@ -340,25 +362,23 @@ Each round, devs cherry-pick TC fixes to `release/v<X.Y>` (RC verifies). To roll
   ```
   Run it with `run_in_background: true`; you're notified on exit, then continue with the cherry-pick.
   (Avoid `/dev/null` redirects — the sandbox blocks them.)
-- **Strings-only round** (no SDK bump): `./gradlew preRelease --rv "<X.Y>"` → merge to develop → cherry-pick strings commit to release.
-- **Cherry-pick onto release (squash-merge aware):** the pre-release MR squash-merges into
+- **2343 Cherry-pick onto release (squash-merge aware):** the pre-release MR squash-merges into
   **one** commit on develop (e.g. `Pre-release - v<X.Y>`); that's what you cherry-pick — not
   the 3 original branch commits (they're orphaned by the squash). Steps: `git fetch`,
   `git checkout -B release/v<X.Y> origin/release/v<X.Y>`, `git cherry-pick <squashed-sha>`.
   - ⚠️ **Expect a conflict in `resources/string-resources/src/main/res/values/strings_shared.xml`**
     (English source) — release's tail differs from develop's. The HEAD (release) side is usually
     empty and the incoming side adds the new `<string>`s before `</resources>`: **keep the incoming
-    block**, drop the markers. The SDK gitlink (→ new rc tag), `megaSdkVersion`, and the
-    per-locale `strings_shared.xml` all apply cleanly. Then `git add` the file,
-    `GIT_EDITOR=true git cherry-pick --continue`, verify no `<<<<<<<` remain, push.
-- **`deliver_appStore` on the release MR** → new Alpha. Watch the build report on the release MR
+    block**, drop the markers. The per-locale `strings_shared.xml` files apply cleanly. Then
+    `git add` the file, `GIT_EDITOR=true git cherry-pick --continue`, verify no `<<<<<<<` remain, push.
+- **2345 `deliver_appStore` on the release MR** → new Alpha. Watch the build report on the release MR
   + `#android` + `#qa` (`:rocket: …uploaded to Google Play Alpha … Version: <X.Y>(<code>)`).
   - **Monitoring without a GitLab token:** background-poll the **public** Artifactory listing
     `https://artifactory.developers.mega.co.nz/artifactory/android-mega/release/v<X.Y>/` — a new
     build appears as a `<versionCode>_<release-HEAD-short-sha>/` folder (e.g. `261761238_1e964c7142/`);
     `slack_info.txt` / `release_info.txt` there carry the published version string. Poll for a folder
     matching the release HEAD sha; timeout → check the MR for a build failure.
-- **Set `Fixed` TCs → `Retest`** so QA re-verifies on the new build. TestRail statuses:
+- **2459 Set `Fixed` TCs → `Retest`** so QA re-verifies on the new build. TestRail statuses:
   **Fixed = `status_id` 8, Retest = `4`** (Failed 5, Feedback 10). Find them
   `TR "get_tests/<run>&status_id=8"`, then for each POST `add_result/<test_id>` with
   `{"status_id":4,"comment":"new Alpha RC delivered (v<X.Y>, SDK <tag>) — please retest"}`.
