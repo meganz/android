@@ -191,15 +191,15 @@ object Util {
     }
 
     @JvmStatic
-    fun String?.toCDATAOrNull(): String? = this?.toCDATA()
+    fun String?.toCDATAOrNull(context: Context): String? = this?.toCDATA(context)
 
-    fun String.toCDATA(): String {
+    fun String.toCDATA(context: Context): String {
         val escaped = replace("&", "&amp;")
             .replace("\"", "&quot;")
             .replace("'", "&#39;")
             .replace("<", "&lt;")
             .replace(">", "&gt;")
-        return ChatUtil.converterShortCodes(escaped) ?: escaped
+        return ChatUtil.converterShortCodes(context, escaped) ?: escaped
     }
 
     @JvmStatic

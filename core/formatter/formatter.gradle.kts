@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(project(":resources:string-resources"))
     implementation(project(":domain"))
+    implementation(project(":third-party-lib:twemoji"))
     //test
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))

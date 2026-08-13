@@ -81,13 +81,13 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
                 ContactUtil.getMegaUserNameDB(user) ?: ""
             } ?: ""
 
-            val folderName = (if (n.isNodeKeyDecrypted) n.name else notificationTitle).toCDATA()
+            val folderName = (if (n.isNodeKeyDecrypted) n.name else notificationTitle).toCDATA(appContext)
 
             val source =
                 "<b>$folderName</b> " +
                         appContext.getString(R.string.incoming_folder_notification) +
                         " " +
-                        userName.toCDATA()
+                        userName.toCDATA(appContext)
             val notificationContent = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY)
             val notificationChannelId = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID
             val pendingIntent = megaNavigator

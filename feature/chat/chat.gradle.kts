@@ -26,6 +26,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:coroutine"))
+    implementation(project(":core:formatter"))
     implementation(project(":shared:chats"))
 
     implementation(lib.mega.core.ui)

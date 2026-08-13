@@ -19,7 +19,6 @@ import mega.privacy.android.domain.entity.PaymentReminderAlert
 import mega.privacy.android.domain.entity.PaymentSucceededAlert
 import mega.privacy.android.domain.entity.RemovedFromShareByOwnerAlert
 import mega.privacy.android.domain.entity.RemovedSharedNodesAlert
-import mega.privacy.android.domain.entity.UpdatedSharedNodesAlert
 import mega.privacy.android.domain.entity.ScheduledMeetingAlert
 import mega.privacy.android.domain.entity.TakeDownAlert
 import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
@@ -29,6 +28,7 @@ import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingDeniedAle
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingAcceptedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingDeniedAlert
+import mega.privacy.android.domain.entity.UpdatedSharedNodesAlert
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.shared.resources.R as SharedR
 
@@ -116,12 +116,12 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
         if (path != null && FileUtil.isFile(path)) {
             String.format(
                 context.getString(R.string.subtitle_file_takedown_notification),
-                name.toCDATAOrNull()
+                name.toCDATAOrNull(context)
             )
         } else {
             String.format(
                 context.getString(R.string.subtitle_folder_takedown_notification),
-                name.toCDATAOrNull()
+                name.toCDATAOrNull(context)
             )
         }
     }
@@ -130,12 +130,12 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
         if (path != null && FileUtil.isFile(path)) {
             String.format(
                 context.getString(R.string.subtitle_file_takedown_reinstated_notification),
-                name.toCDATAOrNull()
+                name.toCDATAOrNull(context)
             )
         } else {
             String.format(
                 context.getString(R.string.subtitle_folder_takedown_reinstated_notification),
-                name.toCDATAOrNull()
+                name.toCDATAOrNull(context)
             )
         }
     }

@@ -126,7 +126,7 @@ class GetLastMessageUseCase @Inject constructor(
                     val message = if ((nodeList?.size() ?: 0) > 0) {
                         nodeList.get(0).name
                     } else {
-                        converterShortCodes(chatListItem.lastMessage)
+                        converterShortCodes(context, chatListItem.lastMessage)
                     }
                     "${chatListItem.getSenderName()}: $message"
                 }
@@ -134,7 +134,7 @@ class GetLastMessageUseCase @Inject constructor(
                 TYPE_CONTACT_ATTACHMENT -> {
                     val message =
                         context.getString(R.string.contacts_sent, chatMessage.usersCount.toString())
-                    "${chatListItem.getSenderName()}: ${converterShortCodes(message)}"
+                    "${chatListItem.getSenderName()}: ${converterShortCodes(context, message)}"
                 }
 
                 TYPE_VOICE_CLIP -> {
@@ -159,7 +159,12 @@ class GetLastMessageUseCase @Inject constructor(
                     if (chatListItem.lastMessage.isNullOrBlank()) {
                         context.getString(R.string.error_message_unrecognizable)
                     } else {
-                        "${chatListItem.getSenderName()}: ${converterShortCodes(chatListItem.lastMessage)}"
+                        "${chatListItem.getSenderName()}: ${
+                            converterShortCodes(
+                                context,
+                                chatListItem.lastMessage
+                            )
+                        }"
                     }
                 }
             }.orEmpty()
@@ -196,7 +201,7 @@ class GetLastMessageUseCase @Inject constructor(
         lastMessageSender == megaChatApi.myUserHandle
 
     private fun String.cleanHtmlText(): String =
-        this.toCDATA()
+        this.toCDATA(context)
             .replace("[A]", "")
             .replace("[/A]", "")
             .replace("[B]", "")

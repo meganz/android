@@ -316,7 +316,7 @@ class ChatController @Inject constructor(
 
                     var textToShow = String.format(
                         context.getString(R.string.history_cleared_by),
-                        megaChatApi.myFullname.toCDATAOrNull()
+                        megaChatApi.myFullname.toCDATAOrNull(context)
                     )
                     try {
                         textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>")

@@ -32,7 +32,6 @@ import mega.privacy.android.navigation.MegaNavigatorEntryPoint
 import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.thirdpartylib.twemoji.EmojiManager
-import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -152,9 +151,12 @@ object ChatUtil {
         }
 
     @JvmStatic
-    fun converterShortCodes(text: String?): String? {
+    fun converterShortCodes(context: Context, text: String?): String? {
         if (text.isNullOrEmpty()) return text
-        return EmojiUtilsShortcodes.emojify(text)
+        return EntryPointAccessors.fromApplication(
+            context,
+            EmojiShortcodeConverterEntryPoint::class.java
+        ).emojiShortcodeConverter().convert(text)
     }
 
     /**
