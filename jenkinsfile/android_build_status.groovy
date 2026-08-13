@@ -311,7 +311,7 @@ pipeline {
                                     }
 
                                     String htmlOutput = "coverage.html"
-                                    sh "./gradlew --no-daemon collectCoverage --modules \"${moduleList.join(",")}\" --html-output ${htmlOutput}"
+                                    sh "./gradlew --no-daemon collectCoverage --modules \"${common.getCoverageModuleList(moduleList).join(",")}\" --html-output ${htmlOutput}"
                                     COVERAGE_SUMMARY = getHtmlReport(htmlOutput, "No coverage report found")
                                 }
                             }

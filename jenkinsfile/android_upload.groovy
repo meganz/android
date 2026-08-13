@@ -381,7 +381,7 @@ pipeline {
                         sh "./gradlew --no-daemon runAllUnitTestsWithCoverage"
                         String artifactoryTargetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
                         String coverageSummaryFile = "coverage_summary.csv"
-                        sh "./gradlew --no-daemon collectCoverage --modules \"${common.getUnitTestModuleList().join(",")}\" --csv-output ${coverageSummaryFile}"
+                        sh "./gradlew --no-daemon collectCoverage --modules \"${common.getCoverageModuleList(common.getUnitTestModuleList()).join(",")}\" --csv-output ${coverageSummaryFile}"
                         sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"$WORKSPACE/$coverageSummaryFile\" \"${artifactoryTargetPath}/$coverageSummaryFile\""
                     }
                 }

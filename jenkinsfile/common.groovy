@@ -738,6 +738,22 @@ ArrayList<String> getUnitTestModuleList() {
     return new ArrayList<String>(moduleList)
 }
 
+/**
+ * Gets the list of modules whose coverage should be collected and compared.
+ *
+ * Test-support modules (ending in "-test", e.g. data-test, core-test) contain test harness
+ * code in src/main, so measuring their coverage produces false positives in the MR coverage
+ * comparison. They are excluded here while their own unit tests still run and report failures.
+ *
+ * @param unitTestModules module list as returned by getUnitTestModuleList()
+ * @return List of module paths to pass to the collectCoverage task
+ */
+ArrayList<String> getCoverageModuleList(List<String> unitTestModules) {
+    def moduleList = unitTestModules.findAll { !it.endsWith("-test") }
+    print("COVERAGE_MODULE_LIST: ${moduleList}")
+    return new ArrayList<String>(moduleList)
+}
+
 
 /**
  * Build a Map of build statistics for the current Jenkins build.
