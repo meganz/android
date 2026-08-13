@@ -23,11 +23,16 @@ internal class SyncDeeplinkProcessorTest {
         assert(syncDeeplinkProcessor.matches(url))
     }
 
+    // Spelled out rather than derived from the production constant, so changing that constant
+    // fails here instead of silently redefining what the test checks. This pins the processor's
+    // own behaviour only — nothing currently invokes it, so it proves nothing about deeplinks
+    // reaching the app.
     private fun urlsProvider() =
         listOf("mega.nz", "mega.app").flatMap { domain ->
             listOf(
-                "https://$domain/${getSyncRoute()}",
-                "https://$domain/${getSyncListRoute()}",
+                "https://$domain/Sync",
+                "https://$domain/Sync/SyncList?selectedChip=SYNC_FOLDERS",
+                "https://$domain/Sync/SyncNewFolder",
             )
         }
 }

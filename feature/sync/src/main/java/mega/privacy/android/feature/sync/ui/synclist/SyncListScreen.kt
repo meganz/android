@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import android.content.res.Configuration
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -19,20 +18,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ScaffoldDefaults
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,22 +34,17 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.banner.InlineWarningBanner
 import mega.android.core.ui.components.chip.MegaChip
-import mega.android.core.ui.components.sheets.MegaModalBottomSheet
-import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
-import mega.privacy.android.feature.sync.ui.model.SyncModalSheetContent
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.STALLED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
@@ -68,8 +57,6 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssu
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesRoute
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
-import mega.privacy.android.feature.sync.ui.views.ApplyToAllDialog
-import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
 import mega.privacy.android.feature.sync.ui.views.SyncNotificationWarningBanner
 import mega.privacy.android.feature.sync.ui.views.SyncPermissionWarningBanner
 import mega.privacy.android.feature.sync.ui.views.SyncStorageQuotaExceedWarning
@@ -97,7 +84,6 @@ internal fun SyncListScreen(
     onBackupFolderClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
-    actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction, isApplyToAll: Boolean) -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
     actions: List<MenuAction>,
     onActionPressed: (MenuAction) -> Unit,
@@ -108,19 +94,13 @@ internal fun SyncListScreen(
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
     syncIssueNotificationViewModel: SyncIssueNotificationViewModel,
     title: String,
+    onStalledIssueMoreClicked: (issueId: String) -> Unit,
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
-    onStalledIssueMoreClicked: ((issueId: String) -> Unit)? = null,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
-    var sheetContent by remember { mutableStateOf<SyncModalSheetContent?>(null) }
-
-    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-    val modalSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = isLandscape)
 
     val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
     val syncStalledIssueState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
@@ -214,8 +194,7 @@ internal fun SyncListScreen(
                     },
                 stalledIssuesCount = stalledIssuesCount,
                 moreClicked = { stalledIssueItem ->
-                    onStalledIssueMoreClicked?.invoke(stalledIssueItem.id)
-                        ?: run { sheetContent = SyncModalSheetContent.IssueResolutions(stalledIssueItem) }
+                    onStalledIssueMoreClicked(stalledIssueItem.id)
                 },
                 onAddNewSyncClicked = onSyncFolderClicked,
                 onAddNewBackupClicked = onBackupFolderClicked,
@@ -233,87 +212,6 @@ internal fun SyncListScreen(
             )
         },
     )
-
-    // SyncHostActivity's classic NavHost has neither Nav3 scene strategies nor a
-    // NavigationHandler, so hosts that cannot navigate keep these inline. Hosts that can pass
-    // onStalledIssueMoreClicked and reach the destinations in SyncScreenDestination instead.
-    // Remove this branch once that activity is retired and every host navigates.
-    if (onStalledIssueMoreClicked == null) {
-        LegacyStalledIssueResolution(
-            sheetContent = sheetContent,
-            sheetState = modalSheetState,
-            hasMultipleStalledIssues = syncStalledIssueState.stalledIssues.size > 1,
-            onSheetContentChanged = { sheetContent = it },
-            actionSelected = actionSelected,
-        )
-    }
-}
-
-/**
- * The stalled issue resolution flow for hosts that cannot navigate.
- *
- * Only the resolution list is sheet content; [ApplyToAllDialog] wraps a ConfirmationDialog and is a
- * dialog window in its own right, so the two are rendered separately rather than swapped through one
- * slot. The Material 2 ModalBottomSheetLayout this replaced kept its body composed while hidden,
- * which is what let both share a slot before.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun LegacyStalledIssueResolution(
-    sheetContent: SyncModalSheetContent?,
-    sheetState: SheetState,
-    hasMultipleStalledIssues: Boolean,
-    onSheetContentChanged: (SyncModalSheetContent?) -> Unit,
-    actionSelected: (StalledIssueUiItem, StalledIssueResolutionAction, Boolean) -> Unit,
-) {
-    val coroutineScope = rememberCoroutineScope()
-
-    when (sheetContent) {
-        is SyncModalSheetContent.IssueResolutions -> {
-            MegaModalBottomSheet(
-                sheetState = sheetState,
-                bottomSheetBackground = MegaModalBottomSheetBackground.PageBackground,
-                onDismissRequest = { onSheetContentChanged(null) },
-            ) {
-                IssuesResolutionDialog(
-                    icon = sheetContent.stalledIssueUiItem.icon,
-                    conflictName = sheetContent.stalledIssueUiItem.conflictName,
-                    nodeName = sheetContent.stalledIssueUiItem.displayedName,
-                    actions = sheetContent.stalledIssueUiItem.actions,
-                    actionSelected = { action ->
-                        // Let the sheet animate away before the dialog takes over.
-                        coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-                            onSheetContentChanged(
-                                SyncModalSheetContent.ApplyToAllDialog(
-                                    stalledIssueUiItem = sheetContent.stalledIssueUiItem,
-                                    selectedAction = action,
-                                )
-                            )
-                        }
-                    },
-                )
-            }
-        }
-
-        is SyncModalSheetContent.ApplyToAllDialog -> {
-            ApplyToAllDialog(
-                fileName = sheetContent.stalledIssueUiItem.displayedName,
-                selectedAction = sheetContent.selectedAction,
-                onApplyToCurrent = {
-                    actionSelected(sheetContent.stalledIssueUiItem, sheetContent.selectedAction, false)
-                    onSheetContentChanged(null)
-                },
-                onApplyToAll = {
-                    actionSelected(sheetContent.stalledIssueUiItem, sheetContent.selectedAction, true)
-                    onSheetContentChanged(null)
-                },
-                onCancel = { onSheetContentChanged(null) },
-                shouldShowApplyToAllOption = hasMultipleStalledIssues,
-            )
-        }
-
-        null -> Unit
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)

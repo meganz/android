@@ -11,10 +11,5 @@
             android:foregroundServiceType="dataSync"
             android:exported="false"
             tools:node="merge" />
-        <activity
-            android:name=".ui.SyncHostActivity"
-            android:launchMode="singleTop"
-            android:exported="false"/>
-
     </application>
 </manifest>

@@ -1,12 +1,10 @@
 package mega.privacy.android.feature.sync.navigation
 
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
@@ -30,6 +28,7 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
+import mega.privacy.android.feature.sync.ui.synclist.stalledissues.trackResolutionConfirmed
 import mega.privacy.android.feature.sync.ui.views.ApplyToAllDialog
 import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
 import mega.privacy.android.feature_flags.AppFeatures
@@ -263,12 +262,14 @@ fun EntryProviderScope<NavKey>.syncScreens(
                     fileName = issue.displayedName,
                     selectedAction = action,
                     onApplyToCurrent = {
+                        action.resolutionActionType.trackResolutionConfirmed()
                         viewModel.handleAction(
                             SyncListAction.ResolveStalledIssue(issue, action, isApplyToAll = false)
                         )
                         navigationHandler.remove(key)
                     },
                     onApplyToAll = {
+                        action.resolutionActionType.trackResolutionConfirmed()
                         viewModel.handleAction(
                             SyncListAction.ResolveStalledIssue(issue, action, isApplyToAll = true)
                         )

@@ -10,8 +10,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
@@ -20,13 +18,6 @@ import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.android.feature.sync.ui.extension.showAutoDurationSnackbar
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
-import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
-import mega.privacy.mobile.analytics.event.AndroidSyncChooseLocalFileEvent
-import mega.privacy.mobile.analytics.event.AndroidSyncChooseRemoteFileEvent
-import mega.privacy.mobile.analytics.event.AndroidSyncMergeFoldersEvent
-import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesAndRemoveRestEvent
-import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesEvent
-import mega.privacy.mobile.analytics.event.AndroidSyncRenameAllItemsEvent
 
 /**
  * Composable function that represents the route for the sync list screen.
@@ -43,6 +34,7 @@ import mega.privacy.mobile.analytics.event.AndroidSyncRenameAllItemsEvent
  * @param isInCloudDrive Indicates whether the user is currently within the cloud drive context. Defaults to false.
  * @param selectedChip The currently selected chip in the sync list UI. Defaults to [SyncChip.SYNC_FOLDERS].
  * @param onOpenMegaFolderClicked Callback invoked when the user clicks to open a specific Mega folder.
+ * @param onStalledIssueMoreClicked Callback invoked with the id of the stalled issue whose resolution options were requested.
  */
 @Composable
 fun SyncListRoute(
@@ -53,11 +45,11 @@ fun SyncListRoute(
     onOpenUpgradeAccountClicked: () -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
     onOpenMegaFolderClicked: (Long) -> Unit,
+    onStalledIssueMoreClicked: (issueId: String) -> Unit,
     isInCloudDrive: Boolean = false,
     onSyncSettingsClicked: (() -> Unit)? = null,
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
-    onStalledIssueMoreClicked: ((issueId: String) -> Unit)? = null,
 ) {
     val fragmentActivity = LocalContext.current.findFragmentActivity()
     val viewModelStoreOwner =
@@ -93,16 +85,16 @@ internal fun SyncListRoute(
     onCameraUploadsSettingsClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: (String?) -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
-    onSyncSettingsClicked: (() -> Unit)? = null,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
     syncIssueNotificationViewModel: SyncIssueNotificationViewModel,
+    onStalledIssueMoreClicked: (issueId: String) -> Unit,
+    onSyncSettingsClicked: (() -> Unit)? = null,
     isInCloudDrive: Boolean = false,
     viewModel: SyncListViewModel = hiltViewModel(),
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
-    onStalledIssueMoreClicked: ((issueId: String) -> Unit)? = null,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val stalledIssueState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
@@ -114,48 +106,6 @@ internal fun SyncListRoute(
         onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         onSyncFolderClicked = { onSyncFolderClicked() },
         onBackupFolderClicked = { onBackupFolderClicked() },
-        actionSelected = { item, selectedAction, isApplyToAll ->
-            when (selectedAction.resolutionActionType) {
-                StalledIssueResolutionActionType.RENAME_ALL_ITEMS -> {
-                    Analytics.tracker.trackEvent(AndroidSyncRenameAllItemsEvent)
-                }
-
-                StalledIssueResolutionActionType.REMOVE_DUPLICATES -> {
-                    Analytics.tracker.trackEvent(AndroidSyncRemoveDuplicatesEvent)
-                }
-
-                StalledIssueResolutionActionType.MERGE_FOLDERS -> {
-                    Analytics.tracker.trackEvent(AndroidSyncMergeFoldersEvent)
-                }
-
-                StalledIssueResolutionActionType.REMOVE_DUPLICATES_AND_REMOVE_THE_REST -> {
-                    Analytics.tracker.trackEvent(AndroidSyncRemoveDuplicatesAndRemoveRestEvent)
-                }
-
-                StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE -> {
-                    Analytics.tracker.trackEvent(AndroidSyncChooseLocalFileEvent)
-                }
-
-                StalledIssueResolutionActionType.CHOOSE_REMOTE_FILE -> {
-                    Analytics.tracker.trackEvent(AndroidSyncChooseRemoteFileEvent)
-                }
-
-                StalledIssueResolutionActionType.CHOOSE_LATEST_MODIFIED_TIME -> {
-                    Analytics.tracker.trackEvent(AndroidSyncChooseLatestModifiedTimeEvent)
-                }
-
-                else -> {
-
-                }
-            }
-            syncStalledIssuesViewModel.handleAction(
-                SyncListAction.ResolveStalledIssue(
-                    item,
-                    selectedAction,
-                    isApplyToAll = isApplyToAll
-                )
-            )
-        },
         syncPermissionsManager = syncPermissionsManager,
         actions = listOfNotNull(onSyncSettingsClicked?.let { CommonMenuAction.Settings }),
         onActionPressed = {

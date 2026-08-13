@@ -126,6 +126,7 @@ internal class SyncListRouteTest {
                 onSyncSettingsClicked = {},
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
+                onStalledIssueMoreClicked = {},
             )
         }
     }
@@ -244,6 +245,7 @@ internal class SyncListRouteTest {
                     onSyncSettingsClicked = {},
                     onOpenMegaFolderClicked = {},
                     onCameraUploadsSettingsClicked = {},
+                    onStalledIssueMoreClicked = {},
                 )
             }
         }
