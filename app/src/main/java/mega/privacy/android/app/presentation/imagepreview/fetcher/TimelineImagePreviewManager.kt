@@ -47,21 +47,27 @@ class TimelineImagePreviewManager @Inject constructor(
 
     /**
      * Builds the filter/order and resolves the total media count. Runs once per session and unblocks
-     * [getImageNodeAtIndex]/[indexOfImageNode].
+     * [getImageNodeAtIndex]/[indexOfImageNode]. When [knownTotal] is positive (the grid already
+     * summed the sections) it's used directly, skipping the expensive sections aggregate.
      */
     suspend fun initialize(
         sort: Sort,
         mediaType: FilterMediaType,
         source: TimelinePhotosSource,
         hideSensitive: Boolean,
+        knownTotal: Int = 0,
     ): Int = withContext(ioDispatcher) {
         order = sort.toSortOrder()
         filter = buildFilter(mediaType, source, hideSensitive)
-        total = runCatching { getMediaTimelineSectionsUseCase(filter, order) }
-            .onFailure { Timber.e(it, "Failed to load timeline sections") }
-            .getOrDefault(emptyList())
-            .distinctBy { it.groupId }
-            .sumOf { it.count.toInt() }
+        total = if (knownTotal > 0) {
+            knownTotal
+        } else {
+            runCatching { getMediaTimelineSectionsUseCase(filter, order) }
+                .onFailure { Timber.e(it, "Failed to load timeline sections") }
+                .getOrDefault(emptyList())
+                .distinctBy { it.groupId }
+                .sumOf { it.count.toInt() }
+        }
         ready.complete(Unit)
         total
     }

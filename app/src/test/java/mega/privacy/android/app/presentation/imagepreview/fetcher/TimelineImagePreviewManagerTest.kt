@@ -82,6 +82,20 @@ class TimelineImagePreviewManagerTest {
     }
 
     @Test
+    fun `test that initialize uses the known total and skips the sections query`() = runTest {
+        val total = underTest.initialize(
+            sort = Sort.NEWEST,
+            mediaType = FilterMediaType.ALL_MEDIA,
+            source = TimelinePhotosSource.ALL_PHOTOS,
+            hideSensitive = false,
+            knownTotal = 42,
+        )
+
+        assertThat(total).isEqualTo(42)
+        verifyNoInteractions(getMediaTimelineSectionsUseCase)
+    }
+
+    @Test
     fun `test that initialize builds a newest photos filter with show all sensitivity`() = runTest {
         whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
         val filterCaptor = argumentCaptor<MediaTimelineFilter>()

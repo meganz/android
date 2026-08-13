@@ -28,6 +28,8 @@ class GetImageUseCase @Inject constructor(
      * @param node                  Typed Image Node
      * @param fullSize              Flag to request full size image despite data/size requirements
      * @param highPriority          Flag to request image with high priority
+     * @param skipThumbnail         Flag to skip the 1:1 thumbnail fetch so a cached preview can be
+     *                              shown immediately without waiting on the thumbnail download
      * @param resetDownloads        Callback to reset downloads
      *
      * @return Flow<ImageResult>
@@ -36,6 +38,7 @@ class GetImageUseCase @Inject constructor(
         node: TypedImageNode,
         fullSize: Boolean,
         highPriority: Boolean,
+        skipThumbnail: Boolean = false,
         resetDownloads: () -> Unit,
     ): Flow<ImageResult> {
         return photosRepository.monitorImageResult(node.id) ?: flow {
@@ -58,7 +61,7 @@ class GetImageUseCase @Inject constructor(
                 photosRepository.saveImageResult(node.id, imageResult)
             }
 
-            if (node.thumbnailPath == null) {
+            if (!skipThumbnail && node.thumbnailPath == null) {
                 runCatching {
                     node.fetchThumbnail()
                 }.onSuccess {

@@ -393,6 +393,7 @@ fun MediaMainRoute(
         },
         onClearTimelinePhotosSelection = { timelineSelectedPhotoIds.clear() },
         onNavigateToTimelinePhotoPreview = onNavigateToTimelinePhotoPreview,
+        onPrefetchPreview = mediaMainViewModel::prefetchPreview,
         clearCameraUploadsCompletedMessage = mediaCameraUploadViewModel::onConsumeUploadCompleteEvent,
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         multiNodeActionHandler = selectionModeActionHandler,
@@ -478,6 +479,7 @@ fun MediaMainScreen(
     viewModel: MediaMainViewModel = hiltViewModel(),
     albumsTabViewModel: AlbumsTabViewModel = hiltViewModel(),
     videoPlaylistsTabViewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
+    onPrefetchPreview: (Long) -> Unit = {},
 ) {
     val mediaMainUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -732,6 +734,7 @@ fun MediaMainScreen(
                                         if (selectionModeType == MediaSelectionModeType.Timeline) {
                                             onTimelinePhotoSelected(id)
                                         } else {
+                                            onPrefetchPreview(id)
                                             onNavigateToTimelinePhotoPreview(
                                                 MediaTimelinePhotoPreviewNavKey(
                                                     id = id,

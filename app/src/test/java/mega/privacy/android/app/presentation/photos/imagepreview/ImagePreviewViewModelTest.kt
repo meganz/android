@@ -97,6 +97,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.never
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -1012,7 +1013,7 @@ class ImagePreviewViewModelTest {
             val typedNode = mock<TypedImageNode>()
             val expected = ImageResult(isFullyLoaded = true)
             whenever(addImageTypeUseCase(imageNode)).thenReturn(typedNode)
-            whenever(getImageUseCase(any(), any(), any(), any())).thenReturn(flowOf(expected))
+            whenever(getImageUseCase(any(), any(), any(), any(), any())).thenReturn(flowOf(expected))
 
             val result = underTest.monitorImageResult(imageNode).toList()
 
@@ -1337,7 +1338,7 @@ class ImagePreviewViewModelTest {
             whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any())).thenReturn(10)
+            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any(), any())).thenReturn(10)
             whenever(timelineImagePreviewManager.indexOfImageNode(3, NodeId(3L))).thenReturn(3)
             whenever(timelineImagePreviewManager.getImageNodeAtIndex(3)).thenReturn(anchorNode)
             initViewModel()
@@ -1363,7 +1364,7 @@ class ImagePreviewViewModelTest {
             whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any())).thenReturn(10)
+            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any(), any())).thenReturn(10)
             whenever(timelineImagePreviewManager.indexOfImageNode(3, NodeId(4L))).thenReturn(4)
             whenever(timelineImagePreviewManager.getImageNodeAtIndex(4)).thenReturn(tappedNode)
             initViewModel()
@@ -1401,15 +1402,16 @@ class ImagePreviewViewModelTest {
             whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any())).thenReturn(10)
+            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any(), any())).thenReturn(10)
             whenever(timelineImagePreviewManager.getImageNode(NodeId(3L))).thenReturn(anchorNode)
             whenever(timelineImagePreviewManager.indexOfImageNode(3, NodeId(3L))).thenReturn(3)
-            whenever(timelineImagePreviewManager.getImageNodeAtIndex(3)).thenReturn(anchorNode)
             initViewModel()
 
             advanceUntilIdle()
 
             verify(timelineImagePreviewManager, atLeastOnce()).getImageNode(NodeId(3L))
+            // The anchor is served from the pre-resolved node, not the (slow) index path.
+            verify(timelineImagePreviewManager, never()).getImageNodeAtIndex(any())
             val state = underTest.state.value
             assertThat(state.totalImageCount).isEqualTo(10)
             assertThat(state.currentImageNodeIndex).isEqualTo(3)
@@ -1426,7 +1428,7 @@ class ImagePreviewViewModelTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-        whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any())).thenReturn(100)
+        whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any(), any())).thenReturn(100)
         whenever(timelineImagePreviewManager.indexOfImageNode(0, NodeId(0L))).thenReturn(0)
         initViewModel()
         advanceUntilIdle()
@@ -1449,7 +1451,7 @@ class ImagePreviewViewModelTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-        whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any())).thenReturn(100)
+        whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any(), any())).thenReturn(100)
         whenever(timelineImagePreviewManager.indexOfImageNode(0, NodeId(0L))).thenReturn(0)
         val nodes = mutableMapOf<Int, ImageNode>()
         (46..50).forEach { index ->

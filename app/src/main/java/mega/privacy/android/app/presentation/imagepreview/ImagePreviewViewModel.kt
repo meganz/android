@@ -175,6 +175,9 @@ class ImagePreviewViewModel @Inject constructor(
 
     private val imageNodesOffline: MutableMap<NodeId, Boolean> = mutableMapOf()
 
+    private var anchorImageNode: ImageNode? = null
+    private var anchorPageIndex: Int = -1
+
     private val _state = MutableStateFlow(ImagePreviewState())
 
     internal val state: StateFlow<ImagePreviewState> = _state
@@ -305,6 +308,8 @@ class ImagePreviewViewModel @Inject constructor(
         val anchor = timelineImagePreviewManager.getImageNode(NodeId(currentImageNodeIdValue))
             ?: return
         val index = currentImageNodeIndexValue.coerceIn(0, total - 1)
+        anchorImageNode = anchor
+        anchorPageIndex = index
         _state.update {
             it.copy(
                 isInitialized = true,
@@ -337,6 +342,7 @@ class ImagePreviewViewModel @Inject constructor(
             source = params.readEnum<TimelinePhotosSource>(TimelineImageNodeFetcher.TIMELINE_MEDIA_SOURCE)
                 ?: TimelinePhotosSource.ALL_PHOTOS,
             hideSensitive = hiddenNodesEnabled && !showHiddenItems,
+            knownTotal = currentImageNodeTotalCountValue,
         )
 
         _state.update { state ->
@@ -349,6 +355,7 @@ class ImagePreviewViewModel @Inject constructor(
             )
         }
         if (total <= 0) return
+        if (anchorImageNode != null) return
 
         val anchorIndex = currentImageNodeIndexValue.coerceIn(0, total - 1)
         val resolvedIndex = timelineImagePreviewManager
@@ -364,15 +371,15 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     /**
-     * Resolves the [ImageNode] for the pager page at [index]: from the timeline manager in paginated
-     * mode, or the fully-held list otherwise. Null while it can't be resolved.
+     * Resolves the [ImageNode] for the pager page at [index]: the anchor is served from the node
+     * already resolved by id in [previewAnchor] (so its image loads without waiting on the ordering),
+     * other pages come from the timeline manager, and the fully-held list backs the non-paginated mode.
      */
-    suspend fun resolveImageNode(index: Int): ImageNode? =
-        if (_state.value.isPaginated) {
-            timelineImagePreviewManager.getImageNodeAtIndex(index)
-        } else {
-            _state.value.imageNodes.getOrNull(index)
-        }
+    suspend fun resolveImageNode(index: Int): ImageNode? {
+        if (!_state.value.isPaginated) return _state.value.imageNodes.getOrNull(index)
+        if (index == anchorPageIndex) anchorImageNode?.let { return it }
+        return timelineImagePreviewManager.getImageNodeAtIndex(index)
+    }
 
     /**
      * Reacts to the pager settling on [index]: updates the current index and resolves that page's
@@ -617,6 +624,7 @@ class ImagePreviewViewModel @Inject constructor(
                     node = typedNode,
                     fullSize = true,
                     highPriority = true,
+                    skipThumbnail = imagePreviewFetcherSource == ImagePreviewFetcherSource.TIMELINE,
                     resetDownloads = {},
                 )
             }

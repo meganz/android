@@ -7,6 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -356,4 +357,27 @@ internal class GetImageUseCaseTest {
             underTest.invoke(imageNode, true, highPriority = false, resetDownloads = {}).collect { }
         }
     }
+
+    @Test
+    internal fun `test that fetchThumbnail is not fetched when skipThumbnail is true`() =
+        runTest {
+            // A dedicated node keeps this independent of the shared imageNode mock's state, and a
+            // ready previewPath lets the flow finish without touching the (un-mockable) fetchPreview.
+            val node = mock<TypedImageNode> {
+                on { type } doReturn mock<StaticImageFileTypeInfo>()
+                on { previewPath } doReturn previewFilePath
+                on { fetchFullImage } doReturn { _, _ -> emptyFlow() }
+            }
+            whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(true)
+
+            underTest.invoke(
+                node,
+                fullSize = true,
+                highPriority = false,
+                skipThumbnail = true,
+                resetDownloads = {},
+            ).collect { }
+
+            verify(node, never()).fetchThumbnail
+        }
 }
