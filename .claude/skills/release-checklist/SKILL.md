@@ -71,7 +71,7 @@ Everywhere below refers to things by name — `#devops-cicd`, `@eu-mobile-releas
 |---|---|
 | RC ticket title | `Release management - Android <X.Y>` (type **Story**) |
 | RC ticket required fields | Expense Product = `Cloud/Default`; Expense Type = `OPEX`; Epic Link = RC ticket Epic (field ids + Epic in `local-constants.md`) |
-| Cadence | Every 2 weeks; **code freeze = Wednesday** |
+| Cadence | Every 3 weeks; **code freeze = Wednesday** |
 | Jira projects in a release | AND, AP, BAC, CC, CU, MEET, TRAN, SHR, FM, SAT, SAO |
 
 ### Slack channels / user groups — role reference (IDs in `local-constants.md`)
@@ -93,7 +93,7 @@ Everywhere below refers to things by name — `#devops-cicd`, `@eu-mobile-releas
 ### Date rules
 - **"Previous Friday"** = the Friday of the week *before* code-freeze week
   (code freeze is the following Wednesday). This is release-notes prep day (1.1).
-- **Next code freeze** = current code freeze **+ 14 days**.
+- **Next code freeze** = current code freeze **+ 21 days**.
 - **Next-RC reminder** fires the Friday before the *next* code-freeze week
   (i.e. next-freeze-Wednesday − 5 days).
 - Get the version's code-freeze date from Jira: it's the version **`startDate`**
@@ -225,7 +225,7 @@ recover with `git log --all -- <path>` / `git show <sha>:<path>`, don't rewrite 
   `extra["megaSdkVersion"]` in root `build.gradle.kts` to that `-rel` value (replacing
   the prior `-dev`/`-rel`), commit **only `build.gradle.kts`** as "Update prebuilt SDK version", push.
 - **Next Jira version (MR comment):** `create_jira_version -rv "<NEXT_X.Y>" -rd "<NEXT_FREEZE_DATE>"`
-  — the version **2 weeks out** (e.g. 16.9 → 16.10, freeze +14d). Bot replies
+  — the version **3 weeks out** (e.g. 16.9 → 16.10, freeze +21d). Bot replies
   "Create Jira Version succeeded"; verify in AND (`jira_get_project_versions`).
 - Add reviewers; **needs 2 approvals**, then **merge the pre-release MR → `develop`** (squash).
 - **Re-sync local develop after the squash-merge (gotcha):** preRelease leaves a
@@ -493,7 +493,7 @@ the main thread in `AudioPlayerServiceViewModel.onPlayerError`; fixed by wrappin
 ## Gotchas
 - Large Jira/Confluence reads overflow to a file — read that file (Confluence
   storage ≈ 2× the markdown size).
-- `create_jira_version` takes the **next** version (2 weeks out), not the current.
+- `create_jira_version` takes the **next** version (3 weeks out), not the current.
 - Do **not** rebase the `release` MR onto develop; do **not** squash it.
 - `#nz-mobile-release` pings only between 7am–7pm NZ time.
 - `/remind` is **manual only** — never send it via API or fake it with a scheduled
