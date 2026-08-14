@@ -61,6 +61,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.StickySectionHeader
@@ -88,6 +89,8 @@ import mega.privacy.android.feature.photos.presentation.timeline.rememberCameraU
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.MediaScreenDateHeaderSelectAllPressedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenDragToSelectStartedEvent
 import timber.log.Timber
 import java.time.Year
 import java.time.format.DateTimeFormatter
@@ -483,6 +486,7 @@ private fun TimelineRevampGrid(
     // loadedNodes (which cannot represent a range larger than its cache) resolve through
     // loadMediaRange, marked pending meanwhile when selecting.
     fun toggleRangeSelection(range: IntRange) {
+        Analytics.tracker.trackEvent(MediaScreenDateHeaderSelectAllPressedEvent)
         val selectAll = !isRangeSelected(range)
         var hasUnloadedCells = false
         range.forEach { index ->
@@ -575,6 +579,9 @@ private fun TimelineRevampGrid(
                     isMediaSelected = { index ->
                         currentLoadedNodes[index]
                             ?.let { it.id in currentSelectedPhotoIds } == true
+                    },
+                    onDragSelectStarted = {
+                        Analytics.tracker.trackEvent(MediaScreenDragToSelectStartedEvent)
                     },
                     onDragSelectionChange = { index, selected ->
                         val node = currentLoadedNodes[index]

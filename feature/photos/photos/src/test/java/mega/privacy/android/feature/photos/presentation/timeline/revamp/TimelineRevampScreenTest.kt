@@ -21,6 +21,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.model.MediaType
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
@@ -31,6 +32,8 @@ import mega.privacy.android.feature.photos.presentation.component.PHOTOS_NODE_BO
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
+import mega.privacy.mobile.analytics.event.MediaScreenDateHeaderSelectAllPressedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenDragToSelectStartedEvent
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,6 +45,9 @@ class TimelineRevampScreenTest {
 
     @get:Rule
     val composeRule = createComposeRule()
+
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule()
 
     private companion object {
         const val MAY_HEADER_CHECKBOX_TAG = "${TIMELINE_REVAMP_SECTION_HEADER_CHECKBOX_TAG}2026-5"
@@ -254,6 +260,43 @@ class TimelineRevampScreenTest {
     }
 
     @Test
+    fun `test that drag selection tracks MediaScreenDragToSelectStartedEvent once per gesture`() {
+        val selectedIds = mutableStateSetOf<Long>()
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = (0..2).associateWith { index -> photoNode(id = index + 1L) },
+            ),
+            selectedPhotoIds = selectedIds,
+            onNodeSelected = { node ->
+                if (node.id in selectedIds) selectedIds.remove(node.id) else selectedIds.add(node.id)
+            },
+        )
+
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+            .onFirst()
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(width.toFloat(), 0f))
+                moveBy(Offset(width.toFloat(), 0f))
+                up()
+            }
+
+        composeRule.runOnIdle {
+            assertThat(analyticsRule.events).containsExactly(MediaScreenDragToSelectStartedEvent)
+        }
+    }
+
+    @Test
     fun `test that swept cells are selected once their nodes are lazily loaded`() {
         val selectedIds = mutableStateSetOf<Long>()
         val initialState = TimelineRevampUiState.Data(
@@ -332,6 +375,23 @@ class TimelineRevampScreenTest {
 
         composeRule.runOnIdle {
             assertThat(selectedIds).containsExactly(1L, 2L, 3L)
+        }
+    }
+
+    @Test
+    fun `test that clicking the month header checkbox tracks MediaScreenDateHeaderSelectAllPressedEvent`() {
+        val selectedIds = mutableStateSetOf(1L)
+        composeRule.setScreen(
+            uiState = twoMonthsUiState(),
+            selectedPhotoIds = selectedIds,
+            onNodeSelected = { selectedIds.toggle(it.id) },
+        )
+
+        mayHeaderCheckbox().performClick()
+
+        composeRule.runOnIdle {
+            assertThat(analyticsRule.events)
+                .containsExactly(MediaScreenDateHeaderSelectAllPressedEvent)
         }
     }
 

@@ -71,6 +71,8 @@ fun Modifier.photosZoomGestureDetector(
  * @param isMediaSelected whether the media cell at the given ordinal index is currently selected;
  * sampled at the anchor to decide the drag mode, and when a cell enters the range so a deselecting
  * drag can restore it should it leave again
+ * @param onDragSelectStarted called once per gesture, when a long-press first turns into a drag
+ * (a long-press released without dragging never triggers it)
  * @param onDragSelectionChange called with the ordinal media index and the selection state it
  * should take; the caller applies it idempotently through the same event a tap or long-press fires
  */
@@ -78,6 +80,7 @@ internal fun Modifier.photosGridDragToSelectGesture(
     lazyGridState: LazyGridState,
     mediaIndexOfKey: (key: Any?) -> Int?,
     isMediaSelected: (mediaIndex: Int) -> Boolean,
+    onDragSelectStarted: () -> Unit,
     onDragSelectionChange: (mediaIndex: Int, selected: Boolean) -> Unit,
 ) = this.pointerInput(lazyGridState) {
     val autoScrollThreshold = DRAG_TO_SELECT_AUTO_SCROLL_THRESHOLD.toPx()
@@ -105,6 +108,7 @@ internal fun Modifier.photosGridDragToSelectGesture(
         lastHitIndex = hitIndex
         if (!anchorReported) {
             anchorReported = true
+            onDragSelectStarted()
             onDragSelectionChange(anchor, dragSelectMode)
         }
         val range = minOf(anchor, hitIndex)..maxOf(anchor, hitIndex)

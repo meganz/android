@@ -42,6 +42,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
@@ -62,6 +63,7 @@ import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineDateTextCache
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
+import mega.privacy.mobile.analytics.event.MediaScreenDragToSelectStartedEvent
 import mega.privacy.android.shared.resources.R as sharedR
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -426,6 +428,9 @@ fun PhotosNodeGridViewV2(
                 isMediaSelected = { index ->
                     currentItems.getOrNull(index)
                         ?.let { it.id in currentSelectedPhotoIds } == true
+                },
+                onDragSelectStarted = {
+                    Analytics.tracker.trackEvent(MediaScreenDragToSelectStartedEvent)
                 },
                 onDragSelectionChange = { index, selected ->
                     currentItems.getOrNull(index)
