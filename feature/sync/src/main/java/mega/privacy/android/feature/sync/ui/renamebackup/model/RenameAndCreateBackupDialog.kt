@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.renamebackup.model
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,9 +11,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.components.dialogs.BasicInputDialog
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -58,21 +57,19 @@ internal fun RenameAndCreateBackupDialogBody(
     onDismiss: () -> Unit,
     onInputChange: () -> Unit,
 ) {
-    var initialInput by rememberSaveable { mutableStateOf(backupName) }
+    var backupInput by rememberSaveable { mutableStateOf(backupName) }
 
-    InputDialog(
+    BasicInputDialog(
         modifier = Modifier.testTag(RENAME_AND_CREATE_BACKUP_DIALOG_TAG),
         title = stringResource(sharedR.string.sync_rename_and_create_backup_dialog_title),
-        message = stringResource(sharedR.string.sync_rename_and_create_backup_dialog_text),
-        hint = stringResource(sharedR.string.sync_rename_and_create_backup_dialog_hint_text),
-        text = initialInput,
-        confirmButtonText = stringResource(sharedR.string.context_rename),
-        cancelButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
-        onInputChange = {
-            initialInput = it
+        description = stringResource(sharedR.string.sync_rename_and_create_backup_dialog_text),
+        inputValue = backupInput,
+        onValueChange = {
+            backupInput = it
             onInputChange()
         },
-        error = uiState.errorMessage?.let { nonNullErrorMessage ->
+        placeholder = stringResource(sharedR.string.sync_rename_and_create_backup_dialog_hint_text),
+        errorText = uiState.errorMessage?.let { nonNullErrorMessage ->
             if (nonNullErrorMessage == sharedR.string.general_invalid_characters_defined) {
                 stringResource(nonNullErrorMessage).replace(
                     oldValue = "%1\$s",
@@ -82,7 +79,10 @@ internal fun RenameAndCreateBackupDialogBody(
                 stringResource(nonNullErrorMessage)
             }
         },
-        onConfirm = onConfirm,
+        positiveButtonText = stringResource(sharedR.string.context_rename),
+        onPositiveButtonClicked = { onConfirm(backupInput) },
+        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+        onNegativeButtonClicked = onDismiss,
         onDismiss = onDismiss,
     )
 }
@@ -93,7 +93,7 @@ internal fun RenameAndCreateBackupDialogBody(
 @CombinedThemePreviews
 @Composable
 private fun RenameAndCreateBackupDialogBodyPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         RenameAndCreateBackupDialogBody(
             uiState = RenameAndCreateBackupState(),
             backupName = "Backup",
@@ -110,7 +110,7 @@ private fun RenameAndCreateBackupDialogBodyPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RenameAndCreateBackupDialogBodyEmptyNameErrorPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         RenameAndCreateBackupDialogBody(
             uiState = RenameAndCreateBackupState(errorMessage = sharedR.string.sync_rename_and_create_backup_dialog_error_message_empty_backup_name),
             backupName = "",
@@ -127,7 +127,7 @@ private fun RenameAndCreateBackupDialogBodyEmptyNameErrorPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RenameAndCreateBackupDialogBodyNameAlreadyExistsErrorPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         RenameAndCreateBackupDialogBody(
             uiState = RenameAndCreateBackupState(errorMessage = sharedR.string.sync_rename_and_create_backup_dialog_error_message_name_already_exists),
             backupName = "Backup",
@@ -144,7 +144,7 @@ private fun RenameAndCreateBackupDialogBodyNameAlreadyExistsErrorPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RenameAndCreateBackupDialogBodyInvalidCharactersErrorPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         RenameAndCreateBackupDialogBody(
             uiState = RenameAndCreateBackupState(errorMessage = sharedR.string.general_invalid_characters_defined),
             backupName = "Backup>",

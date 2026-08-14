@@ -1,8 +1,10 @@
 package mega.privacy.android.feature.sync.ui.createnewfolder
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -13,9 +15,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.feature.sync.ui.createnewfolder.model.CreateNewFolderState
-import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.components.dialogs.BasicInputDialog
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -49,21 +51,24 @@ internal fun CreateNewFolderDialog(
 }
 
 @Composable
-private fun CreateNewFolderDialogBody(
+internal fun CreateNewFolderDialogBody(
     uiState: CreateNewFolderState,
     onConfirm: (String) -> Unit,
     onCancel: () -> Unit,
     onInputChange: (String) -> Unit = {},
 ) {
-    InputDialog(
-        title = stringResource(sharedR.string.general_new_folder),
-        confirmButtonText = stringResource(sharedR.string.general_create_label),
-        cancelButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
-        onConfirm = onConfirm,
-        onDismiss = onCancel,
+    var folderName by rememberSaveable { mutableStateOf("") }
+
+    BasicInputDialog(
         modifier = Modifier.testTag(TEST_TAG_CREATE_NEW_FOLDER_DIALOG),
-        hint = stringResource(sharedR.string.create_new_folder_dialog_hint_text),
-        error = uiState.errorMessage?.let { nonNullErrorMessage ->
+        title = stringResource(sharedR.string.general_new_folder),
+        inputValue = folderName,
+        onValueChange = {
+            folderName = it
+            onInputChange(it)
+        },
+        placeholder = stringResource(sharedR.string.create_new_folder_dialog_hint_text),
+        errorText = uiState.errorMessage?.let { nonNullErrorMessage ->
             if (nonNullErrorMessage == sharedR.string.general_invalid_characters_defined) {
                 stringResource(nonNullErrorMessage).replace(
                     oldValue = "%1\$s",
@@ -73,7 +78,11 @@ private fun CreateNewFolderDialogBody(
                 stringResource(nonNullErrorMessage)
             }
         },
-        onInputChange = onInputChange,
+        positiveButtonText = stringResource(sharedR.string.general_create_label),
+        onPositiveButtonClicked = { onConfirm(folderName) },
+        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+        onNegativeButtonClicked = onCancel,
+        onDismiss = onCancel,
     )
 }
 
@@ -82,7 +91,7 @@ private fun CreateNewFolderDialogBody(
 private fun CreateNewFolderDialogPreview(
     @PreviewParameter(CreateNewFolderDialogPreviewProvider::class) createNewFolderState: CreateNewFolderState,
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         CreateNewFolderDialogBody(
             uiState = createNewFolderState,
             onConfirm = {},
