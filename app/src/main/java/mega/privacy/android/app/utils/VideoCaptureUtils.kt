@@ -3,8 +3,10 @@ package mega.privacy.android.app.utils
 import android.content.Context
 import androidx.annotation.Keep
 import androidx.annotation.VisibleForTesting
-import mega.privacy.android.app.MegaApplication
+import dagger.hilt.android.EntryPointAccessors
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
+import nz.mega.sdk.MegaChatApiAndroid
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraEnumerator
 import org.webrtc.CapturerObserver
@@ -46,6 +48,12 @@ object VideoCaptureUtils {
     private fun context(): Context = requireNotNull(applicationContext) {
         "VideoCaptureUtils application context has not been set"
     }
+
+    private fun megaChatApi(): MegaChatApiAndroid =
+        EntryPointAccessors.fromApplication(
+            context(),
+            MegaApiEntryPoint::class.java,
+        ).megaChatApi()
 
     @VisibleForTesting
     internal fun getApplicationContextForTesting(): Context? = applicationContext
@@ -121,7 +129,7 @@ object VideoCaptureUtils {
     @JvmStatic
     fun swapCamera(listener: ChatChangeVideoStreamListener?) {
         try {
-            val megaChatApi = MegaApplication.getInstance().megaChatApi
+            val megaChatApi = megaChatApi()
             val currentCamera = megaChatApi.videoDeviceSelected
             val newCamera = if (isFrontCamera(currentCamera)) {
                 getBackCamera()
@@ -245,7 +253,7 @@ object VideoCaptureUtils {
     @JvmStatic
     fun isFrontCameraInUse(): Boolean {
         try {
-            val megaChatApi = MegaApplication.getInstance().megaChatApi
+            val megaChatApi = megaChatApi()
             val deviceName = megaChatApi.videoDeviceSelected
             if (deviceName.isNullOrEmpty()) return false
             return isFrontCameraFromCache(deviceName)

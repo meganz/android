@@ -19,11 +19,18 @@ import android.widget.RemoteViews
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
+import mega.privacy.android.app.meeting.CallServiceStarterEntryPoint
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
@@ -59,6 +66,36 @@ import timber.log.Timber
 object CallUtil {
 
     /**
+     * Application context set once at app boot by the app-create initialiser tier.
+     *
+     * This object is a legacy `@JvmStatic` util with many Java/Kotlin callers and cannot be
+     * Hilt-injected, so its application context is handed to it explicitly during
+     * `Application.onCreate` instead of reaching through `MegaApplication.getInstance()`. It is used
+     * to resolve the SDK singletons and call collaborators through Hilt entry points.
+     */
+    internal lateinit var applicationContext: Context
+
+    private fun megaChatApi() = EntryPointAccessors.fromApplication(
+        applicationContext,
+        MegaApiEntryPoint::class.java,
+    ).megaChatApi()
+
+    private fun megaApi() = EntryPointAccessors.fromApplication(
+        applicationContext,
+        MegaApiEntryPoint::class.java,
+    ).megaApi()
+
+    private fun chatManagement() = EntryPointAccessors.fromApplication(
+        applicationContext,
+        ChatManagementEntryPoint::class.java,
+    ).chatManagement()
+
+    private fun startCallService(chatId: Long) = EntryPointAccessors.fromApplication(
+        applicationContext,
+        CallServiceStarterEntryPoint::class.java,
+    ).callServiceStarter().invoke(chatId)
+
+    /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
      *
      * @param context            Context
@@ -77,7 +114,7 @@ object CallUtil {
         isWaitingRoom: Boolean,
     ) {
         Timber.d("Open join a meeting screen:: chatId = %s", chatId)
-        MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true)
+        chatManagement().setOpeningMeetingLink(chatId, true)
         val intent: Intent
         if (isWaitingRoom) {
             intent = Intent(context, WaitingRoomActivity::class.java)
@@ -108,7 +145,7 @@ object CallUtil {
     @JvmStatic
     fun openMeetingRinging(context: Context, chatId: Long) {
         Timber.d("Open incoming call screen. Chat id is %s", chatId)
-        MegaApplication.getInstance().openCallService(chatId)
+        startCallService(chatId)
         val meetingIntent = Intent(context, MeetingActivity::class.java)
         meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         meetingIntent.action = MeetingActivity.MEETING_ACTION_RINGING
@@ -133,7 +170,7 @@ object CallUtil {
     ) {
         Timber.d("Open in progress call screen. Chat id is %s", chatId)
         if (isNewTask) {
-            MegaApplication.getInstance().openCallService(chatId)
+            startCallService(chatId)
         }
 
         val meetingIntent = Intent(context, MeetingActivity::class.java)
@@ -141,7 +178,7 @@ object CallUtil {
         meetingIntent.putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
         meetingIntent.putExtra(
             MeetingActivity.MEETING_IS_GUEST,
-            MegaApplication.getInstance().megaApi.isEphemeralPlusPlus,
+            megaApi().isEphemeralPlusPlus,
         )
         if (isNewTask) {
             Timber.d("New task")
@@ -169,7 +206,7 @@ object CallUtil {
         isVideoEnable: Boolean,
     ) {
         Timber.d("Open call with audio or video. Chat id is %s", chatId)
-        MegaApplication.getInstance().openCallService(chatId)
+        startCallService(chatId)
         val meetingIntent = Intent(context, MeetingActivity::class.java)
         meetingIntent.action = MeetingActivity.MEETING_ACTION_IN
         meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -197,7 +234,7 @@ object CallUtil {
         isWaitingRoom: Boolean,
     ) {
         Timber.d("Open meeting in guest mode. Chat id is %s", chatId)
-        MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true)
+        chatManagement().setOpeningMeetingLink(chatId, true)
         chatRequestHandler.setIsLoginRunning(true)
         val intent: Intent
         if (isWaitingRoom) {
@@ -226,7 +263,7 @@ object CallUtil {
     @JvmStatic
     @Deprecated("Use IsParticipatingInChatCallUseCase instead")
     fun participatingInACall(): Boolean {
-        val megaChatApi = MegaApplication.getInstance().megaChatApi
+        val megaChatApi = megaChatApi()
         val listCallsInitial = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_INITIAL)
         val listCallsConnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_CONNECTING)
         val listCallsJoining = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_JOINING)
@@ -243,7 +280,7 @@ object CallUtil {
      */
     @JvmStatic
     fun existsAnOngoingOrIncomingCall(): Boolean {
-        val megaChatApi = MegaApplication.getInstance().megaChatApi
+        val megaChatApi = megaChatApi()
         val listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT)
         val listCallsUserTerminatingUserParticipation =
             megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION)
@@ -278,7 +315,7 @@ object CallUtil {
 
         if (!currentCalls.isNullOrEmpty()) {
             for (chatIdCall in currentCalls) {
-                val call = MegaApplication.getInstance().megaChatApi.getChatCall(chatIdCall)
+                val call = megaChatApi().getChatCall(chatIdCall)
                 if (call != null) {
                     openMeetingInProgress(context, chatIdCall, false, isSessionOnRecording)
                     break
@@ -317,7 +354,7 @@ object CallUtil {
         val listPeers = call.peeridParticipants
         if (listPeers != null && listPeers.size() > 0) {
             for (i in 0 until listPeers.size()) {
-                if (listPeers[i] == MegaApplication.getInstance().megaApi.myUserHandleBinary) {
+                if (listPeers[i] == megaApi().myUserHandleBinary) {
                     return true
                 }
             }
@@ -345,11 +382,11 @@ object CallUtil {
      */
     @JvmStatic
     fun isSessionOnHold(chatId: Long): Boolean {
-        val chat = MegaApplication.getInstance().megaChatApi.getChatRoom(chatId)
+        val chat = megaChatApi().getChatRoom(chatId)
         if (chat == null || chat.isGroup) return false
 
         val session = getSessionIndividualCall(
-            MegaApplication.getInstance().megaChatApi.getChatCall(chatId)
+            megaChatApi().getChatCall(chatId)
         ) ?: return false
 
         return session.isOnHold
@@ -362,7 +399,7 @@ object CallUtil {
         callInProgressChrono: Chronometer?,
         callInProgressText: TextView,
     ) {
-        val megaChatApi = MegaApplication.getInstance().megaChatApi
+        val megaChatApi = megaChatApi()
 
         val call = megaChatApi.getChatCall(chatId) ?: return
 
@@ -371,7 +408,7 @@ object CallUtil {
             ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorSecondary)
         )
 
-        if (MegaApplication.getChatManagement().isRequestSent(call.callId)) {
+        if (chatManagement().isRequestSent(call.callId)) {
             activateChrono(false, callInProgressChrono, null)
         } else {
             activateChrono(true, callInProgressChrono, call)
@@ -424,7 +461,7 @@ object CallUtil {
         val calls = getCallsParticipating()
         if (!calls.isNullOrEmpty()) {
             for (chatId in calls) {
-                val call = MegaApplication.getInstance().megaChatApi.getChatCall(chatId)
+                val call = megaChatApi().getChatCall(chatId)
                 if (call != null && call.isOnHold) {
                     createCallBanner(
                         context,
@@ -522,7 +559,7 @@ object CallUtil {
             val calls = getCallsParticipating()
             if (!calls.isNullOrEmpty()) {
                 for (chatId in calls) {
-                    val call = MegaApplication.getInstance().megaChatApi.getChatCall(chatId)
+                    val call = megaChatApi().getChatCall(chatId)
                     if (call != null && call.isOnHold) {
                         createCallMenuItem(
                             context,
@@ -650,7 +687,7 @@ object CallUtil {
 
     @JvmStatic
     fun isStatusConnected(context: Context, chatId: Long): Boolean {
-        val megaChatApi = MegaApplication.getInstance().megaChatApi
+        val megaChatApi = megaChatApi()
         return checkConnection(context) &&
                 megaChatApi.connectionState == MegaChatApi.CONNECTED &&
                 megaChatApi.getChatConnectionState(chatId) == MegaChatApi.CHAT_CONNECTION_ONLINE
@@ -685,9 +722,9 @@ object CallUtil {
         listener: MegaChatRequestListenerInterface,
     ) {
         if (isEnabled) {
-            MegaApplication.getInstance().megaChatApi.enableVideo(chatId, listener)
+            megaChatApi().enableVideo(chatId, listener)
         } else {
-            MegaApplication.getInstance().megaChatApi.disableVideo(chatId, listener)
+            megaChatApi().disableVideo(chatId, listener)
         }
     }
 
@@ -701,7 +738,7 @@ object CallUtil {
         val listCalls = getCallsParticipating()
         if (!listCalls.isNullOrEmpty()) {
             for (chatId in listCalls) {
-                val call = MegaApplication.getInstance().megaChatApi.getChatCall(chatId)
+                val call = megaChatApi().getChatCall(chatId)
                 if (call != null && !call.isOnHold) {
                     return call
                 }
@@ -811,7 +848,7 @@ object CallUtil {
     @JvmStatic
     fun getImageAvatarCall(peerId: Long): Bitmap? {
         val mail = getUserMailCall(peerId)
-        val megaChatApi = MegaApplication.getInstance().megaChatApi
+        val megaChatApi = megaChatApi()
 
         val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
         val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.myUserHandle)
@@ -834,7 +871,7 @@ object CallUtil {
      */
     @JvmStatic
     fun getUserMailCall(peerId: Long): String? {
-        val megaChatApi = MegaApplication.getInstance().megaChatApi
+        val megaChatApi = megaChatApi()
         return if (peerId == megaChatApi.myUserHandle) {
             megaChatApi.myEmail
         } else {
@@ -875,7 +912,7 @@ object CallUtil {
     @JvmStatic
     fun getCallsParticipating(): ArrayList<Long>? {
         val listCalls = ArrayList<Long>()
-        val megaChatApi = MegaApplication.getInstance().megaChatApi
+        val megaChatApi = megaChatApi()
 
         val listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS)
         if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
@@ -920,12 +957,12 @@ object CallUtil {
             return currentChatId
         }
 
-        val currentCall = MegaApplication.getInstance().megaChatApi.getChatCall(currentChatId)
+        val currentCall = megaChatApi().getChatCall(currentChatId)
         if (currentCall != null && currentCall.isOnHold) {
             Timber.d("Current call ON HOLD, look for other")
             for (anotherChatId in chatsIDsWithCallActive) {
                 if (anotherChatId != currentChatId) {
-                    val call = MegaApplication.getInstance().megaChatApi.getChatCall(anotherChatId)
+                    val call = megaChatApi().getChatCall(anotherChatId)
                     if (call != null && !call.isOnHold) {
                         Timber.d("Another call ACTIVE")
                         return anotherChatId
@@ -951,7 +988,7 @@ object CallUtil {
         }
         for (anotherChatId in chatsIDsWithCallActive) {
             if (anotherChatId != currentChatId) {
-                val call = MegaApplication.getInstance().megaChatApi.getChatCall(anotherChatId)
+                val call = megaChatApi().getChatCall(anotherChatId)
                 if (call != null && !call.isOnHold) {
                     return anotherChatId
                 }
@@ -1063,7 +1100,7 @@ object CallUtil {
 
     @JvmStatic
     fun addChecksForACall(chatId: Long, speakerStatus: Boolean) {
-        MegaApplication.getChatManagement().setSpeakerStatus(chatId, speakerStatus)
+        chatManagement().setSpeakerStatus(chatId, speakerStatus)
     }
 
     /**
@@ -1160,7 +1197,7 @@ object CallUtil {
     @JvmStatic
     @Deprecated("Use CheckInThisMeetingUseCase instead")
     fun amIParticipatingInThisMeeting(chatId: Long): Boolean {
-        val call = MegaApplication.getInstance().megaChatApi.getChatCall(chatId)
+        val call = megaChatApi().getChatCall(chatId)
         return call != null &&
                 call.status != MegaChatCall.CALL_STATUS_DESTROYED &&
                 call.status != MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION &&
@@ -1177,7 +1214,7 @@ object CallUtil {
         publicChatHandle: Long,
         isWaitingRoom: Boolean,
     ) {
-        val call = MegaApplication.getInstance().megaChatApi.getChatCall(chatId)
+        val call = megaChatApi().getChatCall(chatId)
         if (call == null ||
             call.status == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
             call.status == MegaChatCall.CALL_STATUS_WAITING_ROOM
@@ -1215,7 +1252,7 @@ object CallUtil {
         val rtcAudioManager = rtcAudioManagerGateway.audioManager
         if (rtcAudioManager != null && rtcAudioManager.typeAudioManager == typeAudioManager) return
 
-        val chatRoom = MegaApplication.getInstance().megaChatApi.getChatRoom(chatId)
+        val chatRoom = megaChatApi().getChatRoom(chatId)
         if (chatRoom == null) {
             Timber.e("The chat does not exist")
             return
@@ -1231,7 +1268,7 @@ object CallUtil {
         }
 
         MegaApplication.getInstance().createOrUpdateAudioManager(
-            MegaApplication.getChatManagement().getSpeakerStatus(chatId),
+            chatManagement().getSpeakerStatus(chatId),
             resolvedTypeAudioManager,
         )
     }
@@ -1278,7 +1315,7 @@ object CallUtil {
     ): RemoteViews {
         val statusIcon: Bitmap? = if (isOneToOneCall(chatToAnswer)) {
             getStatusBitmap(
-                MegaApplication.getInstance().megaChatApi
+                megaChatApi()
                     .getUserOnlineStatus(chatToAnswer.getPeerHandle(0)),
                 context
             )
@@ -1330,4 +1367,18 @@ object CallUtil {
         return checkPermissionsCall(context)
     }
 
+}
+
+/**
+ * Entry point to resolve [ChatManagement] in [CallUtil], which is a hand-instantiated static object
+ * that cannot use constructor or field injection.
+ */
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+internal interface ChatManagementEntryPoint {
+
+    /**
+     * The [ChatManagement] instance.
+     */
+    fun chatManagement(): ChatManagement
 }

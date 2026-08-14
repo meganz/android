@@ -13,8 +13,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
@@ -41,6 +41,12 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
+     * Starts the foreground call service.
+     */
+    @Inject
+    lateinit var callServiceStarter: CallServiceStarter
+
+    /**
      * On create view
      */
     override fun onCreateView(
@@ -57,7 +63,7 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
                     UsersInWaitingRoomDialog(
                         onSeeWaitingRoomClick = {
                             val chatId = viewModel.state.value.chatId
-                            MegaApplication.getInstance().openCallService(chatId)
+                            callServiceStarter(chatId)
 
                             val intent =
                                 Intent(requireContext(), MeetingActivity::class.java).apply {

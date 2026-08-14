@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.presentation.contactinfo.LegacyContactInfoViewModel
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -84,6 +85,7 @@ class LegacyContactInfoViewModelTest {
     private var isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private var setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
     private var chatManagement: ChatManagement = mock()
+    private var callServiceStarter: CallServiceStarter = mock()
     private var monitorContactUpdates: MonitorContactUpdates = mock()
     private var getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
     private var requestUserLastGreenUseCase: RequestUserLastGreenUseCase = mock()
@@ -152,6 +154,7 @@ class LegacyContactInfoViewModelTest {
             isConnectedToInternetUseCase,
             setChatVideoInDeviceUseCase,
             chatManagement,
+            callServiceStarter,
             monitorContactUpdates,
             getUserOnlineStatusByHandleUseCase,
             requestUserLastGreenUseCase,
@@ -186,6 +189,7 @@ class LegacyContactInfoViewModelTest {
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
             chatManagement = chatManagement,
+            callServiceStarter = callServiceStarter,
             monitorContactUpdates = monitorContactUpdates,
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,

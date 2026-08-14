@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.presentation.contactinfo.model.LegacyContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
@@ -78,6 +78,7 @@ import javax.inject.Inject
  * @property isConnectedToInternetUseCase       [IsConnectedToInternetUseCase]
  * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
  * @property chatManagement                     [ChatManagement]
+ * @property callServiceStarter                 [CallServiceStarter]
  * @property monitorContactUpdates              [MonitorContactUpdates]
  * @property requestUserLastGreenUseCase        [RequestUserLastGreenUseCase]
  * @property getChatRoomUseCase                        [GetChatRoomUseCase]
@@ -96,6 +97,7 @@ class LegacyContactInfoViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val chatManagement: ChatManagement,
+    private val callServiceStarter: CallServiceStarter,
     private val monitorContactUpdates: MonitorContactUpdates,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
@@ -412,7 +414,7 @@ class LegacyContactInfoViewModel @Inject constructor(
     private fun openCurrentCall(call: ChatCall) {
         chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
         chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
-        MegaApplication.getInstance().openCallService(call.chatId)
+        callServiceStarter(call.chatId)
         _uiState.update {
             it.copy(
                 currentCallChatId = call.chatId,

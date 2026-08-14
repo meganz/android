@@ -5,8 +5,9 @@ import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 
 import android.content.Context;
 
-import mega.privacy.android.app.MegaApplication;
+import dagger.hilt.android.EntryPointAccessors;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
@@ -47,7 +48,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         this.idChat = idChat;
 
         if (megaChatApi == null) {
-            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+            megaChatApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaChatApi();
         }
 
         chatController = controller;

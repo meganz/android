@@ -18,9 +18,9 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
@@ -80,6 +80,7 @@ import javax.inject.Inject
  * @property openOrStartCallUseCase                     [OpenOrStartCallUseCase]
  * @property answerChatCallUseCase                      [AnswerChatCallUseCase]
  * @property chatManagement                             [ChatManagement]
+ * @property callServiceStarter                         [CallServiceStarter]
  * @property megaChatApiGateway                         [MegaChatApiGateway]
  * @property rtcAudioManagerGateway                     [RTCAudioManagerGateway]
  * @property getCurrentChatStatusUseCase                [GetCurrentChatStatusUseCase]
@@ -104,6 +105,7 @@ class ChatTabsViewModel @Inject constructor(
     private val openOrStartCallUseCase: OpenOrStartCallUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val chatManagement: ChatManagement,
+    private val callServiceStarter: CallServiceStarter,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val getCurrentChatStatusUseCase: GetCurrentChatStatusUseCase,
@@ -423,7 +425,7 @@ class ChatTabsViewModel @Inject constructor(
         chatManagement.setSpeakerStatus(call.chatId, false)
         chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
         enablePasscode()
-        MegaApplication.getInstance().openCallService(call.chatId)
+        callServiceStarter(call.chatId)
         getChatCallUpdates(call.chatId)
         state.update { it.copy(currentCallChatId = call.chatId) }
     }

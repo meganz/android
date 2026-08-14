@@ -56,6 +56,7 @@ import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService.Com
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveX
 import mega.privacy.android.app.meeting.AnimationTool.moveY
+import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.meeting.OnDragTouchListener
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
@@ -137,6 +138,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     @Inject
     lateinit var chatManagement: ChatManagement
+
+    @Inject
+    lateinit var callServiceStarter: CallServiceStarter
 
     @Inject
     lateinit var megaNavigator: MegaNavigator
@@ -802,7 +806,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .distinctUntilChanged()) {
             it?.let { shouldBeEnabled ->
                 if (inMeetingViewModel.getChatId() != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null && shouldBeEnabled != sharedModel.state.value.camEnabled) {
-                    MegaApplication.getChatManagement().isDisablingLocalVideo = true
+                    chatManagement.isDisablingLocalVideo = true
                     inMeetingViewModel.onVideoEnabledDueToProximitySensorConsumed()
                     sharedModel.clickCamera(shouldBeEnabled)
                 }
@@ -1449,7 +1453,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         viewLifecycleOwner.collectFlow(inMeetingViewModel.showOnlyMeBanner) { shouldBeShown ->
             checkMenuItemsVisibility()
-            if (shouldBeShown && !MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+            if (shouldBeShown && !chatManagement.hasEndCallDialogBeenIgnored) {
                 showCallWillEndBannerAndOnlyMeDialog()
             } else {
                 hideCallBannerAndOnlyMeDialog()
@@ -2555,8 +2559,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         Timber.d("Update Local Video $isCamOn")
         inMeetingViewModel.getCall()?.apply {
             val isVideoOn: Boolean = inMeetingViewModel.state.value.hasLocalVideo
-            if (!MegaApplication.getChatManagement().isInTemporaryState) {
-                MegaApplication.getChatManagement().setVideoStatus(chatId, isVideoOn)
+            if (!chatManagement.isInTemporaryState) {
+                chatManagement.setVideoStatus(chatId, isVideoOn)
             }
         }
 
@@ -2845,7 +2849,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param chatId The chat ID of the call
      */
     private fun checkCallStarted(chatId: Long) {
-        MegaApplication.getInstance().openCallService(chatId)
+        callServiceStarter(chatId)
         inMeetingViewModel.setCall(chatId)
         checkChildFragments()
         showMuteBanner()
@@ -3028,7 +3032,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Dialogue displayed when you are left alone in the group call or meeting and you can stay on the call or end it
      */
     private fun showOnlyMeInTheCallDialog() {
-        if (MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+        if (chatManagement.hasEndCallDialogBeenIgnored) {
             dismissDialog(onlyMeDialog)
             return
         }
@@ -3053,7 +3057,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun showCallWillEndBannerAndOnlyMeDialog() {
         inMeetingViewModel.startCounterTimerAfterBanner()
         val currentTime =
-            MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog
+            chatManagement.millisecondsOnlyMeInCallDialog
         inMeetingViewModel.showOnlyMeEndCallTimer(
             if (currentTime > 0) currentTime else TimeUnit.SECONDS.toMillis(
                 SECONDS_TO_WAIT_ALONE_ON_THE_CALL

@@ -5,14 +5,16 @@ import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import dagger.Lazy
-import mega.privacy.android.app.MegaApplication
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.meeting.CallServiceStarterEntryPoint
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
@@ -37,6 +39,12 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
         metadata = transparentMetadata()
     ) { key ->
         val context = LocalContext.current
+        val callServiceStarter = remember(context) {
+            EntryPointAccessors.fromApplication(
+                context,
+                CallServiceStarterEntryPoint::class.java,
+            ).callServiceStarter()
+        }
         LaunchedEffect(Unit) {
             val intent = Intent(context, MeetingActivity::class.java).apply {
                 putExtra(MeetingActivity.MEETING_CHAT_ID, key.chatId)
@@ -96,7 +104,7 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
                             meetingInfo.callId,
                             meetingInfo.isOutgoing
                         )
-                        MegaApplication.getInstance().openCallService(key.chatId)
+                        callServiceStarter(key.chatId)
 
                         setAction(MeetingActivity.MEETING_ACTION_IN)
                         putExtra(MeetingActivity.MEETING_IS_GUEST, meetingInfo.isGuest)
@@ -104,7 +112,7 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
                     }
 
                     is MeetingNavKeyInfo.StartOutgoingCall -> {
-                        MegaApplication.getInstance().openCallService(key.chatId)
+                        callServiceStarter(key.chatId)
 
                         setAction(MeetingActivity.MEETING_ACTION_IN)
                         putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, meetingInfo.isAudioEnable)

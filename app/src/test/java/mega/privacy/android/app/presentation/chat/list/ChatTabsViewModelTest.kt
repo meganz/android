@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
@@ -65,6 +66,7 @@ internal class ChatTabsViewModelTest {
     private val openOrStartCallUseCase: OpenOrStartCallUseCase = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
     private val chatManagement: ChatManagement = mock()
+    private val callServiceStarter: CallServiceStarter = mock()
     private val megaChatApiGateway: MegaChatApiGateway = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val getCurrentChatStatusUseCase: GetCurrentChatStatusUseCase = mock()
@@ -103,6 +105,7 @@ internal class ChatTabsViewModelTest {
             openOrStartCallUseCase,
             answerChatCallUseCase,
             chatManagement,
+            callServiceStarter,
             megaChatApiGateway,
             rtcAudioManagerGateway,
             getCurrentChatStatusUseCase,
@@ -132,6 +135,7 @@ internal class ChatTabsViewModelTest {
             openOrStartCallUseCase = openOrStartCallUseCase,
             answerChatCallUseCase = answerChatCallUseCase,
             chatManagement = chatManagement,
+            callServiceStarter = callServiceStarter,
             megaChatApiGateway = megaChatApiGateway,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             getCurrentChatStatusUseCase = getCurrentChatStatusUseCase,

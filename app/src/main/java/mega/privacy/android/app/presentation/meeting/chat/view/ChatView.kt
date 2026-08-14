@@ -50,13 +50,14 @@ import androidx.navigation3.runtime.NavKey
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import dagger.hilt.android.EntryPointAccessors
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
+import mega.privacy.android.app.meeting.CallServiceStarterEntryPoint
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.meeting.chat.extension.getOpenChatId
 import mega.privacy.android.feature.chat.meeting.call.isJoined
@@ -600,7 +601,10 @@ internal fun ChatView(
 
         if (isStartingCall && callInThisChat != null) {
             onCallStarted()
-            MegaApplication.getInstance().openCallService(chatId)
+            EntryPointAccessors.fromApplication(
+                context,
+                CallServiceStarterEntryPoint::class.java,
+            ).callServiceStarter().invoke(chatId)
             CallUtil.clearIncomingCallNotification(callInThisChat.callId)
             navigateToMeeting(
                 chatId,

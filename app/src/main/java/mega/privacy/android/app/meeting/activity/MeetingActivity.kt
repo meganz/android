@@ -26,14 +26,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.meeting.CallNotificationIntentService
+import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.meeting.fragments.CreateMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 import mega.privacy.android.app.meeting.fragments.JoinMeetingAsGuestFragment
@@ -119,6 +120,12 @@ class MeetingActivity : PasscodeActivity() {
 
     @Inject
     lateinit var navigationEventQueue: NavigationEventQueue
+
+    @Inject
+    lateinit var chatManagement: ChatManagement
+
+    @Inject
+    lateinit var callServiceStarter: CallServiceStarter
 
     lateinit var binding: ActivityMeetingBinding
     private lateinit var pipBuilderParams: PictureInPictureParams.Builder
@@ -332,7 +339,7 @@ class MeetingActivity : PasscodeActivity() {
             if (chatId != MEGACHAT_INVALID_HANDLE && meetingViewModel.state.value.chatId != chatId) {
                 Timber.d("Switch call")
                 passcodeFacade.enablePassCode()
-                MegaApplication.getInstance().openCallService(chatId)
+                callServiceStarter(chatId)
                 startActivity(getIntentOngoingCall(this@MeetingActivity, chatId))
             }
         }
@@ -433,7 +440,7 @@ class MeetingActivity : PasscodeActivity() {
                 ((!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere())
             ) {
                 if (chatId != MEGACHAT_INVALID_HANDLE) {
-                    MegaApplication.getChatManagement().removeNotificationShown(chatId)
+                    chatManagement.removeNotificationShown(chatId)
                 }
                 finish()
                 return
