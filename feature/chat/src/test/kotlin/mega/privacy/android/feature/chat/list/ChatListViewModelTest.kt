@@ -8,11 +8,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
-import mega.privacy.android.domain.usecase.chat.GetChatListItemUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
+import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
@@ -38,7 +37,7 @@ class ChatListViewModelTest {
     private lateinit var underTest: ChatListViewModel
 
     private val getChatsUseCase = mock<GetChatsUseCase>()
-    private val getChatListItemUseCase = mock<GetChatListItemUseCase>()
+    private val chatLastMessageFormatter = mock<ChatLastMessageFormatter>()
     private val chatRoomTimestampMapper = mock<ChatRoomTimestampMapper>()
     private val chatRoomUiItemMapper = mock<ChatRoomUiItemMapper>()
 
@@ -62,7 +61,7 @@ class ChatListViewModelTest {
     fun setUp() {
         underTest = ChatListViewModel(
             getChatsUseCase = getChatsUseCase,
-            getChatListItemUseCase = getChatListItemUseCase,
+            chatLastMessageFormatter = chatLastMessageFormatter,
             chatRoomTimestampMapper = chatRoomTimestampMapper,
             chatRoomUiItemMapper = chatRoomUiItemMapper,
         )
@@ -76,7 +75,7 @@ class ChatListViewModelTest {
         capturedHeaderTimeMapper = null
         reset(
             getChatsUseCase,
-            getChatListItemUseCase,
+            chatLastMessageFormatter,
             chatRoomTimestampMapper,
             chatRoomUiItemMapper,
         )
@@ -173,28 +172,14 @@ class ChatListViewModelTest {
     }
 
     @Test
-    fun `test that last message lambda returns the last message from getChatListItemUseCase`() =
+    fun `test that last message lambda delegates to the chat last message formatter`() =
         runTest {
             stubChatRooms()
-            whenever(getChatListItemUseCase(1L)) doReturn ChatListItem(
-                chatId = 1L,
-                lastMessage = "Last message",
-            )
+            whenever(chatLastMessageFormatter(1L)) doReturn "Formatted preview"
 
             underTest.uiState.test { awaitDataState() }
 
-            assertThat(capturedLastMessage?.invoke(1L)).isEqualTo("Last message")
-        }
-
-    @Test
-    fun `test that last message lambda returns an empty string when the chat list item is null`() =
-        runTest {
-            stubChatRooms()
-            whenever(getChatListItemUseCase(1L)) doReturn null
-
-            underTest.uiState.test { awaitDataState() }
-
-            assertThat(capturedLastMessage?.invoke(1L)).isEmpty()
+            assertThat(capturedLastMessage?.invoke(1L)).isEqualTo("Formatted preview")
         }
 
     @Test

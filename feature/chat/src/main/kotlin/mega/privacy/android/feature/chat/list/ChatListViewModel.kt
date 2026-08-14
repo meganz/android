@@ -15,9 +15,9 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
-import mega.privacy.android.domain.usecase.chat.GetChatListItemUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
+import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
@@ -32,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ChatListViewModel @Inject constructor(
     private val getChatsUseCase: GetChatsUseCase,
-    private val getChatListItemUseCase: GetChatListItemUseCase,
+    private val chatLastMessageFormatter: ChatLastMessageFormatter,
     private val chatRoomTimestampMapper: ChatRoomTimestampMapper,
     private val chatRoomUiItemMapper: ChatRoomUiItemMapper,
 ) : ViewModel() {
@@ -72,7 +72,7 @@ internal class ChatListViewModel @Inject constructor(
     private fun chatRoomsFlow(chatRoomType: ChatRoomType): Flow<ImmutableList<ChatRoomUiItem>> =
         getChatsUseCase(
             chatRoomType = chatRoomType,
-            lastMessage = { chatId -> getChatListItemUseCase(chatId)?.lastMessage.orEmpty() },
+            lastMessage = chatLastMessageFormatter::invoke,
             lastTimeMapper = chatRoomTimestampMapper::getLastTimeFormatted,
             meetingTimeMapper = chatRoomTimestampMapper::getMeetingTimeFormatted,
             headerTimeMapper = { _, _ -> null },

@@ -3778,4 +3778,10 @@
     <string name="settings_customise_navigation_state_custom">Custom</string>
     <!-- Body of the system notification shown when transfers are interrupted because the transfer quota has been exceeded -->
     <string name="transfers_over_quota_notification_message">Upgrade to resume transfers, or wait until your transfer quota resets.</string>
+    <!-- Chat list last-message preview shown when a chat has no messages yet -->
+    <string name="chat_last_message_no_history">No conversation history</string>
+    <!-- Chat list last-message preview sender prefix used for the current user's own messages in a group chat -->
+    <string name="chat_last_message_sender_me">Me</string>
+    <!-- Chat list last-message preview sender prefix used when a group-chat message sender's name cannot be resolved -->
+    <string name="chat_last_message_sender_unknown">Unknown name</string>
 </resources>
