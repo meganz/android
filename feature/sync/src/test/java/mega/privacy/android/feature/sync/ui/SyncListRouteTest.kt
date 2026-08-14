@@ -2,6 +2,8 @@ package mega.privacy.android.feature.sync.ui
 
 import androidx.activity.ComponentActivity
 import kotlinx.collections.immutable.toImmutableList
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -13,6 +15,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -226,6 +229,78 @@ internal class SyncListRouteTest {
         composeTestRule.waitForIdle()
 
         verify(syncStalledIssuesViewModel).handleAction(SyncListAction.SnackBarShown)
+    }
+
+    private fun setComposeContentWithSnackbarHost(hostState: SnackbarHostState) {
+        composeTestRule.setContent {
+            CompositionLocalProvider(LocalSnackBarHostState provides hostState) {
+                SyncListRoute(
+                    viewModel = viewModel,
+                    syncPermissionsManager = syncPermissionsManager,
+                    onSyncFolderClicked = {},
+                    onBackupFolderClicked = {},
+                    onSelectStopBackupDestinationClicked = {},
+                    onOpenUpgradeAccountClicked = {},
+                    syncFoldersViewModel = syncFoldersViewModel,
+                    syncStalledIssuesViewModel = syncStalledIssuesViewModel,
+                    syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
+                    syncIssueNotificationViewModel = syncIssueNotificationViewModel,
+                    onSyncSettingsClicked = {},
+                    onOpenMegaFolderClicked = {},
+                    onCameraUploadsSettingsClicked = {},
+                    onStalledIssueMoreClicked = {},
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun `test that stalled issues snackbar is consumed before it finishes displaying`() {
+        whenever(syncStalledIssuesState.value).thenReturn(
+            SyncStalledIssuesState(
+                stalledIssues = emptyList(),
+                snackbarMessageContent = triggered(sharedR.string.sync_stalled_issues_resolved),
+            )
+        )
+
+        setComposeContentWithSnackbarHost(SnackbarHostState())
+
+        verify(syncStalledIssuesViewModel).handleAction(SyncListAction.SnackBarShown)
+    }
+
+    @Test
+    fun `test that sync folders snackbar is consumed before it finishes displaying`() {
+        whenever(syncFoldersUiState.value).thenReturn(
+            SyncFoldersUiState(
+                syncUiItems = synUiItems.toImmutableList(),
+                snackbarMessage = sharedR.string.sync_snackbar_message_confirm_sync_stopped,
+            )
+        )
+
+        setComposeContentWithSnackbarHost(SnackbarHostState())
+
+        verify(syncFoldersViewModel).handleAction(SyncFoldersAction.SnackBarShown)
+    }
+
+    @Test
+    fun `test that sync folders snackbar keeps the moved folder name once consumed`() {
+        whenever(syncFoldersUiState.value).thenReturn(
+            SyncFoldersUiState(
+                syncUiItems = synUiItems.toImmutableList(),
+                snackbarMessage = sharedR.string.sync_snackbar_message_confirm_backup_moved,
+                movedFolderName = "Camera uploads",
+            )
+        )
+        val hostState = SnackbarHostState()
+
+        setComposeContentWithSnackbarHost(hostState)
+
+        val expected = composeTestRule.activity.getString(
+            sharedR.string.sync_snackbar_message_confirm_backup_moved,
+            "Camera uploads",
+        )
+        assertThat(hostState.currentSnackbarData?.visuals?.message).isEqualTo(expected)
     }
 
     private fun setComposeContentWithDisposeSwitch() = mutableStateOf(true).also { switch ->

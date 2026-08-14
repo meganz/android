@@ -4,12 +4,14 @@ import android.content.Intent
 import android.provider.DocumentsContract
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
+import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.ui.stopbackup.StopBackupConfirmationDialog
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.OnRemoveFolderDialogDismissed
@@ -38,6 +40,7 @@ internal fun SyncFoldersRoute(
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
+    val snackbarScope = rememberCoroutineScope()
     val snackBarHostState = LocalSnackBarHostState.current
 
     SyncFoldersScreen(
@@ -125,12 +128,10 @@ internal fun SyncFoldersRoute(
 
     LaunchedEffect(key1 = uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { resId ->
-            val message =
-                uiState.snackbarMessage.let { resources.getString(resId, uiState.movedFolderName) }
-            try {
+            val message = resources.getString(resId, uiState.movedFolderName)
+            viewModel.handleAction(SnackBarShown)
+            snackbarScope.launch {
                 snackBarHostState?.showAutoDurationSnackbar(message)
-            } finally {
-                viewModel.handleAction(SnackBarShown)
             }
         }
     }

@@ -3,12 +3,14 @@ package mega.privacy.android.feature.sync.ui.synclist
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
@@ -127,16 +129,16 @@ internal fun SyncListRoute(
 
     val resources = LocalResources.current
     val snackBarHostState = LocalSnackBarHostState.current
+    val snackbarScope = rememberCoroutineScope()
     EventEffect(
         stalledIssueState.snackbarMessageContent,
         onConsumed = {}
     ) { content ->
-        try {
+        syncStalledIssuesViewModel.handleAction(SyncListAction.SnackBarShown)
+        snackbarScope.launch {
             snackBarHostState?.showAutoDurationSnackbar(
                 resources.getString(content)
             )
-        } finally {
-            syncStalledIssuesViewModel.handleAction(SyncListAction.SnackBarShown)
         }
     }
 
