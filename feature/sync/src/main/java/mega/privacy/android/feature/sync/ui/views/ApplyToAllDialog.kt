@@ -1,14 +1,10 @@
 package mega.privacy.android.feature.sync.ui.views
 
 import android.content.Context
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,18 +18,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.persistentListOf
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.checkbox.Checkbox
+import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.dialogs.BasicDialogButton
+import mega.android.core.ui.components.text.SpannableText
+import mega.android.core.ui.model.MegaSpanStyle
+import mega.android.core.ui.model.SpanIndicator
+import mega.android.core.ui.model.SpanStyleWithAnnotation
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
-import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaCheckbox
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
-import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.body2
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -60,6 +59,7 @@ internal fun ApplyToAllDialog(
     val context = LocalContext.current
     val title = getApplyToAllTitle(selectedAction, context)
     val description = getApplyToAllDescription(fileName, selectedAction, context)
+    var isApplyToAllChecked by rememberSaveable { mutableStateOf(false) }
 
     ApplyToAllDialog(
         title = title,
@@ -69,7 +69,9 @@ internal fun ApplyToAllDialog(
         onCancel = onCancel,
         modifier = modifier,
         shouldShowApplyToAllOption = shouldShowApplyToAllOption,
-        actionButtonStringRes = getActionButtonString(selectedAction)
+        actionButtonStringRes = getActionButtonString(selectedAction),
+        isApplyToAllChecked = isApplyToAllChecked,
+        onApplyToAllCheckedChange = { isApplyToAllChecked = it },
     )
 }
 
@@ -93,76 +95,72 @@ internal fun ApplyToAllDialog(
     onApplyToAll: () -> Unit,
     onCancel: () -> Unit,
     actionButtonStringRes: Int,
+    isApplyToAllChecked: Boolean,
+    onApplyToAllCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     shouldShowApplyToAllOption: Boolean = true,
 ) {
-    var isApplyToAllChecked by rememberSaveable { mutableStateOf(false) }
-
-    ConfirmationDialog(
-        title = title,
-        text = {
-            Column {
-                // Description
-                MegaSpannedText(
-                    value = description,
-                    baseStyle = body2,
-                    styles = hashMapOf(
-                        SpanIndicator('A') to MegaSpanStyle(
-                            spanStyle = SpanStyle(fontWeight = FontWeight.Bold),
-                            color = TextColor.Primary,
-                        ),
+    BasicDialog(
+        modifier = modifier,
+        title = SpannableText(title),
+        description = SpannableText(
+            text = description,
+            annotations = mapOf(
+                SpanIndicator('A') to SpanStyleWithAnnotation(
+                    megaSpanStyle = MegaSpanStyle.TextColorStyle(
+                        spanStyle = SpanStyle(fontWeight = FontWeight.Bold),
+                        textColor = TextColor.Primary,
                     ),
-                    color = TextColor.Secondary,
+                    annotation = null,
+                ),
+            ),
+        ),
+        buttons = persistentListOf(
+            BasicDialogButton(
+                text = stringResource(mega.privacy.android.core.R.string.general_cancel),
+                onClick = onCancel,
+            ),
+            BasicDialogButton(
+                text = stringResource(actionButtonStringRes),
+                onClick = {
+                    if (isApplyToAllChecked) {
+                        onApplyToAll()
+                    } else {
+                        onApplyToCurrent()
+                    }
+                },
+            ),
+        ),
+        onDismissRequest = onCancel,
+        content = if (shouldShowApplyToAllOption) {
+            @Composable {
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_DESCRIPTION),
-                )
+                        .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_ROW),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        modifier = Modifier.testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX),
+                        checked = isApplyToAllChecked,
+                        onCheckStateChanged = onApplyToAllCheckedChange,
+                    )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.size(12.dp))
 
-                // Apply to all checkbox
-                if (shouldShowApplyToAllOption) {
-                    Row(
+                    MegaText(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_ROW),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        MegaCheckbox(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX),
-                            checked = isApplyToAllChecked,
-                            onCheckedChange = { isApplyToAllChecked = it },
-                            rounded = false
-                        )
-
-                        Spacer(modifier = Modifier.size(12.dp))
-
-                        MegaText(
-                            modifier = Modifier
-                                .weight(1f)
-                                .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_TEXT),
-                            text = stringResource(sharedR.string.sync_apply_to_all_checkbox),
-                            textColor = TextColor.Primary,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
+                            .weight(1f)
+                            .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_TEXT),
+                        text = stringResource(sharedR.string.sync_apply_to_all_checkbox),
+                        textColor = TextColor.Primary,
+                        style = AppTheme.typography.bodyMedium,
+                    )
                 }
             }
+        } else {
+            null
         },
-        confirmButtonText = stringResource(actionButtonStringRes),
-        cancelButtonText = stringResource(mega.privacy.android.core.R.string.general_cancel),
-        onConfirm = {
-            if (isApplyToAllChecked) {
-                onApplyToAll()
-            } else {
-                onApplyToCurrent()
-            }
-        },
-        onDismiss = onCancel,
-        onCancel = onCancel,
-        modifier = modifier,
     )
 }
 
@@ -248,7 +246,6 @@ private fun getActionButtonString(
 }
 
 // Test tags for UI testing
-internal const val TEST_TAG_APPLY_TO_ALL_DIALOG_DESCRIPTION = "apply_to_all_dialog:description"
 internal const val TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_ROW = "apply_to_all_dialog:checkbox_row"
 internal const val TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX = "apply_to_all_dialog:checkbox"
 internal const val TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_TEXT = "apply_to_all_dialog:checkbox_text"
@@ -256,14 +253,16 @@ internal const val TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_TEXT = "apply_to_all_di
 @CombinedThemePreviews
 @Composable
 internal fun ApplyToAllDialogPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         ApplyToAllDialog(
             title = "Choose the local file?",
             description = "The local file Let only red flowers bloom.pdf will be moved to the .rubbish or .debris folder in your local sync location.",
             onApplyToCurrent = {},
             onApplyToAll = {},
             onCancel = {},
-            actionButtonStringRes = sharedR.string.general_dialog_choose_button
+            actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+            isApplyToAllChecked = false,
+            onApplyToAllCheckedChange = {},
         )
     }
 } 

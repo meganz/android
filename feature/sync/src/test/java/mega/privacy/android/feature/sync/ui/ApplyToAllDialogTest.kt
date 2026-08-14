@@ -1,6 +1,10 @@
 package mega.privacy.android.feature.sync.ui
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -12,7 +16,6 @@ import mega.privacy.android.feature.sync.ui.views.ApplyToAllDialog
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_ROW
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_TEXT
-import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_DESCRIPTION
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -32,31 +35,36 @@ internal class ApplyToAllDialogTest {
         val description = "The local file will be moved to the .rubbish folder."
 
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = title,
                 description = description,
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
-                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 
         composeTestRule.onNodeWithText(title).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_APPLY_TO_ALL_DIALOG_DESCRIPTION)
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(description).assertIsDisplayed()
     }
 
     @Test
     fun `test that checkbox is displayed`() {
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Choose the local file?",
                 description = "The local file will be moved to the .rubbish folder.",
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
-                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 
@@ -67,13 +75,16 @@ internal class ApplyToAllDialogTest {
     @Test
     fun `test that checkbox text is displayed`() {
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Choose the local file?",
                 description = "The local file will be moved to the .rubbish folder.",
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
-                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 
@@ -84,13 +95,16 @@ internal class ApplyToAllDialogTest {
     @Test
     fun `test that choose button is displayed`() {
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Choose the local file?",
                 description = "The local file will be moved to the .rubbish folder.",
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
-                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 
@@ -101,13 +115,16 @@ internal class ApplyToAllDialogTest {
     @Test
     fun `test that cancel button is displayed`() {
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Choose the local file?",
                 description = "The local file will be moved to the .rubbish folder.",
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
-                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 
@@ -121,13 +138,16 @@ internal class ApplyToAllDialogTest {
         var applyToAllCalled = false
 
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Choose the local file?",
                 description = "The local file will be moved to the .rubbish folder.",
                 onApplyToCurrent = { applyToCurrentCalled = true },
                 onApplyToAll = { applyToAllCalled = true },
                 onCancel = {},
-                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 
@@ -145,13 +165,16 @@ internal class ApplyToAllDialogTest {
         var applyToAllCalled = false
 
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Choose the local file?",
                 description = "The local file will be moved to the .rubbish folder.",
                 onApplyToCurrent = { applyToCurrentCalled = true },
                 onApplyToAll = { applyToAllCalled = true },
                 onCancel = {},
-                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 
@@ -172,13 +195,16 @@ internal class ApplyToAllDialogTest {
         var cancelCalled = false
 
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Choose the local file?",
                 description = "The local file will be moved to the .rubbish folder.",
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = { cancelCalled = true },
-                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 
@@ -191,6 +217,7 @@ internal class ApplyToAllDialogTest {
     @Test
     fun `test that shouldShowApplyToAllOption set to false makes checkbox invisible`() {
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Choose the local file?",
                 description = "The local file will be moved to the .rubbish folder.",
@@ -198,7 +225,9 @@ internal class ApplyToAllDialogTest {
                 onApplyToAll = {},
                 onCancel = {},
                 shouldShowApplyToAllOption = false,
-                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 
@@ -215,13 +244,16 @@ internal class ApplyToAllDialogTest {
         var dismissCalled = false
 
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Choose the local file?",
                 description = "The local file will be moved to the .rubbish folder.",
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = { dismissCalled = true },
-                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
         // Click the cancel button to trigger the dismiss callback
@@ -234,13 +266,16 @@ internal class ApplyToAllDialogTest {
     @Test
     fun `test that rename button is displayed for rename action`() {
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Rename all items?",
                 description = "All conflicting items will be renamed.",
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
-                actionButtonStringRes = sharedR.string.context_rename
+                actionButtonStringRes = sharedR.string.context_rename,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 
@@ -251,13 +286,16 @@ internal class ApplyToAllDialogTest {
     @Test
     fun `test that merge button is displayed for merge action`() {
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Merge folders?",
                 description = "The folders will be merged.",
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
-                actionButtonStringRes = sharedR.string.sync_apply_all_dialog_merge_button
+                actionButtonStringRes = sharedR.string.sync_apply_all_dialog_merge_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 
@@ -268,13 +306,16 @@ internal class ApplyToAllDialogTest {
     @Test
     fun `test that choose button is displayed for default actions`() {
         composeTestRule.setContent {
+            var isChecked by remember { mutableStateOf(false) }
             ApplyToAllDialog(
                 title = "Choose the local file?",
                 description = "The local file will be chosen.",
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
-                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button,
+                isApplyToAllChecked = isChecked,
+                onApplyToAllCheckedChange = { isChecked = it },
             )
         }
 

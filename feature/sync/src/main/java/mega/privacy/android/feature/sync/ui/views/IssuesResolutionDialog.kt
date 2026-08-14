@@ -1,28 +1,29 @@
 package mega.privacy.android.feature.sync.ui.views
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun IssuesResolutionDialog(
@@ -62,12 +63,12 @@ private fun FolderHeader(
         verticalAlignment = Alignment.CenterVertically,
     )
     {
-        ThumbnailView(
+        Image(
+            painter = painterResource(icon),
+            contentDescription = "Node thumbnail",
             modifier = Modifier
+                .size(48.dp)
                 .testTag(TEST_TAG_STALLED_ISSUE_CARD_ICON_NODE_THUMBNAIL),
-            data = null,
-            defaultImage = icon,
-            contentDescription = "Node thumbnail"
         )
 
         Column(
@@ -81,13 +82,13 @@ private fun FolderHeader(
                 modifier = Modifier
                     .padding(top = 1.dp)
                     .testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_NAME),
-                style = MaterialTheme.typography.bodyLarge
+                style = AppTheme.typography.bodyLarge
             )
             MegaText(
                 text = conflictName,
                 textColor = TextColor.Brand,
                 modifier = Modifier.testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_CONFLICT_NAME),
-                style = MaterialTheme.typography.bodyMedium,
+                style = AppTheme.typography.bodyMedium,
             )
         }
     }
@@ -109,7 +110,7 @@ private fun IssueResolutionAction(
             text = actionName,
             textColor = TextColor.Primary,
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-            style = MaterialTheme.typography.bodyLarge
+            style = AppTheme.typography.bodyLarge
         )
     }
 }
@@ -117,7 +118,7 @@ private fun IssueResolutionAction(
 @CombinedThemePreviews
 @Composable
 internal fun IssuesResolutionDialogPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         IssuesResolutionDialog(
             icon = iconPackR.drawable.ic_generic_medium_solid,
             conflictName = "Conflict A",
