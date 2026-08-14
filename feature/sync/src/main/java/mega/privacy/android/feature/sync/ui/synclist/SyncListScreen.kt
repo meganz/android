@@ -302,7 +302,7 @@ private fun SyncListScreenContent(
 }
 
 @Composable
-private fun HeaderChips(
+internal fun HeaderChips(
     selectedChip: SyncChip,
     stalledIssuesCount: Int,
     onChipSelected: (SyncChip) -> Unit,
@@ -313,14 +313,14 @@ private fun HeaderChips(
             .fillMaxWidth()
             .wrapContentHeight()
             .horizontalScroll(rememberScrollState())
-            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .padding(vertical = 16.dp, horizontal = 16.dp)
             .selectableGroup(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         MegaChip(
             selected = selectedChip == SYNC_FOLDERS,
             text = stringResource(id = R.string.sync_folders),
-            modifier = modifier.testTag(SYNC_FOLDERS_CHIP_TEST_TAG),
+            modifier = Modifier.testTag(SYNC_FOLDERS_CHIP_TEST_TAG),
             onClick = {
                 Analytics.tracker.trackEvent(SyncListFoldersButtonPressedEvent)
                 onChipSelected(SYNC_FOLDERS)
@@ -333,7 +333,7 @@ private fun HeaderChips(
             } else {
                 stringResource(id = R.string.sync_stalled_issue_zero)
             },
-            modifier = modifier.testTag(STALLED_ISSUES_CHIP_TEST_TAG),
+            modifier = Modifier.testTag(STALLED_ISSUES_CHIP_TEST_TAG),
             onClick = {
                 Analytics.tracker.trackEvent(SyncListIssuesButtonPressedEvent)
                 onChipSelected(STALLED_ISSUES)
@@ -342,7 +342,7 @@ private fun HeaderChips(
         MegaChip(
             selected = selectedChip == SOLVED_ISSUES,
             text = stringResource(id = sharedR.string.device_center_sync_solved_issues_chip_text),
-            modifier = modifier.testTag(SOLVED_ISSUES_CHIP_TEST_TAG),
+            modifier = Modifier.testTag(SOLVED_ISSUES_CHIP_TEST_TAG),
             onClick = {
                 Analytics.tracker.trackEvent(SyncListSolvedIssuesButtonPressedEvent)
                 onChipSelected(SOLVED_ISSUES)
