@@ -109,29 +109,34 @@ interface BillingRepository {
     )
 
     /**
-     * Monitor whether the current user has closed the subscription offer banner. The preference is
-     * stored per account, so closing the banner does not hide it for other logged in users.
+     * Monitor the offer campaigns the current user has dismissed the subscription offer banner for.
+     * The preference is stored per account, so dismissing the banner does not hide it for other
+     * logged in users.
      */
-    fun monitorSubscriptionOfferBannerClosed(): Flow<Boolean>
+    fun monitorDismissedSubscriptionOfferCampaigns(): Flow<Set<Long>>
 
     /**
-     * Persist that the current user has closed the subscription offer banner, so it stays hidden on
-     * the next app launch.
+     * Persist that the current user has dismissed the subscription offer banner for the given
+     * campaign, so every offer of that campaign stays hidden on the next app launch.
+     *
+     * @param campaignId the campaign whose offers should stay hidden
      */
-    suspend fun setSubscriptionOfferBannerClosed()
+    suspend fun addDismissedSubscriptionOfferCampaign(campaignId: Long)
 
     /**
-     * Monitor whether the current user has closed the subscription offer banner on the Menu screen.
-     * Tracked separately from [monitorSubscriptionOfferBannerClosed], so dismissing the banner on
-     * one surface leaves it visible on the other.
+     * Monitor the offer campaigns the current user has dismissed the subscription offer banner on
+     * the Menu screen for. Tracked separately from [monitorDismissedSubscriptionOfferCampaigns], so
+     * dismissing the banner on one surface leaves it visible on the other.
      */
-    fun monitorSubscriptionOfferMenuBannerClosed(): Flow<Boolean>
+    fun monitorDismissedSubscriptionOfferMenuCampaigns(): Flow<Set<Long>>
 
     /**
-     * Persist that the current user has closed the subscription offer banner on the Menu screen, so
-     * it stays hidden on the next app launch.
+     * Persist that the current user has dismissed the subscription offer banner on the Menu screen
+     * for the given campaign, so every offer of that campaign stays hidden on the next app launch.
+     *
+     * @param campaignId the campaign whose offers should stay hidden
      */
-    suspend fun setSubscriptionOfferMenuBannerClosed()
+    suspend fun addDismissedSubscriptionOfferMenuCampaign(campaignId: Long)
 
     /**
      * Get when the subscription offer screen was last shown to the current user. The preference is

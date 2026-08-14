@@ -17,6 +17,9 @@ import mega.android.core.ui.model.LocalizedText
  * @property planNameRes Plan name string resource (e.g. "Pro I").
  * @property validUntil Offer expiry as epoch seconds, driving the countdown on banners that show
  * one; 0 when the offer carries no expiry, which hides the countdown.
+ * @property campaignId Campaign the offer belongs to, used as the dismissal key so hiding the banner
+ * hides every offer of the campaign and no offer of the next one. Offers belonging to no campaign
+ * group carry the no-campaign id, so their dismissal is still persisted.
  */
 @Immutable
 data class SubscriptionOfferBannerUiModel(
@@ -25,4 +28,5 @@ data class SubscriptionOfferBannerUiModel(
     val formattedPrice: String,
     @StringRes val planNameRes: Int,
     val validUntil: Long,
+    val campaignId: Long,
 )

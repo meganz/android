@@ -2,9 +2,9 @@ package mega.privacy.android.data.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -21,25 +21,30 @@ internal class PaymentDatastore @Inject constructor(
     @PaymentPreference private val paymentPreferenceDataStore: DataStore<Preferences>,
 ) : PaymentPreferencesGateway {
 
-    override fun monitorSubscriptionOfferBannerClosed(userHandle: Long): Flow<Boolean> =
+    override fun monitorDismissedSubscriptionOfferCampaigns(userHandle: Long): Flow<Set<Long>> =
         paymentPreferenceDataStore.data.map {
-            it[subscriptionOfferBannerClosedKey(userHandle)] == true
+            it[dismissedSubscriptionOfferCampaignsKey(userHandle)].toCampaignIds()
         }
 
-    override suspend fun setSubscriptionOfferBannerClosed(userHandle: Long, closed: Boolean) {
+    override suspend fun addDismissedSubscriptionOfferCampaign(userHandle: Long, campaignId: Long) {
         paymentPreferenceDataStore.edit {
-            it[subscriptionOfferBannerClosedKey(userHandle)] = closed
+            val key = dismissedSubscriptionOfferCampaignsKey(userHandle)
+            it[key] = it[key].orEmpty() + campaignId.toString()
         }
     }
 
-    override fun monitorSubscriptionOfferMenuBannerClosed(userHandle: Long): Flow<Boolean> =
+    override fun monitorDismissedSubscriptionOfferMenuCampaigns(userHandle: Long): Flow<Set<Long>> =
         paymentPreferenceDataStore.data.map {
-            it[subscriptionOfferMenuBannerClosedKey(userHandle)] == true
+            it[dismissedSubscriptionOfferMenuCampaignsKey(userHandle)].toCampaignIds()
         }
 
-    override suspend fun setSubscriptionOfferMenuBannerClosed(userHandle: Long, closed: Boolean) {
+    override suspend fun addDismissedSubscriptionOfferMenuCampaign(
+        userHandle: Long,
+        campaignId: Long,
+    ) {
         paymentPreferenceDataStore.edit {
-            it[subscriptionOfferMenuBannerClosedKey(userHandle)] = closed
+            val key = dismissedSubscriptionOfferMenuCampaignsKey(userHandle)
+            it[key] = it[key].orEmpty() + campaignId.toString()
         }
     }
 
@@ -54,19 +59,23 @@ internal class PaymentDatastore @Inject constructor(
         }
     }
 
-    private fun subscriptionOfferBannerClosedKey(userHandle: Long) =
-        booleanPreferencesKey("${userHandle}_$SUBSCRIPTION_OFFER_BANNER_CLOSED")
+    private fun dismissedSubscriptionOfferCampaignsKey(userHandle: Long) =
+        stringSetPreferencesKey("${userHandle}_$DISMISSED_SUBSCRIPTION_OFFER_CAMPAIGNS")
 
-    private fun subscriptionOfferMenuBannerClosedKey(userHandle: Long) =
-        booleanPreferencesKey("${userHandle}_$SUBSCRIPTION_OFFER_MENU_BANNER_CLOSED")
+    private fun dismissedSubscriptionOfferMenuCampaignsKey(userHandle: Long) =
+        stringSetPreferencesKey("${userHandle}_$DISMISSED_SUBSCRIPTION_OFFER_MENU_CAMPAIGNS")
 
     private fun subscriptionOfferLastShownTimeKey(userHandle: Long) =
         longPreferencesKey("${userHandle}_$SUBSCRIPTION_OFFER_LAST_SHOWN_TIME")
 
+    private fun Set<String>?.toCampaignIds(): Set<Long> =
+        orEmpty().mapNotNullTo(mutableSetOf()) { it.toLongOrNull() }
+
     companion object {
-        private const val SUBSCRIPTION_OFFER_BANNER_CLOSED = "SUBSCRIPTION_OFFER_BANNER_CLOSED"
-        private const val SUBSCRIPTION_OFFER_MENU_BANNER_CLOSED =
-            "SUBSCRIPTION_OFFER_MENU_BANNER_CLOSED"
+        private const val DISMISSED_SUBSCRIPTION_OFFER_CAMPAIGNS =
+            "DISMISSED_SUBSCRIPTION_OFFER_CAMPAIGNS"
+        private const val DISMISSED_SUBSCRIPTION_OFFER_MENU_CAMPAIGNS =
+            "DISMISSED_SUBSCRIPTION_OFFER_MENU_CAMPAIGNS"
         private const val SUBSCRIPTION_OFFER_LAST_SHOWN_TIME = "SUBSCRIPTION_OFFER_LAST_SHOWN_TIME"
     }
 }

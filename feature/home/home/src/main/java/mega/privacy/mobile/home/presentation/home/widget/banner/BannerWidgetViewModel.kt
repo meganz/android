@@ -3,22 +3,20 @@ package mega.privacy.mobile.home.presentation.home.widget.banner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.banner.DismissBannerUseCase
 import mega.privacy.android.domain.usecase.banner.GetPromoBannersUseCase
-import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferBannerClosedUseCase
+import mega.privacy.android.domain.usecase.billing.DismissSubscriptionOfferCampaignUseCase
+import mega.privacy.android.domain.usecase.billing.MonitorDismissedSubscriptionOfferCampaignsUseCase
 import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferUseCase
-import mega.privacy.android.domain.usecase.billing.SetSubscriptionOfferBannerClosedUseCase
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper.Companion.SUBSCRIPTION_OFFER_BANNER_ID
 import mega.privacy.mobile.home.presentation.home.widget.banner.model.BannerUiState
@@ -34,8 +32,8 @@ class BannerWidgetViewModel @Inject constructor(
     private val getPromoBannersUseCase: GetPromoBannersUseCase,
     private val dismissBannerUseCase: DismissBannerUseCase,
     private val monitorSubscriptionOfferUseCase: MonitorSubscriptionOfferUseCase,
-    private val monitorSubscriptionOfferBannerClosedUseCase: MonitorSubscriptionOfferBannerClosedUseCase,
-    private val setSubscriptionOfferBannerClosedUseCase: SetSubscriptionOfferBannerClosedUseCase,
+    private val monitorDismissedSubscriptionOfferCampaignsUseCase: MonitorDismissedSubscriptionOfferCampaignsUseCase,
+    private val dismissSubscriptionOfferCampaignUseCase: DismissSubscriptionOfferCampaignUseCase,
     private val subscriptionOfferBannerMapper: SubscriptionOfferBannerMapper,
 ) : ViewModel() {
 
@@ -64,29 +62,22 @@ class BannerWidgetViewModel @Inject constructor(
     /**
      * Monitor the subscription offer banner. It is not delivered by the banners API, so it is built
      * locally from the subscription that currently carries an offer, and dropped again once the
-     * account moves to a plan the campaign no longer targets.
+     * account moves to a plan the campaign no longer targets or the user dismisses the campaign.
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun monitorSubscriptionOfferBanner() {
         viewModelScope.launch {
-            monitorSubscriptionOfferBannerClosedUseCase()
-                .distinctUntilChanged()
-                .flatMapLatest { isClosed ->
-                    if (isClosed) {
-                        flowOf(null)
-                    } else {
-                        monitorSubscriptionOfferUseCase().map { result ->
-                            result
-                                .onFailure { Timber.e(it, "Failed to load the offer banner") }
-                                .getOrNull()
-                        }
-                    }
-                }
-                .map { offer ->
-                    offer?.let {
-                        subscriptionOfferBannerMapper(it.subscription, Locale.getDefault())
-                    }
-                }
+            combine(
+                monitorSubscriptionOfferUseCase().map { result ->
+                    result
+                        .onFailure { Timber.e(it, "Failed to load the offer banner") }
+                        .getOrNull()
+                },
+                monitorDismissedSubscriptionOfferCampaignsUseCase().distinctUntilChanged(),
+            ) { offer, dismissedCampaigns ->
+                offer
+                    ?.let { subscriptionOfferBannerMapper(it.subscription, Locale.getDefault()) }
+                    ?.takeUnless { it.campaignId in dismissedCampaigns }
+            }
                 .catch { Timber.e(it, "Failed to monitor subscription offer banner") }
                 .collect { offerBanner ->
                     _uiState.update { it.copy(offerBanner = offerBanner) }
@@ -96,15 +87,17 @@ class BannerWidgetViewModel @Inject constructor(
 
     /**
      * Dismiss a banner. The subscription offer banner only exists locally, so instead of calling the
-     * banners API its dismissal is persisted per account, keeping it hidden on the next app launch.
+     * banners API its dismissal is persisted per account and per offer campaign, keeping every offer
+     * of that campaign hidden on the next app launch while leaving the next campaign free to show.
      *
      * @param bannerId The ID of the banner to dismiss
      */
     fun dismissBanner(bannerId: Int) {
         if (bannerId == SUBSCRIPTION_OFFER_BANNER_ID) {
+            val campaignId = _uiState.value.offerBanner?.campaignId ?: return
             viewModelScope.launch {
                 runCatching {
-                    setSubscriptionOfferBannerClosedUseCase()
+                    dismissSubscriptionOfferCampaignUseCase(campaignId)
                 }.onFailure { exception ->
                     Timber.e(exception, "Failed to persist subscription offer banner dismissal")
                 }

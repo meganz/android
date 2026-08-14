@@ -173,25 +173,27 @@ internal class DefaultBillingRepository @Inject constructor(
         }
     }
 
-    override fun monitorSubscriptionOfferBannerClosed(): Flow<Boolean> =
-        paymentPreferencesGateway.monitorSubscriptionOfferBannerClosed(megaApiGateway.myUserHandle)
+    override fun monitorDismissedSubscriptionOfferCampaigns(): Flow<Set<Long>> =
+        paymentPreferencesGateway.monitorDismissedSubscriptionOfferCampaigns(megaApiGateway.myUserHandle)
 
-    override suspend fun setSubscriptionOfferBannerClosed() = withContext(ioDispatcher) {
-        paymentPreferencesGateway.setSubscriptionOfferBannerClosed(
-            userHandle = megaApiGateway.myUserHandle,
-            closed = true,
-        )
-    }
+    override suspend fun addDismissedSubscriptionOfferCampaign(campaignId: Long) =
+        withContext(ioDispatcher) {
+            paymentPreferencesGateway.addDismissedSubscriptionOfferCampaign(
+                userHandle = megaApiGateway.myUserHandle,
+                campaignId = campaignId,
+            )
+        }
 
-    override fun monitorSubscriptionOfferMenuBannerClosed(): Flow<Boolean> =
-        paymentPreferencesGateway.monitorSubscriptionOfferMenuBannerClosed(megaApiGateway.myUserHandle)
+    override fun monitorDismissedSubscriptionOfferMenuCampaigns(): Flow<Set<Long>> =
+        paymentPreferencesGateway.monitorDismissedSubscriptionOfferMenuCampaigns(megaApiGateway.myUserHandle)
 
-    override suspend fun setSubscriptionOfferMenuBannerClosed() = withContext(ioDispatcher) {
-        paymentPreferencesGateway.setSubscriptionOfferMenuBannerClosed(
-            userHandle = megaApiGateway.myUserHandle,
-            closed = true,
-        )
-    }
+    override suspend fun addDismissedSubscriptionOfferMenuCampaign(campaignId: Long) =
+        withContext(ioDispatcher) {
+            paymentPreferencesGateway.addDismissedSubscriptionOfferMenuCampaign(
+                userHandle = megaApiGateway.myUserHandle,
+                campaignId = campaignId,
+            )
+        }
 
     override suspend fun getSubscriptionOfferLastShownTime(): Long? = withContext(ioDispatcher) {
         paymentPreferencesGateway.getSubscriptionOfferLastShownTime(megaApiGateway.myUserHandle)

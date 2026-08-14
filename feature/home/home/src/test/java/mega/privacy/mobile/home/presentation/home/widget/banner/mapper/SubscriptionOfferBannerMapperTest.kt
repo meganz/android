@@ -25,6 +25,7 @@ class SubscriptionOfferBannerMapperTest {
         discountedPercentage = 50,
         discountName = "Black Friday",
         offerValidUntil = 1_785_000_000L,
+        offerCampaignId = 90210L,
     )
 
     @Test
@@ -37,6 +38,7 @@ class SubscriptionOfferBannerMapperTest {
         assertThat(result?.formattedPrice).isEqualTo("€4.99")
         assertThat(result?.planNameRes).isEqualTo(sharedR.string.pro1_account)
         assertThat(result?.validUntil).isEqualTo(1_785_000_000L)
+        assertThat(result?.campaignId).isEqualTo(90210L)
     }
 
     @Test
@@ -44,6 +46,13 @@ class SubscriptionOfferBannerMapperTest {
         val result = underTest(subscription.copy(offerValidUntil = null), Locale.US)
 
         assertThat(result?.validUntil).isEqualTo(0L)
+    }
+
+    @Test
+    fun `test that invoke maps a missing campaign to the no campaign id`() {
+        val result = underTest(subscription.copy(offerCampaignId = null), Locale.US)
+
+        assertThat(result?.campaignId).isEqualTo(Subscription.NO_OFFER_CAMPAIGN_ID)
     }
 
     @Test

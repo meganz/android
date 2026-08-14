@@ -141,6 +141,7 @@ class MenuHomeScreeUiTest {
         formattedPrice = "€4.99",
         planNameRes = sharedR.string.pro1_account,
         validUntil = System.currentTimeMillis() / 1000L + 28L * 24L * 3600L,
+        campaignId = 90210L,
     )
 
     @Test

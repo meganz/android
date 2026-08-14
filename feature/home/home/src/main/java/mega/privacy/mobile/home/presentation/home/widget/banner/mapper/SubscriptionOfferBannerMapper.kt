@@ -46,6 +46,7 @@ class SubscriptionOfferBannerMapper @Inject constructor() {
             formattedPrice = currencyFormatter.format(discountedAmountMonthly.value),
             planNameRes = planNameRes,
             validUntil = subscription.offerValidUntil ?: 0L,
+            campaignId = subscription.offerCampaignId ?: Subscription.NO_OFFER_CAMPAIGN_ID,
         )
     }
 

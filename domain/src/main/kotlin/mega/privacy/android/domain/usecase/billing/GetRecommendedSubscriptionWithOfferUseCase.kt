@@ -52,14 +52,15 @@ class GetRecommendedSubscriptionWithOfferUseCase @Inject constructor(
         val currentLevel = availablePlans
             .firstOrNull { it.accountType == currentPlan }
             ?.sku.subscriptionSkuLevel
-        val skus = availablePlans.map { it.sku }.distinct()
+
+        val advertisedPlans = availablePlans.filter { it.hasOffer && it.isOfferVisible }
+        if (advertisedPlans.isEmpty()) return null
+
+        val skus = advertisedPlans.map { it.sku }.distinct()
         val products = billingRepository.querySkus(skus).associateBy { it.sku }
 
-        val plansWithOffer = availablePlans
-            .filter {
-                it.hasOffer && it.isOfferVisible &&
-                        products[it.sku]?.offers.orEmpty().isNotEmpty()
-            }
+        val plansWithOffer = advertisedPlans
+            .filter { products[it.sku]?.offers.orEmpty().isNotEmpty() }
 
         val offerPlan = plansWithOffer
             .firstOrNull { it.sku.subscriptionSkuLevel > currentLevel }

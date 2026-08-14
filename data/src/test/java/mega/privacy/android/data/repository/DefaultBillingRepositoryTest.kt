@@ -446,58 +446,66 @@ class DefaultBillingRepositoryTest {
         }
 
     @Test
-    fun `test that monitorSubscriptionOfferBannerClosed monitors the preference of the current user`() =
+    fun `test that monitorDismissedSubscriptionOfferCampaigns monitors the preference of the current user`() =
         runTest {
             val userHandle = 123L
+            val campaignId = 90210L
             whenever(megaApiGateway.myUserHandle).thenReturn(userHandle)
-            whenever(paymentPreferencesGateway.monitorSubscriptionOfferBannerClosed(userHandle))
-                .thenReturn(flowOf(true))
+            whenever(
+                paymentPreferencesGateway.monitorDismissedSubscriptionOfferCampaigns(userHandle)
+            ).thenReturn(flowOf(setOf(campaignId)))
 
-            val actual = underTest.monitorSubscriptionOfferBannerClosed().first()
+            val actual = underTest.monitorDismissedSubscriptionOfferCampaigns().first()
 
-            assertThat(actual).isTrue()
-            verify(paymentPreferencesGateway).monitorSubscriptionOfferBannerClosed(userHandle)
+            assertThat(actual).containsExactly(campaignId)
+            verify(paymentPreferencesGateway)
+                .monitorDismissedSubscriptionOfferCampaigns(userHandle)
         }
 
     @Test
-    fun `test that setSubscriptionOfferBannerClosed saves the preference for the current user`() =
+    fun `test that addDismissedSubscriptionOfferCampaign saves the preference for the current user`() =
         runTest {
             val userHandle = 123L
+            val campaignId = 90210L
             whenever(megaApiGateway.myUserHandle).thenReturn(userHandle)
 
-            underTest.setSubscriptionOfferBannerClosed()
+            underTest.addDismissedSubscriptionOfferCampaign(campaignId)
 
-            verify(paymentPreferencesGateway).setSubscriptionOfferBannerClosed(
+            verify(paymentPreferencesGateway).addDismissedSubscriptionOfferCampaign(
                 userHandle = userHandle,
-                closed = true
+                campaignId = campaignId,
             )
         }
 
     @Test
-    fun `test that monitorSubscriptionOfferMenuBannerClosed monitors the preference of the current user`() =
+    fun `test that monitorDismissedSubscriptionOfferMenuCampaigns monitors the preference of the current user`() =
         runTest {
             val userHandle = 123L
+            val campaignId = 90210L
             whenever(megaApiGateway.myUserHandle).thenReturn(userHandle)
-            whenever(paymentPreferencesGateway.monitorSubscriptionOfferMenuBannerClosed(userHandle))
-                .thenReturn(flowOf(true))
+            whenever(
+                paymentPreferencesGateway.monitorDismissedSubscriptionOfferMenuCampaigns(userHandle)
+            ).thenReturn(flowOf(setOf(campaignId)))
 
-            val actual = underTest.monitorSubscriptionOfferMenuBannerClosed().first()
+            val actual = underTest.monitorDismissedSubscriptionOfferMenuCampaigns().first()
 
-            assertThat(actual).isTrue()
-            verify(paymentPreferencesGateway).monitorSubscriptionOfferMenuBannerClosed(userHandle)
+            assertThat(actual).containsExactly(campaignId)
+            verify(paymentPreferencesGateway)
+                .monitorDismissedSubscriptionOfferMenuCampaigns(userHandle)
         }
 
     @Test
-    fun `test that setSubscriptionOfferMenuBannerClosed saves the preference for the current user`() =
+    fun `test that addDismissedSubscriptionOfferMenuCampaign saves the preference for the current user`() =
         runTest {
             val userHandle = 123L
+            val campaignId = 90210L
             whenever(megaApiGateway.myUserHandle).thenReturn(userHandle)
 
-            underTest.setSubscriptionOfferMenuBannerClosed()
+            underTest.addDismissedSubscriptionOfferMenuCampaign(campaignId)
 
-            verify(paymentPreferencesGateway).setSubscriptionOfferMenuBannerClosed(
+            verify(paymentPreferencesGateway).addDismissedSubscriptionOfferMenuCampaign(
                 userHandle = userHandle,
-                closed = true
+                campaignId = campaignId,
             )
         }
 

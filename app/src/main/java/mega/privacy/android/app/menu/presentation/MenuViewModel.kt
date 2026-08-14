@@ -9,7 +9,6 @@ import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,9 +18,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -52,9 +49,9 @@ import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCa
 import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
-import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferMenuBannerClosedUseCase
+import mega.privacy.android.domain.usecase.billing.DismissSubscriptionOfferMenuCampaignUseCase
+import mega.privacy.android.domain.usecase.billing.MonitorDismissedSubscriptionOfferMenuCampaignsUseCase
 import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferUseCase
-import mega.privacy.android.domain.usecase.billing.SetSubscriptionOfferMenuBannerClosedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -98,8 +95,8 @@ class MenuViewModel @Inject constructor(
     private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase,
     private val avatarContentMapper: AvatarContentMapper,
     private val monitorSubscriptionOfferUseCase: MonitorSubscriptionOfferUseCase,
-    private val monitorSubscriptionOfferMenuBannerClosedUseCase: MonitorSubscriptionOfferMenuBannerClosedUseCase,
-    private val setSubscriptionOfferMenuBannerClosedUseCase: SetSubscriptionOfferMenuBannerClosedUseCase,
+    private val monitorDismissedSubscriptionOfferMenuCampaignsUseCase: MonitorDismissedSubscriptionOfferMenuCampaignsUseCase,
+    private val dismissSubscriptionOfferMenuCampaignUseCase: DismissSubscriptionOfferMenuCampaignUseCase,
     private val subscriptionOfferBannerMapper: SubscriptionOfferBannerMapper,
     private val getEnabledFlaggedItemsUseCase: GetEnabledFlaggedItemsUseCase,
     private val monitorNavigationItemsPreferenceUseCase: MonitorNavigationItemsPreferenceUseCase,
@@ -136,29 +133,23 @@ class MenuViewModel @Inject constructor(
     /**
      * Monitor the subscription offer banner. The offer is not delivered by the banners API, so it is
      * built locally from the recommended subscription that currently carries an offer, and dropped
-     * again once the account moves to a plan the campaign no longer targets.
+     * again once the account moves to a plan the campaign no longer targets or the user dismisses
+     * the campaign.
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun monitorSubscriptionOfferBanner() {
         viewModelScope.launch {
-            monitorSubscriptionOfferMenuBannerClosedUseCase()
-                .distinctUntilChanged()
-                .flatMapLatest { isClosed ->
-                    if (isClosed) {
-                        flowOf(null)
-                    } else {
-                        monitorSubscriptionOfferUseCase().map { result ->
-                            result
-                                .onFailure { Timber.e(it, "Failed to load the offer banner") }
-                                .getOrNull()
-                        }
-                    }
-                }
-                .map { offer ->
-                    offer?.let {
-                        subscriptionOfferBannerMapper(it.subscription, Locale.getDefault())
-                    }
-                }
+            combine(
+                monitorSubscriptionOfferUseCase().map { result ->
+                    result
+                        .onFailure { Timber.e(it, "Failed to load the offer banner") }
+                        .getOrNull()
+                },
+                monitorDismissedSubscriptionOfferMenuCampaignsUseCase().distinctUntilChanged(),
+            ) { offer, dismissedCampaigns ->
+                offer
+                    ?.let { subscriptionOfferBannerMapper(it.subscription, Locale.getDefault()) }
+                    ?.takeUnless { it.campaignId in dismissedCampaigns }
+            }
                 .catch { Timber.e(it, "Failed to monitor subscription offer banner") }
                 .collect { offerBanner ->
                     _uiState.update { it.copy(offerBanner = offerBanner) }
@@ -168,14 +159,16 @@ class MenuViewModel @Inject constructor(
 
     /**
      * Dismiss the subscription offer banner. The banner only exists locally, so instead of calling
-     * the banners API its dismissal is persisted per account, keeping it hidden on the next app
-     * launch. The Menu banner is tracked separately from the Home carousel one, so dismissing it
-     * here leaves the Home banner visible.
+     * the banners API its dismissal is persisted per account and per offer campaign, keeping every
+     * offer of that campaign hidden on the next app launch while leaving the next campaign free to
+     * show. The Menu banner is tracked separately from the Home carousel one, so dismissing it here
+     * leaves the Home banner visible.
      */
     fun dismissOfferBanner() {
+        val campaignId = _uiState.value.offerBanner?.campaignId ?: return
         viewModelScope.launch {
             runCatching {
-                setSubscriptionOfferMenuBannerClosedUseCase()
+                dismissSubscriptionOfferMenuCampaignUseCase(campaignId)
             }.onFailure { exception ->
                 Timber.e(exception, "Failed to persist subscription offer banner dismissal")
             }

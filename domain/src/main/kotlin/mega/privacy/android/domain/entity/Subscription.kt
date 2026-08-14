@@ -49,4 +49,13 @@ data class Subscription(
      */
     val hasOffer: Boolean
         get() = discountedAmountMonthly != null
+
+    companion object {
+        /**
+         * Campaign id used for offers that belong to no campaign group, so their dismissal can still
+         * be persisted. The API never uses 0 as a real campaign id, so dismissing a standalone offer
+         * never hides the offers of a grouped campaign.
+         */
+        const val NO_OFFER_CAMPAIGN_ID = 0L
+    }
 }

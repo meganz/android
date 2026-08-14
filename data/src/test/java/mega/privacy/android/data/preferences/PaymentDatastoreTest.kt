@@ -38,98 +38,107 @@ class PaymentDatastoreTest {
     }
 
     @Test
-    fun `test that the subscription offer banner is not closed by default`() = runTest {
-        underTest.monitorSubscriptionOfferBannerClosed(userHandle).test {
-            assertThat(expectMostRecentItem()).isFalse()
+    fun `test that no subscription offer campaign is dismissed by default`() = runTest {
+        underTest.monitorDismissedSubscriptionOfferCampaigns(userHandle).test {
+            assertThat(expectMostRecentItem()).isEmpty()
         }
     }
 
     @Test
-    fun `test that the subscription offer banner is closed after it is set`() = runTest {
-        underTest.setSubscriptionOfferBannerClosed(userHandle = userHandle, closed = true)
+    fun `test that a subscription offer campaign is dismissed after it is added`() = runTest {
+        underTest.addDismissedSubscriptionOfferCampaign(userHandle, campaignId)
 
-        underTest.monitorSubscriptionOfferBannerClosed(userHandle).test {
-            assertThat(expectMostRecentItem()).isTrue()
+        underTest.monitorDismissedSubscriptionOfferCampaigns(userHandle).test {
+            assertThat(expectMostRecentItem()).containsExactly(campaignId)
         }
     }
 
     @Test
-    fun `test that the subscription offer banner is not closed after it is reset`() = runTest {
-        underTest.setSubscriptionOfferBannerClosed(userHandle = userHandle, closed = true)
-        underTest.setSubscriptionOfferBannerClosed(userHandle = userHandle, closed = false)
-
-        underTest.monitorSubscriptionOfferBannerClosed(userHandle).test {
-            assertThat(expectMostRecentItem()).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that closing the subscription offer banner does not close it for another user`() =
+    fun `test that dismissing a subscription offer campaign keeps the previously dismissed ones`() =
         runTest {
-            underTest.setSubscriptionOfferBannerClosed(userHandle = userHandle, closed = true)
+            underTest.addDismissedSubscriptionOfferCampaign(userHandle, campaignId)
+            underTest.addDismissedSubscriptionOfferCampaign(userHandle, otherCampaignId)
 
-            underTest.monitorSubscriptionOfferBannerClosed(otherUserHandle).test {
-                assertThat(expectMostRecentItem()).isFalse()
-            }
-            underTest.monitorSubscriptionOfferBannerClosed(userHandle).test {
-                assertThat(expectMostRecentItem()).isTrue()
+            underTest.monitorDismissedSubscriptionOfferCampaigns(userHandle).test {
+                assertThat(expectMostRecentItem())
+                    .containsExactly(campaignId, otherCampaignId)
             }
         }
 
     @Test
-    fun `test that the subscription offer menu banner is not closed by default`() = runTest {
-        underTest.monitorSubscriptionOfferMenuBannerClosed(userHandle).test {
-            assertThat(expectMostRecentItem()).isFalse()
+    fun `test that dismissing a subscription offer campaign twice keeps a single entry`() = runTest {
+        underTest.addDismissedSubscriptionOfferCampaign(userHandle, campaignId)
+        underTest.addDismissedSubscriptionOfferCampaign(userHandle, campaignId)
+
+        underTest.monitorDismissedSubscriptionOfferCampaigns(userHandle).test {
+            assertThat(expectMostRecentItem()).containsExactly(campaignId)
         }
     }
 
     @Test
-    fun `test that the subscription offer menu banner is closed after it is set`() = runTest {
-        underTest.setSubscriptionOfferMenuBannerClosed(userHandle = userHandle, closed = true)
+    fun `test that dismissing a subscription offer campaign does not dismiss it for another user`() =
+        runTest {
+            underTest.addDismissedSubscriptionOfferCampaign(userHandle, campaignId)
 
-        underTest.monitorSubscriptionOfferMenuBannerClosed(userHandle).test {
-            assertThat(expectMostRecentItem()).isTrue()
+            underTest.monitorDismissedSubscriptionOfferCampaigns(otherUserHandle).test {
+                assertThat(expectMostRecentItem()).isEmpty()
+            }
+            underTest.monitorDismissedSubscriptionOfferCampaigns(userHandle).test {
+                assertThat(expectMostRecentItem()).containsExactly(campaignId)
+            }
+        }
+
+    @Test
+    fun `test that no subscription offer menu campaign is dismissed by default`() = runTest {
+        underTest.monitorDismissedSubscriptionOfferMenuCampaigns(userHandle).test {
+            assertThat(expectMostRecentItem()).isEmpty()
         }
     }
 
     @Test
-    fun `test that closing the subscription offer menu banner does not close the home banner`() =
-        runTest {
-            underTest.setSubscriptionOfferMenuBannerClosed(userHandle = userHandle, closed = true)
+    fun `test that a subscription offer menu campaign is dismissed after it is added`() = runTest {
+        underTest.addDismissedSubscriptionOfferMenuCampaign(userHandle, campaignId)
 
-            underTest.monitorSubscriptionOfferBannerClosed(userHandle).test {
-                assertThat(expectMostRecentItem()).isFalse()
-            }
-            underTest.monitorSubscriptionOfferMenuBannerClosed(userHandle).test {
-                assertThat(expectMostRecentItem()).isTrue()
-            }
+        underTest.monitorDismissedSubscriptionOfferMenuCampaigns(userHandle).test {
+            assertThat(expectMostRecentItem()).containsExactly(campaignId)
         }
+    }
 
     @Test
-    fun `test that closing the subscription offer home banner does not close the menu banner`() =
-        runTest {
-            underTest.setSubscriptionOfferBannerClosed(userHandle = userHandle, closed = true)
+    fun `test that dismissing a menu campaign does not dismiss it on the home banner`() = runTest {
+        underTest.addDismissedSubscriptionOfferMenuCampaign(userHandle, campaignId)
 
-            underTest.monitorSubscriptionOfferMenuBannerClosed(userHandle).test {
-                assertThat(expectMostRecentItem()).isFalse()
-            }
-            underTest.monitorSubscriptionOfferBannerClosed(userHandle).test {
-                assertThat(expectMostRecentItem()).isTrue()
-            }
+        underTest.monitorDismissedSubscriptionOfferCampaigns(userHandle).test {
+            assertThat(expectMostRecentItem()).isEmpty()
         }
+        underTest.monitorDismissedSubscriptionOfferMenuCampaigns(userHandle).test {
+            assertThat(expectMostRecentItem()).containsExactly(campaignId)
+        }
+    }
 
     @Test
-    fun `test that closing the subscription offer menu banner does not close it for another user`() =
-        runTest {
-            underTest.setSubscriptionOfferMenuBannerClosed(userHandle = userHandle, closed = true)
+    fun `test that dismissing a home banner campaign does not dismiss it on the menu`() = runTest {
+        underTest.addDismissedSubscriptionOfferCampaign(userHandle, campaignId)
 
-            underTest.monitorSubscriptionOfferMenuBannerClosed(otherUserHandle).test {
-                assertThat(expectMostRecentItem()).isFalse()
-            }
-            underTest.monitorSubscriptionOfferMenuBannerClosed(userHandle).test {
-                assertThat(expectMostRecentItem()).isTrue()
-            }
+        underTest.monitorDismissedSubscriptionOfferMenuCampaigns(userHandle).test {
+            assertThat(expectMostRecentItem()).isEmpty()
         }
+        underTest.monitorDismissedSubscriptionOfferCampaigns(userHandle).test {
+            assertThat(expectMostRecentItem()).containsExactly(campaignId)
+        }
+    }
+
+    @Test
+    fun `test that dismissing a menu campaign does not dismiss it for another user`() = runTest {
+        underTest.addDismissedSubscriptionOfferMenuCampaign(userHandle, campaignId)
+
+        underTest.monitorDismissedSubscriptionOfferMenuCampaigns(otherUserHandle).test {
+            assertThat(expectMostRecentItem()).isEmpty()
+        }
+        underTest.monitorDismissedSubscriptionOfferMenuCampaigns(userHandle).test {
+            assertThat(expectMostRecentItem()).containsExactly(campaignId)
+        }
+    }
 
     @Test
     fun `test that the subscription offer last shown time is null by default`() = runTest {
@@ -160,6 +169,8 @@ class PaymentDatastoreTest {
     private companion object {
         const val userHandle = 123L
         const val otherUserHandle = 456L
+        const val campaignId = 90210L
+        const val otherCampaignId = 90211L
         const val lastShownTime = 1_700_000_000_000L
     }
 }

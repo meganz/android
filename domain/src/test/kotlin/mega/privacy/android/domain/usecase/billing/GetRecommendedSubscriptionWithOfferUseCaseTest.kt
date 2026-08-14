@@ -20,7 +20,9 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -339,6 +341,32 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
 
             assertThat(underTest.invoke()?.hasMultipleOffers).isFalse()
         }
+
+    @Test
+    fun `test that play billing is not queried when no plan advertises an offer`() = runTest {
+        val lite =
+            subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = false)
+        val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = false)
+        whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(AccountType.FREE)
+        whenever(getSubscriptionOptionsUseCase()).thenReturn(listOf(lite, proI))
+
+        assertThat(underTest.invoke()).isNull()
+
+        verify(billingRepository, never()).querySkus(any())
+    }
+
+    @Test
+    fun `test that only the advertised plans are queried against play billing`() = runTest {
+        val lite =
+            subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = false)
+        val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
+        stub(currentPlan = AccountType.FREE, options = listOf(lite, proI))
+        stubMapping(proI, Skus.SKU_PRO_I_MONTH)
+
+        underTest.invoke()
+
+        verify(billingRepository).querySkus(listOf(Skus.SKU_PRO_I_MONTH))
+    }
 
     private fun subscriptionOption(
         type: AccountType,

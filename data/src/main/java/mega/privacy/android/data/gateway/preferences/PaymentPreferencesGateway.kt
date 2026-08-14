@@ -10,37 +10,40 @@ import kotlinx.coroutines.flow.Flow
 interface PaymentPreferencesGateway {
 
     /**
-     * Monitor whether the given user has closed the subscription offer banner.
+     * Monitor the offer campaigns the given user has dismissed the subscription offer banner for.
      *
      * @param userHandle the handle of the logged in user
      */
-    fun monitorSubscriptionOfferBannerClosed(userHandle: Long): Flow<Boolean>
+    fun monitorDismissedSubscriptionOfferCampaigns(userHandle: Long): Flow<Set<Long>>
 
     /**
-     * Set whether the given user has closed the subscription offer banner.
+     * Add an offer campaign to the ones the given user has dismissed the subscription offer banner
+     * for.
      *
      * @param userHandle the handle of the logged in user
-     * @param closed true when the banner should stay hidden for this user
+     * @param campaignId the campaign whose offers should stay hidden for this user
      */
-    suspend fun setSubscriptionOfferBannerClosed(userHandle: Long, closed: Boolean)
+    suspend fun addDismissedSubscriptionOfferCampaign(userHandle: Long, campaignId: Long)
 
     /**
-     * Monitor whether the given user has closed the subscription offer banner on the Menu screen.
+     * Monitor the offer campaigns the given user has dismissed the subscription offer banner on the
+     * Menu screen for.
      *
-     * Tracked separately from [monitorSubscriptionOfferBannerClosed] so dismissing the banner on
-     * one surface leaves it visible on the other.
+     * Tracked separately from [monitorDismissedSubscriptionOfferCampaigns] so dismissing the banner
+     * on one surface leaves it visible on the other.
      *
      * @param userHandle the handle of the logged in user
      */
-    fun monitorSubscriptionOfferMenuBannerClosed(userHandle: Long): Flow<Boolean>
+    fun monitorDismissedSubscriptionOfferMenuCampaigns(userHandle: Long): Flow<Set<Long>>
 
     /**
-     * Set whether the given user has closed the subscription offer banner on the Menu screen.
+     * Add an offer campaign to the ones the given user has dismissed the subscription offer banner
+     * on the Menu screen for.
      *
      * @param userHandle the handle of the logged in user
-     * @param closed true when the Menu banner should stay hidden for this user
+     * @param campaignId the campaign whose offers should stay hidden for this user
      */
-    suspend fun setSubscriptionOfferMenuBannerClosed(userHandle: Long, closed: Boolean)
+    suspend fun addDismissedSubscriptionOfferMenuCampaign(userHandle: Long, campaignId: Long)
 
     /**
      * Get when the subscription offer screen was last shown to the given user.

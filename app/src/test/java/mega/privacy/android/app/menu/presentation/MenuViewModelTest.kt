@@ -58,9 +58,9 @@ import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCa
 import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
-import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferMenuBannerClosedUseCase
+import mega.privacy.android.domain.usecase.billing.DismissSubscriptionOfferMenuCampaignUseCase
+import mega.privacy.android.domain.usecase.billing.MonitorDismissedSubscriptionOfferMenuCampaignsUseCase
 import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferUseCase
-import mega.privacy.android.domain.usecase.billing.SetSubscriptionOfferMenuBannerClosedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -103,7 +103,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -132,10 +131,10 @@ class MenuViewModelTest {
     private val getSpecificAccountDetailUseCase = mock<GetSpecificAccountDetailUseCase>()
     private val avatarContentMapper = mock<AvatarContentMapper>()
     private val monitorSubscriptionOfferUseCase = mock<MonitorSubscriptionOfferUseCase>()
-    private val monitorSubscriptionOfferMenuBannerClosedUseCase =
-        mock<MonitorSubscriptionOfferMenuBannerClosedUseCase>()
-    private val setSubscriptionOfferMenuBannerClosedUseCase =
-        mock<SetSubscriptionOfferMenuBannerClosedUseCase>()
+    private val monitorDismissedSubscriptionOfferMenuCampaignsUseCase =
+        mock<MonitorDismissedSubscriptionOfferMenuCampaignsUseCase>()
+    private val dismissSubscriptionOfferMenuCampaignUseCase =
+        mock<DismissSubscriptionOfferMenuCampaignUseCase>()
     private val subscriptionOfferBannerMapper = mock<SubscriptionOfferBannerMapper>()
     private val getEnabledFlaggedItemsUseCase = mock<GetEnabledFlaggedItemsUseCase>()
     private val monitorNavigationItemsPreferenceUseCase =
@@ -184,23 +183,25 @@ class MenuViewModelTest {
             getSpecificAccountDetailUseCase,
             avatarContentMapper,
             monitorSubscriptionOfferUseCase,
-            monitorSubscriptionOfferMenuBannerClosedUseCase,
-            setSubscriptionOfferMenuBannerClosedUseCase,
+            monitorDismissedSubscriptionOfferMenuCampaignsUseCase,
+            dismissSubscriptionOfferMenuCampaignUseCase,
             subscriptionOfferBannerMapper,
             getEnabledFlaggedItemsUseCase,
             monitorNavigationItemsPreferenceUseCase,
             getFeatureFlagValueUseCase,
         )
-        stubOfferBannerNotClosed()
+        stubNoDismissedCampaign()
         whenever(monitorSubscriptionOfferUseCase()).thenReturn(flowOf(Result.success(null)))
     }
 
-    private fun stubOfferBannerNotClosed() {
-        whenever(monitorSubscriptionOfferMenuBannerClosedUseCase()).thenReturn(flowOf(false))
+    private fun stubNoDismissedCampaign() {
+        whenever(monitorDismissedSubscriptionOfferMenuCampaignsUseCase())
+            .thenReturn(flowOf(emptySet()))
     }
 
-    private fun stubOfferBannerClosed() {
-        whenever(monitorSubscriptionOfferMenuBannerClosedUseCase()).thenReturn(flowOf(true))
+    private fun stubDismissedCampaigns(vararg campaigns: Long) {
+        whenever(monitorDismissedSubscriptionOfferMenuCampaignsUseCase())
+            .thenReturn(flowOf(campaigns.toSet()))
     }
 
     /**
@@ -212,7 +213,9 @@ class MenuViewModelTest {
         val offer = mock<RecommendedSubscriptionOffer> {
             on { this.subscription } doReturn subscription
         }
-        val offerBanner = mock<SubscriptionOfferBannerUiModel>()
+        val offerBanner = mock<SubscriptionOfferBannerUiModel> {
+            on { campaignId } doReturn CAMPAIGN_ID
+        }
         whenever(monitorSubscriptionOfferUseCase()).thenReturn(flowOf(Result.success(offer)))
         whenever(subscriptionOfferBannerMapper(eq(subscription), any())).thenReturn(offerBanner)
         return offerBanner
@@ -1079,18 +1082,32 @@ class MenuViewModelTest {
     }
 
     @Test
-    fun `test that init emits no offer banner when the menu banner was already dismissed`() =
+    fun `test that init emits no offer banner when its campaign was already dismissed`() = runTest {
+        stubDefaultDependencies()
+        stubActiveOfferBanner()
+        stubDismissedCampaigns(CAMPAIGN_ID)
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().offerBanner).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that init emits the offer banner when only another campaign was dismissed`() =
         runTest {
             stubDefaultDependencies()
-            stubOfferBannerClosed()
+            val offerBanner = stubActiveOfferBanner()
+            stubDismissedCampaigns(OTHER_CAMPAIGN_ID)
 
             initUnderTest()
 
             underTest.uiState.test {
-                assertThat(awaitItem().offerBanner).isNull()
+                assertThat(awaitItem().offerBanner).isEqualTo(offerBanner)
                 cancelAndIgnoreRemainingEvents()
             }
-            verifyNoInteractions(monitorSubscriptionOfferUseCase)
         }
 
     @Test
@@ -1137,21 +1154,21 @@ class MenuViewModelTest {
     }
 
     @Test
-    fun `test that dismissOfferBanner persists the dismissal`() = runTest {
+    fun `test that dismissOfferBanner persists the dismissal of its campaign`() = runTest {
         stubDefaultDependencies()
-        val offerBanner = stubActiveOfferBanner()
+        stubActiveOfferBanner()
 
         initUnderTest()
         underTest.dismissOfferBanner()
 
-        verify(setSubscriptionOfferMenuBannerClosedUseCase).invoke()
+        verify(dismissSubscriptionOfferMenuCampaignUseCase).invoke(CAMPAIGN_ID)
     }
 
     @Test
     fun `test that dismissOfferBanner hides the banner when persisting fails`() = runTest {
         stubDefaultDependencies()
         val offerBanner = stubActiveOfferBanner()
-        whenever(setSubscriptionOfferMenuBannerClosedUseCase())
+        whenever(dismissSubscriptionOfferMenuCampaignUseCase(CAMPAIGN_ID))
             .thenAnswer { throw RuntimeException("Datastore unavailable") }
 
         initUnderTest()
@@ -1191,8 +1208,8 @@ class MenuViewModelTest {
             getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
             avatarContentMapper = avatarContentMapper,
             monitorSubscriptionOfferUseCase = monitorSubscriptionOfferUseCase,
-            monitorSubscriptionOfferMenuBannerClosedUseCase = monitorSubscriptionOfferMenuBannerClosedUseCase,
-            setSubscriptionOfferMenuBannerClosedUseCase = setSubscriptionOfferMenuBannerClosedUseCase,
+            monitorDismissedSubscriptionOfferMenuCampaignsUseCase = monitorDismissedSubscriptionOfferMenuCampaignsUseCase,
+            dismissSubscriptionOfferMenuCampaignUseCase = dismissSubscriptionOfferMenuCampaignUseCase,
             subscriptionOfferBannerMapper = subscriptionOfferBannerMapper,
             getEnabledFlaggedItemsUseCase = getEnabledFlaggedItemsUseCase,
             monitorNavigationItemsPreferenceUseCase = monitorNavigationItemsPreferenceUseCase,
@@ -2415,5 +2432,10 @@ class MenuViewModelTest {
         override val preferredSlot: PreferredSlot = preferredSlot
         override val availableOffline: Boolean = false
         override val analyticsEventIdentifier: NavigationEventIdentifier = mock()
+    }
+
+    private companion object {
+        const val CAMPAIGN_ID = 90210L
+        const val OTHER_CAMPAIGN_ID = 90211L
     }
 }

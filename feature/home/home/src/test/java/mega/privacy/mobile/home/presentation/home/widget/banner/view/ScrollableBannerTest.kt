@@ -58,6 +58,7 @@ class ScrollableBannerTest {
         formattedPrice = "€4.99",
         planNameRes = sharedR.string.pro1_account,
         validUntil = 1_785_000_000L,
+        campaignId = 90210L,
     )
 
     @Test

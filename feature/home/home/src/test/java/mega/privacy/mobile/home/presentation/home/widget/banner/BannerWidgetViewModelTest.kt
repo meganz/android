@@ -16,9 +16,9 @@ import mega.privacy.android.domain.entity.banner.PromotionalBanner
 import mega.privacy.android.domain.entity.billing.RecommendedSubscriptionOffer
 import mega.privacy.android.domain.usecase.banner.DismissBannerUseCase
 import mega.privacy.android.domain.usecase.banner.GetPromoBannersUseCase
-import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferBannerClosedUseCase
+import mega.privacy.android.domain.usecase.billing.DismissSubscriptionOfferCampaignUseCase
+import mega.privacy.android.domain.usecase.billing.MonitorDismissedSubscriptionOfferCampaignsUseCase
 import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferUseCase
-import mega.privacy.android.domain.usecase.billing.SetSubscriptionOfferBannerClosedUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper.Companion.SUBSCRIPTION_OFFER_BANNER_ID
@@ -45,10 +45,10 @@ class BannerWidgetViewModelTest {
     private val getPromoBannersUseCase = mock<GetPromoBannersUseCase>()
     private val dismissBannerUseCase = mock<DismissBannerUseCase>()
     private val monitorSubscriptionOfferUseCase = mock<MonitorSubscriptionOfferUseCase>()
-    private val monitorSubscriptionOfferBannerClosedUseCase =
-        mock<MonitorSubscriptionOfferBannerClosedUseCase>()
-    private val setSubscriptionOfferBannerClosedUseCase =
-        mock<SetSubscriptionOfferBannerClosedUseCase>()
+    private val monitorDismissedSubscriptionOfferCampaignsUseCase =
+        mock<MonitorDismissedSubscriptionOfferCampaignsUseCase>()
+    private val dismissSubscriptionOfferCampaignUseCase =
+        mock<DismissSubscriptionOfferCampaignUseCase>()
     private val subscriptionOfferBannerMapper = mock<SubscriptionOfferBannerMapper>()
 
     private val banner1 = PromotionalBanner(
@@ -77,6 +77,7 @@ class BannerWidgetViewModelTest {
         formattedPrice = "€4.99",
         planNameRes = sharedR.string.pro1_account,
         validUntil = 1_785_000_000L,
+        campaignId = campaignId,
     )
 
     private val offerSubscription = Subscription(
@@ -89,6 +90,7 @@ class BannerWidgetViewModelTest {
         discountedAmountMonthly = CurrencyAmount(4.99f, Currency("EUR")),
         discountedPercentage = 50,
         discountName = "Black Friday",
+        offerCampaignId = campaignId,
     )
 
     private val recommendedOffer = mock<RecommendedSubscriptionOffer> {
@@ -101,11 +103,11 @@ class BannerWidgetViewModelTest {
             dismissBannerUseCase,
             getPromoBannersUseCase,
             monitorSubscriptionOfferUseCase,
-            monitorSubscriptionOfferBannerClosedUseCase,
-            setSubscriptionOfferBannerClosedUseCase,
+            monitorDismissedSubscriptionOfferCampaignsUseCase,
+            dismissSubscriptionOfferCampaignUseCase,
             subscriptionOfferBannerMapper,
         )
-        stubOfferBannerNotClosed()
+        stubNoDismissedCampaign()
     }
 
     private fun initViewModel() {
@@ -113,8 +115,8 @@ class BannerWidgetViewModelTest {
             dismissBannerUseCase = dismissBannerUseCase,
             getPromoBannersUseCase = getPromoBannersUseCase,
             monitorSubscriptionOfferUseCase = monitorSubscriptionOfferUseCase,
-            monitorSubscriptionOfferBannerClosedUseCase = monitorSubscriptionOfferBannerClosedUseCase,
-            setSubscriptionOfferBannerClosedUseCase = setSubscriptionOfferBannerClosedUseCase,
+            monitorDismissedSubscriptionOfferCampaignsUseCase = monitorDismissedSubscriptionOfferCampaignsUseCase,
+            dismissSubscriptionOfferCampaignUseCase = dismissSubscriptionOfferCampaignUseCase,
             subscriptionOfferBannerMapper = subscriptionOfferBannerMapper,
         )
     }
@@ -134,12 +136,14 @@ class BannerWidgetViewModelTest {
             .thenReturn(flowOf(Result.failure(RuntimeException("Billing error"))))
     }
 
-    private fun stubOfferBannerNotClosed() {
-        whenever(monitorSubscriptionOfferBannerClosedUseCase()).thenReturn(flowOf(false))
+    private fun stubNoDismissedCampaign() {
+        whenever(monitorDismissedSubscriptionOfferCampaignsUseCase())
+            .thenReturn(flowOf(emptySet()))
     }
 
-    private fun stubOfferBannerClosed() {
-        whenever(monitorSubscriptionOfferBannerClosedUseCase()).thenReturn(flowOf(true))
+    private fun stubDismissedCampaigns(vararg campaigns: Long) {
+        whenever(monitorDismissedSubscriptionOfferCampaignsUseCase())
+            .thenReturn(flowOf(campaigns.toSet()))
     }
 
     @Test
@@ -299,7 +303,7 @@ class BannerWidgetViewModelTest {
         }
 
     @Test
-    fun `test that dismissing the offer banner persists that it is closed`() = runTest {
+    fun `test that dismissing the offer banner persists the dismissal of its campaign`() = runTest {
         whenever(getPromoBannersUseCase()).thenReturn(emptyList())
         stubOffer()
 
@@ -307,14 +311,14 @@ class BannerWidgetViewModelTest {
 
         underTest.dismissBanner(SUBSCRIPTION_OFFER_BANNER_ID)
 
-        verify(setSubscriptionOfferBannerClosedUseCase).invoke()
+        verify(dismissSubscriptionOfferCampaignUseCase).invoke(campaignId)
     }
 
     @Test
     fun `test that the offer banner is removed even when persisting it fails`() = runTest {
         whenever(getPromoBannersUseCase()).thenReturn(listOf(banner1))
         stubOffer()
-        whenever(setSubscriptionOfferBannerClosedUseCase())
+        whenever(dismissSubscriptionOfferCampaignUseCase(campaignId))
             .thenThrow(RuntimeException("Datastore error"))
 
         initViewModel()
@@ -332,20 +336,36 @@ class BannerWidgetViewModelTest {
     }
 
     @Test
-    fun `test that offer banner is not shown when the user has already closed it`() = runTest {
-        whenever(getPromoBannersUseCase()).thenReturn(listOf(banner1))
-        stubOfferBannerClosed()
+    fun `test that offer banner is not shown when the user has already dismissed its campaign`() =
+        runTest {
+            whenever(getPromoBannersUseCase()).thenReturn(listOf(banner1))
+            stubOffer()
+            stubDismissedCampaigns(campaignId)
 
-        initViewModel()
+            initViewModel()
 
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.offerBanner).isNull()
-            assertThat(state.banners).containsExactly(banner1)
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.offerBanner).isNull()
+                assertThat(state.banners).containsExactly(banner1)
+            }
         }
-        verifyNoInteractions(monitorSubscriptionOfferUseCase)
-        verifyNoInteractions(subscriptionOfferBannerMapper)
-    }
+
+    @Test
+    fun `test that offer banner is shown when the user has only dismissed another campaign`() =
+        runTest {
+            whenever(getPromoBannersUseCase()).thenReturn(listOf(banner1))
+            stubOffer()
+            stubDismissedCampaigns(otherCampaignId)
+
+            initViewModel()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.offerBanner).isEqualTo(offerBanner)
+                assertThat(state.banners).containsExactly(banner1)
+            }
+        }
 
     @Test
     fun `test that the offer banner is removed when the offer goes away after an upgrade`() =
@@ -407,5 +427,10 @@ class BannerWidgetViewModelTest {
             expectNoEvents()
             assertThat(underTest.uiState.value).isEqualTo(initialState)
         }
+    }
+
+    private companion object {
+        const val campaignId = 90210L
+        const val otherCampaignId = 90211L
     }
 }
