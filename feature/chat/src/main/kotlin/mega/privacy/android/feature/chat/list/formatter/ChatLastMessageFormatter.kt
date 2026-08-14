@@ -2,6 +2,7 @@ package mega.privacy.android.feature.chat.list.formatter
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.core.formatter.emoji.EmojiShortcodeConverter
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.usecase.chat.GetChatListItemUseCase
@@ -21,6 +22,9 @@ import javax.inject.Inject
  * The dispatch in [invoke] is keyed by [ChatListItem.lastMessageType]: each
  * message family is a dedicated branch, and any type without a dedicated branch
  * falls back to the raw last-message text so previews never regress.
+ *
+ * Emoji short-codes embedded in normal-text message content are converted to
+ * their glyphs via [EmojiShortcodeConverter], matching the legacy preview.
  */
 internal class ChatLastMessageFormatter @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -28,6 +32,7 @@ internal class ChatLastMessageFormatter @Inject constructor(
     private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val getMyFullNameUseCase: GetMyFullNameUseCase,
+    private val emojiShortcodeConverter: EmojiShortcodeConverter,
 ) {
 
     /**
@@ -46,8 +51,8 @@ internal class ChatLastMessageFormatter @Inject constructor(
     }
 
     private suspend fun plainTextPreview(item: ChatListItem): String {
-        val content = item.lastMessage
-        if (content.isBlank()) return noHistoryPreview()
+        if (item.lastMessage.isBlank()) return noHistoryPreview()
+        val content = emojiShortcodeConverter.convert(item.lastMessage)
         if (!item.isGroup) return content
         return "${senderPrefix(item)}: $content"
     }

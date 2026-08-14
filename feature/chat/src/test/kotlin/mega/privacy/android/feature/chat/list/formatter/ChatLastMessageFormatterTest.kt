@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.formatter.emoji.EmojiShortcodeConverter
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.usecase.chat.GetChatListItemUseCase
@@ -15,6 +16,8 @@ import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -28,6 +31,7 @@ class ChatLastMessageFormatterTest {
     private val getMessageSenderNameUseCase = mock<GetMessageSenderNameUseCase>()
     private val getMyUserHandleUseCase = mock<GetMyUserHandleUseCase>()
     private val getMyFullNameUseCase = mock<GetMyFullNameUseCase>()
+    private val emojiShortcodeConverter = mock<EmojiShortcodeConverter>()
 
     private lateinit var underTest: ChatLastMessageFormatter
 
@@ -38,13 +42,16 @@ class ChatLastMessageFormatterTest {
             getMessageSenderNameUseCase,
             getMyUserHandleUseCase,
             getMyFullNameUseCase,
+            emojiShortcodeConverter,
         )
+        whenever(emojiShortcodeConverter.convert(any())) doAnswer { it.getArgument(0) }
         underTest = ChatLastMessageFormatter(
             context = context,
             getChatListItemUseCase = getChatListItemUseCase,
             getMessageSenderNameUseCase = getMessageSenderNameUseCase,
             getMyUserHandleUseCase = getMyUserHandleUseCase,
             getMyFullNameUseCase = getMyFullNameUseCase,
+            emojiShortcodeConverter = emojiShortcodeConverter,
         )
     }
 
@@ -91,6 +98,36 @@ class ChatLastMessageFormatterTest {
             )
 
             assertThat(underTest(CHAT_ID)).isEqualTo("Hello there")
+        }
+
+    @Test
+    fun `test that invoke converts emoji short-codes in the normal message content`() = runTest {
+        whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+            chatId = CHAT_ID,
+            lastMessage = "Hello :smile:",
+            lastMessageType = ChatRoomLastMessage.Normal,
+            isGroup = false,
+        )
+        whenever(emojiShortcodeConverter.convert("Hello :smile:")) doReturn "Hello 😄"
+
+        assertThat(underTest(CHAT_ID)).isEqualTo("Hello 😄")
+    }
+
+    @Test
+    fun `test that invoke converts the content but not the sender name for a group message`() =
+        runTest {
+            whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+                chatId = CHAT_ID,
+                lastMessage = "Hello :smile:",
+                lastMessageType = ChatRoomLastMessage.Normal,
+                lastMessageSender = SENDER_HANDLE,
+                isGroup = true,
+            )
+            whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+            whenever(getMessageSenderNameUseCase(SENDER_HANDLE, CHAT_ID)) doReturn ":smile:"
+            whenever(emojiShortcodeConverter.convert("Hello :smile:")) doReturn "Hello 😄"
+
+            assertThat(underTest(CHAT_ID)).isEqualTo(":smile:: Hello 😄")
         }
 
     @Test
