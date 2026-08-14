@@ -14,8 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.media3.common.Player
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.sharedcomponents.systemui.DarkStatusBarEffect
-import mega.privacy.android.core.sharedcomponents.systemui.TransparentNavigationBarEffect
+import mega.privacy.android.feature.mediaplayer.components.AudioPlayerWindowEffect
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.feature.mediaplayer.components.AudioPlayerLandscapeContent
@@ -87,9 +86,9 @@ fun AudioPlayerScreen(
     modifier: Modifier = Modifier,
     sleepTimerState: SleepTimerState = SleepTimerState.Inactive,
 ) {
-    TransparentNavigationBarEffect()
-    DarkStatusBarEffect()
-    AndroidTheme(isDark = true) {
+    AndroidTheme(isDark = true, useLegacyStatusBarColor = false) {
+        // Must be the first child — see AudioPlayerWindowEffect KDoc for ordering requirements.
+        AudioPlayerWindowEffect()
         BoxWithConstraints(
             modifier = modifier
                 .fillMaxSize()

@@ -18,6 +18,8 @@ dependencies {
     implementation(google.media3.ui)
     implementation(google.media3.common)
 
+    implementation(androidx.compose.activity)
+    implementation(lib.logging.timber)
     implementation(androidx.bundles.compose.bom)
     implementation(platform(androidx.compose.bom))
     implementation(androidx.material3)
