@@ -52,6 +52,12 @@ interface AudioMediaControllerGateway {
     /** Sets the playback speed. A value of `1.0` is normal speed. */
     fun setPlaybackSpeed(speed: Float)
 
+    /** Seeks to the media item at [index] in the queue and starts from its default position. No-op if [index] is out of range. */
+    fun seekToMediaItem(index: Int)
+
+    /** Moves the media item at [fromIndex] to [toIndex] in the queue. No-op if either index is out of range. */
+    fun moveMediaItem(fromIndex: Int, toIndex: Int)
+
     /** Releases the MediaController connection and all associated resources. */
     fun release()
 }

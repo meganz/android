@@ -17,7 +17,6 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -33,7 +32,9 @@ import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
 import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState
+import mega.privacy.android.feature.mediaplayer.data.model.AudioQueueItem
 import timber.log.Timber
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * [AudioMediaControllerGateway] implementation backed by a Media3 [MediaController].
@@ -147,9 +148,27 @@ internal class AudioMediaControllerFacade @Inject constructor(
                     it
                 )
             },
+            queueItems = buildQueueItems(c),
+            currentQueueIndex = c.safeQueueIndex(),
         )
         _playerState.tryEmit(currentState)
     }
+
+    /**
+     * Media3 returns -1 when no item is active; clamp to 0 as a safe sentinel.
+     */
+    private fun MediaController.safeQueueIndex(): Int = currentMediaItemIndex.coerceAtLeast(0)
+
+    private fun buildQueueItems(c: MediaController): List<AudioQueueItem> =
+        List(c.mediaItemCount) { i ->
+            val item = c.getMediaItemAt(i)
+            AudioQueueItem(
+                mediaId = item.mediaId,
+                title = item.mediaMetadata.title?.toString(),
+                artist = item.mediaMetadata.artist?.toString(),
+                handle = mediaHandleStore.getHandle(item.mediaId),
+            )
+        }
 
     private fun updateState(update: AudioControllerState.() -> AudioControllerState) {
         currentState = currentState.update()
@@ -174,10 +193,12 @@ internal class AudioMediaControllerFacade @Inject constructor(
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            val ctrl = controller ?: return
             updateState {
                 copy(
                     currentMediaItemId = mediaItem?.mediaId,
                     currentMediaItemHandle = mediaItem?.mediaId?.let { mediaHandleStore.getHandle(it) },
+                    currentQueueIndex = ctrl.safeQueueIndex(),
                 )
             }
         }
@@ -201,7 +222,15 @@ internal class AudioMediaControllerFacade @Inject constructor(
 
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
             val ctrl = controller ?: return
-            updateState { copy(mediaItemCount = ctrl.mediaItemCount) }
+            val newQueueItems = buildQueueItems(ctrl)
+            val newQueueIndex = ctrl.safeQueueIndex()
+            updateState {
+                copy(
+                    mediaItemCount = ctrl.mediaItemCount,
+                    queueItems = newQueueItems,
+                    currentQueueIndex = newQueueIndex,
+                )
+            }
         }
 
         override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
@@ -287,6 +316,20 @@ internal class AudioMediaControllerFacade @Inject constructor(
 
     override fun setPlaybackSpeed(speed: Float) {
         controller?.setPlaybackSpeed(speed)
+    }
+
+    override fun seekToMediaItem(index: Int) {
+        val ctrl = controller ?: return
+        if (index !in 0 until ctrl.mediaItemCount) return
+        ctrl.seekToDefaultPosition(index)
+    }
+
+    override fun moveMediaItem(fromIndex: Int, toIndex: Int) {
+        val ctrl = controller ?: return
+        if (fromIndex == toIndex) return
+        if (fromIndex !in 0 until ctrl.mediaItemCount) return
+        if (toIndex !in 0 until ctrl.mediaItemCount) return
+        ctrl.moveMediaItem(fromIndex, toIndex)
     }
 
     override fun stop() {
