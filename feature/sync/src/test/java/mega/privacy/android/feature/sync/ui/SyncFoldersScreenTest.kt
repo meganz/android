@@ -35,7 +35,6 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_SYNC_ITEM_VIEW
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.TITLE_TAG
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
@@ -216,7 +215,6 @@ class SyncFoldersScreenTest {
                 folderName = null
             )
         }
-        composeTestRule.onNodeWithTag(TITLE_TAG).assertIsDisplayed().assertHasNoClickAction()
         composeTestRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_BODY_TEST_TAG)
             .assertIsDisplayed()
             .assertHasNoClickAction()

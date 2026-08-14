@@ -19,9 +19,9 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.O
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.PauseRunClicked
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.RemoveFolderClicked
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.SnackBarShown
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.sync.ui.extension.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -142,14 +142,15 @@ internal fun StopSyncConfirmDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    ConfirmationDialog(
-        title = stringResource(id = sharedResR.string.sync_stop_sync_confirm_dialog_title),
-        text = stringResource(id = sharedResR.string.sync_stop_sync_confirm_dialog_message),
-        confirmButtonText = stringResource(id = sharedResR.string.sync_stop_sync_button),
-        cancelButtonText = stringResource(id = sharedResR.string.general_dialog_cancel_button),
-        onConfirm = onConfirm,
-        onDismiss = onDismiss,
+    BasicDialog(
         modifier = Modifier.testTag(STOP_SYNC_CONFIRM_DIALOG_TEST_TAG),
+        title = stringResource(id = sharedResR.string.sync_stop_sync_confirm_dialog_title),
+        description = stringResource(id = sharedResR.string.sync_stop_sync_confirm_dialog_message),
+        positiveButtonText = stringResource(id = sharedResR.string.sync_stop_sync_button),
+        onPositiveButtonClicked = onConfirm,
+        negativeButtonText = stringResource(id = sharedResR.string.general_dialog_cancel_button),
+        onNegativeButtonClicked = onDismiss,
+        onDismiss = onDismiss,
     )
 }
 

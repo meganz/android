@@ -8,7 +8,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.TITLE_TAG
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +32,6 @@ internal class StopBackupConfirmationDialogTest {
     @Test
     fun `test that all dialog items are displayed and clickable if required`() {
         initComposeRuleContent()
-        composeRule.onNodeWithTag(TITLE_TAG).assertIsDisplayed().assertHasNoClickAction()
         composeRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_BODY_TEST_TAG).assertIsDisplayed()
             .assertHasNoClickAction()
         composeRule.onNodeWithText(composeRule.activity.getString(sharedR.string.sync_stop_backup_confirm_dialog_title))
