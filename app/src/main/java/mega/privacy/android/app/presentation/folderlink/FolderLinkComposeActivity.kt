@@ -19,16 +19,20 @@ import androidx.compose.runtime.getValue
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
@@ -36,7 +40,7 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.shared.ads.advertisements.GoogleAdsManager
+import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
@@ -51,7 +55,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
-import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
@@ -60,18 +63,20 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.OpenTextEditorParams
+import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.shared.ads.advertisements.GoogleAdsManager
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -80,7 +85,7 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 @Deprecated("Use revamp")
-class FolderLinkComposeActivity : PasscodeActivity(),
+class FolderLinkComposeActivity : BaseActivity(),
     DecryptAlertDialog.DecryptDialogListener {
 
     /**
@@ -107,6 +112,24 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     @Inject
     lateinit var googleAdsManager: GoogleAdsManager
 
+    /**
+     * Navigation result manager
+     */
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    /**
+     * Feature destinations
+     */
+    @Inject
+    lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
+
+    /**
+     * App dialog destinations
+     */
+    @Inject
+    lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
+
     private val viewModel: FolderLinkViewModel by viewModels()
 
     private var mKey: String? = null
@@ -116,7 +139,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         NameCollisionActivityContract()
     ) { result ->
         result?.let {
-            showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
+            viewModel.showSnackbar(it)
         }
     }
 
@@ -181,7 +204,28 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         }
 
         setContent {
-            StartFolderLinkView()
+            val themeMode by monitorThemeModeUseCase()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            // A folder link opens without a session, so the shell must not require one.
+            LegacyActivityScaffold(
+                container = { content ->
+                    SharedAppContainer(
+                        themeMode = themeMode,
+                        isSessionRequired = false,
+                        finishOnSessionRefresh = false,
+                        content = content,
+                    )
+                },
+                initialKey = InternalFolderLinkNavKey,
+                navigationResultManager = navigationResultManager,
+                featureDestinations = featureDestinations,
+                appDialogDestinations = appDialogDestinations,
+                onEmptyBackStack = { if (!isFinishing) finish() },
+            ) { _, _ ->
+                entry<InternalFolderLinkNavKey> {
+                    FolderLinkContent(isDark = themeMode.isDarkMode())
+                }
+            }
         }
 
         intent?.let { viewModel.handleIntent(it) }
@@ -203,13 +247,12 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     }
 
     @Composable
-    private fun StartFolderLinkView() {
-        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+    private fun FolderLinkContent(isDark: Boolean) {
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val request by googleAdsManager.request.collectAsStateWithLifecycle()
 
         val scaffoldState = rememberScaffoldState()
-        OriginalTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTheme(isDark = isDark) {
             FolderLinkView(
                 state = uiState,
                 scaffoldState = scaffoldState,
@@ -241,54 +284,56 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 fileTypeIconMapper = fileTypeIconMapper,
                 request = request
             )
-            StartTransferComponent(
-                event = uiState.downloadEvent,
-                onConsumeEvent = viewModel::resetDownloadNode,
-                snackBarHostState = scaffoldState.snackbarHostState,
-            )
+        }
+        StartTransferComponent(
+            event = uiState.downloadEvent,
+            onConsumeEvent = viewModel::resetDownloadNode,
+            snackBarHostState = scaffoldState.snackbarHostState,
+        )
 
-            EventEffect(
-                event = uiState.finishActivityEvent,
-                onConsumed = viewModel::onFinishActivityEventConsumed
-            ) {
-                finish()
-            }
+        EventEffect(
+            event = uiState.finishActivityEvent,
+            onConsumed = viewModel::onFinishActivityEventConsumed
+        ) {
+            finish()
+        }
 
-            EventEffect(
-                event = uiState.askForDecryptionKeyDialogEvent,
-                onConsumed = viewModel::resetAskForDecryptionKeyDialog
-            ) {
-                showAskForDecryptionKeyDialog()
-            }
+        EventEffect(
+            event = uiState.askForDecryptionKeyDialogEvent,
+            onConsumed = viewModel::resetAskForDecryptionKeyDialog
+        ) {
+            showAskForDecryptionKeyDialog()
+        }
 
-            EventEffect(
-                event = uiState.collisionsEvent,
-                onConsumed = {
-                    viewModel.resetLaunchCollisionActivity()
-                    viewModel.clearAllSelection()
-                }
-            ) {
-                AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
-                nameCollisionActivityLauncher.launch(ArrayList(it))
+        EventEffect(
+            event = uiState.collisionsEvent,
+            onConsumed = {
+                viewModel.resetLaunchCollisionActivity()
+                viewModel.clearAllSelection()
             }
+        ) {
+            AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
+            nameCollisionActivityLauncher.launch(ArrayList(it))
+        }
 
-            EventEffect(
-                event = uiState.copyResultEvent,
-                onConsumed = viewModel::resetShowCopyResult
-            ) { (resultText, throwable) ->
-                showCopyResult(copyResultText = resultText, throwable = throwable)
-            }
+        EventEffect(
+            event = uiState.copyResultEvent,
+            onConsumed = viewModel::resetShowCopyResult
+        ) { (resultText, throwable) ->
+            showCopyResult(copyResultText = resultText, throwable = throwable)
+        }
 
-            EventEffect(
-                event = uiState.openFileNodeEvent,
-                onConsumed = viewModel::resetOpenFileNodeEvent
-            ) { nodeUIItem ->
-                handleFileOpening(nodeUIItem)
-            }
+        EventEffect(
+            event = uiState.openFileNodeEvent,
+            onConsumed = viewModel::resetOpenFileNodeEvent
+        ) { nodeUIItem ->
+            handleFileOpening(nodeUIItem)
+        }
 
-            BackHandler {
-                viewModel.handleBackPress()
-            }
+        // Composed inside the NavDisplay entry, so it only takes back presses while the folder
+        // link is on top and the back stack handles the rest.
+        BackHandler {
+            viewModel.handleBackPress()
         }
     }
 
@@ -547,3 +592,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
             }
     }
 }
+
+@Serializable
+private data object InternalFolderLinkNavKey : NavKey
