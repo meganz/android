@@ -23,7 +23,7 @@ internal fun VerifyRemovalDialog(
         return
     }
 
-    val title = if (selectedItems.size > 1) {
+    val message = if (selectedItems.size > 1) {
         pluralStringResource(
             R.plurals.remove_multiple_contacts_shared_folder,
             selectedItems.size,
@@ -33,10 +33,9 @@ internal fun VerifyRemovalDialog(
         stringResource(R.string.remove_contact_shared_folder, selectedItems[0].email)
     }
 
-
     BasicDialog(
         modifier = Modifier.testTag(VERIFY_REMOVAL_DIALOG_TAG),
-        title = title,
+        description = message,
         positiveButtonText = stringResource(R.string.general_remove),
         onPositiveButtonClicked = {
             onDismiss()

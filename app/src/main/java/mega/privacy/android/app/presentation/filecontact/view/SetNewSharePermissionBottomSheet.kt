@@ -1,8 +1,5 @@
 package mega.privacy.android.app.presentation.filecontact.view
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
@@ -13,16 +10,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.list.OneLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -36,63 +33,38 @@ internal fun SetNewSharePermissionBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
 ) {
+    val onPermissionClick = { permission: AccessPermission ->
+        shareWithPermission(permission)
+        coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
+            if (!sheetState.isVisible) {
+                onDismissSheet()
+            }
+        }
+    }
+
     MegaModalBottomSheet(
         sheetState = sheetState,
         bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
         onDismissRequest = onDismissSheet,
         modifier = modifier,
     ) {
-        Spacer(Modifier.Companion.height(24.dp))
         MegaText(
-            modifier = Modifier.Companion.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             text = stringResource(R.string.file_properties_shared_folder_permissions),
             textColor = TextColor.Primary,
-            style = TextStyle(fontWeight = FontWeight.Companion.Bold)
+            style = AppTheme.typography.titleMedium,
         )
-        Spacer(Modifier.Companion.height(24.dp))
-        MegaText(
-            modifier = Modifier.Companion
-                .clickable {
-                    shareWithPermission(AccessPermission.READ)
-                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            onDismissSheet()
-                        }
-                    }
-                }
-                .padding(16.dp),
+        OneLineListItem(
             text = stringResource(R.string.file_properties_shared_folder_read_only),
-            textColor = TextColor.Primary
+            onClickListener = { onPermissionClick(AccessPermission.READ) },
         )
-        Spacer(Modifier.Companion.height(24.dp))
-        MegaText(
-            modifier = Modifier.Companion
-                .clickable {
-                    shareWithPermission(AccessPermission.READWRITE)
-                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            onDismissSheet()
-                        }
-                    }
-                }
-                .padding(16.dp),
+        OneLineListItem(
             text = stringResource(R.string.file_properties_shared_folder_read_write),
-            textColor = TextColor.Primary
+            onClickListener = { onPermissionClick(AccessPermission.READWRITE) },
         )
-        Spacer(Modifier.Companion.height(24.dp))
-        MegaText(
-            modifier = Modifier.Companion
-                .clickable {
-                    shareWithPermission(AccessPermission.FULL)
-                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            onDismissSheet()
-                        }
-                    }
-                }
-                .padding(16.dp),
+        OneLineListItem(
             text = stringResource(R.string.file_properties_shared_folder_full_access),
-            textColor = TextColor.Primary
+            onClickListener = { onPermissionClick(AccessPermission.FULL) },
         )
     }
 }

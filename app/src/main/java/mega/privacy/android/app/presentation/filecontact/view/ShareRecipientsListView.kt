@@ -30,6 +30,7 @@ import kotlinx.collections.immutable.toImmutableList
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.presentation.filecontact.model.ShareRecipientPreviewParameterProvider
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.icon.pack.IconPack
@@ -77,6 +78,7 @@ internal fun ShareRecipientsListView(
                     ) {
                         MegaIcon(
                             painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
+                            tint = IconColor.Secondary,
                             contentDescription = "More",
                             modifier = Modifier
                                 .size(24.dp)
