@@ -19,4 +19,10 @@ enum class SubscriptionOfferSource {
      * Opened from the offer banner on the Menu screen.
      */
     MenuBanner,
+
+    /**
+     * Opened from a promo notification, either in the notifications list or as a push, through the
+     * `mega://upgrade?offer=1` deep link.
+     */
+    Notification,
 }

@@ -43,6 +43,7 @@ internal fun subscriptionOfferEvents(source: SubscriptionOfferSource): Subscript
 
         SubscriptionOfferSource.HomeBanner,
         SubscriptionOfferSource.MenuBanner,
+        SubscriptionOfferSource.Notification,
             -> SubscriptionOfferEvents(
             screenView = SubscriptionOfferTriggeredScreenEvent,
             ctaPressed = SubscriptionOfferTriggeredCtaButtonPressedEvent,
