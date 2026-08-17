@@ -23,7 +23,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.test.Ignore
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -57,17 +56,22 @@ internal class AddImageTypeUseCaseTest {
 
     @Nested
     inner class Preview {
-        private lateinit var downloadPreviewLambda: suspend (String) -> String
+        // Suspend function types cannot be mocked: their continuation is erased to Object on
+        // FunctionN.invoke, so Mockito treats it as an ordinary argument and neither stubbing nor
+        // verification ever matches. This lambda records its own invocations instead.
+        private val downloadedPreviewPaths = mutableListOf<String>()
+        private val downloadPreviewLambda: suspend (String) -> String = { path ->
+            downloadedPreviewPaths.add(path)
+            path
+        }
 
         @BeforeEach
         fun recreateMocks() {
-            downloadPreviewLambda = mock<suspend (String) -> String>()
+            downloadedPreviewPaths.clear()
             whenever(imageNode.type).thenReturn(RawFileTypeInfo("jpg", "jpg"))
             whenever(imageNode.downloadPreview).thenReturn(downloadPreviewLambda)
         }
 
-        // suspend high order function cannot be mocked on Kotlin 2.0
-        @Ignore
         @Test
         fun `test that if the file exists download preview is not triggered`() = runTest {
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
@@ -75,11 +79,9 @@ internal class AddImageTypeUseCaseTest {
             val result = underTest(imageNode)
             result.fetchPreview()
             // as the file already exists, download lambda is not needed
-            verify(downloadPreviewLambda, never()).invoke(any())
+            assertThat(downloadedPreviewPaths).isEmpty()
         }
 
-        // suspend high order function cannot be mocked on Kotlin 2.0
-        @Ignore
         @Test
         fun `test that if the file doesn't exists download preview is triggered`() = runTest {
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
@@ -87,11 +89,9 @@ internal class AddImageTypeUseCaseTest {
             val result = underTest(imageNode)
             result.fetchPreview()
             // as the file doesn't exist, download is needed
-            verify(downloadPreviewLambda).invoke(any())
+            assertThat(downloadedPreviewPaths).hasSize(1)
         }
 
-        // suspend high order function cannot be mocked on Kotlin 2.0
-        @Ignore
         @Test
         fun `test that if the file is downloaded then download preview is not triggered again`() =
             runTest {
@@ -103,7 +103,7 @@ internal class AddImageTypeUseCaseTest {
                 whenever(fileSystemRepository.doesFileExist(any())).thenReturn(true)
                 result.fetchPreview()
                 // lambda should be triggered only once, the second will return the already downloaded file
-                verify(downloadPreviewLambda).invoke(any())
+                assertThat(downloadedPreviewPaths).hasSize(1)
             }
 
         @Test
@@ -138,17 +138,19 @@ internal class AddImageTypeUseCaseTest {
     @Nested
     inner class Thumbnail {
 
-        private lateinit var downloadThumbnailLambda: suspend (String) -> String
+        private val downloadedThumbnailPaths = mutableListOf<String>()
+        private val downloadThumbnailLambda: suspend (String) -> String = { path ->
+            downloadedThumbnailPaths.add(path)
+            path
+        }
 
         @BeforeEach
         fun recreateMocks() {
-            downloadThumbnailLambda = mock()
+            downloadedThumbnailPaths.clear()
             whenever(imageNode.type).thenReturn(RawFileTypeInfo("jpg", "jpg"))
             whenever(imageNode.downloadThumbnail).thenReturn(downloadThumbnailLambda)
         }
 
-        // suspend high order function cannot be mocked on Kotlin 2.0
-        @Ignore
         @Test
         fun `test that if the file exists download thumbnail is not triggered`() = runTest {
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
@@ -156,11 +158,9 @@ internal class AddImageTypeUseCaseTest {
             val result = underTest(imageNode)
             result.fetchThumbnail()
             // as the file already exists, download lambda is not needed
-            verify(downloadThumbnailLambda, never()).invoke(any())
+            assertThat(downloadedThumbnailPaths).isEmpty()
         }
 
-        // suspend high order function cannot be mocked on Kotlin 2.0
-        @Ignore
         @Test
         fun `test that if the file doesn't exists download thumbnail is triggered`() = runTest {
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
@@ -168,11 +168,9 @@ internal class AddImageTypeUseCaseTest {
             val result = underTest(imageNode)
             result.fetchThumbnail()
             // as the file doesn't exist, download is needed
-            verify(downloadThumbnailLambda).invoke(any())
+            assertThat(downloadedThumbnailPaths).hasSize(1)
         }
 
-        // suspend high order function cannot be mocked on Kotlin 2.0
-        @Ignore
         @Test
         fun `test that if the file is downloaded then download thumbnail is not triggered again`() =
             runTest {
@@ -184,7 +182,7 @@ internal class AddImageTypeUseCaseTest {
                 whenever(fileSystemRepository.doesFileExist(any())).thenReturn(true)
                 result.fetchThumbnail()
                 // lambda should be triggered only once, the second will return the already downloaded file
-                verify(downloadThumbnailLambda).invoke(any())
+                assertThat(downloadedThumbnailPaths).hasSize(1)
             }
 
         @Test

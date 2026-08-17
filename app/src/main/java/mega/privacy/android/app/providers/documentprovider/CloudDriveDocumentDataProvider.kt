@@ -219,7 +219,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
                 }
                 .distinctUntilChangedBy { it?.email },
         ) { isPasscodeLockEnabled, isConnected, credentials ->
-            Timber.d("CloudDriveDocumentDataProvider isPasscodeLockEnabled=$isPasscodeLockEnabled isConnected=$isConnected credentials=$credentials")
+            Timber.d("CloudDriveDocumentDataProvider isPasscodeLockEnabled=$isPasscodeLockEnabled isConnected=$isConnected credentials=${credentials?.email}")
             val accountName = credentials?.email ?: ""
             when {
                 credentials == null -> AppSession.NotLoggedIn

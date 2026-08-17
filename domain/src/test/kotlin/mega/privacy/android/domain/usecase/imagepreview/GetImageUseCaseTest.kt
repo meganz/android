@@ -38,7 +38,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.test.Ignore
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -54,14 +53,22 @@ internal class GetImageUseCaseTest {
     private val photosRepository: PhotosRepository = mock()
     private val broadcastTransferOverQuotaEventUseCase: BroadcastTransferOverQuotaEventUseCase =
         mock()
-    private val imageNode: TypedImageNode = mock {
-        on { fetchFullImage }.thenReturn { _, _ ->
-            emptyFlow()
-        }
-    }
+    private val imageNode: TypedImageNode = mock()
 
-    private lateinit var fetchThumbnailLambda: suspend () -> String
-    private lateinit var fetchPreviewLambda: suspend () -> String
+    private var fetchThumbnailInvocations = 0
+    private var fetchPreviewInvocations = 0
+
+    // Suspend function types cannot be mocked: their continuation is erased to Object on
+    // FunctionN.invoke, so Mockito treats it as an ordinary argument and neither stubbing nor
+    // verification ever matches. These lambdas record their own invocations instead.
+    private val fetchThumbnailLambda: suspend () -> String = {
+        fetchThumbnailInvocations++
+        thumbnailFilePath
+    }
+    private val fetchPreviewLambda: suspend () -> String = {
+        fetchPreviewInvocations++
+        previewFilePath
+    }
 
     @BeforeAll
     fun setUp() {
@@ -75,12 +82,18 @@ internal class GetImageUseCaseTest {
 
     @BeforeEach
     fun recreateMocks() {
-        reset(photosRepository, broadcastTransferOverQuotaEventUseCase)
-        fetchThumbnailLambda = mock {
-            on { invoke() }.thenReturn(thumbnailFilePath)
-        }
-        fetchPreviewLambda = mock {
-            on { invoke() }.thenReturn(previewFilePath)
+        reset(
+            isFullSizeRequiredUseCase,
+            photosRepository,
+            broadcastTransferOverQuotaEventUseCase,
+            imageNode,
+        )
+        fetchThumbnailInvocations = 0
+        fetchPreviewInvocations = 0
+        imageNode.stub {
+            on { fetchFullImage }.thenReturn { _, _ ->
+                emptyFlow()
+            }
         }
     }
 
@@ -110,39 +123,38 @@ internal class GetImageUseCaseTest {
         }
     }
 
-    // suspend high order function cannot be mocked on Kotlin 2.0
-    @Ignore
     @Test
     internal fun `test that fetchThumbnail is invoked`() =
         runTest {
             imageNode.stub {
                 on { type } doReturn mock<StaticImageFileTypeInfo>()
                 on { fetchThumbnail } doReturn fetchThumbnailLambda
+                on { fetchPreview } doReturn fetchPreviewLambda
             }
+            whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(true)
             underTest.invoke(imageNode, true, highPriority = false, resetDownloads = {}).test {
                 awaitItem()
-                verify(fetchThumbnailLambda).invoke()
                 cancelAndIgnoreRemainingEvents()
             }
+
+            assertThat(fetchThumbnailInvocations).isEqualTo(1)
         }
 
-    // suspend high order function cannot be mocked on Kotlin 2.0
-    @Ignore
     @Test
     internal fun `test that imageResult thumbnailUri matches value returned by fetchThumbnail`() =
         runTest {
             imageNode.stub {
                 on { type } doReturn mock<StaticImageFileTypeInfo>()
                 on { fetchThumbnail } doReturn fetchThumbnailLambda
+                on { fetchPreview } doReturn fetchPreviewLambda
             }
+            whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(true)
             underTest.invoke(imageNode, true, highPriority = false, resetDownloads = {}).test {
                 assertThat(awaitItem().thumbnailUri).isEqualTo("$FILE$thumbnailFilePath")
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
-    // suspend high order function cannot be mocked on Kotlin 2.0
-    @Ignore
     @Test
     internal fun `test that fetchPreview is invoked`() =
         runTest {
@@ -154,13 +166,12 @@ internal class GetImageUseCaseTest {
             whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(true)
             underTest.invoke(imageNode, true, highPriority = false, resetDownloads = {}).test {
                 awaitItem()
-                verify(fetchPreviewLambda).invoke()
                 cancelAndIgnoreRemainingEvents()
             }
+
+            assertThat(fetchPreviewInvocations).isEqualTo(1)
         }
 
-    // suspend high order function cannot be mocked on Kotlin 2.0
-    @Ignore
     @Test
     internal fun `test that imageResult previewUri matches value returned by fetchPreview`() =
         runTest {
@@ -176,8 +187,6 @@ internal class GetImageUseCaseTest {
             }
         }
 
-    // suspend high order function cannot be mocked on Kotlin 2.0
-    @Ignore
     @Test
     internal fun `test that imageResult isFullyLoaded is true after fetching preview when isFullSizeRequired is false`() =
         runTest {
@@ -194,8 +203,6 @@ internal class GetImageUseCaseTest {
             }
         }
 
-    // suspend high order function cannot be mocked on Kotlin 2.0
-    @Ignore
     @Test
     internal fun `test that imageResult isFullyLoaded is false after fetching preview when isFullSizeRequired is true`() =
         runTest {

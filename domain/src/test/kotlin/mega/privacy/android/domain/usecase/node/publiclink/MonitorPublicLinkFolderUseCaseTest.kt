@@ -18,10 +18,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
-import kotlin.test.Ignore
 
-// suspend high order function cannot be mocked on Kotlin 2.0
-@Ignore
 internal class MonitorPublicLinkFolderUseCaseTest {
     private lateinit var underTest: MonitorPublicLinkFolderUseCase
 
