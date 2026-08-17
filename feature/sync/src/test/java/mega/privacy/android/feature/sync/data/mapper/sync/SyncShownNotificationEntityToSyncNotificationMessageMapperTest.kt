@@ -132,15 +132,25 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
             notificationType = "STALLED_ISSUE",
             otherIdentifiers = """
                 {
-                  "path": "/example/path"
+                  "path": "/example/path",
+                  "issueId": "issue-id"
                 }
             """.trimIndent()
         )
-        val notificationDetails = NotificationDetails("/example/path", null)
+        val notificationDetails = NotificationDetails(
+            path = "/example/path",
+            errorCode = null,
+            issueId = "issue-id",
+        )
         val notificationMessage: SyncNotificationMessage = mock()
         whenever(json.decodeFromString<NotificationDetails>(dbEntity.otherIdentifiers ?: ""))
             .thenReturn(notificationDetails)
-        whenever(stalledIssuesToNotificationMessageMapper(notificationDetails.path.orEmpty()))
+        whenever(
+            stalledIssuesToNotificationMessageMapper(
+                issuePath = notificationDetails.path.orEmpty(),
+                issueId = notificationDetails.issueId,
+            )
+        )
             .thenReturn(notificationMessage)
 
         val result = underTest(dbEntity)
@@ -223,14 +233,19 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
             title = sharedResR.string.general_sync_notification_stalled_issues_title,
             text = sharedResR.string.general_sync_notification_stalled_issues_text,
             syncNotificationType = SyncNotificationType.STALLED_ISSUE,
-            notificationDetails = NotificationDetails(path = "/example/path", errorCode = null)
+            notificationDetails = NotificationDetails(
+                path = "/example/path",
+                errorCode = null,
+                issueId = "issue-id",
+            )
         )
         val dbEntity = SyncShownNotificationEntity(
             notificationId = notificationId,
             notificationType = SyncNotificationType.STALLED_ISSUE.name,
             otherIdentifiers = """
                 {
-                  "path": "/example/path"
+                  "path": "/example/path",
+                  "issueId": "issue-id"
                 }
             """.trimIndent()
         )

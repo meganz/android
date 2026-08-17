@@ -588,7 +588,7 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     override fun openSyncs(context: Context) {
         navigateForSingleActivity(
-            context = context, singleActivityDestination = SyncListNavKey
+            context = context, singleActivityDestination = SyncListNavKey()
         )
     }
 

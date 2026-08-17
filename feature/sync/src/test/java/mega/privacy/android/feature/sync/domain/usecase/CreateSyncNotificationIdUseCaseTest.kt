@@ -2,6 +2,9 @@ package mega.privacy.android.feature.sync.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.CreateSyncNotificationIdUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -17,10 +20,21 @@ internal class CreateSyncNotificationIdUseCaseTest {
     }
 
     @Test
-    fun `test that every time the use case generates a different value`() = runTest {
-        val firstInvocation = underTest()
-        val secondInvocation = underTest()
+    fun `test that the use case generates a stable value for the same notification`() = runTest {
+        val notification = SyncNotificationMessage(
+            title = 1,
+            text = 2,
+            syncNotificationType = SyncNotificationType.STALLED_ISSUE,
+            notificationDetails = NotificationDetails(
+                path = "/path",
+                errorCode = null,
+                issueId = "issue-id",
+            ),
+        )
 
-        assertThat(firstInvocation).isNotEqualTo(secondInvocation)
+        val firstInvocation = underTest(notification)
+        val secondInvocation = underTest(notification)
+
+        assertThat(firstInvocation).isEqualTo(secondInvocation)
     }
 }

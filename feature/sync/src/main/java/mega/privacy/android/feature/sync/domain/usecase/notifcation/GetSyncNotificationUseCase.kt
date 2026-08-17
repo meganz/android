@@ -37,6 +37,7 @@ class GetSyncNotificationUseCase @Inject constructor(
         isSyncOnlyWhenCharging: Boolean,
     ): SyncNotificationMessage? {
         val isNetworkConstraintRespected = (isSyncOnlyByWifi && isUserOnWifi) || !isSyncOnlyByWifi
+        val pendingCrossDeviceConflict = getCrossDeviceConflictNotification()
 
         return when {
             syncs.isEmpty() -> {
@@ -45,35 +46,48 @@ class GetSyncNotificationUseCase @Inject constructor(
             }
 
             isCharging.not() && isSyncOnlyWhenCharging -> {
+                resetBatteryLowNotification()
+                resetNetworkConstraintNotification()
+                resetStaleCrossDeviceConflictNotification(pendingCrossDeviceConflict)
                 getDeviceIsNotChargingNotification()
             }
 
             isBatteryLow -> {
+                resetDeviceNotChargingNotification()
+                resetNetworkConstraintNotification()
+                resetStaleCrossDeviceConflictNotification(pendingCrossDeviceConflict)
                 getBatteryLowNotification()
             }
 
             !isNetworkConstraintRespected -> {
+                resetDeviceNotChargingNotification()
                 resetBatteryLowNotification()
+                resetStaleCrossDeviceConflictNotification(pendingCrossDeviceConflict)
                 getNetworkConstraintNotification()
             }
 
             syncs.any { it.syncError != SyncError.NO_SYNC_ERROR } -> {
+                resetDeviceNotChargingNotification()
                 resetBatteryLowNotification()
                 resetNetworkConstraintNotification()
+                resetStaleCrossDeviceConflictNotification(pendingCrossDeviceConflict)
                 getSyncErrorsNotification(syncs)
             }
 
-            getCrossDeviceConflictNotification() != null -> {
+            pendingCrossDeviceConflict != null -> {
+                resetDeviceNotChargingNotification()
                 resetBatteryLowNotification()
                 resetNetworkConstraintNotification()
                 resetSyncErrorsNotification()
-                getCrossDeviceConflictNotification()
+                pendingCrossDeviceConflict
             }
 
             stalledIssues.isNotEmpty() -> {
+                resetDeviceNotChargingNotification()
                 resetBatteryLowNotification()
                 resetNetworkConstraintNotification()
                 resetSyncErrorsNotification()
+                resetStaleCrossDeviceConflictNotification(pendingCrossDeviceConflict)
                 getStalledIssuesNotification(stalledIssues)
             }
 
@@ -141,6 +155,14 @@ class GetSyncNotificationUseCase @Inject constructor(
         syncNotificationRepository.deleteDisplayedNotificationByType(CROSS_DEVICE_CONFLICT)
     }
 
+    private suspend fun resetStaleCrossDeviceConflictNotification(
+        pendingCrossDeviceConflict: SyncNotificationMessage?,
+    ) {
+        if (pendingCrossDeviceConflict == null) {
+            resetCrossDeviceConflictNotification()
+        }
+    }
+
     private suspend fun getBatteryLowNotification(): SyncNotificationMessage? =
         if (syncNotificationRepository.getDisplayedNotificationsByType(BATTERY_LOW).isEmpty()) {
             syncNotificationRepository.getBatteryLowNotification()
@@ -185,13 +207,18 @@ class GetSyncNotificationUseCase @Inject constructor(
             syncNotificationRepository.getDisplayedNotificationsByType(STALLED_ISSUE)
         val newStalledIssues = stalledIssues.filter { stalledIssue ->
             shownStalledIssues.none { shownStalledIssue ->
-                shownStalledIssue.notificationDetails.path.equals(
-                    stalledIssue.localPaths.firstOrNull(),
-                    ignoreCase = true
-                ) || shownStalledIssue.notificationDetails.path.equals(
-                    stalledIssue.nodeNames.firstOrNull(),
-                    ignoreCase = true
-                )
+                val shownIssueId = shownStalledIssue.notificationDetails.issueId
+                if (shownIssueId != null) {
+                    shownIssueId == stalledIssue.id
+                } else {
+                    shownStalledIssue.notificationDetails.path.equals(
+                        stalledIssue.localPaths.firstOrNull(),
+                        ignoreCase = true
+                    ) || shownStalledIssue.notificationDetails.path.equals(
+                        stalledIssue.nodeNames.firstOrNull(),
+                        ignoreCase = true
+                    )
+                }
             }
         }
         return if (newStalledIssues.isNotEmpty()) {

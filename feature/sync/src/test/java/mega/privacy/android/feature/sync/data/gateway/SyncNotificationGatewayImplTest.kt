@@ -57,6 +57,29 @@ internal class SyncNotificationGatewayImplTest {
     }
 
     @Test
+    fun `test that get pending notification by type fetches pending notification from dao`() = runTest {
+        val notificationType = SyncNotificationType.CROSS_DEVICE_CONFLICT.name
+        val syncNotifications = listOf(
+            SyncShownNotificationEntity(notificationType = notificationType)
+        )
+        whenever(syncShownNotificationDao.getPendingSyncNotificationByType(notificationType))
+            .thenReturn(syncNotifications)
+
+        val result = underTest.getPendingNotificationByType(notificationType)
+
+        assertThat(result).isEqualTo(syncNotifications)
+    }
+
+    @Test
+    fun `test that delete pending notification by type deletes pending notification from dao`() = runTest {
+        val notificationType = SyncNotificationType.CROSS_DEVICE_CONFLICT.name
+
+        underTest.deletePendingNotificationByType(notificationType)
+
+        verify(syncShownNotificationDao).deletePendingSyncNotificationByType(notificationType)
+    }
+
+    @Test
     fun `test delete notification by type deletes notification from dao`() = runTest {
         val notificationType = SyncNotificationType.STALLED_ISSUE.name
 

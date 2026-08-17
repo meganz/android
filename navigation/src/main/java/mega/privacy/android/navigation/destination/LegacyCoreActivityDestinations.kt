@@ -216,7 +216,17 @@ data class AuthenticityCredentialsNavKey(
 
 @Serializable
 @Parcelize
-data object SyncListNavKey : NavKey, Parcelable
+enum class SyncTab : Parcelable {
+    FOLDERS,
+    STALLED_ISSUES,
+    SOLVED_ISSUES,
+}
+
+@Serializable
+@Parcelize
+data class SyncListNavKey(
+    val initialTab: SyncTab = SyncTab.FOLDERS,
+) : NavKey, Parcelable
 
 @Serializable
 data class SyncNewFolderNavKey(

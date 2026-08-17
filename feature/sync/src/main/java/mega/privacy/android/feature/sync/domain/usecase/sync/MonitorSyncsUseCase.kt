@@ -71,6 +71,8 @@ internal class MonitorSyncsUseCaseImpl @Inject constructor(
                             conflictingSyncs,
                             conflictingSyncsWithUsage.first().second,
                         )
+                    } else {
+                        syncNotificationRepository.clearPendingCrossDeviceConflictNotification()
                     }
 
                     val pausedSyncs = invalidSyncs.map {

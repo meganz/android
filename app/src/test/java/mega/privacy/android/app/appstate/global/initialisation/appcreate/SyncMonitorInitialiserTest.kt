@@ -1,41 +1,34 @@
 package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
-import android.content.Context
-import android.content.pm.PackageManager
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
+import mega.privacy.android.feature.sync.domain.usecase.notifcation.DisplaySyncNotificationUseCase
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.MonitorSyncNotificationsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotificationShownUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
-import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SyncMonitorInitialiserTest {
     private lateinit var underTest: SyncMonitorInitialiser
 
-    private val context = mock<Context>()
     private val monitorShouldSyncUseCase = mock<MonitorShouldSyncUseCase>()
     private val monitorSyncNotificationsUseCase = mock<MonitorSyncNotificationsUseCase>()
     private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase =
         mock<PauseResumeSyncsBasedOnBatteryAndWiFiUseCase>()
-    private val setSyncNotificationShownUseCase = mock<SetSyncNotificationShownUseCase>()
-    private val syncNotificationManager = mock<SyncNotificationManager>()
+    private val displaySyncNotificationUseCase = mock<DisplaySyncNotificationUseCase>()
 
     private val notificationMessage = SyncNotificationMessage(
         title = 1,
@@ -47,31 +40,23 @@ class SyncMonitorInitialiserTest {
     @BeforeAll
     fun setUp() {
         underTest = SyncMonitorInitialiser(
-            context = context,
             monitorShouldSyncUseCase = monitorShouldSyncUseCase,
             monitorSyncNotificationsUseCase = monitorSyncNotificationsUseCase,
             pauseResumeSyncsBasedOnBatteryAndWiFiUseCase = pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
-            setSyncNotificationShownUseCase = setSyncNotificationShownUseCase,
-            syncNotificationManager = syncNotificationManager,
+            displaySyncNotificationUseCase = displaySyncNotificationUseCase,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            context,
             monitorShouldSyncUseCase,
             monitorSyncNotificationsUseCase,
             pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
-            setSyncNotificationShownUseCase,
-            syncNotificationManager,
+            displaySyncNotificationUseCase,
         )
         monitorShouldSyncUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
         monitorSyncNotificationsUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
-        context.stub {
-            on { checkPermission(any(), any(), any()) }
-                .thenReturn(PackageManager.PERMISSION_GRANTED)
-        }
     }
 
     @Test
@@ -91,18 +76,11 @@ class SyncMonitorInitialiserTest {
             monitorSyncNotificationsUseCase.stub {
                 on { invoke() }.thenReturn(flowOf(notificationMessage))
             }
-            syncNotificationManager.stub {
-                on { isSyncNotificationDisplayed() }.thenReturn(false)
-                onBlocking { show(context, notificationMessage) }.thenReturn(1234)
-            }
+            displaySyncNotificationUseCase.stub { on { invoke(notificationMessage) }.thenReturn(true) }
 
             underTest()
 
-            verify(syncNotificationManager).show(context, notificationMessage)
-            verify(setSyncNotificationShownUseCase).invoke(
-                syncNotificationMessage = notificationMessage,
-                notificationId = 1234,
-            )
+            verify(displaySyncNotificationUseCase).invoke(notificationMessage)
         }
 
     @Test
@@ -111,14 +89,9 @@ class SyncMonitorInitialiserTest {
             monitorSyncNotificationsUseCase.stub {
                 on { invoke() }.thenReturn(flowOf(notificationMessage))
             }
-            syncNotificationManager.stub {
-                on { isSyncNotificationDisplayed() }.thenReturn(true)
-            }
-
             underTest()
 
-            verify(syncNotificationManager, never()).show(any(), any())
-            verifyNoInteractions(setSyncNotificationShownUseCase)
+            verify(displaySyncNotificationUseCase).invoke(notificationMessage)
         }
 
     @Test
@@ -127,13 +100,28 @@ class SyncMonitorInitialiserTest {
             monitorSyncNotificationsUseCase.stub {
                 on { invoke() }.thenReturn(flowOf(notificationMessage))
             }
-            context.stub {
-                on { checkPermission(any(), any(), any()) }
-                    .thenReturn(PackageManager.PERMISSION_DENIED)
-            }
-
             underTest()
 
-            verifyNoInteractions(syncNotificationManager)
+            verify(displaySyncNotificationUseCase).invoke(notificationMessage)
         }
+
+    @Test
+    fun `test that invoke retries notification monitoring after an upstream failure`() = runTest {
+        var attempts = 0
+        monitorSyncNotificationsUseCase.stub {
+            on { invoke() }.thenReturn(
+                flow {
+                    if (attempts++ == 0) throw IllegalStateException("temporary failure")
+                    emit(notificationMessage)
+                }
+            )
+        }
+        displaySyncNotificationUseCase.stub {
+            on { invoke(notificationMessage) }.thenReturn(true)
+        }
+
+        underTest()
+
+        verify(displaySyncNotificationUseCase).invoke(notificationMessage)
+    }
 }

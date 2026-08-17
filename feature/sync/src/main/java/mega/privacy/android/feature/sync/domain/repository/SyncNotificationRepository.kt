@@ -30,6 +30,11 @@ interface SyncNotificationRepository {
     )
 
     /**
+     * Checks whether the notification has already been displayed for its current identity.
+     */
+    suspend fun isNotificationDisplayed(notification: SyncNotificationMessage): Boolean
+
+    /**
      * Delete the displayed notification by [SyncNotificationType]
      */
     suspend fun deleteDisplayedNotificationByType(type: SyncNotificationType)
@@ -98,6 +103,11 @@ interface SyncNotificationRepository {
         conflictingSyncs: List<FolderPair>,
         folderUsageResult: FolderUsageResult,
     )
+
+    /**
+     * Removes the pending cross-device conflict state while preserving any displayed record.
+     */
+    suspend fun clearPendingCrossDeviceConflictNotification()
 
     /**
      * Get pending cross-device conflict notification if any

@@ -16,6 +16,13 @@ internal class SyncNotificationGatewayImpl @Inject constructor(
     override suspend fun getNotificationByType(type: String): List<SyncShownNotificationEntity> =
         syncShownNotificationDao.get().getSyncNotificationByType(type)
 
+    override suspend fun getPendingNotificationByType(type: String): List<SyncShownNotificationEntity> =
+        syncShownNotificationDao.get().getPendingSyncNotificationByType(type)
+
+    override suspend fun deletePendingNotificationByType(type: String) {
+        syncShownNotificationDao.get().deletePendingSyncNotificationByType(type)
+    }
+
     override suspend fun deleteNotificationByType(type: String) {
         syncShownNotificationDao.get().deleteSyncNotificationByType(type)
     }

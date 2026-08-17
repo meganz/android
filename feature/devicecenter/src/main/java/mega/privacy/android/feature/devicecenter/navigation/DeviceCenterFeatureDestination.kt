@@ -23,7 +23,7 @@ class DeviceCenterFeatureDestination : FeatureDestination {
                     navigationHandler.navigate(CloudDriveNavKey(handle))
                 },
                 onNavigateToSyncs = {
-                    navigationHandler.navigate(SyncListNavKey)
+                    navigationHandler.navigate(SyncListNavKey())
                 },
                 onNavigateToNewSync = { syncType: SyncType ->
                     navigationHandler.navigate(

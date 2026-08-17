@@ -1,21 +1,25 @@
 package mega.privacy.android.feature.sync.ui.notification
 
-import android.Manifest
 import android.app.Notification
+import android.annotation.SuppressLint
 import android.content.Context
-import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationManagerCompat
+import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.CreateSyncNotificationIdUseCase
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * A class responsible for showing and canceling sync notifications
  */
 class SyncNotificationManager @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val syncNotificationMapper: SyncNotificationMapper,
     private val createSyncNotificationIdUseCase: CreateSyncNotificationIdUseCase,
+    private val syncPermissionsManager: SyncPermissionsManager,
 ) {
 
     /**
@@ -23,12 +27,20 @@ class SyncNotificationManager @Inject constructor(
      *
      * @return the notification ID
      */
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    suspend fun show(context: Context, notificationMessage: SyncNotificationMessage): Int {
-        val notificationId = createSyncNotificationIdUseCase()
+    @SuppressLint("MissingPermission")
+    suspend fun show(notificationMessage: SyncNotificationMessage): Int? {
+        if (!syncPermissionsManager.isNotificationsPermissionGranted()) return null
+
+        val notificationId = createSyncNotificationIdUseCase(notificationMessage)
         val notification = syncNotificationMapper(context, notificationMessage)
-        notificationManagerCompat.notify(notificationId, notification)
-        return notificationId
+        return try {
+            notificationManagerCompat.notify(notificationId, notification)
+            notificationId
+        } catch (exception: SecurityException) {
+            // The permission can be revoked between the check above and the post.
+            Timber.w(exception, "Unable to post sync notification $notificationId")
+            null
+        }
     }
 
     /**
@@ -39,21 +51,9 @@ class SyncNotificationManager @Inject constructor(
     }
 
     /**
-     * Check if the sync notification is currently displayed
-     */
-    fun isSyncNotificationDisplayed(): Boolean {
-        notificationManagerCompat.activeNotifications.forEach { notification ->
-            if (notification.notification.channelId == CHANNEL_ID) {
-                return true
-            }
-        }
-        return false
-    }
-
-    /**
      * Creates a notification for the foreground service
      */
-    fun createForegroundNotification(context: Context): Notification {
+    fun createForegroundNotification(): Notification {
         return syncNotificationMapper.createForegroundNotification(context)
     }
 

@@ -19,7 +19,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.sync.Mutex
@@ -34,16 +33,11 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.feature.sync.data.SyncWorker.Companion.SYNC_WORKER_RECHECK_DELAY_IN_SECONDS
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
-import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
-import mega.privacy.android.feature.sync.domain.usecase.notifcation.MonitorSyncNotificationsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotificationShownUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncWorkerForegroundPreferenceUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SetSyncWorkerForegroundPreferenceUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import org.junit.Before
@@ -51,7 +45,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -78,13 +71,8 @@ internal class SyncWorkerTest {
     private val loginMutex: Mutex = mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
-    private val monitorShouldSyncUseCase: MonitorShouldSyncUseCase = mock()
-    private val monitorSyncNotificationsUseCase: MonitorSyncNotificationsUseCase = mock()
     private val syncNotificationManager: SyncNotificationManager = mock()
-    private val setSyncNotificationShownUseCase: SetSyncNotificationShownUseCase = mock()
     private val isRootNodeExistsUseCase: RootNodeExistsUseCase = mock()
-    private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase =
-        mock()
     private val syncPermissionsManager: SyncPermissionsManager = mock()
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
     private val setSyncWorkerForegroundPreferenceUseCase: SetSyncWorkerForegroundPreferenceUseCase =
@@ -119,20 +107,14 @@ internal class SyncWorkerTest {
             )
         )
         whenever(loginMutex.isLocked).thenReturn(false)
-        whenever(monitorShouldSyncUseCase()).thenReturn(flowOf(true))
-        whenever(monitorSyncNotificationsUseCase()).thenReturn(emptyFlow())
         whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
         underTest = SyncWorker(
             context = context,
             workerParams = workParams,
             monitorSyncsUseCase = monitorSyncsUseCase,
             loginMutex = loginMutex,
-            monitorShouldSyncUseCase = monitorShouldSyncUseCase,
-            monitorSyncNotificationsUseCase = monitorSyncNotificationsUseCase,
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             syncNotificationManager = syncNotificationManager,
-            setSyncNotificationShownUseCase = setSyncNotificationShownUseCase,
-            pauseResumeSyncsBasedOnBatteryAndWiFiUseCase = pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
             isRootNodeExistsUseCase = isRootNodeExistsUseCase,
             syncPermissionManager = syncPermissionsManager,
             setSyncWorkerForegroundPreferenceUseCase = setSyncWorkerForegroundPreferenceUseCase,
@@ -213,19 +195,6 @@ internal class SyncWorkerTest {
     }
 
     @Test
-    fun `test that sync worker dispatches notifications`() = runTest {
-        val notification: SyncNotificationMessage = mock()
-        whenever(monitorSyncNotificationsUseCase()).thenReturn(flowOf(notification))
-        whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(true)
-        whenever(syncNotificationManager.isSyncNotificationDisplayed()).thenReturn(false)
-        whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
-
-        underTest.doWork()
-
-        verify(syncNotificationManager).show(context, notification)
-    }
-
-    @Test
     fun `test that sync worker retries if login fails`() = runTest {
         whenever(loginMutex.isLocked).thenReturn(false) // Simulate login lock
         whenever(backgroundFastLoginUseCase()).thenThrow(RuntimeException("Login failed"))
@@ -245,33 +214,6 @@ internal class SyncWorkerTest {
             assertThat(result).isEqualTo(Result.retry())
             verifyNoInteractions(backgroundFastLoginUseCase)
         }
-
-    @Test
-    fun `test that no notification is displayed if permission is denied`() = runTest {
-        whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(false)
-        whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
-
-        underTest.doWork()
-
-        verify(syncNotificationManager, never()).show(any(), any())
-    }
-
-    @Test
-    fun `test that syncs are paused when should be paused`() = runTest {
-        whenever(monitorShouldSyncUseCase()).thenReturn(flowOf(false))
-        whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
-        underTest.doWork()
-
-        verify(pauseResumeSyncsBasedOnBatteryAndWiFiUseCase).invoke(false)
-    }
-
-    @Test
-    fun `test that syncs are resumed when should be resumed`() = runTest {
-        whenever(monitorShouldSyncUseCase()).thenReturn(flowOf(true))
-        whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
-        underTest.doWork()
-        verify(pauseResumeSyncsBasedOnBatteryAndWiFiUseCase).invoke(true)
-    }
 
     @Test
     fun `test that sync worker sets preference to true on timeout`() = runTest {
@@ -302,20 +244,6 @@ internal class SyncWorkerTest {
 
             assertThat(result).isEqualTo(Result.retry())
         }
-
-    @Test
-    fun `test that sync worker skips notification display when already displayed`() = runTest {
-        val notification: SyncNotificationMessage = mock()
-        whenever(monitorSyncNotificationsUseCase()).thenReturn(flowOf(notification))
-        whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(true)
-        whenever(syncNotificationManager.isSyncNotificationDisplayed()).thenReturn(true)
-        whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
-
-        underTest.doWork()
-
-        verify(syncNotificationManager, never()).show(any(), any())
-        verify(setSyncNotificationShownUseCase).invoke(notification, null)
-    }
 
     @Test
     fun `test that sync worker waits for empty syncs list before checking completion`() = runTest {
@@ -359,7 +287,7 @@ internal class SyncWorkerTest {
             whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(syncedSync)))
             whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(true)
             whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(true)
-            whenever(syncNotificationManager.createForegroundNotification(context)).thenReturn(
+            whenever(syncNotificationManager.createForegroundNotification()).thenReturn(
                 mock()
             )
 
@@ -392,7 +320,7 @@ internal class SyncWorkerTest {
         )
         whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(syncedSync)))
         whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(true)
-        whenever(syncNotificationManager.createForegroundNotification(context)).thenReturn(
+        whenever(syncNotificationManager.createForegroundNotification()).thenReturn(
             mock()
         )
         whenever(foregroundSetter.setForeground(any())).thenThrow(

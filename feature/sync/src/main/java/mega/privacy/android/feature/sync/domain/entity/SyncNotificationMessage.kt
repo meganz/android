@@ -30,4 +30,5 @@ data class NotificationDetails(
     val path: String?,
     val errorCode: Int?,
     val formattedConflictBody: String? = null,
+    val issueId: String? = null,
 )

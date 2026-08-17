@@ -26,7 +26,9 @@ import org.mockito.Mockito.reset
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -124,6 +126,9 @@ internal class GetSyncNotificationUseCaseTest {
             whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.BATTERY_LOW)).thenReturn(
                 listOf(mock())
             )
+            whenever(
+                syncNotificationRepository.getDisplayedNotificationsIdsByType(any())
+            ).thenReturn(emptyList())
             whenever(
                 syncNotificationRepository.getDisplayedNotificationsIdsByType(SyncNotificationType.BATTERY_LOW)
             ).thenReturn(listOf(1234))
@@ -504,6 +509,9 @@ internal class GetSyncNotificationUseCaseTest {
             whenever(
                 syncNotificationRepository.getDisplayedNotificationsByType(any())
             ).thenReturn(emptyList())
+            whenever(
+                syncNotificationRepository.getDisplayedNotificationsIdsByType(any())
+            ).thenReturn(emptyList())
             whenever(syncNotificationRepository.getDeviceIsNotChargingNotification()).thenReturn(
                 notification
             )
@@ -549,4 +557,116 @@ internal class GetSyncNotificationUseCaseTest {
 
             assertThat(result).isNull()
         }
+
+    @Test
+    fun `test that use case clears displayed conflict when pending conflict is gone`() = runTest {
+        val sync = mock<FolderPair> {
+            on { syncError } doReturn SyncError.NO_SYNC_ERROR
+        }
+        val stalledIssue = mock<StalledIssue>()
+        val notification: SyncNotificationMessage = mock()
+        whenever(syncNotificationRepository.getPendingCrossDeviceConflictNotification())
+            .thenReturn(null)
+        whenever(syncNotificationRepository.getDisplayedNotificationsIdsByType(any()))
+            .thenReturn(emptyList())
+        whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.STALLED_ISSUE))
+            .thenReturn(emptyList())
+        whenever(syncNotificationRepository.getSyncStalledIssuesNotification(listOf(stalledIssue)))
+            .thenReturn(notification)
+
+        val result = underTest(
+            isBatteryLow = false,
+            isUserOnWifi = true,
+            isSyncOnlyByWifi = false,
+            syncs = listOf(sync),
+            stalledIssues = listOf(stalledIssue),
+            isCharging = true,
+            isSyncOnlyWhenCharging = false,
+        )
+
+        assertThat(result).isEqualTo(notification)
+        verify(syncNotificationRepository).deleteDisplayedNotificationByType(
+            SyncNotificationType.CROSS_DEVICE_CONFLICT
+        )
+    }
+
+    @Test
+    fun `test that use case deduplicates stalled issue by stable issue ID`() = runTest {
+        val sync = mock<FolderPair> {
+            on { syncError } doReturn SyncError.NO_SYNC_ERROR
+        }
+        val stalledIssue = mock<StalledIssue> {
+            on { id } doReturn "issue-id"
+            on { localPaths } doReturn listOf("new/path")
+            on { nodeNames } doReturn listOf("new-name")
+        }
+        val displayedNotification = SyncNotificationMessage(
+            title = sharedResR.string.general_sync_notification_stalled_issues_title,
+            text = sharedResR.string.general_sync_notification_stalled_issues_text,
+            syncNotificationType = SyncNotificationType.STALLED_ISSUE,
+            notificationDetails = NotificationDetails(
+                path = "old/path",
+                errorCode = null,
+                issueId = "issue-id",
+            ),
+        )
+        whenever(syncNotificationRepository.getPendingCrossDeviceConflictNotification())
+            .thenReturn(null)
+        whenever(syncNotificationRepository.getDisplayedNotificationsIdsByType(any()))
+            .thenReturn(emptyList())
+        whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.STALLED_ISSUE))
+            .thenReturn(listOf(displayedNotification))
+
+        val result = underTest(
+            isBatteryLow = false,
+            isUserOnWifi = true,
+            isSyncOnlyByWifi = false,
+            syncs = listOf(sync),
+            stalledIssues = listOf(stalledIssue),
+            isCharging = true,
+            isSyncOnlyWhenCharging = false,
+        )
+
+        assertThat(result).isNull()
+        verifyBlocking(syncNotificationRepository, never()) {
+            getSyncStalledIssuesNotification(any())
+        }
+    }
+
+    @Test
+    fun `test that use case clears obsolete not charging notification before showing sync error`() = runTest {
+        val sync = FolderPair(
+            id = 1,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "pair",
+            localFolderPath = "path",
+            remoteFolder = RemoteFolder(NodeId(1L), "remote"),
+            syncStatus = SyncStatus.ERROR,
+            syncError = SyncError.ACTIVE_SYNC_SAME_PATH,
+        )
+        val notification: SyncNotificationMessage = mock()
+        whenever(syncNotificationRepository.getPendingCrossDeviceConflictNotification())
+            .thenReturn(null)
+        whenever(syncNotificationRepository.getDisplayedNotificationsIdsByType(any()))
+            .thenReturn(emptyList())
+        whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.ERROR))
+            .thenReturn(emptyList())
+        whenever(syncNotificationRepository.getSyncErrorsNotification(listOf(sync)))
+            .thenReturn(notification)
+
+        val result = underTest(
+            isBatteryLow = false,
+            isUserOnWifi = true,
+            isSyncOnlyByWifi = false,
+            syncs = listOf(sync),
+            stalledIssues = emptyList(),
+            isCharging = false,
+            isSyncOnlyWhenCharging = false,
+        )
+
+        assertThat(result).isEqualTo(notification)
+        verify(syncNotificationRepository).deleteDisplayedNotificationByType(
+            SyncNotificationType.NOT_CHARGING
+        )
+    }
 }

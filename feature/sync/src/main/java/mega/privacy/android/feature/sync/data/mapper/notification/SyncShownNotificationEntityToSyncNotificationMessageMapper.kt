@@ -21,7 +21,8 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapper @Injec
         return when (dbEntity.notificationType) {
             SyncNotificationType.STALLED_ISSUE.name -> {
                 stalledIssueToNotificationMessageMapper(
-                    issuePath = notificationDetails?.path ?: ""
+                    issuePath = notificationDetails?.path ?: "",
+                    issueId = notificationDetails?.issueId,
                 )
             }
 

@@ -10,13 +10,15 @@ internal class StalledIssuesToNotificationMessageMapper @Inject constructor() {
 
     operator fun invoke(
         issuePath: String,
+        issueId: String? = null,
     ): SyncNotificationMessage = SyncNotificationMessage(
         title = sharedResR.string.general_sync_notification_stalled_issues_title,
         text = sharedResR.string.general_sync_notification_stalled_issues_text,
         syncNotificationType = SyncNotificationType.STALLED_ISSUE,
         notificationDetails = NotificationDetails(
             path = issuePath,
-            errorCode = 0
+            errorCode = 0,
+            issueId = issueId,
         )
     )
 }

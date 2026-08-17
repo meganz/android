@@ -11,6 +11,10 @@ internal interface SyncNotificationGateway {
 
     suspend fun getNotificationByType(type: String): List<SyncShownNotificationEntity>
 
+    suspend fun getPendingNotificationByType(type: String): List<SyncShownNotificationEntity>
+
+    suspend fun deletePendingNotificationByType(type: String)
+
     suspend fun deleteNotificationByType(type: String)
 
 }

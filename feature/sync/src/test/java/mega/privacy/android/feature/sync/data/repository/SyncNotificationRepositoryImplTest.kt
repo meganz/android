@@ -77,7 +77,10 @@ internal class SyncNotificationRepositoryImplTest {
     ) =
         runTest {
             val notificationEntities = listOf(
-                SyncShownNotificationEntity(notificationType = notificationType.name)
+                SyncShownNotificationEntity(
+                    notificationId = 1234,
+                    notificationType = notificationType.name,
+                )
             )
             val notificationMessage = SyncNotificationMessage(
                 title = when (notificationType) {
@@ -112,6 +115,23 @@ internal class SyncNotificationRepositoryImplTest {
 
             assertThat(result.first()).isEqualTo(notificationMessage)
         }
+
+    @Test
+    fun `test that getDisplayedNotificationsByType ignores pending notifications`() = runTest {
+        val pendingEntity = SyncShownNotificationEntity(
+            notificationType = SyncNotificationType.CROSS_DEVICE_CONFLICT.name,
+        )
+        val displayedEntity = pendingEntity.copy(notificationId = 1234)
+        val notificationMessage = mock<SyncNotificationMessage>()
+        whenever(
+            syncNotificationGateway.getNotificationByType(SyncNotificationType.CROSS_DEVICE_CONFLICT.name)
+        ).thenReturn(listOf(pendingEntity, displayedEntity))
+        whenever(dbEntityToDomainMapper(displayedEntity)).thenReturn(notificationMessage)
+
+        val result = underTest.getDisplayedNotificationsByType(SyncNotificationType.CROSS_DEVICE_CONFLICT)
+
+        assertThat(result).containsExactly(notificationMessage)
+    }
 
     @ParameterizedTest
     @EnumSource(SyncNotificationType::class)
@@ -242,7 +262,8 @@ internal class SyncNotificationRepositoryImplTest {
             )
             whenever(
                 stalledIssuesToNotificationMessageMapper(
-                    stalledIssues.first().localPaths.first()
+                    issuePath = stalledIssues.first().localPaths.first(),
+                    issueId = stalledIssues.first().id,
                 )
             ).thenReturn(notificationMessage)
 
@@ -329,6 +350,9 @@ internal class SyncNotificationRepositoryImplTest {
                 folderUsageResult,
             )
 
+            verify(syncNotificationGateway).deletePendingNotificationByType(
+                SyncNotificationType.CROSS_DEVICE_CONFLICT.name
+            )
             verify(syncNotificationGateway).setNotificationShown(notificationEntity)
         }
 
@@ -343,4 +367,13 @@ internal class SyncNotificationRepositoryImplTest {
             verifyNoInteractions(crossDeviceConflictNotificationMessageMapper)
             verifyNoInteractions(syncNotificationGateway)
         }
+
+    @Test
+    fun `test that clearPendingCrossDeviceConflictNotification deletes pending conflict`() = runTest {
+        underTest.clearPendingCrossDeviceConflictNotification()
+
+        verify(syncNotificationGateway).deletePendingNotificationByType(
+            SyncNotificationType.CROSS_DEVICE_CONFLICT.name
+        )
+    }
 }

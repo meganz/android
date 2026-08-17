@@ -28,6 +28,7 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
     override suspend fun getDisplayedNotificationsByType(type: SyncNotificationType): List<SyncNotificationMessage> =
         withContext(ioDispatcher) {
             syncNotificationGateway.getNotificationByType(type.name)
+                .filter { it.notificationId != null }
                 .map { syncShownNotificationEntityToSyncNotificationMessageMapper(it) }
         }
 
@@ -44,6 +45,15 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
             )
         }
     }
+
+    override suspend fun isNotificationDisplayed(notification: SyncNotificationMessage): Boolean =
+        withContext(ioDispatcher) {
+            syncNotificationGateway.getNotificationByType(notification.syncNotificationType.name)
+                .asSequence()
+                .filter { it.notificationId != null }
+                .map { syncShownNotificationEntityToSyncNotificationMessageMapper(it) }
+                .any { it.hasSameIdentityAs(notification) }
+        }
 
     override suspend fun deleteDisplayedNotificationByType(type: SyncNotificationType) {
         withContext(ioDispatcher) {
@@ -70,7 +80,9 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
     override suspend fun getSyncStalledIssuesNotification(syncsWithStalledIssues: List<StalledIssue>): SyncNotificationMessage =
         stalledIssuesToNotificationMessageMapper(
             issuePath = syncsWithStalledIssues.first()
-                .let { it.localPaths.firstOrNull() ?: it.nodeNames.first() })
+                .let { it.localPaths.firstOrNull() ?: it.nodeNames.first() },
+            issueId = syncsWithStalledIssues.first().id,
+        )
 
     override suspend fun getDisplayedNotificationsIdsByType(type: SyncNotificationType): List<Int> =
         withContext(ioDispatcher) {
@@ -97,13 +109,55 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
         if (conflictingSyncs.isNotEmpty()) {
             val notification =
                 getCrossDeviceConflictNotification(conflictingSyncs, folderUsageResult)
-            setDisplayedNotification(notification, notificationId = null)
+            withContext(ioDispatcher) {
+                syncNotificationGateway.deletePendingNotificationByType(
+                    SyncNotificationType.CROSS_DEVICE_CONFLICT.name
+                )
+                syncNotificationGateway.setNotificationShown(
+                    syncShownNotificationEntityToSyncNotificationMessageMapper(
+                        domainModel = notification,
+                        id = null,
+                    )
+                )
+            }
+        }
+    }
+
+    override suspend fun clearPendingCrossDeviceConflictNotification() {
+        withContext(ioDispatcher) {
+            syncNotificationGateway.deletePendingNotificationByType(
+                SyncNotificationType.CROSS_DEVICE_CONFLICT.name
+            )
         }
     }
 
     override suspend fun getPendingCrossDeviceConflictNotification(): SyncNotificationMessage? {
-        val pendingNotifications =
-            getDisplayedNotificationsByType(SyncNotificationType.CROSS_DEVICE_CONFLICT)
-        return pendingNotifications.firstOrNull()
+        return withContext(ioDispatcher) {
+            syncNotificationGateway
+                .getPendingNotificationByType(SyncNotificationType.CROSS_DEVICE_CONFLICT.name)
+                .firstOrNull()
+                ?.let { syncShownNotificationEntityToSyncNotificationMessageMapper(it) }
+        }
+    }
+
+    private fun SyncNotificationMessage.hasSameIdentityAs(other: SyncNotificationMessage): Boolean {
+        if (syncNotificationType != other.syncNotificationType) return false
+        return when (syncNotificationType) {
+            SyncNotificationType.ERROR,
+            SyncNotificationType.CROSS_DEVICE_CONFLICT,
+                -> notificationDetails.path.equals(other.notificationDetails.path, ignoreCase = true)
+
+            SyncNotificationType.STALLED_ISSUE -> {
+                val issueId = notificationDetails.issueId
+                val otherIssueId = other.notificationDetails.issueId
+                if (issueId != null && otherIssueId != null) {
+                    issueId == otherIssueId
+                } else {
+                    notificationDetails.path.equals(other.notificationDetails.path, ignoreCase = true)
+                }
+            }
+
+            else -> true
+        }
     }
 }

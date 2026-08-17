@@ -27,6 +27,25 @@ interface SyncShownNotificationDao {
     suspend fun getSyncNotificationByType(type: String): List<SyncShownNotificationEntity>
 
     /**
+     * Get pending notifications by type. Pending notifications are represented by a null Android
+     * notification ID and are not treated as displayed notifications.
+     */
+    @Query(
+        "SELECT * FROM ${MegaDatabaseConstant.TABLE_SYNC_SHOWN_NOTIFICATIONS} " +
+            "WHERE notificationType = :type AND notificationId IS NULL"
+    )
+    suspend fun getPendingSyncNotificationByType(type: String): List<SyncShownNotificationEntity>
+
+    /**
+     * Remove pending notifications by type without removing notifications already shown to users.
+     */
+    @Query(
+        "DELETE FROM ${MegaDatabaseConstant.TABLE_SYNC_SHOWN_NOTIFICATIONS} " +
+            "WHERE notificationType = :type AND notificationId IS NULL"
+    )
+    suspend fun deletePendingSyncNotificationByType(type: String)
+
+    /**
      * Remove [SyncShownNotificationEntity] by type (error, stalled issue, low battery, etc)
      */
     @Query("DELETE FROM ${MegaDatabaseConstant.TABLE_SYNC_SHOWN_NOTIFICATIONS} WHERE notificationType = :type")

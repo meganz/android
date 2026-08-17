@@ -11,7 +11,6 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -29,15 +28,11 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
-import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
-import mega.privacy.android.feature.sync.domain.usecase.notifcation.MonitorSyncNotificationsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotificationShownUseCase
+import mega.privacy.android.feature.sync.domain.usecase.notifcation.CreateSyncNotificationIdUseCase.Companion.SYNC_FOREGROUND_NOTIFICATION_ID
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncWorkerForegroundPreferenceUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SetSyncWorkerForegroundPreferenceUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.SyncWorkerForegroundExecutionStartedEvent
@@ -57,11 +52,7 @@ internal class SyncWorker @AssistedInject constructor(
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
     @LoginMutex private val loginMutex: Mutex,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
-    private val monitorShouldSyncUseCase: MonitorShouldSyncUseCase,
-    private val monitorSyncNotificationsUseCase: MonitorSyncNotificationsUseCase,
     private val syncNotificationManager: SyncNotificationManager,
-    private val setSyncNotificationShownUseCase: SetSyncNotificationShownUseCase,
-    private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
     private val isRootNodeExistsUseCase: RootNodeExistsUseCase,
     private val syncPermissionManager: SyncPermissionsManager,
     private val setSyncWorkerForegroundPreferenceUseCase: SetSyncWorkerForegroundPreferenceUseCase,
@@ -70,7 +61,6 @@ internal class SyncWorker @AssistedInject constructor(
     private val crashReporter: CrashReporter,
 ) : CoroutineWorker(context, workerParams) {
 
-    private var monitorNotificationsJob: Job? = null
     private var syncs: List<FolderPair> = emptyList()
 
     override suspend fun doWork(): Result = coroutineScope {
@@ -85,7 +75,6 @@ internal class SyncWorker @AssistedInject constructor(
                     MAX_BACKGROUND_DURATION_IN_MINUTES.minutes
                 }
 
-                monitorNotificationsJob = monitorNotifications()
                 val result = withTimeoutOrNull(timeoutDuration) {
                     checkSyncStatus()
                 }
@@ -94,13 +83,11 @@ internal class SyncWorker @AssistedInject constructor(
                     // Timeout occurred
                     Timber.d("SyncWorker timeout")
                     setSyncWorkerForegroundPreferenceUseCase(true)
-                    cancelNotificationJob()
                     crashReporter.log("${SyncWorker::class.java.simpleName} finished with timeout after $timeoutDuration")
                     Result.retry()
                 } else {
                     Timber.d("withTimeoutOrNull returned $result")
                     setSyncWorkerForegroundPreferenceUseCase(false)
-                    cancelNotificationJob()
                     Timber.d("SyncWorker finished, result: $result")
                     crashReporter.log("${SyncWorker::class.java.simpleName} finished")
                     result
@@ -108,14 +95,12 @@ internal class SyncWorker @AssistedInject constructor(
             } else {
                 // login failed after few attempts
                 Timber.d("Login failed")
-                cancelNotificationJob()
                 Timber.d("SyncWorker finished")
                 crashReporter.log("${SyncWorker::class.java.simpleName} finished with login failure")
                 return@coroutineScope Result.retry()
             }
         }.logAndSwallowExceptions()
             .getOrElse {
-                cancelNotificationJob()
                 crashReporter.log("${SyncWorker::class.java.simpleName} finished with exception: ${it.message}")
                 return@coroutineScope Result.retry()
             }
@@ -156,12 +141,6 @@ internal class SyncWorker @AssistedInject constructor(
         return Result.success()
     }
 
-    private suspend fun cancelNotificationJob() {
-        monitorNotificationsJob?.cancelAndJoin()
-        monitorNotificationsJob = null
-        Timber.d("monitorNotificationsJob cancelled")
-    }
-
     private fun isSyncingCompleted(syncs: List<FolderPair>): Boolean =
         syncs.isNotEmpty() && syncs.all { it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.PAUSED }
 
@@ -187,7 +166,7 @@ internal class SyncWorker @AssistedInject constructor(
     }
 
     private fun createForegroundInfo(): ForegroundInfo {
-        val notification = syncNotificationManager.createForegroundNotification(context)
+        val notification = syncNotificationManager.createForegroundNotification()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ForegroundInfo(
                 SYNC_FOREGROUND_NOTIFICATION_ID,
@@ -237,46 +216,6 @@ internal class SyncWorker @AssistedInject constructor(
         }.getOrElse { false }
     }
 
-    private fun CoroutineScope.monitorNotifications() = launch {
-        Timber.d("monitorSyncsState started")
-        monitorShouldSyncUseCase()
-            .onEach {
-                Timber.d("monitorShouldSyncUseCase: $it")
-                runCatching {
-                    pauseResumeSyncsBasedOnBatteryAndWiFiUseCase(it)
-                }.onFailure { e -> Timber.e(e, "pauseResumeSyncsBasedOnBatteryAndWiFi failed") }
-
-            }
-            .launchIn(this)
-
-        Timber.d("monitorNotifications started $monitorNotificationsJob")
-        monitorSyncNotificationsUseCase()
-            .onEach {
-                runCatching {
-                    displayNotification(it)
-                }.onFailure { e -> Timber.e(e, "displayNotification failed") }
-            }
-            .launchIn(this)
-
-        Timber.d("monitorNotifications job $monitorNotificationsJob")
-    }
-
-    private suspend fun displayNotification(notification: SyncNotificationMessage?) {
-        notification?.let {
-            if (syncPermissionManager.isNotificationsPermissionGranted()) {
-                var notificationId: Int? = null
-                if (!syncNotificationManager.isSyncNotificationDisplayed()) {
-                    notificationId = syncNotificationManager.show(context, notification)
-                }
-                setSyncNotificationShownUseCase(
-                    syncNotificationMessage = notification,
-                    notificationId = notificationId,
-                )
-                Timber.d("displayNotification: ${notification.syncNotificationType}")
-            }
-        }
-    }
-
     companion object {
         /**
          * Tag identifying the worker when enqueued
@@ -295,10 +234,5 @@ internal class SyncWorker @AssistedInject constructor(
         const val MAX_BACKGROUND_DURATION_IN_MINUTES = 9 // 9 minutes
 
         const val MAX_FOREGROUND_DURATION_IN_HOURS = 1 // 1 hour
-
-        /**
-         * Notification ID for the foreground service
-         */
-        const val SYNC_FOREGROUND_NOTIFICATION_ID = 123456
     }
 }

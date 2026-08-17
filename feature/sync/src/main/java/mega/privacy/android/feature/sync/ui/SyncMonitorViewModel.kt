@@ -81,7 +81,7 @@ class SyncMonitorViewModel @Inject constructor(
      */
     fun onNotificationShown(
         syncNotificationMessage: SyncNotificationMessage,
-        notificationId: Int?,
+        notificationId: Int,
     ) {
         _state.update { it.copy(displayNotification = null) }
         viewModelScope.launch {

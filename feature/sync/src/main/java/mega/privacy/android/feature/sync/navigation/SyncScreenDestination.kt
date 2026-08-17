@@ -47,6 +47,7 @@ import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.SyncSettingsNavKey
 import mega.privacy.android.navigation.destination.SyncStalledIssueResolutionNavKey
+import mega.privacy.android.navigation.destination.SyncTab
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -63,7 +64,7 @@ fun EntryProviderScope<NavKey>.syncScreens(
     getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     openUpgradeAccountPage: () -> Unit,
 ) {
-    entry<SyncListNavKey> {
+    entry<SyncListNavKey> { navKey ->
         val useCloudExplorerPicker by produceState(initialValue = false) {
             value = runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
@@ -93,7 +94,11 @@ fun EntryProviderScope<NavKey>.syncScreens(
                     )
                 },
                 onOpenUpgradeAccountClicked = openUpgradeAccountPage,
-                selectedChip = SyncChip.SYNC_FOLDERS,
+                selectedChip = when (navKey.initialTab) {
+                    SyncTab.FOLDERS -> SyncChip.SYNC_FOLDERS
+                    SyncTab.STALLED_ISSUES -> SyncChip.STALLED_ISSUES
+                    SyncTab.SOLVED_ISSUES -> SyncChip.SOLVED_ISSUES
+                },
                 onOpenMegaFolderClicked = { handle ->
                     navigationHandler.navigate(CloudDriveNavKey(nodeHandle = handle))
                 },
@@ -155,7 +160,7 @@ fun EntryProviderScope<NavKey>.syncScreens(
                 },
                 openNextScreen = { _ ->
                     if (navKey.isFromDeviceCenter) {
-                        navigationHandler.navigate(SyncListNavKey)
+                        navigationHandler.navigate(SyncListNavKey())
                     }
                     navigationHandler.remove(navKey)
                 },

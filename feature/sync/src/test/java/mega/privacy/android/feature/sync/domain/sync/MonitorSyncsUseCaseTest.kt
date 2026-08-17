@@ -465,11 +465,12 @@ internal class MonitorSyncsUseCaseTest {
             ).thenReturn(FolderUsageResult.NotUsed)
         }
 
-        underTest().test {
-            awaitItem()
-            verify(setUserPausedSyncUseCase, never()).invoke(any(), any())
-            cancelAndIgnoreRemainingEvents()
-        }
+            underTest().test {
+                awaitItem()
+                verify(setUserPausedSyncUseCase, never()).invoke(any(), any())
+                verify(syncNotificationRepository).clearPendingCrossDeviceConflictNotification()
+                cancelAndIgnoreRemainingEvents()
+            }
     }
 
     @Test
