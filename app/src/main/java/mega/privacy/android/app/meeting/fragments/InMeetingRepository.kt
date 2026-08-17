@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.AddContactListener
@@ -34,6 +34,7 @@ class InMeetingRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
     private val chatController: ChatController,
+    private val chatManagement: ChatManagement,
 ) {
 
     /**
@@ -229,9 +230,9 @@ class InMeetingRepository @Inject constructor(
         megaChatApi.openChatPreview(link, listener)
 
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) {
-        if (!MegaApplication.getChatManagement().isAlreadyJoining(chatId)) {
+        if (!chatManagement.isAlreadyJoining(chatId)) {
             Timber.d("Joining to public chat with ID $chatId")
-            MegaApplication.getChatManagement().addJoiningChatId(chatId)
+            chatManagement.addJoiningChatId(chatId)
             megaChatApi.autojoinPublicChat(chatId, listener)
         }
     }

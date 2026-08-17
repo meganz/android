@@ -15,11 +15,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.getLink.BaseLinkViewModel
+import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantUiStateMapper
 import mega.privacy.android.app.presentation.meeting.model.ChatInfoUiState
@@ -126,6 +126,8 @@ class ChatInfoViewModel @Inject constructor(
     private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase,
     private val getPublicChatToPrivate: SetPublicChatToPrivate,
     private val chatManagement: ChatManagement,
+    private val pushNotificationSettingManagement: PushNotificationSettingManagement,
+    private val callServiceStarter: CallServiceStarter,
     private val startConversationUseCase: StartConversationUseCase,
     private val openOrStartCallUseCase: OpenOrStartCallUseCase,
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
@@ -626,7 +628,7 @@ class ChatInfoViewModel @Inject constructor(
      * @param id    Chat id.
      */
     private fun updateDndSeconds(id: Long) {
-        getPushNotificationSettingManagement().pushNotificationSetting.let { push ->
+        pushNotificationSettingManagement.pushNotificationSetting.let { push ->
             if (push.isChatDndEnabled(id)) {
                 _uiState.update {
                     it.copy(dndSeconds = push.getChatDnd(id))
@@ -792,7 +794,7 @@ class ChatInfoViewModel @Inject constructor(
                         if (call.isOutgoing) {
                             chatManagement.setRequestSentCall(call.callId, true)
                         }
-                        getInstance().openCallService(chatCallId)
+                        callServiceStarter(chatCallId)
                         openChatCall(call.chatId)
                     }
                 }.onFailure { Timber.e("Exception opening or starting call: $it") }

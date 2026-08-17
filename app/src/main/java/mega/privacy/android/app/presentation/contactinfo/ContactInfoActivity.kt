@@ -43,14 +43,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
+import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -58,6 +57,7 @@ import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity
+import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment
@@ -141,6 +141,12 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     @Inject
     lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
+
+    @Inject
+    lateinit var pushNotificationSettingManagement: PushNotificationSettingManagement
+
+    @Inject
+    lateinit var callServiceStarter: CallServiceStarter
 
     /**
      * Get theme mode
@@ -972,7 +978,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     private fun launchCallScreen() {
         val chatId = waitingRoomManagementViewModel.state.value.chatId
-        MegaApplication.getInstance().openCallService(chatId)
+        callServiceStarter(chatId)
         passcodeCheck.enablePassCode()
 
         val intent = Intent(this, MeetingActivity::class.java).apply {
@@ -1367,7 +1373,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 megaChatApi
             )
         } else {
-            getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(
+            pushNotificationSettingManagement.controlMuteNotificationsOfAChat(
                 this,
                 Constants.NOTIFICATIONS_ENABLED,
                 chatId

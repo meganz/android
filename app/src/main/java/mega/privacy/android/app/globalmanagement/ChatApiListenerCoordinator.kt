@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.listeners.GlobalChatListener
 import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.CallSoundsController
@@ -31,10 +32,11 @@ class ChatApiListenerCoordinator @Inject constructor(
     private val globalChatListener: GlobalChatListener,
     private val monitorCallSoundsUseCase: MonitorCallSoundsUseCase,
     private val logoutState: LogoutState,
+    private val chatManagement: ChatManagement,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
 ) {
-    private val meetingListener = MeetingListener(logoutState)
+    private val meetingListener = MeetingListener(logoutState, chatManagement)
     private val soundsController = CallSoundsController(context)
     private var callSoundsJob: Job? = null
     private var registered = false

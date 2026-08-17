@@ -42,8 +42,8 @@ import dagger.hilt.android.EntryPointAccessors;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.ChatComponentsEntryPoint;
 import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -661,7 +661,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 if (holderHeader.notificationsSwitch.isChecked()) {
                     createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId, megaChatApi);
                 } else {
-                    MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
+                    EntryPointAccessors.fromApplication(groupChatInfoActivity, ChatComponentsEntryPoint.class).pushNotificationSettingManagement().controlMuteNotificationsOfAChat(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
                 }
             }
         } else if (id == R.id.chat_group_allow_participants_layout || id == R.id.chat_group_allow_participants_properties_switch) {

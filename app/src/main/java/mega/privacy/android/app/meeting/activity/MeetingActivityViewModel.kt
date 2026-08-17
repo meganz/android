@@ -1802,7 +1802,7 @@ class MeetingActivityViewModel @Inject constructor(
                     return@launch
                 }
 
-                MegaApplication.getChatManagement().isAlreadyJoiningCall(chatId) -> {
+                chatManagement.isAlreadyJoiningCall(chatId) -> {
                     Timber.d("The call has been answered")
                     return@launch
                 }

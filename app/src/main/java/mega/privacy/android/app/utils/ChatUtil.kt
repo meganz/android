@@ -22,6 +22,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.MarqueeTextView
+import mega.privacy.android.app.di.ChatComponentsEntryPoint
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
@@ -478,8 +479,11 @@ object ChatUtil {
      * @return The type of mute.
      */
     @JvmStatic
-    fun getGeneralNotification(): String {
-        val pushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().pushNotificationSetting
+    fun getGeneralNotification(context: Context): String {
+        val pushNotificationSettings = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            ChatComponentsEntryPoint::class.java
+        ).pushNotificationSettingManagement().pushNotificationSetting
 
         if (!pushNotificationSettings.isGlobalChatsDndEnabled || pushNotificationSettings.globalChatsDnd == -1L) {
             // Chat settings defaults are ensured by ResetChatSettingsUseCase (app start + login flows).
@@ -596,7 +600,10 @@ object ChatUtil {
                 }
             }
 
-            MegaApplication.getPushNotificationSettingManagement()
+            EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                ChatComponentsEntryPoint::class.java
+            ).pushNotificationSettingManagement()
                 .controlMuteNotifications(
                     context,
                     getTypeMute(itemClicked.get(), optionSelected),
@@ -684,7 +691,10 @@ object ChatUtil {
         notificationsSubTitle: TextView,
         context: Context,
     ) {
-        val push = MegaApplication.getPushNotificationSettingManagement().pushNotificationSetting
+        val push = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            ChatComponentsEntryPoint::class.java
+        ).pushNotificationSettingManagement().pushNotificationSetting
 
         if (push.isChatDndEnabled(chatId)) {
             notificationsSwitch.setChecked(false)

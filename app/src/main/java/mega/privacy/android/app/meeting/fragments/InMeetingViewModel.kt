@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.fragments.homepage.Event
@@ -424,7 +423,7 @@ class InMeetingViewModel @Inject constructor(
                 val waitingForOthers = onlyMeInTheCall && chatManagement.isRequestSent(callId)
                 if (_state.value.currentChatId == chatId) {
                     val millisecondsOnlyMeInCallDialog =
-                        TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog)
+                        TimeUnit.MILLISECONDS.toSeconds(chatManagement.millisecondsOnlyMeInCallDialog)
 
                     if (onlyMeInTheCall) {
                         hideBottomPanels()
@@ -718,7 +717,7 @@ class InMeetingViewModel @Inject constructor(
                     if (_state.value.currentChatId == id) {
                         if (isEnded) {
                             _showWaitingForOthersBanner.value = false
-                            if (!MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+                            if (!chatManagement.hasEndCallDialogBeenIgnored) {
                                 _showOnlyMeBanner.value = true
                             }
                         }
@@ -1086,8 +1085,8 @@ class InMeetingViewModel @Inject constructor(
      * Control when Stay on call option is chosen
      */
     fun checkStayCall() {
-        MegaApplication.getChatManagement().stopCounterToFinishCall()
-        MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
+        chatManagement.stopCounterToFinishCall()
+        chatManagement.hasEndCallDialogBeenIgnored = true
         if (_showOnlyMeBanner.value) {
             _showOnlyMeBanner.value = false
             _showWaitingForOthersBanner.value = true
@@ -1104,7 +1103,7 @@ class InMeetingViewModel @Inject constructor(
      * Control when End call now option is chosen
      */
     fun checkEndCall() {
-        MegaApplication.getChatManagement().stopCounterToFinishCall()
+        chatManagement.stopCounterToFinishCall()
         _showOnlyMeBanner.value = false
         _showWaitingForOthersBanner.value = false
         hangCurrentCall()
@@ -1120,8 +1119,8 @@ class InMeetingViewModel @Inject constructor(
      * Start the counter to end the call after the previous banner has been hidden
      */
     fun startCounterTimerAfterBanner() {
-        MegaApplication.getChatManagement().stopCounterToFinishCall()
-        MegaApplication.getChatManagement()
+        chatManagement.stopCounterToFinishCall()
+        chatManagement
             .startCounterToFinishCall(_state.value.currentChatId)
     }
 
@@ -1345,7 +1344,7 @@ class InMeetingViewModel @Inject constructor(
             }
 
             getSessionOneToOneCall()?.let { chatSession ->
-                if (chatSession.isOnHold || (!call.hasLocalVideo && !MegaApplication.getChatManagement()
+                if (chatSession.isOnHold || (!call.hasLocalVideo && !chatManagement
                         .getVideoStatus(call.chatId) && !chatSession.hasVideo)
                 ) {
                     return true
@@ -1654,7 +1653,7 @@ class InMeetingViewModel @Inject constructor(
     fun isRequestSent(): Boolean {
         val callId = state.value.call?.callId ?: return false
 
-        return callId != MEGACHAT_INVALID_HANDLE && MegaApplication.getChatManagement()
+        return callId != MEGACHAT_INVALID_HANDLE && chatManagement
             .isRequestSent(callId)
     }
 

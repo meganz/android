@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -156,7 +155,7 @@ class MonitorCallSoundsUseCase @Inject constructor(
             amIAloneOnAnyCallUseCase()
                 .collectLatest { (chatId, callId, onlyMeInTheCall) ->
                     withContext(mainImmediateDispatcher) {
-                        MegaApplication.getChatManagement().stopCounterToFinishCall()
+                        chatManagement.stopCounterToFinishCall()
                     }
                     val waitingForOthers =
                         onlyMeInTheCall && chatManagement.isRequestSent(callId)
@@ -169,7 +168,7 @@ class MonitorCallSoundsUseCase @Inject constructor(
                             )
 
                             withContext(mainImmediateDispatcher) {
-                                MegaApplication.getChatManagement()
+                                chatManagement
                                     .startCounterToFinishCall(chatId)
                             }
 
@@ -185,12 +184,12 @@ class MonitorCallSoundsUseCase @Inject constructor(
                             }
                         } else {
                             withContext(mainImmediateDispatcher) {
-                                MegaApplication.getChatManagement()
+                                chatManagement
                                     .startCounterToFinishCall(chatId)
                             }
                         }
                     } else {
-                        MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = false
+                        chatManagement.hasEndCallDialogBeenIgnored = false
                     }
                 }
         }
@@ -204,7 +203,7 @@ class MonitorCallSoundsUseCase @Inject constructor(
                             when (call.status) {
                                 ChatCallStatus.TerminatingUserParticipation -> {
                                     Timber.d("Terminating user participation")
-                                    MegaApplication.getChatManagement()
+                                    chatManagement
                                         .stopCounterToFinishCall()
                                     rtcAudioManagerGateway.removeRTCAudioManager()
                                     send(CallSoundType.CALL_ENDED)
@@ -226,7 +225,7 @@ class MonitorCallSoundsUseCase @Inject constructor(
                         }
 
                         if (contains(ChatCallChanges.OutgoingRingingStop)) {
-                            if (MegaApplication.getChatManagement()
+                            if (chatManagement
                                     .isRequestSent(call.callId) && call.numParticipants == ONE_PARTICIPANT
                             ) {
                                 hangCall(call.callId)

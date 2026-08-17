@@ -15,11 +15,11 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.presentation.extensions.title
@@ -46,6 +46,9 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
 
     @Inject
     lateinit var megaChatApi: MegaChatApiAndroid
+
+    @Inject
+    lateinit var pushNotificationSettingManagement: PushNotificationSettingManagement
 
     private val viewModel: SettingsChatViewModel by viewModels()
 
@@ -298,7 +301,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
      */
     fun updateNotifChat() {
         val pushNotificationSettings =
-            MegaApplication.getPushNotificationSettingManagement().pushNotificationSetting
+            pushNotificationSettingManagement.pushNotificationSetting
 
         var option = Constants.NOTIFICATIONS_ENABLED
 

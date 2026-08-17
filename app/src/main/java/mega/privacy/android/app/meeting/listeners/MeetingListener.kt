@@ -1,7 +1,7 @@
 package mega.privacy.android.app.meeting.listeners
 
 import androidx.lifecycle.MutableLiveData
-import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.globalmanagement.LogoutState
 
@@ -17,6 +17,7 @@ import timber.log.Timber
 
 class MeetingListener(
     private val logoutState: LogoutState,
+    private val chatManagement: ChatManagement,
 ) : MegaChatCallListenerInterface {
 
     var customCountDownTimer: CustomCountDownTimer? = null
@@ -76,7 +77,7 @@ class MeetingListener(
         api.getChatRoom(call.chatid)?.let { chat ->
             if (chat.isMeeting || chat.isGroup) {
                 if (call.hasLocalAudio() && call.status == CALL_STATUS_IN_PROGRESS &&
-                    MegaApplication.getChatManagement().isRequestSent(call.callId)
+                    chatManagement.isRequestSent(call.callId)
                 ) {
                     stopCountDown()
                     if (customCountDownTimer == null) {

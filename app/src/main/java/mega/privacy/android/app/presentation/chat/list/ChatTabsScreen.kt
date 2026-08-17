@@ -33,14 +33,14 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
+import dagger.hilt.android.EntryPointAccessors
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
+import mega.privacy.android.app.di.ChatComponentsEntryPoint
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
@@ -118,6 +118,12 @@ internal fun ChatTabsScreen(
     val context = LocalContext.current
     val resources = LocalResources.current
     val activity = LocalActivity.current as FragmentActivity
+    val pushNotificationSettingManagement = remember(context) {
+        EntryPointAccessors.fromApplication(
+            context,
+            ChatComponentsEntryPoint::class.java,
+        ).pushNotificationSettingManagement()
+    }
 
     var showChatStatusDialog by rememberSaveable { mutableStateOf(false) }
     var showShareLinkSheet by rememberSaveable { mutableStateOf(false) }
@@ -485,7 +491,7 @@ internal fun ChatTabsScreen(
         onChangeUserStatus = { showChatStatusDialog = true },
         onDoNotDisturbActionClick = {
             Analytics.tracker.trackEvent(ChatRoomDNDMenuItemEvent)
-            if (ChatUtil.getGeneralNotification() == Constants.NOTIFICATIONS_ENABLED) {
+            if (ChatUtil.getGeneralNotification(context) == Constants.NOTIFICATIONS_ENABLED) {
                 muteTarget = MuteTarget.Global
             } else {
                 coroutineScope.launch {
@@ -494,7 +500,7 @@ internal fun ChatTabsScreen(
                         actionLabel = resources.getString(R.string.general_unmute)
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        getPushNotificationSettingManagement().controlMuteNotifications(
+                        pushNotificationSettingManagement.controlMuteNotifications(
                             context,
                             Constants.NOTIFICATIONS_ENABLED,
                             null
@@ -531,7 +537,7 @@ internal fun ChatTabsScreen(
         },
         onUnmuteSelected = {
             chatsTabState.selectedIds.forEach { id ->
-                MegaApplication.getPushNotificationSettingManagement()
+                pushNotificationSettingManagement
                     .controlMuteNotificationsOfAChat(
                         activity,
                         Constants.NOTIFICATIONS_ENABLED,

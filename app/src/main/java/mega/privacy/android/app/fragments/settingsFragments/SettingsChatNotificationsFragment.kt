@@ -8,10 +8,10 @@ import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_DND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_NOTIFICATIONS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_SOUND
@@ -20,6 +20,7 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * The fragment for chat notifications of settings
@@ -29,6 +30,9 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
     Preference.OnPreferenceClickListener {
 
     private val viewModel by viewModels<SettingsChatNotificationsViewModel>()
+
+    @Inject
+    lateinit var pushNotificationSettingManagement: PushNotificationSettingManagement
 
     private var chatNotificationsSwitch: SwitchPreferenceCompat? = null
     private var chatSoundPreference: Preference? = null
@@ -44,7 +48,8 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
 
         chatNotificationsSwitch?.let {
             it.onPreferenceClickListener = this
-            it.isChecked = ChatUtil.getGeneralNotification() == Constants.NOTIFICATIONS_ENABLED
+            it.isChecked =
+                ChatUtil.getGeneralNotification(requireContext()) == Constants.NOTIFICATIONS_ENABLED
         }
 
         chatSoundPreference?.let {
@@ -63,7 +68,7 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
             it.onPreferenceChangeListener =
                 Preference.OnPreferenceChangeListener { preference, _ ->
                     if ((preference as SwitchPreferenceCompat).isChecked) {
-                        getPushNotificationSettingManagement().controlMuteNotifications(
+                        pushNotificationSettingManagement.controlMuteNotifications(
                             context,
                             Constants.NOTIFICATIONS_ENABLED,
                             null
@@ -93,7 +98,7 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
      * Method to update the UI items when the Push notification Settings change.
      */
     fun updateSwitch() {
-        with(getPushNotificationSettingManagement().pushNotificationSetting) {
+        with(pushNotificationSettingManagement.pushNotificationSetting) {
             val isDndEnabled = this.isGlobalChatsDndEnabled
             val dndTime = this.globalChatsDnd
 
@@ -167,7 +172,7 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
         when (preference.key) {
             KEY_CHAT_NOTIFICATIONS ->
                 chatNotificationsSwitch?.let {
-                    getPushNotificationSettingManagement().controlMuteNotifications(
+                    pushNotificationSettingManagement.controlMuteNotifications(
                         context,
                         if (it.isChecked)
                             Constants.NOTIFICATIONS_ENABLED

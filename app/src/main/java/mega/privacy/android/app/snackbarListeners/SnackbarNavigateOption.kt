@@ -3,8 +3,9 @@ package mega.privacy.android.app.snackbarListeners
 import android.app.Activity
 import android.content.Context
 import android.view.View
-import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.di.ChatComponentsEntryPoint
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
@@ -27,7 +28,10 @@ class SnackbarNavigateOption @JvmOverloads constructor(
                 //Do nothing, only dismiss
             }
 
-            MUTE_NOTIFICATIONS_SNACKBAR_TYPE -> getPushNotificationSettingManagement().controlMuteNotifications(
+            MUTE_NOTIFICATIONS_SNACKBAR_TYPE -> EntryPointAccessors.fromApplication(
+                context,
+                ChatComponentsEntryPoint::class.java,
+            ).pushNotificationSettingManagement().controlMuteNotifications(
                 context,
                 Constants.NOTIFICATIONS_ENABLED,
                 null

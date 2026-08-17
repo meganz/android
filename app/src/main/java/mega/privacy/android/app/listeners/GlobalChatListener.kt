@@ -5,7 +5,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
@@ -50,7 +49,7 @@ class GlobalChatListener @Inject constructor(
                     if (!list.isNullOrEmpty()) {
                         withContext(mainDispatcher) {
                             for (i in 0 until list.size) {
-                                MegaApplication.getChatManagement().addCurrentGroupChat(list[i].chatId)
+                                chatManagement.addCurrentGroupChat(list[i].chatId)
                             }
                         }
                     }

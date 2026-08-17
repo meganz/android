@@ -16,7 +16,7 @@ import dagger.hilt.android.EntryPointAccessors
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.di.ChatComponentsEntryPoint
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.chat.list.ChatTabsViewModel
@@ -150,7 +150,10 @@ fun ChatRoomItemBottomSheet(
                 onDismissRequest()
             },
             onUnmuteClick = {
-                MegaApplication.getPushNotificationSettingManagement()
+                EntryPointAccessors.fromApplication(
+                    context,
+                    ChatComponentsEntryPoint::class.java,
+                ).pushNotificationSettingManagement()
                     .controlMuteNotificationsOfAChat(
                         context,
                         Constants.NOTIFICATIONS_ENABLED,

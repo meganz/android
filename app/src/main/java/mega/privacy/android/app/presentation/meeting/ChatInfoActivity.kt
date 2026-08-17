@@ -29,15 +29,16 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
+import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_IN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_AUDIO_ENABLE
@@ -102,6 +103,12 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var pushNotificationSettingManagement: PushNotificationSettingManagement
+
+    @Inject
+    lateinit var callServiceStarter: CallServiceStarter
 
     private val viewModel by viewModels<ChatInfoViewModel>()
     private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
@@ -448,7 +455,7 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
                 megaChatApi
             )
         } else {
-            MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(
+            pushNotificationSettingManagement.controlMuteNotificationsOfAChat(
                 this@ChatInfoActivity,
                 Constants.NOTIFICATIONS_ENABLED,
                 chatRoomId
@@ -502,7 +509,7 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun launchCallScreen() {
         val chatId = waitingRoomManagementViewModel.state.value.chatId
-        MegaApplication.getInstance().openCallService(chatId)
+        callServiceStarter(chatId)
         passcodeFacade.enablePassCode()
 
         val intent = Intent(this@ChatInfoActivity, MeetingActivity::class.java).apply {

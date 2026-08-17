@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.listeners.GlobalChatListener
 import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.usecase.call.MonitorCallSoundsUseCase
@@ -34,6 +35,7 @@ class ChatApiListenerCoordinatorTest {
     private val globalChatListener = mock<GlobalChatListener>()
     private val monitorCallSoundsUseCase = mock<MonitorCallSoundsUseCase>()
     private val logoutState = LogoutState()
+    private val chatManagement = mock<ChatManagement>()
     private val context = mock<Context>()
 
     @BeforeEach
@@ -55,6 +57,7 @@ class ChatApiListenerCoordinatorTest {
         globalChatListener = globalChatListener,
         monitorCallSoundsUseCase = monitorCallSoundsUseCase,
         logoutState = logoutState,
+        chatManagement = chatManagement,
         applicationScope = applicationScope,
         context = context,
     )

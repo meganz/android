@@ -12,9 +12,10 @@ import android.view.View
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.EntryPointAccessors
-import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.di.ChatComponentsEntryPoint
 import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.main.controllers.ChatController
@@ -50,6 +51,10 @@ class ChatAdvancedNotificationBuilder(
         context,
         MegaApiEntryPoint::class.java,
     ).megaChatApi()
+    private val chatManagement: ChatManagement = EntryPointAccessors.fromApplication(
+        context,
+        ChatComponentsEntryPoint::class.java,
+    ).chatManagement()
 
     private val chatC: ChatController = ChatController(
         context = context,
@@ -544,7 +549,7 @@ class ChatAdvancedNotificationBuilder(
 
         val incomingCall = megaChatApi.getChatCall(incomingCallChatId)
         if (callInProgress != null && incomingCall != null && incomingCall.isRinging && !incomingCall.isIgnored) {
-            getChatManagement().addNotificationShown(incomingCall.chatid)
+            chatManagement.addNotificationShown(incomingCall.chatid)
             showIncomingCallNotification(incomingCall, callInProgress)
         }
     }
