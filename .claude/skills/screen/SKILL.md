@@ -249,6 +249,13 @@ See [screen-destination-conventions.md](./screen-destination-conventions.md) for
 
 ---
 
+## Screenshot Test Standards
+
+See [screenshot-test-conventions.md](./screenshot-test-conventions.md) for recording goldens, and for
+reviewing the diff rather than the new render when changing existing UI.
+
+---
+
 ## Guidelines
 
 1. **No TDD for screens** — unlike ViewModels, use cases, and mappers, screen composables and destinations are not created with TDD. Compilation verification is used instead.

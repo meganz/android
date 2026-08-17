@@ -178,6 +178,7 @@ alwaysApply: true
 - **Use Case Tests**: See [usecase-test-conventions.md](.claude/skills/usecase/usecase-test-conventions.md) for UseCase test conventions.
 - **ViewModel Tests**: See [viewmodel-test-conventions.md](.claude/skills/viewmodel/viewmodel-test-conventions.md) for ViewModel test conventions.
 - **Mapper Tests**: See [mapper-test-conventions.md](.claude/skills/mapper/mapper-test-conventions.md) for Mapper test conventions.
+- **Screenshot Tests**: See [screenshot-test-conventions.md](.claude/skills/screen/screenshot-test-conventions.md) for Compose screenshot test conventions — record the baseline before changing UI, and review the diff rather than the new render.
 
 ### Test Modules
 - **Core Test**: Shared test utilities and extensions
