@@ -6,7 +6,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -16,10 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,32 +38,36 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import kotlinx.collections.immutable.persistentListOf
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.banner.TopWarningBanner
+import mega.android.core.ui.components.button.PrimaryFilledButton
+import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.dialogs.BasicDialogButton
+import mega.android.core.ui.components.text.SpannableText
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.MegaSpanStyle
+import mega.android.core.ui.model.SpanIndicator
+import mega.android.core.ui.model.SpanStyleWithAnnotation
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.ui.extension.showAutoDurationSnackbar
 import mega.privacy.android.feature.sync.ui.megapicker.AllFilesAccessDialog
+import mega.privacy.android.feature.sync.ui.preview.CombinedThemePhoneLandscapePreviews
 import mega.privacy.android.feature.sync.ui.renamebackup.model.RenameAndCreateBackupDialog
 import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
 import mega.privacy.android.feature.sync.ui.views.SyncStorageQuotaExceedWarning
 import mega.privacy.android.feature.sync.ui.views.SyncTypePreviewProvider
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
-import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
-import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDisplayedEvent
@@ -110,7 +110,7 @@ internal fun SyncNewFolderScreen(
 }
 
 @Composable
-private fun SyncNewFolderScreenScaffold(
+internal fun SyncNewFolderScreenScaffold(
     state: SyncNewFolderState,
     selectedLocalFolder: String,
     selectedLocalFolderUri: String,
@@ -127,29 +127,26 @@ private fun SyncNewFolderScreenScaffold(
     onOpenUpgradeAccount: () -> Unit,
     onShowSnackbarConsumed: () -> Unit,
 ) {
-    val scaffoldState = rememberScaffoldState()
     val syncType = state.syncType
     var isWarningBannerDisplayed by rememberSaveable { mutableStateOf(false) }
-    val appBarWindowInsets = WindowInsets.statusBars
+    val snackBarHostState = LocalSnackBarHostState.current
 
     MegaScaffold(
-        scaffoldState = scaffoldState,
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
-            MegaAppBar(
+            MegaTopAppBar(
                 modifier = Modifier.testTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR),
-                appBarType = AppBarType.BACK_NAVIGATION,
                 title = when (syncType) {
                     SyncType.TYPE_BACKUP -> stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title)
                     else -> stringResource(R.string.sync_toolbar_title)
                 },
-                onNavigationPressed = {
+                navigationType = AppBarNavigationType.Back {
                     if (state.isLoading.not()) {
                         onBackClicked()
                     }
                 },
-                windowInsets = appBarWindowInsets,
-                elevation = if (isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
+                // M3 draws the separator from scroll state rather than a fixed elevation.
+                drawBottomLineOnScrolledContent = isWarningBannerDisplayed,
             )
         },
         content = { paddingValues ->
@@ -177,7 +174,7 @@ private fun SyncNewFolderScreenScaffold(
                     onShowSyncPermissionBannerValueChanged = { value ->
                         isWarningBannerDisplayed = value
                     },
-                    snackBarHostState = scaffoldState.snackbarHostState,
+                    snackBarHostState = snackBarHostState,
                     isStorageOverQuota = state.isStorageOverQuota
                 )
 
@@ -187,7 +184,7 @@ private fun SyncNewFolderScreenScaffold(
                     onConsumed = { onShowSnackbarConsumed() },
                 ) { message ->
                     message?.let {
-                        scaffoldState.snackbarHostState.showAutoDurationSnackbar(it.get(context))
+                        snackBarHostState?.showAutoDurationSnackbar(it.get(context))
                     }
                 }
             }
@@ -196,7 +193,7 @@ private fun SyncNewFolderScreenScaffold(
 }
 
 @Composable
-private fun SyncNewFolderScreenContent(
+internal fun SyncNewFolderScreenContent(
     syncType: SyncType,
     deviceName: String,
     isStorageOverQuota: Boolean,
@@ -214,7 +211,7 @@ private fun SyncNewFolderScreenContent(
     onRenameAndCreateBackupSucceeded: () -> Unit,
     onOpenUpgradeAccount: () -> Unit,
     onShowSyncPermissionBannerValueChanged: (Boolean) -> Unit,
-    snackBarHostState: SnackbarHostState,
+    snackBarHostState: SnackbarHostState?,
     modifier: Modifier = Modifier,
 ) {
     val resources = LocalResources.current
@@ -241,7 +238,7 @@ private fun SyncNewFolderScreenContent(
                     onSelectFolder()
                 }.onFailure {
                     coroutineScope.launch {
-                        snackBarHostState.showAutoDurationSnackbar(resources.getString(sharedResR.string.general_no_picker_warning))
+                        snackBarHostState?.showAutoDurationSnackbar(resources.getString(sharedResR.string.general_no_picker_warning))
                     }
                 }
             } else {
@@ -254,46 +251,37 @@ private fun SyncNewFolderScreenContent(
             SyncStorageQuotaExceedWarning(onUpgradeClick = onOpenUpgradeAccount)
         } else {
             AnimatedVisibility(showSyncPermissionBanner) {
-                WarningBanner(
-                    textComponent = {
-                        when (syncType) {
-                            SyncType.TYPE_BACKUP -> {
-                                MegaSpannedClickableText(
-                                    value = stringResource(id = sharedResR.string.sync_add_new_backup_storage_permission_banner),
-                                    styles = mapOf(
-                                        SpanIndicator('U') to MegaSpanStyleWithAnnotation(
-                                            megaSpanStyle = MegaSpanStyle(
-                                                spanStyle = SpanStyle(
-                                                    textDecoration = TextDecoration.Underline
-                                                )
-                                            ),
-                                            annotation = "Tap to grant access",
-                                        )
+                TopWarningBanner(
+                    body = when (syncType) {
+                        SyncType.TYPE_BACKUP -> SpannableText(
+                            text = stringResource(id = sharedResR.string.sync_add_new_backup_storage_permission_banner),
+                            annotations = mapOf(
+                                SpanIndicator('U') to SpanStyleWithAnnotation(
+                                    megaSpanStyle = MegaSpanStyle.TextColorStyle(
+                                        spanStyle = SpanStyle(textDecoration = TextDecoration.Underline),
+                                        textColor = TextColor.Primary,
                                     ),
-                                    color = TextColor.Primary,
-                                    onAnnotationClick = {
-                                        syncPermissionsManager.launchAppSettingFileStorageAccess()
-                                        showSyncPermissionBanner = false
-                                        onShowSyncPermissionBannerValueChanged(false)
-                                    },
+                                    annotation = "Tap to grant access",
                                 )
-                            }
+                            ),
+                            onAnnotationClick = {
+                                syncPermissionsManager.launchAppSettingFileStorageAccess()
+                                showSyncPermissionBanner = false
+                                onShowSyncPermissionBannerValueChanged(false)
+                            },
+                        )
 
-                            else -> {
-                                MegaText(
-                                    text = stringResource(id = R.string.sync_storage_permission_banner),
-                                    textColor = TextColor.Primary,
-                                )
-                            }
-                        }
-
+                        else -> SpannableText(
+                            text = stringResource(id = R.string.sync_storage_permission_banner),
+                        )
                     },
-                    onCloseClick = null,
+                    showCancelButton = false,
                     modifier = Modifier.clickable {
                         syncPermissionsManager.launchAppSettingFileStorageAccess()
                         showSyncPermissionBanner = false
                         onShowSyncPermissionBannerValueChanged(false)
-                    })
+                    },
+                )
             }
 
             if (showAllowAppAccessDialog) {
@@ -309,18 +297,23 @@ private fun SyncNewFolderScreenContent(
         }
 
         if (showStorageOverQuota) {
-            MegaAlertDialog(
+            BasicDialog(
                 title = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_title),
-                text = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_body),
-                confirmButtonText = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_confirm_button),
-                cancelButtonText = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_cancel_button),
-                onConfirm = {
-                    onDismissStorageOverQuota()
-                    onOpenUpgradeAccount()
-                },
-                onDismiss = {
-                    onDismissStorageOverQuota()
-                }
+                description = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_body),
+                buttons = persistentListOf(
+                    BasicDialogButton(
+                        text = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_cancel_button),
+                        onClick = { onDismissStorageOverQuota() },
+                    ),
+                    BasicDialogButton(
+                        text = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_confirm_button),
+                        onClick = {
+                            onDismissStorageOverQuota()
+                            onOpenUpgradeAccount()
+                        },
+                    ),
+                ),
+                onDismissRequest = { onDismissStorageOverQuota() },
             )
         }
 
@@ -349,7 +342,7 @@ private fun SyncNewFolderScreenContent(
                 },
                 textColor = TextColor.Primary,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp),
-                style = MaterialTheme.typography.subtitle2
+                style = AppTheme.typography.titleSmall
             )
 
             InputSyncInformationView(
@@ -362,7 +355,7 @@ private fun SyncNewFolderScreenContent(
                             onSelectFolder()
                         }.onFailure {
                             coroutineScope.launch {
-                                snackBarHostState.showAutoDurationSnackbar(
+                                snackBarHostState?.showAutoDurationSnackbar(
                                     resources.getString(
                                         sharedResR.string.general_no_picker_warning
                                     )
@@ -404,11 +397,12 @@ private fun SyncNewFolderScreenContent(
                     else -> selectedLocalFolder.isNotBlank() && selectedMegaFolder != null && syncPermissionsManager.isManageExternalStoragePermissionGranted()
                 }
 
-                RaisedDefaultMegaButton(
+                PrimaryFilledButton(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-                    textId = when (syncType) {
+                    text = stringResource(
+                        when (syncType) {
                         SyncType.TYPE_BACKUP -> {
                             if (proceedButtonClicked) {
                                 sharedResR.string.sync_list_sync_state_updating
@@ -424,7 +418,8 @@ private fun SyncNewFolderScreenContent(
                                 R.string.sync_button_label
                             }
                         }
-                    },
+                        }
+                    ),
                     onClick = {
                         proceedButtonClicked = true
                         syncClicked()
@@ -446,7 +441,7 @@ internal const val TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON =
 private fun SyncNewFolderScreenPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncNewFolderScreenScaffold(
             state = SyncNewFolderState(
                 syncType = syncType,
@@ -475,7 +470,7 @@ private fun SyncNewFolderScreenPreview(
 private fun SyncNewFolderScreenContentPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         SyncNewFolderScreenContent(
             syncType = syncType,
             deviceName = "Device Name",
@@ -493,7 +488,7 @@ private fun SyncNewFolderScreenContentPreview(
             onRenameAndCreateBackupSucceeded = {},
             onOpenUpgradeAccount = {},
             onShowSyncPermissionBannerValueChanged = {},
-            snackBarHostState = rememberScaffoldState().snackbarHostState,
+            snackBarHostState = null,
             isStorageOverQuota = true
         )
     }

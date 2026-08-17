@@ -2,14 +2,13 @@ package mega.privacy.android.feature.sync.ui.views
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +19,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.card.RoundCard
+import mega.android.core.ui.components.divider.SubtleDivider
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.surface.CardSurface
+import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.R as CoreUiR
@@ -27,13 +35,6 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreen
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.cards.MegaCardWithHeader
-import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
-import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
@@ -46,20 +47,24 @@ internal fun InputSyncInformationView(
     selectedMegaFolder: String = "",
 ) {
     Column(modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)) {
-        MegaCardWithHeader(
-            header = {
-                Header(
-                    imageResource = when (syncType) {
-                        SyncType.TYPE_BACKUP -> iconPackR.drawable.ic_database_medium_thin_outline
-                        else -> CoreUiR.drawable.ic_sync
-                    },
-                    text = when (syncType) {
-                        SyncType.TYPE_BACKUP -> stringResource(id = sharedResR.string.sync_add_new_backup_card_sync_type_text)
-                        else -> stringResource(id = R.string.sync_two_way)
-                    },
-                )
-            },
-            body = {
+        RoundCard {
+            Column {
+                CardSurface(
+                    surfaceColor = SurfaceColor.Surface1,
+                    shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+                ) {
+                    Header(
+                        imageResource = when (syncType) {
+                            SyncType.TYPE_BACKUP -> iconPackR.drawable.ic_database_medium_thin_outline
+                            else -> CoreUiR.drawable.ic_sync
+                        },
+                        text = when (syncType) {
+                            SyncType.TYPE_BACKUP -> stringResource(id = sharedResR.string.sync_add_new_backup_card_sync_type_text)
+                            else -> stringResource(id = R.string.sync_two_way)
+                        },
+                    )
+                }
+
                 TwoLinesItem(
                     imageResource = CoreUiR.drawable.ic_smartphone,
                     topText = when (syncType) {
@@ -73,7 +78,7 @@ internal fun InputSyncInformationView(
                         .testTag(SELECT_DEVICE_FOLDER_OPTION_TEST_TAG)
                 )
 
-                MegaDivider(dividerType = DividerType.Centered)
+                SubtleDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
                 when (syncType) {
                     SyncType.TYPE_BACKUP -> {
@@ -96,8 +101,8 @@ internal fun InputSyncInformationView(
                         )
                     }
                 }
-            },
-        )
+            }
+        }
     }
 }
 
@@ -125,7 +130,7 @@ private fun Header(
         MegaText(
             text = text,
             textColor = TextColor.Secondary,
-            style = MaterialTheme.typography.caption
+            style = AppTheme.typography.bodySmall
         )
     }
 }
@@ -166,9 +171,9 @@ private fun TwoLinesItem(
                 },
                 modifier = Modifier.padding(top = 4.dp),
                 style = if (isBottomTextClickable) {
-                    MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Medium)
+                    AppTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
                 } else {
-                    MaterialTheme.typography.body2
+                    AppTheme.typography.bodyMedium
                 },
             )
         }
@@ -180,7 +185,7 @@ private fun TwoLinesItem(
 private fun EmptyInputSyncInformationViewPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         InputSyncInformationView(
             syncType = syncType,
             deviceName = "Device Name",
@@ -195,7 +200,7 @@ private fun EmptyInputSyncInformationViewPreview(
 private fun InputSyncInformationViewPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         InputSyncInformationView(
             syncType = syncType,
             deviceName = "Device Name",

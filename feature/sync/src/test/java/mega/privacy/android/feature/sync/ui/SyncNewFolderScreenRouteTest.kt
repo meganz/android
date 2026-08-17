@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -20,7 +21,6 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
 import mega.privacy.android.feature.sync.ui.views.SELECT_DEVICE_FOLDER_OPTION_TEST_TAG
-import mega.privacy.android.shared.original.core.ui.controls.appbar.APP_BAR_BACK_BUTTON_TAG
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPressedEvent
@@ -295,8 +295,8 @@ internal class SyncNewFolderScreenRouteTest {
             )
         }
 
-        composeTestRule.onNodeWithTag(APP_BAR_BACK_BUTTON_TAG).assertExists().assertIsDisplayed()
-            .performClick()
+        composeTestRule.onNodeWithContentDescription(APP_BAR_NAVIGATION_ICON_DESCRIPTION)
+            .assertExists().assertIsDisplayed().performClick()
         assertThat(analyticsTestRule.events).contains(SyncNewFolderScreenBackNavigationEvent)
     }
 
@@ -320,8 +320,8 @@ internal class SyncNewFolderScreenRouteTest {
             )
         }
 
-        composeTestRule.onNodeWithTag(APP_BAR_BACK_BUTTON_TAG).assertExists().assertIsDisplayed()
-            .performClick()
+        composeTestRule.onNodeWithContentDescription(APP_BAR_NAVIGATION_ICON_DESCRIPTION)
+            .assertExists().assertIsDisplayed().performClick()
         assertThat(analyticsTestRule.events).contains(SyncNewFolderScreenBackNavigationEvent)
     }
 
@@ -377,3 +377,5 @@ internal class SyncNewFolderScreenRouteTest {
             .assertIsDisplayed()
     }
 }
+
+private const val APP_BAR_NAVIGATION_ICON_DESCRIPTION = "Navigation Icon"
