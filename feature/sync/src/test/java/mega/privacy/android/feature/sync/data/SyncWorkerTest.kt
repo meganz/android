@@ -19,20 +19,21 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.worker.ForegroundSetter
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.monitoring.CrashReporter
-import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.feature.sync.data.SyncWorker.Companion.SYNC_WORKER_RECHECK_DELAY_IN_SECONDS
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.StalledIssue
+import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncWorkerForegroundPreferenceUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
@@ -68,13 +69,11 @@ internal class SyncWorkerTest {
     private lateinit var workParams: WorkerParameters
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var workDatabase: WorkDatabase
-    private val loginMutex: Mutex = mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
-    private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
     private val syncNotificationManager: SyncNotificationManager = mock()
-    private val isRootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val syncPermissionsManager: SyncPermissionsManager = mock()
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
+    private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
     private val setSyncWorkerForegroundPreferenceUseCase: SetSyncWorkerForegroundPreferenceUseCase =
         mock()
     private val getSyncWorkerForegroundPreferenceUseCase: GetSyncWorkerForegroundPreferenceUseCase =
@@ -106,16 +105,14 @@ internal class SyncWorkerTest {
                 workDatabase, { _, _ -> }, workExecutor
             )
         )
-        whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
         underTest = SyncWorker(
             context = context,
             workerParams = workParams,
             monitorSyncsUseCase = monitorSyncsUseCase,
-            loginMutex = loginMutex,
+            monitorSyncStalledIssuesUseCase = monitorSyncStalledIssuesUseCase,
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             syncNotificationManager = syncNotificationManager,
-            isRootNodeExistsUseCase = isRootNodeExistsUseCase,
             syncPermissionManager = syncPermissionsManager,
             setSyncWorkerForegroundPreferenceUseCase = setSyncWorkerForegroundPreferenceUseCase,
             getSyncWorkerForegroundPreferenceUseCase = getSyncWorkerForegroundPreferenceUseCase,
@@ -151,6 +148,31 @@ internal class SyncWorkerTest {
             syncStatus = SyncStatus.PAUSED
         )
         whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(firstSync, secondSync, thirdSync)))
+        whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
+
+        val result = underTest.doWork()
+
+        assertThat(result).isEqualTo(Result.success())
+        verify(setSyncWorkerForegroundPreferenceUseCase).invoke(false)
+    }
+
+    @Test
+    fun `test that sync worker finishes when all folders are terminal`() = runTest {
+        val errorSync = FolderPair(
+            id = 1,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "error",
+            localFolderPath = "error",
+            remoteFolder = RemoteFolder(id = NodeId(1232L), name = "error"),
+            syncStatus = SyncStatus.ERROR,
+        )
+        val disabledSync = errorSync.copy(
+            id = 2,
+            pairName = "disabled",
+            localFolderPath = "disabled",
+            syncStatus = SyncStatus.DISABLED,
+        )
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(errorSync, disabledSync)))
         whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
 
         val result = underTest.doWork()
@@ -196,7 +218,6 @@ internal class SyncWorkerTest {
 
     @Test
     fun `test that sync worker retries if login fails`() = runTest {
-        whenever(loginMutex.isLocked).thenReturn(false) // Simulate login lock
         whenever(backgroundFastLoginUseCase()).thenThrow(RuntimeException("Login failed"))
 
         val result = underTest.doWork()
@@ -205,15 +226,16 @@ internal class SyncWorkerTest {
     }
 
     @Test
-    fun `test that fast login mutex is waited at least 3 times and then sync worker retries`() =
-        runTest {
-            whenever(loginMutex.isLocked).thenReturn(true) // Simulate login lock
-            whenever(isRootNodeExistsUseCase()).thenReturn(false)
-            val result = underTest.doWork()
+    fun `test that sync worker delegates the login attempt to the fast login use case`() = runTest {
+        whenever(monitorSyncsUseCase()).thenReturn(emptyFlow())
+        whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
 
-            assertThat(result).isEqualTo(Result.retry())
-            verifyNoInteractions(backgroundFastLoginUseCase)
-        }
+        underTest.doWork()
+
+        // The use case owns the login mutex and the already-logged-in short circuit, so the
+        // worker must not gate the call behind its own checks.
+        verify(backgroundFastLoginUseCase).invoke()
+    }
 
     @Test
     fun `test that sync worker sets preference to true on timeout`() = runTest {
@@ -235,35 +257,30 @@ internal class SyncWorkerTest {
     }
 
     @Test
-    fun `test isLoginSuccessful returns false when exception is thrown and worker retries`() =
-        runTest {
-            whenever(loginMutex.isLocked).thenReturn(false)
-            whenever(backgroundFastLoginUseCase()).thenThrow(RuntimeException("Login failed"))
+    fun `test that sync worker completes when no syncs remain`() = runTest {
+        whenever(monitorSyncsUseCase()).thenReturn(emptyFlow())
+        whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
 
-            val result = underTest.doWork()
+        val result = underTest.doWork()
 
-            assertThat(result).isEqualTo(Result.retry())
-        }
+        assertThat(result).isEqualTo(Result.success())
+        verify(setSyncWorkerForegroundPreferenceUseCase).invoke(false)
+    }
 
     @Test
-    fun `test that sync worker waits for empty syncs list before checking completion`() = runTest {
-        // First emit empty list, then after delay emit completed syncs
+    fun `test that sync worker completes when syncs disappear`() = runTest {
+        val syncingSync = FolderPair(
+            id = 1,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "test",
+            localFolderPath = "test",
+            remoteFolder = RemoteFolder(id = NodeId(1232L), name = "test"),
+            syncStatus = SyncStatus.SYNCING,
+        )
         whenever(monitorSyncsUseCase()).thenReturn(
             flow {
+                emit(listOf(syncingSync))
                 emit(emptyList())
-                delay(SYNC_WORKER_RECHECK_DELAY_IN_SECONDS.seconds + 100.seconds)
-                emit(
-                    listOf(
-                        FolderPair(
-                            id = 1,
-                            syncType = SyncType.TYPE_TWOWAY,
-                            pairName = "test",
-                            localFolderPath = "test",
-                            remoteFolder = RemoteFolder(id = NodeId(1232L), name = "test"),
-                            syncStatus = SyncStatus.SYNCED
-                        )
-                    )
-                )
             }
         )
         whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
@@ -271,20 +288,99 @@ internal class SyncWorkerTest {
         val result = underTest.doWork()
 
         assertThat(result).isEqualTo(Result.success())
+        verify(setSyncWorkerForegroundPreferenceUseCase).invoke(false)
     }
+
+    @Test
+    fun `test that sync worker completes when all remaining work is stalled`() = runTest {
+        val syncingSync = FolderPair(
+            id = 1,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "test",
+            localFolderPath = "test",
+            remoteFolder = RemoteFolder(id = NodeId(1232L), name = "test"),
+            syncStatus = SyncStatus.SYNCING,
+        )
+        val stalledIssue = StalledIssue(
+            id = "issue-id",
+            syncId = syncingSync.id,
+            nodeIds = listOf(NodeId(1L)),
+            localPaths = listOf("test/file"),
+            issueType = StallIssueType.FileIssue,
+            conflictName = "file",
+            nodeNames = listOf("file"),
+        )
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(syncingSync)))
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(listOf(stalledIssue)))
+        whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
+
+        val result = underTest.doWork()
+
+        assertThat(result).isEqualTo(Result.success())
+        verify(setSyncWorkerForegroundPreferenceUseCase).invoke(false)
+    }
+
+    @Test
+    fun `test that sync worker does not promote stalled work to foreground`() = runTest {
+        val syncingSync = FolderPair(
+            id = 1,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "test",
+            localFolderPath = "test",
+            remoteFolder = RemoteFolder(id = NodeId(1232L), name = "test"),
+            syncStatus = SyncStatus.SYNCING,
+        )
+        val stalledIssue = StalledIssue(
+            id = "issue-id",
+            syncId = syncingSync.id,
+            nodeIds = listOf(NodeId(1L)),
+            localPaths = listOf("test/file"),
+            issueType = StallIssueType.FileIssue,
+            conflictName = "file",
+            nodeNames = listOf("file"),
+        )
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(syncingSync)))
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(listOf(stalledIssue)))
+        whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(true)
+        whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(true)
+
+        val result = underTest.doWork()
+
+        assertThat(result).isEqualTo(Result.success())
+        verifyNoInteractions(foregroundSetter)
+    }
+
+    @Test
+    fun `test that sync worker does not wait indefinitely for foreground state before login`() =
+        runTest {
+            whenever(monitorSyncsUseCase()).thenReturn(flow { awaitCancellation() })
+            whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flow { awaitCancellation() })
+            whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(true)
+            whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(true)
+
+            val result = underTest.doWork()
+
+            assertThat(result).isEqualTo(Result.success())
+            verifyNoInteractions(foregroundSetter)
+        }
 
     @Test
     fun `test that sync worker runs in foreground when preference is true and promotion succeeds`() =
         runTest {
-            val syncedSync = FolderPair(
+            val syncingSync = FolderPair(
                 id = 1,
                 syncType = SyncType.TYPE_TWOWAY,
                 pairName = "test",
                 localFolderPath = "test",
                 remoteFolder = RemoteFolder(id = NodeId(1232L), name = "test"),
-                syncStatus = SyncStatus.SYNCED
+                syncStatus = SyncStatus.SYNCING
             )
-            whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(syncedSync)))
+            whenever(monitorSyncsUseCase()).thenReturn(
+                flowOf(
+                    listOf(syncingSync),
+                    listOf(syncingSync.copy(syncStatus = SyncStatus.SYNCED)),
+                )
+            )
             whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(true)
             whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(true)
             whenever(syncNotificationManager.createForegroundNotification()).thenReturn(
@@ -310,15 +406,20 @@ internal class SyncWorkerTest {
 
     @Test
     fun `test that sync worker handles foreground promotion failure gracefully`() = runTest {
-        val syncedSync = FolderPair(
+        val syncingSync = FolderPair(
             id = 1,
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "test",
             localFolderPath = "test",
             remoteFolder = RemoteFolder(id = NodeId(1232L), name = "test"),
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCING
         )
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(syncedSync)))
+        whenever(monitorSyncsUseCase()).thenReturn(
+            flowOf(
+                listOf(syncingSync),
+                listOf(syncingSync.copy(syncStatus = SyncStatus.SYNCED)),
+            )
+        )
         whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(true)
         whenever(syncNotificationManager.createForegroundNotification()).thenReturn(
             mock()
@@ -412,6 +513,17 @@ internal class SyncWorkerTest {
         val outcome = runCatching { underTest.doWork() }
 
         // Cancellation must propagate so WorkManager treats it as a stop, not silently retry.
+        assertThat(outcome.exceptionOrNull()).isInstanceOf(CancellationException::class.java)
+    }
+
+    @Test
+    fun `test that cancellation during login propagates instead of retrying`() = runTest {
+        whenever(getSyncWorkerForegroundPreferenceUseCase()).thenReturn(false)
+        whenever(backgroundFastLoginUseCase())
+            .thenThrow(CancellationException("Worker stopped during login"))
+
+        val outcome = runCatching { underTest.doWork() }
+
         assertThat(outcome.exceptionOrNull()).isInstanceOf(CancellationException::class.java)
     }
 }

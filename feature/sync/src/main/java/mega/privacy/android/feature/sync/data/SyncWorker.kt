@@ -15,28 +15,27 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withTimeoutOrNull
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.coroutine.logAndSwallowExceptions
 import mega.privacy.android.data.worker.ForegroundSetter
 import mega.privacy.android.domain.monitoring.CrashReporter
-import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
+import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
-import mega.privacy.android.feature.sync.domain.usecase.notifcation.CreateSyncNotificationIdUseCase.Companion.SYNC_FOREGROUND_NOTIFICATION_ID
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncWorkerForegroundPreferenceUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SetSyncWorkerForegroundPreferenceUseCase
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.SyncWorkerForegroundExecutionStartedEvent
 import timber.log.Timber
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -50,10 +49,9 @@ internal class SyncWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
-    @LoginMutex private val loginMutex: Mutex,
+    private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val syncNotificationManager: SyncNotificationManager,
-    private val isRootNodeExistsUseCase: RootNodeExistsUseCase,
     private val syncPermissionManager: SyncPermissionsManager,
     private val setSyncWorkerForegroundPreferenceUseCase: SetSyncWorkerForegroundPreferenceUseCase,
     private val getSyncWorkerForegroundPreferenceUseCase: GetSyncWorkerForegroundPreferenceUseCase,
@@ -114,6 +112,10 @@ internal class SyncWorker @AssistedInject constructor(
             return false
         }
 
+        if (!hasActiveSyncWork()) {
+            return false
+        }
+
         val promoted = promoteToForeground()
         if (promoted) {
             Timber.d("SyncWorker running in Foreground")
@@ -121,28 +123,78 @@ internal class SyncWorker @AssistedInject constructor(
         return promoted
     }
 
-    private suspend fun CoroutineScope.checkSyncStatus(): Result {
-        val job = launch {
-            monitorSyncsUseCase().onEach {
-                Timber.d("SyncWorker syncs: ${it.map { sync -> sync.syncStatus }}")
-                syncs = it
-            }.catch {
-                Timber.e(it, "monitorSyncsUseCase exception")
-            }.launchIn(this)
-        }
-        // add initial delay before checking the sync status
-        delay(1.minutes)
-        while (syncs.isEmpty() || isSyncingCompleted(syncs).not()) {
-            delay(SYNC_WORKER_RECHECK_DELAY_IN_SECONDS.seconds)
-            Timber.d("checking sync status...")
-        }
-        Timber.d("all syncs completed")
-        job.cancelAndJoin()
-        return Result.success()
+    private suspend fun hasActiveSyncWork(): Boolean {
+        return withTimeoutOrNull(ACTIVE_SYNC_STATE_TIMEOUT) {
+            val currentSyncs = monitorSyncsUseCase().first()
+            val stalledSyncIds = monitorSyncStalledIssuesUseCase()
+                .first()
+                .map { it.syncId }
+                .toSet()
+            currentSyncs.any {
+                it.syncStatus == SyncStatus.SYNCING && it.id !in stalledSyncIds
+            }
+        } == true
     }
 
-    private fun isSyncingCompleted(syncs: List<FolderPair>): Boolean =
-        syncs.isNotEmpty() && syncs.all { it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.PAUSED }
+    private suspend fun CoroutineScope.checkSyncStatus(): Result {
+        syncs = emptyList()
+        var stalledIssues = emptyList<StalledIssue>()
+        val syncJob = monitorSyncsUseCase()
+            .onEach {
+                Timber.d("SyncWorker syncs: ${it.map { sync -> sync.syncStatus }}")
+                syncs = it
+            }
+            .catch { throwable ->
+                Timber.e(throwable, "monitorSyncsUseCase exception")
+                throw throwable
+            }
+            .launchIn(this)
+        val stalledIssuesJob = monitorSyncStalledIssuesUseCase()
+            .onEach { stalledIssues = it }
+            .catch { throwable ->
+                Timber.e(throwable, "monitorSyncStalledIssuesUseCase exception")
+                throw throwable
+            }
+            .launchIn(this)
+
+        return try {
+            val hasSyncs = withTimeoutOrNull(INITIAL_SYNC_STATE_TIMEOUT) {
+                while (syncs.isEmpty()) {
+                    delay(SYNC_WORKER_RECHECK_DELAY_IN_SECONDS.seconds)
+                }
+                true
+            } == true
+
+            if (!hasSyncs) {
+                Timber.d("No syncs available for SyncWorker")
+                Result.success()
+            } else {
+                while (syncs.isNotEmpty() && !isSyncingCompleted(syncs, stalledIssues)) {
+                    delay(SYNC_WORKER_RECHECK_DELAY_IN_SECONDS.seconds)
+                    Timber.d("checking sync status...")
+                }
+                Timber.d("all syncs completed or no longer available")
+                Result.success()
+            }
+        } finally {
+            syncJob.cancelAndJoin()
+            stalledIssuesJob.cancelAndJoin()
+        }
+    }
+
+    private fun isSyncingCompleted(
+        syncs: List<FolderPair>,
+        stalledIssues: List<StalledIssue>,
+    ): Boolean {
+        val stalledSyncIds = stalledIssues.map { it.syncId }.toSet()
+        return syncs.isNotEmpty() && syncs.all {
+            it.syncStatus == SyncStatus.SYNCED ||
+                it.syncStatus == SyncStatus.PAUSED ||
+                it.syncStatus == SyncStatus.ERROR ||
+                it.syncStatus == SyncStatus.DISABLED ||
+                it.id in stalledSyncIds
+        }
+    }
 
     private suspend fun promoteToForeground(): Boolean {
         val foregroundInfo = createForegroundInfo()
@@ -182,39 +234,23 @@ internal class SyncWorker @AssistedInject constructor(
     }
 
     /**
-     * When the user is not logged in, perform a Complete Fast Login procedure
+     * Ensures the worker has a usable session before it inspects sync state.
+     *
+     * [BackgroundFastLoginUseCase] already serialises on the login mutex and returns the existing
+     * session when the root node is present, so no extra guarding is needed here.
      *
      * @return [Boolean] true if the login process successful otherwise false
      */
-    private suspend fun isLoginSuccessful(): Boolean {
-        return runCatching {
-            Timber.d("Waiting for the user to complete the Fast Login procedure")
-
-            // arbitrary retry value
-            var retry = 3
-            while (loginMutex.isLocked && retry > 0) {
-                Timber.d("Wait for the login lock to be available")
-                delay(1.seconds)
-                retry--
-            }
-
-            return if (!loginMutex.isLocked) {
-                val result = runCatching { backgroundFastLoginUseCase() }.onFailure {
-                    Timber.e(it, "performCompleteFastLogin exception")
-                }
-                Timber.d("Complete Fast Login procedure successful")
-                result.isSuccess
-            } else {
-                isRootNodeExistsUseCase().also { rootNodeExists ->
-                    if (rootNodeExists) {
-                        Timber.d("Root node exists, no need to perform login")
-                    } else {
-                        Timber.w("Root node does not exist, login failed in the SyncWorker")
-                    }
-                }
-            }
-        }.getOrElse { false }
-    }
+    private suspend fun isLoginSuccessful(): Boolean =
+        try {
+            backgroundFastLoginUseCase()
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.e(e, "performCompleteFastLogin exception")
+            false
+        }
 
     companion object {
         /**
@@ -234,5 +270,13 @@ internal class SyncWorker @AssistedInject constructor(
         const val MAX_BACKGROUND_DURATION_IN_MINUTES = 9 // 9 minutes
 
         const val MAX_FOREGROUND_DURATION_IN_HOURS = 1 // 1 hour
+
+        private val ACTIVE_SYNC_STATE_TIMEOUT = 5.seconds
+        private val INITIAL_SYNC_STATE_TIMEOUT = 1.minutes
+
+        /**
+         * Notification ID for the foreground service
+         */
+        const val SYNC_FOREGROUND_NOTIFICATION_ID = 123456
     }
 }

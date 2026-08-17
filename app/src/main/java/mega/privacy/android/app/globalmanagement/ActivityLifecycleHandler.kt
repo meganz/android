@@ -5,6 +5,8 @@ import android.app.Application
 import android.os.Bundle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.domain.entity.StorageState
@@ -36,6 +38,14 @@ class ActivityLifecycleHandler @Inject constructor(
     // Flag to indicate if the current Activity is going through configuration change like orientation switch
     private var isActivityChangingConfigurations = false
 
+    private val syncWorkerLifecycleMutex = Mutex()
+
+    // applicationScope runs on Dispatchers.Default, so two launches can reach the mutex in either
+    // order. The lifecycle callbacks are main-thread, so the last intent written here is the
+    // correct end state whichever coroutine wins.
+    @Volatile
+    private var shouldSyncWorkerRun = false
+
     /**
      * On activity created
      *
@@ -53,9 +63,7 @@ class ActivityLifecycleHandler @Inject constructor(
         Timber.d("onActivityStarted: %s", activity.javaClass.simpleName)
         if (activityReferences == 0) {
             Timber.i("Stopping SyncWorker")
-            applicationScope.launch {
-                stopSyncWorkerUseCase()
-            }
+            updateSyncWorker(shouldStart = false)
         }
 
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
@@ -100,9 +108,7 @@ class ActivityLifecycleHandler @Inject constructor(
 
         if (activityReferences == 0) {
             Timber.i("Starting SyncWorker")
-            applicationScope.launch {
-                startSyncWorkerUseCase()
-            }
+            updateSyncWorker(shouldStart = true)
         }
     }
 
@@ -127,6 +133,19 @@ class ActivityLifecycleHandler @Inject constructor(
      * @return current visible activity
      */
     fun getCurrentActivity(): Activity? = currentActivity
+
+    private fun updateSyncWorker(shouldStart: Boolean) {
+        shouldSyncWorkerRun = shouldStart
+        applicationScope.launch {
+            syncWorkerLifecycleMutex.withLock {
+                if (shouldSyncWorkerRun) {
+                    startSyncWorkerUseCase()
+                } else {
+                    stopSyncWorkerUseCase()
+                }
+            }
+        }
+    }
 
     /**
      * Is activity visible
