@@ -90,7 +90,7 @@ internal fun OfflineOptionsBottomSheetContent(
                 icon = if (isFolder) {
                     iconPackR.drawable.ic_folder_medium_solid
                 } else {
-                    getFileTypeIcon(offlineFileInformation.name) ?: return@with
+                    getFileTypeIcon(offlineFileInformation.name)
                 },
                 thumbnailData = thumbnailData,
                 onItemClicked = {},

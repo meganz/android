@@ -21,14 +21,9 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.shared.resources.R as SharedR
 
 @Composable
-internal fun getFileTypeIcon(fileName: String): Int? {
+internal fun getFileTypeIcon(fileName: String): Int {
     val fileTypeIconMapper = remember { FileTypeIconMapper() }
-    val extension = fileName
-        .substringAfterLast('.', "")
-        .takeIf { it.isNotEmpty() }
-        ?: return null
-
-    return fileTypeIconMapper(extension)
+    return fileTypeIconMapper(fileName.substringAfterLast('.', ""))
 }
 
 @Composable

@@ -516,7 +516,7 @@ private fun OfflineContent(
                         icon = if (node.offlineFileInformation.isFolder) {
                             iconPackR.drawable.ic_folder_medium_solid
                         } else {
-                            getFileTypeIcon(node.offlineFileInformation.name) ?: return@items
+                            getFileTypeIcon(node.offlineFileInformation.name)
                         },
                         thumbnailData = node.offlineFileInformation.thumbnailData,
                         highlightText = uiState.searchQuery ?: "",
@@ -566,7 +566,7 @@ private fun OfflineContent(
                         iconRes = if (node.offlineFileInformation.isFolder) {
                             iconPackR.drawable.ic_folder_medium_solid
                         } else {
-                            getFileTypeIcon(node.offlineFileInformation.name) ?: return@items
+                            getFileTypeIcon(node.offlineFileInformation.name)
                         },
                         thumbnailData = node.offlineFileInformation.thumbnailData,
                         isTakenDown = false,
