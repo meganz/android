@@ -1,4 +1,4 @@
-package mega.privacy.android.app.myAccount
+package mega.privacy.android.feature.myaccount.presentation.usage
 
 import androidx.compose.runtime.Stable
 import mega.privacy.android.domain.entity.AccountType
@@ -22,24 +22,23 @@ enum class PaymentAlertType {
  *
  * @property isUsageContentReady When false, account usage data is not ready for display.
  * @property isFileVersioningEnabled Whether file versioning is enabled
- * @property versionsInfo Formatted string of previous versions size
+ * @property versionsSize Previous versions size in bytes, null when unavailable
  * @property accountType The type of the account
  * @property storageState The current state of the storage
  * @property isBusinessAccount Whether this is a business account
  * @property isProFlexiAccount Whether this is a Pro Flexi account
  * @property isMasterBusinessAccount Whether this is the master admin of a business account (sub-accounts are false)
  * @property usedStoragePercentage Percentage of storage used
- * @property usedStorage Formatted string of used storage
- * @property totalStorage Formatted string of total storage
- * @property usedTransfer Formatted string of used transfer
+ * @property usedStorage Used storage in bytes, null until loaded
+ * @property totalStorage Total storage in bytes, null until loaded
+ * @property usedTransfer Used transfer in bytes, null until loaded
  * @property usedTransferPercentage Percentage of transfer used
- * @property totalTransfer Formatted string of total transfer
+ * @property totalTransfer Total transfer in bytes, null until loaded
  * @property usedTransferStatus Status of transfer usage
- * @property cloudStorage Formatted string of cloud drive storage
- * @property incomingStorage Formatted string of incoming shares storage
- * @property rubbishStorage Formatted string of rubbish bin storage
- * @property backupStorageSize Raw backup storage size in bytes
- * @property backupStorage Formatted string of backup storage
+ * @property cloudStorage Cloud drive storage in bytes, null until loaded
+ * @property incomingStorage Incoming shares storage in bytes, null until loaded
+ * @property rubbishStorage Rubbish bin storage in bytes, null until loaded
+ * @property backupStorageSize Backup storage size in bytes
  * @property renewTime Subscription renewal time in milliseconds
  * @property proExpirationTime Subscription expiration time in milliseconds
  * @property hasRenewableSubscription Whether the account has a renewable subscription
@@ -54,24 +53,23 @@ data class MyAccountUsageUiState(
     val usageLoadFailed: Boolean = false,
     val isUsageContentReady: Boolean = false,
     val isFileVersioningEnabled: Boolean = true,
-    val versionsInfo: String = "",
+    val versionsSize: Long? = null,
     val accountType: AccountType = AccountType.FREE,
     val storageState: StorageState = StorageState.Unknown,
     val isBusinessAccount: Boolean = false,
     val isProFlexiAccount: Boolean = false,
     val isMasterBusinessAccount: Boolean = false,
     val usedStoragePercentage: Int = 0,
-    val usedStorage: String = "",
-    val totalStorage: String = "",
-    val usedTransfer: String = "",
+    val usedStorage: Long? = null,
+    val totalStorage: Long? = null,
+    val usedTransfer: Long? = null,
     val usedTransferPercentage: Int = 0,
-    val totalTransfer: String = "",
+    val totalTransfer: Long? = null,
     val usedTransferStatus: UsedTransferStatus = UsedTransferStatus.NoTransferProblems,
-    val cloudStorage: String = "",
-    val incomingStorage: String = "",
-    val rubbishStorage: String = "",
+    val cloudStorage: Long? = null,
+    val incomingStorage: Long? = null,
+    val rubbishStorage: Long? = null,
     val backupStorageSize: Long = 0L,
-    val backupStorage: String = "",
     val renewTime: Long = 0L,
     val proExpirationTime: Long = 0L,
     val hasRenewableSubscription: Boolean = false,

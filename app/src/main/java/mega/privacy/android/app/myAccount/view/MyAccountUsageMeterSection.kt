@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -26,12 +27,13 @@ import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.myAccount.MyAccountUsageUiState
-import mega.privacy.android.app.presentation.myaccount.view.MyAccountQuotaProgressBar
+import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.stripLinkAnnotations
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
+import mega.privacy.android.feature.myaccount.presentation.usage.MyAccountUsageUiState
+import mega.privacy.android.feature.myaccount.presentation.view.MyAccountQuotaProgressBar
 
 @Composable
 internal fun UsageMeterSection(
@@ -58,9 +60,12 @@ internal fun UsageMeterSection(
                 when {
                     isBusinessOrProFlexi -> {
                         // Business/Pro Flexi Account Layout
+                        val context = LocalContext.current
                         BusinessUsageLayout(
-                            usedStorage = uiState.usedStorage,
-                            usedTransfer = uiState.usedTransfer,
+                            usedStorage = uiState.usedStorage
+                                ?.let { formatFileSize(it, context) }.orEmpty(),
+                            usedTransfer = uiState.usedTransfer
+                                ?.let { formatFileSize(it, context) }.orEmpty(),
                             modifier = Modifier.fillMaxSize()
                         )
                     }
@@ -139,6 +144,7 @@ private fun RegularUsageLayout(
     uiState: MyAccountUsageUiState,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val isStorageOverQuota = uiState.storageState == StorageState.Red
 
     val storageQuotaLevel = when (uiState.storageState) {
@@ -176,8 +182,8 @@ private fun RegularUsageLayout(
             Column {
                 val storageText = stringResource(
                     R.string.used_storage_transfer,
-                    uiState.usedStorage,
-                    uiState.totalStorage
+                    uiState.usedStorage?.let { formatFileSize(it, context) }.orEmpty(),
+                    uiState.totalStorage?.let { formatFileSize(it, context) }.orEmpty()
                 ).let { if (isStorageOverQuota) it else it.stripLinkAnnotations() }
 
                 SpannedText(
@@ -227,8 +233,8 @@ private fun RegularUsageLayout(
                 Column {
                     val transferText = stringResource(
                         R.string.used_storage_transfer,
-                        uiState.usedTransfer,
-                        uiState.totalTransfer
+                        uiState.usedTransfer?.let { formatFileSize(it, context) }.orEmpty(),
+                        uiState.totalTransfer?.let { formatFileSize(it, context) }.orEmpty()
                     ).stripLinkAnnotations()
 
                     MegaText(

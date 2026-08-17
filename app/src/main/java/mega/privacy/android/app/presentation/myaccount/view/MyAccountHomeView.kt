@@ -114,6 +114,7 @@ import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
 import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.view.MyAccountQuotaProgressBar
 import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem

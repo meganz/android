@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.myaccount.view
+package mega.privacy.android.feature.myaccount.presentation.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -29,8 +29,19 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 
+/**
+ * Circular quota meter showing [progress] as a percentage, coloured by [level].
+ *
+ * The percentage text shrinks to fit and is only drawn once it no longer overflows.
+ *
+ * @param level Quota level driving the indicator and text colours.
+ * @param progress Percentage used, clamped to 100% for the indicator but shown verbatim as text.
+ * @param progressIndicatorTestTag Test tag applied to the circular indicator.
+ * @param modifier Modifier for the meter.
+ * @param progressTextTestTag Test tag applied to the percentage text, when the caller needs one.
+ */
 @Composable
-internal fun MyAccountQuotaProgressBar(
+fun MyAccountQuotaProgressBar(
     level: QuotaLevel,
     progress: Int,
     progressIndicatorTestTag: String,

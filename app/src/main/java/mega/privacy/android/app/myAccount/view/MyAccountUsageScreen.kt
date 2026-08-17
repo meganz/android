@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -28,11 +29,12 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.myAccount.MyAccountUsageUiState
-import mega.privacy.android.app.myAccount.PaymentAlertType
+import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
+import mega.privacy.android.feature.myaccount.presentation.usage.MyAccountUsageUiState
+import mega.privacy.android.feature.myaccount.presentation.usage.PaymentAlertType
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.time.Duration.Companion.milliseconds
@@ -53,6 +55,7 @@ fun MyAccountUsageScreen(
     onUsageLoadErrorDismiss: () -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
     val shouldShowSkeleton by delayedTrue(MY_ACCOUNT_USAGE_SKELETON_DELAY)
     var errorDialogDismissed by remember(uiState.usageLoadFailed) { mutableStateOf(false) }
@@ -98,34 +101,34 @@ fun MyAccountUsageScreen(
                 // Storage Details Items
                 StorageDetailItem(
                     title = stringResource(id = R.string.section_cloud_drive),
-                    value = uiState.cloudStorage,
+                    value = uiState.cloudStorage?.let { formatFileSize(it, context) }.orEmpty(),
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                if (uiState.backupStorage.isNotEmpty()) {
+                if (uiState.backupStorageSize > 0) {
                     StorageDetailItem(
                         title = stringResource(id = R.string.home_side_menu_backups_title),
-                        value = uiState.backupStorage,
+                        value = formatFileSize(uiState.backupStorageSize, context),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
 
                 StorageDetailItem(
                     title = stringResource(id = R.string.title_incoming_shares_explorer),
-                    value = uiState.incomingStorage,
+                    value = uiState.incomingStorage?.let { formatFileSize(it, context) }.orEmpty(),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 StorageDetailItem(
                     title = stringResource(id = sharedR.string.general_section_rubbish_bin),
-                    value = uiState.rubbishStorage,
+                    value = uiState.rubbishStorage?.let { formatFileSize(it, context) }.orEmpty(),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 if (uiState.isFileVersioningEnabled) {
                     StorageDetailItem(
                         title = stringResource(id = R.string.file_properties_folder_previous_versions),
-                        value = uiState.versionsInfo,
+                        value = uiState.versionsSize?.let { formatFileSize(it, context) }.orEmpty(),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -169,22 +172,25 @@ internal val MY_ACCOUNT_USAGE_SKELETON_DELAY = 300.milliseconds
 
 private class MyAccountUsageStateProvider : PreviewParameterProvider<MyAccountUsageUiState> {
 
+    private val gb = 1024L * 1024 * 1024
+    private val mb = 1024L * 1024
+
     private val baseProState = MyAccountUsageUiState(
         isUsageContentReady = true,
         accountType = AccountType.PRO_I,
-        usedStorage = "18\u00A0GB",
-        totalStorage = "400\u00A0GB",
+        usedStorage = 18 * gb,
+        totalStorage = 400 * gb,
         usedStoragePercentage = 75,
-        usedTransfer = "120\u00A0GB",
-        totalTransfer = "400\u00A0GB",
+        usedTransfer = 120 * gb,
+        totalTransfer = 400 * gb,
         usedTransferPercentage = 30,
         usedTransferStatus = UsedTransferStatus.NoTransferProblems,
-        cloudStorage = "10\u00A0GB",
-        incomingStorage = "5\u00A0GB",
-        rubbishStorage = "2\u00A0GB",
-        backupStorage = "1\u00A0GB",
+        cloudStorage = 10 * gb,
+        incomingStorage = 5 * gb,
+        rubbishStorage = 2 * gb,
+        backupStorageSize = 1 * gb,
         isFileVersioningEnabled = true,
-        versionsInfo = "200\u00A0MB",
+        versionsSize = 200 * mb,
         hasRenewableSubscription = true,
         paymentAlertType = PaymentAlertType.AccountRenewsOn,
         paymentAlertDate = 1_780_000_000L,
@@ -195,13 +201,13 @@ private class MyAccountUsageStateProvider : PreviewParameterProvider<MyAccountUs
         MyAccountUsageUiState(
             isUsageContentReady = true,
             accountType = AccountType.FREE,
-            usedStorage = "5.2\u00A0GB",
-            totalStorage = "20\u00A0GB",
+            usedStorage = 5 * gb,
+            totalStorage = 20 * gb,
             usedStoragePercentage = 26,
-            cloudStorage = "3.1\u00A0GB",
-            incomingStorage = "1.5\u00A0GB",
-            rubbishStorage = "0.6\u00A0GB",
-            backupStorage = "",
+            cloudStorage = 3 * gb,
+            incomingStorage = 1 * gb,
+            rubbishStorage = 600 * mb,
+            backupStorageSize = 0L,
             isFileVersioningEnabled = false,
         ),
         // Pro
@@ -209,34 +215,34 @@ private class MyAccountUsageStateProvider : PreviewParameterProvider<MyAccountUs
         // Pro - storage warning
         baseProState.copy(
             storageState = StorageState.Orange,
-            usedStorage = "36\u00A0GB",
-            totalStorage = "40\u00A0GB",
+            usedStorage = 36 * gb,
+            totalStorage = 40 * gb,
             usedStoragePercentage = 90,
-            cloudStorage = "300\u00A0GB",
-            incomingStorage = "40\u00A0GB",
-            rubbishStorage = "20\u00A0GB",
-            backupStorage = "",
+            cloudStorage = 300 * gb,
+            incomingStorage = 40 * gb,
+            rubbishStorage = 20 * gb,
+            backupStorageSize = 0L,
         ),
         // Pro - over quota
         baseProState.copy(
             storageState = StorageState.Red,
-            usedStorage = "410\u00A0GB",
+            usedStorage = 410 * gb,
             usedStoragePercentage = 100,
-            usedTransfer = "400\u00A0GB",
+            usedTransfer = 400 * gb,
             usedTransferPercentage = 100,
             usedTransferStatus = UsedTransferStatus.Full,
-            cloudStorage = "350\u00A0GB",
-            incomingStorage = "40\u00A0GB",
-            rubbishStorage = "20\u00A0GB",
-            backupStorage = "",
+            cloudStorage = 350 * gb,
+            incomingStorage = 40 * gb,
+            rubbishStorage = 20 * gb,
+            backupStorageSize = 0L,
         ),
         // Business
         MyAccountUsageUiState(
             isUsageContentReady = true,
             isBusinessAccount = true,
             isMasterBusinessAccount = true,
-            usedStorage = "340\u00A0GB",
-            usedTransfer = "80\u00A0GB",
+            usedStorage = 340 * gb,
+            usedTransfer = 80 * gb,
             paymentAlertType = PaymentAlertType.BusinessGracePeriod,
         ),
         // Loading

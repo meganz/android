@@ -9,10 +9,10 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.myAccount.MyAccountUsageUiState
-import mega.privacy.android.app.myAccount.PaymentAlertType
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
+import mega.privacy.android.feature.myaccount.presentation.usage.MyAccountUsageUiState
+import mega.privacy.android.feature.myaccount.presentation.usage.PaymentAlertType
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -110,15 +110,15 @@ class MyAccountUsageScreenTest {
     }
 
     @Test
-    fun `test that backup storage item is shown when backupStorage is not empty`() {
-        setContent(readyFreeState().copy(backupStorage = "1 GB"))
+    fun `test that backup storage item is shown when backupStorageSize is positive`() {
+        setContent(readyFreeState().copy(backupStorageSize = GIGABYTE))
         val label = composeTestRule.activity.getString(R.string.home_side_menu_backups_title)
         composeTestRule.onNodeWithText(label).assertIsDisplayed()
     }
 
     @Test
-    fun `test that backup storage item is not shown when backupStorage is empty`() {
-        setContent(readyFreeState().copy(backupStorage = ""))
+    fun `test that backup storage item is not shown when backupStorageSize is zero`() {
+        setContent(readyFreeState().copy(backupStorageSize = 0L))
         val label = composeTestRule.activity.getString(R.string.home_side_menu_backups_title)
         composeTestRule.onNodeWithText(label).assertDoesNotExist()
     }
@@ -195,22 +195,27 @@ class MyAccountUsageScreenTest {
         isBusinessAccount = false,
         isProFlexiAccount = false,
         isMasterBusinessAccount = false,
-        usedStorage = "5 GB",
-        totalStorage = "20 GB",
+        usedStorage = 5 * GIGABYTE,
+        totalStorage = 20 * GIGABYTE,
         usedStoragePercentage = 25,
-        usedTransfer = "1 GB",
-        totalTransfer = "10 GB",
+        usedTransfer = 1 * GIGABYTE,
+        totalTransfer = 10 * GIGABYTE,
         usedTransferPercentage = 10,
         usedTransferStatus = UsedTransferStatus.NoTransferProblems,
-        cloudStorage = "3 GB",
-        incomingStorage = "1 GB",
-        rubbishStorage = "1 GB",
-        backupStorage = "",
+        cloudStorage = 3 * GIGABYTE,
+        incomingStorage = 1 * GIGABYTE,
+        rubbishStorage = 1 * GIGABYTE,
+        backupStorageSize = 0L,
         isFileVersioningEnabled = true,
-        versionsInfo = "100 MB",
+        versionsSize = 100 * MEGABYTE,
         paymentAlertType = PaymentAlertType.None,
     )
 
     private fun upgradeButtonText() =
         composeTestRule.activity.getString(R.string.account_my_account_usage_get_more_storage_button)
+
+    private companion object {
+        const val MEGABYTE = 1024L * 1024
+        const val GIGABYTE = MEGABYTE * 1024
+    }
 }

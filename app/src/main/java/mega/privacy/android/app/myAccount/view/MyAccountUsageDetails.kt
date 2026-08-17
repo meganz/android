@@ -15,10 +15,10 @@ import mega.android.core.ui.components.divider.StrongDivider
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.myAccount.MyAccountUsageUiState
-import mega.privacy.android.app.myAccount.PaymentAlertType
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.formatter.stripLinkAnnotations
+import mega.privacy.android.feature.myaccount.presentation.usage.MyAccountUsageUiState
+import mega.privacy.android.feature.myaccount.presentation.usage.PaymentAlertType
 
 /**
  * Payment alert section

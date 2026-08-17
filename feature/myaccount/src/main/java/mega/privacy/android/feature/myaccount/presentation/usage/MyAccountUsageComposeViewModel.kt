@@ -1,4 +1,4 @@
-package mega.privacy.android.app.myAccount
+package mega.privacy.android.feature.myaccount.presentation.usage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.StateFlow
-import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.StorageState
@@ -45,8 +44,7 @@ import javax.inject.Inject
  * is set; the UI shows a message and navigates back (no retry).
  */
 @HiltViewModel
-internal class MyAccountUsageComposeViewModel @Inject constructor(
-    private val fileSizeStringMapper: FileSizeStringMapper,
+class MyAccountUsageComposeViewModel @Inject constructor(
     private val getFileVersionsOption: GetFileVersionsOption,
     private val checkVersionsUseCase: CheckVersionsUseCase,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
@@ -139,42 +137,32 @@ internal class MyAccountUsageComposeViewModel @Inject constructor(
     }
 
     /**
-     * Resolves backup folder size from [MonitorBackupFolder]: maps node id to tree size, formats with
-     * [fileSizeStringMapper], and falls back to zero/empty on any error so this leg never stalls [combine].
+     * Resolves backup folder size in bytes from [MonitorBackupFolder], falling back to zero on any
+     * error so this leg never stalls [combine].
      */
     private fun monitorBackupFolderFlow() = channelFlow {
         monitorBackupFolder()
             .catch { e ->
                 Timber.w(e, "Exception monitoring backups folder")
-                send(BackupUsageSlice(0L, ""))
+                send(0L)
             }
             .collect { result ->
                 result.fold(
                     onSuccess = { nodeId ->
                         runCatching {
                             when (val node = getNodeByIdUseCase(nodeId)) {
-                                is TypedFolderNode -> {
-                                    getFolderTreeInfo(node).let { folderTreeInfo ->
-                                        val backupSizeInBytes =
-                                            folderTreeInfo.totalCurrentSizeInBytes
-                                        val backupSize = if (backupSizeInBytes > 0) {
-                                            fileSizeStringMapper(backupSizeInBytes)
-                                        } else {
-                                            ""
-                                        }
-                                        send(BackupUsageSlice(backupSizeInBytes, backupSize))
-                                    }
-                                }
+                                is TypedFolderNode ->
+                                    send(getFolderTreeInfo(node).totalCurrentSizeInBytes)
 
-                                else -> send(BackupUsageSlice(0L, ""))
+                                else -> send(0L)
                             }
                         }.onFailure {
                             Timber.w(it)
-                            send(BackupUsageSlice(0L, ""))
+                            send(0L)
                         }
                     },
                     onFailure = {
-                        send(BackupUsageSlice(0L, ""))
+                        send(0L)
                     },
                 )
             }
@@ -192,12 +180,10 @@ internal class MyAccountUsageComposeViewModel @Inject constructor(
                 val folderTreeInfo = runCatching {
                     checkVersionsUseCase()
                 }.getOrNull()
-                val versionsInfo = folderTreeInfo?.sizeOfPreviousVersionsInBytes?.let { size ->
-                    if (size >= 0) fileSizeStringMapper(size) else ""
-                } ?: ""
                 emit(
                     VersionsUsageSlice(
-                        versionsInfo = versionsInfo,
+                        versionsSize = folderTreeInfo?.sizeOfPreviousVersionsInBytes
+                            ?.takeIf { it >= 0 },
                         isFileVersioningEnabled = isDisableFileVersions.not(),
                         isLoaded = true,
                     ),
@@ -207,7 +193,7 @@ internal class MyAccountUsageComposeViewModel @Inject constructor(
                 Timber.e(error)
                 emit(
                     VersionsUsageSlice(
-                        versionsInfo = "",
+                        versionsSize = null,
                         isFileVersioningEnabled = false,
                         isLoaded = true,
                     ),
@@ -313,24 +299,23 @@ internal class MyAccountUsageComposeViewModel @Inject constructor(
             usageLoadFailed = usageLoadFailed,
             isUsageContentReady = prev.isUsageContentReady || contentReady,
             isFileVersioningEnabled = inputs.versions.isFileVersioningEnabled,
-            versionsInfo = inputs.versions.versionsInfo,
+            versionsSize = inputs.versions.versionsSize,
             accountType = accountType,
             storageState = inputs.storageState,
             isBusinessAccount = bootstrap.isBusinessAccount,
             isProFlexiAccount = bootstrap.isProFlexiAccount,
             isMasterBusinessAccount = bootstrap.isMasterBusinessAccount,
             usedStoragePercentage = storageDetail?.usedPercentage ?: 0,
-            usedStorage = storageDetail?.usedStorage?.let { fileSizeStringMapper(it) } ?: "",
-            totalStorage = storageDetail?.totalStorage?.let { fileSizeStringMapper(it) } ?: "",
+            usedStorage = storageDetail?.usedStorage,
+            totalStorage = storageDetail?.totalStorage,
             usedTransferPercentage = transferDetail?.usedTransferPercentage ?: 0,
-            usedTransfer = transferDetail?.usedTransfer?.let { fileSizeStringMapper(it) } ?: "",
-            totalTransfer = transferDetail?.totalTransfer?.let { fileSizeStringMapper(it) } ?: "",
+            usedTransfer = transferDetail?.usedTransfer,
+            totalTransfer = transferDetail?.totalTransfer,
             usedTransferStatus = usedTransferStatus,
-            cloudStorage = storageDetail?.usedCloudDrive?.let { fileSizeStringMapper(it) } ?: "",
-            incomingStorage = storageDetail?.usedIncoming?.let { fileSizeStringMapper(it) } ?: "",
-            rubbishStorage = storageDetail?.usedRubbish?.let { fileSizeStringMapper(it) } ?: "",
-            backupStorageSize = inputs.backup.sizeBytes,
-            backupStorage = inputs.backup.formatted,
+            cloudStorage = storageDetail?.usedCloudDrive,
+            incomingStorage = storageDetail?.usedIncoming,
+            rubbishStorage = storageDetail?.usedRubbish,
+            backupStorageSize = inputs.backup,
             renewTime = renewTime,
             proExpirationTime = proExpirationTime,
             hasRenewableSubscription = hasRenewableSubscription,
@@ -360,15 +345,9 @@ private data class AccountUsageBootstrap(
     val loadFailed: Boolean,
 )
 
-/** Backup folder total size for the usage breakdown row. */
-private data class BackupUsageSlice(
-    val sizeBytes: Long,
-    val formatted: String,
-)
-
-/** File versioning toggle and formatted previous-versions size string. */
+/** File versioning toggle and previous-versions size in bytes. */
 private data class VersionsUsageSlice(
-    val versionsInfo: String,
+    val versionsSize: Long?,
     val isFileVersioningEnabled: Boolean,
     val isLoaded: Boolean,
 )
@@ -381,6 +360,6 @@ private data class AccountUsageInputs(
     val accountDetail: AccountDetail,
     val accountDetailFlowFailed: Boolean,
     val storageState: StorageState,
-    val backup: BackupUsageSlice,
+    val backup: Long,
     val versions: VersionsUsageSlice,
 )

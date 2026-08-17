@@ -1,4 +1,4 @@
-package mega.privacy.android.app.myAccount
+package mega.privacy.android.feature.myaccount.presentation.usage
 
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
@@ -56,7 +55,6 @@ import org.mockito.kotlin.wheneverBlocking
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class MyAccountUsageComposeViewModelTest {
 
-    private val fileSizeStringMapper: FileSizeStringMapper = mock()
     private val getFileVersionsOption: GetFileVersionsOption = mock()
     private val checkVersionsUseCase: CheckVersionsUseCase = mock()
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase = mock()
@@ -75,7 +73,6 @@ internal class MyAccountUsageComposeViewModelTest {
     @BeforeEach
     fun setUp() {
         reset(
-            fileSizeStringMapper,
             getFileVersionsOption,
             checkVersionsUseCase,
             getAccountDetailsUseCase,
@@ -87,9 +84,6 @@ internal class MyAccountUsageComposeViewModelTest {
             getNodeByIdUseCase,
             getBusinessStatusUseCase,
         )
-        whenever(fileSizeStringMapper(any())).thenAnswer { invocation ->
-            "fmt:${invocation.getArgument<Long>(0)}"
-        }
         accountDetailFlow.value = defaultFreeAccountDetail()
         storageStateFlow.value = StorageState.Unknown
 
@@ -105,7 +99,6 @@ internal class MyAccountUsageComposeViewModelTest {
         wheneverBlocking { getUsedTransferStatusUseCase(any()) }.thenReturn(UsedTransferStatus.NoTransferProblems)
 
         underTest = MyAccountUsageComposeViewModel(
-            fileSizeStringMapper = fileSizeStringMapper,
             getFileVersionsOption = getFileVersionsOption,
             checkVersionsUseCase = checkVersionsUseCase,
             getAccountDetailsUseCase = getAccountDetailsUseCase,
@@ -366,12 +359,12 @@ internal class MyAccountUsageComposeViewModelTest {
                 )
                 advanceUntilIdle()
                 val state = awaitItem()
-                assertThat(state.usedStorage).isEqualTo("fmt:100")
-                assertThat(state.totalStorage).isEqualTo("fmt:1000")
+                assertThat(state.usedStorage).isEqualTo(100L)
+                assertThat(state.totalStorage).isEqualTo(1000L)
                 assertThat(state.usedStoragePercentage).isEqualTo(10)
-                assertThat(state.cloudStorage).isEqualTo("fmt:40")
-                assertThat(state.incomingStorage).isEqualTo("fmt:10")
-                assertThat(state.rubbishStorage).isEqualTo("fmt:5")
+                assertThat(state.cloudStorage).isEqualTo(40L)
+                assertThat(state.incomingStorage).isEqualTo(10L)
+                assertThat(state.rubbishStorage).isEqualTo(5L)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -435,15 +428,48 @@ internal class MyAccountUsageComposeViewModelTest {
             )
             advanceUntilIdle()
             val state = awaitItem()
-            assertThat(state.usedStorage).isEqualTo("fmt:500")
-            assertThat(state.totalStorage).isEqualTo("fmt:2000")
+            assertThat(state.usedStorage).isEqualTo(500L)
+            assertThat(state.totalStorage).isEqualTo(2000L)
             assertThat(state.usedStoragePercentage).isEqualTo(25)
-            assertThat(state.cloudStorage).isEqualTo("fmt:300")
-            assertThat(state.incomingStorage).isEqualTo("fmt:150")
-            assertThat(state.rubbishStorage).isEqualTo("fmt:50")
+            assertThat(state.cloudStorage).isEqualTo(300L)
+            assertThat(state.incomingStorage).isEqualTo(150L)
+            assertThat(state.rubbishStorage).isEqualTo(50L)
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that uiState clears usage sizes when account detail is emptied after content is ready`() =
+        runTest {
+            underTest.uiState.test {
+                awaitUntilUsageReady()
+                accountDetailFlow.value = accountDetailWithStorage(
+                    usedStorage = 500L,
+                    totalStorage = 2000L,
+                    usedCloud = 300L,
+                    usedIncoming = 150L,
+                    usedRubbish = 50L,
+                )
+                advanceUntilIdle()
+                assertThat(awaitItem().cloudStorage).isEqualTo(300L)
+
+                // Mirrors the fallback monitorAccountDetailFlow emits when the monitor fails: sizes
+                // must read as absent, not as zero, so the UI keeps rendering them blank.
+                accountDetailFlow.value = AccountDetail()
+                advanceUntilIdle()
+
+                var state = awaitItem()
+                while (state.cloudStorage != null) state = awaitItem()
+                assertThat(state.isUsageContentReady).isTrue()
+                assertThat(state.usedStorage).isNull()
+                assertThat(state.totalStorage).isNull()
+                assertThat(state.usedTransfer).isNull()
+                assertThat(state.totalTransfer).isNull()
+                assertThat(state.incomingStorage).isNull()
+                assertThat(state.rubbishStorage).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that uiState updates storageState when storage monitor emits`() = runTest {
@@ -458,7 +484,7 @@ internal class MyAccountUsageComposeViewModelTest {
     }
 
     @Test
-    fun `test that uiState updates versionsInfo when checkVersionsUseCase returns versions data`() =
+    fun `test that uiState updates versionsSize when checkVersionsUseCase returns versions data`() =
         runTest {
             wheneverBlocking { getFileVersionsOption(any()) }.thenReturn(false)
             val versionsFolderInfo = FolderTreeInfo(
@@ -475,13 +501,13 @@ internal class MyAccountUsageComposeViewModelTest {
             vm.uiState.test {
                 val state = awaitUntilUsageReady()
                 assertThat(state.isFileVersioningEnabled).isTrue()
-                assertThat(state.versionsInfo).isEqualTo("fmt:1024")
+                assertThat(state.versionsSize).isEqualTo(1024L)
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that uiState updates backupStorage when backup folder size is positive`() = runTest {
+    fun `test that uiState updates backupStorageSize when backup folder size is positive`() = runTest {
         val nodeId = NodeId(42L)
         val folderNode: TypedFolderNode = mock()
         wheneverBlocking { monitorBackupFolder() }.thenReturn(flowOf(Result.success(nodeId)))
@@ -501,13 +527,11 @@ internal class MyAccountUsageComposeViewModelTest {
         vm.uiState.test {
             val state = awaitUntilUsageReady()
             assertThat(state.backupStorageSize).isEqualTo(2048L)
-            assertThat(state.backupStorage).isEqualTo("fmt:2048")
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     private fun createViewModel() = MyAccountUsageComposeViewModel(
-        fileSizeStringMapper = fileSizeStringMapper,
         getFileVersionsOption = getFileVersionsOption,
         checkVersionsUseCase = checkVersionsUseCase,
         getAccountDetailsUseCase = getAccountDetailsUseCase,

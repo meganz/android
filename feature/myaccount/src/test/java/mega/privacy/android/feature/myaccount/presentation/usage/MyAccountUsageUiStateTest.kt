@@ -1,4 +1,4 @@
-package mega.privacy.android.app.myAccount
+package mega.privacy.android.feature.myaccount.presentation.usage
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.AccountType
