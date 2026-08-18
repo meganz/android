@@ -32,8 +32,9 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaEventQueue
+import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
 import mega.privacy.android.app.mediaplayer.AudioPlayQueueBuilder
-import mega.privacy.android.feature.mediaplayer.data.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.AudioPlayQueueParams
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
@@ -48,7 +49,10 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioR
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.TrackAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
+import mega.privacy.android.feature.mediaplayer.data.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.feature.mediaplayer.navigation.AudioPlayerScreenNavKey
 import mega.privacy.mobile.analytics.event.AudioPlayerIsActivatedEvent
 import timber.log.Timber
@@ -98,6 +102,15 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     @Inject
     lateinit var mediaHandleStore: MediaHandleStore
 
+    @Inject
+    lateinit var monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase
+
+    @Inject
+    lateinit var isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase
+
+    @Inject
+    lateinit var transferOverQuotaEventQueue: TransferOverQuotaEventQueue
+
     private var player: ExoPlayer? = null
     private var mediaSession: MediaSession? = null
 
@@ -108,6 +121,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private var playQueueBuildJob: Job? = null
     private var trackPlaybackInfoJob: Job? = null
     private var lastPlayQueueParams: AudioPlayQueueParams? = null
+    private var isTransferOverQuota = false
 
     override fun onCreate() {
         super.onCreate()
@@ -117,6 +131,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         initializeSession()
         observePreferences()
         observeHiddenNodeSettingChanges()
+        observeTransferOverQuota()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
@@ -232,6 +247,45 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         }
     }
 
+    /**
+     * Streaming over quota keeps the SDK raising the event for every streaming request, so playback
+     * is left paused instead of prepared again: nothing re-requests the stream until the user asks
+     * for it, which is what stops the warning from reappearing as soon as it is dismissed.
+     */
+    private fun observeTransferOverQuota() {
+        lifecycleScope.launch {
+            monitorTransferOverQuotaUseCase()
+                .catch { Timber.e(it, "Failed to monitor transfer over quota") }
+                .collect { isOverQuota ->
+                    isTransferOverQuota = isOverQuota
+                    if (isOverQuota) {
+                        player?.pause()
+                    }
+                }
+        }
+    }
+
+    /**
+     * The player is left paused while over quota, so pressing play in the mini player or the
+     * notification cannot resume on its own. Ask the SDK whether the quota window has passed: if it
+     * has, prepare the stream again, otherwise warn the user. Pressing play is a deliberate action,
+     * so the warning is raised every time rather than only once per quota window.
+     */
+    private fun handlePlayRequestedWhileOverQuota() {
+        lifecycleScope.launch {
+            val stillOverQuota = runCatching { isInTransferOverQuotaUseCase() }
+                .onFailure { Timber.e(it) }
+                .getOrDefault(true)
+            if (stillOverQuota) {
+                player?.pause()
+                transferOverQuotaEventQueue.emit(TransferOverQuotaSource.Streaming)
+            } else {
+                isTransferOverQuota = false
+                player?.prepare()
+            }
+        }
+    }
+
     private fun createPlayerListener(): Player.Listener = object : Player.Listener {
 
         override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
@@ -262,7 +316,16 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             }
         }
 
+        override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+            if (!playWhenReady) return
+            when {
+                isTransferOverQuota -> handlePlayRequestedWhileOverQuota()
+                player?.playbackState == Player.STATE_IDLE -> player?.prepare()
+            }
+        }
+
         override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+            if (isTransferOverQuota) return
             player?.prepare()
         }
     }

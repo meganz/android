@@ -135,6 +135,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
@@ -210,6 +211,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
+    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val checkNodeAccessibilityUseCase: CheckNodeAccessibilityUseCase,
     monitorAudioBackgroundPlayEnabledUseCase: MonitorAudioBackgroundPlayEnabledUseCase,
     monitorAudioShuffleEnabledUseCase: MonitorAudioShuffleEnabledUseCase,
@@ -269,6 +271,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private var playerRetry = 0
 
+    @Volatile
+    private var isTransferOverQuota = false
+
     private var needStopStreamingServer = false
 
     private var playSourceChanged: MutableList<MediaItem> = CopyOnWriteArrayList()
@@ -287,6 +292,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     init {
         setupTransferListener()
+        monitorTransferOverQuota()
         cancellableJobs[JOB_KEY_MONITOR_SHUFFLE] = sharingScope.launch {
             monitorAudioShuffleEnabledUseCase().collect {
                 recreateAndUpdatePlaylistItems(
@@ -958,7 +964,24 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Streaming over quota keeps the SDK raising the event for every streaming request, so the
+     * player is left idle instead of retried: nothing re-requests the stream until the user asks
+     * for it, which is what stops the warning from reappearing as soon as it is dismissed.
+     */
+    private fun monitorTransferOverQuota() {
+        cancellableJobs[JOB_KEY_MONITOR_TRANSFER_OVER_QUOTA] = sharingScope.launch {
+            monitorTransferOverQuotaUseCase()
+                .catch { Timber.e(it) }
+                .collect { isTransferOverQuota = it }
+        }
+    }
+
     override fun onPlayerError() {
+        if (isTransferOverQuota) {
+            retry.value = false
+            return
+        }
         playerRetry++
         if (playerRetry == 1) {
             sharingScope.launch {
@@ -1551,6 +1574,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
         private const val JOB_KEY_SET_SHUFFLE = "JOB_KEY_SET_SHUFFLE"
         private const val JOB_KEY_SET_AUDIO_REPEAT_MODE = "JOB_KEY_SET_AUDIO_REPEAT_MODE"
         private const val JOB_KEY_MONITOR_TRANSFER = "JOB_KEY_MONITOR_TRANSFER"
+        private const val JOB_KEY_MONITOR_TRANSFER_OVER_QUOTA =
+            "JOB_KEY_MONITOR_TRANSFER_OVER_QUOTA"
         private const val JOB_KEY_AUDIO_PLAYBACK_INFO = "JOB_KEY_AUDIO_PLAYBACK_INFO"
         private const val JOB_KEY_ACCOUNT_DETAIL = "JOB_KEY_ACCOUNT_DETAIL"
     }

@@ -13,6 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
@@ -21,6 +22,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.NavHostFragment
@@ -34,6 +37,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaWarningViewModel
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
@@ -86,12 +90,15 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
@@ -134,6 +141,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    private val transferOverQuotaWarningViewModel by viewModels<TransferOverQuotaWarningViewModel>()
 
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
 
@@ -327,7 +336,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         setupToolbar()
         setupNavDestListener()
 
-        val playerServiceIntent = Intent(this, LegacyAudioPlayerService::class.java).putExtras(extras)
+        val playerServiceIntent =
+            Intent(this, LegacyAudioPlayerService::class.java).putExtras(extras)
 
         if (savedInstanceState == null) {
             PermissionUtils.checkNotificationsPermission(this)
@@ -341,6 +351,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         serviceBound = true
 
         setupObserver()
+        observeTransferOverQuotaWarning()
 
         if (CallUtil.participatingInACall()) {
             showNotAllowPlayAlert()
@@ -613,6 +624,34 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             }
         }
     }
+
+    /**
+     * The player hosts its fragments in a legacy navigation graph, so it cannot render the
+     * quota-warning screen itself: the warning is opened in the single activity shell instead.
+     * Only collected while resumed, so whichever activity is in front takes the event.
+     */
+    private fun observeTransferOverQuotaWarning() {
+        lifecycleScope.launch {
+            if (isQuotaWarningUpsellEnabled()) {
+                transferOverQuotaWarningViewModel.transferOverQuotaEvents
+                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                    .collect {
+                        transferOverQuotaWarningViewModel.consumeTransferOverQuotaEvent()
+                            ?.let { source ->
+                                megaNavigator.openQuotaWarningUpsell(
+                                    context = this@AudioPlayerActivity,
+                                    type = QuotaWarningType.Transfer,
+                                    trigger = source.quotaWarningTrigger,
+                                )
+                            }
+                    }
+            }
+        }
+    }
+
+    private suspend fun isQuotaWarningUpsellEnabled() = runCatching {
+        getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
+    }.onFailure { Timber.e(it) }.getOrDefault(false)
 
     private fun showNotAllowPlayAlert() {
         showSnackbar(getString(R.string.not_allow_play_alert))
