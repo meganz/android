@@ -35,6 +35,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onItemClick Callback when a row is clicked, with the chat id.
  * @param modifier [Modifier]
  * @param contentPadding Padding for the list content.
+ * @param onItemLongClick Optional callback when a row is long-pressed, with the chat id.
  */
 @Composable
 internal fun ChatListContent(
@@ -43,6 +44,7 @@ internal fun ChatListContent(
     onItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    onItemLongClick: ((Long) -> Unit)? = null,
 ) {
     when (state) {
         ChatListTabState.Empty -> ChatListEmptyView(
@@ -65,6 +67,7 @@ internal fun ChatListContent(
                 ChatRoomItemView(
                     item = item,
                     onItemClick = onItemClick,
+                    onItemLongClick = onItemLongClick,
                 )
             }
         }

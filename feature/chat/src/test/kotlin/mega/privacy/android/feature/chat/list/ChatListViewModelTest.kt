@@ -3,17 +3,35 @@ package mega.privacy.android.feature.chat.list
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
+import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
+import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
+import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
+import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.feature.chat.list.formatter.ChatLastMessageFormatter
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.feature.chat.list.mapper.ChatRoomUiItemMapper
+import mega.privacy.android.feature.chat.list.menu.ArchiveChatRoomMenuItem
+import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_ARCHIVE_TAG
+import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_CLEAR_HISTORY_TAG
+import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_LEAVE_TAG
+import mega.privacy.android.feature.chat.list.menu.CHAT_ROOM_ACTIONS_MUTE_TAG
+import mega.privacy.android.feature.chat.list.menu.ChatRoomMenuItem
+import mega.privacy.android.feature.chat.list.menu.ClearHistoryChatRoomMenuItem
+import mega.privacy.android.feature.chat.list.menu.LeaveChatRoomMenuItem
+import mega.privacy.android.feature.chat.list.menu.MuteChatRoomMenuItem
+import mega.privacy.android.feature.chat.list.menu.UnarchiveChatRoomMenuItem
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
@@ -29,8 +47,11 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 class ChatListViewModelTest {
 
@@ -40,6 +61,23 @@ class ChatListViewModelTest {
     private val chatLastMessageFormatter = mock<ChatLastMessageFormatter>()
     private val chatRoomTimestampMapper = mock<ChatRoomTimestampMapper>()
     private val chatRoomUiItemMapper = mock<ChatRoomUiItemMapper>()
+    private val muteChatNotificationForChatRoomsUseCase =
+        mock<MuteChatNotificationForChatRoomsUseCase>()
+    private val unmuteChatNotificationUseCase = mock<UnmuteChatNotificationUseCase>()
+    private val archiveChatUseCase = mock<ArchiveChatUseCase>()
+    private val clearChatHistoryUseCase = mock<ClearChatHistoryUseCase>()
+    private val leaveChatUseCase = mock<LeaveChatUseCase>()
+
+    private val chatRoomMenuItems: Map<Int, ChatRoomMenuItem> = mapOf(
+        0 to ClearHistoryChatRoomMenuItem(clearChatHistoryUseCase),
+        1 to MuteChatRoomMenuItem(
+            muteChatNotificationForChatRoomsUseCase,
+            unmuteChatNotificationUseCase,
+        ),
+        2 to ArchiveChatRoomMenuItem(archiveChatUseCase),
+        3 to UnarchiveChatRoomMenuItem(archiveChatUseCase),
+        4 to LeaveChatRoomMenuItem(leaveChatUseCase),
+    )
 
     private val chatRoomItem = ChatRoomItem.IndividualChatRoomItem(
         chatId = 1L,
@@ -64,6 +102,7 @@ class ChatListViewModelTest {
             chatLastMessageFormatter = chatLastMessageFormatter,
             chatRoomTimestampMapper = chatRoomTimestampMapper,
             chatRoomUiItemMapper = chatRoomUiItemMapper,
+            chatRoomMenuItems = chatRoomMenuItems,
         )
     }
 
@@ -78,6 +117,11 @@ class ChatListViewModelTest {
             chatLastMessageFormatter,
             chatRoomTimestampMapper,
             chatRoomUiItemMapper,
+            muteChatNotificationForChatRoomsUseCase,
+            unmuteChatNotificationUseCase,
+            archiveChatUseCase,
+            clearChatHistoryUseCase,
+            leaveChatUseCase,
         )
     }
 
@@ -201,6 +245,70 @@ class ChatListViewModelTest {
         underTest.uiState.test { awaitDataState() }
 
         assertThat(capturedHeaderTimeMapper?.invoke(chatRoomItem, null)).isNull()
+    }
+
+    @Test
+    fun `test that getChatRoomActions returns the eligible actions ordered for the chat`() =
+        runTest {
+            stubChatRooms(
+                chats = listOf(
+                    ChatRoomItem.GroupChatRoomItem(
+                        chatId = 1L,
+                        title = "Group",
+                        hasPermissions = true,
+                        isActive = true,
+                    )
+                ),
+                meetings = emptyList(),
+            )
+
+            val actual = underTest.getChatRoomActions(1L).map { it.testTag }
+
+            assertThat(actual).containsExactly(
+                CHAT_ROOM_ACTIONS_CLEAR_HISTORY_TAG,
+                CHAT_ROOM_ACTIONS_MUTE_TAG,
+                CHAT_ROOM_ACTIONS_ARCHIVE_TAG,
+                CHAT_ROOM_ACTIONS_LEAVE_TAG,
+            ).inOrder()
+        }
+
+    @Test
+    fun `test that getChatRoomActions returns empty for an unknown chat`() = runTest {
+        stubChatRooms()
+
+        assertThat(underTest.getChatRoomActions(999L)).isEmpty()
+    }
+
+    @Test
+    fun `test that onChatRoomActionSelected runs the picked action on the chat`() = runTest {
+        stubChatRooms(
+            chats = listOf(
+                ChatRoomItem.IndividualChatRoomItem(
+                    chatId = 1L,
+                    title = "Chat",
+                    hasPermissions = true,
+                )
+            ),
+            meetings = emptyList(),
+        )
+
+        underTest.onChatRoomActionSelected(1L, CHAT_ROOM_ACTIONS_MUTE_TAG)
+        advanceUntilIdle()
+
+        verify(muteChatNotificationForChatRoomsUseCase)(
+            chatIdList = listOf(1L),
+            muteOption = ChatPushNotificationMuteOption.MuteUntilTurnBackOn,
+        )
+    }
+
+    @Test
+    fun `test that onChatRoomActionSelected does nothing for an unknown chat`() = runTest {
+        stubChatRooms()
+
+        underTest.onChatRoomActionSelected(999L, CHAT_ROOM_ACTIONS_MUTE_TAG)
+        advanceUntilIdle()
+
+        verifyNoInteractions(muteChatNotificationForChatRoomsUseCase)
     }
 
     private fun stubChatRooms(

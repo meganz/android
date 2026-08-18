@@ -43,12 +43,15 @@ import java.io.File
  * @param item Row content.
  * @param onItemClick Callback when the row is clicked, with the chat id.
  * @param modifier [Modifier]
+ * @param onItemLongClick Optional callback when the row is long-pressed, with the chat id;
+ * when null the row has no long-press affordance.
  */
 @Composable
 internal fun ChatRoomItemView(
     item: ChatRoomUiItem,
     onItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    onItemLongClick: ((Long) -> Unit)? = null,
 ) {
     GenericListItem(
         modifier = modifier.testTag(CHAT_ROOM_ITEM_TAG),
@@ -116,6 +119,7 @@ internal fun ChatRoomItemView(
             }
         },
         onClickListener = { onItemClick(item.chatId) },
+        onLongClickListener = onItemLongClick?.let { { it(item.chatId) } },
     )
 }
 

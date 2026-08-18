@@ -3784,4 +3784,20 @@
     <string name="chat_last_message_sender_me">Me</string>
     <!-- Chat list last-message preview sender prefix used when a group-chat message sender's name cannot be resolved -->
     <string name="chat_last_message_sender_unknown">Unknown name</string>
+    <!-- Chat list item action that mutes notifications for the chat -->
+    <string name="general_mute">Mute</string>
+    <!-- Chat list item action that unmutes notifications for the chat -->
+    <string name="general_unmute">Unmute</string>
+    <!-- Chat list item action that archives the chat -->
+    <string name="general_archive">Archive</string>
+    <!-- Chat list item action that unarchives the chat -->
+    <string name="general_unarchive">Unarchive</string>
+    <!-- Chat list item action, and confirmation dialog title, for clearing the chat's message history -->
+    <string name="title_properties_chat_clear">Clear chat history</string>
+    <!-- Message of the confirmation dialog shown before clearing a chat's message history -->
+    <string name="confirmation_clear_chat_history">Are you sure you want to clear the full message history of this conversation?</string>
+    <!-- Title of the confirmation dialog shown before leaving a group chat -->
+    <string name="title_confirmation_leave_group_chat">Leave group chat?</string>
+    <!-- Message of the confirmation dialog shown before leaving a group chat -->
+    <string name="confirmation_leave_group_chat">If you leave, you will no longer have access to read or send messages.</string>
 </resources>

@@ -37,6 +37,8 @@ fun ChatListEntry(
             navigationHandler.navigate(ShowChatMessagesNavKey(chatId))
         },
         onSearchQueryChange = viewModel::onSearchQueryChange,
+        resolveActions = viewModel::getChatRoomActions,
+        onActionSelected = viewModel::onChatRoomActionSelected,
     )
 }
 

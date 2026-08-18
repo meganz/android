@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -25,6 +26,8 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
+import mega.privacy.android.feature.chat.list.model.ChatRoomActionUiItem
+import mega.privacy.android.feature.chat.list.model.ChatRoomActionsUiState
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.shared.chats.components.ChatsViewSkeleton
 import mega.privacy.android.shared.resources.R as sharedR
@@ -32,7 +35,8 @@ import mega.privacy.android.shared.resources.R as sharedR
 /**
  * Chat list screen with Chats and Meetings tabs and in-tab search.
  *
- * Owns the search field state and delegates rendering to [ChatListScreenContent].
+ * Owns the search field state and the per-row actions overlay, and delegates rendering to
+ * [ChatListScreenContent].
  *
  * @param uiState UI state of the screen.
  * @param showMeetingTab Whether the Meetings tab should be initially selected.
@@ -40,6 +44,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onItemClick Callback when a chat room row is clicked, with the chat id.
  * @param onSearchQueryChange Callback when the search query changes, with `null` when cleared.
  * @param modifier [Modifier]
+ * @param resolveActions Resolves the ordered actions for a chat when its sheet is opened.
+ * @param onActionSelected Runs the picked action, with the chat id and the action's identity.
  */
 @Composable
 internal fun ChatListScreen(
@@ -49,9 +55,14 @@ internal fun ChatListScreen(
     onItemClick: (Long) -> Unit,
     onSearchQueryChange: (String?) -> Unit,
     modifier: Modifier = Modifier,
+    resolveActions: suspend (Long) -> List<ChatRoomActionUiItem> = { emptyList() },
+    onActionSelected: (Long, String) -> Unit = { _, _ -> },
 ) {
     var searchMode by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
+    var actionsState by rememberSaveable(stateSaver = ChatRoomActionsUiState.Saver) {
+        mutableStateOf<ChatRoomActionsUiState>(ChatRoomActionsUiState.Hidden)
+    }
 
     LaunchedEffect(searchMode) {
         if (!searchMode && searchQuery.isNotEmpty()) {
@@ -73,7 +84,78 @@ internal fun ChatListScreen(
             onSearchQueryChange(it.ifBlank { null })
         },
         modifier = modifier,
+        onItemLongClick = { chatId ->
+            actionsState = ChatRoomActionsUiState.ShowingActions(chatId)
+        },
     )
+
+    ChatRoomActionsOverlay(
+        actionsState = actionsState,
+        resolveActions = resolveActions,
+        onStateChange = { actionsState = it },
+        onActionSelected = onActionSelected,
+    )
+}
+
+@Composable
+private fun ChatRoomActionsOverlay(
+    actionsState: ChatRoomActionsUiState,
+    resolveActions: suspend (Long) -> List<ChatRoomActionUiItem>,
+    onStateChange: (ChatRoomActionsUiState) -> Unit,
+    onActionSelected: (Long, String) -> Unit,
+) {
+    when (actionsState) {
+        ChatRoomActionsUiState.Hidden -> Unit
+
+        is ChatRoomActionsUiState.ShowingActions -> {
+            val chatId = actionsState.chatId
+            var actions by remember(chatId) {
+                mutableStateOf<List<ChatRoomActionUiItem>?>(null)
+            }
+            LaunchedEffect(chatId) {
+                val resolved = resolveActions(chatId)
+                if (resolved.isEmpty()) {
+                    onStateChange(ChatRoomActionsUiState.Hidden)
+                } else {
+                    actions = resolved
+                }
+            }
+            actions?.let { resolved ->
+                ChatRoomActionsBottomSheet(
+                    actions = resolved,
+                    onDismiss = { onStateChange(ChatRoomActionsUiState.Hidden) },
+                    onActionClick = { action ->
+                        val confirmation = action.confirmation
+                        if (confirmation != null) {
+                            onStateChange(
+                                ChatRoomActionsUiState.Confirming(
+                                    chatId = chatId,
+                                    actionId = action.testTag,
+                                    confirmation = confirmation,
+                                )
+                            )
+                        } else {
+                            onActionSelected(chatId, action.testTag)
+                            onStateChange(ChatRoomActionsUiState.Hidden)
+                        }
+                    },
+                )
+            }
+        }
+
+        is ChatRoomActionsUiState.Confirming -> {
+            val chatId = actionsState.chatId
+            val actionId = actionsState.actionId
+            ChatRoomActionConfirmationDialog(
+                confirmation = actionsState.confirmation,
+                onConfirm = {
+                    onActionSelected(chatId, actionId)
+                    onStateChange(ChatRoomActionsUiState.Hidden)
+                },
+                onDismiss = { onStateChange(ChatRoomActionsUiState.Hidden) },
+            )
+        }
+    }
 }
 
 /**
@@ -88,6 +170,7 @@ internal fun ChatListScreen(
  * @param onSearchModeChange Callback when the search field is opened or closed.
  * @param onQueryChange Callback when the search query text changes.
  * @param modifier [Modifier]
+ * @param onItemLongClick Optional callback when a chat room row is long-pressed, with the chat id.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,6 +184,7 @@ internal fun ChatListScreenContent(
     onSearchModeChange: (Boolean) -> Unit,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    onItemLongClick: ((Long) -> Unit)? = null,
 ) {
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
@@ -147,6 +231,7 @@ internal fun ChatListScreenContent(
                             contentPadding = PaddingValues(
                                 bottom = paddingValues.calculateBottomPadding(),
                             ),
+                            onItemLongClick = onItemLongClick,
                         )
                     }
                     addTextTabWithScrollableContent(
@@ -163,6 +248,7 @@ internal fun ChatListScreenContent(
                             contentPadding = PaddingValues(
                                 bottom = paddingValues.calculateBottomPadding(),
                             ),
+                            onItemLongClick = onItemLongClick,
                         )
                     }
                 },
