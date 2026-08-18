@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.banner.HOME_BANNER_MIN_HEIGHT_DP
-import mega.android.core.ui.components.button.PrimaryFilledButtonM3XSmall
+import mega.android.core.ui.components.button.PrimaryFilledButtonXXSmall
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
@@ -46,7 +46,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
  * button top-padding) so the offer card is the same height as the other cards in the carousel. Only
  * the palette differs: the campaign artwork is always light, so the content is themed light via
  * [AndroidTheme] with `isDark = false`, giving dark [TextColor.Primary] copy, a dark
- * [PrimaryFilledButtonM3XSmall] "Grab deal" button and a dark dismiss icon regardless of the device
+ * [PrimaryFilledButtonXXSmall] "Grab deal" button and a dark dismiss icon regardless of the device
  * theme. `useLegacyStatusBarColor = false` keeps the forced theme from touching the window.
  *
  * @param title Banner copy; the campaign headline and price on two lines (`"headline\nprice"`).
@@ -93,7 +93,7 @@ internal fun HomeOfferBanner(
                     modifier = Modifier
                         .weight(0.7f)
                         .wrapContentHeight()
-                        .padding(start = spacing.x4, top = spacing.x2),
+                        .padding(start = spacing.x4),
                     verticalArrangement = Arrangement.Top,
                 ) {
                     MegaText(
@@ -108,7 +108,7 @@ internal fun HomeOfferBanner(
                             .heightIn(min = 32.dp)
                             .testTag(HOME_OFFER_BANNER_TITLE_TAG),
                     )
-                    PrimaryFilledButtonM3XSmall(
+                    PrimaryFilledButtonXXSmall(
                         modifier = Modifier
                             .padding(top = 10.dp)
                             .testTag(HOME_OFFER_BANNER_BUTTON_TAG),
@@ -127,8 +127,8 @@ internal fun HomeOfferBanner(
             MegaIcon(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(end = 4.dp, top = 4.dp)
-                    .size(spacing.x24)
+                    .padding(end = spacing.x8, top = spacing.x8)
+                    .size(spacing.x16)
                     .clickable { onDismissClick() }
                     .testTag(HOME_OFFER_BANNER_DISMISS_TAG),
                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),

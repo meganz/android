@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.payment.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,9 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,7 +33,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.button.PrimaryFilledButtonM3XSmall
+import mega.android.core.ui.components.button.PrimaryFilledButtonXSmall
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
@@ -174,34 +173,28 @@ private fun OfferBannerContent(
                 modifier = Modifier.testTag(TEST_TAG_OFFER_BANNER_SUBTITLE),
             )
         }
-        IconButton(
-            onClick = onDismissClick,
+        MegaIcon(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 8.dp, end = 12.dp)
                 .size(16.dp)
-                .wrapContentSize(unbounded = true, align = Alignment.Center)
-                .size(40.dp)
+                .clickable { onDismissClick() }
                 .testTag(TEST_TAG_OFFER_BANNER_DISMISS),
-        ) {
-            MegaIcon(
-                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
-                tint = IconColor.Primary,
-                contentDescription = stringResource(sharedR.string.general_dismiss_dialog),
-                modifier = Modifier.size(16.dp),
-            )
-        }
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
+            tint = IconColor.Primary,
+            contentDescription = stringResource(sharedR.string.general_dismiss_dialog),
+        )
         Row(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .fillMaxWidth()
-                .padding(start = 12.dp, end = 12.dp, bottom = 14.dp),
+                .padding(start = 12.dp, end = 12.dp, bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(modifier = Modifier.weight(1f)) {
                 OfferBannerCountdown(remaining = remaining)
             }
-            PrimaryFilledButtonM3XSmall(
+            PrimaryFilledButtonXSmall(
                 text = actionButtonText,
                 onClick = onActionClick,
                 modifier = Modifier.testTag(TEST_TAG_OFFER_BANNER_BUTTON),
@@ -289,7 +282,7 @@ private fun CountdownUnit(
         )
         MegaText(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal),
             textColor = TextColor.Secondary,
         )
     }
