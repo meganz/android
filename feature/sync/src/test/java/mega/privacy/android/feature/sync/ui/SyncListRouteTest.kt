@@ -2,11 +2,18 @@ package mega.privacy.android.feature.sync.ui
 
 import androidx.activity.ComponentActivity
 import kotlinx.collections.immutable.toImmutableList
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -16,6 +23,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -33,6 +41,7 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
+import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesState
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesState
@@ -301,6 +310,128 @@ internal class SyncListRouteTest {
             "Camera uploads",
         )
         assertThat(hostState.currentSnackbarData?.visuals?.message).isEqualTo(expected)
+    }
+
+    /**
+     * Mirrors how Cloud Drive hosts the Syncs tab: the host owns the scaffold, and so the only
+     * snackbar host, while the tab supplies content only.
+     */
+    @OptIn(ExperimentalMaterial3Api::class)
+    private fun setComposeContentInHostScaffold(hostState: SnackbarHostState) {
+        composeTestRule.setContent {
+            CompositionLocalProvider(LocalSnackBarHostState provides hostState) {
+                MegaScaffoldWithTopAppBarScrollBehavior { paddingValues ->
+                    SyncListRoute(
+                        isInCloudDrive = true,
+                        viewModel = viewModel,
+                        syncPermissionsManager = syncPermissionsManager,
+                        onSyncFolderClicked = {},
+                        onBackupFolderClicked = {},
+                        onSelectStopBackupDestinationClicked = {},
+                        onOpenUpgradeAccountClicked = {},
+                        syncFoldersViewModel = syncFoldersViewModel,
+                        syncStalledIssuesViewModel = syncStalledIssuesViewModel,
+                        syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
+                        syncIssueNotificationViewModel = syncIssueNotificationViewModel,
+                        onSyncSettingsClicked = {},
+                        onOpenMegaFolderClicked = {},
+                        onCameraUploadsSettingsClicked = {},
+                        onStalledIssueMoreClicked = {},
+                    )
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun `test that the stalled issues snackbar is displayed once when the sync list is hosted as a tab`() {
+        whenever(syncStalledIssuesState.value).thenReturn(
+            SyncStalledIssuesState(
+                stalledIssues = emptyList(),
+                snackbarMessageContent = triggered(sharedR.string.sync_stalled_issue_resolved),
+            )
+        )
+
+        setComposeContentInHostScaffold(SnackbarHostState())
+
+        val message =
+            composeTestRule.activity.getString(sharedR.string.sync_stalled_issue_resolved)
+        composeTestRule.onAllNodesWithText(message).assertCountEquals(1)
+    }
+
+    @Test
+    fun `test that the sync folders snackbar is displayed once when the sync list is hosted as a tab`() {
+        whenever(syncFoldersUiState.value).thenReturn(
+            SyncFoldersUiState(
+                syncUiItems = synUiItems.toImmutableList(),
+                snackbarMessage = sharedR.string.sync_snackbar_message_confirm_sync_stopped,
+            )
+        )
+
+        setComposeContentInHostScaffold(SnackbarHostState())
+
+        val message = composeTestRule.activity.getString(
+            sharedR.string.sync_snackbar_message_confirm_sync_stopped
+        )
+        composeTestRule.onAllNodesWithText(message).assertCountEquals(1)
+    }
+
+    private val manySyncUiItems = (0 until 30).map { index ->
+        synUiItems.first().copy(id = index.toLong(), folderPairName = "Folder Name $index")
+    }
+
+    @Test
+    fun `test that the standalone screen FAB sits at the bottom end of the screen`() {
+        whenever(syncFoldersUiState.value).thenReturn(
+            SyncFoldersUiState(syncUiItems = manySyncUiItems.toImmutableList())
+        )
+        setComposeContent()
+        composeTestRule.waitForIdle()
+
+        val root = composeTestRule.onRoot().getUnclippedBoundsInRoot()
+        val fab = composeTestRule
+            .onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
+            .getUnclippedBoundsInRoot()
+
+        assertThat((root.bottom - fab.bottom).value).isWithin(0.5f).of(16f)
+        assertThat((root.right - fab.right).value).isWithin(0.5f).of(16f)
+    }
+
+    @Test
+    fun `test that the FAB stays anchored to the bottom of the tab while the sync list scrolls`() {
+        whenever(syncFoldersUiState.value).thenReturn(
+            SyncFoldersUiState(syncUiItems = manySyncUiItems.toImmutableList())
+        )
+        setComposeContentInHostScaffold(SnackbarHostState())
+
+        val before = composeTestRule
+            .onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
+            .getUnclippedBoundsInRoot()
+        composeTestRule.onRoot().performTouchInput { swipeUp() }
+        composeTestRule.waitForIdle()
+        val after = composeTestRule
+            .onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
+            .getUnclippedBoundsInRoot()
+
+        assertThat(after.top).isEqualTo(before.top)
+        assertThat(after.left).isEqualTo(before.left)
+    }
+
+    @Test
+    fun `test that the tab FAB sits at the bottom end of the tab area`() {
+        whenever(syncFoldersUiState.value).thenReturn(
+            SyncFoldersUiState(syncUiItems = manySyncUiItems.toImmutableList())
+        )
+        setComposeContentInHostScaffold(SnackbarHostState())
+
+        val root = composeTestRule.onRoot().getUnclippedBoundsInRoot()
+        val fab = composeTestRule
+            .onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
+            .getUnclippedBoundsInRoot()
+
+        assertThat((root.bottom - fab.bottom).value).isWithin(0.5f).of(16f)
+        assertThat((root.right - fab.right).value).isWithin(0.5f).of(16f)
     }
 
     private fun setComposeContentWithDisposeSwitch() = mutableStateOf(true).also { switch ->

@@ -8,7 +8,6 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,46 +16,43 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.persistentListOf
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.banner.InlineWarningBanner
 import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
-import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
+import mega.privacy.android.feature.sync.ui.SyncMonitorState
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.STALLED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesState
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
-import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesRoute
-import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
-import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesRoute
-import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
+import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesState
 import mega.privacy.android.feature.sync.ui.views.SyncNotificationWarningBanner
 import mega.privacy.android.feature.sync.ui.views.SyncPermissionWarningBanner
 import mega.privacy.android.feature.sync.ui.views.SyncStorageQuotaExceedWarning
@@ -76,34 +72,32 @@ import mega.privacy.mobile.analytics.event.SyncListFoldersButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncListIssuesButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncListSolvedIssuesButtonPressedEvent
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Standalone sync list screen. It owns the screen shell — top app bar, FAB and the single
+ * snackbar host — so it must not be used where an ancestor already provides one.
+ */
 @Composable
 internal fun SyncListScreen(
+    syncFoldersUiState: SyncFoldersUiState,
+    syncStalledIssuesState: SyncStalledIssuesState,
+    syncSolvedIssuesState: SyncSolvedIssuesState,
+    syncNotificationState: SyncMonitorState,
     stalledIssuesCount: Int,
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
-    onOpenMegaFolderClicked: (handle: Long) -> Unit,
-    onCameraUploadsSettingsClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
     actions: List<MenuAction>,
     onActionPressed: (MenuAction) -> Unit,
-    onSelectStopBackupDestinationClicked: (String?) -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
-    syncFoldersViewModel: SyncFoldersViewModel,
-    syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
-    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
-    syncIssueNotificationViewModel: SyncIssueNotificationViewModel,
+    onDismissNotification: () -> Unit,
+    onSyncRefresh: () -> Unit,
     title: String,
-    onStalledIssueMoreClicked: (issueId: String) -> Unit,
-    isInCloudDrive: Boolean = false,
+    chipContent: @Composable (chip: SyncChip, onIssuesInfoClicked: () -> Unit) -> Unit,
     selectedChip: SyncChip = SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
-    val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
-    val syncStalledIssueState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
 
     var isWarningBannerDisplayed by rememberSaveable { mutableStateOf(false) }
     ComposableLifecycle { event ->
@@ -114,132 +108,199 @@ internal fun SyncListScreen(
     }
 
     val multiFabState = rememberMultiFloatingActionButtonState()
-
-    DisposableEffect(multiFabState.value) {
-        onFabExpanded(multiFabState.value == MultiFloatingActionButtonState.EXPANDED)
-        onDispose { }
-    }
+    FabExpandedEffect(multiFabState, onFabExpanded)
 
     MegaScaffold(
-        contentWindowInsets = if (isInCloudDrive) WindowInsets(0.dp) else ScaffoldDefaults.contentWindowInsets,
         topBar = {
-            if (!isInCloudDrive) {
-                MegaTopAppBar(
-                    title = title.ifEmpty { stringResource(R.string.sync_toolbar_title) },
-                    navigationType = AppBarNavigationType.Back {
-                        onBackPressedDispatcher?.onBackPressed()
-                    },
-                    actions = actions.map { action ->
-                        MenuActionWithClick(action) { onActionPressed(action) }
-                    },
-                    // M3 draws the separator from scroll state rather than a fixed elevation.
-                    drawBottomLineOnScrolledContent = isWarningBannerDisplayed ||
-                            syncFoldersState.isWarningBannerDisplayed,
-                )
-            }
+            MegaTopAppBar(
+                title = title.ifEmpty { stringResource(R.string.sync_toolbar_title) },
+                navigationType = AppBarNavigationType.Back {
+                    onBackPressedDispatcher?.onBackPressed()
+                },
+                actions = actions.map { action ->
+                    MenuActionWithClick(action) { onActionPressed(action) }
+                },
+                // M3 draws the separator from scroll state rather than a fixed elevation.
+                drawBottomLineOnScrolledContent = isWarningBannerDisplayed ||
+                        syncFoldersUiState.isWarningBannerDisplayed,
+            )
         },
         floatingActionButton = {
-            if ((syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) && syncFoldersState.isStorageOverQuota.not()) {
-                MegaMultiFloatingActionButton(
-                    items = listOf(
-                        MultiFloatingActionButtonItem(
-                            icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
-                            label = stringResource(id = R.string.sync_toolbar_title),
-                            onClicked = {
-                                Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
-                                onSyncFolderClicked()
-                                multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
-                            },
-                        ),
-                        MultiFloatingActionButtonItem(
-                            icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
-                            label = stringResource(id = sharedR.string.sync_add_new_backup_toolbar_title),
-                            onClicked = {
-                                Analytics.tracker.trackEvent(AndroidBackupFABButtonPressedEvent)
-                                onBackupFolderClicked()
-                                multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
-                            },
-                        ),
-                    ),
-                    modifier = Modifier
-                        .testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
-                        .navigationBarsPadding(),
-                    multiFabState = multiFabState,
-                    onStateChanged = { state ->
-                        if (state == MultiFloatingActionButtonState.EXPANDED) {
-                            Analytics.tracker.trackEvent(
-                                AndroidSyncMultiFABButtonPressedEvent
-                            )
-                        }
-                        onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
-                        multiFabState.value = state
-                    },
-                    isCircular = false,
-                )
-            }
+            SyncListFab(
+                modifier = Modifier.navigationBarsPadding(),
+                syncFoldersUiState = syncFoldersUiState,
+                multiFabState = multiFabState,
+                onSyncFolderClicked = onSyncFolderClicked,
+                onBackupFolderClicked = onBackupFolderClicked,
+                onFabExpanded = onFabExpanded,
+            )
         },
         content = { paddingValues ->
-            SyncListScreenContent(
-                syncFoldersUiState = syncFoldersState,
-                syncStalledIssuesState = syncStalledIssueState,
+            SyncListContent(
                 modifier = Modifier
                     .padding(paddingValues)
-                    .conditional(multiFabState.value == MultiFloatingActionButtonState.EXPANDED) {
-                        clickable(
-                            interactionSource = null,
-                            indication = null,
-                        ) {
-                            multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
-                        }
-                    },
+                    .collapseFabOnTap(multiFabState),
+                syncFoldersUiState = syncFoldersUiState,
+                syncStalledIssuesState = syncStalledIssuesState,
+                syncSolvedIssuesState = syncSolvedIssuesState,
+                syncNotificationState = syncNotificationState,
                 stalledIssuesCount = stalledIssuesCount,
-                moreClicked = { stalledIssueItem ->
-                    onStalledIssueMoreClicked(stalledIssueItem.id)
-                },
-                onAddNewSyncClicked = onSyncFolderClicked,
-                onAddNewBackupClicked = onBackupFolderClicked,
-                onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                 syncPermissionsManager = syncPermissionsManager,
-                onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                 onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
-                onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
-                syncFoldersViewModel = syncFoldersViewModel,
-                syncStalledIssuesViewModel = syncStalledIssuesViewModel,
-                syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
-                syncIssueNotificationViewModel = syncIssueNotificationViewModel,
-                deviceName = title,
+                onDismissNotification = onDismissNotification,
+                onSyncRefresh = onSyncRefresh,
                 selectedChip = selectedChip,
+                chipContent = chipContent,
             )
         },
     )
 }
 
+/**
+ * Sync list as a tab of another screen. The host screen owns the scaffold, top app bar and
+ * snackbar host; adding a second scaffold here would render every snackbar twice.
+ */
+@Composable
+internal fun SyncListTabContent(
+    syncFoldersUiState: SyncFoldersUiState,
+    syncStalledIssuesState: SyncStalledIssuesState,
+    syncSolvedIssuesState: SyncSolvedIssuesState,
+    syncNotificationState: SyncMonitorState,
+    stalledIssuesCount: Int,
+    onSyncFolderClicked: () -> Unit,
+    onBackupFolderClicked: () -> Unit,
+    syncPermissionsManager: SyncPermissionsManager,
+    onOpenUpgradeAccountClicked: () -> Unit,
+    onDismissNotification: () -> Unit,
+    onSyncRefresh: () -> Unit,
+    chipContent: @Composable (chip: SyncChip, onIssuesInfoClicked: () -> Unit) -> Unit,
+    modifier: Modifier = Modifier,
+    selectedChip: SyncChip = SYNC_FOLDERS,
+    onFabExpanded: (Boolean) -> Unit = {},
+) {
+    val multiFabState = rememberMultiFloatingActionButtonState()
+    FabExpandedEffect(multiFabState, onFabExpanded)
+
+    Box(modifier = modifier.fillMaxSize()) {
+        SyncListContent(
+            modifier = Modifier
+                .fillMaxSize()
+                .collapseFabOnTap(multiFabState),
+            syncFoldersUiState = syncFoldersUiState,
+            syncStalledIssuesState = syncStalledIssuesState,
+            syncSolvedIssuesState = syncSolvedIssuesState,
+            syncNotificationState = syncNotificationState,
+            stalledIssuesCount = stalledIssuesCount,
+            syncPermissionsManager = syncPermissionsManager,
+            onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
+            onDismissNotification = onDismissNotification,
+            onSyncRefresh = onSyncRefresh,
+            selectedChip = selectedChip,
+            chipContent = chipContent,
+        )
+        SyncListFab(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .navigationBarsPadding()
+                .padding(16.dp),
+            syncFoldersUiState = syncFoldersUiState,
+            multiFabState = multiFabState,
+            onSyncFolderClicked = onSyncFolderClicked,
+            onBackupFolderClicked = onBackupFolderClicked,
+            onFabExpanded = onFabExpanded,
+        )
+    }
+}
+
+@Composable
+private fun SyncListFab(
+    syncFoldersUiState: SyncFoldersUiState,
+    multiFabState: MutableState<MultiFloatingActionButtonState>,
+    onSyncFolderClicked: () -> Unit,
+    onBackupFolderClicked: () -> Unit,
+    onFabExpanded: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val hasSyncs = syncFoldersUiState.syncUiItems.isNotEmpty() || syncFoldersUiState.isLoading
+    if (hasSyncs && syncFoldersUiState.isStorageOverQuota.not()) {
+        // MegaMultiFloatingActionButton applies its modifier to the button itself, not to the
+        // root of the expandable column, so positioning has to be applied to a wrapper.
+        Box(modifier = modifier) {
+            MegaMultiFloatingActionButton(
+                items = listOf(
+                    MultiFloatingActionButtonItem(
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
+                        label = stringResource(id = R.string.sync_toolbar_title),
+                        onClicked = {
+                            Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
+                            onSyncFolderClicked()
+                            multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
+                        },
+                    ),
+                    MultiFloatingActionButtonItem(
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
+                        label = stringResource(id = sharedR.string.sync_add_new_backup_toolbar_title),
+                        onClicked = {
+                            Analytics.tracker.trackEvent(AndroidBackupFABButtonPressedEvent)
+                            onBackupFolderClicked()
+                            multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
+                        },
+                    ),
+                ),
+                modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
+                multiFabState = multiFabState,
+                onStateChanged = { state ->
+                    if (state == MultiFloatingActionButtonState.EXPANDED) {
+                        Analytics.tracker.trackEvent(AndroidSyncMultiFABButtonPressedEvent)
+                    }
+                    onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
+                    multiFabState.value = state
+                },
+                isCircular = false,
+            )
+        }
+    }
+}
+
+@Composable
+private fun FabExpandedEffect(
+    multiFabState: MutableState<MultiFloatingActionButtonState>,
+    onFabExpanded: (Boolean) -> Unit,
+) {
+    DisposableEffect(multiFabState.value) {
+        onFabExpanded(multiFabState.value == MultiFloatingActionButtonState.EXPANDED)
+        onDispose { }
+    }
+}
+
+private fun Modifier.collapseFabOnTap(
+    multiFabState: MutableState<MultiFloatingActionButtonState>,
+) = conditional(multiFabState.value == MultiFloatingActionButtonState.EXPANDED) {
+    clickable(
+        interactionSource = null,
+        indication = null,
+    ) {
+        multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-private fun SyncListScreenContent(
+private fun SyncListContent(
     modifier: Modifier,
     syncFoldersUiState: SyncFoldersUiState,
     syncStalledIssuesState: SyncStalledIssuesState,
+    syncSolvedIssuesState: SyncSolvedIssuesState,
+    syncNotificationState: SyncMonitorState,
     stalledIssuesCount: Int,
-    moreClicked: (StalledIssueUiItem) -> Unit,
-    onAddNewSyncClicked: () -> Unit,
-    onAddNewBackupClicked: () -> Unit,
-    onOpenMegaFolderClicked: (handle: Long) -> Unit,
-    onCameraUploadsSettingsClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
-    onSelectStopBackupDestinationClicked: (String?) -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
-    syncFoldersViewModel: SyncFoldersViewModel,
-    syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
-    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
-    syncIssueNotificationViewModel: SyncIssueNotificationViewModel,
-    deviceName: String,
+    onDismissNotification: () -> Unit,
+    onSyncRefresh: () -> Unit,
+    chipContent: @Composable (chip: SyncChip, onIssuesInfoClicked: () -> Unit) -> Unit,
     selectedChip: SyncChip = SYNC_FOLDERS,
 ) {
     var checkedChip by rememberSaveable { mutableStateOf(selectedChip) }
-
-    val syncSolvedIssuesState by syncSolvedIssuesViewModel.state.collectAsStateWithLifecycle()
-    val issueNotificationState by syncIssueNotificationViewModel.state.collectAsStateWithLifecycle()
 
     val isSyncNotEmpty = syncFoldersUiState.syncUiItems.isNotEmpty()
 
@@ -252,8 +313,8 @@ private fun SyncListScreenContent(
                 isDisableBatteryOptimizationEnabled = syncFoldersUiState.isDisableBatteryOptimizationEnabled
             )
             SyncNotificationWarningBanner(
-                issueNotificationState,
-                onDismissNotification = syncIssueNotificationViewModel::dismissNotification,
+                syncNotificationState,
+                onDismissNotification = onDismissNotification,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             if (syncFoldersUiState.syncUiItems.isNotEmpty() && syncFoldersUiState.isLowBatteryLevel) {
@@ -277,26 +338,10 @@ private fun SyncListScreenContent(
             modifier = Modifier.fillMaxSize(),
             isRefreshing = isSyncNotEmpty && syncFoldersUiState.isRefreshing,
             onRefresh = {
-                if (isSyncNotEmpty) syncFoldersViewModel.onSyncRefresh()
+                if (isSyncNotEmpty) onSyncRefresh()
             },
         ) {
-            SelectedChipScreen(
-                onAddNewSyncClicked = onAddNewSyncClicked,
-                onAddNewBackupClicked = onAddNewBackupClicked,
-                onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
-                onOpenMegaFolderClicked = onOpenMegaFolderClicked,
-                onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
-                moreClicked = moreClicked,
-                issuesInfoClicked = {
-                    checkedChip = STALLED_ISSUES
-                },
-                checkedChip = checkedChip,
-                syncStalledIssuesViewModel = syncStalledIssuesViewModel,
-                syncFoldersViewModel = syncFoldersViewModel,
-                syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
-                syncFoldersUiState = syncFoldersUiState,
-                deviceName = deviceName,
-            )
+            chipContent(checkedChip) { checkedChip = STALLED_ISSUES }
         }
     }
 }
@@ -351,47 +396,24 @@ internal fun HeaderChips(
     }
 }
 
+@CombinedThemePreviews
 @Composable
-private fun SelectedChipScreen(
-    onAddNewSyncClicked: () -> Unit,
-    onAddNewBackupClicked: () -> Unit,
-    onSelectStopBackupDestinationClicked: (String?) -> Unit,
-    onOpenMegaFolderClicked: (handle: Long) -> Unit,
-    onCameraUploadsSettingsClicked: () -> Unit,
-    moreClicked: (StalledIssueUiItem) -> Unit,
-    issuesInfoClicked: () -> Unit,
-    checkedChip: SyncChip,
-    syncFoldersViewModel: SyncFoldersViewModel,
-    syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
-    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
-    syncFoldersUiState: SyncFoldersUiState,
-    deviceName: String,
-) {
-    when (checkedChip) {
-        SYNC_FOLDERS -> {
-            SyncFoldersRoute(
-                onAddNewSyncClicked = onAddNewSyncClicked,
-                onAddNewBackupClicked = onAddNewBackupClicked,
-                onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
-                issuesInfoClicked = issuesInfoClicked,
-                viewModel = syncFoldersViewModel,
-                uiState = syncFoldersUiState,
-                deviceName = deviceName,
-                onOpenMegaFolderClicked = onOpenMegaFolderClicked,
-                onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
-            )
-        }
-
-        STALLED_ISSUES -> {
-            SyncStalledIssuesRoute(
-                moreClicked = moreClicked,
-                viewModel = syncStalledIssuesViewModel
-            )
-        }
-
-        SOLVED_ISSUES -> {
-            SyncSolvedIssuesRoute(viewModel = syncSolvedIssuesViewModel)
-        }
+private fun SyncListTabContentPreview() {
+    AndroidThemeForPreviews {
+        SyncListTabContent(
+            syncFoldersUiState = SyncFoldersUiState(syncUiItems = persistentListOf()),
+            syncStalledIssuesState = SyncStalledIssuesState(stalledIssues = emptyList()),
+            syncSolvedIssuesState = SyncSolvedIssuesState(),
+            syncNotificationState = SyncMonitorState(),
+            stalledIssuesCount = 0,
+            onSyncFolderClicked = {},
+            onBackupFolderClicked = {},
+            syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
+            onOpenUpgradeAccountClicked = {},
+            onDismissNotification = {},
+            onSyncRefresh = {},
+            chipContent = { _, _ -> },
+        )
     }
 }
 

@@ -85,7 +85,7 @@ class SyncFoldersScreenTest {
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
-                viewModel = viewModel,
+                onAction = viewModel::handleAction,
                 onSelectStopBackupDestinationClicked = {},
                 onAddNewSyncClicked = {},
                 onAddNewBackupClicked = {},
@@ -110,7 +110,7 @@ class SyncFoldersScreenTest {
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
-                viewModel = viewModel,
+                onAction = viewModel::handleAction,
                 onAddNewSyncClicked = {},
                 onAddNewBackupClicked = {},
                 onSelectStopBackupDestinationClicked = {},
@@ -142,7 +142,7 @@ class SyncFoldersScreenTest {
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
-                viewModel = viewModel,
+                onAction = viewModel::handleAction,
                 onAddNewSyncClicked = {},
                 onAddNewBackupClicked = {},
                 onSelectStopBackupDestinationClicked = {},

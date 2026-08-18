@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +34,8 @@ internal class SyncStalledIssuesViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(SyncStalledIssuesState(emptyList()))
     val state: StateFlow<SyncStalledIssuesState> = _state.asStateFlow()
+
+    private var resolveStalledIssueJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -63,7 +66,10 @@ internal class SyncStalledIssuesViewModel @Inject constructor(
     fun handleAction(action: SyncListAction) {
         when (action) {
             is SyncListAction.ResolveStalledIssue -> {
-                viewModelScope.launch {
+                // A second tap on the confirmation dialog, before it leaves the composition,
+                // would otherwise resolve the same issue twice.
+                if (resolveStalledIssueJob?.isActive == true) return
+                resolveStalledIssueJob = viewModelScope.launch {
                     if (action.isApplyToAll) {
                         val groupedIssues =
                             _state.value.stalledIssues.filter { it.issueType == action.uiItem.issueType }

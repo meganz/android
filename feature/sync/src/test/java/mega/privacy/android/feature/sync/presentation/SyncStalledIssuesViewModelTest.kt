@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
@@ -30,8 +31,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -45,6 +49,11 @@ internal class SyncStalledIssuesViewModelTest {
     private val resolveStalledIssueUseCase: ResolveStalledIssueUseCase = mock()
 
     private lateinit var underTest: SyncStalledIssuesViewModel
+
+    private val resolutionAction = StalledIssueResolutionAction(
+        resolutionActionType = StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE,
+        actionName = "Choose local file",
+    )
 
     private val stalledIssues = listOf(
         StalledIssue(
@@ -225,6 +234,42 @@ internal class SyncStalledIssuesViewModelTest {
     }
 
     @Test
+    fun `test that resolveStalledIssue resolves the issue once when the same issue is resolved again while the first resolution is in flight`() =
+        runTest {
+            stubEmptyStalledIssues()
+            val uiItem = stalledIssuesUiItems.first()
+            val stalledIssue: StalledIssue = mock()
+            whenever(stalledIssueItemMapper(uiItem)).thenReturn(stalledIssue)
+            val inFlight = CompletableDeferred<Unit>()
+            resolveStalledIssueUseCase.stub {
+                on { invoke(resolutionAction, stalledIssue) }
+                    .doSuspendableAnswer { inFlight.await() }
+            }
+            initViewModel()
+
+            underTest.handleAction(SyncListAction.ResolveStalledIssue(uiItem, resolutionAction))
+            underTest.handleAction(SyncListAction.ResolveStalledIssue(uiItem, resolutionAction))
+            inFlight.complete(Unit)
+
+            verify(resolveStalledIssueUseCase).invoke(resolutionAction, stalledIssue)
+        }
+
+    @Test
+    fun `test that resolveStalledIssue resolves the issue again when the previous resolution has completed`() =
+        runTest {
+            stubEmptyStalledIssues()
+            val uiItem = stalledIssuesUiItems.first()
+            val stalledIssue: StalledIssue = mock()
+            whenever(stalledIssueItemMapper(uiItem)).thenReturn(stalledIssue)
+            initViewModel()
+
+            underTest.handleAction(SyncListAction.ResolveStalledIssue(uiItem, resolutionAction))
+            underTest.handleAction(SyncListAction.ResolveStalledIssue(uiItem, resolutionAction))
+
+            verify(resolveStalledIssueUseCase, times(2)).invoke(resolutionAction, stalledIssue)
+        }
+
+    @Test
     fun `test that distinctUntilChanged prevents duplicate emissions when stalled issues are the same`() =
         runTest {
             val mutableFlow = MutableSharedFlow<List<StalledIssue>>()
@@ -256,6 +301,13 @@ internal class SyncStalledIssuesViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    private suspend fun stubEmptyStalledIssues() {
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flow {
+            emit(emptyList())
+            awaitCancellation()
+        })
+    }
 
     private fun initViewModel() {
         underTest = SyncStalledIssuesViewModel(

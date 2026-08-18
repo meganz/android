@@ -34,7 +34,7 @@ internal fun SyncFoldersRoute(
     issuesInfoClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
-    viewModel: SyncFoldersViewModel,
+    onAction: (SyncFoldersAction) -> Unit,
     uiState: SyncFoldersUiState,
     deviceName: String,
 ) {
@@ -45,12 +45,12 @@ internal fun SyncFoldersRoute(
 
     SyncFoldersScreen(
         syncUiItems = uiState.syncUiItems,
-        cardExpanded = viewModel::handleAction,
+        cardExpanded = onAction,
         pauseRunClicked = {
-            viewModel.handleAction(PauseRunClicked(it))
+            onAction(PauseRunClicked(it))
         },
         removeFolderClicked = {
-            viewModel.handleAction(RemoveFolderClicked(it))
+            onAction(RemoveFolderClicked(it))
         },
         onAddNewSyncClicked = onAddNewSyncClicked,
         onAddNewBackupClicked = onAddNewBackupClicked,
@@ -75,7 +75,7 @@ internal fun SyncFoldersRoute(
         deviceName = deviceName,
         syncPauseReason = uiState.syncPauseReason,
         onLocalFolderSelected = { sync, uri ->
-            viewModel.handleAction(
+            onAction(
                 SyncFoldersAction.LocalFolderSelected(
                     syncUiItem = sync,
                     uri = uri,
@@ -90,7 +90,7 @@ internal fun SyncFoldersRoute(
                 SyncType.TYPE_BACKUP -> {
                     StopBackupConfirmationDialog(
                         onConfirm = { selectedOption, selectedFolder ->
-                            viewModel.handleAction(
+                            onAction(
                                 SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(
                                     stopBackupOption = selectedOption,
                                     selectedFolder = selectedFolder,
@@ -98,12 +98,12 @@ internal fun SyncFoldersRoute(
                             )
                         },
                         onDismiss = {
-                            viewModel.handleAction(OnRemoveFolderDialogDismissed)
+                            onAction(OnRemoveFolderDialogDismissed)
                         },
                         onSelectStopBackupDestinationClicked = { folderName ->
                             // Hide the dialog before opening the picker so a second quick tap on
                             // "Move folder to Cloud drive" cannot re-open it. See AND-22622.
-                            viewModel.handleAction(
+                            onAction(
                                 SyncFoldersAction.OnStopBackupMoveDestinationSelectionStarted
                             )
                             onSelectStopBackupDestinationClicked(folderName)
@@ -115,10 +115,10 @@ internal fun SyncFoldersRoute(
                 else -> {
                     StopSyncConfirmDialog(
                         onConfirm = {
-                            viewModel.handleAction(OnRemoveSyncFolderDialogConfirmed)
+                            onAction(OnRemoveSyncFolderDialogConfirmed)
                         },
                         onDismiss = {
-                            viewModel.handleAction(OnRemoveFolderDialogDismissed)
+                            onAction(OnRemoveFolderDialogDismissed)
                         },
                     )
                 }
@@ -129,7 +129,7 @@ internal fun SyncFoldersRoute(
     LaunchedEffect(key1 = uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { resId ->
             val message = resources.getString(resId, uiState.movedFolderName)
-            viewModel.handleAction(SnackBarShown)
+            onAction(SnackBarShown)
             snackbarScope.launch {
                 snackBarHostState?.showAutoDurationSnackbar(message)
             }

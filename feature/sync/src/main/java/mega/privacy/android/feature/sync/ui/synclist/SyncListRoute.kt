@@ -13,6 +13,16 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
+import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
+import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
+import mega.privacy.android.feature.sync.ui.synclist.SyncChip.STALLED_ISSUES
+import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
+import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
+import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesScreen
+import mega.privacy.android.feature.sync.ui.synclist.stalledissues.StalledIssuesScreen
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
@@ -100,32 +110,70 @@ internal fun SyncListRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val stalledIssueState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
+    val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
+    val solvedIssuesState by syncSolvedIssuesViewModel.state.collectAsStateWithLifecycle()
+    val notificationState by syncIssueNotificationViewModel.state.collectAsStateWithLifecycle()
 
-    SyncListScreen(
-        isInCloudDrive = isInCloudDrive,
-        stalledIssuesCount = state.stalledIssuesCount,
-        onOpenMegaFolderClicked = onOpenMegaFolderClicked,
-        onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
-        onSyncFolderClicked = { onSyncFolderClicked() },
-        onBackupFolderClicked = { onBackupFolderClicked() },
-        syncPermissionsManager = syncPermissionsManager,
-        actions = listOfNotNull(onSyncSettingsClicked?.let { CommonMenuAction.Settings }),
-        onActionPressed = {
-            when (it) {
-                is CommonMenuAction.Settings -> onSyncSettingsClicked?.invoke()
-            }
-        },
-        onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
-        onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
-        title = state.deviceName,
-        syncFoldersViewModel = syncFoldersViewModel,
-        syncStalledIssuesViewModel = syncStalledIssuesViewModel,
-        syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
-        syncIssueNotificationViewModel = syncIssueNotificationViewModel,
-        selectedChip = selectedChip,
-        onFabExpanded = onFabExpanded,
-        onStalledIssueMoreClicked = onStalledIssueMoreClicked,
-    )
+    val chipContent: @Composable (SyncChip, () -> Unit) -> Unit = { chip, onIssuesInfoClicked ->
+        SelectedChipScreen(
+            onAddNewSyncClicked = onSyncFolderClicked,
+            onAddNewBackupClicked = onBackupFolderClicked,
+            onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
+            onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+            onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
+            moreClicked = { stalledIssueItem -> onStalledIssueMoreClicked(stalledIssueItem.id) },
+            issuesInfoClicked = onIssuesInfoClicked,
+            checkedChip = chip,
+            syncFoldersUiState = syncFoldersState,
+            stalledIssues = stalledIssueState.stalledIssues,
+            solvedIssues = solvedIssuesState.solvedIssues,
+            onFoldersAction = syncFoldersViewModel::handleAction,
+            deviceName = state.deviceName,
+        )
+    }
+
+    if (isInCloudDrive) {
+        SyncListTabContent(
+            syncFoldersUiState = syncFoldersState,
+            syncStalledIssuesState = stalledIssueState,
+            syncSolvedIssuesState = solvedIssuesState,
+            syncNotificationState = notificationState,
+            stalledIssuesCount = state.stalledIssuesCount,
+            onSyncFolderClicked = { onSyncFolderClicked() },
+            onBackupFolderClicked = { onBackupFolderClicked() },
+            syncPermissionsManager = syncPermissionsManager,
+            onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
+            onDismissNotification = syncIssueNotificationViewModel::dismissNotification,
+            onSyncRefresh = syncFoldersViewModel::onSyncRefresh,
+            chipContent = chipContent,
+            selectedChip = selectedChip,
+            onFabExpanded = onFabExpanded,
+        )
+    } else {
+        SyncListScreen(
+            syncFoldersUiState = syncFoldersState,
+            syncStalledIssuesState = stalledIssueState,
+            syncSolvedIssuesState = solvedIssuesState,
+            syncNotificationState = notificationState,
+            stalledIssuesCount = state.stalledIssuesCount,
+            onSyncFolderClicked = { onSyncFolderClicked() },
+            onBackupFolderClicked = { onBackupFolderClicked() },
+            syncPermissionsManager = syncPermissionsManager,
+            actions = listOfNotNull(onSyncSettingsClicked?.let { CommonMenuAction.Settings }),
+            onActionPressed = {
+                when (it) {
+                    is CommonMenuAction.Settings -> onSyncSettingsClicked?.invoke()
+                }
+            },
+            onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
+            onDismissNotification = syncIssueNotificationViewModel::dismissNotification,
+            onSyncRefresh = syncFoldersViewModel::onSyncRefresh,
+            title = state.deviceName,
+            chipContent = chipContent,
+            selectedChip = selectedChip,
+            onFabExpanded = onFabExpanded,
+        )
+    }
 
     val resources = LocalResources.current
     val snackBarHostState = LocalSnackBarHostState.current
@@ -142,4 +190,48 @@ internal fun SyncListRoute(
         }
     }
 
+}
+
+@Composable
+private fun SelectedChipScreen(
+    onAddNewSyncClicked: () -> Unit,
+    onAddNewBackupClicked: () -> Unit,
+    onSelectStopBackupDestinationClicked: (String?) -> Unit,
+    onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
+    moreClicked: (StalledIssueUiItem) -> Unit,
+    issuesInfoClicked: () -> Unit,
+    checkedChip: SyncChip,
+    syncFoldersUiState: SyncFoldersUiState,
+    stalledIssues: List<StalledIssueUiItem>,
+    solvedIssues: List<SolvedIssueUiItem>,
+    onFoldersAction: (SyncFoldersAction) -> Unit,
+    deviceName: String,
+) {
+    when (checkedChip) {
+        SYNC_FOLDERS -> {
+            SyncFoldersRoute(
+                onAddNewSyncClicked = onAddNewSyncClicked,
+                onAddNewBackupClicked = onAddNewBackupClicked,
+                onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
+                issuesInfoClicked = issuesInfoClicked,
+                onAction = onFoldersAction,
+                uiState = syncFoldersUiState,
+                deviceName = deviceName,
+                onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+                onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
+            )
+        }
+
+        STALLED_ISSUES -> {
+            StalledIssuesScreen(
+                stalledIssues = stalledIssues,
+                moreClicked = moreClicked,
+            )
+        }
+
+        SOLVED_ISSUES -> {
+            SyncSolvedIssuesScreen(solvedIssues = solvedIssues)
+        }
+    }
 }
