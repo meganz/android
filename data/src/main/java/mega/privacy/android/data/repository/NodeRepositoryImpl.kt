@@ -7,6 +7,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,9 +16,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.SortOrderSource
@@ -65,6 +66,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -154,17 +156,27 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     private val sharedNodeUpdates: SharedFlow<NodeUpdate> = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
-        .mapNotNull {
-            it.nodeList?.mapNotNull { megaNode ->
-                val unTypedNode = convertToUnTypedNode(megaNode)
-                if (unTypedNode != null) {
-                    unTypedNode to nodeUpdateMapper(megaNode)
-                } else {
-                    null
+        .transform { update ->
+            val nodeList = update.nodeList ?: return@transform
+            var emitted = false
+            nodeList.chunked(NODE_UPDATES_CHUNK_SIZE).forEach { chunk ->
+                val changes = chunk
+                    .mapNotNull<MegaNode, Pair<Node, List<NodeChanges>>> { megaNode ->
+                        runCatching {
+                            convertToUnTypedNode(megaNode)?.let { it to nodeUpdateMapper(megaNode) }
+                        }.onFailure { error ->
+                            currentCoroutineContext().ensureActive()
+                            Timber.e(error, "Failed to map node in node update")
+                        }.getOrNull()
+                    }
+                    .toMap()
+                if (changes.isNotEmpty()) {
+                    emitted = true
+                    emit(NodeUpdate(changes))
                 }
             }
+            if (!emitted) emit(NodeUpdate(emptyMap()))
         }
-        .map { nodes -> NodeUpdate(nodes.toMap()) }
         .flowOn(ioDispatcher)
         .catch { Timber.e(it, "monitorNodeUpdates failed") }
         .shareIn(
@@ -1434,5 +1446,15 @@ internal class NodeRepositoryImpl @Inject constructor(
                 )
             }
         }
+    }
+
+    companion object {
+        /**
+         * Maximum number of nodes mapped and emitted per [NodeUpdate]. Bounds peak heap usage
+         * when the SDK delivers a massive OnNodesUpdate, e.g. after copying or moving a folder
+         * with hundreds of thousands of nodes; larger updates are delivered in multiple
+         * consecutive emissions instead of one huge one.
+         */
+        internal const val NODE_UPDATES_CHUNK_SIZE = 5_000
     }
 }

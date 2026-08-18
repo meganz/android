@@ -1,10 +1,14 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -30,8 +34,6 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderTypeMapper
-import mega.privacy.android.domain.entity.FolderType
-import mega.privacy.android.domain.entity.FolderTypeData
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
@@ -45,13 +47,18 @@ import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
+import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.FolderType
+import mega.privacy.android.domain.entity.FolderTypeData
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -84,6 +91,7 @@ import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -102,6 +110,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.util.concurrent.atomic.AtomicLong
 import java.util.stream.Stream
 import kotlin.test.Ignore
 
@@ -1826,19 +1835,20 @@ internal class NodeRepositoryImplTest {
     }
 
     @Test
-    fun `test that checkNodeAccessibility completes successfully when API_OK is returned`() = runTest {
-        val megaNode = mock<MegaNode>()
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
-        whenever(megaApiGateway.getDownloadUrl(any(), any())).thenAnswer {
-            (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
-                api = mock(),
-                request = mock(),
-                error = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
-            )
-        }
+    fun `test that checkNodeAccessibility completes successfully when API_OK is returned`() =
+        runTest {
+            val megaNode = mock<MegaNode>()
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+            whenever(megaApiGateway.getDownloadUrl(any(), any())).thenAnswer {
+                (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
+                )
+            }
 
-        assertDoesNotThrow { underTest.checkNodeAccessibility(nodeId) }
-    }
+            assertDoesNotThrow { underTest.checkNodeAccessibility(nodeId) }
+        }
 
     @Test
     fun `test that checkNodeAccessibility throws IllegalArgumentException when node is not found`() =
@@ -1850,20 +1860,209 @@ internal class NodeRepositoryImplTest {
         }
 
     @Test
-    fun `test that checkNodeAccessibility throws exception when API returns non-OK error`() = runTest {
-        val megaNode = mock<MegaNode>()
-        val expectedException = MegaException(MegaError.API_EBLOCKED, "blocked")
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
-        whenever(megaExceptionMapper(any(), anyOrNull(), anyOrNull())).thenReturn(expectedException)
-        whenever(megaApiGateway.getDownloadUrl(any(), any())).thenAnswer {
-            (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
-                api = mock(),
-                request = mock(),
-                error = mock { on { errorCode }.thenReturn(MegaError.API_EBLOCKED) },
+    fun `test that checkNodeAccessibility throws exception when API returns non-OK error`() =
+        runTest {
+            val megaNode = mock<MegaNode>()
+            val expectedException = MegaException(MegaError.API_EBLOCKED, "blocked")
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+            whenever(megaExceptionMapper(any(), anyOrNull(), anyOrNull())).thenReturn(
+                expectedException
             )
+            whenever(megaApiGateway.getDownloadUrl(any(), any())).thenAnswer {
+                (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = mock { on { errorCode }.thenReturn(MegaError.API_EBLOCKED) },
+                )
+            }
+
+            assertThrows<MegaException> { underTest.checkNodeAccessibility(nodeId) }
         }
 
-        assertThrows<MegaException> { underTest.checkNodeAccessibility(nodeId) }
+    @Nested
+    inner class MonitorNodeUpdates {
+
+        private val updateMegaNode = mock<MegaNode>()
+
+        @Test
+        fun `test that monitorNodeUpdates emits multiple updates covering all nodes when the update exceeds the chunk size`() =
+            runTest {
+                stubNodeMapping()
+                val updatesFlow = MutableSharedFlow<GlobalUpdate>()
+                val underTest = createUnderTest(updatesFlow)
+                val total = NodeRepositoryImpl.NODE_UPDATES_CHUNK_SIZE + 1
+
+                underTest.monitorNodeUpdates().test {
+                    updatesFlow.emit(GlobalUpdate.OnNodesUpdate(ArrayList(List(total) { updateMegaNode })))
+                    assertThat(awaitItem().changes).hasSize(NodeRepositoryImpl.NODE_UPDATES_CHUNK_SIZE)
+                    assertThat(awaitItem().changes).hasSize(1)
+                    expectNoEvents()
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
+        @Test
+        fun `test that monitorNodeUpdates emits a single update when the update is within the chunk size`() =
+            runTest {
+                stubNodeMapping()
+                val updatesFlow = MutableSharedFlow<GlobalUpdate>()
+                val underTest = createUnderTest(updatesFlow)
+
+                underTest.monitorNodeUpdates().test {
+                    updatesFlow.emit(GlobalUpdate.OnNodesUpdate(ArrayList(List(3) { updateMegaNode })))
+                    val update = awaitItem()
+                    assertThat(update.changes).hasSize(3)
+                    assertThat(update.changes.values.toSet())
+                        .containsExactly(listOf(NodeChanges.New))
+                    expectNoEvents()
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
+        @Test
+        fun `test that monitorNodeUpdates emits an empty update when no node can be mapped`() =
+            runTest {
+                whenever(nodeMapper(any(), any(), any(), anyOrNull(), anyOrNull()))
+                    .thenReturn(null)
+                val updatesFlow = MutableSharedFlow<GlobalUpdate>()
+                val underTest = createUnderTest(updatesFlow)
+
+                underTest.monitorNodeUpdates().test {
+                    updatesFlow.emit(GlobalUpdate.OnNodesUpdate(arrayListOf(updateMegaNode)))
+                    assertThat(awaitItem().changes).isEmpty()
+                    expectNoEvents()
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
+        @Test
+        fun `test that monitorNodeUpdates emits nothing when the update has no node list`() =
+            runTest {
+                stubNodeMapping()
+                val updatesFlow = MutableSharedFlow<GlobalUpdate>()
+                val underTest = createUnderTest(updatesFlow)
+
+                underTest.monitorNodeUpdates().test {
+                    updatesFlow.emit(GlobalUpdate.OnNodesUpdate(null))
+                    expectNoEvents()
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
+        @Test
+        fun `test that monitorNodeUpdates keeps remaining nodes when mapping one node fails`() =
+            runTest {
+                val failingMegaNode = mock<MegaNode>()
+                val counter = AtomicLong(1)
+                whenever(nodeMapper(any(), any(), any(), anyOrNull(), anyOrNull()))
+                    .thenAnswer { invocation ->
+                        if (invocation.getArgument<MegaNode>(0) === failingMegaNode) {
+                            throw RuntimeException("mapping failed")
+                        }
+                        createFileNode(counter.getAndIncrement())
+                    }
+                whenever(nodeUpdateMapper(any())).thenReturn(listOf(NodeChanges.New))
+                val updatesFlow = MutableSharedFlow<GlobalUpdate>()
+                val underTest = createUnderTest(updatesFlow)
+
+                underTest.monitorNodeUpdates().test {
+                    updatesFlow.emit(
+                        GlobalUpdate.OnNodesUpdate(
+                            arrayListOf(
+                                updateMegaNode,
+                                failingMegaNode,
+                                updateMegaNode,
+                                updateMegaNode,
+                                updateMegaNode,
+                            )
+                        )
+                    )
+                    assertThat(awaitItem().changes).hasSize(4)
+
+                    updatesFlow.emit(GlobalUpdate.OnNodesUpdate(arrayListOf(updateMegaNode)))
+                    assertThat(awaitItem().changes).hasSize(1)
+                    expectNoEvents()
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
+        private suspend fun stubNodeMapping() {
+            val counter = AtomicLong(1)
+            whenever(nodeMapper(any(), any(), any(), anyOrNull(), anyOrNull()))
+                .thenAnswer { createFileNode(counter.getAndIncrement()) }
+            whenever(nodeUpdateMapper(any())).thenReturn(listOf(NodeChanges.New))
+        }
+
+        private fun createFileNode(handle: Long) = DefaultFileNode(
+            id = NodeId(handle),
+            name = "node$handle",
+            parentId = NodeId(-1L),
+            base64Id = "base64Id",
+            restoreId = null,
+            size = 0L,
+            label = 0,
+            nodeLabel = null,
+            creationTime = 0L,
+            modificationTime = 0L,
+            type = PdfFileTypeInfo,
+            isFavourite = false,
+            isMarkedSensitive = false,
+            isSensitiveInherited = false,
+            exportedData = null,
+            isTakenDown = false,
+            isIncomingShare = false,
+            fingerprint = null,
+            originalFingerprint = null,
+            isNodeKeyDecrypted = false,
+            hasThumbnail = false,
+            hasPreview = false,
+            serializedData = null,
+            isAvailableOffline = false,
+            versionCount = 0,
+            tags = null,
+        )
+
+        private fun TestScope.createUnderTest(updates: Flow<GlobalUpdate>): NodeRepository {
+            whenever(megaApiGateway.globalUpdates).thenReturn(updates)
+            val dispatcher = UnconfinedTestDispatcher(testScheduler)
+            return NodeRepositoryImpl(
+                context = context,
+                megaApiGateway = megaApiGateway,
+                megaApiFolderGateway = megaApiFolderGateway,
+                megaChatApiGateway = megaChatApiGateway,
+                ioDispatcher = dispatcher,
+                defaultDispatcher = dispatcher,
+                megaLocalStorageGateway = megaLocalStorageGateway,
+                shareDataMapper = shareDataMapper,
+                megaExceptionMapper = megaExceptionMapper,
+                sortOrderIntMapper = sortOrderIntMapper,
+                nodeMapper = nodeMapper,
+                nodeListMapper = nodeListMapper,
+                fileNodeMapper = fileNodeMapper,
+                fileTypeInfoMapper = fileTypeInfoMapper,
+                offlineNodeInformationMapper = offlineNodeInformationMapper,
+                offlineInformationMapper = offlineInformationMapper,
+                fileGateway = fileGateway,
+                chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
+                streamingGateway = streamingGateway,
+                nodeUpdateMapper = nodeUpdateMapper,
+                accessPermissionMapper = accessPermissionMapper,
+                nodeShareKeyResultMapper = nodeShareKeyResultMapper,
+                accessPermissionIntMapper = accessPermissionIntMapper,
+                megaLocalRoomGateway = megaLocalRoomGateway,
+                megaNodeMapper = megaNodeMapper,
+                nodeLabelIntMapper = nodeLabelIntMapper,
+                cancelTokenProvider = cancelTokenProvider,
+                megaSearchFilterMapper = megaSearchFilterMapper,
+                workManagerGateway = workManagerGateway,
+                stringListMapper = stringListMapper,
+                nodeLabelMapper = nodeLabelMapper,
+                typedNodeMapper = typedNodeMapper,
+                folderTypeMapper = folderTypeMapper,
+                nodePathMapper = nodePathMapper,
+                applicationScope = CoroutineScope(dispatcher),
+            )
+        }
     }
 
     private fun provideNodeId() = Stream.of(
