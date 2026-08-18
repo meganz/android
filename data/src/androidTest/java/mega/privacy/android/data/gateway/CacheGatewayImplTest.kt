@@ -1,13 +1,16 @@
 package mega.privacy.android.data.gateway
 
 import android.content.Context
+import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.database.MegaDatabaseConstant
+import mega.privacy.android.domain.entity.BatteryInfo
 import org.junit.After
 import org.junit.Assert.fail
 import org.junit.Before
@@ -28,6 +31,7 @@ class CacheGatewayImplTest {
         underTest = CacheGatewayImpl(
             context = context,
             ioDispatcher = UnconfinedTestDispatcher(),
+            deviceGateway = FakeDeviceGateway(),
         )
     }
 
@@ -175,91 +179,91 @@ class CacheGatewayImplTest {
     }
 
     /**
-     * Test that getThumbnailCacheFolder returns the Thumbnail Cache Folder
+     * Test that getThumbnailCacheFolderPath returns the Thumbnail Cache Folder path
      * when it exists in cache
      */
     @Test
-    fun test_that_getThumbnailCacheFolder_returns_the_folder_if_exist() = runTest {
+    fun test_that_getThumbnailCacheFolderPath_returns_the_folder_path_if_exist() = runTest {
         val folderName = CacheFolderConstant.THUMBNAIL_FOLDER
         val expected = File(context.cacheDir, folderName)
         createDirectory(expected)
 
         assertThat(expected.exists()).isEqualTo(true)
-        assertThat(underTest.getThumbnailCacheFolder()).isEqualTo(expected)
+        assertThat(underTest.getThumbnailCacheFolderPath()).isEqualTo(expected.path)
     }
 
     /**
-     * Test that getThumbnailCacheFolder returns Thumbnail Cache Folder
-     * and create it in cache if the folder does not exist
+     * Test that getThumbnailCacheFolderPath returns the Thumbnail Cache Folder path
+     * and creates it in cache if the folder does not exist
      */
     @Test
-    fun test_that_getThumbnailCacheFolder_creates_the_folder_in_cacheDir_if_not_exist_and_return_it() =
+    fun test_that_getThumbnailCacheFolderPath_creates_the_folder_in_cacheDir_if_not_exist_and_return_its_path() =
         runTest {
             val folderName = CacheFolderConstant.THUMBNAIL_FOLDER
             val expected = File(context.cacheDir, folderName)
 
             assertThat(expected.exists()).isEqualTo(false)
-            assertThat(underTest.getThumbnailCacheFolder()).isEqualTo(expected)
+            assertThat(underTest.getThumbnailCacheFolderPath()).isEqualTo(expected.path)
             assertThat(expected.exists()).isEqualTo(true)
         }
 
 
     /**
-     * Test that getPreviewCacheFolder returns the Preview Cache Folder
+     * Test that getPreviewCacheFolderPath returns the Preview Cache Folder path
      * when it exists in cache
      */
     @Test
-    fun test_that_getPreviewCacheFolder_returns_the_folder_if_exist() = runTest {
+    fun test_that_getPreviewCacheFolderPath_returns_the_folder_path_if_exist() = runTest {
         val folderName = CacheFolderConstant.PREVIEW_FOLDER
         val expected = File(context.cacheDir, folderName)
         createDirectory(expected)
 
         assertThat(expected.exists()).isEqualTo(true)
-        assertThat(underTest.getPreviewCacheFolder()).isEqualTo(expected)
+        assertThat(underTest.getPreviewCacheFolderPath()).isEqualTo(expected.path)
     }
 
     /**
-     * Test that getPreviewCacheFolder returns Preview Cache Folder
-     * and create it in cache if the folder does not exist
+     * Test that getPreviewCacheFolderPath returns the Preview Cache Folder path
+     * and creates it in cache if the folder does not exist
      */
     @Test
-    fun test_that_getPreviewCacheFolder_creates_the_folder_in_cacheDir_if_not_exist_and_return_it() =
+    fun test_that_getPreviewCacheFolderPath_creates_the_folder_in_cacheDir_if_not_exist_and_return_its_path() =
         runTest {
             val folderName = CacheFolderConstant.PREVIEW_FOLDER
             val expected = File(context.cacheDir, folderName)
 
             assertThat(expected.exists()).isEqualTo(false)
-            assertThat(underTest.getPreviewCacheFolder()).isEqualTo(expected)
+            assertThat(underTest.getPreviewCacheFolderPath()).isEqualTo(expected.path)
             assertThat(expected.exists()).isEqualTo(true)
         }
 
 
     /**
-     * Test that getFullSizeCacheFolder returns the  Full Size Cache Folder
+     * Test that getFullSizeCacheFolderPath returns the Full Size Cache Folder path
      * when it exists in cache
      */
     @Test
-    fun test_that_getFullSizeCacheFolder_returns_the_folder_if_exist() = runTest {
+    fun test_that_getFullSizeCacheFolderPath_returns_the_folder_path_if_exist() = runTest {
         val folderName = CacheFolderConstant.TEMPORARY_FOLDER
         val expected = File(context.cacheDir, folderName)
         createDirectory(expected)
 
         assertThat(expected.exists()).isEqualTo(true)
-        assertThat(underTest.getFullSizeCacheFolder()).isEqualTo(expected)
+        assertThat(underTest.getFullSizeCacheFolderPath()).isEqualTo(expected.path)
     }
 
     /**
-     * Test that getFullSizeCacheFolder returns Full Size Cache Folder
-     * and create it in cache if the folder does not exist
+     * Test that getFullSizeCacheFolderPath returns the Full Size Cache Folder path
+     * and creates it in cache if the folder does not exist
      */
     @Test
-    fun test_that_getFullSizeCacheFolder_creates_the_folder_in_cacheDir_if_not_exist_and_return_it() =
+    fun test_that_getFullSizeCacheFolderPath_creates_the_folder_in_cacheDir_if_not_exist_and_return_its_path() =
         runTest {
             val folderName = CacheFolderConstant.TEMPORARY_FOLDER
             val expected = File(context.cacheDir, folderName)
 
             assertThat(expected.exists()).isEqualTo(false)
-            assertThat(underTest.getFullSizeCacheFolder()).isEqualTo(expected)
+            assertThat(underTest.getFullSizeCacheFolderPath()).isEqualTo(expected.path)
             assertThat(expected.exists()).isEqualTo(true)
         }
 
@@ -270,5 +274,41 @@ class CacheGatewayImplTest {
         assertThat(passphraseFile.exists()).isEqualTo(true)
         underTest.clearAppData(setOf(MegaDatabaseConstant.PASSPHRASE_FILE_NAME))
         assertThat(passphraseFile.exists()).isEqualTo(true)
+    }
+
+    /**
+     * [CacheGatewayImpl] only relies on [DeviceGateway.nanoTime]; every other member is
+     * irrelevant to these filesystem tests and is left unimplemented.
+     */
+    private class FakeDeviceGateway : DeviceGateway {
+        override val nanoTime: Long get() = System.nanoTime()
+
+        override fun getManufacturerName(): String = unsupported()
+        override fun getDeviceModel(): String = unsupported()
+        override fun getDeviceName(): String = unsupported()
+        override fun getCurrentDeviceLanguage(): String = unsupported()
+        override fun getSdkVersionInt(): Int = unsupported()
+        override fun getSdkVersionName(): String = unsupported()
+        override fun getCurrentTimeInMillis(): Long = unsupported()
+        override fun getElapsedRealtime(): Long = unsupported()
+        override suspend fun getDeviceMemory(): Long? = unsupported()
+        override suspend fun getDiskSpaceBytes(path: String): Long = unsupported()
+        override fun is24HourFormat(): Boolean = unsupported()
+        override val now: Long get() = unsupported()
+        override suspend fun getLocalIpAddress(): String? = unsupported()
+        override fun getCurrentHourOfDay(): Int = unsupported()
+        override fun getCurrentMinute(): Int = unsupported()
+        override fun getBatteryInfo(intent: Intent?): BatteryInfo = unsupported()
+        override val monitorBatteryInfo: Flow<BatteryInfo> get() = unsupported()
+        override val monitorDevicePowerConnectionState: Flow<String?> get() = unsupported()
+        override fun isInPowerSaveMode(): Boolean = unsupported()
+        override val monitorPowerSaveState: Flow<Boolean> get() = unsupported()
+        override val monitorThermalState: Flow<Int> get() = unsupported()
+        override fun getAvailableProcessors(): Int = unsupported()
+        override fun getTimezone(): String = unsupported()
+        override fun getCurrentTimezoneOffset(): String = unsupported()
+
+        private fun unsupported(): Nothing =
+            throw UnsupportedOperationException("Not used by CacheGatewayImpl")
     }
 }

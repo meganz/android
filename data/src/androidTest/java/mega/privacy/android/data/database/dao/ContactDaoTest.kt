@@ -135,8 +135,9 @@ class ContactDaoTest {
         val expectedNickname = "UberDevMeister"
 
         contactDao.monitorContactByHandle(handle).test {
-            assertThat(awaitItem()).isEqualTo(contact)
-            contactDao.insertOrUpdateContact(contact.copy(nickName = expectedNickname))
+            val stored = awaitItem()
+            assertThat(stored.copy(id = null)).isEqualTo(contact)
+            contactDao.insertOrUpdateContact(stored.copy(nickName = expectedNickname))
             assertThat(awaitItem().nickName).isEqualTo(expectedNickname)
         }
     }
@@ -156,8 +157,9 @@ class ContactDaoTest {
         val expectedNickname = "UberDevMeister"
 
         contactDao.monitorContactByEmail(mail).test {
-            assertThat(awaitItem()).isEqualTo(contact)
-            contactDao.insertOrUpdateContact(contact.copy(nickName = expectedNickname))
+            val stored = awaitItem()
+            assertThat(stored?.copy(id = null)).isEqualTo(contact)
+            contactDao.insertOrUpdateContact(stored!!.copy(nickName = expectedNickname))
             assertThat(awaitItem()?.nickName).isEqualTo(expectedNickname)
         }
     }
