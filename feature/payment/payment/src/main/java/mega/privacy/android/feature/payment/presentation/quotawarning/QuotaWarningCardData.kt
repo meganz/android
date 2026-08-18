@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.payment.presentation.quotawarning
 
 import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.feature.payment.components.QuotaCardUsage
 import mega.privacy.android.feature.payment.components.QuotaUsageLevel
 
 /**
@@ -28,10 +29,9 @@ internal data class CurrentCardData(
  * @property yearlyTotalText total yearly charge (e.g. "€40.01 charged yearly"), null for monthly billing
  * @property storageText storage feature text (e.g. "200 GB storage")
  * @property transferText transfer feature text (e.g. "2.4 TB transfer")
- * @property usagePercentage current usage against the recommended plan's quota, as a 0..100 value
- * @property usageLevel severity level driving the usage bar colour
- * @property usageText usage help text (e.g. "Storage: 19 GB out of 200 GB")
  * @property subscriptionToBuy the subscription launched when the upgrade button is tapped, null when unavailable
+ * @property usage projected usage against the recommended plan's quota, null when the screen does
+ * not show quota details (free and logged-out users)
  * @property offer discount data when the recommended subscription carries an active offer, null otherwise
  */
 internal data class RecommendedCardData(
@@ -40,10 +40,8 @@ internal data class RecommendedCardData(
     val yearlyTotalText: String?,
     val storageText: String,
     val transferText: String,
-    val usagePercentage: Float,
-    val usageLevel: QuotaUsageLevel,
-    val usageText: String,
     val subscriptionToBuy: Subscription?,
+    val usage: QuotaCardUsage? = null,
     val offer: RecommendedOfferData? = null,
 )
 

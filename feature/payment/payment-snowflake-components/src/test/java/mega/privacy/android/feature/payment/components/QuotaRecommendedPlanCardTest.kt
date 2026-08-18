@@ -25,9 +25,11 @@ class QuotaRecommendedPlanCardTest {
                 storageText = "200 GB storage",
                 transferText = "2.4 TB transfer",
                 badgeLabel = "Best for you",
-                usagePercentage = 10f,
-                usageLevel = QuotaUsageLevel.Normal,
-                usageText = "Storage: 19 GB out of 200 GB",
+                usage = QuotaCardUsage(
+                    percentage = 10f,
+                    level = QuotaUsageLevel.Normal,
+                    text = "Storage: 19 GB out of 200 GB",
+                ),
             )
         }
         composeRule.onNodeWithTag(TEST_TAG_QUOTA_RECOMMENDED_CARD).assertExists()
@@ -52,12 +54,31 @@ class QuotaRecommendedPlanCardTest {
                 storageText = "200 GB storage",
                 transferText = "2.4 TB transfer",
                 badgeLabel = "Best for you",
-                usagePercentage = 10f,
-                usageLevel = QuotaUsageLevel.Normal,
-                usageText = "Storage: 19 GB out of 200 GB",
+                usage = QuotaCardUsage(
+                    percentage = 10f,
+                    level = QuotaUsageLevel.Normal,
+                    text = "Storage: 19 GB out of 200 GB",
+                ),
             )
         }
         composeRule.onNodeWithTag(TEST_TAG_QUOTA_RECOMMENDED_PRICE).assertExists()
         composeRule.onNodeWithText("€4.99/month").assertExists()
+    }
+
+    @Test
+    fun `test that QuotaRecommendedPlanCard hides the usage bar when no usage is given`() {
+        composeRule.setContent {
+            QuotaRecommendedPlanCard(
+                planName = "Essential",
+                monthlyPriceText = "€3.33/month",
+                yearlyTotalText = "€40.01 charged yearly",
+                storageText = "200 GB storage",
+                transferText = "2.4 TB transfer",
+                badgeLabel = "Best for you",
+            )
+        }
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_RECOMMENDED_CARD).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_RECOMMENDED_PROGRESS).assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_RECOMMENDED_USAGE).assertDoesNotExist()
     }
 }

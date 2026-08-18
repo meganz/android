@@ -636,10 +636,6 @@ class LoginViewModel @Inject constructor(
      * Check typed values before perform login.
      */
     fun onLoginClicked(cancelTransfers: Boolean) {
-        if (cancelTransfers) {
-            viewModelScope.launch { cancelTransfersUseCase() }
-        }
-
         with(state.value) {
             val typedEmail = accountSession?.email?.lowercase()?.trim()
             val emailError = when {
@@ -658,8 +654,13 @@ class LoginViewModel @Inject constructor(
                 }
             } else {
                 viewModelScope.launch {
+                    if (cancelTransfers) {
+                        runCatching { cancelTransfersUseCase() }.onFailure { Timber.e(it) }
+                    }
                     when {
-                        ongoingTransfersExistUseCase() -> _state.update { state ->
+                        // cancelling is awaited above and the user has already confirmed it, so
+                        // checking again would only re-raise the warning they just dismissed
+                        !cancelTransfers && ongoingTransfersExistUseCase() -> _state.update { state ->
                             state.copy(ongoingTransfersExist = true)
                         }
 

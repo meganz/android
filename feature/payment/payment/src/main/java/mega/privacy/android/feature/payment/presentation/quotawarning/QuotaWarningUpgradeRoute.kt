@@ -22,6 +22,10 @@ import mega.privacy.android.navigation.payment.QuotaWarningType
  * Route for the quota-warning upsell screen. Wires the [QuotaWarningUpgradeViewModel] state, the
  * Google Play purchase flow via [BillingViewModel], and navigation to the full plan list.
  *
+ * Anonymous users reach this screen from public links, where there is nothing to buy against: both
+ * plan actions send them to login instead, and the post-login flow takes free accounts on to the
+ * upgrade screen.
+ *
  * @param onViewAllPlans navigates to the full upgrade/plan-list screen
  * @param onBack closes the screen
  */
@@ -69,23 +73,35 @@ fun QuotaWarningUpgradeRoute(
         }
     }
 
+    fun openLogin() {
+        activity?.let { megaNavigator.openLogin(it) }
+    }
+
     QuotaWarningUpgradeScreen(
         type = type,
         trigger = trigger,
         uiState = uiState,
         onUpgradeClick = { subscription ->
             Analytics.tracker.trackEvent(events.upgradeButtonPressed)
-            activity?.let {
-                billingViewModel.startPurchase(
-                    activity = it,
-                    subscription = subscription,
-                    source = UpgradeSource.Main,
-                )
+            if (!uiState.isLoggedIn) {
+                openLogin()
+            } else {
+                activity?.let {
+                    billingViewModel.startPurchase(
+                        activity = it,
+                        subscription = subscription,
+                        source = UpgradeSource.Main,
+                    )
+                }
             }
         },
         onViewAllPlansClick = {
             Analytics.tracker.trackEvent(events.viewAllPlansButtonPressed)
-            onViewAllPlans()
+            if (!uiState.isLoggedIn) {
+                openLogin()
+            } else {
+                onViewAllPlans()
+            }
         },
         onLearnMoreClick = {
             activity?.let { megaNavigator.launchUrl(it, TRANSFER_QUOTA_LEARN_MORE_URL) }

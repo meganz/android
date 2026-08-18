@@ -28,10 +28,12 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
+import mega.privacy.android.feature.payment.presentation.quotawarning.QuotaMetric
 import mega.privacy.android.feature.payment.presentation.quotawarning.QuotaWarningUpgradeViewModel
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,9 +42,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
@@ -60,6 +64,7 @@ class QuotaWarningUpgradeViewModelTest {
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val getSpecificAccountDetailUseCase = mock<GetSpecificAccountDetailUseCase>()
+    private val isUserLoggedInUseCase = mock<IsUserLoggedInUseCase>()
     private val localisedPriceCurrencyCodeStringMapper =
         mock<LocalisedPriceCurrencyCodeStringMapper>()
     private val formattedSizeMapper = mock<FormattedSizeMapper>()
@@ -76,9 +81,11 @@ class QuotaWarningUpgradeViewModelTest {
             getCurrentUserEmail,
             monitorConnectivityUseCase,
             getSpecificAccountDetailUseCase,
+            isUserLoggedInUseCase,
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
         )
+        wheneverBlocking { isUserLoggedInUseCase() }.thenReturn(true)
         whenever(monitorAccountDetailUseCase()).thenReturn(emptyFlow())
         // both monitors emit their current value on collection
         whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Unknown))
@@ -97,6 +104,7 @@ class QuotaWarningUpgradeViewModelTest {
             getCurrentUserEmail = getCurrentUserEmail,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
+            isUserLoggedInUseCase = isUserLoggedInUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
         )
     }
@@ -135,6 +143,75 @@ class QuotaWarningUpgradeViewModelTest {
             assertThat(state.storageUsedPercentage).isEqualTo(95)
             assertThat(state.transferUsed).isEqualTo(1 * BYTES_IN_GB)
             assertThat(state.transferUsedPercentage).isEqualTo(20)
+        }
+    }
+
+    @Test
+    fun `test that init recommends the smallest plan when the user is not logged in`() = runTest {
+        wheneverBlocking { isUserLoggedInUseCase() }.thenReturn(false)
+        wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(
+            Subscriptions(
+                monthlySubscriptions = listOf(
+                    subscription(AccountType.ESSENTIAL, storage = 200, transfer = 2400),
+                    subscription(AccountType.PRO_LITE, storage = 750, transfer = 12288),
+                ),
+                yearlySubscriptions = emptyList(),
+            )
+        )
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isLoggedIn).isFalse()
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.currentPlan).isNull()
+            assertThat(state.showQuotaDetails(QuotaMetric.Storage)).isFalse()
+            assertThat(state.showQuotaDetails(QuotaMetric.Transfer)).isFalse()
+            assertThat(state.recommendedSubscription?.accountType)
+                .isEqualTo(AccountType.ESSENTIAL)
+        }
+    }
+
+    @Test
+    fun `test that init does not read account data when the user is not logged in`() = runTest {
+        wheneverBlocking { isUserLoggedInUseCase() }.thenReturn(false)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        verifyBlocking(getSpecificAccountDetailUseCase, never()) { invoke(any(), any(), any()) }
+        verifyBlocking(getCurrentUserEmail, never()) { invoke() }
+        verifyNoInteractions(monitorAccountDetailUseCase)
+    }
+
+    @Test
+    fun `test that init reports a load error when the user is not logged in and plans fail to load`() =
+        runTest {
+            wheneverBlocking { isUserLoggedInUseCase() }.thenReturn(false)
+            wheneverBlocking { getSubscriptionsUseCase() }
+                .thenThrow(RuntimeException("offline"))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.hasLoadError).isTrue()
+                assertThat(state.recommendedSubscription).isNull()
+            }
+        }
+
+    @Test
+    fun `test that init treats a failing login check as logged out`() = runTest {
+        wheneverBlocking { isUserLoggedInUseCase() }.thenThrow(RuntimeException("no session"))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().isLoggedIn).isFalse()
         }
     }
 

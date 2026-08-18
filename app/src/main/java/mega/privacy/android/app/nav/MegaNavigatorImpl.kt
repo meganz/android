@@ -114,6 +114,7 @@ import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
@@ -274,6 +275,13 @@ internal class MegaNavigatorImpl @Inject constructor(
                 context = context, source = source
             )
         }
+    }
+
+    override fun openLogin(context: Context) {
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = LoginNavKey(),
+        )
     }
 
     override fun openQuotaWarningUpsell(

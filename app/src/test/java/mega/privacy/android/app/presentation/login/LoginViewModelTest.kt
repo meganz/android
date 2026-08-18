@@ -340,6 +340,24 @@ internal class LoginViewModelTest {
         }
 
     @Test
+    fun `test that ongoingTransfersExist is not raised again when onLoginClicked cancels the transfers`() =
+        runTest {
+            // the SDK still reports the transfers until the cancellation it was asked for completes
+            whenever(ongoingTransfersExistUseCase()).thenReturn(true)
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+
+            with(underTest) {
+                onEmailChanged("test@test.com")
+                onPasswordChanged("Password")
+                onLoginClicked(true)
+                advanceUntilIdle()
+
+                assertThat(state.value.ongoingTransfersExist).isNull()
+            }
+            verify(cancelTransfersUseCase).invoke()
+        }
+
+    @Test
     fun `test that snackbarMessage is updated when onLoginClicked and there is no network connection`() =
         runTest {
             whenever(ongoingTransfersExistUseCase()).thenReturn(false)

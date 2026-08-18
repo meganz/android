@@ -123,6 +123,13 @@ interface AppNavigator {
     )
 
     /**
+     * Open the login screen through the single activity, launching it if the caller is a legacy
+     * activity. Used by the upsell screens for anonymous users reached from a public link, who have
+     * no account to buy a plan against.
+     */
+    fun openLogin(context: Context)
+
+    /**
      * Open the quota-warning upsell screen in the single activity, launching it if the caller is a
      * legacy activity.
      *

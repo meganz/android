@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
@@ -44,6 +46,7 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase,
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(QuotaWarningUpgradeState())
@@ -61,9 +64,28 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
 
     init {
         monitorConnectivity()
-        fetchEmail()
-        monitorAccountDetail()
-        fetchLatestUsedInfo()
+        loadQuotaData()
+    }
+
+    /**
+     * Anonymous users have no account to read, so which sources the screen is built from can only
+     * be decided once the session is known.
+     */
+    private fun loadQuotaData() {
+        viewModelScope.launch {
+            val isLoggedIn = runCatching { isUserLoggedInUseCase() }.getOrElse {
+                Timber.e(it)
+                false
+            }
+            _state.update { it.copy(isLoggedIn = isLoggedIn) }
+            if (isLoggedIn) {
+                fetchEmail()
+                monitorAccountDetail()
+                fetchLatestUsedInfo()
+            } else {
+                monitorAnonymousRecommendation()
+            }
+        }
     }
 
     private fun fetchLatestUsedInfo() {
@@ -86,7 +108,7 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
         if (retryJob?.isActive == true) return
         retryJob = viewModelScope.launch {
             fetchSubscriptions()
-            if (_state.value.email == null) {
+            if (_state.value.isLoggedIn && _state.value.email == null) {
                 loadEmail()
             }
         }
@@ -131,6 +153,37 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
             }
                 .catch { Timber.e(it) }
                 .collect(::updateAccountDetail)
+        }
+    }
+
+    /**
+     * Anonymous users reach the screen from public links, where there is no account detail to
+     * monitor. The recommendation then comes from the price list alone: the smallest plan on offer,
+     * which is what a free account with no usage to cover would be recommended too.
+     */
+    private fun monitorAnonymousRecommendation() {
+        viewModelScope.launch {
+            fetchSubscriptions()
+            subscriptionsResult.filterNotNull().collect { result ->
+                val candidates = upgradeCandidates(
+                    currentPlan = AccountType.FREE,
+                    totalStorage = null,
+                    totalTransfer = null,
+                    cycle = AccountSubscriptionCycle.UNKNOWN,
+                    subscriptions = result.getOrNull(),
+                )
+                _state.update {
+                    it.copy(
+                        recommendedSubscription = recommendedSubscription(
+                            storageToCover = null,
+                            transferToCover = null,
+                            cycle = AccountSubscriptionCycle.UNKNOWN,
+                            candidates = candidates,
+                        ),
+                        isLoading = false,
+                    )
+                }
+            }
         }
     }
 

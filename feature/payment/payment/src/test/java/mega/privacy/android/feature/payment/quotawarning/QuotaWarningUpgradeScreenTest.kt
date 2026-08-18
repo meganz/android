@@ -62,7 +62,7 @@ class QuotaWarningUpgradeScreenTest {
             type = QuotaWarningType.Storage,
             trigger = QuotaWarningTrigger.Upload,
             state = QuotaWarningUpgradeState(
-                currentPlan = AccountType.FREE,
+                currentPlan = AccountType.PRO_I,
                 storageState = StorageState.Orange,
                 storageUsedPercentage = 80,
                 isLoading = false,
@@ -77,6 +77,59 @@ class QuotaWarningUpgradeScreenTest {
             )
         ).assertExists()
         composeRule.onNodeWithTag(TEST_TAG_QUOTA_CURRENT_PLAN_CARD).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_WARNING_VIEW_ALL_PLANS).assertExists()
+    }
+
+    @Test
+    fun `test that free user sees the current plan card on storage quota`() {
+        setScreen(
+            type = QuotaWarningType.Storage,
+            trigger = QuotaWarningTrigger.Upload,
+            state = QuotaWarningUpgradeState(
+                currentPlan = AccountType.FREE,
+                storageState = StorageState.Orange,
+                storageUsedPercentage = 80,
+                isLoading = false,
+            ),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_WARNING_TITLE).assertIsDisplayed()
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_CURRENT_PLAN_CARD).assertExists()
+    }
+
+    @Test
+    fun `test that free user does not see the current plan card on transfer quota`() {
+        setScreen(
+            type = QuotaWarningType.Transfer,
+            trigger = QuotaWarningTrigger.Download,
+            state = QuotaWarningUpgradeState(
+                currentPlan = AccountType.FREE,
+                isTransferOverQuota = true,
+                transferUsedPercentage = 100,
+                isLoading = false,
+            ),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_WARNING_TITLE).assertIsDisplayed()
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_CURRENT_PLAN_CARD).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that logged out user does not see the current plan card`() {
+        setScreen(
+            type = QuotaWarningType.Transfer,
+            trigger = QuotaWarningTrigger.Streaming,
+            state = QuotaWarningUpgradeState(
+                isLoggedIn = false,
+                isTransferOverQuota = true,
+                isLoading = false,
+            ),
+        )
+
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(sharedR.string.subscription_quota_transfer_over_title)
+        ).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_CURRENT_PLAN_CARD).assertDoesNotExist()
         composeRule.onNodeWithTag(TEST_TAG_QUOTA_WARNING_VIEW_ALL_PLANS).assertExists()
     }
 

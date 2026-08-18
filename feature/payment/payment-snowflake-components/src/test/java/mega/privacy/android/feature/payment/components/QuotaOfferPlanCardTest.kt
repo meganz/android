@@ -26,9 +26,11 @@ class QuotaOfferPlanCardTest {
                 discountBadgeText = "Special offer · 50% off",
                 storageText = "2 TB cloud storage",
                 transferText = "2 TB transfer",
-                usagePercentage = 10f,
-                usageLevel = QuotaUsageLevel.Normal,
-                usageText = "Storage: 19 GB out of 2 TB",
+                usage = QuotaCardUsage(
+                    percentage = 10f,
+                    level = QuotaUsageLevel.Normal,
+                    text = "Storage: 19 GB out of 2 TB",
+                ),
                 monthlyPriceText = "€4.99/month",
             )
         }
@@ -57,11 +59,32 @@ class QuotaOfferPlanCardTest {
                 discountBadgeText = "Special offer · 50% off",
                 storageText = "2 TB cloud storage",
                 transferText = "2 TB transfer",
-                usagePercentage = 10f,
-                usageLevel = QuotaUsageLevel.Normal,
-                usageText = "Storage: 19 GB out of 2 TB",
+                usage = QuotaCardUsage(
+                    percentage = 10f,
+                    level = QuotaUsageLevel.Normal,
+                    text = "Storage: 19 GB out of 2 TB",
+                ),
             )
         }
         composeRule.onNodeWithTag(TEST_TAG_QUOTA_OFFER_PRICE_PER_MONTH).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that QuotaOfferPlanCard hides the usage bar when no usage is given`() {
+        composeRule.setContent {
+            QuotaOfferPlanCard(
+                planName = "Pro I",
+                priceText = "€29.94 charged yearly",
+                originalPriceText = "€59.88",
+                discountDescriptionText = "Billed at €29.94 for the first year, €119.88 charged yearly after",
+                discountBadgeText = "Special offer · 50% off",
+                storageText = "2 TB cloud storage",
+                transferText = "2 TB transfer",
+                monthlyPriceText = "€4.99/month",
+            )
+        }
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_OFFER_CARD).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_OFFER_PROGRESS).assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_OFFER_USAGE).assertDoesNotExist()
     }
 }

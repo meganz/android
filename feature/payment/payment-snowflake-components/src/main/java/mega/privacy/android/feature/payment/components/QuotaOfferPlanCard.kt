@@ -32,9 +32,9 @@ import mega.privacy.android.icon.pack.IconPack
 /**
  * Discount variant of [QuotaRecommendedPlanCard] for the quota-warning upsell screen. Shows the
  * recommended plan as a promotional offer: a discount badge, the original price with a strikethrough
- * alongside the discounted price, a discount description, plan benefits, and a bar showing how the
- * current usage would sit against the recommended plan's quota. The buy action lives in the anchored
- * button bar, so this card has no button of its own.
+ * alongside the discounted price, a discount description, plan benefits, and optionally a bar showing
+ * how the current usage would sit against the recommended plan's quota. The buy action lives in the
+ * anchored button bar, so this card has no button of its own.
  *
  * @param planName the recommended plan name (e.g. "Pro I")
  * @param priceText the discounted price shown as the main price (e.g. "€4.99/month" for monthly,
@@ -44,11 +44,9 @@ import mega.privacy.android.icon.pack.IconPack
  * @param discountBadgeText the promotional badge text (e.g. "Special offer · 50% off")
  * @param storageText storage feature text (e.g. "2 TB cloud storage")
  * @param transferText transfer feature text (e.g. "2 TB transfer")
- * @param usagePercentage current usage against the recommended plan's quota, as a 0..100 value
- * @param usageLevel severity level driving the usage bar colour
- * @param usageText usage help text (e.g. "Storage: 19 GB out of 3 TB")
  * @param monthlyPriceText the per-month price shown above the total (e.g. "€4.99/month"), null for
  * monthly plans
+ * @param usage projected usage against the recommended plan's quota, null to leave the bar out
  */
 @Composable
 fun QuotaOfferPlanCard(
@@ -59,11 +57,9 @@ fun QuotaOfferPlanCard(
     discountBadgeText: String,
     storageText: String,
     transferText: String,
-    usagePercentage: Float,
-    usageLevel: QuotaUsageLevel,
-    usageText: String,
     modifier: Modifier = Modifier,
     monthlyPriceText: String? = null,
+    usage: QuotaCardUsage? = null,
 ) {
     val cardShape = RoundedCornerShape(16.dp)
     Box(
@@ -136,18 +132,20 @@ fun QuotaOfferPlanCard(
                     )
                 }
             }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                QuotaUsageProgressBar(
-                    percentage = usagePercentage,
-                    level = usageLevel,
-                    modifier = Modifier.testTag(TEST_TAG_QUOTA_OFFER_PROGRESS),
-                )
-                MegaText(
-                    text = usageText,
-                    style = MaterialTheme.typography.bodyMedium,
-                    textColor = TextColor.Secondary,
-                    modifier = Modifier.testTag(TEST_TAG_QUOTA_OFFER_USAGE),
-                )
+            if (usage != null) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    QuotaUsageProgressBar(
+                        percentage = usage.percentage,
+                        level = usage.level,
+                        modifier = Modifier.testTag(TEST_TAG_QUOTA_OFFER_PROGRESS),
+                    )
+                    MegaText(
+                        text = usage.text,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textColor = TextColor.Secondary,
+                        modifier = Modifier.testTag(TEST_TAG_QUOTA_OFFER_USAGE),
+                    )
+                }
             }
         }
         DiscountBadge(
@@ -171,9 +169,29 @@ private fun QuotaOfferPlanCardPreview() {
             discountBadgeText = "Special offer · 50% off",
             storageText = "2 TB cloud storage",
             transferText = "2 TB transfer",
-            usagePercentage = 10f,
-            usageLevel = QuotaUsageLevel.Normal,
-            usageText = "Storage: 19 GB out of 3 TB",
+            monthlyPriceText = "€4.99/month",
+            usage = QuotaCardUsage(
+                percentage = 10f,
+                level = QuotaUsageLevel.Normal,
+                text = "Storage: 19 GB out of 3 TB",
+            ),
+            modifier = Modifier.padding(16.dp),
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun QuotaOfferPlanCardWithoutUsagePreview() {
+    AndroidTheme(isSystemInDarkTheme()) {
+        QuotaOfferPlanCard(
+            planName = "Pro I",
+            priceText = "€29.94 charged yearly",
+            originalPriceText = "€59.88",
+            discountDescriptionText = "Billed at €29.94 for the first year, €119.88 charged yearly after",
+            discountBadgeText = "Special offer · 50% off",
+            storageText = "2 TB cloud storage",
+            transferText = "2 TB transfer",
             monthlyPriceText = "€4.99/month",
             modifier = Modifier.padding(16.dp),
         )

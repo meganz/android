@@ -288,12 +288,17 @@ data class SubscriptionOfferNavKey(
     val source: SubscriptionOfferSource,
 ) : NavKey
 
+/**
+ * Downloading and streaming from a public link hit the transfer quota without a session, so the
+ * warning is shown to anonymous users too; the screen then upsells plans and routes both of its
+ * actions through login.
+ */
 @Serializable
 @Parcelize
 data class QuotaWarningUpgradeNavKey(
     val type: QuotaWarningType,
     val trigger: QuotaWarningTrigger,
-) : NavKey, Parcelable
+) : NoSessionNavKey.Optional, Parcelable
 
 @Serializable
 @Parcelize

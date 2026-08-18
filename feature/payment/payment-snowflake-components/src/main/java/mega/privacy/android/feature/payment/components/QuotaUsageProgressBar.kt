@@ -51,6 +51,20 @@ internal fun QuotaUsageLevel.escalateIfFull(percentage: Float): QuotaUsageLevel 
     if (percentage >= 100f) QuotaUsageLevel.Error else this
 
 /**
+ * Usage shown on a quota-warning plan card: the bar fill, its severity, and the help text under it.
+ * Cards take it as a whole so they can leave the section out entirely when it is not available.
+ *
+ * @property percentage usage as a 0..100 value
+ * @property level severity driving the bar colour
+ * @property text usage help text (e.g. "19 GB of 200 GB used")
+ */
+data class QuotaCardUsage(
+    val percentage: Float,
+    val level: QuotaUsageLevel,
+    val text: String,
+)
+
+/**
  * Severity level of a quota usage bar, driving its colour.
  */
 enum class QuotaUsageLevel {

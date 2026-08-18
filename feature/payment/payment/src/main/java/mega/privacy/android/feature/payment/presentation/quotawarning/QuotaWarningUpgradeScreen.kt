@@ -52,6 +52,7 @@ import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.feature.payment.components.QuotaCardUsage
 import mega.privacy.android.feature.payment.components.QuotaCurrentPlanCard
 import mega.privacy.android.feature.payment.components.QuotaOfferPlanCard
 import mega.privacy.android.feature.payment.components.QuotaRecommendedPlanCard
@@ -117,22 +118,26 @@ fun QuotaWarningUpgradeScreen(
     val title = if (message.titleTakesPercentage) {
         stringResource(
             message.titleId,
-            currentUsagePercentage(uiState, message.metric, isProUser, message.level).toInt()
+            currentUsagePercentage(uiState, message.metric).toInt()
         )
     } else {
         stringResource(message.titleId)
     }
     val subtitle = stringResource(message.subtitleId)
 
-    val currentCard = CurrentCardData(
-        planName = stringResource(
-            (uiState.currentPlan ?: AccountType.FREE).toUIAccountType().textValue
-        ),
-        currentPlanLabel = stringResource(sharedR.string.account_upgrade_account_pro_plan_info_current_plan_label),
-        usagePercentage = currentUsagePercentage(uiState, message.metric, isProUser, message.level),
-        usageLevel = message.level,
-        usageText = currentUsageText(uiState, message.metric, isProUser, context),
-    )
+    val currentCard = if (uiState.showQuotaDetails(message.metric)) {
+        CurrentCardData(
+            planName = stringResource(
+                (uiState.currentPlan ?: AccountType.FREE).toUIAccountType().textValue
+            ),
+            currentPlanLabel = stringResource(sharedR.string.account_upgrade_account_pro_plan_info_current_plan_label),
+            usagePercentage = currentUsagePercentage(uiState, message.metric),
+            usageLevel = message.level,
+            usageText = currentUsageText(uiState, message.metric, context),
+        )
+    } else {
+        null
+    }
 
     val recommended = uiState.recommendedSubscription?.let {
         recommendedCardData(it, uiState, message.metric, locale, context)
@@ -172,7 +177,7 @@ private fun QuotaWarningUpgradeContent(
     isLoading: Boolean,
     isConnected: Boolean,
     hasLoadError: Boolean,
-    currentCard: CurrentCardData,
+    currentCard: CurrentCardData?,
     recommended: RecommendedCardData?,
     onUpgradeClick: (Subscription) -> Unit,
     onViewAllPlansClick: () -> Unit,
@@ -295,7 +300,7 @@ private fun QuotaWarningDataContent(
     subtitle: String,
     showLearnMore: Boolean,
     subtitleHasLink: Boolean,
-    currentCard: CurrentCardData,
+    currentCard: CurrentCardData?,
     recommended: RecommendedCardData?,
     onLearnMoreClick: () -> Unit,
     onManagePlanClick: () -> Unit,
@@ -378,13 +383,15 @@ private fun QuotaWarningDataContent(
                         .testTag(TEST_TAG_QUOTA_WARNING_SUBTITLE),
                 )
             }
-            QuotaCurrentPlanCard(
-                planName = currentCard.planName,
-                currentPlanLabel = currentCard.currentPlanLabel,
-                usagePercentage = currentCard.usagePercentage,
-                usageLevel = currentCard.usageLevel,
-                usageText = currentCard.usageText,
-            )
+            if (currentCard != null) {
+                QuotaCurrentPlanCard(
+                    planName = currentCard.planName,
+                    currentPlanLabel = currentCard.currentPlanLabel,
+                    usagePercentage = currentCard.usagePercentage,
+                    usageLevel = currentCard.usageLevel,
+                    usageText = currentCard.usageText,
+                )
+            }
             if (recommended != null) {
                 val offer = recommended.offer
                 if (offer != null) {
@@ -396,10 +403,8 @@ private fun QuotaWarningDataContent(
                         discountBadgeText = offer.discountBadgeText,
                         storageText = recommended.storageText,
                         transferText = recommended.transferText,
-                        usagePercentage = recommended.usagePercentage,
-                        usageLevel = recommended.usageLevel,
-                        usageText = recommended.usageText,
                         monthlyPriceText = offer.monthlyPriceText,
+                        usage = recommended.usage,
                     )
                 } else {
                     QuotaRecommendedPlanCard(
@@ -409,9 +414,7 @@ private fun QuotaWarningDataContent(
                         storageText = recommended.storageText,
                         transferText = recommended.transferText,
                         badgeLabel = stringResource(sharedR.string.subscription_quota_best_for_you),
-                        usagePercentage = recommended.usagePercentage,
-                        usageLevel = recommended.usageLevel,
-                        usageText = recommended.usageText,
+                        usage = recommended.usage,
                     )
                 }
             }
@@ -480,24 +483,15 @@ private fun QuotaWarningBottomBar(
 private fun currentUsagePercentage(
     state: QuotaWarningUpgradeState,
     metric: QuotaMetric,
-    isProUser: Boolean,
-    level: QuotaUsageLevel,
 ): Float = when (metric) {
     QuotaMetric.Storage -> state.storageUsedPercentage.toFloat()
-    QuotaMetric.Transfer -> if (isProUser) {
-        state.transferUsedPercentage.toFloat()
-    } else {
-        // Free users have no known transfer total, so the bar is fixed:
-        // 80% while running low, 100% once exceeded.
-        if (level == QuotaUsageLevel.Error) 100f else 80f
-    }
+    QuotaMetric.Transfer -> state.transferUsedPercentage.toFloat()
 }
 
 @Composable
 private fun currentUsageText(
     state: QuotaWarningUpgradeState,
     metric: QuotaMetric,
-    isProUser: Boolean,
     context: android.content.Context,
 ): String = when (metric) {
     QuotaMetric.Storage -> stringResource(
@@ -506,18 +500,11 @@ private fun currentUsageText(
         state.storageTotal?.let { formatFileSize(it, context) }.orEmpty(),
     )
 
-    QuotaMetric.Transfer -> if (isProUser) {
-        stringResource(
-            sharedR.string.subscription_quota_current_plan_transfer_usage_with_total,
-            state.transferUsed?.let { formatFileSize(it, context) }.orEmpty(),
-            state.transferTotal?.let { formatFileSize(it, context) }.orEmpty(),
-        )
-    } else {
-        stringResource(
-            sharedR.string.subscription_quota_current_plan_transfer_usage,
-            state.transferUsed?.let { formatFileSize(it, context) }.orEmpty(),
-        )
-    }
+    QuotaMetric.Transfer -> stringResource(
+        sharedR.string.subscription_quota_current_plan_transfer_usage_with_total,
+        state.transferUsed?.let { formatFileSize(it, context) }.orEmpty(),
+        state.transferTotal?.let { formatFileSize(it, context) }.orEmpty(),
+    )
 }
 
 @Composable
@@ -568,19 +555,26 @@ private fun recommendedCardData(
     } else {
         subscription.getSubscription(isMonthly = !useYearly)?.transfer
     }
-    val usagePercentage = usagePercentageAgainstQuota(usedBytes, quotaGb)
-    val usageText = when (metric) {
-        QuotaMetric.Storage -> stringResource(
-            sharedR.string.subscription_quota_recommended_storage_usage,
-            usedBytes?.let { formatFileSize(it, context) }.orEmpty(),
-            storageQuota,
-        )
+    val usage = if (state.showQuotaDetails(metric)) {
+        QuotaCardUsage(
+            percentage = usagePercentageAgainstQuota(usedBytes, quotaGb),
+            level = QuotaUsageLevel.Normal,
+            text = when (metric) {
+                QuotaMetric.Storage -> stringResource(
+                    sharedR.string.subscription_quota_recommended_storage_usage,
+                    usedBytes?.let { formatFileSize(it, context) }.orEmpty(),
+                    storageQuota,
+                )
 
-        QuotaMetric.Transfer -> stringResource(
-            sharedR.string.subscription_quota_recommended_transfer_usage,
-            usedBytes?.let { formatFileSize(it, context) }.orEmpty(),
-            transferQuota,
+                QuotaMetric.Transfer -> stringResource(
+                    sharedR.string.subscription_quota_recommended_transfer_usage,
+                    usedBytes?.let { formatFileSize(it, context) }.orEmpty(),
+                    transferQuota,
+                )
+            },
         )
+    } else {
+        null
     }
 
     val offer = offerCardData(subscription, useYearly, locale)
@@ -591,11 +585,9 @@ private fun recommendedCardData(
         yearlyTotalText = yearlyTotalText,
         storageText = storageText,
         transferText = transferText,
-        usagePercentage = usagePercentage,
-        usageLevel = QuotaUsageLevel.Normal,
-        usageText = usageText,
         subscriptionToBuy = subscription.getSubscription(isMonthly = !useYearly)
             ?: subscription.getSubscription(isMonthly = useYearly),
+        usage = usage,
         offer = offer,
     )
 }
@@ -759,22 +751,24 @@ private fun QuotaWarningUpgradeContentLandscapePreview() {
             isConnected = true,
             hasLoadError = false,
             currentCard = CurrentCardData(
-                planName = "Free",
+                planName = "Essential",
                 currentPlanLabel = "Current plan",
                 usagePercentage = 95f,
                 usageLevel = QuotaUsageLevel.Warning,
-                usageText = "19 GB of 20 GB used",
+                usageText = "190 GB of 200 GB used",
             ),
             recommended = RecommendedCardData(
-                planName = "Essential",
-                monthlyPriceText = "€3.33/month",
-                yearlyTotalText = "€40.01 charged yearly",
-                storageText = "200 GB storage",
-                transferText = "2.4 TB transfer",
-                usagePercentage = 10f,
-                usageLevel = QuotaUsageLevel.Normal,
-                usageText = "19 GB of 200 GB used",
+                planName = "Pro Lite",
+                monthlyPriceText = "€5.85/month",
+                yearlyTotalText = "€70.2 charged yearly",
+                storageText = "750 GB storage",
+                transferText = "12 TB transfer",
                 subscriptionToBuy = null,
+                usage = QuotaCardUsage(
+                    percentage = 25f,
+                    level = QuotaUsageLevel.Normal,
+                    text = "190 GB of 750 GB used",
+                ),
             ),
             onUpgradeClick = {},
             onViewAllPlansClick = {},
@@ -800,7 +794,7 @@ private data class QuotaWarningPreviewState(
     val subtitle: String,
     val showLearnMore: Boolean,
     val isLoading: Boolean,
-    val currentCard: CurrentCardData,
+    val currentCard: CurrentCardData?,
     val recommended: RecommendedCardData?,
     val subtitleHasLink: Boolean = false,
     val isHighestPlan: Boolean = false,
@@ -810,27 +804,29 @@ private data class QuotaWarningPreviewState(
 
 private class QuotaWarningPreviewProvider : PreviewParameterProvider<QuotaWarningPreviewState> {
     private val storageCurrentAlmostFull = CurrentCardData(
-        planName = "Free",
+        planName = "Essential",
         currentPlanLabel = "Current plan",
         usagePercentage = 80f,
         usageLevel = QuotaUsageLevel.Warning,
-        usageText = "19 GB of 20 GB used",
+        usageText = "160 GB of 200 GB used",
     )
     private val storageCurrentFull = storageCurrentAlmostFull.copy(
         usagePercentage = 100f,
         usageLevel = QuotaUsageLevel.Error,
-        usageText = "20 GB of 20 GB used",
+        usageText = "200 GB of 200 GB used",
     )
     private val storageRecommended = RecommendedCardData(
-        planName = "Essential",
-        monthlyPriceText = "€3.33/month",
-        yearlyTotalText = "€40.01 charged yearly",
-        storageText = "200 GB storage",
-        transferText = "2.4 TB transfer",
-        usagePercentage = 10f,
-        usageLevel = QuotaUsageLevel.Normal,
-        usageText = "19 GB of 200 GB used",
+        planName = "Pro Lite",
+        monthlyPriceText = "€5.85/month",
+        yearlyTotalText = "€70.2 charged yearly",
+        storageText = "750 GB storage",
+        transferText = "12 TB transfer",
         subscriptionToBuy = null,
+        usage = QuotaCardUsage(
+            percentage = 21f,
+            level = QuotaUsageLevel.Normal,
+            text = "160 GB of 750 GB used",
+        ),
     )
 
     private val storageRecommendedOffer = storageRecommended.copy(
@@ -839,7 +835,7 @@ private class QuotaWarningPreviewProvider : PreviewParameterProvider<QuotaWarnin
         yearlyTotalText = "€29.94 charged yearly",
         storageText = "2 TB cloud storage",
         transferText = "2 TB transfer",
-        usageText = "Storage: 19 GB out of 2 TB",
+        usage = storageRecommended.usage?.copy(text = "Storage: 160 GB out of 2 TB"),
         offer = RecommendedOfferData(
             priceText = "€29.94 charged yearly",
             originalPriceText = "€59.88",
@@ -849,24 +845,31 @@ private class QuotaWarningPreviewProvider : PreviewParameterProvider<QuotaWarnin
         ),
     )
 
-    private val transferCurrentFree = CurrentCardData(
-        planName = "Free",
-        currentPlanLabel = "Current plan",
-        usagePercentage = 80f,
-        usageLevel = QuotaUsageLevel.Warning,
-        usageText = "1 GB used",
-    )
-    private val transferCurrentPro = transferCurrentFree.copy(
+    private val transferCurrentPro = CurrentCardData(
         planName = "Essential",
+        currentPlanLabel = "Current plan",
         usagePercentage = 95f,
+        usageLevel = QuotaUsageLevel.Warning,
         usageText = "2.3 TB of 2.4 TB used",
     )
-    private val transferCurrentExceeded = transferCurrentFree.copy(
+    private val transferCurrentExceeded = transferCurrentPro.copy(
         usagePercentage = 100f,
         usageLevel = QuotaUsageLevel.Error,
+        usageText = "2.4 TB of 2.4 TB used",
     )
-    private val transferRecommended =
-        storageRecommended.copy(usageText = "1 GB of 2.4 TB used")
+    private val transferRecommended = storageRecommended.copy(
+        usage = storageRecommended.usage?.copy(text = "2.3 TB of 12 TB used"),
+    )
+
+    /** Free and logged-out users are upsold the plan alone, with no quota figures anywhere. */
+    private val recommendedWithoutUsage = RecommendedCardData(
+        planName = "Essential",
+        monthlyPriceText = "€3.33/month",
+        yearlyTotalText = "€40.01 charged yearly",
+        storageText = "200 GB storage",
+        transferText = "2.4 TB transfer",
+        subscriptionToBuy = null,
+    )
 
     private val transferCurrentProIIILow = CurrentCardData(
         planName = "Pro III",
@@ -915,14 +918,6 @@ private class QuotaWarningPreviewProvider : PreviewParameterProvider<QuotaWarnin
             recommended = storageRecommendedOffer,
         ),
         QuotaWarningPreviewState(
-            title = "Your transfer quota is running low",
-            subtitle = "As a result, your download may be interrupted. Upgrade your plan to get more transfer quota.",
-            showLearnMore = true,
-            isLoading = false,
-            currentCard = transferCurrentFree,
-            recommended = transferRecommended,
-        ),
-        QuotaWarningPreviewState(
             title = "You've used 95% of your transfer quota",
             subtitle = "As a result, media playback may be interrupted. Upgrade your plan to get more transfer quota.",
             showLearnMore = true,
@@ -937,6 +932,22 @@ private class QuotaWarningPreviewProvider : PreviewParameterProvider<QuotaWarnin
             isLoading = false,
             currentCard = transferCurrentExceeded,
             recommended = transferRecommended,
+        ),
+        QuotaWarningPreviewState(
+            title = "Transfer quota exceeded",
+            subtitle = "To continue your download, upgrade your plan to get more transfer quota.",
+            showLearnMore = true,
+            isLoading = false,
+            currentCard = null,
+            recommended = recommendedWithoutUsage,
+        ),
+        QuotaWarningPreviewState(
+            title = "Your storage is 100% full",
+            subtitle = "Upgrade your plan to get more storage and upload more files",
+            showLearnMore = false,
+            isLoading = false,
+            currentCard = null,
+            recommended = recommendedWithoutUsage,
         ),
         QuotaWarningPreviewState(
             title = "Your storage is 100% full",

@@ -31,8 +31,8 @@ import mega.privacy.android.icon.pack.IconPack
 
 /**
  * Card recommending the next-tier plan on the quota-warning upsell screen: a "Best for you"
- * badge, plan name, price, storage/transfer features, and a bar showing how the current usage
- * would sit against the recommended plan's quota. The buy action lives in the anchored button
+ * badge, plan name, price, storage/transfer features, and optionally a bar showing how the current
+ * usage would sit against the recommended plan's quota. The buy action lives in the anchored button
  * bar, so this card has no button of its own.
  *
  * @param planName the recommended plan name (e.g. "Essential")
@@ -40,10 +40,8 @@ import mega.privacy.android.icon.pack.IconPack
  * @param storageText storage feature text (e.g. "200 GB storage")
  * @param transferText transfer feature text (e.g. "2.4 TB transfer")
  * @param badgeLabel the badge label (e.g. "Best for you")
- * @param usagePercentage current usage against the recommended plan's quota, as a 0..100 value
- * @param usageLevel severity level driving the bar colour
- * @param usageText usage help text (e.g. "Storage: 19 GB out of 200 GB")
  * @param yearlyTotalText total yearly charge (e.g. "€40.01 charged yearly"), null for monthly billing
+ * @param usage projected usage against the recommended plan's quota, null to leave the bar out
  */
 @Composable
 fun QuotaRecommendedPlanCard(
@@ -52,11 +50,9 @@ fun QuotaRecommendedPlanCard(
     storageText: String,
     transferText: String,
     badgeLabel: String,
-    usagePercentage: Float,
-    usageLevel: QuotaUsageLevel,
-    usageText: String,
     modifier: Modifier = Modifier,
     yearlyTotalText: String? = null,
+    usage: QuotaCardUsage? = null,
 ) {
     val cardShape = RoundedCornerShape(16.dp)
     Column(
@@ -118,18 +114,20 @@ fun QuotaRecommendedPlanCard(
                     )
                 }
             }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                QuotaUsageProgressBar(
-                    percentage = usagePercentage,
-                    level = usageLevel,
-                    modifier = Modifier.testTag(TEST_TAG_QUOTA_RECOMMENDED_PROGRESS),
-                )
-                MegaText(
-                    text = usageText,
-                    style = MaterialTheme.typography.bodyMedium,
-                    textColor = TextColor.Secondary,
-                    modifier = Modifier.testTag(TEST_TAG_QUOTA_RECOMMENDED_USAGE),
-                )
+            if (usage != null) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    QuotaUsageProgressBar(
+                        percentage = usage.percentage,
+                        level = usage.level,
+                        modifier = Modifier.testTag(TEST_TAG_QUOTA_RECOMMENDED_PROGRESS),
+                    )
+                    MegaText(
+                        text = usage.text,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textColor = TextColor.Secondary,
+                        modifier = Modifier.testTag(TEST_TAG_QUOTA_RECOMMENDED_USAGE),
+                    )
+                }
             }
         }
     }
@@ -172,9 +170,27 @@ private fun QuotaRecommendedPlanCardPreview() {
             storageText = "200 GB storage",
             transferText = "2.4 TB transfer",
             badgeLabel = "Best for you",
-            usagePercentage = 10f,
-            usageLevel = QuotaUsageLevel.Normal,
-            usageText = "Storage: 19 GB out of 200 GB",
+            usage = QuotaCardUsage(
+                percentage = 10f,
+                level = QuotaUsageLevel.Normal,
+                text = "Storage: 19 GB out of 200 GB",
+            ),
+            modifier = Modifier.padding(16.dp),
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun QuotaRecommendedPlanCardWithoutUsagePreview() {
+    AndroidTheme(isSystemInDarkTheme()) {
+        QuotaRecommendedPlanCard(
+            planName = "Essential",
+            monthlyPriceText = "€3.33/month",
+            yearlyTotalText = "€40.01 charged yearly",
+            storageText = "200 GB storage",
+            transferText = "2.4 TB transfer",
+            badgeLabel = "Best for you",
             modifier = Modifier.padding(16.dp),
         )
     }

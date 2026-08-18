@@ -21,6 +21,8 @@ import mega.privacy.android.feature.payment.model.LocalisedSubscription
  * @property recommendedSubscription the next-tier plan to recommend, null until loaded or none available
  * @property isHighestPlan whether the user is already on the highest available plan, so no upgrade is offered
  * @property email the current user's email, used to pre-fill the custom-plan support request
+ * @property isLoggedIn whether a user is signed in; anonymous users reach the screen from public
+ * links, so the screen upsells them without any account data and sends both actions to login
  * @property isLoading whether the recommended plan is still being resolved
  * @property isConnected whether the device has an internet connection
  * @property hasLoadError whether fetching the available plans failed; stays false while a fetch is
@@ -40,6 +42,7 @@ data class QuotaWarningUpgradeState(
     val recommendedSubscription: LocalisedSubscription? = null,
     val isHighestPlan: Boolean = false,
     val email: String? = null,
+    val isLoggedIn: Boolean = true,
     val isLoading: Boolean = true,
     val isConnected: Boolean = true,
     val hasLoadError: Boolean = false,
@@ -48,7 +51,15 @@ data class QuotaWarningUpgradeState(
      * Whether the current account is on a paid (Pro) plan. An unknown plan counts as free, matching
      * the plan name the screen falls back to.
      */
-    val isProUser: Boolean = currentPlan != null && currentPlan != AccountType.FREE
+    val isProUser: Boolean = isLoggedIn && currentPlan != null && currentPlan != AccountType.FREE
+
+    /**
+     * Whether the screen shows the current plan and the usage figures for [metric]. Free accounts
+     * have a storage total to compare against but no transfer total, so only their transfer usage
+     * is left out. Logged-out users have no account data at all.
+     */
+    fun showQuotaDetails(metric: QuotaMetric): Boolean =
+        isLoggedIn && (isProUser || metric == QuotaMetric.Storage)
 
     /**
      * Whether the loaded quota data is being shown, as opposed to the skeleton or the error state.
