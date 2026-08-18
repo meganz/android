@@ -655,6 +655,8 @@ internal fun ComposeVideoPlayerScreen(
                                         playerComposeView.hideWithFade()
                                     }
                                 },
+                                onBrightnessChange = { applyScreenBrightness(context, it) },
+                                onVolumeChange = { applyStreamVolume(context, it) },
                             ).also { controller ->
                                 playerComposeView.tag = controller
                             }

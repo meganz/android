@@ -2,9 +2,11 @@ package mega.privacy.android.app.presentation.videoplayer.view
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.graphics.Bitmap
+import android.media.AudioManager
 import android.os.Build
 import android.os.Environment.DIRECTORY_DCIM
 import android.os.Environment.getExternalStoragePublicDirectory
@@ -84,12 +86,14 @@ import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R as Media3R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import de.palm.composestateevents.EventEffect
+import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import de.palm.composestateevents.EventEffect
+import timber.log.Timber
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
@@ -600,6 +604,8 @@ internal fun VideoPlayerScreen(
                                             playerComposeView.hideWithFade()
                                         }
                                     },
+                                    onBrightnessChange = { applyScreenBrightness(context, it) },
+                                    onVolumeChange = { applyStreamVolume(context, it) },
                                 ).also { controller ->
                                     playerComposeView.tag = controller
                                 }
@@ -1020,4 +1026,23 @@ private fun updateControllerViewPadding(
         }
     }
     controllerView.layoutParams = layoutParams
+}
+
+/** Shared by [VideoPlayerScreen] and [ComposeVideoPlayerScreen]. */
+internal fun applyScreenBrightness(context: Context, brightness: Float) {
+    runCatching {
+        val window = (context as? Activity)?.window ?: return
+        val clamped = brightness.coerceIn(0f, 1f)
+        window.attributes = window.attributes.also { it.screenBrightness = clamped }
+    }.onFailure { Timber.e(it, "Failed to set screen brightness") }
+}
+
+/** Shared by [VideoPlayerScreen] and [ComposeVideoPlayerScreen]. */
+internal fun applyStreamVolume(context: Context, volume: Float) {
+    runCatching {
+        val am = context.getSystemService(AudioManager::class.java) ?: return
+        val max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        // Flag 0 suppresses the system volume overlay UI; the player draws its own slider.
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, (volume * max).roundToInt(), 0)
+    }.onFailure { Timber.e(it, "Failed to set stream volume") }
 }

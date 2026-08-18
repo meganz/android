@@ -261,6 +261,7 @@ interface IconPackInterface {
                 val Square: ImageVector
                 val Star: ImageVector
                 val Subtitles02: ImageVector
+                val Sun: ImageVector
                 val Sync01: ImageVector
                 val TagSimple: ImageVector
                 val TransferArrowsUpDownAlt: ImageVector
@@ -277,6 +278,7 @@ interface IconPackInterface {
                 val VolumeMax: ImageVector
                 val VolumeMin: ImageVector
                 val VolumeOff: ImageVector
+                val VolumeX: ImageVector
                 val Waveform: ImageVector
                 val Video: ImageVector
                 val VideoJoin: ImageVector

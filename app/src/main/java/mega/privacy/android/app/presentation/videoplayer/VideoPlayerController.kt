@@ -6,8 +6,10 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Matrix
+import android.media.AudioManager
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.Gravity
@@ -39,13 +41,16 @@ import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.feature.mediaplayer.components.GestureSliderType
+import mega.privacy.android.feature.mediaplayer.components.VideoPlayerGestureSlider
 import mega.privacy.android.feature.mediaplayer.components.VideoPlayerOverlayChip
 import mega.privacy.android.feature.mediaplayer.components.VideoPlayerOverlayChipState
-import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.mobile.analytics.event.VideoPlayerRotateToLandscapePressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRotateToPortraitPressedEvent
 import timber.log.Timber
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @OptIn(UnstableApi::class)
@@ -64,6 +69,8 @@ class VideoPlayerController(
     private val resetAutoHideTimer: () -> Unit,
     private val onLongPressSpeedChange: (SpeedPlaybackItem) -> Unit,
     private val onLongPressActivated: () -> Unit,
+    private val onBrightnessChange: (Float) -> Unit,
+    private val onVolumeChange: (Float) -> Unit,
 ) {
     private val repeatToggleButton = container.findViewById<ImageButton>(R.id.repeat_toggle)
     private val playerComposeView = container.findViewById<PlayerView>(R.id.player_compose_view)
@@ -123,6 +130,24 @@ class VideoPlayerController(
     private var isGesturesEnabled = uiState.isGesturesEnabled
     private var playQueueInOverflowMenu = mutableStateOf(uiState.items.size > SINGLE_PLAYLIST_SIZE)
 
+    private enum class ScrollGestureType { None, Brightness, Volume }
+
+    private var scrollGestureType = ScrollGestureType.None
+
+    // Suppresses brightness/volume gestures after a multi-touch (pinch) sequence until the
+    // user starts a completely fresh touch (ACTION_DOWN). Prevents the finger remaining on
+    // screen after a pinch from accidentally triggering brightness/volume adjustment.
+    private var suppressScrollGesture = false
+    private var gestureStartBrightness = 0f
+    private var gestureStartVolume = 0f
+    private val brightnessSliderState = mutableStateOf<Float?>(null)
+    private val volumeSliderState = mutableStateOf<Float?>(null)
+    private var brightnessSliderView: ComposeView? = null
+    private var volumeSliderView: ComposeView? = null
+    private val sliderHideHandler = Handler(Looper.getMainLooper())
+    private val hideBrightnessSliderRunnable = Runnable { brightnessSliderState.value = null }
+    private val hideVolumeSliderRunnable = Runnable { volumeSliderState.value = null }
+
     init {
         initChipOverlays()
         playerComposeView.setControllerAnimationEnabled(false)
@@ -175,6 +200,46 @@ class VideoPlayerController(
                 Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
             ).also { it.bottomMargin = longPressChipBottomMarginDp.toPx() },
         )
+
+        val sliderSideMarginDp = if (isLandscape) {
+            SLIDER_SIDE_MARGIN_LAND_DP
+        } else {
+            SLIDER_SIDE_MARGIN_PORT_DP
+        }
+
+        val brightnessComposeView = ComposeView(context)
+        brightnessComposeView.setupComposeView(context) {
+            val value = brightnessSliderState.value
+            if (value != null) {
+                VideoPlayerGestureSlider(value = value, type = GestureSliderType.Brightness)
+            }
+        }
+        playerComposeView.addView(
+            brightnessComposeView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER_VERTICAL or Gravity.START,
+            ).also { it.marginStart = sliderSideMarginDp.toPx() },
+        )
+        brightnessSliderView = brightnessComposeView
+
+        val volumeComposeView = ComposeView(context)
+        volumeComposeView.setupComposeView(context) {
+            val value = volumeSliderState.value
+            if (value != null) {
+                VideoPlayerGestureSlider(value = value, type = GestureSliderType.Volume)
+            }
+        }
+        playerComposeView.addView(
+            volumeComposeView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER_VERTICAL or Gravity.END,
+            ).also { it.marginEnd = sliderSideMarginDp.toPx() },
+        )
+        volumeSliderView = volumeComposeView
     }
 
     /**
@@ -414,11 +479,42 @@ class VideoPlayerController(
                     distanceY: Float,
                 ): Boolean {
                     if (isLongPressActive) return true
-                    if (zoomLevel > 1 && !isLocked.value) {
+                    if (zoomLevel > 1f && !isLocked.value) {
                         translationX -= distanceX
                         translationY -= distanceY
                         enforceBoundaries()
                         updateTransformations()
+                        return true
+                    }
+                    if (isGesturesEnabled && !isLocked.value && e1 != null && e2.pointerCount == 1 && !suppressScrollGesture) {
+                        if (scrollGestureType == ScrollGestureType.None) {
+                            if (abs(distanceY) > abs(distanceX)) {
+                                if (isLeftHalfOfScreen(e1.x)) {
+                                    scrollGestureType = ScrollGestureType.Brightness
+                                    gestureStartBrightness = readCurrentBrightness()
+                                } else {
+                                    scrollGestureType = ScrollGestureType.Volume
+                                    gestureStartVolume = readCurrentVolume()
+                                }
+                                // Cancel long-press so the speed overlay cannot activate
+                                // during a brightness/volume swipe, and so that onScroll
+                                // is never blocked by isLongPressActive = true mid-swipe.
+                                longPressHandler.removeCallbacks(startLongPressRunnable)
+                                // Hide instantly (not with the post-gesture delay) so both sliders never show at once.
+                                if (scrollGestureType == ScrollGestureType.Brightness) {
+                                    sliderHideHandler.removeCallbacks(hideVolumeSliderRunnable)
+                                    volumeSliderState.value = null
+                                } else {
+                                    sliderHideHandler.removeCallbacks(hideBrightnessSliderRunnable)
+                                    brightnessSliderState.value = null
+                                }
+                            }
+                        }
+                        when (scrollGestureType) {
+                            ScrollGestureType.Brightness -> handleBrightnessScroll(distanceY)
+                            ScrollGestureType.Volume -> handleVolumeScroll(distanceY)
+                            else -> {}
+                        }
                     }
                     return true
                 }
@@ -445,22 +541,44 @@ class VideoPlayerController(
         playerComposeView.setOnTouchListener { _, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
+                    suppressScrollGesture = false
                     if (isGesturesEnabled && !isLocked.value) {
                         longPressHandler.postDelayed(
                             startLongPressRunnable,
-                            LONG_PRESS_TIMEOUT_MS,
+                            LONG_PRESS_TIMEOUT.inWholeMilliseconds,
                         )
                     }
                 }
 
                 MotionEvent.ACTION_POINTER_DOWN -> {
+                    suppressScrollGesture = true
                     longPressHandler.removeCallbacks(startLongPressRunnable)
+                    scrollGestureType = ScrollGestureType.None
+                    sliderHideHandler.removeCallbacks(hideBrightnessSliderRunnable)
+                    sliderHideHandler.removeCallbacks(hideVolumeSliderRunnable)
+                    brightnessSliderState.value = null
+                    volumeSliderState.value = null
                 }
 
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     longPressHandler.removeCallbacks(startLongPressRunnable)
                     if (isLongPressActive) {
                         releaseLongPress()
+                    }
+                    scrollGestureType = ScrollGestureType.None
+                    if (brightnessSliderState.value != null) {
+                        sliderHideHandler.removeCallbacks(hideBrightnessSliderRunnable)
+                        sliderHideHandler.postDelayed(
+                            hideBrightnessSliderRunnable,
+                            SLIDER_HIDE_DELAY.inWholeMilliseconds
+                        )
+                    }
+                    if (volumeSliderState.value != null) {
+                        sliderHideHandler.removeCallbacks(hideVolumeSliderRunnable)
+                        sliderHideHandler.postDelayed(
+                            hideVolumeSliderRunnable,
+                            SLIDER_HIDE_DELAY.inWholeMilliseconds
+                        )
                     }
                 }
             }
@@ -475,6 +593,53 @@ class VideoPlayerController(
         longPressChipState.value = null
         longPressSavedSpeed?.let { onLongPressSpeedChange(it) }
         longPressSavedSpeed = null
+    }
+
+    private fun handleBrightnessScroll(distanceY: Float) {
+        val playerHeight = playerComposeView.height.takeIf { it > 0 } ?: return
+        val delta = distanceY / playerHeight * GESTURE_SCROLL_SENSITIVITY
+        val newValue =
+            ((brightnessSliderState.value ?: gestureStartBrightness) + delta).coerceIn(0f, 1f)
+        brightnessSliderState.value = newValue
+        onBrightnessChange(newValue)
+    }
+
+    private fun handleVolumeScroll(distanceY: Float) {
+        val playerHeight = playerComposeView.height.takeIf { it > 0 } ?: return
+        val delta = distanceY / playerHeight * GESTURE_SCROLL_SENSITIVITY
+        val newValue = ((volumeSliderState.value ?: gestureStartVolume) + delta).coerceIn(0f, 1f)
+        volumeSliderState.value = newValue
+        onVolumeChange(newValue)
+    }
+
+    private fun readCurrentBrightness(): Float {
+        // Android reports -1f when the window uses system default brightness; read the system
+        // setting so the slider starts at the actual display level rather than jumping to 50%.
+        val windowBrightness = (context as? Activity)?.window?.attributes?.screenBrightness ?: -1f
+        if (windowBrightness >= 0f) return windowBrightness
+        return runCatching {
+            val raw = Settings.System.getInt(
+                context.contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS,
+            )
+            (raw.toFloat() / SYSTEM_BRIGHTNESS_MAX).coerceIn(0f, 1f)
+        }.getOrElse {
+            Timber.e(it, "Failed to read system screen brightness")
+            DEFAULT_BRIGHTNESS_FALLBACK
+        }
+    }
+
+    private fun readCurrentVolume(): Float {
+        return runCatching {
+            val am = context.getSystemService(AudioManager::class.java)
+                ?: return DEFAULT_VOLUME_FALLBACK
+            val max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            if (max == 0) 0f else am.getStreamVolume(AudioManager.STREAM_MUSIC)
+                .toFloat() / max.toFloat()
+        }.getOrElse {
+            Timber.e(it, "Failed to read current volume")
+            DEFAULT_VOLUME_FALLBACK
+        }
     }
 
     private fun updateTransformations() {
@@ -500,6 +665,8 @@ class VideoPlayerController(
         }
     }
 
+    private fun isLeftHalfOfScreen(x: Float): Boolean = x < playerComposeView.width / 2f
+
     internal fun release() {
         repeatToggleButton?.setOnClickListener(null)
         moreOptionButton?.setOnClickListener(null)
@@ -510,13 +677,27 @@ class VideoPlayerController(
         rewButton?.setOnClickListener(null)
         ffwdButton?.setOnClickListener(null)
 
-        seekHandler.removeCallbacks(hideSeekChipRunnable)
+        seekHandler.removeCallbacksAndMessages(null)
         seekChipState.value = null
         playerComposeView.removeView(seekChipView)
 
-        longPressHandler.removeCallbacks(startLongPressRunnable)
+        longPressHandler.removeCallbacksAndMessages(null)
         if (isLongPressActive) releaseLongPress()
         playerComposeView.removeView(longPressChipView)
+
+        sliderHideHandler.removeCallbacksAndMessages(null)
+        brightnessSliderState.value = null
+        volumeSliderState.value = null
+        brightnessSliderView?.let {
+            playerComposeView.removeView(it)
+            it.disposeComposition()
+        }
+        brightnessSliderView = null
+        volumeSliderView?.let {
+            playerComposeView.removeView(it)
+            it.disposeComposition()
+        }
+        volumeSliderView = null
 
         playerComposeView?.setOnTouchListener(null)
         scaleGestureDetector = null
@@ -535,7 +716,28 @@ class VideoPlayerController(
 
         // Positions long-press chip 30dp above the seek chip in portrait (per design spec).
         private const val LONG_PRESS_CHIP_PORTRAIT_EXTRA_DP = 30
-        // Fires 300ms after touch-down — faster than the system default (~500ms) for a snappier feel.
-        private const val LONG_PRESS_TIMEOUT_MS = 300L
+
+        // Matches the system default long-press threshold (~500ms), giving brightness/volume swipes
+        // a larger window to be recognized before the speed-change gesture fires.
+        private val LONG_PRESS_TIMEOUT = 500.milliseconds
+
+        // Slider lingers briefly after touch-up so the user can read the final value.
+        private val SLIDER_HIDE_DELAY = 800.milliseconds
+        private const val SLIDER_SIDE_MARGIN_PORT_DP = 30
+        private const val SLIDER_SIDE_MARGIN_LAND_DP = 60
+
+        // Empirically tuned: a half-screen swipe (~45% of screen height) maps to ~100% range
+        // change. Comparable to YouTube's gesture sensitivity on a typical phone screen.
+        private const val GESTURE_SCROLL_SENSITIVITY = 2.5f
+
+        // Android's Settings.System.SCREEN_BRIGHTNESS uses a 0–255 integer scale.
+        private const val SYSTEM_BRIGHTNESS_MAX = 255f
+
+        // Android returns -1f when the window is using the system default brightness;
+        // 0.5f (50%) is used as a reasonable starting point for the gesture.
+        private const val DEFAULT_BRIGHTNESS_FALLBACK = 0.5f
+
+        // Used when AudioManager is unavailable; starts the volume gesture at 50%.
+        private const val DEFAULT_VOLUME_FALLBACK = 0.5f
     }
 }

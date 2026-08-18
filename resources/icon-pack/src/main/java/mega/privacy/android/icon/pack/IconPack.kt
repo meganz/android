@@ -156,6 +156,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSpeedometer
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSquareImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineStarImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSubtitles02ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSunImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSync01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTagSimpleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTransferArrowsUpDownAltCircleCutoutImageVector
@@ -176,6 +177,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVolumeImage
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVolumeMaxImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVolumeMinImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVolumeOffImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVolumeXImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineWaveformImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineXCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineXImageVector
@@ -663,6 +665,8 @@ public object IconPack : IconPackInterface {
                 override val Subtitles02: ImageVector by
                         lazy { createMediumThinOutlineSubtitles02ImageVector() }
 
+                override val Sun: ImageVector by lazy { createMediumThinOutlineSunImageVector() }
+
                 override val Sync01: ImageVector by
                         lazy { createMediumThinOutlineSync01ImageVector() }
 
@@ -720,6 +724,9 @@ public object IconPack : IconPackInterface {
 
                 override val VolumeOff: ImageVector by
                         lazy { createMediumThinOutlineVolumeOffImageVector() }
+
+                override val VolumeX: ImageVector by
+                        lazy { createMediumThinOutlineVolumeXImageVector() }
 
                 override val Waveform: ImageVector by
                         lazy { createMediumThinOutlineWaveformImageVector() }

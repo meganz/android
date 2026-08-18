@@ -24,6 +24,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
@@ -51,6 +52,8 @@ class VideoPlayerControllerTest {
     private val onLongPressActivated = mock<() -> Unit>()
     private val fullscreenClickedCallback = mock<(Boolean) -> Unit>()
     private val playerViewClicked = mock<() -> Unit>()
+    private val onBrightnessChange = mock<(Float) -> Unit>()
+    private val onVolumeChange = mock<(Float) -> Unit>()
 
     private lateinit var activity: AppCompatActivity
     private lateinit var mockContainer: FrameLayout
@@ -85,6 +88,8 @@ class VideoPlayerControllerTest {
         )
         whenever(mockContainer.findViewById<ImageButton>(R.id.exo_rew)).thenReturn(mockRew)
         whenever(mockContainer.findViewById<ImageButton>(R.id.exo_ffwd)).thenReturn(mockFfwd)
+        whenever(mockPlayerView.width).thenReturn(1000)
+        whenever(mockPlayerView.height).thenReturn(1000)
     }
 
     @After
@@ -118,6 +123,8 @@ class VideoPlayerControllerTest {
         resetAutoHideTimer = {},
         onLongPressSpeedChange = onLongPressSpeedChange,
         onLongPressActivated = onLongPressActivated,
+        onBrightnessChange = onBrightnessChange,
+        onVolumeChange = onVolumeChange,
     ).also { controller = it }
 
     private fun VideoPlayerController.runStartLongPressRunnable() {
@@ -156,17 +163,36 @@ class VideoPlayerControllerTest {
         return field.getFloat(this)
     }
 
-    private fun VideoPlayerController.callOnScroll(distanceX: Float = 50f, distanceY: Float = 50f) {
+    private fun VideoPlayerController.callOnScroll(
+        distanceX: Float = 50f,
+        distanceY: Float = 50f,
+        startX: Float? = null,
+        pointerCount: Int = 1,
+    ) {
         val gdField = VideoPlayerController::class.java.getDeclaredField("gestureDetector")
         gdField.isAccessible = true
         val gd = gdField.get(this) as? GestureDetector ?: return
         val listenerField = GestureDetector::class.java.getDeclaredField("mListener")
         listenerField.isAccessible = true
         val listener = listenerField.get(gd) as? GestureDetector.OnGestureListener ?: return
-        val e2 = MotionEvent.obtain(0L, 0L, MotionEvent.ACTION_MOVE, 100f, 100f, 0)
+        val e1 = startX?.let { x ->
+            MotionEvent.obtain(0L, 0L, MotionEvent.ACTION_DOWN, x, 100f, 0)
+        }
+        val e2 = if (pointerCount == 1) {
+            MotionEvent.obtain(0L, 0L, MotionEvent.ACTION_MOVE, 100f, 100f, 0)
+        } else {
+            val properties = Array(pointerCount) { i ->
+                MotionEvent.PointerProperties().also { it.id = i; it.toolType = MotionEvent.TOOL_TYPE_FINGER }
+            }
+            val coords = Array(pointerCount) { i ->
+                MotionEvent.PointerCoords().also { it.x = 100f + i * 50f; it.y = 100f }
+            }
+            MotionEvent.obtain(0L, 0L, MotionEvent.ACTION_MOVE, pointerCount, properties, coords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+        }
         try {
-            listener.onScroll(null, e2, distanceX, distanceY)
+            listener.onScroll(e1, e2, distanceX, distanceY)
         } finally {
+            e1?.recycle()
             e2.recycle()
         }
     }
@@ -324,5 +350,94 @@ class VideoPlayerControllerTest {
         val controller = createController(isFullscreen = true)
         controller.callOnScale(scaleFactor = 1.5f)
         assertThat(controller.getZoomLevel()).isGreaterThan(1.0f)
+    }
+
+    @Test
+    fun `test that onScroll triggers brightness change when gestures enabled and swipe on left half`() {
+        val controller = createController(isGesturesEnabled = true)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        verify(onBrightnessChange).invoke(any())
+        verify(onVolumeChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScroll triggers volume change when gestures enabled and swipe on right half`() {
+        val controller = createController(isGesturesEnabled = true)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 600f)
+        verify(onVolumeChange).invoke(any())
+        verify(onBrightnessChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScroll does not trigger brightness or volume change when gestures disabled`() {
+        val controller = createController(isGesturesEnabled = false)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        verify(onBrightnessChange, never()).invoke(any())
+        verify(onVolumeChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScroll does not trigger brightness or volume change when locked`() {
+        val controller = createController(isGesturesEnabled = true, isLocked = true)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        verify(onBrightnessChange, never()).invoke(any())
+        verify(onVolumeChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScroll does not trigger brightness or volume change when zoomed in`() {
+        val controller = createController(isGesturesEnabled = true)
+        controller.setZoomLevel(2.0f)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        verify(onBrightnessChange, never()).invoke(any())
+        verify(onVolumeChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScroll does not trigger brightness or volume change when e1 is null`() {
+        val controller = createController(isGesturesEnabled = true)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = null)
+        verify(onBrightnessChange, never()).invoke(any())
+        verify(onVolumeChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScroll does not trigger brightness or volume change when swipe is horizontal`() {
+        val controller = createController(isGesturesEnabled = true)
+        controller.callOnScroll(distanceX = 50f, distanceY = 10f, startX = 400f)
+        verify(onBrightnessChange, never()).invoke(any())
+        verify(onVolumeChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScroll does not trigger brightness or volume change when suppressScrollGesture is true`() {
+        val controller = createController(isGesturesEnabled = true)
+        controller.setSuppressScrollGesture(true)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        verify(onBrightnessChange, never()).invoke(any())
+        verify(onVolumeChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScroll does not trigger brightness or volume change when pointer count is greater than 1`() {
+        val controller = createController(isGesturesEnabled = true)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f, pointerCount = 2)
+        verify(onBrightnessChange, never()).invoke(any())
+        verify(onVolumeChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScroll triggers brightness change on consecutive scroll events in same gesture`() {
+        val controller = createController(isGesturesEnabled = true)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        verify(onBrightnessChange, times(2)).invoke(any())
+        verify(onVolumeChange, never()).invoke(any())
+    }
+
+    private fun VideoPlayerController.setSuppressScrollGesture(suppress: Boolean) {
+        val field = VideoPlayerController::class.java.getDeclaredField("suppressScrollGesture")
+        field.isAccessible = true
+        field.setBoolean(this, suppress)
     }
 }

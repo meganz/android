@@ -5,6 +5,11 @@ plugins {
 
 android {
     namespace = "mega.privacy.android.feature.mediaplayer.components"
+    testOptions {
+        unitTests {
+            targetSdk = 34
+        }
+    }
 }
 
 dependencies {
@@ -26,6 +31,8 @@ dependencies {
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
     testRuntimeOnly(testlib.junit.jupiter.engine)
