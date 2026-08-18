@@ -54,27 +54,6 @@ internal class SyncPreferencesDatastoreImplTest {
         Dispatchers.resetMain()
     }
 
-    @ParameterizedTest(name = "onboarding shown state: {0}")
-    @ValueSource(booleans = [true, false])
-    internal fun `test that getOnboardingShown returns correct value`(
-        isOnboardingShown: Boolean,
-    ) = runTest {
-        whenever(preferences.get<Boolean>(any())).thenReturn(isOnboardingShown)
-
-        val result = underTest.getOnboardingShown()
-
-        assertThat(result).isEqualTo(isOnboardingShown)
-    }
-
-    @Test
-    internal fun `test that getOnboardingShown returns null when not set`() = runTest {
-        whenever(preferences.get<Boolean>(any())).thenReturn(null)
-
-        val result = underTest.getOnboardingShown()
-
-        assertThat(result).isNull()
-    }
-
     @ParameterizedTest(name = "sync only by WiFi state: {0}")
     @ValueSource(booleans = [true, false])
     internal fun `test that monitorSyncOnlyByWiFi emits correct value`(

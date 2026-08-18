@@ -21,21 +21,11 @@ internal class SyncPreferencesDatastoreImpl @Inject constructor(
     @Named(syncPrefsDataStoreName) private val dataStore: DataStore<Preferences>,
 ) : SyncPreferencesDatastore {
 
-    private val onboardingShownKey = booleanPreferencesKey("onboardingShown")
     private val syncOnlyByWiFiKey = booleanPreferencesKey("syncOnlyByWiFi")
     private val syncOnlyByChargingKey = booleanPreferencesKey("syncOnlyByCharging")
     private val pauseSyncOnBatterySaverKey = booleanPreferencesKey("pauseSyncOnBatterySaver")
     private val syncFrequencyKey = intPreferencesKey("syncFrequency")
     private val shouldRunForegroundKey = booleanPreferencesKey("shouldRunForeground")
-
-    override suspend fun setOnboardingShown(shown: Boolean) {
-        dataStore.edit {
-            it[onboardingShownKey] = shown
-        }
-    }
-
-    override suspend fun getOnboardingShown(): Boolean? =
-        dataStore.data.first()[onboardingShownKey]
 
     override suspend fun setSyncOnlyByWiFi(checked: Boolean) {
         dataStore.edit {

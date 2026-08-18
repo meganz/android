@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.sync.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
@@ -14,10 +13,8 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import mega.android.core.ui.theme.thememode.LocalIsDark
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerViewModel
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
@@ -40,7 +37,6 @@ import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNa
 import mega.privacy.android.navigation.destination.SelectSyncFolderNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncApplyToAllNavKey
-import mega.privacy.android.navigation.destination.SyncEmptyRouteNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
 import mega.privacy.android.navigation.destination.SyncMegaPickerNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
@@ -53,8 +49,6 @@ import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicke
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
-import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
-import mega.privacy.mobile.analytics.event.AndroidSyncGetStartedButtonEvent
 import timber.log.Timber
 
 fun EntryProviderScope<NavKey>.syncScreens(
@@ -145,34 +139,32 @@ fun EntryProviderScope<NavKey>.syncScreens(
             },
         )
 
-        SyncLegacyTheme {
-            SyncNewFolderScreenRoute(
-                viewModel = viewModel,
-                syncPermissionsManager = syncPermissionsManager,
-                openSelectMegaFolderScreen = {
-                    navigationHandler.navigate(
-                        if (useCloudExplorerPicker) {
-                            SelectSyncFolderNavKey
-                        } else {
-                            SyncMegaPickerNavKey
-                        }
-                    )
-                },
-                openNextScreen = { _ ->
-                    if (navKey.isFromDeviceCenter) {
-                        navigationHandler.navigate(SyncListNavKey())
+        SyncNewFolderScreenRoute(
+            viewModel = viewModel,
+            syncPermissionsManager = syncPermissionsManager,
+            openSelectMegaFolderScreen = {
+                navigationHandler.navigate(
+                    if (useCloudExplorerPicker) {
+                        SelectSyncFolderNavKey
+                    } else {
+                        SyncMegaPickerNavKey
                     }
-                    navigationHandler.remove(navKey)
-                },
-                openUpgradeAccount = openUpgradeAccountPage,
-                onBackClicked = {
-                    navigationHandler.back()
-                },
-                onSelectFolder = {
-                    launcher.launch(null)
-                },
-            )
-        }
+                )
+            },
+            openNextScreen = { _ ->
+                if (navKey.isFromDeviceCenter) {
+                    navigationHandler.navigate(SyncListNavKey())
+                }
+                navigationHandler.remove(navKey)
+            },
+            openUpgradeAccount = openUpgradeAccountPage,
+            onBackClicked = {
+                navigationHandler.back()
+            },
+            onSelectFolder = {
+                launcher.launch(null)
+            },
+        )
     }
 
     entry<SyncMegaPickerNavKey> {
@@ -208,22 +200,12 @@ fun EntryProviderScope<NavKey>.syncScreens(
         }
     }
 
-    entry<SyncEmptyRouteNavKey> {
-        LaunchedEffect(Unit) {
-            Analytics.tracker.trackEvent(AddSyncScreenEvent)
-        }
-        SyncLegacyTheme {
-            SyncEmptyScreen {
-                Analytics.tracker.trackEvent(AndroidSyncGetStartedButtonEvent)
-                navigationHandler.navigate(SyncNewFolderNavKey())
-            }
-        }
-    }
-
     entry<SyncSettingsNavKey> {
-        SyncLegacyTheme {
-            SettingsSyncRoute()
-        }
+        SettingsSyncRoute(
+            onBackClicked = {
+                navigationHandler.back()
+            }
+        )
     }
 
     entry<SyncStalledIssueResolutionNavKey>(metadata = bottomSheetMetadata()) { key ->
@@ -231,26 +213,24 @@ fun EntryProviderScope<NavKey>.syncScreens(
             hiltViewModel(viewModelStoreOwner = sharedViewModelStoreOwner())
         val state by viewModel.state.collectAsStateWithLifecycle()
 
-        SyncLegacyTheme {
-            state.stalledIssues.firstOrNull { it.id == key.issueId }?.let { issue ->
-                IssuesResolutionDialog(
-                    icon = issue.icon,
-                    conflictName = issue.conflictName,
-                    nodeName = issue.displayedName,
-                    actions = issue.actions,
-                    actionSelected = { action ->
-                        navigationHandler.navigate(
-                            SyncApplyToAllNavKey(
-                                issueId = issue.id,
-                                actionType = action.resolutionActionType.name,
-                            ),
-                            navOptions {
-                                popUpTo<SyncStalledIssueResolutionNavKey> { inclusive = true }
-                            },
-                        )
-                    },
-                )
-            }
+        state.stalledIssues.firstOrNull { it.id == key.issueId }?.let { issue ->
+            IssuesResolutionDialog(
+                icon = issue.icon,
+                conflictName = issue.conflictName,
+                nodeName = issue.displayedName,
+                actions = issue.actions,
+                actionSelected = { action ->
+                    navigationHandler.navigate(
+                        SyncApplyToAllNavKey(
+                            issueId = issue.id,
+                            actionType = action.resolutionActionType.name,
+                        ),
+                        navOptions {
+                            popUpTo<SyncStalledIssueResolutionNavKey> { inclusive = true }
+                        },
+                    )
+                },
+            )
         }
     }
 
@@ -261,29 +241,27 @@ fun EntryProviderScope<NavKey>.syncScreens(
         val issue = state.stalledIssues.firstOrNull { it.id == key.issueId }
         val action = issue?.actions?.firstOrNull { it.resolutionActionType.name == key.actionType }
 
-        SyncLegacyTheme {
-            if (issue != null && action != null) {
-                ApplyToAllDialog(
-                    fileName = issue.displayedName,
-                    selectedAction = action,
-                    onApplyToCurrent = {
-                        action.resolutionActionType.trackResolutionConfirmed()
-                        viewModel.handleAction(
-                            SyncListAction.ResolveStalledIssue(issue, action, isApplyToAll = false)
-                        )
-                        navigationHandler.remove(key)
-                    },
-                    onApplyToAll = {
-                        action.resolutionActionType.trackResolutionConfirmed()
-                        viewModel.handleAction(
-                            SyncListAction.ResolveStalledIssue(issue, action, isApplyToAll = true)
-                        )
-                        navigationHandler.remove(key)
-                    },
-                    onCancel = { navigationHandler.remove(key) },
-                    shouldShowApplyToAllOption = state.stalledIssues.size > 1,
-                )
-            }
+        if (issue != null && action != null) {
+            ApplyToAllDialog(
+                fileName = issue.displayedName,
+                selectedAction = action,
+                onApplyToCurrent = {
+                    action.resolutionActionType.trackResolutionConfirmed()
+                    viewModel.handleAction(
+                        SyncListAction.ResolveStalledIssue(issue, action, isApplyToAll = false)
+                    )
+                    navigationHandler.remove(key)
+                },
+                onApplyToAll = {
+                    action.resolutionActionType.trackResolutionConfirmed()
+                    viewModel.handleAction(
+                        SyncListAction.ResolveStalledIssue(issue, action, isApplyToAll = true)
+                    )
+                    navigationHandler.remove(key)
+                },
+                onCancel = { navigationHandler.remove(key) },
+                shouldShowApplyToAllOption = state.stalledIssues.size > 1,
+            )
         }
     }
 }

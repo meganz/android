@@ -6,10 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.sync.ui.isDarkMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -30,10 +30,9 @@ class SettingsSyncActivity : ComponentActivity() {
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-            OriginalTheme(isDark = themeMode.isDarkMode()) {
+            AndroidTheme(isDark = themeMode.isDarkMode()) {
                 SettingsSyncRoute()
             }
         }
     }
 }
-

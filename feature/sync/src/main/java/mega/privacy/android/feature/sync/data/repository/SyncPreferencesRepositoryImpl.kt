@@ -36,13 +36,6 @@ internal class SyncPreferencesRepositoryImpl @Inject constructor(
     override fun monitorPauseSyncOnBatterySaver(): Flow<Boolean?> =
         syncPreferencesDatastore.monitorPauseSyncOnBatterySaver()
 
-    override suspend fun setOnboardingShown(shown: Boolean) {
-        syncPreferencesDatastore.setOnboardingShown(shown)
-    }
-
-    override suspend fun getOnboardingShown(): Boolean? =
-        syncPreferencesDatastore.getOnboardingShown()
-
     override suspend fun setUserPausedSync(syncId: Long) {
         withContext(ioDispatcher) {
             userPausedSyncGateway.setUserPausedSync(syncId)

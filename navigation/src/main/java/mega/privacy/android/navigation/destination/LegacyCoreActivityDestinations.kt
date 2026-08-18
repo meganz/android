@@ -244,9 +244,6 @@ data class SyncSelectStopBackupDestinationNavKey(
 @Serializable
 data object SyncMegaPickerNavKey : NavKey
 
-@Serializable
-data object SyncEmptyRouteNavKey : NavKey
-
 /**
  * Bottom sheet listing the resolutions available for a stalled sync issue.
  *

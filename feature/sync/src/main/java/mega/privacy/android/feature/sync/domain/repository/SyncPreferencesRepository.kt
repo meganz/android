@@ -37,10 +37,6 @@ interface SyncPreferencesRepository {
      */
     fun monitorPauseSyncOnBatterySaver(): Flow<Boolean?>
 
-    suspend fun setOnboardingShown(shown: Boolean)
-
-    suspend fun getOnboardingShown(): Boolean?
-
     suspend fun setUserPausedSync(syncId: Long)
 
     suspend fun deleteUserPausedSync(syncId: Long)

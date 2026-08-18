@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
-import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import timber.log.Timber
@@ -19,7 +18,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SyncListViewModel @Inject constructor(
-    private val setOnboardingShownUseCase: SetOnboardingShownUseCase,
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
     private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
@@ -30,14 +28,9 @@ internal class SyncListViewModel @Inject constructor(
     val state: StateFlow<SyncListState> = _state.asStateFlow()
 
     init {
-        observeOnboardingFlow()
         monitorStalledIssue()
         monitorSolvedIssue()
         getDeviceName()
-    }
-
-    private fun observeOnboardingFlow() {
-        viewModelScope.launch { setOnboardingShownUseCase(true) }
     }
 
     private fun monitorStalledIssue() {

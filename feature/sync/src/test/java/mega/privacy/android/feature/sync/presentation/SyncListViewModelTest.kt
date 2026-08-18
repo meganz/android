@@ -13,7 +13,6 @@ import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
-import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
@@ -25,7 +24,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -34,7 +32,6 @@ import org.mockito.kotlin.whenever
 internal class SyncListViewModelTest {
 
     private lateinit var underTest: SyncListViewModel
-    private val setOnboardingShownUseCase: SetOnboardingShownUseCase = mock()
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
     private val resolveStalledIssueUseCase: ResolveStalledIssueUseCase = mock()
     private val stalledIssueItemMapper: StalledIssueItemMapper = mock()
@@ -63,7 +60,6 @@ internal class SyncListViewModelTest {
     @AfterEach
     fun resetAndTearDown() {
         reset(
-            setOnboardingShownUseCase,
             monitorSyncStalledIssuesUseCase,
             resolveStalledIssueUseCase,
             stalledIssueItemMapper,
@@ -71,13 +67,6 @@ internal class SyncListViewModelTest {
             getDeviceIdUseCase,
             getDeviceNameUseCase,
         )
-    }
-
-    @Test
-    fun `test that view model initialization sets onboarding shown to true`() = runTest {
-        initViewModel()
-
-        verify(setOnboardingShownUseCase).invoke(true)
     }
 
     @Test
@@ -114,7 +103,6 @@ internal class SyncListViewModelTest {
 
     private fun initViewModel() {
         underTest = SyncListViewModel(
-            setOnboardingShownUseCase = setOnboardingShownUseCase,
             monitorSyncStalledIssuesUseCase = monitorSyncStalledIssuesUseCase,
             monitorSyncSolvedIssuesUseCase = monitorSyncSolvedIssuesUseCase,
             getDeviceIdUseCase = getDeviceIdUseCase,

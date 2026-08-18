@@ -35,10 +35,12 @@ import mega.privacy.android.shared.resources.R
 @Composable
 internal fun SettingsSyncRoute(
     viewModel: SettingsSyncViewModel = hiltViewModel(),
+    onBackClicked: (() -> Unit)? = null,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     SettingSyncScreen(
         uiState = uiState,
+        onBackClicked = onBackClicked,
         syncDebrisCleared = {
             viewModel.handleAction(SettingsSyncAction.ClearDebrisClicked)
         },
@@ -70,6 +72,7 @@ internal fun SettingSyncScreen(
     pauseSyncOnBatterySaverChanged: (Boolean) -> Unit,
     syncFrequencySelected: (SyncFrequency) -> Unit,
     snackbarShown: () -> Unit,
+    onBackClicked: (() -> Unit)? = null,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var showSyncConnectionTypeDialog by rememberSaveable { mutableStateOf(false) }
@@ -83,7 +86,7 @@ internal fun SettingSyncScreen(
                 modifier = Modifier.testTag(SETTINGS_SYNC_TOOLBAR),
                 title = stringResource(R.string.settings_sync_and_backup_title),
                 navigationType = AppBarNavigationType.Back {
-                    onBackPressedDispatcher?.onBackPressed()
+                    onBackClicked?.invoke() ?: onBackPressedDispatcher?.onBackPressed()
                 },
             )
         },

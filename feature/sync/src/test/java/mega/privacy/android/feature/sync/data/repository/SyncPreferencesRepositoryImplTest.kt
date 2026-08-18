@@ -62,22 +62,6 @@ internal class SyncPreferencesRepositoryImplTest {
     }
 
     @Test
-    fun `test that setOnboardingShown calls setOnboardingShown on datastore`() = runTest {
-        underTest.setOnboardingShown(true)
-
-        verify(syncPreferencesDatastore).setOnboardingShown(true)
-    }
-
-    @Test
-    fun `test that getOnboardingShown returns value from datastore`() = runTest {
-        whenever(syncPreferencesDatastore.getOnboardingShown()).thenReturn(true)
-
-        val result = underTest.getOnboardingShown()
-
-        assertThat(result).isEqualTo(true)
-    }
-
-    @Test
     fun `test that setUserPausedSync calls setUserPausedSync on gateway`() = runTest {
         val syncId = 123L
         underTest.setUserPausedSync(syncId)
