@@ -249,4 +249,7 @@ eval "set -- $(
         tr '\n' ' '
     )" '"$@"'
 
+if [ -f "$APP_HOME/tools/gradle/with-build-lock.sh" ]; then
+    exec bash "$APP_HOME/tools/gradle/with-build-lock.sh" "$JAVACMD" "$@"
+fi
 exec "$JAVACMD" "$@"
