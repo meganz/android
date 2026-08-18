@@ -49,12 +49,14 @@ fun QuotaWarningUpgradeRoute(
         uiState.storageState,
         uiState.isTransferOverQuota,
         uiState.isProUser,
+        uiState.isLoggedIn,
     ) {
         QuotaWarningEventMapper()(
             type = type,
             storageState = uiState.storageState,
             isTransferOverQuota = uiState.isTransferOverQuota,
             isProUser = uiState.isProUser,
+            isLoggedIn = uiState.isLoggedIn,
         )
     }
 

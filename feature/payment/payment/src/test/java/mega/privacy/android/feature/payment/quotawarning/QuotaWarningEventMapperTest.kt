@@ -19,12 +19,18 @@ import mega.privacy.mobile.analytics.event.StorageFullProUserViewAllPlansButtonP
 import mega.privacy.mobile.analytics.event.TransferAllUsedFreeUserDialogScreenEvent
 import mega.privacy.mobile.analytics.event.TransferAllUsedFreeUserUpgradeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.TransferAllUsedFreeUserViewAllPlansButtonPressedEvent
+import mega.privacy.mobile.analytics.event.TransferAllUsedNotLoggedInUserDialogScreenEvent
+import mega.privacy.mobile.analytics.event.TransferAllUsedNotLoggedInUserUpgradeButtonPressedEvent
+import mega.privacy.mobile.analytics.event.TransferAllUsedNotLoggedInUserViewAllPlansButtonPressedEvent
 import mega.privacy.mobile.analytics.event.TransferAllUsedProUserDialogScreenEvent
 import mega.privacy.mobile.analytics.event.TransferAllUsedProUserUpgradeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.TransferAllUsedProUserViewAllPlansButtonPressedEvent
 import mega.privacy.mobile.analytics.event.TransferAlmostUsedFreeUserDialogScreenEvent
 import mega.privacy.mobile.analytics.event.TransferAlmostUsedFreeUserUpgradeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.TransferAlmostUsedFreeUserViewAllPlansButtonPressedEvent
+import mega.privacy.mobile.analytics.event.TransferAlmostUsedNotLoggedInUserDialogScreenEvent
+import mega.privacy.mobile.analytics.event.TransferAlmostUsedNotLoggedInUserUpgradeButtonPressedEvent
+import mega.privacy.mobile.analytics.event.TransferAlmostUsedNotLoggedInUserViewAllPlansButtonPressedEvent
 import mega.privacy.mobile.analytics.event.TransferAlmostUsedProUserDialogScreenEvent
 import mega.privacy.mobile.analytics.event.TransferAlmostUsedProUserUpgradeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.TransferAlmostUsedProUserViewAllPlansButtonPressedEvent
@@ -160,6 +166,40 @@ class QuotaWarningEventMapperTest {
             .isEqualTo(TransferAllUsedProUserUpgradeButtonPressedEvent)
         assertThat(result.viewAllPlansButtonPressed)
             .isEqualTo(TransferAllUsedProUserViewAllPlansButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that not logged in transfer running low maps to the transfer almost used events`() {
+        val result = underTest(
+            type = QuotaWarningType.Transfer,
+            storageState = StorageState.Unknown,
+            isTransferOverQuota = false,
+            isProUser = false,
+            isLoggedIn = false,
+        )
+
+        assertThat(result.screenView).isEqualTo(TransferAlmostUsedNotLoggedInUserDialogScreenEvent)
+        assertThat(result.upgradeButtonPressed)
+            .isEqualTo(TransferAlmostUsedNotLoggedInUserUpgradeButtonPressedEvent)
+        assertThat(result.viewAllPlansButtonPressed)
+            .isEqualTo(TransferAlmostUsedNotLoggedInUserViewAllPlansButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that not logged in transfer over quota maps to the transfer all used events`() {
+        val result = underTest(
+            type = QuotaWarningType.Transfer,
+            storageState = StorageState.Unknown,
+            isTransferOverQuota = true,
+            isProUser = false,
+            isLoggedIn = false,
+        )
+
+        assertThat(result.screenView).isEqualTo(TransferAllUsedNotLoggedInUserDialogScreenEvent)
+        assertThat(result.upgradeButtonPressed)
+            .isEqualTo(TransferAllUsedNotLoggedInUserUpgradeButtonPressedEvent)
+        assertThat(result.viewAllPlansButtonPressed)
+            .isEqualTo(TransferAllUsedNotLoggedInUserViewAllPlansButtonPressedEvent)
     }
 
     @Test

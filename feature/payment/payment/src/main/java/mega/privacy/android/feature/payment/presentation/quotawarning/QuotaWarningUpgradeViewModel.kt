@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.runningFold
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
@@ -62,9 +64,33 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
     /** In-flight retry, so a second tap on "Try again" is ignored rather than starting a fetch. */
     private var retryJob: Job? = null
 
+    /**
+     * Bandwidth over quota: once exceeded the warning stands, even if a later emission clears it.
+     *
+     * Shared rather than collected per consumer, so the recommendation and the copy always read the
+     * same value.
+     */
+    private val stickyTransferOverQuota = monitorTransferOverQuotaUseCase()
+        .runningFold(false) { wasOverQuota, isOverQuota -> wasOverQuota || isOverQuota }
+        .catch { Timber.e(it) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     init {
         monitorConnectivity()
+        monitorTransferOverQuota()
         loadQuotaData()
+    }
+
+    /**
+     * Bandwidth over quota is reported for anonymous users too, who hit it on public links, so it
+     * is monitored regardless of the session rather than alongside the account detail.
+     */
+    private fun monitorTransferOverQuota() {
+        viewModelScope.launch {
+            stickyTransferOverQuota.collect { isTransferOverQuota ->
+                _state.update { it.copy(isTransferOverQuota = isTransferOverQuota) }
+            }
+        }
     }
 
     /**
@@ -144,10 +170,7 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
                 monitorAccountDetailUseCase(),
                 subscriptionsResult,
                 monitorStorageStateUseCase(),
-                // once exceeded the warning stands, even if a later emission clears it
-                monitorTransferOverQuotaUseCase().runningFold(false) { wasOverQuota, isOverQuota ->
-                    wasOverQuota || isOverQuota
-                },
+                stickyTransferOverQuota,
             ) { detail, result, storageState, isTransferOverQuota ->
                 QuotaInput(detail, result?.getOrNull(), storageState, isTransferOverQuota)
             }

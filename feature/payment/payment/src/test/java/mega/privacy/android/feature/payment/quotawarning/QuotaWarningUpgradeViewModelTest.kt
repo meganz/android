@@ -175,6 +175,47 @@ class QuotaWarningUpgradeViewModelTest {
     }
 
     @Test
+    fun `test that init flags transfer over quota when the user is not logged in`() = runTest {
+        wheneverBlocking { isUserLoggedInUseCase() }.thenReturn(false)
+        whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf(true))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isLoggedIn).isFalse()
+            assertThat(state.isTransferOverQuota).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that init flags transfer over quota when the user is logged in`() = runTest {
+        val detail = accountDetail(storageUsed = 0, accountType = AccountType.FREE)
+        whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf(true))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().isTransferOverQuota).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that transfer over quota stays flagged when a later emission clears it`() = runTest {
+        whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf(true, false))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().isTransferOverQuota).isTrue()
+        }
+    }
+
+    @Test
     fun `test that init does not read account data when the user is not logged in`() = runTest {
         wheneverBlocking { isUserLoggedInUseCase() }.thenReturn(false)
 
