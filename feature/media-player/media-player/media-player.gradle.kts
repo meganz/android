@@ -44,6 +44,7 @@ dependencies {
     implementation(androidx.lifecycle.viewmodel)
     implementation(androidx.lifecycle.runtime.compose)
     implementation(androidx.navigation3.runtime)
+    implementation(androidx.navigation3.ui)
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))

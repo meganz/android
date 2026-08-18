@@ -7,22 +7,36 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.feature.mediaplayer.components.AudioPlayerWindowState.activeCount
 import timber.log.Timber
 
 /**
- * Owns all system-bar window state for the audio player screen and restores it when
- * the screen leaves composition.
+ * Window state shared by all active [AudioPlayerWindowEffect] instances.
+ *
+ * [activeCount] guards the saved fields: originals are saved when the first instance enters
+ * composition and restored only when the last one leaves. All access is on the main thread;
+ * no synchronisation needed.
+ */
+private object AudioPlayerWindowState {
+    var activeCount = 0
+    var statusBarColor = 0
+    var navBarColor = 0
+    var bgColor = 0
+    var bgColorValid = false
+    var lightStatusBars = true
+    var lightNavBars = true
+    var contrastEnforced = false
+}
+
+/**
+ * Manages all system-bar window state for the audio player screens and restores it when
+ * all audio player screens leave composition.
  *
  * Sets the window state required by the dark audio player UI:
  * - Status bar and navigation bar colors → transparent (gradient shows through)
@@ -37,13 +51,19 @@ import timber.log.Timber
  * `useLegacyStatusBarColor = false`, would let AndroidTheme's SideEffect fight and override
  * these settings on every recomposition.
  *
- * **Original values are preserved across composition re-entries using [rememberSaveable].**
- * Navigation3's slide-up transition removes AudioPlayerScreen from composition when QueueScreen
- * is pushed, then re-adds it when navigating back. Without preservation the re-entry would see the
- * dark-mode state (still applied by QueueScreen's effects) and save it as "original", causing dark
- * system bars on the Home screen after the player is closed. [rememberSaveable] is kept by
- * Navigation3's `rememberSaveableStateHolderNavEntryDecorator` across the round-trip, so the
- * first-entry (Home) state is used for restoration regardless of how many sub-screens were visited.
+ * **Reference-counting across multiple screens.** Both AudioPlayerScreen and
+ * AudioPlayerQueueScreen call this composable. When Navigation3's slide-up transition removes
+ * AudioPlayerScreen from composition while QueueScreen is active (or vice versa during the back
+ * transition), a naive per-screen save/restore would momentarily flash the home-screen bar colors.
+ * To prevent this, original values are shared and saved only by the **first** instance to enter
+ * composition, and restored only by the **last** instance to leave. As long as any audio-player
+ * screen remains in the composition tree the home-screen colors are never touched.
+ *
+ * **Dark colors are applied both in [DisposableEffect] setup and [SideEffect].** Applying in
+ * setup means the colors are set immediately at composition time — without waiting for a
+ * recomposition. This is important because Compose's smart-recomposition may skip recomposing
+ * a screen whose inputs have not changed (e.g. QueueScreen when AudioPlayerScreen is removed),
+ * which would prevent [SideEffect] from re-running and leave the home-screen colors visible.
  */
 @Suppress("DEPRECATION") // statusBarColor / navigationBarColor deprecated on API 35+; all calls are guarded with SDK_INT < VANILLA_ICE_CREAM
 @Composable
@@ -53,19 +73,6 @@ fun AudioPlayerWindowEffect() {
     val activity = LocalActivity.current
     val view = LocalView.current
 
-    // Preserved across composition re-entries by Navigation3's SaveableStateHolder.
-    // Only populated on the very first entry so that re-entries (e.g. back from QueueScreen)
-    // do not overwrite the Home-screen originals with the dark-mode values that are active
-    // while QueueScreen's AudioPlayerWindowEffect is still running.
-    var hasSavedOriginals by rememberSaveable { mutableStateOf(false) }
-    var originalStatusBarColor by rememberSaveable { mutableIntStateOf(0) }
-    var originalNavBarColor by rememberSaveable { mutableIntStateOf(0) }
-    var originalBgColorSaved by rememberSaveable { mutableStateOf(false) }
-    var originalBgColor by rememberSaveable { mutableIntStateOf(0) }
-    var originalLightStatusBars by rememberSaveable { mutableStateOf(true) }
-    var originalLightNavBars by rememberSaveable { mutableStateOf(true) }
-    var originalContrastEnforced by rememberSaveable { mutableStateOf(false) }
-
     DisposableEffect(activity, view) {
         val window = activity?.window ?: run {
             Timber.w("AudioPlayerWindowEffect: activity or window is null, skipping")
@@ -73,52 +80,85 @@ fun AudioPlayerWindowEffect() {
         }
         val insetsController = WindowCompat.getInsetsController(window, view)
 
-        if (!hasSavedOriginals) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                originalStatusBarColor = window.statusBarColor
-                originalNavBarColor = window.navigationBarColor
+        with(AudioPlayerWindowState) {
+            if (activeCount == 0) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                    statusBarColor = window.statusBarColor
+                    navBarColor = window.navigationBarColor
+                }
+                val bgDrawable = window.decorView.background
+                if (bgDrawable is ColorDrawable) {
+                    bgColor = bgDrawable.color
+                    bgColorValid = true
+                } else {
+                    bgColorValid = false
+                }
+                lightStatusBars = insetsController.isAppearanceLightStatusBars
+                lightNavBars = insetsController.isAppearanceLightNavigationBars
+                contrastEnforced = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    window.isNavigationBarContrastEnforced
+                } else {
+                    false
+                }
             }
-            val bgDrawable = window.decorView.background
-            if (bgDrawable is ColorDrawable) {
-                originalBgColor = bgDrawable.color
-                originalBgColorSaved = true
-            }
-            originalLightStatusBars = insetsController.isAppearanceLightStatusBars
-            originalLightNavBars = insetsController.isAppearanceLightNavigationBars
-            originalContrastEnforced = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                window.isNavigationBarContrastEnforced
-            } else {
-                false
-            }
-            hasSavedOriginals = true
+            activeCount++
+        }
+
+        // Apply dark settings immediately at composition time.
+        // SideEffect also applies them on every recomposition, but a screen whose inputs
+        // have not changed may be skipped by smart-recomposition, leaving this DisposableEffect
+        // setup as the only guarantee that the correct colors are active.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            window.statusBarColor = AndroidColor.TRANSPARENT
+            window.navigationBarColor = AndroidColor.TRANSPARENT
+        }
+        window.setBackgroundDrawable(pageBackgroundDrawable)
+        insetsController.isAppearanceLightStatusBars = false
+        insetsController.isAppearanceLightNavigationBars = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
         }
 
         onDispose {
-            runCatching {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                    window.statusBarColor = originalStatusBarColor
-                    window.navigationBarColor = originalNavBarColor
-                }
-            }.onFailure { Timber.e(it, "Failed to restore status/nav bar colors") }
+            // Restore original values only when the last audio-player screen leaves composition.
+            // While any audio-player screen is still active (count > 0) we must not restore,
+            // otherwise navigating between AudioPlayerScreen and QueueScreen would flash the
+            // home-screen bar colors.
+            with(AudioPlayerWindowState) {
+                activeCount--
+                if (activeCount == 0) {
+                    runCatching {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                            window.statusBarColor = statusBarColor
+                            window.navigationBarColor = navBarColor
+                        }
+                    }.onFailure { Timber.e(it, "Failed to restore status/nav bar colors") }
 
-            runCatching {
-                if (originalBgColorSaved) {
-                    window.setBackgroundDrawable(originalBgColor.toDrawable())
-                } else {
-                    window.setBackgroundDrawable(null)
-                }
-            }.onFailure { Timber.e(it, "Failed to restore window background") }
+                    runCatching {
+                        if (bgColorValid) {
+                            window.setBackgroundDrawable(bgColor.toDrawable())
+                        } else {
+                            window.setBackgroundDrawable(null)
+                        }
+                    }.onFailure { Timber.e(it, "Failed to restore window background") }
 
-            runCatching {
-                insetsController.isAppearanceLightStatusBars = originalLightStatusBars
-                insetsController.isAppearanceLightNavigationBars = originalLightNavBars
-            }.onFailure { Timber.e(it, "Failed to restore light bar appearance") }
+                    runCatching {
+                        insetsController.isAppearanceLightStatusBars = lightStatusBars
+                        insetsController.isAppearanceLightNavigationBars = lightNavBars
+                    }.onFailure { Timber.e(it, "Failed to restore light bar appearance") }
 
-            runCatching {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    window.isNavigationBarContrastEnforced = originalContrastEnforced
+                    runCatching {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            window.isNavigationBarContrastEnforced = contrastEnforced
+                        }
+                    }.onFailure {
+                        Timber.e(
+                            it,
+                            "Failed to restore navigation bar contrast enforcement"
+                        )
+                    }
                 }
-            }.onFailure { Timber.e(it, "Failed to restore navigation bar contrast enforcement") }
+            }
         }
     }
 

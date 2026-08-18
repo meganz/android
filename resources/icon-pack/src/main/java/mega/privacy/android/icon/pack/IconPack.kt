@@ -222,6 +222,7 @@ import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineTransferChec
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineTransferErrorImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineTransferPauseImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineTransferWarningImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineWaveformImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinSolidHeartImageVector
 
 public object IconPack : IconPackInterface {
@@ -853,6 +854,9 @@ public object IconPack : IconPackInterface {
 
                 override val TransferWarning: ImageVector by
                         lazy { createSmallThinOutlineTransferWarningImageVector() }
+
+                override val Waveform: ImageVector by
+                        lazy { createSmallThinOutlineWaveformImageVector() }
             }
 
             public object Solid : IconPackInterface.Small.Thin.Solid {

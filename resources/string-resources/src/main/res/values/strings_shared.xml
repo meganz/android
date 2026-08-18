@@ -463,10 +463,6 @@
     <string name="chat_recent_list_empty_title">Keep conversations private</string>
     <!--Subtitle text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
-    <!-- Title shown on the chat list when a search returns no matching chats or meetings -->
-    <string name="chat_list_search_no_results_title">No results found</string>
-    <!-- Description shown on the chat list when a search returns no matching chats or meetings -->
-    <string name="chat_list_search_no_results_description">Try a different search term</string>
     <!-- Label of the action button of inviting a friend from contact screen -->
     <string name="chat_recent_invite_friend">Invite a friend</string>
     <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
@@ -1249,20 +1245,6 @@
     <string name="settings_sync_power_always_title">Sync always</string>
     <!-- Sync only when charging label for sync power options -->
     <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
-    <!-- Title of the sync and backup settings screen -->
-    <string name="settings_sync_and_backup_title">Sync and backup</string>
-    <!-- Settings title for the sync and backup battery usage options -->
-    <string name="settings_sync_battery_usage_title">Battery usage</string>
-    <!-- Description shown in the sync and backup battery usage options dialog -->
-    <string name="settings_sync_battery_usage_description">Syncs and backups pause below 20% battery when not charging.</string>
-    <!-- Settings toggle to pause syncs and backups while the device battery saver is on -->
-    <string name="settings_sync_battery_pause_on_battery_saver_title">Pause when battery saver is on</string>
-    <!-- Status shown on a sync card when the sync is paused because the device battery saver is on -->
-    <string name="sync_list_sync_state_paused_battery_saver">Paused, battery saver</string>
-    <!-- Status shown on a sync card when the sync is paused because the device battery is low -->
-    <string name="sync_list_sync_state_paused_low_battery">Paused, low battery</string>
-    <!-- Status shown on a sync card when the sync is paused because the device is not connected to Wi-Fi -->
-    <string name="sync_list_sync_state_paused_no_wifi">Paused, no Wi-Fi</string>
     <!-- Message shown when uploading edited image as a new file -->
     <string name="photo_editor_upload_message">Uploading edits as a new file</string>
     <!-- Dialog title asking user to discard changes -->
@@ -3767,23 +3749,47 @@
     <string name="settings_customise_navigation_tooltip_body">Choose which items appear in your navigation</string>
     <!-- Action button label inside the onboarding tooltip pointing at the bottom navigation bar that opens the Customise navigation screen -->
     <string name="settings_customise_navigation_tooltip_action">Explore</string>
+    <!-- Settings: subtitle of the Customise navigation entry when the default navigation arrangement is used -->
+    <string name="settings_customise_navigation_state_default">Default</string>
+    <!-- Settings: subtitle of the Customise navigation entry when a custom navigation arrangement is saved -->
+    <string name="settings_customise_navigation_state_custom">Custom</string>
     <!-- Seek duration overlay shown in the video player when the user taps the seek buttons or double-taps the screen -->
     <plurals name="video_player_seek_seconds">
         <item quantity="one">%1$d second</item>
         <item quantity="other">%1$d seconds</item>
     </plurals>
-    <!-- Settings: subtitle of the Customise navigation entry when the default navigation arrangement is used -->
-    <string name="settings_customise_navigation_state_default">Default</string>
-    <!-- Settings: subtitle of the Customise navigation entry when a custom navigation arrangement is saved -->
-    <string name="settings_customise_navigation_state_custom">Custom</string>
+    <!-- Settings title for the sync and backup battery usage options -->
+    <string name="settings_sync_battery_usage_title">Battery usage</string>
+    <!-- Description shown in the sync and backup battery usage options dialog -->
+    <string name="settings_sync_battery_usage_description">Syncs and backups pause below 20% battery when not charging.</string>
+    <!-- Settings toggle to pause syncs and backups while the device battery saver is on -->
+    <string name="settings_sync_battery_pause_on_battery_saver_title">Pause when battery saver is on</string>
+    <!-- Title shown on the chat list when a search returns no matching chats or meetings -->
+    <string name="chat_list_search_no_results_title">No results found</string>
+    <!-- Description shown on the chat list when a search returns no matching chats or meetings -->
+    <string name="chat_list_search_no_results_description">Try a different search term</string>
+    <!-- Title of the sync and backup settings screen -->
+    <string name="settings_sync_and_backup_title">Sync and backup</string>
     <!-- Body of the system notification shown when transfers are interrupted because the transfer quota has been exceeded -->
     <string name="transfers_over_quota_notification_message">Upgrade to resume transfers, or wait until your transfer quota resets.</string>
+    <!-- Status shown on a sync card when the sync is paused because the device battery saver is on -->
+    <string name="sync_list_sync_state_paused_battery_saver">Paused, battery saver on</string>
+    <!-- Status shown on a sync card when the sync is paused because the device battery is low -->
+    <string name="sync_list_sync_state_paused_low_battery">Paused, low battery</string>
+    <!-- Status shown on a sync card when the sync is paused because the device is not connected to Wi-Fi -->
+    <string name="sync_list_sync_state_paused_no_wifi">Paused, no Wi-Fi</string>
     <!-- Chat list last-message preview shown when a chat has no messages yet -->
     <string name="chat_last_message_no_history">No conversation history</string>
     <!-- Chat list last-message preview sender prefix used for the current user's own messages in a group chat -->
     <string name="chat_last_message_sender_me">Me</string>
     <!-- Chat list last-message preview sender prefix used when a group-chat message sender's name cannot be resolved -->
     <string name="chat_last_message_sender_unknown">Unknown name</string>
+    <!-- Audio player: label for the continuous-playback toggle in the queue screen -->
+    <string name="audio_player_continuous_playback_title">Continuous playback</string>
+    <!-- Audio player: description for the continuous-playback toggle -->
+    <string name="audio_player_continuous_playback_description">Play the next file in the queue automatically</string>
+    <!-- Audio player: queue screen header showing the source folder; [A] marks the folder name rendered in Primary colour -->
+    <string name="audio_player_playing_from_label">Playing from [A]%s[/A]</string>
     <!-- Chat list item action that mutes notifications for the chat -->
     <string name="general_mute">Mute</string>
     <!-- Chat list item action that unmutes notifications for the chat -->

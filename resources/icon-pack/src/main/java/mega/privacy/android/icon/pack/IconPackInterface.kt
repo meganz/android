@@ -71,6 +71,7 @@ interface IconPackInterface {
                 val MessageChatCircle: ImageVector
                 val ClockRotate: ImageVector
                 val Music: ImageVector
+                val Waveform: ImageVector
             }
 
             /**

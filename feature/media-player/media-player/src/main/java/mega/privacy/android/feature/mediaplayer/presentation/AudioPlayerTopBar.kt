@@ -19,10 +19,10 @@ internal data object AudioPlayerMoreActionsMenuAction : MenuActionString(
 @Composable
 internal fun AudioPlayerTopBar(
     onBackPressed: () -> Unit,
-    onMoreActionsClicked: () -> Unit,
-    modifier: Modifier = Modifier,
+    onMoreActionsClicked: (() -> Unit)? = null,
     title: String = "",
     subtitle: String? = null,
+    modifier: Modifier = Modifier,
 ) {
     val backIcon: Painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronDown)
     TransparentTopBar(
@@ -31,9 +31,13 @@ internal fun AudioPlayerTopBar(
         modifier = modifier.testTag(AUDIO_PLAYER_TOP_BAR_TEST_TAG),
         navigationIcon = backIcon,
         onNavigationIconClicked = onBackPressed,
-        actions = listOf(AudioPlayerMoreActionsMenuAction),
+        actions = if (onMoreActionsClicked != null) {
+            listOf(AudioPlayerMoreActionsMenuAction)
+        } else {
+            emptyList()
+        },
         onActionPressed = {
-            onMoreActionsClicked()
+            onMoreActionsClicked?.invoke()
         },
     )
 }
