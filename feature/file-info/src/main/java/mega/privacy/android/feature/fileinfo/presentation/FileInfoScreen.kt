@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +30,7 @@ import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -143,6 +146,17 @@ private fun FileInfoContent(
     onDisputeTakedown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Kept above the orientation-dependent layout so the draft survives rotation; the key
+    // resets it when the persisted description changes.
+    val descriptionState = rememberSaveable(
+        uiState.descriptionText,
+        saver = TextFieldState.Saver,
+    ) {
+        TextFieldState(
+            initialText = uiState.descriptionText,
+            initialSelection = TextRange(uiState.descriptionText.length),
+        )
+    }
     FileInfoResponsiveLayout(
         modifier = modifier,
         header = { headerModifier ->
@@ -152,6 +166,7 @@ private fun FileInfoContent(
             FileInfoDetails(
                 uiState = uiState,
                 nodeHandle = nodeHandle,
+                descriptionState = descriptionState,
                 onLocationClick = onLocationClick,
                 onNavigate = onNavigate,
                 onDescriptionChange = onDescriptionChange,
@@ -274,6 +289,7 @@ private fun FileInfoHeader(
 private fun FileInfoDetails(
     uiState: FileInfoUiState,
     nodeHandle: Long,
+    descriptionState: TextFieldState,
     onLocationClick: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     onDescriptionChange: (String) -> Unit,
@@ -457,6 +473,7 @@ private fun FileInfoDetails(
         if (uiState.canShowDescription) {
             NodeDescriptionField(
                 description = uiState.descriptionText,
+                state = descriptionState,
                 isEditable = uiState.canEditDescription,
                 label = stringResource(sharedR.string.file_info_information_description_label),
                 placeholder = stringResource(sharedR.string.file_info_information_description_placeholder),

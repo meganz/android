@@ -3,16 +3,21 @@ package mega.privacy.android.feature.fileinfo.presentation
 import android.content.res.Configuration
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -247,6 +252,48 @@ class FileInfoScreenTest {
 
         composeRule.onNodeWithTag(FILE_INFO_DESCRIPTION_TAG).assertExists()
         composeRule.onNodeWithText("My description").assertExists()
+    }
+
+    @Test
+    fun `test that an in-progress description edit is preserved when rotating to landscape`() {
+        // Not snapshot state on purpose: the orientation only changes on the post-restore
+        // composition, emulating a rotation that recreates the screen with the other layout branch.
+        var orientation = Configuration.ORIENTATION_PORTRAIT
+        val restorationTester = StateRestorationTester(composeRule)
+        restorationTester.setContent {
+            val configuration = Configuration(LocalConfiguration.current).apply {
+                this.orientation = orientation
+            }
+            AndroidThemeForPreviews {
+                CompositionLocalProvider(
+                    LocalConfiguration provides configuration,
+                    LocalDeviceType provides DeviceType.Phone,
+                ) {
+                    FileInfoScreen(
+                        uiState = fileState.copy(
+                            accessPermission = AccessPermission.OWNER,
+                            descriptionText = "",
+                        ),
+                        nodeHandle = NODE_HANDLE,
+                        onBack = {},
+                        onLocationClick = {},
+                        onNavigate = {},
+                        onDescriptionChange = {},
+                        onDisputeTakedown = {},
+                    )
+                }
+            }
+        }
+        composeRule.onNodeWithTag(NODE_DESCRIPTION_TEXT_FIELD_TAG)
+            .performScrollTo()
+            .performTextInput("Edited description")
+
+        orientation = Configuration.ORIENTATION_LANDSCAPE
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        composeRule.onNodeWithTag(NODE_DESCRIPTION_TEXT_FIELD_TAG)
+            .assert(hasText("Edited description"))
+            .assertIsFocused()
     }
 
     @Test

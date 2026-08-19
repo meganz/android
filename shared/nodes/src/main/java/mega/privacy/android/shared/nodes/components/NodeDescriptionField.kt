@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -19,10 +21,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -43,13 +46,21 @@ import mega.android.core.ui.tokens.theme.DSTokens
  *
  * Multi line text area with a counter
  *
+ * The draft is a hoisted [TextFieldState]: create it with
+ * `rememberSaveable(description, saver = TextFieldState.Saver) { TextFieldState(description, TextRange(description.length)) }`
+ * above any orientation-dependent layout branch so the draft (text, selection and IME
+ * composition) survives rotation and resets when the persisted value changes. A field composed
+ * with an uncommitted draft requests focus so the user can finish the edit and commit it with
+ * Done.
+ *
  * @param description the persisted description
+ * @param state the hoisted state holding the in-progress edit
  * @param isEditable whether the current user can change the description
  * @param label the field/section label (e.g. "Description")
  * @param placeholder the hint shown in the editable field while it is empty
  * @param onDescriptionChange invoked with the new value when the keyboard "Done" action is pressed
  * @param modifier modifier for the field/section
- * @param charLimit the maximum number of characters allowed
+ * @param charLimit the maximum number of characters allowed; longer input is truncated
  * @param onFocused invoked when the editable field gains focus
  * @param onConfirmed invoked when the keyboard "Done" action is pressed, whether or not the value changed
  * @param onCharLimitReached invoked when an input would exceed [charLimit]
@@ -58,6 +69,7 @@ import mega.android.core.ui.tokens.theme.DSTokens
 @Composable
 fun NodeDescriptionField(
     description: String,
+    state: TextFieldState,
     isEditable: Boolean,
     label: String,
     placeholder: String,
@@ -79,12 +91,17 @@ fun NodeDescriptionField(
         )
 
         if (isEditable) {
-            var text by rememberSaveable { mutableStateOf(description) }
-            var isFocused by rememberSaveable { mutableStateOf(false) }
-            // Keep the field in sync when the persisted description changes (e.g. after a save/update).
-            LaunchedEffect(description) { text = description }
+            var isFocused by remember { mutableStateOf(false) }
 
             val focusManager = LocalFocusManager.current
+            val focusRequester = remember { FocusRequester() }
+            // A draft that differs from the persisted value is an edit the user has not committed
+            // with Done yet, so take focus back after recreation (e.g. rotation) to finish it.
+            LaunchedEffect(Unit) {
+                if (state.text.toString() != description) {
+                    focusRequester.requestFocus()
+                }
+            }
             val bringIntoViewRequester = remember { BringIntoViewRequester() }
             val imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)
             // A multiline field scrolls its own cursor, so ask the parent scroll to lift the whole
@@ -96,9 +113,11 @@ fun NodeDescriptionField(
             }
 
             OutlinedTextField(
+                state = state,
                 modifier = Modifier
                     .fillMaxWidth()
                     .bringIntoViewRequester(bringIntoViewRequester)
+                    .focusRequester(focusRequester)
                     .onFocusChanged {
                         if (it.isFocused && !isFocused) {
                             onFocused()
@@ -106,12 +125,15 @@ fun NodeDescriptionField(
                         isFocused = it.isFocused
                     }
                     .testTag(NODE_DESCRIPTION_TEXT_FIELD_TAG),
-                value = text,
-                onValueChange = {
-                    if (it.length > charLimit) {
-                        onCharLimitReached()
+                // Truncates instead of InputTransformation.maxLength, which would reject an
+                // overflowing edit (e.g. a long paste) entirely.
+                inputTransformation = remember(charLimit, onCharLimitReached) {
+                    InputTransformation {
+                        if (length > charLimit) {
+                            onCharLimitReached()
+                            replace(charLimit, length, "")
+                        }
                     }
-                    text = it.take(charLimit)
                 },
                 placeholder = {
                     MegaText(
@@ -122,20 +144,18 @@ fun NodeDescriptionField(
                 },
                 textStyle = AppTheme.typography.bodyLarge,
                 shape = RoundedCornerShape(8.dp),
-                minLines = 1,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done,
                 ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        onConfirmed()
-                        if (text != description) {
-                            onDescriptionChange(text)
-                        }
-                        focusManager.clearFocus()
-                    },
-                ),
+                onKeyboardAction = {
+                    onConfirmed()
+                    val currentText = state.text.toString()
+                    if (currentText != description) {
+                        onDescriptionChange(currentText)
+                    }
+                    focusManager.clearFocus()
+                },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = DSTokens.colors.border.strongSelected,
                     unfocusedBorderColor = DSTokens.colors.border.strong,
@@ -152,7 +172,7 @@ fun NodeDescriptionField(
                                 modifier = Modifier
                                     .align(Alignment.CenterEnd)
                                     .testTag(NODE_DESCRIPTION_COUNTER_TAG),
-                                text = "${text.length}/$charLimit",
+                                text = "${state.text.length}/$charLimit",
                                 textColor = TextColor.Secondary,
                                 style = AppTheme.typography.bodySmall,
                             )
@@ -179,6 +199,7 @@ private fun NodeDescriptionFieldEmptyPreview() {
     AndroidThemeForPreviews {
         NodeDescriptionField(
             description = "",
+            state = rememberTextFieldState(),
             isEditable = true,
             label = "Description",
             placeholder = "Add description",
@@ -193,6 +214,7 @@ private fun NodeDescriptionFieldEditablePreview() {
     AndroidThemeForPreviews {
         NodeDescriptionField(
             description = "Slides for the Q3 planning meeting",
+            state = rememberTextFieldState("Slides for the Q3 planning meeting"),
             isEditable = true,
             label = "Description",
             placeholder = "Add description",
@@ -207,6 +229,7 @@ private fun NodeDescriptionFieldReadOnlyPreview() {
     AndroidThemeForPreviews {
         NodeDescriptionField(
             description = "Slides for the Q3 planning meeting",
+            state = rememberTextFieldState("Slides for the Q3 planning meeting"),
             isEditable = false,
             label = "Description",
             placeholder = "Add description",
