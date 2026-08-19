@@ -208,6 +208,21 @@ class MyAccountWidgetTest {
     }
 
     @Test
+    fun `test that widget triggers onClick callback while loading`() {
+        var clickTriggered = false
+
+        setWidgetContent(
+            state = MyAccountWidgetUiState(isLoading = true),
+            onClick = { clickTriggered = true }
+        )
+
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_TEST_TAG, useUnmergedTree = true)
+            .performClick()
+
+        assertTrue("onClick callback should be triggered while loading", clickTriggered)
+    }
+
+    @Test
     fun `test that chevron icon is displayed`() {
         setWidgetContent(createBasicState())
 

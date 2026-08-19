@@ -85,14 +85,11 @@ class MyAccountWidgetViewModel @Inject constructor(
                 storageQuotaLevel = quotaLevelMapper(storageState),
                 accountTypeNameResource = accountTypeNameMapper(accountDetail.levelDetail?.accountType),
                 avatarContent = avatarContent,
-                isLoading = false,
+                isLoading = storageDetail == null || accountDetail.levelDetail == null,
                 isBusinessAccount = accountDetail.levelDetail?.accountType?.isBusinessAccount
                     ?: false
             )
         }.catch { Timber.e(it) }
-            .asUiStateFlow(
-                viewModelScope,
-                MyAccountWidgetUiState(accountTypeNameResource = accountTypeNameMapper(null))
-            )
+            .asUiStateFlow(viewModelScope, MyAccountWidgetUiState())
     }
 }

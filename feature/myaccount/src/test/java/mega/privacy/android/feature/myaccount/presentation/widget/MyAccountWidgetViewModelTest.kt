@@ -124,6 +124,38 @@ class MyAccountWidgetViewModelTest {
     }
 
     @Test
+    fun `test that isLoading is true when account detail has no storage detail`() = runTest {
+        stubDefaultDependencies(
+            accountDetailFlow = flowOf(createAccountDetail(storageDetail = null))
+        )
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.name).isEqualTo("Test User")
+            assertThat(state.isLoading).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isLoading is true when account detail has no level detail`() = runTest {
+        stubDefaultDependencies(
+            accountDetailFlow = flowOf(createAccountDetail(levelDetail = null))
+        )
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.name).isEqualTo("Test User")
+            assertThat(state.isLoading).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `test that account detail monitoring handles errors gracefully`() = runTest {
         stubDefaultDependencies(
             accountDetailFlow = flow { throw RuntimeException("Account detail error") }

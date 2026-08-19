@@ -69,4 +69,22 @@ class GetFullAccountInfoUseCaseTest {
             verify(getNumberOfSubscription).invoke(true)
         }
     }
+
+    @Test
+    fun `test that every request is still issued when the preceding ones throw`() {
+        runTest {
+            val event = StorageStateEvent(0L, StorageState.Unknown)
+            whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(event))
+            whenever(getPaymentMethodUseCase(true)).thenAnswer { throw RuntimeException() }
+            whenever(getAccountDetailsUseCase(true)).thenAnswer { throw RuntimeException() }
+            whenever(getPricing(true)).thenAnswer { throw RuntimeException() }
+
+            underTest()
+
+            verify(getPaymentMethodUseCase).invoke(true)
+            verify(getAccountDetailsUseCase).invoke(true)
+            verify(getPricing).invoke(true)
+            verify(getNumberOfSubscription).invoke(true)
+        }
+    }
 }
