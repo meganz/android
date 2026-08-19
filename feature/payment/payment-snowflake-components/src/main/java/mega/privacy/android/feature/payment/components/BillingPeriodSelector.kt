@@ -48,10 +48,11 @@ fun BillingPeriodSelector(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.CenterStart,
     ) {
         Row(
             modifier = Modifier
+                .testTag(TEST_TAG_BILLING_PERIOD_SELECTOR)
                 .background(
                     color = DSTokens.colors.background.surface2,
                     shape = RoundedCornerShape(24.dp),
@@ -151,6 +152,11 @@ private fun BillingPeriodSelectorYearlyPreview() {
         )
     }
 }
+
+/**
+ * Tag for the pill container of the billing period selector
+ */
+const val TEST_TAG_BILLING_PERIOD_SELECTOR = "billing_period_selector:pill"
 
 /**
  * Tag for the Monthly segment of the billing period selector

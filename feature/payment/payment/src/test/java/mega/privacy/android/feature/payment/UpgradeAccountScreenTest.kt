@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEqualTo
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -14,6 +16,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
@@ -27,6 +30,7 @@ import mega.privacy.android.domain.entity.account.OfferPeriod
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.feature.payment.components.TEST_TAG_BILLING_PERIOD_MONTHLY
+import mega.privacy.android.feature.payment.components.TEST_TAG_BILLING_PERIOD_SELECTOR
 import mega.privacy.android.feature.payment.components.TEST_TAG_BILLING_PERIOD_YEARLY
 import mega.privacy.mobile.analytics.event.UpgradeAccountPlanMonthlyPeriodTogglePressedEvent
 import mega.privacy.mobile.analytics.event.UpgradeAccountPlanYearlyPeriodTogglePressedEvent
@@ -489,6 +493,26 @@ class UpgradeAccountScreenTest {
                 .performScrollToNode(hasTestTag(tag))
                 .assertExists()
         }
+    }
+
+    @Test
+    fun `test that revamp plan card list keeps a 16dp gap below the billing period selector`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(currentPlan = null),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag("${TEST_TAG_REVAMP_PLAN_CARD}0"))
+        val selectorBottom = composeRule.onNodeWithTag(TEST_TAG_BILLING_PERIOD_SELECTOR)
+            .getUnclippedBoundsInRoot()
+            .bottom
+        val firstCardTop = composeRule.onNodeWithTag("${TEST_TAG_REVAMP_PLAN_CARD}0")
+            .getUnclippedBoundsInRoot()
+            .top
+
+        (firstCardTop - selectorBottom).assertIsEqualTo(16.dp, "gap")
     }
 
     @Test

@@ -3,9 +3,12 @@ package mega.privacy.android.feature.payment.components
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsEqualTo
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -66,5 +69,23 @@ class BillingPeriodSelectorTest {
         }
         composeRule.onNodeWithTag(TEST_TAG_BILLING_PERIOD_SAVE_LABEL, useUnmergedTree = true)
             .assertExists()
+    }
+
+    @Test
+    fun `test that the selector is aligned to the start`() {
+        composeRule.setContent {
+            BillingPeriodSelector(
+                modifier = Modifier.fillMaxWidth(),
+                isMonthly = true,
+                onPeriodSelected = {},
+                monthlyLabel = "Monthly",
+                yearlyLabel = "Yearly",
+                saveLabel = "Save up to 16%",
+            )
+        }
+        composeRule.onNodeWithTag(TEST_TAG_BILLING_PERIOD_SELECTOR)
+            .getUnclippedBoundsInRoot()
+            .left
+            .assertIsEqualTo(16.dp, "left")
     }
 }

@@ -2,9 +2,7 @@ package mega.privacy.android.feature.payment.presentation.upgrade
 
 import androidx.annotation.PluralsRes
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -116,8 +114,8 @@ internal fun LazyListScope.subscriptionRevampContent(
 }
 
 /**
- * Renders a single [PlanPriceCard] (plus trailing spacer) for [subscription] on the redesigned and
- * single-offer subscription pages.
+ * Renders a single [PlanPriceCard] for [subscription] on the redesigned and single-offer
+ * subscription pages.
  */
 @Composable
 internal fun PlanPriceCardItem(
@@ -183,10 +181,9 @@ internal fun PlanPriceCardItem(
         recommendedLabel = stringResource(sharedR.string.account_upgrade_account_pro_plan_info_recommended_label),
         isCurrentPlan = isCurrentPlan,
         modifier = Modifier
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .testTag("$TEST_TAG_REVAMP_PLAN_CARD$index"),
     )
-    Spacer(modifier = Modifier.height(16.dp))
 }
 
 /**
