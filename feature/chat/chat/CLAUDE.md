@@ -1,12 +1,12 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code when working in the `:feature:chat` module.
+This file provides guidance to Claude Code when working in the `:feature:chat:chat` module.
 
-> Module path: `:feature:chat` · Build file: `feature/chat/chat.gradle.kts` · Namespace:
+> Module path: `:feature:chat:chat` · Build file: `feature/chat/chat/chat.gradle.kts` · Namespace:
 `mega.privacy.android.feature.chat`
 
 ## Overview
-`:feature:chat` is a Jetpack Compose feature module covering chat-adjacent functionality: meetings (call recording, recording-consent, "meeting has ended"), and call/chat settings. It is presentation-focused — it consumes business logic from `:domain` use cases and exposes screens, dialogs, and navigation entry points to the host app via the navigation contract.
+`:feature:chat:chat` is a Jetpack Compose feature module covering chat-adjacent functionality: meetings (call recording, recording-consent, "meeting has ended"), and call/chat settings. It is presentation-focused — it consumes business logic from `:domain` use cases and exposes screens, dialogs, and navigation entry points to the host app via the navigation contract.
 
 The module wires itself into the app through Hilt multibindings (`@IntoSet`): it contributes a `FeatureDestination`, a `DeepLinkHandler`, and a `PostLoginInitialiser`. There is no data layer in this module (no repositories/gateways/mappers); state is sourced from injected use cases.
 
@@ -29,7 +29,7 @@ Project modules: `:domain`, `:navigation`, `:core:navigation-contract`, `:core:c
 Notable external libs: MEGA core-ui, Material3 (+ window size class), Compose BOM, Hilt navigation, Navigation Compose, Navigation3 runtime/ui, Kotlin Serialization, Timber.
 
 ## Testing
-JUnit 5 + Mockito + Turbine (Flow/UiState) + Truth, with Hilt test support. Run: `./gradlew feature:chat:testDebugUnitTest`. Unit-test `targetSdk` is pinned to 34.
+JUnit 5 + Mockito + Turbine (Flow/UiState) + Truth, with Hilt test support. Run: `./gradlew feature:chat:chat:testDebugUnitTest`. Unit-test `targetSdk` is pinned to 34.
 
 ## Notes & Gotchas
 

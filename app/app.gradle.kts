@@ -254,7 +254,7 @@ dependencies {
     implementation(project(":feature:devicecenter"))
     implementation(project(":feature:cloudexplorer"))
     implementation(project(":resources:string-resources"))
-    implementation(project(":feature:chat"))
+    implementation(project(":feature:chat:chat"))
     implementation(project(":feature:contact:contact"))
     implementation(project(":feature:media-player:media-player"))
     implementation(project(":feature:media-player:media-player-snowflake-components"))
