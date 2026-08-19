@@ -310,4 +310,10 @@ class AudioPlayerQueueViewModelTest {
         underTest.setContinuousPlayback(false)
         verify(gateway).setRepeatMode(Player.REPEAT_MODE_OFF)
     }
+
+    @Test
+    fun `test that moveQueueItem calls moveMediaItem on gateway with the given indices`() = runTest {
+        underTest.moveQueueItem(1, 3)
+        verify(gateway).moveMediaItem(1, 3)
+    }
 }

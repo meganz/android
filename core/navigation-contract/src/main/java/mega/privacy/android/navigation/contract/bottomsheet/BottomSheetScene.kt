@@ -51,7 +51,9 @@ class BottomSheetScene<T : Any>(
             }
         }
         if (forceDarkTheme) {
-            AndroidTheme(isDark = true, content = sheet)
+            // useLegacyStatusBarColor = false: the legacy SideEffect writes dark colors to the
+            // host Activity's window and never restores them on dismissal.
+            AndroidTheme(isDark = true, useLegacyStatusBarColor = false, content = sheet)
         } else {
             sheet()
         }

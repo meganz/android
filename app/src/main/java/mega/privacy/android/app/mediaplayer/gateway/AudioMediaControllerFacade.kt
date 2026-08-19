@@ -29,6 +29,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.feature.mediaplayer.data.AudioQueueItemFactory
 import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
 import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState
@@ -47,6 +48,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     private val mediaHandleStore: MediaHandleStore,
+    private val audioQueueItemFactory: AudioQueueItemFactory,
 ) : AudioMediaControllerGateway {
 
     private val gatewayScope = CoroutineScope(SupervisorJob() + mainDispatcher)
@@ -138,7 +140,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
             mediaItemCount = c.mediaItemCount,
             isBuffering = c.playbackState == Player.STATE_BUFFERING,
             isIdle = !suppressIdle && c.playbackState == Player.STATE_IDLE,
-            title = c.mediaMetadata.title?.toString(),
+            title = audioQueueItemFactory.resolveTitle(c.mediaMetadata),
             artist = c.mediaMetadata.artist?.toString(),
             artworkUri = c.mediaMetadata.artworkUri?.toString(),
             currentMediaItemId = c.currentMediaItem?.mediaId,
@@ -160,15 +162,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
     private fun MediaController.safeQueueIndex(): Int = currentMediaItemIndex.coerceAtLeast(0)
 
     private fun buildQueueItems(c: MediaController): List<AudioQueueItem> =
-        List(c.mediaItemCount) { i ->
-            val item = c.getMediaItemAt(i)
-            AudioQueueItem(
-                mediaId = item.mediaId,
-                title = item.mediaMetadata.title?.toString(),
-                artist = item.mediaMetadata.artist?.toString(),
-                handle = mediaHandleStore.getHandle(item.mediaId),
-            )
-        }
+        audioQueueItemFactory.buildQueueItems(List(c.mediaItemCount) { c.getMediaItemAt(it) })
 
     private fun updateState(update: AudioControllerState.() -> AudioControllerState) {
         currentState = currentState.update()
@@ -183,11 +177,24 @@ internal class AudioMediaControllerFacade @Inject constructor(
         }
 
         override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+            val ctrl = controller
+            val mediaId = ctrl?.currentMediaItem?.mediaId
+            val newQueueItems = if (
+                ctrl != null && mediaId != null &&
+                audioQueueItemFactory.cacheParsedMetadata(mediaId, mediaMetadata)
+            ) {
+                // Re-derive the queue so the parsed title/artist show on the item immediately.
+                buildQueueItems(ctrl)
+            } else {
+                // Nothing the queue displays changed (e.g. artwork-only update) — keep the list.
+                null
+            }
             updateState {
                 copy(
-                    title = mediaMetadata.title?.toString(),
+                    title = audioQueueItemFactory.resolveTitle(mediaMetadata),
                     artist = mediaMetadata.artist?.toString(),
                     artworkUri = mediaMetadata.artworkUri?.toString(),
+                    queueItems = newQueueItems ?: queueItems,
                 )
             }
         }
@@ -224,6 +231,8 @@ internal class AudioMediaControllerFacade @Inject constructor(
             val ctrl = controller ?: return
             val newQueueItems = buildQueueItems(ctrl)
             val newQueueIndex = ctrl.safeQueueIndex()
+            // Drop cached tag metadata for items no longer in the queue (e.g. playlist replaced).
+            audioQueueItemFactory.pruneCache(newQueueItems.mapTo(hashSetOf()) { it.mediaId })
             updateState {
                 copy(
                     mediaItemCount = ctrl.mediaItemCount,
@@ -338,6 +347,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
 
     override fun release() {
         stopPositionPolling()
+        audioQueueItemFactory.clearCache()
         controller?.removeListener(playerListener)
         gatewayScope.cancel()
         // Null the fields before releasing so the pending onSuccess callback (if any) can detect

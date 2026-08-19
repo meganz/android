@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,12 +15,16 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +43,7 @@ import coil3.request.crossfade
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.divider.SubtleDivider
 import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.list.MegaReorderableLazyColumn
 import mega.android.core.ui.components.toggle.Toggle
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.IconColor
@@ -64,6 +68,7 @@ internal fun AudioPlayerQueueScreen(
     uiState: AudioPlayerQueueUiState,
     onBack: () -> Unit,
     onQueueItemClick: (Int) -> Unit,
+    onQueueItemMoved: (fromIndex: Int, toIndex: Int) -> Unit,
     onSetContinuousPlayback: (Boolean) -> Unit,
     onMoreActionsClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -84,50 +89,140 @@ internal fun AudioPlayerQueueScreen(
                 )
 
                 if (uiState is AudioPlayerQueueUiState.Data) {
-                    LazyColumn(
+                    QueueContent(
+                        uiState = uiState,
+                        lazyListState = lazyListState,
+                        onQueueItemClick = onQueueItemClick,
+                        onQueueItemMoved = onQueueItemMoved,
+                        onSetContinuousPlayback = onSetContinuousPlayback,
                         modifier = Modifier.weight(1f),
-                        state = lazyListState,
-                        contentPadding = WindowInsets.navigationBars.asPaddingValues(),
-                    ) {
-                        item {
-                            ContinuousPlaybackRow(
-                                isEnabled = uiState.isContinuousPlayback,
-                                // Ignore toggle changes mid-scroll — they are almost always
-                                // accidental touches while flinging the list.
-                                onToggle = { enabled ->
-                                    if (!lazyListState.isScrollInProgress) {
-                                        onSetContinuousPlayback(enabled)
-                                    }
-                                },
-                            )
-                        }
-                        item {
-                            SubtleDivider()
-                        }
-                        item {
-                            CurrentlyPlayingRow(
-                                title = uiState.currentTitle,
-                                artist = uiState.currentArtist,
-                                artworkUri = uiState.currentArtworkUri,
-                                thumbnailData = uiState.currentThumbnailData,
-                            )
-                        }
-                        item {
-                            PlayingFromHeader(playingFromName = uiState.playingFromName)
-                        }
-                        itemsIndexed(
-                            items = uiState.items,
-                            key = { _, item -> item.mediaId },
-                        ) { index, item ->
-                            QueueItemRow(
-                                item = item,
-                                isCurrentlyPlaying = index == uiState.currentQueueIndex,
-                                onClick = { onQueueItemClick(index) },
-                            )
-                        }
-                    }
+                    )
                 }
             }
+        }
+    }
+}
+
+/**
+ * Rows of the queue list. The headers and the bottom inset participate in the same lazy list as
+ * the tracks so everything scrolls together, but only [Track] rows are draggable.
+ */
+private sealed interface QueueRowModel {
+    val key: String
+
+    data object ContinuousPlayback : QueueRowModel {
+        override val key = "row_continuous_playback"
+    }
+
+    data object HeaderDivider : QueueRowModel {
+        override val key = "row_header_divider"
+    }
+
+    data object NowPlaying : QueueRowModel {
+        override val key = "row_now_playing"
+    }
+
+    data object PlayingFrom : QueueRowModel {
+        override val key = "row_playing_from"
+    }
+
+    data class Track(val item: AudioQueueItem) : QueueRowModel {
+        override val key get() = item.mediaId
+    }
+
+    data object BottomInset : QueueRowModel {
+        override val key = "row_bottom_inset"
+    }
+}
+
+@Composable
+private fun QueueContent(
+    uiState: AudioPlayerQueueUiState.Data,
+    lazyListState: LazyListState,
+    onQueueItemClick: (Int) -> Unit,
+    onQueueItemMoved: (fromIndex: Int, toIndex: Int) -> Unit,
+    onSetContinuousPlayback: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val rows = remember(uiState.items) {
+        buildList {
+            add(QueueRowModel.ContinuousPlayback)
+            add(QueueRowModel.HeaderDivider)
+            add(QueueRowModel.NowPlaying)
+            add(QueueRowModel.PlayingFrom)
+            uiState.items.forEach { add(QueueRowModel.Track(it)) }
+            add(QueueRowModel.BottomInset)
+        }
+    }
+    // Local working copy so each drag step reorders instantly; every step is committed to the
+    // player, whose state emission rebuilds [rows] in the same order and resets this copy.
+    var localRows by remember(rows) { mutableStateOf(rows) }
+    val currentMediaId = uiState.items.getOrNull(uiState.currentQueueIndex)?.mediaId
+    // Row index of the first track == number of header rows; derived so it can never drift
+    // from the buildList block above.
+    val headerRowCount = remember(rows) { rows.indexOfFirst { it is QueueRowModel.Track } }
+
+    MegaReorderableLazyColumn(
+        items = localRows,
+        key = { it.key },
+        lazyListState = lazyListState,
+        modifier = modifier,
+        onMove = { from, to ->
+            val fromRow = localRows.getOrNull(from.index)
+            val toRow = localRows.getOrNull(to.index)
+            // Tracks can only swap with other tracks, which keeps them below the headers
+            // and above the bottom inset.
+            if (fromRow is QueueRowModel.Track && toRow is QueueRowModel.Track) {
+                localRows = localRows.toMutableList().apply {
+                    add(to.index, removeAt(from.index))
+                }
+                onQueueItemMoved(
+                    from.index - headerRowCount,
+                    to.index - headerRowCount,
+                )
+            }
+        },
+        dragEnabled = { it is QueueRowModel.Track },
+    ) { row ->
+        when (row) {
+            QueueRowModel.ContinuousPlayback -> ContinuousPlaybackRow(
+                isEnabled = uiState.isContinuousPlayback,
+                // Ignore toggle changes mid-scroll — they are almost always
+                // accidental touches while flinging the list.
+                onToggle = { enabled ->
+                    if (!lazyListState.isScrollInProgress) {
+                        onSetContinuousPlayback(enabled)
+                    }
+                },
+            )
+
+            QueueRowModel.HeaderDivider -> SubtleDivider()
+
+            QueueRowModel.NowPlaying -> CurrentlyPlayingRow(
+                title = uiState.currentTitle,
+                artist = uiState.currentArtist,
+                artworkUri = uiState.currentArtworkUri,
+                thumbnailData = uiState.currentThumbnailData,
+            )
+
+            QueueRowModel.PlayingFrom -> PlayingFromHeader(
+                playingFromName = uiState.playingFromName,
+            )
+
+            is QueueRowModel.Track -> QueueItemRow(
+                item = row.item,
+                isCurrentlyPlaying = row.item.mediaId == currentMediaId,
+                onClick = {
+                    val queueIndex = localRows.indexOf(row) - headerRowCount
+                    if (queueIndex >= 0) {
+                        onQueueItemClick(queueIndex)
+                    }
+                },
+            )
+
+            QueueRowModel.BottomInset -> Spacer(
+                modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars),
+            )
         }
     }
 }
@@ -337,6 +432,7 @@ private fun AudioPlayerQueueScreenPreview() {
         ),
         onBack = {},
         onQueueItemClick = {},
+        onQueueItemMoved = { _, _ -> },
         onSetContinuousPlayback = {},
         onMoreActionsClicked = {},
     )

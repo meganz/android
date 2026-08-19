@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.mediaplayer.components
 
+import android.app.Activity
 import android.graphics.Color as AndroidColor
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
@@ -14,17 +15,25 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.feature.mediaplayer.components.AudioPlayerWindowState.activeCount
+import mega.privacy.android.feature.mediaplayer.components.AudioPlayerWindowState.savedActivity
 import timber.log.Timber
+import java.lang.ref.WeakReference
 
 /**
  * Window state shared by all active [AudioPlayerWindowEffect] instances.
  *
- * [activeCount] guards the saved fields: originals are saved when the first instance enters
- * composition and restored only when the last one leaves. All access is on the main thread;
- * no synchronisation needed.
+ * [activeCount] guards restoration: originals are restored only when the last instance leaves
+ * composition. Originals are saved at most **once per Activity** ([savedActivity]): when the
+ * player round-trips to another destination and back (e.g. via a node-options action), the
+ * window state at re-entry may have been polluted by overlays that write to the Activity window
+ * without restoring (a force-dark bottom sheet's theme SideEffect can land after this effect's
+ * restore during the exit transition). Re-saving at that point would capture the polluted values
+ * and later "restore" them onto the home screen, so the first-entry originals are kept instead.
+ * All access is on the main thread (Compose applier thread); no synchronisation needed.
  */
 private object AudioPlayerWindowState {
     var activeCount = 0
+    var savedActivity: WeakReference<Activity>? = null
     var statusBarColor = 0
     var navBarColor = 0
     var bgColor = 0
@@ -81,7 +90,7 @@ fun AudioPlayerWindowEffect() {
         val insetsController = WindowCompat.getInsetsController(window, view)
 
         with(AudioPlayerWindowState) {
-            if (activeCount == 0) {
+            if (activeCount == 0 && savedActivity?.get() !== activity) {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
                     statusBarColor = window.statusBarColor
                     navBarColor = window.navigationBarColor
@@ -100,6 +109,7 @@ fun AudioPlayerWindowEffect() {
                 } else {
                     false
                 }
+                savedActivity = WeakReference(activity)
             }
             activeCount++
         }

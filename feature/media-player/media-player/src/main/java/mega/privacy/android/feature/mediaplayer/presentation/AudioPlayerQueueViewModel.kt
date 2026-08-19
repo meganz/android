@@ -103,4 +103,9 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
     fun setContinuousPlayback(enabled: Boolean) {
         gateway.setRepeatMode(if (enabled) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF)
     }
+
+    /** Moves the queue item at [fromIndex] to [toIndex], keeping playback of the current item uninterrupted. */
+    fun moveQueueItem(fromIndex: Int, toIndex: Int) {
+        gateway.moveMediaItem(fromIndex, toIndex)
+    }
 }

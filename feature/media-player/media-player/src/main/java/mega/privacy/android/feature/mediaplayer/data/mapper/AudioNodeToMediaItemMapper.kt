@@ -11,10 +11,12 @@ import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
 /**
  * Maps a [TypedAudioNode] and a resolved stream [Uri] to a Media3 [MediaItem].
  *
- * When displayName is provided it is set as the initial [MediaMetadata.title] so the UI can
- * show the file name immediately while Media3 extracts embedded tags (ID3, Vorbis comment, etc.).
- * Once extraction completes, Media3 fires Player.Listener.onMediaMetadataChanged with the real
- * title/artist, which takes precedence over the initial value.
+ * When displayName is provided it is stored as [MediaMetadata.displayTitle] — deliberately NOT
+ * [MediaMetadata.title]. In the combined player metadata, fields set on the [MediaItem] take
+ * precedence over metadata extracted from embedded tags (ID3, Vorbis comment, etc.), so setting
+ * `title` here would permanently hide the real song title. Keeping the file name in
+ * `displayTitle` lets consumers fall back to it while the `title` slot stays reserved for the
+ * tag-derived value (see AudioMediaControllerFacade's title resolution).
  *
  * Artwork is resolved separately by the Compose UI layer via ThumbnailRequest.
  */
@@ -23,7 +25,7 @@ class AudioNodeToMediaItemMapper @Inject constructor(
 ) {
 
     operator fun invoke(node: TypedAudioNode, uri: Uri): MediaItem =
-        invoke(handle = node.id.longValue, uri = uri)
+        invoke(handle = node.id.longValue, uri = uri, displayName = node.name)
 
     /**
      * Create a [MediaItem] directly from raw fields (for offline items and the fast first-emit).
@@ -38,7 +40,7 @@ class AudioNodeToMediaItemMapper @Inject constructor(
             .setMediaId(mediaId)
             .apply {
                 if (displayName != null) {
-                    setMediaMetadata(MediaMetadata.Builder().setTitle(displayName).build())
+                    setMediaMetadata(MediaMetadata.Builder().setDisplayTitle(displayName).build())
                 }
             }
             .build()

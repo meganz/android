@@ -274,6 +274,7 @@ class AudioPlayQueueBuilder @Inject constructor(
                         audioNodeToMediaItemMapper(
                             handle = item.handle.toLong(),
                             uri = uri,
+                            displayName = item.name,
                         )
                     )
                 }
@@ -377,7 +378,13 @@ class AudioPlayQueueBuilder @Inject constructor(
             .forEachIndexed { index, file ->
                 val hashHandle = file.name.hashCode().toLong()
                 if (hashHandle == firstPlayHandle) firstPlayIndex = index
-                mediaItems.add(audioNodeToMediaItemMapper(hashHandle, file.toUri()))
+                mediaItems.add(
+                    audioNodeToMediaItemMapper(
+                        handle = hashHandle,
+                        uri = file.toUri(),
+                        displayName = file.name,
+                    )
+                )
             }
 
         return mediaItems to firstPlayIndex

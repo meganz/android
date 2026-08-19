@@ -81,6 +81,7 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
             uiState = uiState,
             onBack = navigationHandler::back,
             onQueueItemClick = viewModel::seekToQueueItem,
+            onQueueItemMoved = viewModel::moveQueueItem,
             onSetContinuousPlayback = viewModel::setContinuousPlayback,
             onMoreActionsClicked = {
                 (playerUiState as? AudioPlayerUiState.Data)?.buildNodeOptionsNavKey()
