@@ -69,6 +69,35 @@ the read helpers treat invalid input. Tests can still mutate `nodeTree` directly
 `MegaApiJava`/`MegaChatApiJava` parameter passed to listener callbacks is an inert instance that
 must never be invoked.
 
+## Chat message history
+
+The chat fake feeds the app's real message paging pipeline. Seed a room's history (oldest first,
+unique `msgId`s, distinct timestamps) and the fake answers `loadMessages` the way the SDK does:
+the next batch is emitted newest to oldest as `ChatRoomUpdate.OnMessageLoaded` into the
+`openChatRoom(chatId)` flow, followed by an `OnMessageLoaded(null)` terminator, returning
+`SOURCE_LOCAL`. Once the history is exhausted (or when nothing is seeded) only the null
+terminator is emitted and `SOURCE_NONE` is returned, so paging terminates cleanly; the delivery
+cursor then rewinds so a later refresh replays the full history.
+
+```kotlin
+gateway.chatState.chatRooms[chatId] = StubMegaChatRoom(chatId = chatId, title = "Chat")
+gateway.chatState.addChatMessage(
+    chatId,
+    StubMegaChatMessage(
+        msgId = 1L, userHandle = peerHandle, type = MegaChatMessage.TYPE_NORMAL,
+        status = MegaChatMessage.STATUS_SEEN, timestamp = 1_700_000_000L, content = "hi",
+    ),
+)
+
+// Deliver a live incoming message (appends to the history and emits OnMessageReceived)
+gateway.emitMessageReceived(chatId, StubMegaChatMessage(msgId = 2L, /* … */))
+```
+
+`sendMessage` echoes an own in-flight message as the SDK does — a `STATUS_SENDING` message with a
+fresh generated id (used as both `msgId` and `tempId`), authored by the logged-in user — and
+appends it to the room's history, so a sent message renders through the app's real send-and-store
+path. `getMessage` resolves through the seeded history.
+
 ## Stubbing semantics
 
 Stubs are keyed by method name (`KFunction.name`), so overloads share stubs — use the

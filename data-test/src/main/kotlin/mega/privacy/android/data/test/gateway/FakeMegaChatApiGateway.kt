@@ -2,9 +2,12 @@ package mega.privacy.android.data.test.gateway
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.reflect.KFunction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
@@ -56,6 +59,7 @@ import nz.mega.sdk.MegaStringList
  *
  * // State-backed defaults
  * gateway.chatState.chatRooms[chatId] = StubMegaChatRoom()
+ * gateway.chatState.addChatMessage(chatId, StubMegaChatMessage(msgId = 1L, content = "hi"))
  *
  * // Stub a query
  * gateway.stubResult(MegaChatApiGateway::getNumUnreadChats, 3)
@@ -87,6 +91,8 @@ class FakeMegaChatApiGateway(
         MutableSharedFlow<ScheduledMeetingUpdate>(extraBufferCapacity = 64)
     private val chatRoomUpdateFlows =
         ConcurrentHashMap<Long, MutableSharedFlow<ChatRoomUpdate>>()
+    private val historyCursors = ConcurrentHashMap<Long, Int>()
+    private val nextMessageId = AtomicLong(FIRST_GENERATED_MESSAGE_ID)
     private val localVideoUpdateFlows =
         ConcurrentHashMap<Long, MutableSharedFlow<ChatVideoUpdate>>()
     private val remoteVideoUpdateFlows =
@@ -147,6 +153,7 @@ class FakeMegaChatApiGateway(
     fun resetToDefaults() {
         engine.reset()
         chatState.reset()
+        historyCursors.clear()
         chatRequestListeners.clear()
         chatNotificationListeners.clear()
         chatVideoListeners.clear()
@@ -175,6 +182,16 @@ class FakeMegaChatApiGateway(
         chatRoomUpdateFlow(chatId).emit(update)
 
     /**
+     * Deliver a new incoming [message] to [chatId] as the SDK would deliver a live message:
+     * the message is appended to the seeded history in [chatState] and emitted as
+     * [ChatRoomUpdate.OnMessageReceived] into the flow returned by [openChatRoom].
+     */
+    suspend fun emitMessageReceived(chatId: Long, message: MegaChatMessage) {
+        chatState.addChatMessage(chatId, message)
+        chatRoomUpdateFlow(chatId).emit(ChatRoomUpdate.OnMessageReceived(message))
+    }
+
+    /**
      * Emit an update into the flow returned by [getChatLocalVideoUpdates] for [chatId].
      */
     suspend fun emitChatLocalVideoUpdate(chatId: Long, update: ChatVideoUpdate) =
@@ -195,6 +212,67 @@ class FakeMegaChatApiGateway(
 
     private fun remoteVideoUpdateFlow(chatId: Long) =
         remoteVideoUpdateFlows.getOrPut(chatId) { MutableSharedFlow(extraBufferCapacity = 64) }
+
+    /**
+     * Deliver the next batch of seeded history for [chatId] the way the SDK answers a
+     * `loadMessages` call: up to [count] messages, newest to oldest, each as
+     * [ChatRoomUpdate.OnMessageLoaded], followed by an `OnMessageLoaded(null)` terminator, and
+     * [MegaChatApi.SOURCE_LOCAL] returned. When the history is exhausted (or was never seeded)
+     * only the null terminator is emitted and [MegaChatApi.SOURCE_NONE] is returned; the
+     * delivery cursor then rewinds so a later refresh replays the full history, matching the
+     * app clearing its message store before reloading.
+     */
+    private suspend fun deliverSeededHistory(chatId: Long, count: Int): Int {
+        val flow = chatRoomUpdateFlow(chatId)
+        awaitHistoryCollector(flow)
+        val newestFirst = chatState.chatMessages[chatId].orEmpty().asReversed()
+        val delivered = historyCursors[chatId] ?: 0
+        val batch = newestFirst.drop(delivered).take(count)
+        return if (batch.isEmpty()) {
+            historyCursors.remove(chatId)
+            flow.emit(ChatRoomUpdate.OnMessageLoaded(null))
+            MegaChatApi.SOURCE_NONE
+        } else {
+            historyCursors[chatId] = delivered + batch.size
+            batch.forEach { flow.emit(ChatRoomUpdate.OnMessageLoaded(it)) }
+            flow.emit(ChatRoomUpdate.OnMessageLoaded(null))
+            MegaChatApi.SOURCE_LOCAL
+        }
+    }
+
+    /**
+     * The app subscribes its history collector concurrently with calling `loadMessages`, so give
+     * a new subscriber a short window to attach before emitting; the shared flows have no replay
+     * and a batch emitted before the collector attaches would be lost. Existing long-lived
+     * subscribers (message-update monitors) keep the count above zero, so wait for an increase
+     * over the baseline rather than for the first subscriber.
+     */
+    private suspend fun awaitHistoryCollector(flow: MutableSharedFlow<ChatRoomUpdate>) {
+        val baseline = flow.subscriptionCount.value
+        withTimeoutOrNull(HISTORY_COLLECTOR_TIMEOUT_MS) {
+            flow.subscriptionCount.first { it > baseline }
+        }
+    }
+
+    /**
+     * Build the message the SDK echoes back for an own outgoing message: in-flight
+     * ([MegaChatMessage.STATUS_SENDING]) with a fresh id used as both `msgId` and `tempId`,
+     * authored by the logged-in user, and appended to the seeded history of [chatId].
+     */
+    private fun newOwnMessage(chatId: Long, content: String?): MegaChatMessage {
+        val id = nextMessageId.getAndIncrement()
+        return StubMegaChatMessage(
+            msgId = id,
+            tempId = id,
+            userHandle = chatState.myUserHandle,
+            type = MegaChatMessage.TYPE_NORMAL,
+            status = MegaChatMessage.STATUS_SENDING,
+            timestamp = System.currentTimeMillis() / 1000,
+            content = content,
+            isEditable = true,
+            isDeletable = true,
+        ).also { chatState.addChatMessage(chatId, it) }
+    }
 
     private fun completeChatRequest(
         method: KFunction<*>,
@@ -730,7 +808,7 @@ class FakeMegaChatApiGateway(
 
     override fun getMessage(chatId: Long, messageId: Long): MegaChatMessage? =
         engine.dispatchBlocking(MegaChatApiGateway::getMessage, listOf(chatId, messageId)) {
-            null
+            chatState.chatMessages[chatId]?.lastOrNull { it.msgId == messageId }
         }
 
     override fun getMessageFromNodeHistory(chatId: Long, messageId: Long): MegaChatMessage? =
@@ -849,7 +927,7 @@ class FakeMegaChatApiGateway(
 
     override suspend fun loadMessages(chatId: Long, count: Int): Int =
         engine.dispatch(MegaChatApiGateway::loadMessages, listOf(chatId, count)) {
-            MegaChatApi.SOURCE_NONE
+            deliverSeededHistory(chatId, count)
         }
 
     override fun setOnlineStatus(status: Int, listener: MegaChatRequestListenerInterface) =
@@ -1117,7 +1195,7 @@ class FakeMegaChatApiGateway(
 
     override fun sendMessage(chatId: Long, message: String): MegaChatMessage? =
         engine.dispatchBlocking(MegaChatApiGateway::sendMessage, listOf(chatId, message)) {
-            StubMegaChatMessage()
+            newOwnMessage(chatId, message)
         }
 
     override suspend fun closeChatPreview(chatId: Long) {
@@ -1336,5 +1414,12 @@ class FakeMegaChatApiGateway(
 
     override suspend fun setUserStoppedTyping(chatId: Long) {
         engine.dispatch(MegaChatApiGateway::setUserStoppedTyping, listOf(chatId)) {}
+    }
+
+    private companion object {
+        const val HISTORY_COLLECTOR_TIMEOUT_MS = 500L
+
+        /** High enough to never collide with test-seeded message ids. */
+        const val FIRST_GENERATED_MESSAGE_ID = 1_000_000L
     }
 }

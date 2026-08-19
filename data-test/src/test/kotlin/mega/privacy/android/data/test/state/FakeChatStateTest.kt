@@ -1,6 +1,7 @@
 package mega.privacy.android.data.test.state
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.data.test.stub.StubMegaChatMessage
 import mega.privacy.android.data.test.stub.StubMegaChatRoom
 import nz.mega.sdk.MegaChatApi
 import org.junit.jupiter.api.Test
@@ -32,6 +33,20 @@ class FakeChatStateTest {
     }
 
     @Test
+    fun `test that addChatMessage appends to the history of its chat id in order`() {
+        val underTest = FakeChatState()
+        val first = StubMegaChatMessage(msgId = 1L)
+        val second = StubMegaChatMessage(msgId = 2L)
+
+        underTest.addChatMessage(1L, first)
+        underTest.addChatMessage(1L, second)
+        underTest.addChatMessage(2L, StubMegaChatMessage(msgId = 3L))
+
+        assertThat(underTest.chatMessages[1L]).containsExactly(first, second).inOrder()
+        assertThat(underTest.chatMessages[2L]).hasSize(1)
+    }
+
+    @Test
     fun `test that reset restores the defaults when fields were mutated`() {
         val underTest = FakeChatState().apply {
             initState = MegaChatApi.INIT_OFFLINE_SESSION
@@ -40,6 +55,7 @@ class FakeChatStateTest {
             myFullname = "Other User"
             myEmail = "other@mega.nz"
             chatRooms[1L] = StubMegaChatRoom(chatId = 1L)
+            addChatMessage(1L, StubMegaChatMessage(msgId = 1L))
         }
 
         underTest.reset()
@@ -50,5 +66,6 @@ class FakeChatStateTest {
         assertThat(underTest.myFullname).isEqualTo("Test User")
         assertThat(underTest.myEmail).isEqualTo("test@mega.nz")
         assertThat(underTest.chatRooms).isEmpty()
+        assertThat(underTest.chatMessages).isEmpty()
     }
 }
