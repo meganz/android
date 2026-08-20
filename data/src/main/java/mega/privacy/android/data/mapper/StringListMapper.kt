@@ -16,9 +16,6 @@ internal class StringListMapper @Inject constructor() {
      */
     operator fun invoke(
         megaStringList: MegaStringList,
-    ): List<String> = buildList {
-        for (i in 0 until megaStringList.size()) {
-            add(megaStringList.get(i))
-        }
-    }
+    ): List<String> = (0 until megaStringList.size())
+        .mapNotNull { megaStringList.get(it) }
 }

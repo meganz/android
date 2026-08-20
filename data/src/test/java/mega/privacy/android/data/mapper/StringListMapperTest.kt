@@ -32,4 +32,17 @@ class StringListMapperTest {
         val stringList = listOf(item1, item2, item3)
         Truth.assertThat(underTest.invoke(megaStringList)).isEqualTo(stringList)
     }
+
+    @Test
+    fun `test that string list mapper skips null entries when the sdk returns a null string`() {
+        val item1 = "item1"
+        val item3 = "item3"
+        val megaStringList = mock<MegaStringList> {
+            on { size() } doReturn 3
+            on { get(0) } doReturn item1
+            on { get(1) } doReturn null
+            on { get(2) } doReturn item3
+        }
+        Truth.assertThat(underTest.invoke(megaStringList)).isEqualTo(listOf(item1, item3))
+    }
 }
