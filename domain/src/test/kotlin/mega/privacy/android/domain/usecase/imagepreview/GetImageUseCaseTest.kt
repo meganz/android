@@ -366,7 +366,7 @@ internal class GetImageUseCaseTest {
     }
 
     @Test
-    internal fun `test that fetchThumbnail is not fetched when skipThumbnail is true`() =
+    internal fun `test that fetchThumbnail is skipped when skipThumbnail is true and a preview is cached`() =
         runTest {
             // A dedicated node keeps this independent of the shared imageNode mock's state, and a
             // ready previewPath lets the flow finish without touching the (un-mockable) fetchPreview.
@@ -386,5 +386,27 @@ internal class GetImageUseCaseTest {
             ).collect { }
 
             verify(node, never()).fetchThumbnail
+        }
+
+    @Test
+    internal fun `test that fetchThumbnail is fetched when skipThumbnail is true but no preview is cached`() =
+        runTest {
+            // No cached preview, so skipThumbnail must not leave the viewer blank: the thumbnail is
+            // still fetched. A dedicated node keeps this independent of the shared imageNode mock.
+            val node = mock<TypedImageNode> {
+                on { type } doReturn mock<StaticImageFileTypeInfo>()
+                on { fetchFullImage } doReturn { _, _ -> emptyFlow() }
+            }
+            whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(true)
+
+            underTest.invoke(
+                node,
+                fullSize = true,
+                highPriority = false,
+                skipThumbnail = true,
+                resetDownloads = {},
+            ).collect { }
+
+            verify(node).fetchThumbnail
         }
 }

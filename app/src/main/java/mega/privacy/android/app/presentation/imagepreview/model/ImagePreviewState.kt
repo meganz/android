@@ -30,6 +30,8 @@ internal data class ImagePreviewState(
     val isFromOffline: Boolean = false,
     val showVideoEditorTooltip: Boolean = false,
     val totalImageCount: Int? = null,
+    val anchorImageNodeId: Long? = null,
+    val anchorImagePath: String? = null,
 ) {
     val isPaginated = totalImageCount != null
     val pageCount = totalImageCount ?: imageNodes.size

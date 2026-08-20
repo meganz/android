@@ -393,7 +393,7 @@ fun MediaMainRoute(
         },
         onClearTimelinePhotosSelection = { timelineSelectedPhotoIds.clear() },
         onNavigateToTimelinePhotoPreview = onNavigateToTimelinePhotoPreview,
-        onPrefetchPreview = mediaMainViewModel::prefetchPreview,
+        onPrefetchThumbnail = mediaMainViewModel::prefetchThumbnail,
         clearCameraUploadsCompletedMessage = mediaCameraUploadViewModel::onConsumeUploadCompleteEvent,
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         multiNodeActionHandler = selectionModeActionHandler,
@@ -479,7 +479,7 @@ fun MediaMainScreen(
     viewModel: MediaMainViewModel = hiltViewModel(),
     albumsTabViewModel: AlbumsTabViewModel = hiltViewModel(),
     videoPlaylistsTabViewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
-    onPrefetchPreview: (Long) -> Unit = {},
+    onPrefetchThumbnail: (Long) -> Unit = {},
 ) {
     val mediaMainUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -730,11 +730,11 @@ fun MediaMainScreen(
                                         effectiveOnSortOptionChange(it)
                                         showTimelineSortDialog = false
                                     },
-                                    onTimelinePhotoClick = { id, anchorIndex, totalCount ->
+                                    onTimelinePhotoClick = { id, anchorIndex, totalCount, thumbnailPath ->
                                         if (selectionModeType == MediaSelectionModeType.Timeline) {
                                             onTimelinePhotoSelected(id)
                                         } else {
-                                            onPrefetchPreview(id)
+                                            onPrefetchThumbnail(id)
                                             onNavigateToTimelinePhotoPreview(
                                                 MediaTimelinePhotoPreviewNavKey(
                                                     id = id,
@@ -743,6 +743,7 @@ fun MediaMainScreen(
                                                     mediaSource = effectiveTimelineFilterUiState.mediaSource.toLegacyPhotosSource().name,
                                                     anchorIndex = anchorIndex,
                                                     totalCount = totalCount,
+                                                    anchorThumbnailPath = thumbnailPath,
                                                 )
                                             )
                                         }
@@ -835,7 +836,7 @@ private fun MediaScreen.MediaContent(
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortDialogDismissed: () -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
-    onTimelinePhotoClick: (id: Long, anchorIndex: Int, totalCount: Int) -> Unit,
+    onTimelinePhotoClick: (id: Long, anchorIndex: Int, totalCount: Int, thumbnailPath: String?) -> Unit,
     onTimelinePhotoSelected: (id: Long) -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
@@ -877,9 +878,15 @@ private fun MediaScreen.MediaContent(
                                     node == null -> return@TimelineRevampScreen
                                     node.isTakenDown -> onTimelineRevampNodeClicked(node)
                                     else -> {
-                                        val totalCount = (timelineRevampUiState as? TimelineRevampUiState.Data)
-                                            ?.sections?.sumOf { it.count.toInt() } ?: 0
-                                        onTimelinePhotoClick(node.id, anchorIndex, totalCount)
+                                        val totalCount =
+                                            (timelineRevampUiState as? TimelineRevampUiState.Data)
+                                                ?.sections?.sumOf { it.count.toInt() } ?: 0
+                                        onTimelinePhotoClick(
+                                            node.id,
+                                            anchorIndex,
+                                            totalCount,
+                                            node.thumbnailFilePath,
+                                        )
                                     }
                                 }
                             },
@@ -951,7 +958,7 @@ private fun MediaScreen.MediaContent(
                         onGridSizeChange = onTimelineGridSizeChange,
                         onSortDialogDismissed = onTimelineSortDialogDismissed,
                         onSortOptionChange = onTimelineSortOptionChange,
-                        onPhotoClick = { onTimelinePhotoClick(it, 0, 0) },
+                        onPhotoClick = { onTimelinePhotoClick(it, 0, 0, null) },
                         onPhotoSelected = onTimelinePhotoSelected,
                         handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                         handleNotificationPermissionResult = handleNotificationPermissionResult,

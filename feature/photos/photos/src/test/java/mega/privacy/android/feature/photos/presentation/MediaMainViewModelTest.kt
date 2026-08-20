@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.advanceUntilIdle
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadPreviewUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -20,13 +20,13 @@ internal class MediaMainViewModelTest {
     private lateinit var underTest: MediaMainViewModel
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val downloadPreviewUseCase = mock<DownloadPreviewUseCase>()
+    private val downloadThumbnailUseCase = mock<DownloadThumbnailUseCase>()
 
     @BeforeEach
     fun setUp() {
         underTest = MediaMainViewModel(
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            downloadPreviewUseCase = downloadPreviewUseCase,
+            downloadThumbnailUseCase = downloadThumbnailUseCase,
         )
     }
 
@@ -39,11 +39,12 @@ internal class MediaMainViewModelTest {
     }
 
     @Test
-    fun `test that prefetchPreview downloads the preview for the tapped node`() = runTest {
-        underTest.prefetchPreview(nodeId = 42L)
+    fun `test that prefetchThumbnail downloads the thumbnail for the tapped node`() =
+        runTest {
+            underTest.prefetchThumbnail(nodeId = 42L)
 
-        advanceUntilIdle()
+            advanceUntilIdle()
 
-        verify(downloadPreviewUseCase).invoke(42L)
-    }
+            verify(downloadThumbnailUseCase).invoke(42L)
+        }
 }

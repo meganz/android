@@ -68,6 +68,7 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_ADD_TO_ALBUM
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_IS_FOREIGN
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_MENU_OPTIONS
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_ANCHOR_THUMBNAIL_PATH
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_INDEX
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT
@@ -787,6 +788,7 @@ class ImagePreviewActivity : BaseActivity() {
             anchorImageNodeId: NodeId? = null,
             anchorImageNodeIndex: Int? = null,
             anchorImageNodeTotalCount: Int? = null,
+            anchorThumbnailPath: String? = null,
             params: Map<String, Any> = mapOf(),
             isForeign: Boolean = false,
             enableAddToAlbum: Boolean = false,
@@ -803,6 +805,7 @@ class ImagePreviewActivity : BaseActivity() {
                 anchorImageNodeTotalCount?.let {
                     putExtra(PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT, it)
                 }
+                putExtra(PARAMS_ANCHOR_THUMBNAIL_PATH, anchorThumbnailPath)
                 putExtra(FETCHER_PARAMS, paramsKey)
                 putExtra(IMAGE_PREVIEW_IS_FOREIGN, isForeign)
                 putExtra(IMAGE_PREVIEW_ADD_TO_ALBUM, enableAddToAlbum)

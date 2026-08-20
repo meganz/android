@@ -28,8 +28,10 @@ class GetImageUseCase @Inject constructor(
      * @param node                  Typed Image Node
      * @param fullSize              Flag to request full size image despite data/size requirements
      * @param highPriority          Flag to request image with high priority
-     * @param skipThumbnail         Flag to skip the 1:1 thumbnail fetch so a cached preview can be
-     *                              shown immediately without waiting on the thumbnail download
+     * @param skipThumbnail         When true, skip the 1:1 thumbnail fetch only if a preview is
+     *                              already cached (so it can be shown immediately). With no cached
+     *                              preview the thumbnail is still fetched, to avoid a blank viewer
+     *                              while the preview downloads.
      * @param resetDownloads        Callback to reset downloads
      *
      * @return Flow<ImageResult>
@@ -61,7 +63,7 @@ class GetImageUseCase @Inject constructor(
                 photosRepository.saveImageResult(node.id, imageResult)
             }
 
-            if (!skipThumbnail && node.thumbnailPath == null) {
+            if (node.thumbnailPath == null && !(skipThumbnail && node.previewPath != null)) {
                 runCatching {
                     node.fetchThumbnail()
                 }.onSuccess {

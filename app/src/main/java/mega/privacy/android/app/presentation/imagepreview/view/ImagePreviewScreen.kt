@@ -58,6 +58,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -70,6 +71,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import kotlinx.coroutines.CoroutineScope
@@ -152,7 +154,27 @@ internal fun ImagePreviewScreen(
     val accountType = viewState.accountType
     val isBusinessAccountExpired = viewState.isBusinessAccountExpired
     val isHiddenNodesOnboarded = viewState.isHiddenNodesOnboarded
-    viewState.currentImageNode?.let { currentImageNode ->
+
+    val currentImageNode = viewState.currentImageNode
+    if (currentImageNode == null) {
+        // Paint the tapped photo's grid thumbnail immediately, gated only on the nav-supplied path,
+        // so the viewer is not blank while the node resolves via GetNodeByIdUseCase.
+        viewState.anchorImagePath?.let { thumbnailPath ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black),
+                contentAlignment = Alignment.Center,
+            ) {
+                AsyncImage(
+                    model = thumbnailPath,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit,
+                )
+            }
+        }
+    } else {
         val isCurrentImageNodeAvailableOffline = viewState.isCurrentImageNodeAvailableOffline
         var showRemoveLinkDialog by rememberSaveable { mutableStateOf(false) }
         var showMoveToRubbishBinDialog by rememberSaveable { mutableStateOf(false) }
@@ -271,6 +293,8 @@ internal fun ImagePreviewScreen(
                     resolveImageNode = viewModel::resolveImageNode,
                     currentImageNodeIndex = currentImageNodeIndex,
                     currentImageNode = currentImageNode,
+                    anchorImageNodeId = viewState.anchorImageNodeId,
+                    anchorImagePath = viewState.anchorImagePath,
                     downloadImage = viewModel::monitorImageResult,
                     getImagePath = viewModel::getHighestResolutionImagePath,
                     getErrorImagePath = viewModel::getFallbackImagePath,
@@ -500,6 +524,8 @@ private fun ImagePreviewContent(
     resolveImageNode: suspend (Int) -> ImageNode?,
     currentImageNodeIndex: Int,
     currentImageNode: ImageNode,
+    anchorImageNodeId: Long?,
+    anchorImagePath: String?,
     onImageTap: () -> Unit,
     onSwitchFullScreenMode: (Boolean) -> Unit,
     onFlick: (Float) -> Unit,
@@ -520,7 +546,10 @@ private fun ImagePreviewContent(
             state = pagerState,
             beyondViewportPageCount = 1,
         ) { index ->
-            val imageNode by produceState<ImageNode?>(initialValue = null, key1 = index) {
+            val imageNode by produceState<ImageNode?>(
+                initialValue = currentImageNode.takeIf { index == currentImageNodeIndex },
+                key1 = index,
+            ) {
                 value = resolveImageNode(index)
             }
             val node = imageNode
@@ -532,8 +561,9 @@ private fun ImagePreviewContent(
                     CircularProgressIndicator(color = MaterialTheme.colors.secondary)
                 }
             } else {
-                val imageResultTriple by produceState<Triple<Int, String?, String?>>(
-                    initialValue = Triple(0, null, null),
+                val seedPath = anchorImagePath.takeIf { node.id.longValue == anchorImageNodeId }
+                val imageResultTriple by produceState(
+                    initialValue = Triple(0, seedPath, seedPath),
                     key1 = node.id,
                 ) {
                     downloadImage(node).collectLatest { imageResult ->

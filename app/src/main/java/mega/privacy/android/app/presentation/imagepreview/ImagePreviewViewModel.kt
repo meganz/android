@@ -168,6 +168,9 @@ class ImagePreviewViewModel @Inject constructor(
     private val currentImageNodeTotalCountValue: Int
         get() = savedStateHandle[PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT] ?: 0
 
+    private val anchorThumbnailPath: String?
+        get() = savedStateHandle[PARAMS_ANCHOR_THUMBNAIL_PATH]
+
     private val imagePreviewMenuSource: ImagePreviewMenuSource
         get() = savedStateHandle[IMAGE_PREVIEW_MENU_OPTIONS] ?: ImagePreviewMenuSource.TIMELINE
 
@@ -178,7 +181,12 @@ class ImagePreviewViewModel @Inject constructor(
     private var anchorImageNode: ImageNode? = null
     private var anchorPageIndex: Int = -1
 
-    private val _state = MutableStateFlow(ImagePreviewState())
+    private val _state = MutableStateFlow(
+        ImagePreviewState(
+            anchorImageNodeId = currentImageNodeIdValue.takeIf { it != 0L },
+            anchorImagePath = anchorThumbnailPath?.let { "$FILE_SCHEME$it" },
+        )
+    )
 
     internal val state: StateFlow<ImagePreviewState> = _state
 
@@ -1157,12 +1165,15 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     companion object {
+        // file:// scheme for loading a local cached path (e.g. the anchor thumbnail) with Coil.
+        private const val FILE_SCHEME = "file://"
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"
         const val IMAGE_PREVIEW_MENU_OPTIONS = "image_preview_menu_options"
         const val FETCHER_PARAMS = "fetcher_params"
         const val PARAMS_CURRENT_IMAGE_NODE_ID_VALUE = "currentImageNodeIdValue"
         const val PARAMS_CURRENT_IMAGE_NODE_INDEX = "currentImageNodeIndexValue"
         const val PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT = "currentImageNodeTotalCountValue"
+        const val PARAMS_ANCHOR_THUMBNAIL_PATH = "anchorThumbnailPath"
         const val IMAGE_PREVIEW_IS_FOREIGN = "image_preview_is_foreign"
         const val IMAGE_PREVIEW_ADD_TO_ALBUM = "image_preview_add_to_album"
         const val IMAGE_PREVIEW_PUBLIC_LINK_URL = "image_preview_public_link_url"

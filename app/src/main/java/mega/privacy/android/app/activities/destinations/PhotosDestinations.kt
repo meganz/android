@@ -140,6 +140,7 @@ fun EntryProviderScope<NavKey>.legacyMediaTimelinePhotoPreview(removeDestination
                 anchorImageNodeId = NodeId(args.id),
                 anchorImageNodeIndex = args.anchorIndex,
                 anchorImageNodeTotalCount = args.totalCount,
+                anchorThumbnailPath = args.anchorThumbnailPath,
                 params = mapOf(
                     TimelineImageNodeFetcher.TIMELINE_SORT_TYPE to args.sortType,
                     TimelineImageNodeFetcher.TIMELINE_FILTER_TYPE to args.filterType,
