@@ -40,6 +40,7 @@ class StubConstructorBackedValuesTest {
     @Test
     fun `test that StubMegaRequest returns the constructor values when queried`() {
         val node = StubMegaNode(handle = 5L)
+        val recentActions = StubMegaRecentActionBucketList(listOf(StubMegaRecentActionBucket()))
         val underTest = StubMegaRequest(
             type = MegaRequest.TYPE_LOGIN,
             nodeHandle = 5L,
@@ -56,6 +57,7 @@ class StubConstructorBackedValuesTest {
             transferTag = 11,
             numDetails = 1,
             publicMegaNode = node,
+            recentActions = recentActions,
         )
 
         assertThat(underTest.type).isEqualTo(MegaRequest.TYPE_LOGIN)
@@ -73,6 +75,7 @@ class StubConstructorBackedValuesTest {
         assertThat(underTest.transferTag).isEqualTo(11)
         assertThat(underTest.numDetails).isEqualTo(1)
         assertThat(underTest.publicMegaNode).isSameInstanceAs(node)
+        assertThat(underTest.recentActions).isSameInstanceAs(recentActions)
     }
 
     @Test

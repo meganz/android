@@ -66,6 +66,7 @@ class StubMegaRequest(
     private val megaSet: MegaSet? = null,
     private val megaSetElementList: MegaSetElementList? = null,
     private val megaAccountDetails: MegaAccountDetails? = null,
+    private val recentActions: MegaRecentActionBucketList? = null,
 ) : MegaRequest(0, false) {
 
     override fun delete() = Unit
@@ -113,7 +114,7 @@ class StubMegaRequest(
     override fun getMegaStringIntegerMap(): MegaStringIntegerMap? = null
     override fun getMegaScheduledMeetingList(): MegaScheduledMeetingList? = null
     override fun getMegaHandleList(): MegaHandleList? = megaHandleList
-    override fun getRecentActions(): MegaRecentActionBucketList? = null
+    override fun getRecentActions(): MegaRecentActionBucketList? = recentActions
     override fun getMegaIntegerList(): MegaIntegerList? = null
     override fun getMegaSet(): MegaSet? = megaSet
     override fun getMegaSetElementList(): MegaSetElementList? = megaSetElementList
