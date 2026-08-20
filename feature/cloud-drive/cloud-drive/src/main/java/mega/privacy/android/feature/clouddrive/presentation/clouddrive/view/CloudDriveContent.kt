@@ -87,6 +87,7 @@ import mega.privacy.android.shared.transfers.components.UploadingFiles
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 import mega.privacy.mobile.analytics.event.CloudDriveChildNodeMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CloudDriveEmptyStateAddFilesPressedEvent
+import mega.privacy.mobile.analytics.event.InactivityPurgeBannerLearnMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SortButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SortByDateAddedMenuItemEvent
 import mega.privacy.mobile.analytics.event.SortByDateModifiedMenuItemEvent
@@ -236,6 +237,7 @@ internal fun CloudDriveContent(
                 ),
                 actionButtonText = stringResource(sharedR.string.general_learn_more),
                 onActionButtonClick = {
+                    Analytics.tracker.trackEvent(InactivityPurgeBannerLearnMoreButtonPressedEvent)
                     megaNavigator.launchUrl(context, ACCOUNT_INACTIVITY_LEARN_MORE_URI)
                 },
                 onCancelButtonClick = {

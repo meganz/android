@@ -68,6 +68,8 @@ import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.InactivityPurgeBannerCloseButtonPressedEvent
+import mega.privacy.mobile.analytics.event.InactivityPurgeBannerDisplayedEvent
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -77,8 +79,8 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
@@ -591,6 +593,52 @@ class CloudDriveViewModelTest {
 
             verify(suppressPurgeTimestampUseCase).invoke(purgeTimestamp)
             verify(acknowledgeLastPurgeUseCase).invoke(purgeTimestamp)
+        }
+
+    @Test
+    fun `test that banner displayed event is tracked once when account inactivity is emitted`() =
+        runTest {
+            val inactivityFlow = MutableStateFlow(
+                AccountInactivity(inactivityMonths = 2, purgeTimestamp = 123L)
+            )
+            whenever(monitorAccountInactivityUseCase()).thenReturn(inactivityFlow)
+            setupTestData(emptyList())
+            val underTest = createViewModel()
+
+            underTest.uiState.test {
+                awaitDataState()
+                inactivityFlow.value =
+                    AccountInactivity(inactivityMonths = 3, purgeTimestamp = 456L)
+                advanceUntilIdle()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(mockTracker, times(1)).trackEvent(InactivityPurgeBannerDisplayedEvent)
+        }
+
+    @Test
+    fun `test that banner displayed event is not tracked when account inactivity is null`() =
+        runTest {
+            setupTestData(emptyList())
+            val underTest = createViewModel()
+
+            underTest.uiState.test {
+                awaitDataState()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(mockTracker, never()).trackEvent(InactivityPurgeBannerDisplayedEvent)
+        }
+
+    @Test
+    fun `test that banner close button event is tracked when InactivityBannerDismissed action is processed`() =
+        runTest {
+            val underTest = createViewModel()
+
+            underTest.processAction(CloudDriveAction.InactivityBannerDismissed(456L))
+            advanceUntilIdle()
+
+            verify(mockTracker).trackEvent(InactivityPurgeBannerCloseButtonPressedEvent)
         }
 
     @Test

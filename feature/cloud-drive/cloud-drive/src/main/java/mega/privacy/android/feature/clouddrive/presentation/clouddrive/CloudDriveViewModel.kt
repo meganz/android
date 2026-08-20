@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
@@ -81,6 +82,8 @@ import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.TypedNodeItem
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.InactivityPurgeBannerCloseButtonPressedEvent
+import mega.privacy.mobile.analytics.event.InactivityPurgeBannerDisplayedEvent
 import mega.privacy.mobile.analytics.event.ViewModeGridMenuItemEvent
 import mega.privacy.mobile.analytics.event.ViewModeListMenuItemEvent
 import timber.log.Timber
@@ -302,6 +305,14 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val accountInactivityFlow: Flow<AccountInactivity?> =
         monitorAccountInactivityUseCase().catch { Timber.e(it) }
 
+    init {
+        viewModelScope.launch {
+            accountInactivityFlow.filterNotNull().take(1).collect {
+                Analytics.tracker.trackEvent(InactivityPurgeBannerDisplayedEvent)
+            }
+        }
+    }
+
     private val monitorFolderUpdatesFlow by lazy(LazyThreadSafetyMode.NONE) {
         monitorNodeUpdatesFlow
             .filterNot { it == NodeChanges.Remove }
@@ -420,6 +431,7 @@ class CloudDriveViewModel @AssistedInject constructor(
     }
 
     private fun onInactivityBannerDismissed(purgeTimestamp: Long) {
+        Analytics.tracker.trackEvent(InactivityPurgeBannerCloseButtonPressedEvent)
         // Optimistically hide the banner app-wide for the rest of the session, then acknowledge
         // on the server. On failure the event simply re-fires on the next session.
         suppressPurgeTimestampUseCase(purgeTimestamp)
