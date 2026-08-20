@@ -196,9 +196,9 @@ class FileFolderMenuTest {
 
         launchCloudDrive()
 
-        // Label the file Red; the change-label sheet renders in its own window, so it is driven
-        // by text.
-        clickNodeOptionsAction(FILE_NAME, LABEL_ACTION_TAG)
+        // The Label sheet item renders without its container tag; resolve it by title. The
+        // change-label sheet then renders in its own window, so its options are driven by text.
+        clickNodeOptionsActionByTitle(FILE_NAME, str(sharedR.string.file_properties_label))
         clickText(str(sharedR.string.label_red), "red-label-option")
         awaitInvocations("setNodeLabel") {
             fakeMegaApi.invocations.filter { it.methodName == "setNodeLabel" }
@@ -207,7 +207,7 @@ class FileFolderMenuTest {
         awaitObjectCount(By.res(LABEL_TAG), 1, "file-label-dot")
 
         // Label the folder Red: a second dot shows.
-        clickNodeOptionsAction(FOLDER_NAME, LABEL_ACTION_TAG)
+        clickNodeOptionsActionByTitle(FOLDER_NAME, str(sharedR.string.file_properties_label))
         clickText(str(sharedR.string.label_red), "red-label-option-folder")
         awaitInvocations("setNodeLabel x2") {
             fakeMegaApi.invocations.filter { it.methodName == "setNodeLabel" }
@@ -217,7 +217,7 @@ class FileFolderMenuTest {
         awaitObjectCount(By.res(LABEL_TAG), 2, "folder-label-dot")
 
         // Remove the file's label: back to one dot.
-        clickNodeOptionsAction(FILE_NAME, LABEL_ACTION_TAG)
+        clickNodeOptionsActionByTitle(FILE_NAME, str(sharedR.string.file_properties_label))
         clickText(str(nodesR.string.action_remove_label), "remove-label-option")
         awaitInvocations("resetNodeLabel") {
             fakeMegaApi.invocations.filter { it.methodName == "resetNodeLabel" }
@@ -643,6 +643,19 @@ class FileFolderMenuTest {
     }
 
     /**
+     * Like [clickNodeOptionsAction], but resolves the sheet item by its title text. Some items
+     * (e.g. Label) render without their `menu_action:<id>` container tag, exposing only the
+     * shared `menu_action:text_title` node.
+     */
+    private fun clickNodeOptionsActionByTitle(nodeName: String, title: String) {
+        clickMoreIconForRow(nodeName)
+        awaitObject(By.res(SHEET_LIST_TAG), LOAD_TIMEOUT, "node-options-sheet")
+        val selector = By.res(MENU_TITLE_TAG).text(title)
+        scrollSheetUntil(selector, "sheet-item-$title")
+        device.findObject(selector).click()
+    }
+
+    /**
      * Clicks the overflow (more) icon of the row titled [rowTitle]. Rows carry no per-row tag, so
      * the icon is resolved by vertical alignment with the row's title node.
      */
@@ -820,7 +833,8 @@ class FileFolderMenuTest {
         /** Mirror the testTags of the node options menu actions. */
         const val FAVOURITE_ACTION_TAG = "menu_action:favourite"
         const val REMOVE_FAVOURITE_ACTION_TAG = "menu_action:remove_favourite"
-        const val LABEL_ACTION_TAG = "menu_action:label"
+        /** Shared title node of node-options sheet items (some items carry no container tag). */
+        const val MENU_TITLE_TAG = "menu_action:text_title"
         const val GET_LINK_ACTION_TAG = "menu_action:get_link"
         const val INFO_ACTION_TAG = "menu_action:info"
         const val RENAME_ACTION_TAG = "menu_action:rename"

@@ -86,7 +86,11 @@ class FakeNodeTree {
 
     /**
      * Reparent the node with [handle] under [newParentHandle], then broadcast it with
-     * `CHANGE_TYPE_PARENT`.
+     * `CHANGE_TYPE_PARENT`. The old parent folder is broadcast alongside it (with
+     * `CHANGE_TYPE_TIMESTAMP`): consumers that filter updates by folder id — e.g.
+     * `MonitorNodeUpdatesByIdUseCase`, which drives the Cloud Drive list — would otherwise never
+     * see a node leave the folder they are showing, because the moved node carries only its new
+     * parent.
      *
      * No-op returning null when [handle] is unknown or when [newParentHandle] is the node itself
      * or one of its descendants (which would make the node its own ancestor).
@@ -96,12 +100,16 @@ class FakeNodeTree {
     suspend fun move(handle: Long, newParentHandle: Long): MegaNode? {
         val existing = nodesByHandle[handle] ?: return null
         if (isInSubtreeOf(newParentHandle, handle)) return null
+        val oldParent = parentHandleByHandle[handle]?.let { nodesByHandle[it] }
         val moved = existing.copyWith(
             parentHandle = newParentHandle,
             changes = MegaNode.CHANGE_TYPE_PARENT.toLong(),
         )
         addNode(moved, newParentHandle)
-        nodeUpdateSink(listOf(moved))
+        val oldParentUpdate = oldParent
+            ?.takeIf { it.handle != newParentHandle }
+            ?.copyWith(changes = MegaNode.CHANGE_TYPE_TIMESTAMP.toLong())
+        nodeUpdateSink(listOfNotNull(moved, oldParentUpdate))
         return moved
     }
 

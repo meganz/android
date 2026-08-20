@@ -61,10 +61,13 @@ class FakeMegaApiGatewayNodeMutationTest {
                 assertThat(underTest.nodeTree.childrenOf(ROOT_HANDLE).map { it.handle })
                     .containsExactly(FOLDER_HANDLE)
 
-                val node = awaitItem().singleUpdatedNode()
-                assertThat(node.handle).isEqualTo(FILE_HANDLE)
+                val nodes = awaitItem().updatedNodes()
+                assertThat(nodes.map { it.handle }).containsExactly(FILE_HANDLE, ROOT_HANDLE)
+                val node = nodes.first { it.handle == FILE_HANDLE }
                 assertThat(node.parentHandle).isEqualTo(FOLDER_HANDLE)
                 assertThat(node.hasChanged(MegaNode.CHANGE_TYPE_PARENT.toLong())).isTrue()
+                val oldParent = nodes.first { it.handle == ROOT_HANDLE }
+                assertThat(oldParent.hasChanged(MegaNode.CHANGE_TYPE_TIMESTAMP.toLong())).isTrue()
             }
         }
 
@@ -126,9 +129,11 @@ class FakeMegaApiGatewayNodeMutationTest {
                 assertThat(underTest.isInRubbish(underTest.nodeTree.nodeByHandle(FILE_HANDLE)!!))
                     .isTrue()
 
-                val node = awaitItem().singleUpdatedNode()
+                val nodes = awaitItem().updatedNodes()
+                val node = nodes.first { it.handle == FILE_HANDLE }
                 assertThat(node.parentHandle).isEqualTo(underTest.nodeTree.rubbishBinNode.handle)
                 assertThat(node.hasChanged(MegaNode.CHANGE_TYPE_PARENT.toLong())).isTrue()
+                assertThat(nodes.map { it.handle }).contains(ROOT_HANDLE)
             }
         }
 
@@ -216,6 +221,11 @@ class FakeMegaApiGatewayNodeMutationTest {
         val nodes = (this as GlobalUpdate.OnNodesUpdate).nodeList
         assertThat(nodes).hasSize(1)
         return nodes!!.single()
+    }
+
+    private fun GlobalUpdate.updatedNodes(): List<MegaNode> {
+        assertThat(this).isInstanceOf(GlobalUpdate.OnNodesUpdate::class.java)
+        return (this as GlobalUpdate.OnNodesUpdate).nodeList!!
     }
 
     private companion object {
