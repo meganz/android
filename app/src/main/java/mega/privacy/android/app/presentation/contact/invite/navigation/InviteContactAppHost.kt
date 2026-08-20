@@ -9,7 +9,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.utils.Constants
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -19,13 +18,14 @@ import mega.privacy.android.feature.contact.invite.model.InviteMessage
 import mega.privacy.android.feature.contact.invite.model.SmsInvite
 import mega.privacy.android.feature.contact.invite.navigation.InviteContactEntry
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * App-module host for the invite-contact flow. Supplies the platform-only side-effects the feature
  * module cannot own — launching the SMS composer, the share-link chooser and the personal QR-code
- * screen, and surfacing the invitation-result snackbar (whose optional action navigates into the
- * legacy [ContactsActivity] contact-request tabs) — then delegates rendering to [InviteContactEntry].
+ * screen, and surfacing the invitation-result snackbar (whose optional action navigates to the
+ * [ContactRequestsNavKey] contact-request destination) — then delegates rendering to [InviteContactEntry].
  *
  * @param navigationHandler
  * @param isFromAchievement whether the flow was launched from the achievements screen.
@@ -82,11 +82,11 @@ fun InviteContactAppHost(
                 } else {
                     val snackbarResult = host.showSnackbar(message, actionLabel)
                     if (snackbarResult == SnackbarResult.ActionPerformed) {
-                        val intent = when (result.actionLabelId) {
-                            R.string.tab_received_requests -> ContactsActivity.getReceivedRequestsIntent(context)
-                            else -> ContactsActivity.getSentRequestsIntent(context)
-                        }.apply { addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) }
-                        context.startActivity(intent)
+                        val navType = when (result.actionLabelId) {
+                            R.string.tab_received_requests -> ContactRequestsNavKey.NavType.ReceivedRequests
+                            else -> ContactRequestsNavKey.NavType.SentRequests
+                        }
+                        navigationHandler.navigate(ContactRequestsNavKey(navType))
                     }
                 }
             }
