@@ -10,7 +10,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.utils.CallUtil
@@ -61,7 +60,6 @@ class ChatManagement @Inject constructor(
     private val isChatOpeningWithLinkUseCase: IsChatOpeningWithLinkUseCase,
     @ApplicationContext private val appContext: Context,
 ) {
-    private val app: MegaApplication by lazy { getInstance() }
     private var countDownTimerToEndCall: CountDownTimer? = null
 
     /**
@@ -604,6 +602,7 @@ class ChatManagement @Inject constructor(
         }
 
         Timber.d("Show incoming call notification")
+        val app = appContext as MegaApplication
         app.showOneCallNotification(call)
     }
 
@@ -615,7 +614,7 @@ class ChatManagement @Inject constructor(
         val filterScreen = IntentFilter()
         filterScreen.addAction(Intent.ACTION_SCREEN_OFF)
         filterScreen.addAction(Intent.ACTION_USER_PRESENT)
-        getInstance().registerReceiver(screenOnOffReceiver, filterScreen)
+        appContext.registerReceiver(screenOnOffReceiver, filterScreen)
         isScreenBroadcastRegister = true
     }
 
@@ -624,7 +623,7 @@ class ChatManagement @Inject constructor(
      */
     private fun unregisterScreenReceiver() {
         if (isScreenBroadcastRegister) {
-            getInstance().unregisterReceiver(screenOnOffReceiver)
+            appContext.unregisterReceiver(screenOnOffReceiver)
             isScreenBroadcastRegister = false
         }
     }

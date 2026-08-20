@@ -8,8 +8,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.main.controllers.NodeController
@@ -59,8 +60,8 @@ class FileBackupManager(
         const val OPERATION_EXECUTE = 2
     }
 
-    private val megaApplication = MegaApplication.getInstance()
-    private val megaApi = megaApplication.megaApi
+    private val megaApi =
+        EntryPointAccessors.fromApplication(activity, MegaApiEntryPoint::class.java).megaApi()
     private var nodeController: NodeController? = null
 
     // No host of this backup-share path consumes the picker result, so the callback is empty.

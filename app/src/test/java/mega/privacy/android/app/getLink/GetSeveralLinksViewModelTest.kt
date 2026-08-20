@@ -42,6 +42,7 @@ class GetSeveralLinksViewModelTest {
             hasSensitiveDescendantUseCase = hasSensitiveDescendantUseCase,
             hasSensitiveInheritedUseCase = hasSensitiveInheritedUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            context = mock(),
             get1On1ChatIdUseCase = mock(),
             sendTextMessageUseCase = mock(),
         )

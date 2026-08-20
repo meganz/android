@@ -5,10 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDER
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_LINKS
@@ -46,6 +46,7 @@ class GetSeveralLinksViewModel @Inject constructor(
     private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
     private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    @ApplicationContext private val context: Context,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -60,7 +61,7 @@ class GetSeveralLinksViewModel @Inject constructor(
     private var linksNumber = 0
     fun getLinksNumber(): Int = linksNumber
 
-    private val thumbFolder by lazy { getThumbFolder(MegaApplication.getInstance()) }
+    private val thumbFolder by lazy { getThumbFolder(context) }
 
     private val _hasSensitiveItems: MutableStateFlow<Int?> = MutableStateFlow(null)
     val hasSensitiveItemsFlow = _hasSensitiveItems.asStateFlow()
