@@ -164,11 +164,46 @@ class FakeMegaApiGatewayNodeMutationTest {
     }
 
     @Test
+    fun `test that setFavourite updates the flag and emits an OnNodesUpdate with the favourite change flag`() =
+        runTest {
+            underTest.globalUpdates.test {
+                val updated = underTest.nodeTree.setFavourite(FILE_HANDLE, true)
+
+                assertThat(updated?.isFavourite).isTrue()
+                assertThat(underTest.nodeTree.nodeByHandle(FILE_HANDLE)?.isFavourite).isTrue()
+
+                val node = awaitItem().singleUpdatedNode()
+                assertThat(node.handle).isEqualTo(FILE_HANDLE)
+                assertThat(node.isFavourite).isTrue()
+                assertThat(node.hasChanged(MegaNode.CHANGE_TYPE_FAVOURITE.toLong())).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that setLabel updates the label and emits an OnNodesUpdate with the attributes change flag`() =
+        runTest {
+            underTest.globalUpdates.test {
+                val updated = underTest.nodeTree.setLabel(FILE_HANDLE, MegaNode.NODE_LBL_RED)
+
+                assertThat(updated?.label).isEqualTo(MegaNode.NODE_LBL_RED)
+                assertThat(underTest.nodeTree.nodeByHandle(FILE_HANDLE)?.label)
+                    .isEqualTo(MegaNode.NODE_LBL_RED)
+
+                val node = awaitItem().singleUpdatedNode()
+                assertThat(node.handle).isEqualTo(FILE_HANDLE)
+                assertThat(node.label).isEqualTo(MegaNode.NODE_LBL_RED)
+                assertThat(node.hasChanged(MegaNode.CHANGE_TYPE_ATTRIBUTES.toLong())).isTrue()
+            }
+        }
+
+    @Test
     fun `test that a mutating helper is a no-op when the handle is unknown`() = runTest {
         underTest.globalUpdates.test {
             assertThat(underTest.nodeTree.rename(UNKNOWN_HANDLE, NEW_NAME)).isNull()
             assertThat(underTest.nodeTree.move(UNKNOWN_HANDLE, FOLDER_HANDLE)).isNull()
             assertThat(underTest.nodeTree.copy(UNKNOWN_HANDLE, FOLDER_HANDLE)).isNull()
+            assertThat(underTest.nodeTree.setFavourite(UNKNOWN_HANDLE, true)).isNull()
+            assertThat(underTest.nodeTree.setLabel(UNKNOWN_HANDLE, MegaNode.NODE_LBL_RED)).isNull()
             assertThat(underTest.nodeTree.moveToRubbish(UNKNOWN_HANDLE)).isNull()
             assertThat(underTest.nodeTree.remove(UNKNOWN_HANDLE)).isNull()
 

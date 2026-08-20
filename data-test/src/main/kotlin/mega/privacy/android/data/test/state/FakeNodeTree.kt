@@ -10,7 +10,8 @@ import nz.mega.sdk.MegaNode
  * lookups are coherent out of the box. Tests add [StubMegaNode]s under any parent handle
  * to build the tree they need.
  *
- * The mutating helpers ([rename], [move], [copy], [moveToRubbish], [remove]) both change the
+ * The mutating helpers ([rename], [move], [copy], [setFavourite], [setLabel], [moveToRubbish],
+ * [remove]) both change the
  * backing state and, through [nodeUpdateSink], broadcast the matching SDK node update in a single
  * call — so tests no longer have to hand-simulate the node-tree change and its `OnNodesUpdate`
  * separately after copy/move/rename/delete. Each emitted node carries the real SDK
@@ -126,6 +127,44 @@ class FakeNodeTree {
     }
 
     /**
+     * Set the favourite flag of the node with [handle] to [favourite], then broadcast it with
+     * `CHANGE_TYPE_FAVOURITE`.
+     *
+     * No-op returning null when [handle] is unknown.
+     *
+     * @return the updated node, or null if [handle] is not in the tree.
+     */
+    suspend fun setFavourite(handle: Long, favourite: Boolean): MegaNode? {
+        val existing = nodesByHandle[handle] ?: return null
+        val updated = existing.copyWith(
+            isFavourite = favourite,
+            changes = MegaNode.CHANGE_TYPE_FAVOURITE.toLong(),
+        )
+        addNode(updated, parentHandleByHandle.getValue(handle))
+        nodeUpdateSink(listOf(updated))
+        return updated
+    }
+
+    /**
+     * Set the label of the node with [handle] to [label] (a `MegaNode.NODE_LBL_*` constant, 0 to
+     * clear it), then broadcast it with `CHANGE_TYPE_ATTRIBUTES`.
+     *
+     * No-op returning null when [handle] is unknown.
+     *
+     * @return the updated node, or null if [handle] is not in the tree.
+     */
+    suspend fun setLabel(handle: Long, label: Int): MegaNode? {
+        val existing = nodesByHandle[handle] ?: return null
+        val updated = existing.copyWith(
+            label = label,
+            changes = MegaNode.CHANGE_TYPE_ATTRIBUTES.toLong(),
+        )
+        addNode(updated, parentHandleByHandle.getValue(handle))
+        nodeUpdateSink(listOf(updated))
+        return updated
+    }
+
+    /**
      * Reparent the node with [handle] to the Rubbish Bin root, then broadcast it with
      * `CHANGE_TYPE_PARENT`.
      *
@@ -178,6 +217,8 @@ class FakeNodeTree {
         handle: Long = this.handle,
         name: String = this.name,
         parentHandle: Long = this.parentHandle,
+        isFavourite: Boolean = this.isFavourite,
+        label: Int = this.label,
         changes: Long,
     ): StubMegaNode = StubMegaNode(
         handle = handle,

@@ -67,6 +67,7 @@ class StubMegaRequest(
     private val megaSetElementList: MegaSetElementList? = null,
     private val megaAccountDetails: MegaAccountDetails? = null,
     private val recentActions: MegaRecentActionBucketList? = null,
+    private val megaFolderInfo: MegaFolderInfo? = null,
 ) : MegaRequest(0, false) {
 
     override fun delete() = Unit
@@ -106,7 +107,7 @@ class StubMegaRequest(
     override fun getMegaStringMap(): MegaStringMap? = megaStringMap
     override fun getMegaStringListMap(): MegaStringListMap? = null
     override fun getMegaStringTable(): MegaStringTable? = null
-    override fun getMegaFolderInfo(): MegaFolderInfo? = null
+    override fun getMegaFolderInfo(): MegaFolderInfo? = megaFolderInfo
     override fun getMegaPushNotificationSettings(): MegaPushNotificationSettings? = null
     override fun getMegaBackgroundMediaUploadPtr(): MegaBackgroundMediaUpload? = null
     override fun getMegaBannerList(): MegaBannerList? = null
