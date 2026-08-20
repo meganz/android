@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.converter
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.chat.ChatMessageChange
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import org.junit.jupiter.api.Test
 
 class TypedMessageEntityConvertersTest {
@@ -95,4 +96,100 @@ class TypedMessageEntityConvertersTest {
         assertThat(actual).isEmpty()
     }
 
+    @Test
+    internal fun `test that convertToMessageReactionList parses valid legacy gson entries`() {
+        val string =
+            """{"reaction":"👍","count":2,"userHandles":[123,456],"hasMe":true};""" +
+                    """{"reaction":"❤","count":1,"userHandles":[789],"hasMe":false}"""
+        val expected = listOf(
+            Reaction(reaction = "👍", count = 2, userHandles = listOf(123L, 456L), hasMe = true),
+            Reaction(reaction = "❤", count = 1, userHandles = listOf(789L), hasMe = false),
+        )
+
+        val actual = underTest.convertToMessageReactionList(string)
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    internal fun `test that convertToMessageReactionList drops entries when legacy json has obfuscated field names`() {
+        val string = """{"a":"👍","b":1,"c":[123],"d":true}"""
+
+        val actual = underTest.convertToMessageReactionList(string)
+
+        assertThat(actual).isEmpty()
+    }
+
+    @Test
+    internal fun `test that convertToMessageReactionList drops entries when legacy json has no reaction field`() {
+        val string = """{"count":0,"hasMe":false}"""
+
+        val actual = underTest.convertToMessageReactionList(string)
+
+        assertThat(actual).isEmpty()
+    }
+
+    @Test
+    internal fun `test that convertToMessageReactionList returns a hashable list when stored json is corrupt`() {
+        val string = """{"count":0,"hasMe":false};{"a":"👍","b":1,"c":[123],"d":true}"""
+
+        val actual = underTest.convertToMessageReactionList(string)
+
+        assertThat(actual.hashCode()).isEqualTo(emptyList<Reaction>().hashCode())
+    }
+
+    @Test
+    internal fun `test that convertToMessageReactionList keeps valid entries when legacy json mixes valid and corrupt entries`() {
+        val string =
+            """{"reaction":"👍","count":2,"userHandles":[123,456],"hasMe":true};""" +
+                    """{"count":0,"hasMe":false}"""
+        val expected = listOf(
+            Reaction(reaction = "👍", count = 2, userHandles = listOf(123L, 456L), hasMe = true),
+        )
+
+        val actual = underTest.convertToMessageReactionList(string)
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    internal fun `test that convertToMessageReactionList returns an empty list when string is malformed`() {
+        val string = "not json at all"
+
+        val actual = underTest.convertToMessageReactionList(string)
+
+        assertThat(actual).isEmpty()
+    }
+
+    @Test
+    internal fun `test that empty strings return an empty list when calling convertToMessageReactionList`() {
+        val string = ""
+
+        val actual = underTest.convertToMessageReactionList(string)
+
+        assertThat(actual).isEmpty()
+    }
+
+    @Test
+    internal fun `test that a reaction list round trips through the converters`() {
+        val list = listOf(
+            Reaction(reaction = "👍", count = 2, userHandles = listOf(123L, 456L), hasMe = true),
+            Reaction(reaction = "a;b", count = 1, userHandles = listOf(789L), hasMe = false),
+        )
+
+        val actual = underTest.convertToMessageReactionList(
+            underTest.convertFromMessageReactionList(list)
+        )
+
+        assertThat(actual).isEqualTo(list)
+    }
+
+    @Test
+    internal fun `test that an empty reaction list round trips through the converters`() {
+        val actual = underTest.convertToMessageReactionList(
+            underTest.convertFromMessageReactionList(emptyList())
+        )
+
+        assertThat(actual).isEmpty()
+    }
 }

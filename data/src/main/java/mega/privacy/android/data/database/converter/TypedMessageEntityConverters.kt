@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.converter
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
+import kotlinx.serialization.json.Json
 import mega.privacy.android.domain.entity.chat.ChatMessageChange
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import javax.inject.Inject
@@ -98,7 +99,7 @@ class TypedMessageEntityConverters @Inject constructor() {
      */
     @TypeConverter
     fun convertFromMessageReactionList(list: List<Reaction>): String =
-        list.joinToString(";") { Gson().toJson(it) }
+        Json.encodeToString(list)
 
     /**
      * Convert String to a list of [Reaction]
@@ -107,8 +108,40 @@ class TypedMessageEntityConverters @Inject constructor() {
      * @return list List of [Reaction].
      */
     @TypeConverter
-    fun convertToMessageReactionList(string: String): List<Reaction> =
-        string.split(";").mapNotNull {
-            Gson().fromJson(it, Reaction::class.java)
+    fun convertToMessageReactionList(string: String): List<Reaction> = when {
+        string.isBlank() -> emptyList()
+        string.startsWith("[") -> runCatching {
+            Json.decodeFromString<List<Reaction>>(string)
+        }.getOrDefault(emptyList())
+
+        else -> convertLegacyMessageReactionList(string)
+    }
+
+    private fun convertLegacyMessageReactionList(string: String): List<Reaction> =
+        string.split(";").mapNotNull { fragment ->
+            val legacy = runCatching {
+                Gson().fromJson(fragment, LegacyReaction::class.java)
+            }.getOrNull() ?: return@mapNotNull null
+            Reaction(
+                reaction = legacy.reaction ?: return@mapNotNull null,
+                count = legacy.count ?: 0,
+                userHandles = legacy.userHandles ?: return@mapNotNull null,
+                hasMe = legacy.hasMe ?: false,
+            )
         }
 }
+
+/**
+ * Nullable mirror of [Reaction] for reading rows persisted with Gson by older app versions.
+ *
+ * Gson instantiates without running constructors, so fields whose JSON keys are missing
+ * (e.g. written with obfuscated names before the Reaction keep rule existed) stay null even
+ * though [Reaction] declares them non-null. Deserialising into this type instead makes those
+ * nulls visible so corrupt entries can be dropped rather than crash later when hashed.
+ */
+private data class LegacyReaction(
+    val reaction: String?,
+    val count: Int?,
+    val userHandles: List<Long>?,
+    val hasMe: Boolean?,
+)
