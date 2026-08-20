@@ -76,7 +76,7 @@ internal abstract class FeatureFlagModule {
         @ElementsIntoSet
         @PersistedFeatures
         fun provideApiFeaturesAsPersistedFeatures(): Set<@JvmSuppressWildcards Feature> =
-            ApiFeatures.entries.toSet()
+            ApiFeatures.entries.toSet() - ApiFeatures.QuotaWarningUpsellScreen
 
         /**
          * Provide Data features
