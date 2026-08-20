@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
@@ -34,6 +35,13 @@ sealed class VideoPlayerOverlayChipState {
 
     /** Long-press speed chip: shows the active speed text followed by a forward icon. */
     data class LongPressSpeedHeld(val speedText: String) : VideoPlayerOverlayChipState()
+
+    /** Pinch-zoom chip: shows the boundary label or the current zoom percentage. */
+    sealed class Zoom : VideoPlayerOverlayChipState() {
+        data object FitToScreen : Zoom()
+        data object FillScreen : Zoom()
+        data class Percentage(val percent: Int) : Zoom()
+    }
 }
 
 /**
@@ -58,6 +66,7 @@ fun VideoPlayerOverlayChip(
         when (state) {
             is VideoPlayerOverlayChipState.Seek -> SeekChipContent(state)
             is VideoPlayerOverlayChipState.LongPressSpeedHeld -> LongPressSpeedHeldChipContent(state)
+            is VideoPlayerOverlayChipState.Zoom -> ZoomChipContent(state)
         }
     }
 }
@@ -109,6 +118,23 @@ private fun LongPressSpeedHeldChipContent(state: VideoPlayerOverlayChipState.Lon
     )
 }
 
+@Composable
+private fun ZoomChipContent(state: VideoPlayerOverlayChipState.Zoom) {
+    MegaText(
+        text = when (state) {
+            VideoPlayerOverlayChipState.Zoom.FitToScreen ->
+                stringResource(SharedR.string.video_player_zoom_fit_to_screen)
+
+            VideoPlayerOverlayChipState.Zoom.FillScreen ->
+                stringResource(SharedR.string.video_player_zoom_fill_screen)
+
+            is VideoPlayerOverlayChipState.Zoom.Percentage -> "${state.percent}%"
+        },
+        textColor = TextColor.Primary,
+        style = AppTheme.typography.labelLarge,
+    )
+}
+
 @Preview
 @Composable
 private fun SeekForwardChipPreview() {
@@ -125,4 +151,22 @@ private fun SeekBackwardChipPreview() {
 @Composable
 private fun LongPressSpeedHeldChipPreview() {
     VideoPlayerOverlayChip(VideoPlayerOverlayChipState.LongPressSpeedHeld(speedText = "2×"))
+}
+
+@Preview
+@Composable
+private fun ZoomFitToScreenChipPreview() {
+    VideoPlayerOverlayChip(VideoPlayerOverlayChipState.Zoom.FitToScreen)
+}
+
+@Preview
+@Composable
+private fun ZoomFillScreenChipPreview() {
+    VideoPlayerOverlayChip(VideoPlayerOverlayChipState.Zoom.FillScreen)
+}
+
+@Preview
+@Composable
+private fun ZoomPercentageChipPreview() {
+    VideoPlayerOverlayChip(VideoPlayerOverlayChipState.Zoom.Percentage(percent = 250))
 }

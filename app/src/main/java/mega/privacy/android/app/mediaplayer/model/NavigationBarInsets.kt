@@ -4,14 +4,18 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Navigation bar insets for different positions
+ * Navigation bar and display cutout insets for different positions
  *
- * @property bottom Bottom inset
- * @property left Left inset
- * @property right Right inset
+ * @property bottom Bottom navigation bar inset
+ * @property left Left navigation bar inset
+ * @property right Right navigation bar inset
+ * @property cutoutLeft Left display cutout inset
+ * @property cutoutRight Right display cutout inset
  */
 data class NavigationBarInsets(
     val bottom: Dp = 0.dp,
     val left: Dp = 0.dp,
     val right: Dp = 0.dp,
+    val cutoutLeft: Dp = 0.dp,
+    val cutoutRight: Dp = 0.dp,
 )

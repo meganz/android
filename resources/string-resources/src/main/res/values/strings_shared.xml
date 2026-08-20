@@ -3784,12 +3784,6 @@
     <string name="chat_last_message_sender_me">Me</string>
     <!-- Chat list last-message preview sender prefix used when a group-chat message sender's name cannot be resolved -->
     <string name="chat_last_message_sender_unknown">Unknown name</string>
-    <!-- Audio player: label for the continuous-playback toggle in the queue screen -->
-    <string name="audio_player_continuous_playback_title">Continuous playback</string>
-    <!-- Audio player: description for the continuous-playback toggle -->
-    <string name="audio_player_continuous_playback_description">Play the next file in the queue automatically</string>
-    <!-- Audio player: queue screen header showing the source folder; [A] marks the folder name rendered in Primary colour -->
-    <string name="audio_player_playing_from_label">Playing from [A]%s[/A]</string>
     <!-- Chat list item action that mutes notifications for the chat -->
     <string name="general_mute">Mute</string>
     <!-- Chat list item action that unmutes notifications for the chat -->
@@ -3806,4 +3800,14 @@
     <string name="title_confirmation_leave_group_chat">Leave group chat?</string>
     <!-- Message of the confirmation dialog shown before leaving a group chat -->
     <string name="confirmation_leave_group_chat">If you leave, you will no longer have access to read or send messages.</string>
+    <!-- Audio player: label for the continuous-playback toggle in the queue screen -->
+    <string name="audio_player_continuous_playback_title">Continuous playback</string>
+    <!-- Audio player: description for the continuous-playback toggle -->
+    <string name="audio_player_continuous_playback_description">Play the next file in the queue automatically</string>
+    <!-- Audio player: queue screen header showing the source folder; [A] marks the folder name rendered in Primary colour -->
+    <string name="audio_player_playing_from_label">Playing from [A]%s[/A]</string>
+    <!-- Zoom overlay shown in the video player while pinch-zooming when the video is displayed at its original size, fitted inside the screen -->
+    <string name="video_player_zoom_fit_to_screen">Fit to screen</string>
+    <!-- Zoom overlay shown in the video player while pinch-zooming when the video is zoomed exactly to fill the whole screen -->
+    <string name="video_player_zoom_fill_screen">Fill screen</string>
 </resources>

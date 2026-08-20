@@ -81,7 +81,6 @@ import androidx.media3.common.Player.STATE_IDLE
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R as Media3R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -179,7 +178,21 @@ internal fun VideoPlayerScreen(
     val rootView: View = (context as? Activity)?.window?.decorView ?: view
     val navBarInsets = rememberRevampNavigationBarInsets(rootView, orientation, density)
     val navigationBarHeight = maxOf(navBarInsets.bottom, navBarInsets.right, navBarInsets.left)
-    val navigationBarHeightPx = with(density) { navigationBarHeight.toPx().toInt() }
+    val navigationBarBottomPx = with(density) { navBarInsets.bottom.toPx().toInt() }
+    // The display cutout contributes a side inset of its own in landscape, independent of
+    // where the navigation bar sits, so each side clears whichever inset is larger. Portrait
+    // keeps the sides flush — waterfall edges report cutout insets there too, and the bar
+    // has never inset for them.
+    val safeAreaLeftPx = if (orientation == ORIENTATION_LANDSCAPE) {
+        with(density) { maxOf(navBarInsets.left, navBarInsets.cutoutLeft).toPx().toInt() }
+    } else {
+        0
+    }
+    val safeAreaRightPx = if (orientation == ORIENTATION_LANDSCAPE) {
+        with(density) { maxOf(navBarInsets.right, navBarInsets.cutoutRight).toPx().toInt() }
+    } else {
+        0
+    }
 
     var navigationBarPosition by remember(navBarInsets) {
         mutableStateOf(
@@ -394,12 +407,19 @@ internal fun VideoPlayerScreen(
         videoPlayerController?.updateFullscreenButtonIcon(uiState.isFullscreen)
     }
 
+    LaunchedEffect(uiState.currentPlayingHandle) {
+        videoPlayerController?.resetZoom()
+    }
+
     LaunchedEffect(uiState.isLocked) {
         videoPlayerController?.updateLockView(uiState.isLocked)
     }
 
     LaunchedEffect(uiState.isInPipMode) {
         if (uiState.isInPipMode) {
+            // The pan offsets are sized for the full screen — clear them so the tiny
+            // PiP window doesn't show a frame translated out of view.
+            videoPlayerController?.resetZoom()
             autoHideJob?.cancel()
             isControllerViewVisible = false
             systemUiController.isSystemBarsVisible = false
@@ -417,10 +437,6 @@ internal fun VideoPlayerScreen(
 
     LaunchedEffect(uiState.repeatToggleMode) {
         videoPlayerController?.updateRepeatToggleButtonUI(context, uiState.repeatToggleMode)
-    }
-
-    LaunchedEffect(uiState.mediaPlaybackState) {
-        videoPlayerController?.updatePlaybackState(uiState.mediaPlaybackState)
     }
 
     LaunchedEffect(uiState.isGesturesEnabled) {
@@ -452,13 +468,7 @@ internal fun VideoPlayerScreen(
                         VideoPlayerRevampPlayerViewBinding.inflate(inflater, parent, attachToParent)
                             .apply {
                                 playerView = playerComposeView
-                                fun updateResizeMode(isFullscreen: Boolean) {
-                                    playerComposeView.resizeMode = if (isFullscreen) {
-                                        RESIZE_MODE_ZOOM
-                                    } else {
-                                        RESIZE_MODE_FIT
-                                    }
-                                }
+                                playerComposeView.resizeMode = RESIZE_MODE_FIT
 
                                 fun applyPlayPauseIcon() {
                                     playerComposeView.findViewById<ImageButton>(Media3R.id.exo_play_pause)
@@ -542,7 +552,6 @@ internal fun VideoPlayerScreen(
                                     },
                                     fullscreenClickedCallback = { isFullscreen ->
                                         viewModel.updateFullscreen(isFullscreen)
-                                        updateResizeMode(isFullscreen)
                                     },
                                     lockStateChanged = { isLock ->
                                         autoHideJob?.cancel()
@@ -622,7 +631,6 @@ internal fun VideoPlayerScreen(
                                 playerComposeView.player = player
                                 applyControlIcons()
                                 playerComposeView.controllerShowTimeoutMs = 0
-                                updateResizeMode(uiState.isFullscreen)
 
                                 autoHideJob?.cancel()
                                 if (isControllerViewVisible) {
@@ -650,9 +658,9 @@ internal fun VideoPlayerScreen(
 
                     updateControllerViewPadding(
                         controllerView = controllerView,
-                        orientation = orientation,
-                        padding = navigationBarHeightPx,
-                        navigationBarPosition = navigationBarPosition
+                        bottomPx = navigationBarBottomPx,
+                        leftPx = safeAreaLeftPx,
+                        rightPx = safeAreaRightPx,
                     )
                     root.findViewById<View>(R.id.navigation_bar_bg).isVisible =
                         orientation != ORIENTATION_PORTRAIT
@@ -956,6 +964,7 @@ private fun rememberRevampNavigationBarInsets(
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val gestures = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
             val tappable = insets.getInsets(WindowInsetsCompat.Type.tappableElement())
+            val cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
 
             val bottomPx = maxOf(systemBars.bottom, gestures.bottom, tappable.bottom)
             val leftPx = maxOf(systemBars.left, gestures.left, tappable.left)
@@ -965,6 +974,8 @@ private fun rememberRevampNavigationBarInsets(
                 bottom = with(density) { bottomPx.toDp() },
                 left = with(density) { leftPx.toDp() },
                 right = with(density) { rightPx.toDp() },
+                cutoutLeft = with(density) { cutout.left.toDp() },
+                cutoutRight = with(density) { cutout.right.toDp() },
             )
             insets
         }
@@ -1004,27 +1015,19 @@ private fun PlayerView.hideWithFade() {
     }
 }
 
+// The insets are physical sides, so raw left/right margins are used rather than the
+// RTL-aware start/end ones.
 private fun updateControllerViewPadding(
     controllerView: View,
-    orientation: Int,
-    padding: Int,
-    navigationBarPosition: NavigationBarPosition,
+    bottomPx: Int,
+    leftPx: Int,
+    rightPx: Int,
 ) {
     val layoutParams = controllerView.layoutParams as ViewGroup.MarginLayoutParams
-    if (orientation == ORIENTATION_PORTRAIT || navigationBarPosition == NavigationBarPosition.Bottom) {
-        controllerView.setPadding(0, 0, 0, padding)
-        layoutParams.bottomMargin = 0
-        layoutParams.marginStart = 0
-        layoutParams.marginEnd = 0
-    } else {
-        controllerView.setPadding(0, 0, 0, 0)
-        layoutParams.bottomMargin = 0
-        when (navigationBarPosition) {
-            NavigationBarPosition.Left -> layoutParams.marginStart = padding
-            NavigationBarPosition.Right -> layoutParams.marginEnd = padding
-            else -> {}
-        }
-    }
+    controllerView.setPadding(0, 0, 0, bottomPx)
+    layoutParams.bottomMargin = 0
+    layoutParams.leftMargin = leftPx
+    layoutParams.rightMargin = rightPx
     controllerView.layoutParams = layoutParams
 }
 

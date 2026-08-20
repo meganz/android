@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.videoplayer.view
 
 import android.Manifest
 import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
@@ -80,7 +81,6 @@ import androidx.media3.common.Player.STATE_IDLE
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R as Media3R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -102,6 +102,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
+import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
 import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
@@ -150,6 +151,12 @@ internal fun ComposeVideoPlayerRoute(
     onFinish: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // This route runs inside the shared single activity, so the rotate button's orientation
+    // lock must not outlive the player — otherwise the whole app stays stuck in landscape.
+    // Placed here rather than in the screen because the route hosts the play-queue and
+    // subtitle overlays in place, keeping this composable alive for the route's whole lifetime.
+    RestoreOrientationOnExitEffect()
 
     BackHandler(enabled = uiState.navigateToSelectSubtitleScreen || uiState.isPlayQueueVisible) {
         when {
@@ -238,7 +245,21 @@ internal fun ComposeVideoPlayerScreen(
     val rootView: View = (context as? Activity)?.window?.decorView ?: view
     val navBarInsets = rememberRevampNavigationBarInsets(rootView, orientation, density)
     val navigationBarHeight = maxOf(navBarInsets.bottom, navBarInsets.right, navBarInsets.left)
-    val navigationBarHeightPx = with(density) { navigationBarHeight.toPx().toInt() }
+    val navigationBarBottomPx = with(density) { navBarInsets.bottom.toPx().toInt() }
+    // The display cutout contributes a side inset of its own in landscape, independent of
+    // where the navigation bar sits, so each side clears whichever inset is larger. Portrait
+    // keeps the sides flush — waterfall edges report cutout insets there too, and the bar
+    // has never inset for them.
+    val safeAreaLeftPx = if (orientation == ORIENTATION_LANDSCAPE) {
+        with(density) { maxOf(navBarInsets.left, navBarInsets.cutoutLeft).toPx().toInt() }
+    } else {
+        0
+    }
+    val safeAreaRightPx = if (orientation == ORIENTATION_LANDSCAPE) {
+        with(density) { maxOf(navBarInsets.right, navBarInsets.cutoutRight).toPx().toInt() }
+    } else {
+        0
+    }
 
     var navigationBarPosition by remember(navBarInsets) {
         mutableStateOf(
@@ -446,12 +467,19 @@ internal fun ComposeVideoPlayerScreen(
         videoPlayerController?.updateFullscreenButtonIcon(uiState.isFullscreen)
     }
 
+    LaunchedEffect(uiState.currentPlayingHandle) {
+        videoPlayerController?.resetZoom()
+    }
+
     LaunchedEffect(uiState.isLocked) {
         videoPlayerController?.updateLockView(uiState.isLocked)
     }
 
     LaunchedEffect(uiState.isInPipMode) {
         if (uiState.isInPipMode) {
+            // The pan offsets are sized for the full screen — clear them so the tiny
+            // PiP window doesn't show a frame translated out of view.
+            videoPlayerController?.resetZoom()
             autoHideJob?.cancel()
             isControllerViewVisible = false
             systemUiController.isSystemBarsVisible = false
@@ -469,10 +497,6 @@ internal fun ComposeVideoPlayerScreen(
 
     LaunchedEffect(uiState.repeatToggleMode) {
         videoPlayerController?.updateRepeatToggleButtonUI(context, uiState.repeatToggleMode)
-    }
-
-    LaunchedEffect(uiState.mediaPlaybackState) {
-        videoPlayerController?.updatePlaybackState(uiState.mediaPlaybackState)
     }
 
     DisposableEffect(Unit) {
@@ -503,13 +527,7 @@ internal fun ComposeVideoPlayerScreen(
                     VideoPlayerRevampPlayerViewBinding.inflate(inflater, parent, attachToParent)
                         .apply {
                             playerView = playerComposeView
-                            fun updateResizeMode(isFullscreen: Boolean) {
-                                playerComposeView.resizeMode = if (isFullscreen) {
-                                    RESIZE_MODE_ZOOM
-                                } else {
-                                    RESIZE_MODE_FIT
-                                }
-                            }
+                            playerComposeView.resizeMode = RESIZE_MODE_FIT
 
                             fun applyPlayPauseIcon() {
                                 playerComposeView.findViewById<ImageButton>(Media3R.id.exo_play_pause)
@@ -593,7 +611,6 @@ internal fun ComposeVideoPlayerScreen(
                                 },
                                 fullscreenClickedCallback = { isFullscreen ->
                                     viewModel.updateFullscreen(isFullscreen)
-                                    updateResizeMode(isFullscreen)
                                 },
                                 lockStateChanged = { isLock ->
                                     autoHideJob?.cancel()
@@ -673,7 +690,6 @@ internal fun ComposeVideoPlayerScreen(
                             playerComposeView.player = player
                             applyControlIcons()
                             playerComposeView.controllerShowTimeoutMs = 0
-                            updateResizeMode(uiState.isFullscreen)
 
                             autoHideJob?.cancel()
                             if (isControllerViewVisible) {
@@ -701,9 +717,9 @@ internal fun ComposeVideoPlayerScreen(
 
                 updateControllerViewPadding(
                     controllerView = controllerView,
-                    orientation = orientation,
-                    padding = navigationBarHeightPx,
-                    navigationBarPosition = navigationBarPosition
+                    bottomPx = navigationBarBottomPx,
+                    leftPx = safeAreaLeftPx,
+                    rightPx = safeAreaRightPx,
                 )
                 root.findViewById<View>(R.id.navigation_bar_bg).isVisible =
                     orientation != ORIENTATION_PORTRAIT
@@ -986,6 +1002,7 @@ private fun rememberRevampNavigationBarInsets(
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val gestures = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
             val tappable = insets.getInsets(WindowInsetsCompat.Type.tappableElement())
+            val cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
 
             val bottomPx = maxOf(systemBars.bottom, gestures.bottom, tappable.bottom)
             val leftPx = maxOf(systemBars.left, gestures.left, tappable.left)
@@ -995,6 +1012,8 @@ private fun rememberRevampNavigationBarInsets(
                 bottom = with(density) { bottomPx.toDp() },
                 left = with(density) { leftPx.toDp() },
                 right = with(density) { rightPx.toDp() },
+                cutoutLeft = with(density) { cutout.left.toDp() },
+                cutoutRight = with(density) { cutout.right.toDp() },
             )
             insets
         }
@@ -1006,6 +1025,31 @@ private fun rememberRevampNavigationBarInsets(
     }
 
     return navInsets
+}
+
+/**
+ * Restores the host activity's original [Activity.requestedOrientation] when the player route
+ * leaves the composition, so the rotate button's orientation lock never outlives the player.
+ */
+@Composable
+private fun RestoreOrientationOnExitEffect() {
+    val context = LocalContext.current
+    // Captured once and kept across recreation: after the rotate button triggers a
+    // configuration change, the activity's current value is the button's lock, not the
+    // orientation the player was entered with.
+    val originalOrientation = rememberSaveable {
+        context.findActivity()?.requestedOrientation
+            ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            val activity = context.findActivity() ?: return@onDispose
+            // A configuration change also disposes this composition — only a real exit restores.
+            if (!activity.isChangingConfigurations) {
+                activity.requestedOrientation = originalOrientation
+            }
+        }
+    }
 }
 
 private const val CONTROLLER_FADE_DURATION_MS = 300L
@@ -1034,27 +1078,19 @@ private fun PlayerView.hideWithFade() {
     }
 }
 
+// The insets are physical sides, so raw left/right margins are used rather than the
+// RTL-aware start/end ones.
 private fun updateControllerViewPadding(
     controllerView: View,
-    orientation: Int,
-    padding: Int,
-    navigationBarPosition: NavigationBarPosition,
+    bottomPx: Int,
+    leftPx: Int,
+    rightPx: Int,
 ) {
     val layoutParams = controllerView.layoutParams as ViewGroup.MarginLayoutParams
-    if (orientation == ORIENTATION_PORTRAIT || navigationBarPosition == NavigationBarPosition.Bottom) {
-        controllerView.setPadding(0, 0, 0, padding)
-        layoutParams.bottomMargin = 0
-        layoutParams.marginStart = 0
-        layoutParams.marginEnd = 0
-    } else {
-        controllerView.setPadding(0, 0, 0, 0)
-        layoutParams.bottomMargin = 0
-        when (navigationBarPosition) {
-            NavigationBarPosition.Left -> layoutParams.marginStart = padding
-            NavigationBarPosition.Right -> layoutParams.marginEnd = padding
-            else -> {}
-        }
-    }
+    controllerView.setPadding(0, 0, 0, bottomPx)
+    layoutParams.bottomMargin = 0
+    layoutParams.leftMargin = leftPx
+    layoutParams.rightMargin = rightPx
     controllerView.layoutParams = layoutParams
 }
 

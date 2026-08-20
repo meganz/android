@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.videoplayer
 
 import android.os.Build
 import android.view.GestureDetector
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
@@ -10,18 +11,24 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.MutableState
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
+import mega.privacy.android.feature.mediaplayer.components.VideoPlayerOverlayChipState
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -37,6 +44,7 @@ import org.robolectric.annotation.Config
 class VideoPlayerControllerTest {
 
     private val mockPlayerView = mock<PlayerView>()
+    private val mockPlayer = mock<Player>()
     private val mockRepeatToggle = mock<ImageButton>()
     private val mockMoreOption = mock<ImageButton>()
     private val mockFullscreen = mock<ImageButton>()
@@ -90,6 +98,8 @@ class VideoPlayerControllerTest {
         whenever(mockContainer.findViewById<ImageButton>(R.id.exo_ffwd)).thenReturn(mockFfwd)
         whenever(mockPlayerView.width).thenReturn(1000)
         whenever(mockPlayerView.height).thenReturn(1000)
+        whenever(mockPlayer.isPlaying).thenReturn(true)
+        whenever(mockPlayerView.player).thenReturn(mockPlayer)
     }
 
     @After
@@ -139,29 +149,44 @@ class VideoPlayerControllerTest {
         method.invoke(this)
     }
 
+    private fun VideoPlayerController.zoomState(): VideoPlayerZoomState {
+        val field = VideoPlayerController::class.java.getDeclaredField("zoomState")
+        field.isAccessible = true
+        return field.get(this) as VideoPlayerZoomState
+    }
+
     private fun VideoPlayerController.setZoomLevel(level: Float) {
-        val field = VideoPlayerController::class.java.getDeclaredField("zoomLevel")
+        val field = VideoPlayerZoomState::class.java.getDeclaredField("zoomLevel")
+        field.isAccessible = true
+        field.setFloat(zoomState(), level)
+    }
+
+    private fun VideoPlayerController.getZoomLevel(): Float = zoomState().zoomLevel
+
+    private fun VideoPlayerController.getLegacyFloatField(name: String): Float {
+        val field = VideoPlayerController::class.java.getDeclaredField(name)
+        field.isAccessible = true
+        return field.getFloat(this)
+    }
+
+    private fun VideoPlayerController.setLegacyZoomLevel(level: Float) {
+        val field = VideoPlayerController::class.java.getDeclaredField("legacyZoomLevel")
         field.isAccessible = true
         field.setFloat(this, level)
     }
 
-    private fun VideoPlayerController.getZoomLevel(): Float {
-        val field = VideoPlayerController::class.java.getDeclaredField("zoomLevel")
-        field.isAccessible = true
-        return field.getFloat(this)
-    }
+    private fun VideoPlayerController.getLegacyZoomLevel(): Float =
+        getLegacyFloatField("legacyZoomLevel")
 
-    private fun VideoPlayerController.getTranslationX(): Float {
-        val field = VideoPlayerController::class.java.getDeclaredField("translationX")
-        field.isAccessible = true
-        return field.getFloat(this)
-    }
+    private fun VideoPlayerController.getLegacyTranslationX(): Float =
+        getLegacyFloatField("legacyTranslationX")
 
-    private fun VideoPlayerController.getTranslationY(): Float {
-        val field = VideoPlayerController::class.java.getDeclaredField("translationY")
-        field.isAccessible = true
-        return field.getFloat(this)
-    }
+    private fun VideoPlayerController.getLegacyTranslationY(): Float =
+        getLegacyFloatField("legacyTranslationY")
+
+    private fun VideoPlayerController.getTranslationX(): Float = zoomState().translationX
+
+    private fun VideoPlayerController.getTranslationY(): Float = zoomState().translationY
 
     private fun VideoPlayerController.callOnScroll(
         distanceX: Float = 50f,
@@ -182,12 +207,28 @@ class VideoPlayerControllerTest {
             MotionEvent.obtain(0L, 0L, MotionEvent.ACTION_MOVE, 100f, 100f, 0)
         } else {
             val properties = Array(pointerCount) { i ->
-                MotionEvent.PointerProperties().also { it.id = i; it.toolType = MotionEvent.TOOL_TYPE_FINGER }
+                MotionEvent.PointerProperties()
+                    .also { it.id = i; it.toolType = MotionEvent.TOOL_TYPE_FINGER }
             }
             val coords = Array(pointerCount) { i ->
                 MotionEvent.PointerCoords().also { it.x = 100f + i * 50f; it.y = 100f }
             }
-            MotionEvent.obtain(0L, 0L, MotionEvent.ACTION_MOVE, pointerCount, properties, coords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+            MotionEvent.obtain(
+                0L,
+                0L,
+                MotionEvent.ACTION_MOVE,
+                pointerCount,
+                properties,
+                coords,
+                0,
+                0,
+                1f,
+                1f,
+                0,
+                0,
+                0,
+                0
+            )
         }
         try {
             listener.onScroll(e1, e2, distanceX, distanceY)
@@ -210,6 +251,28 @@ class VideoPlayerControllerTest {
         } finally {
             event.recycle()
         }
+    }
+
+    private fun VideoPlayerController.callOnDoubleTap(x: Float = 500f): Boolean {
+        val gdField = VideoPlayerController::class.java.getDeclaredField("gestureDetector")
+        gdField.isAccessible = true
+        val gd = gdField.get(this) as? GestureDetector ?: return false
+        val listenerField = GestureDetector::class.java.getDeclaredField("mDoubleTapListener")
+        listenerField.isAccessible = true
+        val listener = listenerField.get(gd) as? GestureDetector.OnDoubleTapListener ?: return false
+        val event = MotionEvent.obtain(0L, 0L, MotionEvent.ACTION_DOWN, x, 500f, 0)
+        return try {
+            listener.onDoubleTap(event)
+        } finally {
+            event.recycle()
+        }
+    }
+
+    private fun VideoPlayerController.getZoomChipState(): VideoPlayerOverlayChipState? {
+        val field = VideoPlayerController::class.java.getDeclaredField("zoomChipState")
+        field.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        return (field.get(this) as MutableState<VideoPlayerOverlayChipState?>).value
     }
 
     private fun VideoPlayerController.callOnScale(scaleFactor: Float) {
@@ -297,6 +360,37 @@ class VideoPlayerControllerTest {
     }
 
     @Test
+    fun `test that onScroll pans vertically between fit and fill when the height overflows`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.setZoomLevel(1.5f)
+        controller.callOnScroll(distanceX = 10f, distanceY = 50f, startX = 400f)
+        assertThat(controller.getTranslationY()).isEqualTo(-50f)
+        assertThat(controller.getTranslationX()).isEqualTo(0f)
+        verify(onBrightnessChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onScroll pans horizontally between fit and fill when the swipe is horizontal`() {
+        stubVideoSurfaceView(videoWidth = 1000, videoHeight = 500)
+        val controller = createController()
+        controller.setZoomLevel(1.5f)
+        controller.callOnScroll(distanceX = 50f, distanceY = 10f, startX = 400f)
+        assertThat(controller.getTranslationX()).isEqualTo(-50f)
+        assertThat(controller.getTranslationY()).isEqualTo(0f)
+    }
+
+    @Test
+    fun `test that onScroll adjusts brightness when the swipe is vertical and only the width overflows`() {
+        stubVideoSurfaceView(videoWidth = 1000, videoHeight = 500)
+        val controller = createController()
+        controller.setZoomLevel(1.5f)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        verify(onBrightnessChange).invoke(any())
+        assertThat(controller.getTranslationX()).isEqualTo(0f)
+    }
+
+    @Test
     fun `test that onSingleTapConfirmed calls playerViewClicked`() {
         val controller = createController()
         controller.callOnSingleTapConfirmed()
@@ -325,10 +419,11 @@ class VideoPlayerControllerTest {
     }
 
     @Test
-    fun `test that onScale applies zoom when gestures are disabled`() {
+    fun `test that onScale applies the legacy zoom when gestures are disabled`() {
         val controller = createController(isGesturesEnabled = false, isFullscreen = true)
         controller.callOnScale(scaleFactor = 1.5f)
-        assertThat(controller.getZoomLevel()).isGreaterThan(1.0f)
+        assertThat(controller.getLegacyZoomLevel()).isGreaterThan(1.0f)
+        assertThat(controller.getZoomLevel()).isEqualTo(1.0f)
     }
 
     @Test
@@ -439,5 +534,215 @@ class VideoPlayerControllerTest {
         val field = VideoPlayerController::class.java.getDeclaredField("suppressScrollGesture")
         field.isAccessible = true
         field.setBoolean(this, suppress)
+    }
+
+    private fun stubVideoSurfaceView(videoWidth: Int, videoHeight: Int) {
+        val videoView = mock<View>()
+        whenever(videoView.width).thenReturn(videoWidth)
+        whenever(videoView.height).thenReturn(videoHeight)
+        whenever(mockPlayerView.videoSurfaceView).thenReturn(videoView)
+    }
+
+    private fun clickFullscreenButton() {
+        val captor = argumentCaptor<View.OnClickListener>()
+        verify(mockFullscreen, atLeastOnce()).setOnClickListener(captor.capture())
+        captor.lastValue.onClick(mockFullscreen)
+    }
+
+    @Test
+    fun `test that fullscreen button click zooms to fill and reports fullscreen when at fit`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        clickFullscreenButton()
+        assertThat(controller.getZoomLevel()).isEqualTo(2f)
+        verify(fullscreenClickedCallback).invoke(true)
+    }
+
+    @Test
+    fun `test that fullscreen button click resets to fit and reports original when zoomed to fill`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        clickFullscreenButton()
+        clickFullscreenButton()
+        assertThat(controller.getZoomLevel()).isEqualTo(1f)
+        verify(fullscreenClickedCallback).invoke(false)
+    }
+
+    @Test
+    fun `test that onScale performs haptic feedback when the zoom reaches the fill boundary`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScale(scaleFactor = 1.95f)
+        verify(mockPlayerView).performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+    }
+
+    @Test
+    fun `test that onScale performs haptic feedback when the zoom returns to the fit boundary`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScale(scaleFactor = 1.5f)
+        controller.callOnScale(scaleFactor = 0.68f)
+        verify(mockPlayerView, times(1)).performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+    }
+
+    @Test
+    fun `test that onScale does not perform haptic feedback when the zoom stays between boundaries`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScale(scaleFactor = 1.5f)
+        verify(mockPlayerView, never()).performHapticFeedback(any<Int>())
+    }
+
+    @Test
+    fun `test that onScale shows the fill screen chip when the zoom reaches the fill boundary`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScale(scaleFactor = 1.95f)
+        assertThat(controller.getZoomChipState())
+            .isEqualTo(VideoPlayerOverlayChipState.Zoom.FillScreen)
+    }
+
+    @Test
+    fun `test that onScale shows the percentage chip when the zoom is between boundaries`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScale(scaleFactor = 1.5f)
+        assertThat(controller.getZoomChipState())
+            .isEqualTo(VideoPlayerOverlayChipState.Zoom.Percentage(percent = 150))
+    }
+
+    @Test
+    fun `test that onScale shows the fit to screen chip when the zoom returns to the fit boundary`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScale(scaleFactor = 1.5f)
+        controller.callOnScale(scaleFactor = 0.68f)
+        assertThat(controller.getZoomChipState())
+            .isEqualTo(VideoPlayerOverlayChipState.Zoom.FitToScreen)
+    }
+
+    @Test
+    fun `test that double tap when zoomed beyond fill returns to fill and shows the fill screen chip`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.setZoomLevel(3f)
+        val handled = controller.callOnDoubleTap()
+        assertThat(handled).isTrue()
+        assertThat(controller.getZoomLevel()).isEqualTo(2f)
+        assertThat(controller.getZoomChipState())
+            .isEqualTo(VideoPlayerOverlayChipState.Zoom.FillScreen)
+        verify(mockPlayerView).performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+    }
+
+    @Test
+    fun `test that fullscreen button click shows the fill screen chip when zooming to fill`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        clickFullscreenButton()
+        assertThat(controller.getZoomChipState())
+            .isEqualTo(VideoPlayerOverlayChipState.Zoom.FillScreen)
+    }
+
+    @Test
+    fun `test that onScale does not show the zoom chip when gestures are disabled`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController(isGesturesEnabled = false)
+        controller.callOnScale(scaleFactor = 1.5f)
+        assertThat(controller.getZoomChipState()).isNull()
+    }
+
+    @Test
+    fun `test that onScale does not perform haptic feedback when gestures are disabled`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController(isGesturesEnabled = false)
+        controller.callOnScale(scaleFactor = 1.95f)
+        verify(mockPlayerView, never()).performHapticFeedback(any<Int>())
+    }
+
+    @Test
+    fun `test that onScale does not show the zoom chip when long press is active`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.runStartLongPressRunnable()
+        controller.callOnScale(scaleFactor = 1.5f)
+        assertThat(controller.getZoomChipState()).isNull()
+    }
+
+    @Test
+    fun `test that startLongPressRunnable clears the zoom chip`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScale(scaleFactor = 1.5f)
+        assertThat(controller.getZoomChipState()).isNotNull()
+        controller.runStartLongPressRunnable()
+        assertThat(controller.getZoomChipState()).isNull()
+    }
+
+    @Test
+    fun `test that startLongPressRunnable does not call onLongPressActivated when video is not playing`() {
+        whenever(mockPlayer.isPlaying).thenReturn(false)
+        val controller = createController()
+        controller.runStartLongPressRunnable()
+        verify(onLongPressActivated, never()).invoke()
+        verify(onLongPressSpeedChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that fullscreen button click applies the zoom resize mode without zooming when gestures are disabled`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController(isGesturesEnabled = false)
+        clickFullscreenButton()
+        verify(fullscreenClickedCallback).invoke(true)
+        verify(mockPlayerView).resizeMode = RESIZE_MODE_ZOOM
+        assertThat(controller.getZoomLevel()).isEqualTo(1f)
+        assertThat(controller.getZoomChipState()).isNull()
+    }
+
+    @Test
+    fun `test that onScroll pans with the legacy zoom when gestures are disabled`() {
+        val controller = createController(isGesturesEnabled = false)
+        controller.setLegacyZoomLevel(2f)
+        controller.callOnScroll(distanceX = 50f, distanceY = 30f)
+        assertThat(controller.getLegacyTranslationX()).isEqualTo(-50f)
+        assertThat(controller.getLegacyTranslationY()).isEqualTo(-30f)
+        verify(onBrightnessChange, never()).invoke(any())
+        verify(onVolumeChange, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that resetZoom does not zoom to fill when gestures are disabled`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController(isGesturesEnabled = false, isFullscreen = true)
+        controller.resetZoom()
+        assertThat(controller.getZoomLevel()).isEqualTo(1f)
+    }
+
+    @Test
+    fun `test that updateGesturesEnabled resets the legacy zoom when the flag turns on`() {
+        val controller = createController(isGesturesEnabled = false)
+        controller.setLegacyZoomLevel(2f)
+        controller.updateGesturesEnabled(true)
+        assertThat(controller.getLegacyZoomLevel()).isEqualTo(1f)
+        assertThat(controller.getLegacyTranslationX()).isEqualTo(0f)
+        assertThat(controller.getLegacyTranslationY()).isEqualTo(0f)
+    }
+
+    @Test
+    fun `test that video overflow rendering is applied when gestures are enabled`() {
+        createController(isGesturesEnabled = true)
+        verify(mockPlayerView).clipChildren = false
+    }
+
+    @Test
+    fun `test that video overflow rendering is not applied when gestures are disabled`() {
+        createController(isGesturesEnabled = false)
+        verify(mockPlayerView, never()).clipChildren = false
+    }
+
+    @Test
+    fun `test that updateGesturesEnabled restores video clipping when the flag turns off`() {
+        val controller = createController(isGesturesEnabled = true)
+        controller.updateGesturesEnabled(false)
+        verify(mockPlayerView).clipChildren = true
     }
 }
