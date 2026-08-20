@@ -56,7 +56,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
@@ -116,6 +115,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.User
@@ -244,6 +244,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var chatController: ChatController
+
+    @Inject
+    lateinit var cookieEnabledCheckWrapper: CookieEnabledCheckWrapper
 
     @Inject
     lateinit var navigationResultManager: NavigationResultManager
@@ -2516,7 +2519,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 megaApi.fetchNodes(this)
 
                 // Get cookies settings after login.
-                getInstance().checkEnabledCookies()
+                cookieEnabledCheckWrapper.checkEnabledCookies()
             }
         } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
             if (error.errorCode == MegaError.API_OK) {

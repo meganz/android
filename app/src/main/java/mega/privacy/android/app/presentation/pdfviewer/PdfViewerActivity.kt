@@ -46,7 +46,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
@@ -90,6 +89,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.data.constant.HttpServerConstant
+import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -160,6 +160,9 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
 
     @Inject
     lateinit var chatController: ChatController
+
+    @Inject
+    lateinit var cookieEnabledCheckWrapper: CookieEnabledCheckWrapper
 
     private lateinit var binding: ActivityPdfviewerBinding
 
@@ -1940,7 +1943,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                 megaApi.fetchNodes(this)
 
                 // Get cookies settings after login.
-                getInstance().checkEnabledCookies()
+                cookieEnabledCheckWrapper.checkEnabledCookies()
             }
         } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
             if (e.errorCode == MegaError.API_OK) {

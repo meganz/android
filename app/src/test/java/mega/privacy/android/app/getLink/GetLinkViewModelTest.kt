@@ -50,6 +50,7 @@ class GetLinkViewModelTest {
             encryptLinkWithPasswordUseCase = mock(),
             exportNodeUseCase = mock(),
             context = mock(),
+            myAccountInfo = mock(),
             hasSensitiveDescendantUseCase = hasSensitiveDescendantUseCase,
             hasSensitiveInheritedUseCase = hasSensitiveInheritedUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,

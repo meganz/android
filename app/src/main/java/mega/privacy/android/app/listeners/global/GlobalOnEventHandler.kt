@@ -8,10 +8,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BuildConfig
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.providers.documentprovider.CloudDriveDocumentProvider
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.data.mapper.StorageStateMapper
+import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
@@ -37,6 +37,7 @@ class GlobalOnEventHandler @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val updateDomainNameUseCase: UpdateDomainNameUseCase,
     private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
+    private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper,
 ) {
 
     operator fun invoke(event: MegaEvent?) {
@@ -70,7 +71,7 @@ class GlobalOnEventHandler @Inject constructor(
                     updateDomainName()
                     updateCloudDriveDocumentProviderState()
                 }
-                MegaApplication.getInstance().checkEnabledCookies()
+                cookieEnabledCheckWrapper.checkEnabledCookies()
             }
 
             MegaEvent.EVENT_UPGRADE_SECURITY -> applicationScope.launch {

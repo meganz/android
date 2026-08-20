@@ -12,12 +12,13 @@ import android.view.View
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.EntryPointAccessors
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.di.ChatComponentsEntryPoint
+import mega.privacy.android.app.di.GlobalManagementEntryPoint
 import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.di.getDbHandler
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -55,13 +56,18 @@ class ChatAdvancedNotificationBuilder(
         context,
         ChatComponentsEntryPoint::class.java,
     ).chatManagement()
+    private val activityLifecycleHandler: ActivityLifecycleHandler =
+        EntryPointAccessors.fromApplication(
+            context,
+            GlobalManagementEntryPoint::class.java,
+        ).activityLifecycleHandler()
 
     private val chatC: ChatController = ChatController(
         context = context,
         megaApi = megaApi,
         megaChatApi = megaChatApi,
         dbH = dbH,
-        activityLifecycleHandler = getInstance().activityLifecycleHandler
+        activityLifecycleHandler = activityLifecycleHandler
     )
 
     private val numberButtons: String

@@ -50,7 +50,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.BaseActivity.Companion.showSimpleSnackbar
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomViewPager
 import mega.privacy.android.app.components.EditTextPIN
@@ -80,6 +79,7 @@ import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -145,6 +145,9 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var dbH: DatabaseHandler
+
+    @Inject
+    lateinit var cookieEnabledCheckWrapper: CookieEnabledCheckWrapper
 
     @Inject
     lateinit var getAccountCredentialsUseCase: GetAccountCredentialsUseCase
@@ -1380,7 +1383,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
                 megaApi.fetchNodes(this@FileProviderActivity)
 
                 // Get cookies settings after login.
-                getInstance().checkEnabledCookies()
+                cookieEnabledCheckWrapper.checkEnabledCookies()
             }
         } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
             if (e.errorCode != MegaError.API_OK) {
