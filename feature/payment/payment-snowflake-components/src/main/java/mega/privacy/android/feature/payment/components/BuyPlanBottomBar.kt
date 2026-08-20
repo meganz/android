@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.button.BrandFilledButton
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.TextOnlyButton
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -30,6 +31,7 @@ import mega.android.core.ui.tokens.theme.DSTokens
  * @param onTextOnlyButtonClick called when the text button is tapped
  * @param maxContentWidth caps the width of the buttons and centres them, leaving the divider and
  * background full width; [Dp.Unspecified] lets the buttons span the whole bar
+ * @param useBrandButton when true, renders the brand (red) buy button instead of the primary one
  */
 @Composable
 fun BuyPlanBottomBar(
@@ -39,6 +41,7 @@ fun BuyPlanBottomBar(
     textOnlyButtonText: String? = null,
     onTextOnlyButtonClick: () -> Unit = {},
     maxContentWidth: Dp = Dp.Unspecified,
+    useBrandButton: Boolean = false,
 ) {
     Box(
         modifier = modifier
@@ -47,23 +50,32 @@ fun BuyPlanBottomBar(
     ) {
         HorizontalDivider(
             thickness = 1.dp,
-            color = DSTokens.colors.border.strong
+            color = DSTokens.colors.border.subtle
         )
 
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .widthIn(max = maxContentWidth)
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            PrimaryFilledButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(TEST_TAG_BUY_BUTTON),
-                text = text,
-                onClick = onClick,
-            )
+            val buttonModifier = Modifier
+                .fillMaxWidth()
+                .testTag(TEST_TAG_BUY_BUTTON)
+            if (useBrandButton) {
+                BrandFilledButton(
+                    modifier = buttonModifier,
+                    text = text,
+                    onClick = onClick,
+                )
+            } else {
+                PrimaryFilledButton(
+                    modifier = buttonModifier,
+                    text = text,
+                    onClick = onClick,
+                )
+            }
 
             textOnlyButtonText?.let {
                 TextOnlyButton(
@@ -95,6 +107,18 @@ private fun BuyPlanBottomBarWithTextOnlyButtonPreview() {
         BuyPlanBottomBar(
             text = "Get Pro I",
             textOnlyButtonText = "View all plans",
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun BuyPlanBottomBarBrandButtonPreview() {
+    AndroidTheme(isSystemInDarkTheme()) {
+        BuyPlanBottomBar(
+            text = "Get Pro I",
+            textOnlyButtonText = "View all plans",
+            useBrandButton = true,
         )
     }
 }

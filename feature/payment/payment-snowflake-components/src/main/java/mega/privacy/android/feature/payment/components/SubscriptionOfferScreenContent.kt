@@ -110,6 +110,7 @@ fun SubscriptionOfferScreenContent(
                 textOnlyButtonText = viewAllPlansText,
                 onTextOnlyButtonClick = onViewAllPlansClick,
                 maxContentWidth = SUBSCRIPTION_OFFER_CONTENT_MAX_WIDTH,
+                useBrandButton = true,
                 modifier = Modifier.navigationBarsPadding(),
             )
         },
