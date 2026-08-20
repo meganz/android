@@ -1,7 +1,6 @@
 package mega.privacy.android.app.utils
 
 import android.content.Context
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
@@ -11,8 +10,16 @@ import nz.mega.sdk.MegaError
  */
 object StringResourcesUtils {
 
+    /**
+     * Application context set once at app boot by the app-create initialiser tier.
+     *
+     * This object cannot be Hilt-injected, so its application context is handed to it explicitly
+     * during `Application.onCreate` instead of reaching through `MegaApplication.getInstance()`.
+     */
+    internal lateinit var applicationContext: Context
 
-    private val context: Context by lazy { getInstance() }
+    private val context: Context
+        get() = applicationContext
 
     /**
      * Gets the translated string of an error received in a request.

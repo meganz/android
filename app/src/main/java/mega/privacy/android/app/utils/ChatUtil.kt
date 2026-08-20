@@ -18,7 +18,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.EntryPointAccessors
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.MarqueeTextView
@@ -325,27 +324,27 @@ object ChatUtil {
         contactStateText: TextView?,
         where: StatusIconLocation,
     ) {
-        val app = MegaApplication.getInstance()
         setContactStatus(userStatus, contactStateIcon, where)
 
         if (contactStateText == null) {
             return
         }
 
+        val context = contactStateText.context
         contactStateText.visibility = View.VISIBLE
 
         when (userStatus) {
             MegaChatApi.STATUS_ONLINE ->
-                contactStateText.text = app.getString(R.string.online_status)
+                contactStateText.text = context.getString(R.string.online_status)
 
             MegaChatApi.STATUS_AWAY ->
-                contactStateText.text = app.getString(R.string.away_status)
+                contactStateText.text = context.getString(R.string.away_status)
 
             MegaChatApi.STATUS_BUSY ->
-                contactStateText.text = app.getString(R.string.busy_status)
+                contactStateText.text = context.getString(R.string.busy_status)
 
             MegaChatApi.STATUS_OFFLINE ->
-                contactStateText.text = app.getString(R.string.offline_status)
+                contactStateText.text = context.getString(R.string.offline_status)
 
             MegaChatApi.STATUS_INVALID -> contactStateText.visibility = View.GONE
             else -> contactStateText.visibility = View.GONE

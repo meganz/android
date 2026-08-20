@@ -15,7 +15,6 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.vdurmont.emoji.EmojiParser
 import dagger.hilt.android.EntryPointAccessors
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.main.ShareContactInfo
@@ -288,7 +287,7 @@ object AvatarUtil {
         val firstEmoji = if (customEmojis) EmojiManager.getInstance().getFirstEmoji(firstLetter) else null
         if (firstEmoji != null) {
             val emojiBitmap = Bitmap.createScaledBitmap(
-                firstEmoji.getBitmap(MegaApplication.getInstance()),
+                firstEmoji.getBitmap(applicationContext),
                 textSize,
                 textSize,
                 false,

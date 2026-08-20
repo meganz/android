@@ -1,7 +1,7 @@
 package mega.privacy.android.app.utils
 
+import android.content.Context
 import dagger.hilt.android.EntryPointAccessors
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.EntryPointsModule
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import java.io.File
@@ -12,6 +12,16 @@ import java.io.File
  * Call to corresponding [CacheRepository] to perform operations related to cache folders.
  */
 object CacheFolderManager {
+
+    /**
+     * Application context set once at app boot by the app-create initialiser tier.
+     *
+     * This object is a legacy static util with many Java/Kotlin callers and cannot be
+     * Hilt-injected, so its application context is handed to it explicitly during
+     * `Application.onCreate` instead of reaching through `MegaApplication.getInstance()`.
+     */
+    internal lateinit var applicationContext: Context
+
     /**
      * THUMBNAIL_FOLDER
      */
@@ -47,7 +57,7 @@ object CacheFolderManager {
      */
     val cacheFolderGateway: CacheFolderGateway by lazy {
         EntryPointAccessors.fromApplication(
-            MegaApplication.getInstance(),
+            applicationContext,
             EntryPointsModule.CacheFolderManagerEntryPoint::class.java
         ).cacheFolderGateway
     }

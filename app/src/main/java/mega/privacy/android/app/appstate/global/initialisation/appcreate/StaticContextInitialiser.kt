@@ -3,7 +3,11 @@ package mega.privacy.android.app.appstate.global.initialisation.appcreate
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.DomainNameFacade
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
 import javax.inject.Inject
@@ -27,7 +31,11 @@ internal class StaticContextInitialiser @Inject constructor(
 
     override operator fun invoke() {
         AvatarUtil.applicationContext = context
+        CacheFolderManager.applicationContext = context
         CallUtil.applicationContext = context
+        DomainNameFacade.applicationContext = context
+        FileUtil.setApplicationContext(context)
+        StringResourcesUtils.applicationContext = context
         VideoCaptureUtils.setApplicationContext(context)
     }
 }

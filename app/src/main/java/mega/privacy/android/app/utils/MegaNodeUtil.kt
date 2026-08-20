@@ -16,7 +16,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.EntryPointAccessors
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.getDbHandler
@@ -256,13 +255,12 @@ object MegaNodeUtil {
      * @param node MegaNode to check
      * @return True if the node is "My chat files" attribute, false otherwise
      */
-    private fun isMyChatFilesFolder(node: MegaNode?): Boolean {
+    private fun isMyChatFilesFolder(megaApi: MegaApiAndroid, node: MegaNode?): Boolean {
         if (node == null || node.handle == INVALID_HANDLE) return false
-        val megaApplication = MegaApplication.getInstance()
-        val storedHandle = megaApplication.dbH.myChatFilesFolderHandle
+        val storedHandle = getDbHandler().myChatFilesFolderHandle
         if (storedHandle == INVALID_HANDLE || node.handle != storedHandle) return false
-        val storedNode = megaApplication.megaApi.getNodeByHandle(storedHandle) ?: return false
-        return !megaApplication.megaApi.isInRubbish(storedNode)
+        val storedNode = megaApi.getNodeByHandle(storedHandle) ?: return false
+        return !megaApi.isInRubbish(storedNode)
     }
 
     /**
@@ -319,7 +317,7 @@ object MegaNodeUtil {
             } else {
                 IconPackR.drawable.ic_folder_camera_uploads_medium_solid
             }
-        } else if (isMyChatFilesFolder(node)) {
+        } else if (isMyChatFilesFolder(megaApi, node)) {
             if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(megaApi, node)) {
                 IconPackR.drawable.ic_folder_users_medium_solid
             } else {

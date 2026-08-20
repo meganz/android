@@ -36,7 +36,6 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -68,6 +67,19 @@ public class FileUtil {
 
     private static final String VOLUME_EXTERNAL = "external";
     private static final String VOLUME_INTERNAL = "internal";
+
+    /**
+     * Application context set once at app boot by the app-create initialiser tier.
+     * <p>
+     * This class is a legacy static util with many callers and cannot be Hilt-injected, so its
+     * application context is handed to it explicitly during {@code Application.onCreate} instead
+     * of reaching through {@code MegaApplication.getInstance()}.
+     */
+    private static Context applicationContext;
+
+    public static void setApplicationContext(Context context) {
+        applicationContext = context;
+    }
 
     public static String getRecoveryKeyFileName(Context context) {
         return context.getString(R.string.general_rk) + TXT_EXTENSION;
@@ -201,7 +213,7 @@ public class FileUtil {
         }
 
         String path;
-        Context context = MegaApplication.getInstance();
+        Context context = applicationContext;
         String data = MediaStore.Files.FileColumns.DATA;
         final String[] projection = {data};
         final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND "
@@ -280,7 +292,7 @@ public class FileUtil {
         final String selection = MediaStore.Files.FileColumns.SIZE + " = ?";
         final String[] selectionArgs = {String.valueOf(node.getSize())};
 
-        Context context = MegaApplication.getInstance();
+        Context context = applicationContext;
 
         try {
             Cursor cursor = context.getContentResolver().query(MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection, selectionArgs, null);
@@ -359,7 +371,7 @@ public class FileUtil {
             inputStream.close();
             outputStream.close();
 
-            sendBroadcastToUpdateGallery(MegaApplication.getInstance(), dest);
+            sendBroadcastToUpdateGallery(applicationContext, dest);
         }
     }
 
@@ -401,7 +413,7 @@ public class FileUtil {
      * @return File
      */
     public static File getDownloadLocationForPreviewingFiles() {
-        Context context = MegaApplication.getInstance();
+        Context context = applicationContext;
         // Using cache to save the files for previewing
         File downloadsDir = context.getExternalCacheDir();
         return downloadsDir != null ? downloadsDir : context.getCacheDir();
@@ -409,7 +421,7 @@ public class FileUtil {
 
     public static String getDownloadLocation() {
         if (isAndroid11OrUpper()) {
-            File file = buildDefaultDownloadDir(MegaApplication.getInstance());
+            File file = buildDefaultDownloadDir(applicationContext);
             file.mkdirs();
             return file.getAbsolutePath();
         }
@@ -425,7 +437,7 @@ public class FileUtil {
             return prefs.getStorageDownloadLocation();
         }
 
-        return buildDefaultDownloadDir(MegaApplication.getInstance()).getAbsolutePath();
+        return buildDefaultDownloadDir(applicationContext).getAbsolutePath();
     }
 
     public static boolean isFileAvailable(File file) {
