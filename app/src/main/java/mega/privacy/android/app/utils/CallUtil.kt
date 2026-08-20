@@ -416,7 +416,7 @@ object CallUtil {
 
         callInProgressLayout.visibility = View.VISIBLE
 
-        if (context is ContactInfoActivity) {
+        if (context is CallInProgressToolbarHost) {
             context.changeToolbarLayoutElevation()
         }
     }
@@ -493,7 +493,7 @@ object CallUtil {
     ) {
         callInProgressLayout.visibility = View.GONE
         activateChrono(false, callInProgressChrono, null)
-        if (context is ContactInfoActivity) {
+        if (context is CallInProgressToolbarHost) {
             context.changeToolbarLayoutElevation()
         }
     }
@@ -607,7 +607,7 @@ object CallUtil {
         }
         if (callInProgressLayout != null && callInProgressLayout.visibility == View.VISIBLE) {
             callInProgressLayout.visibility = View.GONE
-            if (context is ContactInfoActivity) {
+            if (context is CallInProgressToolbarHost) {
                 context.changeToolbarLayoutElevation()
             }
         }

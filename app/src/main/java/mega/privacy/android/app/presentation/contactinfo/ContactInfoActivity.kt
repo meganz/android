@@ -82,6 +82,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQu
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.CallInProgressToolbarHost
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
@@ -128,7 +129,7 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListenerInterface,
-    OnSharedFolderUpdatedCallBack {
+    OnSharedFolderUpdatedCallBack, CallInProgressToolbarHost {
 
     /**
      * object handles passcode lock behaviours
@@ -1463,7 +1464,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     /**
      * This method is used to change the elevation of the toolbar.
      */
-    fun changeToolbarLayoutElevation() {
+    override fun changeToolbarLayoutElevation() {
         collapsingAppBar.appBar.elevation =
             if (callInProgress.callInProgressLayout.isVisible) {
                 Util.dp2px(16f, outMetrics).toFloat()
