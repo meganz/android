@@ -22,6 +22,17 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * WYSIWYG Markdown editing in the text editor: live styling while editing .md files,
+     * formatting toolbar above the keyboard, and a live-preview/source toggle.
+     * Rendering itself remains gated by the remote ApiFeatures.TextEditorMarkdownRendering flag.
+     */
+    TextEditorWysiwyg(
+        experimentName = "txrch",
+        description = "Enable WYSIWYG Markdown editing in the text editor",
+        defaultValue = false,
+    ),
+
+    /**
      * Enable Android credential manager
      */
     CredentialManager(

@@ -9,15 +9,17 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -28,37 +30,35 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
-import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
 import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
-import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
-import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFileLinkUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFolderLinkUseCase
-import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SetShowLineNumbersPreferenceUseCase
@@ -74,8 +74,8 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -294,6 +294,68 @@ internal class TextEditorComposeViewModelTest {
         advanceUntilIdle()
         assertThat(underTest.uiState.value.isMarkdown).isFalse()
     }
+
+    @Test
+    fun `test that markdown flags are resolved in Create mode`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.TextEditorMarkdownRendering))
+            .thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.TextEditorWysiwyg)).thenReturn(true)
+        initUnderTest(mode = TextEditorMode.Create, fileName = "new.md")
+        advanceUntilIdle()
+        val state = underTest.uiState.value
+        assertThat(state.isMarkdownEnabled).isTrue()
+        assertThat(state.isWysiwygEnabled).isTrue()
+    }
+
+    @Test
+    fun `test that isWysiwygEnabled is false when the wysiwyg flag is disabled`() = runTest {
+        stubEmptyLoad()
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.TextEditorMarkdownRendering))
+            .thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.TextEditorWysiwyg)).thenReturn(false)
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = "README.md")
+        advanceUntilIdle()
+        val state = underTest.uiState.value
+        assertThat(state.isWysiwygEnabled).isFalse()
+        assertThat(state.isWysiwygCapable).isFalse()
+    }
+
+    @Test
+    fun `test that isWysiwygCapable is true for a single chunk markdown document in edit mode`() =
+        runTest {
+            doReturn(flowOf(listOf("# Title", "body")))
+                .whenever(getTextContentForTextEditorUseCase)
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+            runBlocking {
+                whenever(getNodeByIdUseCase(any())).thenReturn(null)
+                whenever(getNodeAccessUseCase(any())).thenReturn(null)
+            }
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = "README.md")
+            advanceUntilIdle()
+            underTest.setEditMode()
+            val state = underTest.uiState.value
+            assertThat(state.isSingleChunkDocument).isTrue()
+            assertThat(state.isWysiwygCapable).isTrue()
+        }
+
+    @Test
+    fun `test that isWysiwygCapable is false when the document spans multiple chunks in edit mode`() =
+        runTest {
+            val longLine = "a".repeat(30_000)
+            doReturn(flowOf(listOf(longLine, longLine, longLine)))
+                .whenever(getTextContentForTextEditorUseCase)
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+            runBlocking {
+                whenever(getNodeByIdUseCase(any())).thenReturn(null)
+                whenever(getNodeAccessUseCase(any())).thenReturn(null)
+            }
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = "README.md")
+            advanceUntilIdle()
+            underTest.setEditMode()
+            val state = underTest.uiState.value
+            assertThat(state.isSingleChunkDocument).isFalse()
+            assertThat(state.isWysiwygCapable).isFalse()
+        }
 
     @Test
     fun `test that getMarkdownPreviewContent returns joined content for normal lines`() = runTest {

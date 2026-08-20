@@ -29,6 +29,7 @@ dependencies {
     // Markdown parsing for the in-house Compose reader (CommonMark + GFM tables). No UI dep.
     implementation(lib.commonmark.java)
     implementation(lib.commonmark.ext.gfm.tables)
+    implementation(lib.commonmark.ext.gfm.strikethrough)
 
     //test
     testImplementation(project(":core-test"))

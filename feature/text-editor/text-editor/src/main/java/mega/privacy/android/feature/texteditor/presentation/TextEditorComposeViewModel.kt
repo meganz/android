@@ -23,39 +23,39 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartDownloadNode
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
-import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
 import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
-import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
-import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
-import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFileLinkUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFolderLinkUseCase
@@ -220,12 +220,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     }
                     return@launch
                 }
-                val markdownRenderingEnabled = runCatching {
-                    getFeatureFlagValueUseCase(ApiFeatures.TextEditorMarkdownRendering)
-                }.getOrDefault(false)
-                _uiState.update {
-                    it.copy(isFullyLoaded = false, isMarkdownEnabled = markdownRenderingEnabled)
-                }
+                // Resolved before content streams so the Markdown preview routing never
+                // flips mid-stream.
+                resolveMarkdownFlags()
+                _uiState.update { it.copy(isFullyLoaded = false) }
                 val chatId = args.chatId
                 val messageId = args.messageId
                 val publicUrl = args.publicUrl
@@ -371,6 +369,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                             errorEvent = consumed,
                             totalLineCount = fullContentLines.size,
                             contentVersion = it.contentVersion + 1,
+                            isSingleChunkDocument = chunkTexts.size <= 1,
                         )
                     }
                 }
@@ -386,12 +385,29 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 monitorConnectivityDuringLoad()
             }
         } else {
+            viewModelScope.launch { resolveMarkdownFlags() }
             lastSavedContent = ""
             chunkTexts.add("")
             rebuildStartLineCache()
             _uiState.update {
                 it.copy(isLoading = false, totalLineCount = 0)
             }
+        }
+    }
+
+    /** Resolves the Markdown feature flags; also called in Create mode (new .md files). */
+    private suspend fun resolveMarkdownFlags() {
+        val markdownRenderingEnabled = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.TextEditorMarkdownRendering)
+        }.getOrDefault(false)
+        val wysiwygEnabled = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.TextEditorWysiwyg)
+        }.getOrDefault(false)
+        _uiState.update {
+            it.copy(
+                isMarkdownEnabled = markdownRenderingEnabled,
+                isWysiwygEnabled = wysiwygEnabled,
+            )
         }
     }
 
@@ -596,6 +612,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 totalLineCount = fullContentLines.size,
                 contentVersion = it.contentVersion + 1,
                 focusedEditChunk = initialChunk,
+                isSingleChunkDocument = chunkTexts.size <= 1,
                 // Only force a scroll when switching from the preview (different list state);
                 // the plain chunked view keeps its position because it shares the list state.
                 restoreScrollIndex = if (fromMarkdown) initialChunk else it.restoreScrollIndex,

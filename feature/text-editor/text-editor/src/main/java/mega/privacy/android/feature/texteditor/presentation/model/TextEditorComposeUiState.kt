@@ -53,6 +53,20 @@ data class TextEditorComposeUiState(
     val restoreFocusChunkIndex: Int? = null,
     /** True when the Markdown-rendering feature flag is enabled for this session. */
     val isMarkdownEnabled: Boolean = false,
+    /** True when the WYSIWYG Markdown editing feature flag is enabled for this session. */
+    val isWysiwygEnabled: Boolean = false,
+    /**
+     * True when the whole document fits in a single edit chunk (<= CHUNK_MAX_CHARS). WYSIWYG
+     * editing is limited to single-chunk documents so live styling stays inside the proven
+     * text-measurement budget (AND-23707); larger documents edit as raw chunked source.
+     * Updated whenever edit chunks are (re)built; defaults to true so Create mode qualifies.
+     */
+    val isSingleChunkDocument: Boolean = true,
+    /**
+     * True when Markdown live-preview styling is active in Edit/Create mode. Turning it off
+     * shows the raw Markdown syntax while keeping the formatting toolbar functional.
+     */
+    val isLivePreviewOn: Boolean = true,
     /**
      * One-shot top logical line (0-based) to restore the Markdown preview to, e.g. when returning
      * from Edit or resuming via Continue-Where-Left-Off. Null when nothing to restore.
@@ -65,4 +79,11 @@ data class TextEditorComposeUiState(
      * Markdown files open in a rendered preview in View mode; Edit shows the raw source.
      */
     val isMarkdown: Boolean get() = isMarkdownEnabled && fileName.isMarkdownFile()
+
+    /**
+     * True when WYSIWYG Markdown editing applies to the current document: the file is Markdown,
+     * the WYSIWYG flag is on, and the document fits in a single edit chunk.
+     */
+    val isWysiwygCapable: Boolean
+        get() = isMarkdown && isWysiwygEnabled && isSingleChunkDocument
 }
