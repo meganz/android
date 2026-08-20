@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.texteditor.components
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -10,11 +11,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -61,6 +64,27 @@ import org.commonmark.node.ThematicBreak
  * (AND-23707). Mirrors the chunked editor's per-chunk char cap.
  */
 private const val MAX_TEXT_MEASURE_CHARS = 50_000
+
+/**
+ * Horizontal scroll positions for code blocks and tables, keyed by their source node and owned
+ * above the per-block [androidx.compose.foundation.text.selection.SelectionContainer]. Clearing a
+ * selection recreates those containers, which would otherwise scroll every code block back to its
+ * start. Null (no provider) falls back to local state.
+ *
+ * Node-identity keys are deliberate: every parse yields fresh [Node] instances and the provider
+ * scopes the map to one parsed document, so entries can never outlive their nodes. A plain map
+ * rather than snapshot state is also deliberate — this is an idempotent getOrPut cache that no
+ * composition observes, so mutating it during composition is safe and snapshot tracking would only
+ * add invalidation overhead.
+ */
+internal val LocalMarkdownScrollStates =
+    staticCompositionLocalOf<MutableMap<Node, ScrollState>?> { null }
+
+@Composable
+private fun rememberBlockScrollState(node: Node): ScrollState {
+    val local = rememberScrollState()
+    return LocalMarkdownScrollStates.current?.getOrPut(node) { local } ?: local
+}
 
 /** Resolved colors for Markdown rendering, mapped from design tokens. */
 internal data class MarkdownColors(
@@ -120,8 +144,8 @@ internal fun MarkdownBlock(
 
         is BulletList -> MarkdownList(node, ordered = false, colors = colors, modifier = m)
         is OrderedList -> MarkdownList(node, ordered = true, colors = colors, modifier = m)
-        is FencedCodeBlock -> CodeBlock(node.literal.trimEnd('\n'), colors, m)
-        is IndentedCodeBlock -> CodeBlock(node.literal.trimEnd('\n'), colors, m)
+        is FencedCodeBlock -> CodeBlock(node, node.literal.trimEnd('\n'), colors, m)
+        is IndentedCodeBlock -> CodeBlock(node, node.literal.trimEnd('\n'), colors, m)
         is BlockQuote -> BlockQuoteBlock(node, colors, m)
         is ThematicBreak -> HorizontalDivider(color = colors.divider, modifier = m)
         is TableBlock -> MarkdownTable(node, colors, m)
@@ -157,11 +181,14 @@ private fun MarkdownList(
         while (item != null) {
             if (item is ListItem) {
                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
-                    Text(
-                        text = if (ordered) "$index. " else "•  ",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colors.text,
-                    )
+                    // The marker is decoration, not content — keep it out of copied text.
+                    DisableSelection {
+                        Text(
+                            text = if (ordered) "$index. " else "•  ",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = colors.text,
+                        )
+                    }
                     Column(modifier = Modifier.fillMaxWidth()) {
                         var child = item.firstChild
                         while (child != null) {
@@ -179,6 +206,7 @@ private fun MarkdownList(
 
 @Composable
 private fun CodeBlock(
+    node: Node,
     code: String,
     colors: MarkdownColors,
     modifier: Modifier = Modifier,
@@ -188,7 +216,7 @@ private fun CodeBlock(
         modifier = modifier
             .fillMaxWidth()
             .background(colors.codeBackground, RoundedCornerShape(8.dp))
-            .horizontalScroll(rememberScrollState())
+            .horizontalScroll(rememberBlockScrollState(node))
             .padding(12.dp),
     ) {
         // Split very long code into multiple Texts so a single line can't ANR text measurement.
@@ -264,7 +292,7 @@ private fun MarkdownTable(
 ) {
     Column(
         modifier = modifier
-            .horizontalScroll(rememberScrollState())
+            .horizontalScroll(rememberBlockScrollState(table))
             .border(1.dp, colors.divider, RoundedCornerShape(4.dp)),
     ) {
         var section = table.firstChild

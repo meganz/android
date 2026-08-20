@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.texteditor.components
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -28,6 +29,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import mega.android.core.ui.tokens.theme.DSTokens
 
@@ -64,24 +66,63 @@ internal fun MarkdownScrollbar(
 
     val currentOffset = currentScrollOffset(info, heights, averageHeight)
     val scrollableRange = (estimatedTotal - viewport).coerceAtLeast(1f)
-    val fraction = (currentOffset / scrollableRange).coerceIn(0f, 1f)
-
-    val density = LocalDensity.current
     val scope = rememberCoroutineScope()
+
+    ScrollbarThumbTrack(
+        fraction = (currentOffset / scrollableRange).coerceIn(0f, 1f),
+        onSeek = { targetFraction ->
+            val targetPx = targetFraction * estimatedTotal
+            var accumulated = 0f
+            var index = 0
+            while (index < itemCount - 1 && accumulated + heightAt(index, heights, averageHeight) < targetPx) {
+                accumulated += heightAt(index, heights, averageHeight)
+                index++
+            }
+            scope.launch { state.scrollToItem(index, (targetPx - accumulated).toInt().coerceAtLeast(0)) }
+        },
+        modifier = modifier,
+    )
+}
+
+/**
+ * [MarkdownScrollbar]'s counterpart for the non-virtualized full-selection [Column] path: with a
+ * plain [ScrollState] the content geometry is exact, so the thumb maps directly to
+ * value / maxValue with no estimation.
+ */
+@Composable
+internal fun MarkdownColumnScrollbar(
+    state: ScrollState,
+    modifier: Modifier = Modifier,
+) {
+    // maxValue is Int.MAX_VALUE until the first measure, and 0 when nothing scrolls.
+    val max = state.maxValue
+    if (max <= 0 || max == Int.MAX_VALUE) return
+    val scope = rememberCoroutineScope()
+
+    ScrollbarThumbTrack(
+        fraction = (state.value.toFloat() / max).coerceIn(0f, 1f),
+        onSeek = { targetFraction ->
+            scope.launch { state.scrollTo((targetFraction * max).roundToInt()) }
+        },
+        modifier = modifier,
+    )
+}
+
+/**
+ * Shared track + draggable thumb: renders the thumb at [fraction] of the track and reports the
+ * dragged position back through [onSeek] as a 0..1 fraction.
+ */
+@Composable
+private fun ScrollbarThumbTrack(
+    fraction: Float,
+    onSeek: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val density = LocalDensity.current
     val thumbSizePx = with(density) { ThumbSize.toPx() }
     var trackHeightPx by remember { mutableFloatStateOf(0f) }
-
-    // Read latest geometry inside the long-lived drag handler without restarting it.
-    val seek by rememberUpdatedState<(Float) -> Unit> { targetFraction ->
-        val targetPx = targetFraction * estimatedTotal
-        var accumulated = 0f
-        var index = 0
-        while (index < itemCount - 1 && accumulated + heightAt(index, heights, averageHeight) < targetPx) {
-            accumulated += heightAt(index, heights, averageHeight)
-            index++
-        }
-        scope.launch { state.scrollToItem(index, (targetPx - accumulated).toInt().coerceAtLeast(0)) }
-    }
+    // Read the latest callback inside the long-lived drag handler without restarting it.
+    val currentOnSeek by rememberUpdatedState(onSeek)
 
     Box(
         modifier = modifier
@@ -92,7 +133,7 @@ internal fun MarkdownScrollbar(
                 detectVerticalDragGestures { change, _ ->
                     change.consume()
                     val travel = (trackHeightPx - thumbSizePx).coerceAtLeast(1f)
-                    seek(((change.position.y - thumbSizePx / 2f) / travel).coerceIn(0f, 1f))
+                    currentOnSeek(((change.position.y - thumbSizePx / 2f) / travel).coerceIn(0f, 1f))
                 }
             },
     ) {
