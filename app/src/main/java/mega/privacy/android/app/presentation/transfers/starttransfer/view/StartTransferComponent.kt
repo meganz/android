@@ -11,9 +11,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarHostState as SnackbarHostStateM2
 import androidx.compose.material.SnackbarResult
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -95,7 +97,7 @@ import java.io.File
 /**
  * Helper compose view to show UI related to starting a download transfer
  * (scanning in progress dialog, not enough space snackbar, start download snackbar, quota exceeded, etc.)
- * @param snackBarHostState optional snackbar to show messages, typically null because it should be injected via LocalSnackBarHostState or LocalSnackBarHostStateM2
+ * @param snackBarHostState optional Material3 snackbar host to show messages, typically null because it should be injected via LocalSnackBarHostState (Material3) or LocalSnackBarHostStateOriginal (Material2)
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -232,6 +234,37 @@ internal fun StartTransferComponent(
 }
 
 /**
+ * Material2 seam for [StartTransferComponent]. Legacy screens that still drive their whole UI from a
+ * Material2 [SnackbarHostStateM2] (shared with Material2 scaffolds/views elsewhere in the screen) can
+ * keep passing that host here; it is forwarded to the Material3 component via [LocalSnackBarHostStateOriginal].
+ * Prefer the Material3 overload for new callers. This seam can be removed once the remaining Material2
+ * screens are migrated to Material3.
+ */
+@Composable
+internal fun StartTransferComponent(
+    event: StateEventWithContent<TransferTriggerEvent>,
+    onConsumeEvent: () -> Unit,
+    snackBarHostState: SnackbarHostStateM2?,
+    areTransferOverQuotaWarningsAllowed: Boolean = true,
+    onScanningFinished: (StartTransferEvent) -> Unit = {},
+    viewModel: StartTransfersComponentViewModel = hiltViewModel(),
+    onCancelNotEnoughSpaceForUploadDialog: () -> Unit = {},
+    isPasscodeLocked: Boolean = false,
+) {
+    CompositionLocalProvider(LocalSnackBarHostStateOriginal provides snackBarHostState) {
+        StartTransferComponent(
+            event = event,
+            onConsumeEvent = onConsumeEvent,
+            areTransferOverQuotaWarningsAllowed = areTransferOverQuotaWarningsAllowed,
+            onScanningFinished = onScanningFinished,
+            viewModel = viewModel,
+            onCancelNotEnoughSpaceForUploadDialog = onCancelNotEnoughSpaceForUploadDialog,
+            isPasscodeLocked = isPasscodeLocked,
+        )
+    }
+}
+
+/**
  * Helper function to wrap [StartTransferComponent] into a [ComposeView] so it can be used in screens using View system
  * @param activity the parent activity where this view will be added, it should implement [SnackbarShower] to show the generated Snackbars
  * @param transferEventState flow that usually comes from the view model and triggers the download Transfer events
@@ -251,7 +284,7 @@ internal fun createStartTransferView(
             (transferEventState as? StateFlow)?.value ?: consumed()
         )
         OriginalTheme(isDark = isSystemInDarkTheme()) {
-            val snackbarHostState = remember { SnackbarHostState() }
+            val snackbarHostState = remember { SnackbarHostStateM2() }
             //if we need this view is because we are not using compose views, so we don't have a scaffold to show snack bars and need to launch a View snackbar
             LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
             StartTransferComponent(
@@ -636,8 +669,6 @@ private suspend fun consumeMessage(
 
 @Composable
 private fun SnackbarHostState?.orProvided() =
-    (this ?: LocalSnackBarHostStateOriginal.current)?.let {
-        SnackbarHostStateWrapper(it)
-    } ?: LocalSnackBarHostState.current?.let {
-        SnackbarHostStateWrapper(it)
-    }
+    this?.let { SnackbarHostStateWrapper(it) }
+        ?: LocalSnackBarHostStateOriginal.current?.let { SnackbarHostStateWrapper(it) }
+        ?: LocalSnackBarHostState.current?.let { SnackbarHostStateWrapper(it) }
