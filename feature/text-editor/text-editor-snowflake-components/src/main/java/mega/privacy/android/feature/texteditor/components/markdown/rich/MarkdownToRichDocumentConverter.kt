@@ -202,53 +202,23 @@ class MarkdownToRichDocumentConverter {
             when (node) {
                 is CmText -> builder.append(node.literal)
 
-                is StrongEmphasis -> appendStyled(builder, spans, RichSpanStyle.Bold) {
-                    var child = node.firstChild
-                    while (child != null) {
-                        walk(child)
-                        child = child.next
-                    }
-                }
-
-                is Emphasis -> appendStyled(builder, spans, RichSpanStyle.Italic) {
-                    var child = node.firstChild
-                    while (child != null) {
-                        walk(child)
-                        child = child.next
-                    }
-                }
-
-                is Strikethrough -> appendStyled(builder, spans, RichSpanStyle.Strikethrough) {
-                    var child = node.firstChild
-                    while (child != null) {
-                        walk(child)
-                        child = child.next
-                    }
-                }
-
                 is Code -> appendStyled(builder, spans, RichSpanStyle.Code) {
                     builder.append(node.literal)
-                }
-
-                is Link -> appendStyled(
-                    builder,
-                    spans,
-                    RichSpanStyle.Link(node.destination.orEmpty()),
-                ) {
-                    var child = node.firstChild
-                    while (child != null) {
-                        walk(child)
-                        child = child.next
-                    }
                 }
 
                 is SoftLineBreak, is HardLineBreak -> builder.append('\n')
 
                 else -> {
-                    var child = node.firstChild
-                    while (child != null) {
-                        walk(child)
-                        child = child.next
+                    val walkChildren = {
+                        var child = node.firstChild
+                        while (child != null) {
+                            walk(child)
+                            child = child.next
+                        }
+                    }
+                    when (val style = spanStyleOf(node)) {
+                        null -> walkChildren()
+                        else -> appendStyled(builder, spans, style) { walkChildren() }
                     }
                 }
             }
@@ -260,6 +230,15 @@ class MarkdownToRichDocumentConverter {
             child = child.next
         }
         return RichText(builder.toString(), spans)
+    }
+
+    /** The span style an inline container node maps to, or null for transparent containers. */
+    private fun spanStyleOf(node: Node): RichSpanStyle? = when (node) {
+        is StrongEmphasis -> RichSpanStyle.Bold
+        is Emphasis -> RichSpanStyle.Italic
+        is Strikethrough -> RichSpanStyle.Strikethrough
+        is Link -> RichSpanStyle.Link(node.destination.orEmpty())
+        else -> null
     }
 
     private inline fun appendStyled(
