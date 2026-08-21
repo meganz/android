@@ -108,6 +108,82 @@ class ExpiryDateTest {
         )
     }
 
+    @Test
+    fun `test that MAX_EXPIRY_SECONDS is the 32-bit signed time limit`() {
+        assertThat(MAX_EXPIRY_SECONDS).isEqualTo(2_147_483_647L)
+    }
+
+    @Test
+    fun `test that maxExpiryYear is 2038`() {
+        useTimeZone(UTC.id)
+
+        assertThat(maxExpiryYear()).isEqualTo(2038)
+    }
+
+    @Test
+    fun `test that isSelectableExpiryDay accepts the last day inside the API limit`() {
+        // The limit instant is 2038-01-19T03:14:07Z, so in UTC the whole of 18 January still fits.
+        useTimeZone(UTC.id)
+
+        assertThat(isSelectableExpiryDay(utcMidnight(2038, Calendar.JANUARY, 18))).isTrue()
+    }
+
+    @Test
+    fun `test that isSelectableExpiryDay rejects the first day past the API limit`() {
+        // The day QA picked: its end of day is past the limit, so the API refused the save.
+        useTimeZone(UTC.id)
+
+        assertThat(isSelectableExpiryDay(utcMidnight(2038, Calendar.JANUARY, 19))).isFalse()
+    }
+
+    @Test
+    fun `test that isSelectableExpiryDay rejects a date far past the API limit`() {
+        useTimeZone(UTC.id)
+
+        assertThat(isSelectableExpiryDay(utcMidnight(2100, Calendar.DECEMBER, 31))).isFalse()
+    }
+
+    @Test
+    fun `test that a timezone behind UTC loses the last day a UTC user keeps`() {
+        // End of 18 January in Los Angeles falls on 19 January in UTC, past the limit — so the last
+        // usable day there is a day earlier than for a UTC user.
+        useTimeZone(LOS_ANGELES)
+
+        assertThat(isSelectableExpiryDay(utcMidnight(2038, Calendar.JANUARY, 18))).isFalse()
+        assertThat(isSelectableExpiryDay(utcMidnight(2038, Calendar.JANUARY, 17))).isTrue()
+    }
+
+    @Test
+    fun `test that a timezone ahead of UTC keeps the last day`() {
+        useTimeZone(AUCKLAND)
+
+        assertThat(isSelectableExpiryDay(utcMidnight(2038, Calendar.JANUARY, 18))).isTrue()
+        assertThat(isSelectableExpiryDay(utcMidnight(2038, Calendar.JANUARY, 19))).isFalse()
+    }
+
+    @Test
+    fun `test that isSelectableExpiryDay rejects a day in the past`() {
+        useTimeZone(UTC.id)
+
+        assertThat(isSelectableExpiryDay(utcMidnight(2020, Calendar.JANUARY, 1))).isFalse()
+    }
+
+    @Test
+    fun `test that every accepted day maps to an instant within the API limit`() {
+        // The property the picker bound exists to guarantee: nothing it allows can be rejected for
+        // being out of range.
+        for (zone in listOf(UTC.id, AUCKLAND, LOS_ANGELES)) {
+            useTimeZone(zone)
+            for (day in 10..25) {
+                val utcMidnightMillis = utcMidnight(2038, Calendar.JANUARY, day)
+                if (isSelectableExpiryDay(utcMidnightMillis)) {
+                    val expirySeconds = endOfLocalDay(utcMidnightMillis) / 1000
+                    assertThat(expirySeconds).isAtMost(MAX_EXPIRY_SECONDS)
+                }
+            }
+        }
+    }
+
     private companion object {
         // A large positive offset and a negative one, where UTC-midnight storage breaks differently.
         const val AUCKLAND = "Pacific/Auckland"

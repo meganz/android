@@ -478,7 +478,7 @@ private fun LinkSettingsContent(
             confirmText = stringResource(sharedR.string.general_ok_only),
             dismissText = stringResource(sharedR.string.general_dialog_cancel_button),
             initialSelectedTimeMillis = uiState.expiryDate?.let(::utcMidnightOfLocalDay),
-            selectableDates = TodayOnwardSelectableDates,
+            selectableDates = SelectableExpiryDates,
             onDateSelected = {
                 onExpiryDateChanged(endOfLocalDay(it))
                 showDatePicker = false
@@ -541,14 +541,18 @@ private fun trackPasswordCommit(uiState: LinkSettingsUiState) {
     Analytics.tracker.trackEvent(event)
 }
 
-/** A link expiry cannot be in the past, so only today onwards is selectable. */
+/**
+ * A link expiry cannot be in the past, nor beyond what the API accepts — see [MAX_EXPIRY_SECONDS].
+ * Bounding the picker keeps the out-of-range save, which fails with only a generic error, out of
+ * reach rather than letting the user commit to a date first.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
-private object TodayOnwardSelectableDates : SelectableDates {
+private object SelectableExpiryDates : SelectableDates {
     override fun isSelectableDate(utcTimeMillis: Long): Boolean =
-        utcTimeMillis >= todayStartUtcMillis()
+        isSelectableExpiryDay(utcTimeMillis)
 
     override fun isSelectableYear(year: Int): Boolean =
-        year >= Calendar.getInstance().get(Calendar.YEAR)
+        year in Calendar.getInstance().get(Calendar.YEAR)..maxExpiryYear()
 }
 
 @Composable
