@@ -7,19 +7,18 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
@@ -36,16 +35,13 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
-import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -75,15 +71,19 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
+import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.texteditor.components.MarkdownPreview
 import mega.privacy.android.feature.texteditor.components.TextEditorContent
 import mega.privacy.android.feature.texteditor.components.TextEditorFastScrollbar
-import mega.privacy.android.domain.entity.texteditor.TextEditorMode
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.texteditor.components.markdown.rememberMarkdownWysiwygOutputTransformation
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeEffect
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
@@ -394,6 +394,14 @@ fun TextEditorScreen(
                     }
 
                     else -> {
+                        val useWysiwyg = isEditable &&
+                                uiState.isWysiwygCapable &&
+                                uiState.isLivePreviewOn
+                        val wysiwygTransformation = if (useWysiwyg) {
+                            rememberMarkdownWysiwygOutputTransformation()
+                        } else {
+                            null
+                        }
                         Box(modifier = Modifier.fillMaxSize()) {
                             TextEditorContent(
                                 lazyListState = lazyListState,
@@ -415,6 +423,8 @@ fun TextEditorScreen(
                                 onTopLineChanged = viewModel::updateTopLine,
                                 restoreFocusChunkIndex = uiState.restoreFocusChunkIndex,
                                 onRestoreFocusConsumed = viewModel::consumeRestoreFocusChunkIndex,
+                                chunkOutputTransformationProvider = wysiwygTransformation
+                                    ?.let { transformation -> { _: Int -> transformation } },
                             )
                             TextEditorFastScrollbar(
                                 state = lazyListState,

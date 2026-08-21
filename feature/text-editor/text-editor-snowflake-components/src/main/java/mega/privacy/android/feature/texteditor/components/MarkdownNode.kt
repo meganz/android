@@ -26,12 +26,12 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withLink
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.tokens.theme.DSTokens
 import org.commonmark.ext.gfm.tables.TableBlock
@@ -126,11 +126,13 @@ internal fun MarkdownBlock(
     modifier: Modifier = Modifier,
     nested: Boolean = false,
 ) {
-    val m = modifier.fillMaxWidth().then(blockSpacing(node, nested))
+    val m = modifier
+        .fillMaxWidth()
+        .then(blockSpacing(node, nested))
     when (node) {
         is Heading -> Text(
             text = rememberInline(node, colors),
-            style = headingStyle(node.level),
+            style = markdownHeadingStyle(node.level),
             color = colors.text,
             modifier = m,
         )
@@ -153,8 +155,12 @@ internal fun MarkdownBlock(
     }
 }
 
+/**
+ * Heading text style per level (H1..H6). Single source of truth shared by the read-only
+ * preview and the WYSIWYG editor styles so both modes always agree on the heading scale.
+ */
 @Composable
-private fun headingStyle(level: Int): TextStyle {
+internal fun markdownHeadingStyle(level: Int): TextStyle {
     val t = MaterialTheme.typography
     val base = when (level) {
         1 -> t.headlineSmall
@@ -165,6 +171,26 @@ private fun headingStyle(level: Int): TextStyle {
         else -> t.bodyMedium
     }
     return base.copy(fontWeight = FontWeight.Bold)
+}
+
+/**
+ * Inline Markdown span styles. Single source of truth shared by the read-only preview
+ * ([appendInline]) and the WYSIWYG editor ([mega.privacy.android.feature.texteditor.components.markdown.rememberMarkdownWysiwygStyles]).
+ */
+internal object MarkdownInlineStyles {
+    val bold = SpanStyle(fontWeight = FontWeight.Bold)
+    val italic = SpanStyle(fontStyle = FontStyle.Italic)
+    val strikethrough = SpanStyle(textDecoration = TextDecoration.LineThrough)
+
+    fun code(colors: MarkdownColors): SpanStyle = SpanStyle(
+        fontFamily = FontFamily.Monospace,
+        background = colors.codeBackground,
+    )
+
+    fun link(colors: MarkdownColors): SpanStyle = SpanStyle(
+        color = colors.accent,
+        textDecoration = TextDecoration.Underline,
+    )
 }
 
 @Composable
@@ -180,7 +206,9 @@ private fun MarkdownList(
         var index = start
         while (item != null) {
             if (item is ListItem) {
-                Row(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 2.dp)) {
                     // The marker is decoration, not content — keep it out of copied text.
                     DisableSelection {
                         Text(
@@ -268,7 +296,9 @@ private fun BlockQuoteBlock(
             .padding(vertical = 2.dp),
     ) {
         HorizontalDivider(
-            modifier = Modifier.width(3.dp).padding(end = 8.dp),
+            modifier = Modifier
+                .width(3.dp)
+                .padding(end = 8.dp),
             color = colors.quoteBar,
         )
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -330,7 +360,9 @@ private fun TableRowView(
                         if (header) it.copy(fontWeight = FontWeight.Bold) else it
                     },
                     color = colors.text,
-                    modifier = Modifier.width(TableCellWidth).padding(8.dp),
+                    modifier = Modifier
+                        .width(TableCellWidth)
+                        .padding(8.dp),
                 )
             }
             cell = cell.next
@@ -357,24 +389,20 @@ private fun AnnotatedString.Builder.appendInlineChildren(parent: Node, colors: M
 private fun AnnotatedString.Builder.appendInline(node: Node, colors: MarkdownColors) {
     when (node) {
         is CmText -> append(node.literal)
-        is StrongEmphasis -> withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+        is StrongEmphasis -> withStyle(MarkdownInlineStyles.bold) {
             appendInlineChildren(node, colors)
         }
 
-        is Emphasis -> withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
+        is Emphasis -> withStyle(MarkdownInlineStyles.italic) {
             appendInlineChildren(node, colors)
         }
 
-        is Code -> withStyle(
-            SpanStyle(fontFamily = FontFamily.Monospace, background = colors.codeBackground),
-        ) { append(node.literal) }
+        is Code -> withStyle(MarkdownInlineStyles.code(colors)) { append(node.literal) }
 
         is Link -> withLink(
             LinkAnnotation.Url(
                 url = node.destination,
-                styles = TextLinkStyles(
-                    SpanStyle(color = colors.accent, textDecoration = TextDecoration.Underline),
-                ),
+                styles = TextLinkStyles(MarkdownInlineStyles.link(colors)),
             ),
         ) { appendInlineChildren(node, colors) }
 

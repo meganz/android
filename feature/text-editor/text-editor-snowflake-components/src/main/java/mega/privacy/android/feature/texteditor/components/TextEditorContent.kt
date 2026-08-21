@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -33,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -55,7 +57,6 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.snapshotFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import mega.android.core.ui.tokens.theme.DSTokens
@@ -118,6 +119,11 @@ fun TextEditorContent(
     /** When non-null, restores focus to this chunk index and shows the keyboard (e.g. after rotation). */
     restoreFocusChunkIndex: Int? = null,
     onRestoreFocusConsumed: () -> Unit = {},
+    /**
+     * When non-null, supplies the [OutputTransformation] attached to a chunk's text field
+     * (WYSIWYG Markdown styling). Null provider or null result shows raw source. Edit mode only.
+     */
+    chunkOutputTransformationProvider: ((chunkIndex: Int) -> OutputTransformation?)? = null,
 ) {
     val textColor = DSTokens.colors.text.primary
     val textStyle = remember(textColor) { editorTextStyle(textColor) }
@@ -251,6 +257,7 @@ fun TextEditorContent(
                     restoreFocusChunkIndex = restoreFocusChunkIndex,
                     onRestoreFocusConsumed = onRestoreFocusConsumed,
                     onChunkLayout = onChunkLayout,
+                    chunkOutputTransformationProvider = chunkOutputTransformationProvider,
                 )
             }
         }
@@ -317,6 +324,7 @@ private fun EditModeLazyColumn(
     restoreFocusChunkIndex: Int? = null,
     onRestoreFocusConsumed: () -> Unit = {},
     onChunkLayout: (Int, TextLayoutResult?) -> Unit,
+    chunkOutputTransformationProvider: ((Int) -> OutputTransformation?)? = null,
 ) {
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -370,6 +378,7 @@ private fun EditModeLazyColumn(
                 showLineNumbers = showLineNumbers,
                 textStyle = textStyle,
                 onLayout = { onChunkLayout(idx, it) },
+                outputTransformation = chunkOutputTransformationProvider?.invoke(idx),
                 focusRequester = if (
                     (idx == 0 && requestInitialFocusOnFirstChunk) ||
                     idx == restoreFocusChunkIndex
@@ -435,6 +444,7 @@ private fun EditableChunkItem(
     textStyle: TextStyle,
     onLayout: (TextLayoutResult) -> Unit = {},
     focusRequester: FocusRequester? = null,
+    outputTransformation: OutputTransformation? = null,
 ) {
     val layoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
     EditorChunkLayout(
@@ -453,6 +463,7 @@ private fun EditableChunkItem(
             state = textFieldState,
             readOnly = readOnly,
             textStyle = textStyle,
+            outputTransformation = outputTransformation,
             cursorBrush = SolidColor(cursorColor),
             modifier = Modifier
                 .then(
