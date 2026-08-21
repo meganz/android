@@ -35,6 +35,7 @@ dependencies {
     implementation(lib.commonmark.java)
     implementation(lib.commonmark.ext.gfm.tables)
     implementation(lib.commonmark.ext.gfm.strikethrough)
+    implementation(lib.commonmark.ext.task.list.items)
 
     //test
     testImplementation(project(":core-test"))
