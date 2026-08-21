@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.app.data.extensions.toUnitString
+import mega.privacy.android.feature.myaccount.presentation.achievements.util.toUnitString
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.R

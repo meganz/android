@@ -43,8 +43,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
-import mega.privacy.android.app.data.extensions.getTextByDurationInDays
-import mega.privacy.android.app.data.extensions.toUnitString
+import mega.privacy.android.feature.myaccount.presentation.achievements.util.getTextByDurationInDays
+import mega.privacy.android.feature.myaccount.presentation.achievements.util.toUnitString
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel.Companion.KEY_FROM

@@ -15,7 +15,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.app.data.extensions.toUnitString
+import mega.privacy.android.feature.myaccount.presentation.achievements.util.toUnitString
 import mega.privacy.android.app.presentation.achievements.info.model.AchievementsInfoUIState
 import mega.privacy.android.app.presentation.achievements.info.util.toAchievementsInfoAttribute
 import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoView
