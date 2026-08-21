@@ -44,6 +44,7 @@ import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCas
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkPublicLinkCache
 import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
@@ -83,6 +84,7 @@ class ShareLinkViewModel @AssistedInject constructor(
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
     private val passwordCache: ShareLinkPasswordCache,
     private val separateKeyCache: ShareLinkSeparateKeyCache,
+    private val publicLinkCache: ShareLinkPublicLinkCache,
 ) : ViewModel() {
 
     /**
@@ -203,8 +205,19 @@ class ShareLinkViewModel @AssistedInject constructor(
             emit(ShareLinkUiState.Error)
             return@flow
         }
-        emit(ShareLinkUiState.Data(nodeLinks = nodeLinks, accountType = null))
-        emitAll(refreshedOnNodeUpdates(nodeLinks))
+        // The Link settings screen reads the node itself, but publishing here keeps the two in
+        // step and survives a node read that fails there.
+        nodeLinks.first().let { publicLinkCache.set(it.handle, it.link) }
+
+        val hasNewLinks = exportedLinks.isNotEmpty()
+        emit(
+            ShareLinkUiState.Data(
+                nodeLinks = nodeLinks,
+                accountType = null,
+                hasNewLinks = hasNewLinks,
+            )
+        )
+        emitAll(refreshedOnNodeUpdates(nodeLinks, hasNewLinks))
     }
 
     /**
@@ -221,6 +234,10 @@ class ShareLinkViewModel @AssistedInject constructor(
         val warning = SensitiveWarningType.Items.takeIf { albumHasSensitiveContentUseCase(id) }
         if (!awaitSensitiveApproval(warning, nodeCount = 1)) return@flow
 
+        // Read before exporting: exportAlbumsUseCase returns the existing link for an album that
+        // already has one, so afterwards there is no way to tell the two cases apart.
+        val wasExported = monitorUserAlbumByIdUseCase(id).first()?.isExported == true
+
         val link = exportAlbumsUseCase(albumIds = listOf(id))
             .firstOrNull { it.first == id }
             ?.second?.link?.takeIf(String::isNotEmpty)
@@ -229,6 +246,11 @@ class ShareLinkViewModel @AssistedInject constructor(
             return@flow
         }
         val (linkWithoutKey, key) = splitLinkAndKeyUseCase(link)
+
+        // An album is not a node, so the Link settings screen cannot read this link for itself.
+        // Without it, saving an album's settings copied nothing and left the user holding the
+        // earlier link, key included.
+        publicLinkCache.set(albumId, link)
 
         emitAll(
             combine(
@@ -258,6 +280,7 @@ class ShareLinkViewModel @AssistedInject constructor(
                             photoCount = photos.size,
                             coverThumbnailPath = coverThumbnailPath(album.cover),
                         ),
+                        hasNewLinks = !wasExported,
                     )
                 }
         )
@@ -308,13 +331,22 @@ class ShareLinkViewModel @AssistedInject constructor(
      * [linkFlow] are one-shot and must not run again. The password and separate-key options need no
      * equivalent, as they are session state combined into [uiState] as live flows.
      */
-    private fun refreshedOnNodeUpdates(nodeLinks: List<ShareLinkNodeItem>): Flow<ShareLinkUiState> {
+    private fun refreshedOnNodeUpdates(
+        nodeLinks: List<ShareLinkNodeItem>,
+        hasNewLinks: Boolean,
+    ): Flow<ShareLinkUiState> {
         val handles = nodeLinks.mapTo(mutableSetOf()) { it.handle }
         return monitorNodeUpdatesUseCase()
             .filter { update -> update.changes.keys.any { it.id.longValue in handles } }
             .map { nodeLinks.withUpdatedData() }
             .distinctUntilChanged()
-            .map { ShareLinkUiState.Data(nodeLinks = it, accountType = null) }
+            .map {
+                ShareLinkUiState.Data(
+                    nodeLinks = it,
+                    accountType = null,
+                    hasNewLinks = hasNewLinks,
+                )
+            }
     }
 
     /**

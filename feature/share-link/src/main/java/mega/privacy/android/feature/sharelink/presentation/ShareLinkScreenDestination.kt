@@ -1,13 +1,16 @@
 package mega.privacy.android.feature.sharelink.presentation
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.toClipEntry
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
@@ -86,31 +89,34 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
                     )
                 },
                 onCopyLink = {
-                    val data = uiState as? ShareLinkUiState.Data ?: return@ShareLinkScreen
                     coroutineScope.launch {
                         snackbarQueue.queueMessage(
-                            if (data.isMultiNode) {
-                                resources.getString(sharedR.string.general_link_copied_clipboard)
-                            } else {
-                                resources.getQuantityString(
-                                    sharedR.plurals.share_link_created_and_copied_snackbar,
-                                    data.handles.size,
-                                )
-                            }
+                            resources.getQuantityString(
+                                sharedR.plurals.share_link_copied_snackbar,
+                                1,
+                            )
                         )
                     }
                 },
                 onLinksCopied = {
+                    val data = uiState as? ShareLinkUiState.Data ?: return@ShareLinkScreen
                     coroutineScope.launch {
                         snackbarQueue.queueMessage(
-                            resources.getString(sharedR.string.general_links_copied_clipboard)
+                            resources.getQuantityString(
+                                if (data.hasNewLinks) {
+                                    sharedR.plurals.share_link_created_and_copied_snackbar
+                                } else {
+                                    sharedR.plurals.share_link_copied_snackbar
+                                },
+                                data.handles.size,
+                            )
                         )
                     }
                 },
                 onCopyKey = {
                     coroutineScope.launch {
                         snackbarQueue.queueMessage(
-                            resources.getString(sharedR.string.album_get_link_copy_key_success_message)
+                            resources.getString(sharedR.string.share_link_key_copied_snackbar)
                         )
                     }
                 },
@@ -147,9 +153,20 @@ fun EntryProviderScope<NavKey>.linkSettingsScreen(
         val resources = LocalResources.current
         val snackbarQueue = rememberSnackBarQueue()
         val coroutineScope = rememberCoroutineScope()
+        val clipboard = LocalClipboard.current
         val uriHandler = LocalUriHandler.current
 
         EventEffect(event = uiState.savedEvent, onConsumed = viewModel::onSavedEventConsumed) {
+            // Queued before navigating: the snackbar queue is activity-scoped, so the confirmation
+            // lands on the Share link screen this returns to, which is where the design shows it.
+            uiState.savedLink?.let { link ->
+                clipboard.setClipEntry(
+                    ClipData.newPlainText(COPIED_LINK_LABEL, link).toClipEntry()
+                )
+                snackbarQueue.queueMessage(
+                    resources.getString(sharedR.string.share_link_updated_and_copied_snackbar)
+                )
+            }
             navigationHandler.back()
         }
         EventEffect(event = uiState.errorEvent, onConsumed = viewModel::onErrorEventConsumed) {

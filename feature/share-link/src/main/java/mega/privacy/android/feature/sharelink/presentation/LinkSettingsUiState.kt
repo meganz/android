@@ -24,6 +24,9 @@ import mega.privacy.android.domain.entity.changepassword.PasswordStrength
  * @property isAlbum Whether an album's link is being edited. The SDK supports neither expiry nor
  * password for album links, so those rows are not rendered at all — there is nothing to unlock and
  * no upgrade to offer, which is why this is not a Pro gate.
+ * @property savedLink The link as it stands after a successful save, for the Share link screen to
+ * put back on the clipboard alongside the confirmation. Null only when no link could be resolved at
+ * all, in which case the save is silent rather than claiming a clipboard write that did not happen.
  */
 @Stable
 data class LinkSettingsUiState(
@@ -45,6 +48,7 @@ data class LinkSettingsUiState(
     val hasUnsavedChanges: Boolean = false,
     val isSaveEnabled: Boolean = false,
     val isSaving: Boolean = false,
+    val savedLink: String? = null,
     val savedEvent: StateEvent = consumed,
     val errorEvent: StateEvent = consumed,
 ) {

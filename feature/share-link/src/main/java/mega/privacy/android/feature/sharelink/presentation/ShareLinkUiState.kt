@@ -56,6 +56,8 @@ sealed interface ShareLinkUiState {
      * pre-fill it for change/remove; null when not protected. Not rendered.
      * @property linkWithPassword The password-encrypted link to share, or null when not protected.
      * @property album Album header data when an album is being shared, null for nodes.
+     * @property hasNewLinks Whether reaching this screen created at least one of the links, as
+     * opposed to opening links that already existed.
      */
     data class Data(
         val nodeLinks: List<ShareLinkNodeItem>,
@@ -65,6 +67,7 @@ sealed interface ShareLinkUiState {
         val password: String? = null,
         val linkWithPassword: String? = null,
         val album: ShareLinkAlbumInfo? = null,
+        val hasNewLinks: Boolean = false,
     ) : ShareLinkUiState {
 
         /** Handles of all shared nodes, in selection order. */

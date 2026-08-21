@@ -176,32 +176,56 @@ internal fun ShareLinkContent(
     }
 }
 
+/**
+ * Copies the subject's link(s) to the clipboard once, the first time the screen opens, and reports
+ * it through [onCopied] so the caller can confirm with a snackbar.
+ *
+ * A newly created link is copied whatever the subject, matching the design's "Link created and
+ * copied to your clipboard" confirmation. A link that already existed is only copied for a
+ * multi-node selection, where copying the whole set on open is what the legacy several-links screen
+ * did; a single existing link is left alone, as the design shows no confirmation for merely opening
+ * one to manage it.
+ *
+ * The rememberSaveable guard keeps it to one copy per screen open, surviving recomposition, a
+ * configuration change and returning to this screen.
+ */
+@Composable
+internal fun CopyLinksOnFirstOpen(
+    uiState: ShareLinkUiState.Data,
+    onCopied: () -> Unit,
+) {
+    val clipboard = LocalClipboard.current
+    val linksCopied = rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (linksCopied.value || !(uiState.hasNewLinks || uiState.isMultiNode)) {
+            return@LaunchedEffect
+        }
+        linksCopied.value = true
+        clipboard.setClipEntry(
+            ClipData.newPlainText(COPIED_LINK_LABEL, uiState.linksToCopyOnOpen()).toClipEntry()
+        )
+        onCopied()
+    }
+}
+
+/**
+ * The full link, or every link for a multi-node selection.
+ *
+ * Deliberately the raw link rather than [resolvedSingleLink]: this only runs for a link that was
+ * just created or for a multi-node selection, neither of which can carry a session password or a
+ * separated key yet.
+ */
+private fun ShareLinkUiState.Data.linksToCopyOnOpen(): String =
+    if (isMultiNode) nodeLinks.joinToString(separator = "\n") { it.link } else primary.link
+
 @Composable
 internal fun MultiNodeContent(
     uiState: ShareLinkUiState.Data,
     onCopyLink: () -> Unit,
-    onLinksCopied: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
-
-    // Copy every link once when the screen first opens (parity with the legacy several-links
-    // screen). The rememberSaveable guard keeps it to one copy per screen open, surviving
-    // recomposition / config change / returning to this screen.
-    val linksCopied = rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        if (!linksCopied.value) {
-            linksCopied.value = true
-            clipboard.setClipEntry(
-                ClipData.newPlainText(
-                    COPIED_LINK_LABEL,
-                    uiState.nodeLinks.joinToString(separator = "\n") { it.link },
-                ).toClipEntry()
-            )
-            onLinksCopied()
-        }
-    }
 
     Column(
         modifier = modifier
@@ -538,6 +562,6 @@ private fun sensitiveClip(label: String, text: String): ClipEntry {
     return clip.toClipEntry()
 }
 
-private const val COPIED_LINK_LABEL = "Copied Text"
+internal const val COPIED_LINK_LABEL = "Copied Text"
 private const val COPIED_KEY_LABEL = "Copied Key"
 private const val COPIED_PASSWORD_LABEL = "Copied Password"

@@ -3544,7 +3544,7 @@
     <!-- Share link revamp: helper shown under a password protected link, next to a lock icon -->
     <string name="share_link_password_protected_label">Password-protected</string>
     <!-- Share link revamp: snackbar shown after the link password is copied to the clipboard -->
-    <string name="share_link_password_copied_snackbar">Password copied to clipboard</string>
+    <string name="share_link_password_copied_snackbar">Password copied to your clipboard</string>
     <!-- Title of the subscription offer banner on the Home screen. %1$s is the campaign name (e.g. "Black Friday"), %2$d is the discount percentage. -->
     <string name="home_offer_banner_title">%1$s · Get %2$d%% off</string>
     <!-- Subtitle of the subscription offer banner on the Home screen. %1$s is the localised discounted monthly price (e.g. "€4.99"), %2$s is the plan name (e.g. "Pro I"). -->
@@ -3812,4 +3812,13 @@
     <string name="video_player_zoom_fill_screen">Fill screen</string>
     <!-- Password strength label shown below a password field when the password is of moderate strength, between weak and strong -->
     <string name="password_strength_moderate">Moderate password</string>
+    <!-- Share link revamp: snackbar shown after the link settings are saved and the updated link is copied to the clipboard -->
+    <string name="share_link_updated_and_copied_snackbar">Link updated and copied to your clipboard</string>
+    <!-- Share link revamp: snackbar shown after the link decryption key is copied to the clipboard -->
+    <string name="share_link_key_copied_snackbar">Key copied to your clipboard</string>
+    <!-- Share link revamp: snackbar shown after an existing share link is copied to the clipboard, without creating it. The quantity is the number of links copied. -->
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="one">Link copied to your clipboard</item>
+        <item quantity="other">Links copied to your clipboard</item>
+    </plurals>
 </resources>

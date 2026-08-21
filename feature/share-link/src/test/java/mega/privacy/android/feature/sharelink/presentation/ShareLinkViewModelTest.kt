@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
 import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkPublicLinkCache
 import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
@@ -78,6 +79,9 @@ class ShareLinkViewModelTest {
     private val setShowCopyrightUseCase = mock<SetShowCopyrightUseCase>()
     private val passwordCache = mock<ShareLinkPasswordCache>()
     private val separateKeyCache = mock<ShareLinkSeparateKeyCache>()
+
+    // Real instance: a plain in-memory map, so a mock would only restate what it already does.
+    private val publicLinkCache = ShareLinkPublicLinkCache()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorUserAlbumByIdUseCase = mock<MonitorUserAlbumByIdUseCase>()
     private val getAlbumPhotosUseCase = mock<GetAlbumPhotosUseCase>()
@@ -122,6 +126,7 @@ class ShareLinkViewModelTest {
         downloadThumbnailUseCase = downloadThumbnailUseCase,
         passwordCache = passwordCache,
         separateKeyCache = separateKeyCache,
+        publicLinkCache = publicLinkCache,
     )
 
     @AfterEach
@@ -199,6 +204,46 @@ class ShareLinkViewModelTest {
                 assertThat(node.link).isEqualTo("https://mega.nz/file/new#newkey")
                 assertThat(node.linkWithoutKey).isEqualTo("https://mega.nz/file/new")
                 assertThat(node.key).isEqualTo("newkey")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that uiState Data has hasNewLinks true when the node had no link to begin with`() =
+        runTest {
+            val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
+                on { name } doReturn "video.mp4"
+                on { exportedData } doReturn null
+                on { type } doReturn UnknownFileTypeInfo(mimeType = "video/mp4", extension = "mp4")
+            }
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(exportNodesUseCase(listOf(NODE_HANDLE), CALLER_NAME))
+                .thenReturn(mapOf(NODE_HANDLE to "https://mega.nz/file/new#newkey"))
+            whenever(splitLinkAndKeyUseCase("https://mega.nz/file/new#newkey"))
+                .thenReturn(LinkAndKey("https://mega.nz/file/new", "newkey"))
+
+            underTest.uiState.test {
+                assertThat(awaitData().hasNewLinks).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that uiState Data has hasNewLinks false when the node was already exported`() =
+        runTest {
+            val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
+                on { name } doReturn "report.pdf"
+                on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
+                on { type } doReturn PdfFileTypeInfo
+            }
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(splitLinkAndKeyUseCase("https://mega.nz/file/abc#key123"))
+                .thenReturn(LinkAndKey("https://mega.nz/file/abc", "key123"))
+
+            underTest.uiState.test {
+                assertThat(awaitData().hasNewLinks).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
         }

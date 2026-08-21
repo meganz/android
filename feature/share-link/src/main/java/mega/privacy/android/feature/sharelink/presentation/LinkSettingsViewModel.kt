@@ -24,9 +24,11 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
+import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
 import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkPublicLinkCache
 import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
 import timber.log.Timber
 import kotlin.time.Duration.Companion.milliseconds
@@ -48,8 +50,10 @@ class LinkSettingsViewModel @AssistedInject constructor(
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
     private val getPasswordStrengthUseCase: GetPasswordStrengthUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val splitLinkAndKeyUseCase: SplitLinkAndKeyUseCase,
     private val passwordCache: ShareLinkPasswordCache,
     private val separateKeyCache: ShareLinkSeparateKeyCache,
+    private val publicLinkCache: ShareLinkPublicLinkCache,
 ) : ViewModel() {
 
     private val handle: Long? = args.subject.cacheKey
@@ -71,7 +75,11 @@ class LinkSettingsViewModel @AssistedInject constructor(
     )
     val uiState: StateFlow<LinkSettingsUiState> = _uiState.asStateFlow()
 
-    private var publicLink: String? = null
+    /**
+     * The link being edited, seeded from what the Share link screen resolved. An album is not a
+     * node, so [loadNode] can never find one for it; a node overwrites this with its own once read.
+     */
+    private var publicLink: String? = handle?.let(publicLinkCache::get)
 
     init {
         loadLinkSettings()
@@ -97,8 +105,17 @@ class LinkSettingsViewModel @AssistedInject constructor(
         }
     }
 
+    /**
+     * Re-enabling the expiry restores the date the link already had. Without that, toggling off and
+     * back on dropped the date silently and left the row on with an empty field and Save disabled,
+     * with nothing on screen explaining why.
+     */
     fun onExpiryEnabled(enabled: Boolean) = updateUnlessAlbum {
-        it.copy(isExpiryEnabled = enabled, expiryDate = if (enabled) it.expiryDate else null)
+        if (enabled) {
+            it.copy(isExpiryEnabled = true, expiryDate = it.expiryDate ?: it.initialExpiryDate)
+        } else {
+            it.copy(isExpiryEnabled = false, expiryDate = null)
+        }
     }
 
     fun onExpiryDateChanged(expiryDate: Long) = updateUnlessAlbum {
@@ -143,7 +160,11 @@ class LinkSettingsViewModel @AssistedInject constructor(
         update { it.copy(isSaving = true) }
         viewModelScope.launch {
             runCatching { applyChanges(handle, current) }
-                .onSuccess { update { it.copy(isSaving = false, savedEvent = triggered) } }
+                .onSuccess { savedLink ->
+                    update {
+                        it.copy(isSaving = false, savedLink = savedLink, savedEvent = triggered)
+                    }
+                }
                 .onFailure { throwable ->
                     Timber.e(throwable, "Failed to save link settings")
                     update { it.copy(isSaving = false, errorEvent = triggered) }
@@ -151,21 +172,37 @@ class LinkSettingsViewModel @AssistedInject constructor(
         }
     }
 
-    fun onSavedEventConsumed() = update { it.copy(savedEvent = consumed) }
+    fun onSavedEventConsumed() = update { it.copy(savedEvent = consumed, savedLink = null) }
 
     fun onErrorEventConsumed() = update { it.copy(errorEvent = consumed) }
 
     /**
      * Applies the pending changes, writing any password change/removal to the shared
      * [ShareLinkPasswordCache] so the Share link screen reflects it.
+     *
+     * @return The link as it stands once the changes are applied, for the Share link screen to put
+     * back on the clipboard, or null when no link is known (an album).
      */
     private suspend fun applyChanges(
         handle: Long,
         state: LinkSettingsUiState,
-    ) {
-        if (state.isSeparateKeyDirty) {
-            separateKeyCache.set(handle, state.isSeparateKeyEnabled)
+    ): String? {
+        val link = publicLink?.takeIf(String::isNotEmpty)
+        val password = state.password
+            ?.takeUnless(String::isBlank)
+            ?.takeIf { state.isPasswordEnabled }
+
+        // Everything that can fail runs before anything is committed, so a failure leaves the link
+        // as it was and the error the screen reports is true. Encrypting only computes a string
+        // from the link, and the expiry export is the sole remote side effect; the cache writes
+        // below cannot fail. Committing first meant a later failure left the Share link screen
+        // showing changes the user had just been told did not apply.
+        val encryptedLink = if (password != null && link != null) {
+            encryptLinkWithPasswordUseCase(link, password).takeIf(String::isNotEmpty)
+        } else {
+            null
         }
+
         if (state.isExpiryDirty) {
             val expireTimeSeconds = state.expiryDate
                 ?.takeIf { state.isExpiryEnabled }
@@ -176,16 +213,30 @@ class LinkSettingsViewModel @AssistedInject constructor(
                 callerName = CALLER_NAME,
             )
         }
-        val password = state.password
-        when {
-            state.isPasswordEnabled && !password.isNullOrBlank() -> {
-                val encrypted = publicLink?.takeIf(String::isNotEmpty)
-                    ?.let { encryptLinkWithPasswordUseCase(it, password) }
-                passwordCache.set(handle, LinkPassword(password = password, linkWithPassword = encrypted))
-            }
 
-            state.isPasswordAlreadySet && !state.isPasswordEnabled ->
-                passwordCache.set(handle, null)
+        if (state.isSeparateKeyDirty) {
+            separateKeyCache.set(handle, state.isSeparateKeyEnabled)
+        }
+        // The cache write and the choice of link to copy are settled separately. Deciding both in
+        // one `when` let removing a password return the full link and shadow a separate-key change
+        // made in the same save, putting the decryption key on the clipboard.
+        if (password != null) {
+            passwordCache.set(
+                handle,
+                LinkPassword(password = password, linkWithPassword = encryptedLink),
+            )
+        } else if (state.isPasswordAlreadySet) {
+            passwordCache.set(handle, null)
+        }
+
+        // Mirrors the Share link screen's own rule for the link it shows: password-encrypted if
+        // protected, otherwise the key-less half when the key is sent separately.
+        return when {
+            password != null -> encryptedLink ?: link
+            state.isSeparateKeyEnabled ->
+                link?.let { splitLinkAndKeyUseCase(it).linkWithoutKey ?: it }
+
+            else -> link
         }
     }
 
@@ -230,7 +281,9 @@ class LinkSettingsViewModel @AssistedInject constructor(
         val node = runCatching { getNodeByIdUseCase(NodeId(handle)) }
             .onFailure { Timber.e(it, "Failed to load node for link settings") }
             .getOrNull()
-        publicLink = node?.exportedData?.publicLink
+        // Keeps the seeded link when the node cannot be read, so a transient failure does not
+        // turn the next save silent.
+        node?.exportedData?.publicLink?.let { publicLink = it }
         return node
     }
 

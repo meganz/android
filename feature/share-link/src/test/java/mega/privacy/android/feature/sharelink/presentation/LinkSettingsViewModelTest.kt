@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -23,9 +24,11 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
+import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
 import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkPublicLinkCache
 import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -45,6 +48,7 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LinkSettingsViewModelTest {
 
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
@@ -54,6 +58,10 @@ class LinkSettingsViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val passwordCache = mock<ShareLinkPasswordCache>()
     private val separateKeyCache = mock<ShareLinkSeparateKeyCache>()
+
+    // Real instance: a plain in-memory map, so a mock would only restate what it already does.
+    private val publicLinkCache = ShareLinkPublicLinkCache()
+    private val splitLinkAndKeyUseCase = SplitLinkAndKeyUseCase()
 
     @BeforeEach
     fun setUp() {
@@ -125,8 +133,10 @@ class LinkSettingsViewModelTest {
         encryptLinkWithPasswordUseCase = encryptLinkWithPasswordUseCase,
         getPasswordStrengthUseCase = getPasswordStrengthUseCase,
         monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+        splitLinkAndKeyUseCase = splitLinkAndKeyUseCase,
         passwordCache = passwordCache,
         separateKeyCache = separateKeyCache,
+        publicLinkCache = publicLinkCache,
     )
 
     private suspend fun ReceiveTurbine<LinkSettingsUiState>.awaitUntil(
@@ -388,6 +398,302 @@ class LinkSettingsViewModelTest {
             }
 
             verify(encryptLinkWithPasswordUseCase).invoke(PUBLIC_LINK, PASSWORD)
+        }
+
+    @Test
+    fun `test that onSave carries the encrypted link as savedLink when a password is set`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(encryptLinkWithPasswordUseCase(PUBLIC_LINK, PASSWORD))
+                .thenReturn(ENCRYPTED_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                underTest.onSave()
+                val state = awaitUntil { it.savedEvent == triggered }
+                assertThat(state.savedLink).isEqualTo(ENCRYPTED_LINK)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onSave carries the public link as savedLink when only the expiry changes`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(exportNodeUseCase(any(), anyOrNull(), any())).thenReturn(PUBLIC_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onExpiryEnabled(true)
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                underTest.onSave()
+                val state = awaitUntil { it.savedEvent == triggered }
+                assertThat(state.savedLink).isEqualTo(PUBLIC_LINK)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onSave carries the key-less link as savedLink when the key is sent separately`() =
+        runTest(extension.testDispatcher) {
+            val node = mock<TypedFileNode> {
+                on { exportedData } doReturn ExportedData(LINK_WITH_KEY, 0L)
+            }
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(true)
+                underTest.onSave()
+                val state = awaitUntil { it.savedEvent == triggered }
+                assertThat(state.savedLink).isEqualTo(PUBLIC_LINK)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onSave carries the key-less link as savedLink when a password is removed and the key is sent separately`() =
+        runTest(extension.testDispatcher) {
+            // Regression: removing a password used to return the full link and shadow the
+            // separate-key change made in the same save, so the decryption key landed on the
+            // clipboard.
+            val node = mock<TypedFileNode> {
+                on { exportedData } doReturn ExportedData(LINK_WITH_KEY, 0L)
+            }
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            stubExistingPassword()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(false)
+                underTest.onSeparateKeyEnabled(true)
+                underTest.onSave()
+                val state = awaitUntil { it.savedEvent == triggered }
+                assertThat(state.savedLink).isEqualTo(PUBLIC_LINK)
+                assertThat(state.savedLink).doesNotContain("key123")
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(passwordCache).set(NODE_HANDLE, null)
+        }
+
+    @Test
+    fun `test that onSave still clears the password cache when the key is sent separately`() =
+        runTest(extension.testDispatcher) {
+            // The reordering must not cost the removal itself: the cache write and the returned
+            // link are now decided separately, so both still have to happen.
+            val node = mock<TypedFileNode> {
+                on { exportedData } doReturn ExportedData(LINK_WITH_KEY, 0L)
+            }
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            stubExistingPassword()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(true)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            // Enabling the separate key turns the password off on its own, so the removal applies
+            // even without an explicit toggle.
+            verify(passwordCache).set(NODE_HANDLE, null)
+        }
+
+    @Test
+    fun `test that onSave applies nothing when the expiry export fails`() =
+        runTest(extension.testDispatcher) {
+            // Regression: the caches used to be written before the export, so a failed export left
+            // the Share link screen showing changes the user had just been told did not apply.
+            stubNode()
+            stubCachedSeparateKey()
+            whenever(exportNodeUseCase(any(), anyOrNull(), any()))
+                .thenAnswer { throw RuntimeException("export failed") }
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(false)
+                underTest.onExpiryEnabled(true)
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                underTest.onSave()
+                awaitUntil { it.errorEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(separateKeyCache, never()).set(any(), any())
+            verify(passwordCache, never()).set(any(), anyOrNull())
+        }
+
+    @Test
+    fun `test that onSave applies nothing when encrypting the password fails`() =
+        runTest(extension.testDispatcher) {
+            // Encrypting runs first precisely so its failure costs nothing: no export, no caches.
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(encryptLinkWithPasswordUseCase(PUBLIC_LINK, PASSWORD))
+                .thenAnswer { throw RuntimeException("encrypt failed") }
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onExpiryEnabled(true)
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                underTest.onSave()
+                awaitUntil { it.errorEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verifyNoInteractions(exportNodeUseCase)
+            verify(passwordCache, never()).set(any(), anyOrNull())
+            verify(separateKeyCache, never()).set(any(), any())
+        }
+
+    @Test
+    fun `test that re-enabling the expiry restores the date the link already had`() =
+        runTest(extension.testDispatcher) {
+            // Regression: toggling off nulled the date and toggling back on restored that null,
+            // leaving the row on with an empty field and Save disabled for no visible reason.
+            stubNodeWithExpiry()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitUntil { !it.isLoading }
+                underTest.onExpiryEnabled(false)
+                assertThat(awaitUntil { !it.isExpiryEnabled }.expiryDate).isNull()
+
+                underTest.onExpiryEnabled(true)
+                val reEnabled = awaitUntil { it.isExpiryEnabled }
+                assertThat(reEnabled.expiryDate).isEqualTo(EXPIRY_TIME)
+                assertThat(reEnabled.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onSave falls back to the plain link when the encrypted link comes back empty`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(encryptLinkWithPasswordUseCase(PUBLIC_LINK, PASSWORD)).thenReturn("")
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                underTest.onSave()
+                val state = awaitUntil { it.savedEvent == triggered }
+                // Never the empty string: that would be copied to the clipboard as a success.
+                assertThat(state.savedLink).isEqualTo(PUBLIC_LINK)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, null))
+        }
+
+    @Test
+    fun `test that an album save carries the key-less link so the stale clipboard is replaced`() =
+        runTest(extension.testDispatcher) {
+            // Regression: an album is not a node, so no link was ever read for it and the save
+            // copied nothing. The clipboard kept the link the Share link screen had put there on
+            // arrival — key included — so a user who had just separated the link and key pasted
+            // the key anyway.
+            publicLinkCache.set(ALBUM_ID, ALBUM_LINK_WITH_KEY)
+            val underTest = createUnderTest(ShareLinkSubject.Album(ALBUM_ID))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitUntil { !it.isLoading }
+                underTest.onSeparateKeyEnabled(true)
+                underTest.onSave()
+                val state = awaitUntil { it.savedEvent == triggered }
+                assertThat(state.savedLink).isEqualTo(ALBUM_LINK)
+                assertThat(state.savedLink).doesNotContain("albumKey")
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(separateKeyCache).set(ALBUM_ID, true)
+            verifyNoInteractions(exportNodeUseCase)
+        }
+
+    @Test
+    fun `test that an album save carries the full link again when the key is no longer separate`() =
+        runTest(extension.testDispatcher) {
+            publicLinkCache.set(ALBUM_ID, ALBUM_LINK_WITH_KEY)
+            whenever(separateKeyCache.get(ALBUM_ID)).thenReturn(true)
+            val underTest = createUnderTest(ShareLinkSubject.Album(ALBUM_ID))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitUntil { !it.isLoading }
+                underTest.onSeparateKeyEnabled(false)
+                underTest.onSave()
+                val state = awaitUntil { it.savedEvent == triggered }
+                assertThat(state.savedLink).isEqualTo(ALBUM_LINK_WITH_KEY)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that a failed node read keeps the link the Share link screen resolved`() =
+        runTest(extension.testDispatcher) {
+            // A transient node read failure used to null the link, turning the next save silent.
+            publicLinkCache.set(NODE_HANDLE, LINK_WITH_KEY)
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE)))
+                .thenAnswer { throw RuntimeException("node read failed") }
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitUntil { !it.isLoading }
+                underTest.onSeparateKeyEnabled(true)
+                underTest.onSave()
+                val state = awaitUntil { it.savedEvent == triggered }
+                assertThat(state.savedLink).isEqualTo(PUBLIC_LINK)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onSavedEventConsumed clears savedLink`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(exportNodeUseCase(any(), anyOrNull(), any())).thenReturn(PUBLIC_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onExpiryEnabled(true)
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                underTest.onSavedEventConsumed()
+                val state = awaitUntil { it.savedEvent != triggered }
+                assertThat(state.savedLink).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -1045,6 +1351,14 @@ class LinkSettingsViewModelTest {
         const val NODE_HANDLE = 123L
         const val ALBUM_ID = 987L
         const val PUBLIC_LINK = "https://mega.nz/file/abc"
+
+        // The same link with its decryption key still attached, so the separate-key save has
+        // something real to split.
+        const val LINK_WITH_KEY = "$PUBLIC_LINK#key123"
+
+        // An album link is a collection URL; the key sits after the '#' as it does for a node.
+        const val ALBUM_LINK = "https://mega.nz/collection/xyz789"
+        const val ALBUM_LINK_WITH_KEY = "$ALBUM_LINK#albumKey"
         const val ENCRYPTED_LINK = "https://mega.nz/#P!encrypted"
         const val PASSWORD = "Str0ngP@ss"
         const val OLD_PASSWORD = "0ldP@ssw0rd"

@@ -58,8 +58,8 @@ import mega.privacy.mobile.analytics.event.SingleAlbumLinkScreenEvent
  * @param onCopyLink Invoked when the copy icon on a link is tapped.
  * @param onCopyKey Invoked when the copy icon on the separate key card is tapped.
  * @param onCopyPassword Invoked when the copy icon on the password card is tapped.
- * @param onLinksCopied Invoked once when the multi-node screen opens and all links have been
- * copied to the clipboard automatically.
+ * @param onLinksCopied Invoked once when the screen opens and the link — or every link, for a
+ * multi-node selection — has been copied to the clipboard automatically.
  * @param onSensitiveWarningConfirmed Invoked when the user confirms the hidden-items warning.
  * @param onSensitiveWarningDismissed Invoked when the user cancels the hidden-items warning.
  * @param onCopyrightAgreed Invoked when the user agrees to the first-time copyright consent.
@@ -224,18 +224,22 @@ fun ShareLinkScreen(
                 }
 
                 is ShareLinkUiState.Data -> if (uiState.isMultiNode) {
+                    CopyLinksOnFirstOpen(
+                        uiState = uiState,
+                        onCopied = {
+                            Analytics.tracker.trackEvent(LinkCopyAllLinksButtonPressedEvent)
+                            onLinksCopied()
+                        },
+                    )
                     MultiNodeContent(
                         uiState = uiState,
                         onCopyLink = {
                             Analytics.tracker.trackEvent(LinkCopyLinkButtonPressedEvent)
                             onCopyLink()
                         },
-                        onLinksCopied = {
-                            Analytics.tracker.trackEvent(LinkCopyAllLinksButtonPressedEvent)
-                            onLinksCopied()
-                        },
                     )
                 } else {
+                    CopyLinksOnFirstOpen(uiState = uiState, onCopied = onLinksCopied)
                     ShareLinkContent(
                         uiState = uiState,
                         onCopyLink = {
