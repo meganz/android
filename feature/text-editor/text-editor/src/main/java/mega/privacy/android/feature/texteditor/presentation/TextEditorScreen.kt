@@ -66,6 +66,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
@@ -135,6 +137,12 @@ fun TextEditorScreen(
         contract = megaResultContract.sendToChatActivityResultContract,
     ) { result ->
         result?.let { viewModel.attachNodesToChat(it) }
+    }
+
+    // Get link, share and send to chat hand over to another Activity, so the guard against a
+    // repeated tap is released here rather than when the event is consumed (AND-24231).
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.onScreenResumed()
     }
 
     EventEffect(

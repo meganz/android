@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -14,10 +15,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
@@ -80,12 +83,18 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
+
+/** Mirrors the private `DOWNLOAD_COOLDOWN` in [TextEditorComposeViewModel]. */
+private const val DOWNLOAD_COOLDOWN_MS = 800L
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -1665,6 +1674,174 @@ internal class TextEditorComposeViewModelTest {
 
             assertThat(underTest.uiState.value.shareErrorEvent).isEqualTo(triggered)
         }
+
+    // region one-shot action guard
+    @Test
+    fun `test that onBottomBarAction Share ignores taps while export is in flight`() = runTest {
+        val exportGate = CompletableDeferred<String>()
+        runBlocking {
+            whenever(getNodeByIdUseCase(NodeId(5L))).thenReturn(null)
+        }
+        wheneverBlocking { exportNodeUseCase(any(), anyOrNull(), any()) }
+            .doSuspendableAnswer { exportGate.await() }
+        initUnderTest(nodeHandle = 5L, fileName = "doc.txt")
+
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Share)
+        runCurrent()
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Share)
+        runCurrent()
+
+        verify(exportNodeUseCase, times(1)).invoke(any(), anyOrNull(), any())
+
+        exportGate.complete("https://mega.nz/file/abc123")
+        advanceUntilIdle()
+        underTest.onScreenResumed()
+
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Share)
+        runCurrent()
+        verify(exportNodeUseCase, times(2)).invoke(any(), anyOrNull(), any())
+    }
+
+    @Test
+    fun `test that onBottomBarAction Share can be retried after export fails`() = runTest {
+        runBlocking {
+            whenever(getNodeByIdUseCase(NodeId(5L))).thenReturn(null)
+            whenever(exportNodeUseCase(any(), anyOrNull(), any()))
+                .thenThrow(RuntimeException("export failed"))
+        }
+        initUnderTest(nodeHandle = 5L, fileName = "doc.txt")
+
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Share)
+        advanceUntilIdle()
+        underTest.consumeShareErrorEvent()
+
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Share)
+        advanceUntilIdle()
+
+        verify(exportNodeUseCase, times(2)).invoke(any(), anyOrNull(), any())
+    }
+
+    @Test
+    fun `test that a repeated one-shot action is ignored until the editor resumes`() = runTest {
+        runBlocking {
+            whenever(getNodeByIdUseCase(NodeId(5L))).thenReturn(mock<TypedFileNode>())
+        }
+        initUnderTest(nodeHandle = 5L, fileName = "doc.txt")
+
+        // Consuming the event only means the launch was requested, so the guard has to survive it
+        // and be released by the resume that follows the external Activity closing.
+        fun assertIgnoredUntilResumed(
+            action: TextEditorBottomBarAction,
+            expectedContent: TextEditorNodeEffect,
+        ) {
+            underTest.onBottomBarAction(action)
+            runCurrent()
+            val event = underTest.uiState.value.nodeEffectEvent
+            check(event is StateEventWithContentTriggered<*>) { "$action emitted nothing" }
+            assertThat(event.content).isEqualTo(expectedContent)
+            underTest.consumeNodeEffectEvent()
+
+            underTest.onBottomBarAction(action)
+            runCurrent()
+            assertThat(underTest.uiState.value.nodeEffectEvent).isEqualTo(consumed())
+
+            underTest.onScreenResumed()
+        }
+
+        assertIgnoredUntilResumed(
+            TextEditorBottomBarAction.GetLink,
+            TextEditorNodeEffect.ManageLink(5L),
+        )
+        assertIgnoredUntilResumed(
+            TextEditorBottomBarAction.SendToChat,
+            TextEditorNodeEffect.SendToChat(5L),
+        )
+    }
+
+    @Test
+    fun `test that onBottomBarAction Download is ignored within the cooldown window`() = runTest {
+        runBlocking {
+            whenever(getNodeByIdUseCase(NodeId(5L))).thenReturn(mock<TypedFileNode>())
+        }
+        initUnderTest(nodeHandle = 5L, fileName = "doc.txt")
+        advanceUntilIdle()
+        val firstNode = mock<TypedFileNode>()
+        val secondNode = mock<TypedFileNode>()
+        reset(getNodeByIdUseCase)
+        runBlocking {
+            whenever(getNodeByIdUseCase(NodeId(5L))).thenReturn(firstNode, secondNode)
+        }
+
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Download)
+        runCurrent()
+        assertThat(triggeredTransferContent()).isEqualTo(
+            TransferTriggerEvent.StartDownloadNode(
+                nodes = listOf(firstNode),
+                withStartMessage = true,
+            )
+        )
+        // Consuming the event does not lift the cooldown, the transfer is already on its way.
+        underTest.consumeTransferEvent()
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Download)
+        runCurrent()
+
+        verify(getNodeByIdUseCase, times(1)).invoke(NodeId(5L))
+
+        advanceTimeBy(DOWNLOAD_COOLDOWN_MS + 1)
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Download)
+        runCurrent()
+
+        assertThat(triggeredTransferContent()).isEqualTo(
+            TransferTriggerEvent.StartDownloadNode(
+                nodes = listOf(secondNode),
+                withStartMessage = true,
+            )
+        )
+    }
+
+    @Test
+    fun `test that onBottomBarAction Download does not block a following GetLink`() = runTest {
+        runBlocking {
+            whenever(getNodeByIdUseCase(NodeId(5L))).thenReturn(mock<TypedFileNode>())
+        }
+        initUnderTest(nodeHandle = 5L, fileName = "doc.txt")
+
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Download)
+        runCurrent()
+        underTest.onBottomBarAction(TextEditorBottomBarAction.GetLink)
+        runCurrent()
+
+        val event = underTest.uiState.value.nodeEffectEvent
+        check(event is StateEventWithContentTriggered<*>)
+        assertThat(event.content).isEqualTo(TextEditorNodeEffect.ManageLink(5L))
+    }
+
+    @Test
+    fun `test that a different one-shot action is ignored while an event is pending`() = runTest {
+        runBlocking {
+            whenever(getNodeByIdUseCase(NodeId(5L))).thenReturn(mock<TypedFileNode>())
+        }
+        initUnderTest(nodeHandle = 5L, fileName = "doc.txt")
+
+        underTest.onBottomBarAction(TextEditorBottomBarAction.GetLink)
+        underTest.onBottomBarAction(TextEditorBottomBarAction.SendToChat)
+        runCurrent()
+
+        val event = underTest.uiState.value.nodeEffectEvent
+        check(event is StateEventWithContentTriggered<*>)
+        assertThat(event.content)
+            .isEqualTo(TextEditorNodeEffect.ManageLink(5L))
+    }
+
+    private fun triggeredTransferContent(): TransferTriggerEvent {
+        val event = underTest.uiState.value.transferEvent
+        check(event is StateEventWithContentTriggered<TransferTriggerEvent>) {
+            "no transfer event was emitted"
+        }
+        return event.content
+    }
+
+    // endregion one-shot action guard
 
     @Test
     fun `test that GetLink and SendToChat are no-op when node handle is invalid`() {

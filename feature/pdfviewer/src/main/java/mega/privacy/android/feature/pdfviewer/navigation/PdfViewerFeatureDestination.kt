@@ -7,6 +7,7 @@ import mega.privacy.android.feature.pdfviewer.presentation.pdfViewerScreen
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navOptions
 
 /**
  * Feature destination for the PDF Viewer module.
@@ -30,7 +31,8 @@ object PdfViewerFeatureDestination : FeatureDestination {
                             publicLinkUrl = publicLinkUrl,
                             chatId = chatId,
                             msgId = msgId,
-                        )
+                        ),
+                        navOptions { dropIfAlreadyShown = true },
                     )
                 },
                 navigationHandler = navigationHandler,

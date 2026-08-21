@@ -35,12 +35,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import kotlinx.coroutines.delay
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
+import mega.privacy.android.core.sharedcomponents.button.rememberDebouncedCallback
 import mega.privacy.android.feature.pdfviewer.presentation.components.ExternalFileBottomBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfPageIndicator
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfSearchResultsBar
@@ -107,6 +110,29 @@ internal fun PdfViewerScreen(
     onShare: (() -> Unit)? = null,
 ) {
     val searchState = uiState.searchState
+
+    // Keep the share action disabled until the viewer resumes after the chooser/activity closes.
+    // This is tied to the presentation lifecycle rather than an arbitrary debounce duration.
+    var isShareLaunchPending by rememberSaveable { mutableStateOf(false) }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        isShareLaunchPending = false
+    }
+    val guardedShare = onShare?.let { share ->
+        {
+            if (!isShareLaunchPending) {
+                isShareLaunchPending = true
+                share()
+            }
+        }
+    }
+
+    // Same for the toolbar actions, whose sheets and choosers are equally slow to take over the
+    // input. Keyed by action type so a different action is never swallowed.
+    val debouncedNodeAction = rememberDebouncedCallback(
+        key = { action: MenuActionWithIcon -> action::class },
+    ) { action ->
+        uiState.currentNode?.let { node -> singleNodeActionHandler(action, node) }
+    }
 
     var showPasswordOverlay by rememberSaveable { mutableStateOf(false) }
     // Enable isAutoShowKeyboard after rotate screen
@@ -226,7 +252,7 @@ internal fun PdfViewerScreen(
                             onOpenNodeOptions = onMoreClicked,
                             showMoreAction = !uiState.isExternalFile,
                             showActions = !showLoading,
-                            onShare = onShare,
+                            onShare = guardedShare,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -250,11 +276,7 @@ internal fun PdfViewerScreen(
                         SelectionModeBottomBar(
                             visible = showFloatingToolbar,
                             actions = bottomBarActions,
-                            onActionPressed = { action ->
-                                uiState.currentNode?.let { node ->
-                                    singleNodeActionHandler(action, node)
-                                }
-                            },
+                            onActionPressed = debouncedNodeAction,
                         )
                     }
                 }

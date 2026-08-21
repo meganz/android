@@ -564,6 +564,22 @@ class PdfViewerScreenTest {
         assertThat(capturedNode).isSameInstanceAs(node)
     }
 
+    @Test
+    fun `test that singleNodeActionHandler is invoked once per action when a toolbar action is clicked repeatedly`() {
+        capturedToolbarActions.clear()
+        setContent(
+            uiState = defaultState(currentNode = mock(TypedFileNode::class.java)),
+            bottomBarActions = toolbarActions,
+            singleNodeActionHandler = capturingActionHandler,
+        )
+
+        repeat(3) { composeTestRule.onNodeWithTag(trashAction.testTag).performClick() }
+        composeTestRule.onNodeWithTag(downloadAction.testTag).performClick()
+
+        assertThat(capturedToolbarActions.map { it.first })
+            .containsExactly(trashAction, downloadAction).inOrder()
+    }
+
     // region top bar share
     @Test
     fun `test that share action is displayed when onShare is provided`() {
@@ -606,6 +622,19 @@ class PdfViewerScreenTest {
         composeTestRule.onNodeWithTag(PdfShareAction.testTag).performClick()
 
         assertThat(shared).isTrue()
+    }
+
+    @Test
+    fun `test that onShare is invoked once when the share action is clicked repeatedly`() {
+        var shareCount = 0
+        setContent(
+            uiState = defaultState(),
+            onShare = { shareCount++ },
+        )
+
+        repeat(3) { composeTestRule.onNodeWithTag(PdfShareAction.testTag).performClick() }
+
+        assertThat(shareCount).isEqualTo(1)
     }
     // endregion top bar share
 }

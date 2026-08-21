@@ -12,6 +12,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -76,6 +77,7 @@ import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopB
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
+import kotlin.time.Duration.Companion.milliseconds
 
 /** Maximum characters per chunk. Prevents ANRs caused by native text measurement
  *  (`MeasuredText.nBuildMeasuredText`) blocking the main thread when a chunk contains
@@ -94,6 +96,16 @@ private const val INVALID_NODE_HANDLE = -1L
 
 /** Chunk size for gradual file read; balances responsiveness and I/O overhead. */
 private const val CHUNK_SIZE_LINES = 500
+
+/** Actions that hand over to an external Activity, and so must not present twice. */
+private enum class OneShotAction { GetLink, Share, SendToChat }
+
+/**
+ * Window in which a repeated download request is dropped. A transfer has no external presentation
+ * to key a guard off, so it mirrors `DEFAULT_DEBOUNCE_DURATION` in
+ * `:core:ui-components:shared-components`, which this module does not depend on.
+ */
+private val DOWNLOAD_COOLDOWN = 800.milliseconds
 
 /**
  * ViewModel for the Compose text editor screen.
@@ -208,6 +220,16 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     /** Parses the focused chunk for formatting-toolbar actions; memoizes the last parse. */
     private val formatParseCache = MarkdownEditorParseCache()
+
+    /** Active download request; while it runs, a repeated download request is dropped. */
+    private var downloadJob: Job? = null
+
+    /**
+     * One-shot action being dispatched; a second one is rejected while it is set. The actions that
+     * hand over to an external Activity are held until the editor resumes, because consuming their
+     * event only means the launch was requested.
+     */
+    private var activeOneShotAction: OneShotAction? = null
 
     init {
         viewModelScope.launch {
@@ -1002,6 +1024,11 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         _uiState.update { it.copy(nodeEffectEvent = consumed()) }
     }
 
+    /** Releases the one-shot action guard; whatever the previous action presented is gone. */
+    fun onScreenResumed() {
+        activeOneShotAction = null
+    }
+
     fun consumeShareErrorEvent() {
         _uiState.update { it.copy(shareErrorEvent = consumed) }
     }
@@ -1044,14 +1071,31 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
     }
 
+    /**
+     * Starts a one-shot action and returns true when it can proceed. A second action is rejected
+     * until [activeOneShotAction] is released.
+     */
+    private fun tryStartOneShotAction(action: OneShotAction): Boolean {
+        if (activeOneShotAction != null) return false
+        activeOneShotAction = action
+        return true
+    }
+
+    private fun finishOneShotAction(action: OneShotAction) {
+        if (activeOneShotAction == action) {
+            activeOneShotAction = null
+        }
+    }
+
     private fun emitDownloadTransferEvent() {
         if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
-        viewModelScope.launch {
+        if (downloadJob?.isActive == true) return
+        downloadJob = viewModelScope.launch {
             val publicNode = resolvedPublicNode
-            if (publicNode != null) {
+            val node = if (publicNode != null) {
                 // Folder-link nodes are already PublicLinkNodes; only file-link nodes (plain
                 // TypedFileNode) need mapping. Avoids re-wrapping an already-public node.
-                val downloadNode = if (publicNode is PublicLinkNode) {
+                if (publicNode is PublicLinkNode) {
                     publicNode
                 } else {
                     runCatching {
@@ -1060,35 +1104,27 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                         Timber.e(it, "Text editor: failed to map public node for download")
                     }.getOrDefault(publicNode)
                 }
-                _uiState.update {
-                    it.copy(
-                        transferEvent = triggered(
-                            StartDownloadNode(
-                                nodes = listOf(downloadNode),
-                                withStartMessage = true,
-                            )
-                        )
-                    )
-                }
+            } else {
+                getNodeByIdUseCase(NodeId(resolvedNodeHandle))
+            }
+            if (node == null) {
+                Timber.w("Text editor: node %d not found for download", resolvedNodeHandle)
                 return@launch
             }
-            val node = getNodeByIdUseCase(NodeId(resolvedNodeHandle))
-            if (node != null) {
-                _uiState.update {
-                    it.copy(
-                        transferEvent = triggered(
-                            StartDownloadNode(nodes = listOf(node), withStartMessage = true)
-                        )
+            _uiState.update {
+                it.copy(
+                    transferEvent = triggered(
+                        StartDownloadNode(nodes = listOf(node), withStartMessage = true)
                     )
-                }
-            } else {
-                Timber.w("Text editor: node %d not found for download", resolvedNodeHandle)
+                )
             }
+            delay(DOWNLOAD_COOLDOWN)
         }
     }
 
     private fun emitManageLinkEffect() {
         if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
+        if (!tryStartOneShotAction(OneShotAction.GetLink)) return
         _uiState.update {
             it.copy(nodeEffectEvent = triggered(TextEditorNodeEffect.ManageLink(resolvedNodeHandle)))
         }
@@ -1096,6 +1132,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     private fun emitShareEffect() {
         if (resolvedNodeHandle == INVALID_NODE_HANDLE && args.localPath.isNullOrBlank()) return
+        if (!tryStartOneShotAction(OneShotAction.Share)) return
         val name = _uiState.value.fileName.ifBlank { args.fileName.orEmpty() }.ifBlank { null }
         if (!args.localPath.isNullOrBlank()) {
             _uiState.update {
@@ -1149,6 +1186,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 }
             }.onFailure { e ->
                 Timber.e(e, "Text editor: failed to resolve public link for share")
+                finishOneShotAction(OneShotAction.Share)
                 _uiState.update { it.copy(shareErrorEvent = triggered) }
             }
         }
@@ -1156,6 +1194,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     private fun emitSendToChatEffect() {
         if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
+        if (!tryStartOneShotAction(OneShotAction.SendToChat)) return
         _uiState.update {
             it.copy(nodeEffectEvent = triggered(TextEditorNodeEffect.SendToChat(resolvedNodeHandle)))
         }

@@ -40,6 +40,7 @@ import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeVie
 import mega.privacy.android.feature.texteditor.presentation.TextEditorScreen
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
@@ -325,7 +326,8 @@ private fun TextEditorComposeContent(
                     NodeOptionsBottomSheetNavKey(
                         nodeHandle = nodeHandle,
                         nodeSourceType = viewTypeToNodeSourceTypeMapper(sourceType),
-                    )
+                    ),
+                    navOptions { dropIfAlreadyShown = true },
                 )
             }
         }
