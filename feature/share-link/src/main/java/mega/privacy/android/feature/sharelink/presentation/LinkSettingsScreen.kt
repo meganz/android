@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.sharelink.presentation
 
 import androidx.activity.compose.BackHandler
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -612,22 +611,13 @@ private fun PasswordStrengthHelpText(
     strength: PasswordStrength?,
     modifier: Modifier = Modifier,
 ) {
-    val label = strength?.strengthLabelRes()?.let { stringResource(it) } ?: return
-    when (strength) {
-        PasswordStrength.VERY_WEAK -> HelpTextError(modifier = modifier, text = label)
-        PasswordStrength.WEAK -> HelpTextWarning(modifier = modifier, text = label)
-        else -> HelpTextSuccess(modifier = modifier, text = label)
+    val level = strength?.toLinkPasswordStrength() ?: return
+    val label = stringResource(level.labelRes)
+    when (level) {
+        LinkPasswordStrength.Weak -> HelpTextError(modifier = modifier, text = label)
+        LinkPasswordStrength.Moderate -> HelpTextWarning(modifier = modifier, text = label)
+        LinkPasswordStrength.Strong -> HelpTextSuccess(modifier = modifier, text = label)
     }
-}
-
-@StringRes
-private fun PasswordStrength.strengthLabelRes(): Int? = when (this) {
-    PasswordStrength.VERY_WEAK -> sharedR.string.password_strength_very_weak
-    PasswordStrength.WEAK -> sharedR.string.password_strength_weak
-    PasswordStrength.MEDIUM -> sharedR.string.password_strength_medium
-    PasswordStrength.GOOD -> sharedR.string.password_strength_good
-    PasswordStrength.STRONG -> sharedR.string.password_strength_strong
-    PasswordStrength.INVALID -> null
 }
 
 @Composable

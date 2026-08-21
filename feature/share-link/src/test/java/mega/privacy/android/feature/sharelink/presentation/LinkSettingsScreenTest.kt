@@ -334,7 +334,7 @@ class LinkSettingsScreenTest {
     }
 
     @Test
-    fun `test that the strength helper text is displayed for a strong password`() {
+    fun `test that a strong password shows the Strong label`() {
         setContent(
             uiState = loaded.copy(
                 isPasswordEnabled = true,
@@ -349,7 +349,7 @@ class LinkSettingsScreenTest {
     }
 
     @Test
-    fun `test that the strength helper text is displayed for a very weak password`() {
+    fun `test that a very weak password shows the Weak label`() {
         setContent(
             uiState = loaded.copy(
                 isPasswordEnabled = true,
@@ -358,13 +358,13 @@ class LinkSettingsScreenTest {
             )
         )
 
-        composeRule.onNodeWithText(context.getString(sharedR.string.password_strength_very_weak))
+        composeRule.onNodeWithText(context.getString(sharedR.string.password_strength_weak))
             .performScrollTo()
             .assertIsDisplayed()
     }
 
     @Test
-    fun `test that the strength helper text is displayed for a weak password`() {
+    fun `test that a weak password shows the Weak label`() {
         setContent(
             uiState = loaded.copy(
                 isPasswordEnabled = true,
@@ -379,7 +379,7 @@ class LinkSettingsScreenTest {
     }
 
     @Test
-    fun `test that the strength helper text is displayed for a medium password`() {
+    fun `test that a medium password shows the Moderate label`() {
         setContent(
             uiState = loaded.copy(
                 isPasswordEnabled = true,
@@ -388,13 +388,13 @@ class LinkSettingsScreenTest {
             )
         )
 
-        composeRule.onNodeWithText(context.getString(sharedR.string.password_strength_medium))
+        composeRule.onNodeWithText(context.getString(sharedR.string.password_strength_moderate))
             .performScrollTo()
             .assertIsDisplayed()
     }
 
     @Test
-    fun `test that the strength helper text is displayed for a good password`() {
+    fun `test that a good password shows the Strong label`() {
         setContent(
             uiState = loaded.copy(
                 isPasswordEnabled = true,
@@ -403,7 +403,7 @@ class LinkSettingsScreenTest {
             )
         )
 
-        composeRule.onNodeWithText(context.getString(sharedR.string.password_strength_good))
+        composeRule.onNodeWithText(context.getString(sharedR.string.password_strength_strong))
             .performScrollTo()
             .assertIsDisplayed()
     }

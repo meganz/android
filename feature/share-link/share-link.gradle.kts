@@ -5,9 +5,12 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
 }
 
 android {
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
+
     lint {
         abortOnError = true
     }
@@ -52,6 +55,12 @@ dependencies {
     implementation(androidx.hilt.navigation)
     implementation(lib.compose.state.events)
     implementation(lib.coil.compose)
+
+    // screenshot tests
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
+    screenshotTestImplementation(project(":core-test"))
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))

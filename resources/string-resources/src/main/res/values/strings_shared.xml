@@ -3810,4 +3810,6 @@
     <string name="video_player_zoom_fit_to_screen">Fit to screen</string>
     <!-- Zoom overlay shown in the video player while pinch-zooming when the video is zoomed exactly to fill the whole screen -->
     <string name="video_player_zoom_fill_screen">Fill screen</string>
+    <!-- Password strength label shown below a password field when the password is of moderate strength, between weak and strong -->
+    <string name="password_strength_moderate">Moderate password</string>
 </resources>
