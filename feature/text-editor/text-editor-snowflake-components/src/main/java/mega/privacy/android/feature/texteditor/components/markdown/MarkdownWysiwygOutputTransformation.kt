@@ -50,13 +50,16 @@ internal class MarkdownWysiwygOutputTransformation(
 }
 
 /**
- * Remembers a [MarkdownWysiwygOutputTransformation] with its own parse cache. Attach to the
- * editor's `BasicTextField(outputTransformation = ...)`; pass null instead to show raw source.
+ * Remembers a [MarkdownWysiwygOutputTransformation] backed by [parseCache]. Share one cache
+ * between this transformation and the formatting toolbar so each edit is parsed once. Attach to
+ * the editor's `BasicTextField(outputTransformation = ...)`; pass null instead to show raw source.
  */
 @Composable
-fun rememberMarkdownWysiwygOutputTransformation(): OutputTransformation {
+fun rememberMarkdownWysiwygOutputTransformation(
+    parseCache: MarkdownEditorParseCache,
+): OutputTransformation {
     val styles = rememberMarkdownWysiwygStyles()
-    return remember(styles) {
-        MarkdownWysiwygOutputTransformation(MarkdownEditorParseCache(), styles)
+    return remember(styles, parseCache) {
+        MarkdownWysiwygOutputTransformation(parseCache, styles)
     }
 }

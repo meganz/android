@@ -62,6 +62,13 @@ import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFolderLin
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SetShowLineNumbersPreferenceUseCase
+import mega.privacy.android.feature.texteditor.components.markdown.MarkdownEditorParseCache
+import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormatAction
+import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormatEdit
+import mega.privacy.android.feature.texteditor.components.markdown.MarkdownInlineStyle
+import mega.privacy.android.feature.texteditor.components.markdown.MarkdownSyntaxFormatter
+import mega.privacy.android.feature.texteditor.presentation.model.MarkdownEditMode
+import mega.privacy.android.feature.texteditor.presentation.model.MarkdownLinkDialogUiState
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorComposeUiState
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeEffect
@@ -198,6 +205,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     /** Active content-load job; cancelled if connectivity drops during a network load. */
     private var loadJob: Job? = null
+
+    /** Parses the focused chunk for formatting-toolbar actions; memoizes the last parse. */
+    private val formatParseCache = MarkdownEditorParseCache()
 
     init {
         viewModelScope.launch {
@@ -392,6 +402,158 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             _uiState.update {
                 it.copy(isLoading = false, totalLineCount = 0)
             }
+        }
+    }
+
+    /**
+     * Applies a formatting-toolbar action to the focused chunk's text. [MarkdownFormatAction.Link]
+     * opens the link dialog instead of editing directly; [MarkdownFormatAction.SwitchEditMode]
+     * toggles the Markdown/rich-text editing mode.
+     */
+    fun applyFormatAction(action: MarkdownFormatAction) {
+        val state = chunkStates[_uiState.value.focusedEditChunk] ?: return
+        val text = state.text.toString()
+        val selection = state.selection
+        val edit = when (action) {
+            MarkdownFormatAction.Link -> {
+                requestLinkDialog()
+                return
+            }
+
+            MarkdownFormatAction.SwitchEditMode -> {
+                toggleMarkdownEditMode()
+                return
+            }
+
+            MarkdownFormatAction.Bold -> MarkdownSyntaxFormatter.toggleInline(
+                formatParseCache.parse(text),
+                selection.min,
+                selection.max,
+                MarkdownInlineStyle.Bold,
+            )
+
+            MarkdownFormatAction.Italic -> MarkdownSyntaxFormatter.toggleInline(
+                formatParseCache.parse(text),
+                selection.min,
+                selection.max,
+                MarkdownInlineStyle.Italic,
+            )
+
+            MarkdownFormatAction.Strikethrough -> MarkdownSyntaxFormatter.toggleInline(
+                formatParseCache.parse(text),
+                selection.min,
+                selection.max,
+                MarkdownInlineStyle.Strikethrough,
+            )
+
+            MarkdownFormatAction.InlineCode -> MarkdownSyntaxFormatter.toggleInline(
+                formatParseCache.parse(text),
+                selection.min,
+                selection.max,
+                MarkdownInlineStyle.Code,
+            )
+
+            MarkdownFormatAction.HeadingCycle ->
+                MarkdownSyntaxFormatter.cycleHeading(text, selection.min, selection.max)
+
+            MarkdownFormatAction.BulletList ->
+                MarkdownSyntaxFormatter.toggleList(
+                    text,
+                    selection.min,
+                    selection.max,
+                    ordered = false
+                )
+
+            MarkdownFormatAction.OrderedList ->
+                MarkdownSyntaxFormatter.toggleList(
+                    text,
+                    selection.min,
+                    selection.max,
+                    ordered = true
+                )
+
+            MarkdownFormatAction.Quote ->
+                MarkdownSyntaxFormatter.toggleQuote(text, selection.min, selection.max)
+        }
+        applyFormatEdit(state, edit)
+    }
+
+    fun toggleMarkdownEditMode() {
+        _uiState.update {
+            it.copy(
+                markdownEditMode = when (it.markdownEditMode) {
+                    MarkdownEditMode.Markdown -> MarkdownEditMode.RichText
+                    MarkdownEditMode.RichText -> MarkdownEditMode.Markdown
+                },
+            )
+        }
+    }
+
+    private fun requestLinkDialog() {
+        val state = chunkStates[_uiState.value.focusedEditChunk] ?: return
+        val text = state.text.toString()
+        val selection = state.selection
+        val existing =
+            MarkdownSyntaxFormatter.linkAt(
+                formatParseCache.parse(text),
+                selection.min,
+                selection.max
+            )
+        _uiState.update {
+            it.copy(
+                linkDialog = MarkdownLinkDialogUiState(
+                    text = existing?.text ?: text.substring(selection.min, selection.max),
+                    url = existing?.url.orEmpty(),
+                    existingLink = existing,
+                ),
+            )
+        }
+    }
+
+    fun confirmLink(linkText: String, url: String) {
+        val state = chunkStates[_uiState.value.focusedEditChunk] ?: return dismissLinkDialog()
+        val selection = state.selection
+        val edit = MarkdownSyntaxFormatter.applyLink(
+            selectionStart = selection.min,
+            selectionEnd = selection.max,
+            existing = _uiState.value.linkDialog?.existingLink,
+            linkText = linkText.ifBlank { url },
+            url = url,
+        )
+        applyFormatEdit(state, edit)
+        dismissLinkDialog()
+    }
+
+    fun removeLink() {
+        val existing = _uiState.value.linkDialog?.existingLink ?: return dismissLinkDialog()
+        val state = chunkStates[_uiState.value.focusedEditChunk] ?: return dismissLinkDialog()
+        val selection = state.selection
+        val edit = MarkdownSyntaxFormatter.applyLink(
+            selectionStart = selection.min,
+            selectionEnd = selection.max,
+            existing = existing,
+            linkText = existing.text,
+            url = "",
+        )
+        applyFormatEdit(state, edit)
+        dismissLinkDialog()
+    }
+
+    fun dismissLinkDialog() {
+        _uiState.update { it.copy(linkDialog = null) }
+    }
+
+    /** Applies all replacements and the restored selection as one edit (a single undo step). */
+    private fun applyFormatEdit(state: TextFieldState, edit: MarkdownFormatEdit) {
+        if (edit.replacements.isEmpty()) return
+        state.edit {
+            edit.replacements.sortedByDescending { it.start }.forEach {
+                replace(it.start, it.end, it.text)
+            }
+            selection = TextRange(
+                edit.selectionStart.coerceIn(0, length),
+                edit.selectionEnd.coerceIn(0, length),
+            )
         }
     }
 

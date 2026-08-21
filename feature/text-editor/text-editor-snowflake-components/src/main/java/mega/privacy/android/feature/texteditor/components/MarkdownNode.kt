@@ -34,6 +34,7 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.tokens.theme.DSTokens
+import org.commonmark.ext.gfm.strikethrough.Strikethrough
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
@@ -394,6 +395,10 @@ private fun AnnotatedString.Builder.appendInline(node: Node, colors: MarkdownCol
         }
 
         is Emphasis -> withStyle(MarkdownInlineStyles.italic) {
+            appendInlineChildren(node, colors)
+        }
+
+        is Strikethrough -> withStyle(MarkdownInlineStyles.strikethrough) {
             appendInlineChildren(node, colors)
         }
 

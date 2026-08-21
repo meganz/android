@@ -4,6 +4,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.TextLayoutResult
@@ -36,7 +37,9 @@ class MarkdownWysiwygOutputTransformationTest {
         h1LineHeight = MaterialTheme.typography.headlineSmall.lineHeight
         BasicTextField(
             state = TextFieldState(text),
-            outputTransformation = rememberMarkdownWysiwygOutputTransformation(),
+            outputTransformation = rememberMarkdownWysiwygOutputTransformation(
+                remember { MarkdownEditorParseCache() },
+            ),
             onTextLayout = { getResult -> getResult()?.let { layoutResult = it } },
         )
     }

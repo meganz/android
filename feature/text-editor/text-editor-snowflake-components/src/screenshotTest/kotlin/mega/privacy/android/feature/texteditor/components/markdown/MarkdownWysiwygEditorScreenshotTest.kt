@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -51,7 +52,9 @@ class MarkdownWysiwygEditorScreenshotTest {
                 textStyle = TextStyle(
                     color = DSTokens.colors.text.primary
                 ),
-                outputTransformation = rememberMarkdownWysiwygOutputTransformation(),
+                outputTransformation = rememberMarkdownWysiwygOutputTransformation(
+                    remember { MarkdownEditorParseCache() },
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),

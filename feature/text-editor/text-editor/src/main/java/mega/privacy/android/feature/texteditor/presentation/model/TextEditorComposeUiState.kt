@@ -62,11 +62,10 @@ data class TextEditorComposeUiState(
      * Updated whenever edit chunks are (re)built; defaults to true so Create mode qualifies.
      */
     val isSingleChunkDocument: Boolean = true,
-    /**
-     * True when Markdown live-preview styling is active in Edit/Create mode. Turning it off
-     * shows the raw Markdown syntax while keeping the formatting toolbar functional.
-     */
-    val isLivePreviewOn: Boolean = true,
+    /** Active Markdown editing mode; only meaningful while [isWysiwygCapable] is true. */
+    val markdownEditMode: MarkdownEditMode = MarkdownEditMode.Markdown,
+    /** Non-null while the insert/edit link dialog is showing. */
+    val linkDialog: MarkdownLinkDialogUiState? = null,
     /**
      * One-shot top logical line (0-based) to restore the Markdown preview to, e.g. when returning
      * from Edit or resuming via Continue-Where-Left-Off. Null when nothing to restore.

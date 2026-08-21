@@ -124,6 +124,11 @@ fun TextEditorContent(
      * (WYSIWYG Markdown styling). Null provider or null result shows raw source. Edit mode only.
      */
     chunkOutputTransformationProvider: ((chunkIndex: Int) -> OutputTransformation?)? = null,
+    /**
+     * When false, the caller owns keyboard insets (e.g. a formatting toolbar sits between the
+     * content and the IME); when true, edit mode applies [imePadding] itself as before.
+     */
+    applyImePadding: Boolean = true,
 ) {
     val textColor = DSTokens.colors.text.primary
     val textStyle = remember(textColor) { editorTextStyle(textColor) }
@@ -175,7 +180,7 @@ fun TextEditorContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .then(if (!readOnly) Modifier.imePadding() else Modifier)
+                .then(if (!readOnly && applyImePadding) Modifier.imePadding() else Modifier)
                 .pointerInput(readOnly) {
                     awaitEachGesture {
                         awaitFirstDown(requireUnconsumed = false)

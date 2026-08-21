@@ -33,16 +33,17 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
+import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
 import org.commonmark.ext.gfm.tables.TablesExtension
 import org.commonmark.node.Node
 import org.commonmark.parser.IncludeSourceSpans
 import org.commonmark.parser.Parser
+import kotlin.math.roundToInt
 
 /**
  * Cross-block text selection requires one [SelectionContainer] around the whole document, which is
@@ -272,7 +273,7 @@ private fun FullSelectionPreview(
 
 private val markdownParser: Parser by lazy {
     Parser.builder()
-        .extensions(listOf(TablesExtension.create()))
+        .extensions(listOf(TablesExtension.create(), StrikethroughExtension.create()))
         .includeSourceSpans(IncludeSourceSpans.BLOCKS)
         .build()
 }
