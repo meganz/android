@@ -410,8 +410,14 @@ Trigger: QA signs off in the `#android` release thread.
 
 ### 2.1 Beta
 - **Feature flags → PUBLISH:** post the reminder in **`#android-dev-team`**,
-  tagging `@androiddevs-urgent` (even if the 1.3 request got no replies — send it anyway):
-  > Hi @androiddevs-urgent, v<X.Y> has been signed off by QA and is moving to Beta. If you have a remote feature flag to enable in this release, please set its status to *PUBLISH* in https://featureflags.tools.mega.co.nz/ and set *Min Android (rules.av)* to *<X.Y>*. Also please update your flag status in the Android Remote Feature Flags Tracking doc. Thank you.
+  tagging `@androiddevs-urgent` (even if the 1.3 request got no replies — send it anyway).
+  The dev must do **all three** in the flag tool — status, min version, **and** the
+  anonymous-users toggle (a flag left off for anonymous users won't reach logged-out users):
+  > Hi @androiddevs-urgent, v<X.Y> has been signed off by QA and is moving to Beta. If you have a remote feature flag to enable in this release, please update it in https://featureflags.tools.mega.co.nz/:
+  > • set the status to *PUBLISH*
+  > • set *Min Android (rules.av)* to *<X.Y>*
+  > • enable *"Enable for anonymous users"*
+  > Also please update your flag status in the Android Remote Feature Flags Tracking doc. Thank you.
 - **Ask `#devops-cicd` to promote to Beta, 100%** — exact template (ping
   `@eu-mobile-release` always; add `@nz-mobile-release` **only** 7am–7pm NZ time — you can't
   read the wall clock, so confirm the NZ hour with the user; app build timestamps are `+12` NZ):
