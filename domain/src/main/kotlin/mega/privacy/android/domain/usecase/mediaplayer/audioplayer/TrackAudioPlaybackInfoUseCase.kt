@@ -11,6 +11,11 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUs
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@Deprecated(
+    message = "Only used by the legacy audio player; remove together with it. " +
+        "The revamped player uses TrackAndSaveAudioPlaybackInfoUseCase, which persists every " +
+        "update instead of caching in memory until SaveAudioPlaybackInfoUseCase runs.",
+)
 class TrackAudioPlaybackInfoUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
     private val removeRecentlyUsedItemUseCase: RemoveRecentlyUsedItemUseCase,
