@@ -66,7 +66,7 @@ fun QuotaOfferPlanCard(
         modifier = modifier
             .fillMaxWidth()
             .border(width = 1.dp, color = DSTokens.colors.border.strong, shape = cardShape)
-            .background(color = DSTokens.colors.brand.containerDefault, shape = cardShape)
+            .background(color = offerPlanCardBackground, shape = cardShape)
             .clip(cardShape)
             .testTag(TEST_TAG_QUOTA_OFFER_CARD),
     ) {

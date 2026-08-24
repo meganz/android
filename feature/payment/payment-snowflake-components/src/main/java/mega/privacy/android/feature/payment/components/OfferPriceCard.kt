@@ -76,7 +76,7 @@ fun OfferPriceCard(
                 shape = cardShape,
             )
             .background(
-                color = DSTokens.colors.brand.containerDefault,
+                color = offerPlanCardBackground,
                 shape = cardShape,
             )
             .clip(cardShape)
