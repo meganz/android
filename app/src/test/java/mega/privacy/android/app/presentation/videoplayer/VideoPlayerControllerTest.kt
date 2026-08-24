@@ -17,11 +17,23 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.feature.mediaplayer.components.VideoPlayerOverlayChipState
+import mega.privacy.mobile.analytics.event.VideoPlayerBrightnessSwipeEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerDoubleTapSeekBackwardEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerDoubleTapSeekForwardEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerLongPressSpeedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerPinchToZoomEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerVolumeSwipeEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerZoomToFillEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerZoomToFitEvent
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -45,6 +57,7 @@ class VideoPlayerControllerTest {
 
     private val mockPlayerView = mock<PlayerView>()
     private val mockPlayer = mock<Player>()
+    private val mockAnalyticsTracker = mock<AnalyticsTracker>()
     private val mockRepeatToggle = mock<ImageButton>()
     private val mockMoreOption = mock<ImageButton>()
     private val mockFullscreen = mock<ImageButton>()
@@ -100,12 +113,14 @@ class VideoPlayerControllerTest {
         whenever(mockPlayerView.height).thenReturn(1000)
         whenever(mockPlayer.isPlaying).thenReturn(true)
         whenever(mockPlayerView.player).thenReturn(mockPlayer)
+        Analytics.initialise(mockAnalyticsTracker)
     }
 
     @After
     fun tearDown() {
         controller?.release()
         controller = null
+        Analytics.initialise(null as AnalyticsTracker?)
     }
 
     private fun createController(
@@ -275,17 +290,43 @@ class VideoPlayerControllerTest {
         return (field.get(this) as MutableState<VideoPlayerOverlayChipState?>).value
     }
 
-    private fun VideoPlayerController.callOnScale(scaleFactor: Float) {
+    private fun VideoPlayerController.scaleListener(): ScaleGestureDetector.OnScaleGestureListener {
         val sgdField = VideoPlayerController::class.java.getDeclaredField("scaleGestureDetector")
         sgdField.isAccessible = true
         val sgd = sgdField.get(this) as ScaleGestureDetector
         val listenerField = ScaleGestureDetector::class.java.getDeclaredField("mListener")
         listenerField.isAccessible = true
-        val listener = listenerField.get(sgd) as ScaleGestureDetector.OnScaleGestureListener
+        return listenerField.get(sgd) as ScaleGestureDetector.OnScaleGestureListener
+    }
+
+    private fun VideoPlayerController.callOnScale(scaleFactor: Float) {
         val mockDetector = mock<ScaleGestureDetector>()
         whenever(mockDetector.scaleFactor).thenReturn(scaleFactor)
-        listener.onScale(mockDetector)
+        scaleListener().onScale(mockDetector)
     }
+
+    private fun VideoPlayerController.callOnScaleBegin() {
+        scaleListener().onScaleBegin(mock())
+    }
+
+    private fun VideoPlayerController.callOnScaleEnd() {
+        scaleListener().onScaleEnd(mock())
+    }
+
+    private fun dispatchTouchEvent(action: Int, x: Float = 400f) {
+        val captor = argumentCaptor<View.OnTouchListener>()
+        verify(mockPlayerView, atLeastOnce()).setOnTouchListener(captor.capture())
+        val event = MotionEvent.obtain(0L, 0L, action, x, 100f, 0)
+        try {
+            captor.lastValue.onTouch(mockPlayerView, event)
+        } finally {
+            event.recycle()
+        }
+    }
+
+    private fun dispatchTouchUp(x: Float = 400f) = dispatchTouchEvent(MotionEvent.ACTION_UP, x)
+
+    private fun dispatchTouchCancel() = dispatchTouchEvent(MotionEvent.ACTION_CANCEL)
 
     @Test
     fun `test that startLongPressRunnable calls onLongPressActivated when current speed is not 2x`() {
@@ -744,5 +785,202 @@ class VideoPlayerControllerTest {
         val controller = createController(isGesturesEnabled = true)
         controller.updateGesturesEnabled(false)
         verify(mockPlayerView).clipChildren = true
+    }
+
+    @Test
+    fun `test that fullscreen button click tracks the fullscreen pressed event when at fit`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        createController()
+        clickFullscreenButton()
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerFullScreenPressedEvent)
+    }
+
+    @Test
+    fun `test that fullscreen button click tracks the original pressed event when zoomed to fill`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        createController()
+        clickFullscreenButton()
+        clickFullscreenButton()
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerOriginalPressedEvent)
+    }
+
+    @Test
+    fun `test that fullscreen button click tracks the fullscreen pressed event when gestures are disabled`() {
+        createController(isGesturesEnabled = false)
+        clickFullscreenButton()
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerFullScreenPressedEvent)
+    }
+
+    @Test
+    fun `test that onScale does not track the fullscreen pressed event when the pinch crosses the fill level`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScale(scaleFactor = 1.95f)
+        verify(fullscreenClickedCallback).invoke(true)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerFullScreenPressedEvent)
+    }
+
+    @Test
+    fun `test that double tap when zoomed beyond fill does not track the fullscreen pressed event`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.setZoomLevel(3f)
+        controller.callOnDoubleTap()
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerFullScreenPressedEvent)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerOriginalPressedEvent)
+    }
+
+    @Test
+    fun `test that startLongPressRunnable tracks the long press speed event when activated`() {
+        val controller = createController()
+        controller.runStartLongPressRunnable()
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerLongPressSpeedEvent)
+    }
+
+    @Test
+    fun `test that startLongPressRunnable does not track the long press speed event when current speed is already 2x`() {
+        val controller =
+            createController(currentSpeedPlayback = VideoSpeedPlaybackItem.PlaybackSpeed_2X)
+        controller.runStartLongPressRunnable()
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerLongPressSpeedEvent)
+    }
+
+    @Test
+    fun `test that onScaleEnd tracks the zoom to fill event when the pinch ends at the fill level`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScaleBegin()
+        controller.callOnScale(scaleFactor = 1.95f)
+        controller.callOnScaleEnd()
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerZoomToFillEvent)
+    }
+
+    @Test
+    fun `test that onScaleEnd tracks the zoom to fit event when the pinch ends back at the fit level`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScaleBegin()
+        controller.callOnScale(scaleFactor = 1.5f)
+        controller.callOnScaleEnd()
+        controller.callOnScaleBegin()
+        controller.callOnScale(scaleFactor = 0.68f)
+        controller.callOnScaleEnd()
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerZoomToFitEvent)
+    }
+
+    @Test
+    fun `test that onScaleEnd tracks the pinch to zoom event when the pinch ends between boundaries`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScaleBegin()
+        controller.callOnScale(scaleFactor = 1.5f)
+        controller.callOnScaleEnd()
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerPinchToZoomEvent)
+    }
+
+    @Test
+    fun `test that onScaleEnd does not track any zoom event when the zoom level did not change`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScaleBegin()
+        controller.callOnScaleEnd()
+        verify(mockAnalyticsTracker, never()).trackEvent(any())
+    }
+
+    @Test
+    fun `test that onScaleEnd does not track any zoom event when the pinch only carries float noise`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnScaleBegin()
+        controller.callOnScale(scaleFactor = 1.5f)
+        controller.callOnScaleEnd()
+        controller.callOnScaleBegin()
+        controller.callOnScale(scaleFactor = 1.000001f)
+        controller.callOnScaleEnd()
+        verify(mockAnalyticsTracker, times(1)).trackEvent(VideoPlayerPinchToZoomEvent)
+    }
+
+    @Test
+    fun `test that onScaleEnd does not track any zoom event when gestures are disabled`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController(isGesturesEnabled = false)
+        controller.callOnScaleBegin()
+        controller.callOnScale(scaleFactor = 1.5f)
+        controller.callOnScaleEnd()
+        verify(mockAnalyticsTracker, never()).trackEvent(any())
+    }
+
+    @Test
+    fun `test that double tap on the right half tracks the seek forward event`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnDoubleTap(x = 600f)
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerDoubleTapSeekForwardEvent)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerDoubleTapSeekBackwardEvent)
+    }
+
+    @Test
+    fun `test that double tap on the left half tracks the seek backward event`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.callOnDoubleTap(x = 400f)
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerDoubleTapSeekBackwardEvent)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerDoubleTapSeekForwardEvent)
+    }
+
+    @Test
+    fun `test that double tap when zoomed beyond fill tracks the zoom to fill event instead of seek events`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.setZoomLevel(3f)
+        controller.callOnDoubleTap()
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerZoomToFillEvent)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerDoubleTapSeekForwardEvent)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerDoubleTapSeekBackwardEvent)
+    }
+
+    @Test
+    fun `test that touch up after a brightness swipe tracks the brightness swipe event`() {
+        val controller = createController()
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        dispatchTouchUp()
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerBrightnessSwipeEvent)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerVolumeSwipeEvent)
+    }
+
+    @Test
+    fun `test that touch up after a volume swipe tracks the volume swipe event`() {
+        val controller = createController()
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 600f)
+        dispatchTouchUp(x = 600f)
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerVolumeSwipeEvent)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerBrightnessSwipeEvent)
+    }
+
+    @Test
+    fun `test that touch up without a swipe gesture does not track swipe events`() {
+        createController()
+        dispatchTouchUp()
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerBrightnessSwipeEvent)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerVolumeSwipeEvent)
+    }
+
+    @Test
+    fun `test that touch cancel after a brightness swipe does not track swipe events`() {
+        val controller = createController()
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        dispatchTouchCancel()
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerBrightnessSwipeEvent)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerVolumeSwipeEvent)
+    }
+
+    @Test
+    fun `test that double tap does not track seek events when the player is null`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        whenever(mockPlayerView.player).thenReturn(null)
+        val controller = createController()
+        controller.callOnDoubleTap(x = 600f)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerDoubleTapSeekForwardEvent)
+        verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerDoubleTapSeekBackwardEvent)
     }
 }

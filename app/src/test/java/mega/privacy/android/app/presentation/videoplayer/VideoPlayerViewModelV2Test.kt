@@ -2202,12 +2202,9 @@ class VideoPlayerViewModelV2Test {
         initViewModel()
         underTest.updateFullscreen(isFullscreen)
         testScheduler.advanceUntilIdle()
-        assertThat(analyticsExtension.events.first()).isInstanceOf(
-            if (isFullscreen) {
-                VideoPlayerFullScreenPressedEvent::class.java
-            } else {
-                VideoPlayerOriginalPressedEvent::class.java
-            }
+        assertThat(analyticsExtension.events).containsNoneOf(
+            VideoPlayerFullScreenPressedEvent,
+            VideoPlayerOriginalPressedEvent,
         )
         underTest.uiState.test {
             assertThat(awaitItem().isFullscreen).isEqualTo(isFullscreen)

@@ -194,9 +194,7 @@ import mega.privacy.mobile.analytics.event.VideoPlaybackMkvStartedEvent
 import mega.privacy.mobile.analytics.event.VideoPlaybackMovStartedEvent
 import mega.privacy.mobile.analytics.event.VideoPlaybackMp4StartedEvent
 import mega.privacy.mobile.analytics.event.VideoPlaybackOtherStartedEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import java.io.File
@@ -1877,13 +1875,6 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     }
 
     internal fun updateFullscreen(value: Boolean) {
-        Analytics.tracker.trackEvent(
-            if (value) {
-                VideoPlayerFullScreenPressedEvent
-            } else {
-                VideoPlayerOriginalPressedEvent
-            }
-        )
         uiState.update { it.copy(isFullscreen = value) }
     }
 

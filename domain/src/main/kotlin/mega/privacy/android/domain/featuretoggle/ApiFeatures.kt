@@ -42,13 +42,14 @@ enum class ApiFeatures(
     ),
 
     /**
-     * Video Player gesture seek controls.
-     * When enabled, shows a seek-seconds overlay when the user taps the forward/backward
-     * buttons or double-taps the left/right side of the screen.
+     * Video Player gesture controls.
+     * When enabled, activates the revamped gesture set in the Video Player: double-tap
+     * seek with a seek-seconds overlay, vertical swipe for brightness/volume, long-press
+     * for 2x playback speed, and pinch-to-zoom with fit/fill snapping.
      */
     VideoPlayerGestures(
         experimentName = "vpges",
-        description = "Enable gesture seek controls in Video Player",
+        description = "Enable gesture controls in Video Player",
         defaultValue = false,
     ),
 

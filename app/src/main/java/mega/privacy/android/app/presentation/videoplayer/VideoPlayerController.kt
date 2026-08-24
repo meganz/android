@@ -48,8 +48,18 @@ import mega.privacy.android.feature.mediaplayer.components.GestureSliderType
 import mega.privacy.android.feature.mediaplayer.components.VideoPlayerGestureSlider
 import mega.privacy.android.feature.mediaplayer.components.VideoPlayerOverlayChip
 import mega.privacy.android.feature.mediaplayer.components.VideoPlayerOverlayChipState
+import mega.privacy.mobile.analytics.event.VideoPlayerBrightnessSwipeEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerDoubleTapSeekBackwardEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerDoubleTapSeekForwardEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerLongPressSpeedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerPinchToZoomEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRotateToLandscapePressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRotateToPortraitPressedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerVolumeSwipeEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerZoomToFillEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerZoomToFitEvent
 import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -120,6 +130,7 @@ class VideoPlayerController(
         longPressSavedSpeed = speed
         isLongPressActive = true
         playerComposeView.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        Analytics.tracker.trackEvent(VideoPlayerLongPressSpeedEvent)
         onLongPressActivated()
         // Only one overlay chip at a time: drop lingering seek/zoom chips immediately
         // instead of letting them outlive their hide delay next to the 2x chip.
@@ -136,6 +147,7 @@ class VideoPlayerController(
     private var scaleGestureDetector: ScaleGestureDetector? = null
     private var gestureDetector: GestureDetector? = null
     private val zoomState = VideoPlayerZoomState()
+    private var pinchStartZoomLevel = VideoPlayerZoomState.MIN_ZOOM
 
     // Pinch state for the pre-gestures behaviour, kept while the VideoPlayerGestures feature
     // flag is off: a plain 1x-5x TextureView-matrix zoom inside the FIT frame, with fullscreen
@@ -373,21 +385,33 @@ class VideoPlayerController(
     internal fun setupFullscreen(isFullScreen: Boolean) {
         updateFullscreenButtonIcon(isFullScreen)
         fullscreenButton.setOnClickListener {
+            val enteringFullscreen: Boolean
             if (isGesturesEnabled) {
                 val viewport = currentViewport()
-                if (zoomState.isZoomedToFill(viewport)) {
-                    zoomState.reset()
-                } else {
+                enteringFullscreen = !zoomState.isZoomedToFill(viewport)
+                if (enteringFullscreen) {
                     zoomState.zoomToFill(viewport)
+                } else {
+                    zoomState.reset()
                 }
                 updateTransformations()
                 showZoomChipWithAutoHide(viewport)
                 syncFullscreenState()
             } else {
                 isFullscreen.value = !isFullscreen.value
-                applyLegacyResizeMode(isFullscreen.value)
-                fullscreenClickedCallback(isFullscreen.value)
+                enteringFullscreen = isFullscreen.value
+                applyLegacyResizeMode(enteringFullscreen)
+                fullscreenClickedCallback(enteringFullscreen)
             }
+            // Tracked here, at the button, so gesture-driven fullscreen transitions (pinch
+            // across the fill level, double tap) never report a button press.
+            Analytics.tracker.trackEvent(
+                if (enteringFullscreen) {
+                    VideoPlayerFullScreenPressedEvent
+                } else {
+                    VideoPlayerOriginalPressedEvent
+                }
+            )
             resetAutoHideTimer()
         }
     }
@@ -566,8 +590,27 @@ class VideoPlayerController(
                     return true
                 }
 
+                override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+                    pinchStartZoomLevel = zoomState.zoomLevel
+                    return true
+                }
+
                 override fun onScaleEnd(detector: ScaleGestureDetector) {
                     zoomState.onPinchEnd()
+                    // A pinch that did not meaningfully move the zoom is not a zoom
+                    // interaction and reports nothing: ZOOM_TRACKING_EPSILON absorbs the
+                    // float noise a barely-moving two-finger touch produces at mid-range
+                    // levels, where boundary snapping cannot fold it away.
+                    if (!isGesturesEnabled ||
+                        abs(zoomState.zoomLevel - pinchStartZoomLevel) < ZOOM_TRACKING_EPSILON
+                    ) return
+                    Analytics.tracker.trackEvent(
+                        when (zoomState.currentBoundary(currentViewport())) {
+                            ZoomBoundary.Fill -> VideoPlayerZoomToFillEvent
+                            ZoomBoundary.Fit -> VideoPlayerZoomToFitEvent
+                            null -> VideoPlayerPinchToZoomEvent
+                        }
+                    )
                 }
             })
 
@@ -648,6 +691,7 @@ class VideoPlayerController(
                     if (zoomState.isZoomedBeyondFill(viewport)) {
                         zoomState.zoomToFill(viewport)
                         performBoundaryHapticFeedback()
+                        Analytics.tracker.trackEvent(VideoPlayerZoomToFillEvent)
                         updateTransformations()
                         // The trailing ACTION_UP of the double tap schedules the chip hide.
                         showZoomChip(viewport)
@@ -655,12 +699,22 @@ class VideoPlayerController(
                         return true
                     }
                     val viewWidth = playerComposeView.width
-                    if (viewWidth == 0) return false
-                    if (e.x < viewWidth / 2f) {
-                        seekByDelta(-SEEK_STEP.inWholeMilliseconds)
-                    } else {
-                        seekByDelta(+SEEK_STEP.inWholeMilliseconds)
-                    }
+                    if (viewWidth == 0 || playerComposeView.player == null) return false
+                    val isForward = e.x >= viewWidth / 2f
+                    Analytics.tracker.trackEvent(
+                        if (isForward) {
+                            VideoPlayerDoubleTapSeekForwardEvent
+                        } else {
+                            VideoPlayerDoubleTapSeekBackwardEvent
+                        }
+                    )
+                    seekByDelta(
+                        if (isForward) {
+                            +SEEK_STEP.inWholeMilliseconds
+                        } else {
+                            -SEEK_STEP.inWholeMilliseconds
+                        }
+                    )
                     resetAutoHideTimer()
                     return true
                 }
@@ -696,6 +750,8 @@ class VideoPlayerController(
                     if (isLongPressActive) {
                         releaseLongPress()
                     }
+                    // A cancelled gesture is not a completed swipe — only a real finger lift reports.
+                    if (event.actionMasked == MotionEvent.ACTION_UP) trackCompletedSwipe()
                     scrollGestureType = ScrollGestureType.None
                     if (brightnessSliderState.value != null) {
                         sliderHideHandler.removeCallbacks(hideBrightnessSliderRunnable)
@@ -780,6 +836,18 @@ class VideoPlayerController(
         longPressChipState.value = null
         longPressSavedSpeed?.let { onLongPressSpeedChange(it) }
         longPressSavedSpeed = null
+    }
+
+    private fun trackCompletedSwipe() {
+        when (scrollGestureType) {
+            ScrollGestureType.Brightness ->
+                Analytics.tracker.trackEvent(VideoPlayerBrightnessSwipeEvent)
+
+            ScrollGestureType.Volume ->
+                Analytics.tracker.trackEvent(VideoPlayerVolumeSwipeEvent)
+
+            ScrollGestureType.None, ScrollGestureType.Pan -> {}
+        }
     }
 
     /**
@@ -965,6 +1033,10 @@ class VideoPlayerController(
 
         // Zoom chip lingers briefly after the pinch ends so the user can read the final level.
         private val ZOOM_CHIP_HIDE_DELAY = 800.milliseconds
+
+        // Sub-1% zoom change across a whole pinch is touch-sensor noise, not an intentional
+        // zoom — such pinches report no analytics event.
+        private const val ZOOM_TRACKING_EPSILON = 0.01f
         private const val SLIDER_SIDE_MARGIN_PORT_DP = 30
         private const val SLIDER_SIDE_MARGIN_LAND_DP = 60
 
