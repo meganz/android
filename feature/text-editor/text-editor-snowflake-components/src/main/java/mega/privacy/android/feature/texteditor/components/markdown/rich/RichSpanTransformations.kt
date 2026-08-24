@@ -16,14 +16,29 @@ import mega.privacy.android.feature.texteditor.components.rememberMarkdownColors
  * edit the change list is fed through [RichSpanAdjuster], applying the active typing styles to
  * inserted text. Programmatic edits (`TextFieldState.edit`) bypass this by design — callers
  * mutating text directly must adjust spans themselves.
+ *
+ * A lone newline never reaches the text: blocks are single units, so Enter is reverted and
+ * reported through [onSplit] with the replaced range, for the document state to split the
+ * block. [onSplit] must not reenter the field's own [androidx.compose.foundation.text.input.TextFieldState].
  */
 @OptIn(ExperimentalFoundationApi::class)
 class RichSpanInputTransformation(
     private val state: RichTextBlockState,
+    private val onSplit: ((start: Int, end: Int) -> Unit)? = null,
 ) : InputTransformation {
 
     override fun TextFieldBuffer.transformInput() {
         if (changes.changeCount == 0) return
+        if (onSplit != null && changes.changeCount == 1) {
+            val newRange = changes.getRange(0)
+            val inserted = asCharSequence().subSequence(newRange.min, newRange.max).toString()
+            if (inserted == "\n") {
+                val originalRange = changes.getOriginalRange(0)
+                revertAllChanges()
+                onSplit.invoke(originalRange.min, originalRange.max)
+                return
+            }
+        }
         val edits = (0 until changes.changeCount).map { index ->
             val newRange = changes.getRange(index)
             val originalRange = changes.getOriginalRange(index)

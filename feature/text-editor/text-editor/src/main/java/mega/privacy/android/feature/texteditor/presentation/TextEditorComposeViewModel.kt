@@ -73,6 +73,7 @@ import mega.privacy.android.feature.texteditor.components.markdown.rich.Markdown
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentState
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentToMarkdownConverter
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichSpanStyle
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichTextBlockEditState
 import mega.privacy.android.feature.texteditor.presentation.model.MarkdownEditMode
 import mega.privacy.android.feature.texteditor.presentation.model.MarkdownLinkDialogUiState
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
@@ -575,19 +576,55 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     /**
-     * Toolbar actions in rich text mode operate on the focused block's spans. Structural
-     * actions (headings, lists, quotes, links) are wired up with the block-lifecycle work.
+     * Toolbar actions in rich text mode: inline styles toggle spans on the focused block,
+     * structural actions retype the focused block, and Link opens the link dialog.
      */
     private fun applyRichFormatAction(action: MarkdownFormatAction) {
-        val block = richDocumentState.value?.focusedTextBlock ?: return
-        val style = when (action) {
-            MarkdownFormatAction.Bold -> RichSpanStyle.Bold
-            MarkdownFormatAction.Italic -> RichSpanStyle.Italic
-            MarkdownFormatAction.Strikethrough -> RichSpanStyle.Strikethrough
-            MarkdownFormatAction.InlineCode -> RichSpanStyle.Code
-            else -> null
+        val rich = richDocumentState.value ?: return
+        when (action) {
+            MarkdownFormatAction.Bold ->
+                rich.focusedTextBlock?.text?.toggleStyle(RichSpanStyle.Bold)
+
+            MarkdownFormatAction.Italic ->
+                rich.focusedTextBlock?.text?.toggleStyle(RichSpanStyle.Italic)
+
+            MarkdownFormatAction.Strikethrough ->
+                rich.focusedTextBlock?.text?.toggleStyle(RichSpanStyle.Strikethrough)
+
+            MarkdownFormatAction.InlineCode ->
+                rich.focusedTextBlock?.text?.toggleStyle(RichSpanStyle.Code)
+
+            MarkdownFormatAction.HeadingCycle -> rich.cycleFocusedHeading()
+            MarkdownFormatAction.BulletList -> rich.toggleFocusedListItem(ordered = false)
+            MarkdownFormatAction.OrderedList -> rich.toggleFocusedListItem(ordered = true)
+            MarkdownFormatAction.Quote -> rich.toggleFocusedQuote()
+            MarkdownFormatAction.Link -> requestRichLinkDialog(rich)
+            MarkdownFormatAction.SwitchEditMode -> Unit
         }
-        style?.let { block.text.toggleStyle(it) }
+    }
+
+    private fun requestRichLinkDialog(rich: RichDocumentState) {
+        val block = rich.focusedTextBlock ?: return
+        val selection = block.text.textFieldState.selection
+        val existing = block.text.linkAt(selection)
+        val text = block.text.textFieldState.text.toString()
+        _uiState.update {
+            it.copy(
+                linkDialog = MarkdownLinkDialogUiState(
+                    text = existing?.let { span -> text.substring(span.start, span.end) }
+                        ?: text.substring(selection.min, selection.max),
+                    url = (existing?.style as? RichSpanStyle.Link)?.url.orEmpty(),
+                    isRichExistingLink = existing != null,
+                ),
+            )
+        }
+    }
+
+    /** The focused rich block when the link dialog is confirmed from rich text mode. */
+    private fun richTextBlockForLink(): RichTextBlockEditState? {
+        val ui = _uiState.value
+        if (!ui.isWysiwygCapable || ui.markdownEditMode != MarkdownEditMode.RichText) return null
+        return richDocumentState.value?.focusedTextBlock
     }
 
     private fun requestLinkDialog() {
@@ -612,6 +649,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     fun confirmLink(linkText: String, url: String) {
+        richTextBlockForLink()?.let { block ->
+            block.text.applyLink(linkText, url)
+            return dismissLinkDialog()
+        }
         val state = chunkStates[_uiState.value.focusedEditChunk] ?: return dismissLinkDialog()
         val selection = state.selection
         val edit = MarkdownSyntaxFormatter.applyLink(
@@ -626,6 +667,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     fun removeLink() {
+        richTextBlockForLink()?.let { block ->
+            block.text.removeLink()
+            return dismissLinkDialog()
+        }
         val existing = _uiState.value.linkDialog?.existingLink ?: return dismissLinkDialog()
         val state = chunkStates[_uiState.value.focusedEditChunk] ?: return dismissLinkDialog()
         val selection = state.selection

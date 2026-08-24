@@ -28,12 +28,13 @@ class RichSpanEditingTest {
 
     private lateinit var state: RichTextBlockState
     private var layoutResult: TextLayoutResult? = null
+    private var splitRequests = mutableListOf<Pair<Int, Int>>()
 
     @Composable
-    private fun RichField() {
+    private fun RichField(onSplit: ((Int, Int) -> Unit)?) {
         BasicTextField(
             state = state.textFieldState,
-            inputTransformation = RichSpanInputTransformation(state),
+            inputTransformation = RichSpanInputTransformation(state, onSplit),
             outputTransformation = RichSpanOutputTransformation(
                 state,
                 rememberRichSpanVisualStyles(),
@@ -43,11 +44,15 @@ class RichSpanEditingTest {
         )
     }
 
-    private fun setField(text: String, spans: List<RichSpan> = emptyList()) {
+    private fun setField(
+        text: String,
+        spans: List<RichSpan> = emptyList(),
+        onSplit: ((Int, Int) -> Unit)? = null,
+    ) {
         state = RichTextBlockState(text, spans)
         composeRule.setContent {
             AndroidThemeForPreviews {
-                RichField()
+                RichField(onSplit)
             }
         }
     }
@@ -97,6 +102,32 @@ class RichSpanEditingTest {
         state.toggleStyle(RichSpanStyle.Italic, TextRange(0, 5))
 
         assertThat(state.spans).containsExactly(RichSpan(0, 5, RichSpanStyle.Italic))
+    }
+
+    @Test
+    fun `test that typing a newline is reverted and reported as a split request`() {
+        splitRequests = mutableListOf()
+        setField("hello") { start, end -> splitRequests += start to end }
+        composeRule.onNodeWithTag(FIELD_TAG).performTextInputSelection(TextRange(2))
+
+        composeRule.onNodeWithTag(FIELD_TAG).performTextInput("\n")
+        composeRule.waitForIdle()
+
+        assertThat(state.textFieldState.text.toString()).isEqualTo("hello")
+        assertThat(splitRequests).containsExactly(2 to 2)
+    }
+
+    @Test
+    fun `test that a newline replacing a selection reports the replaced range`() {
+        splitRequests = mutableListOf()
+        setField("hello") { start, end -> splitRequests += start to end }
+        composeRule.onNodeWithTag(FIELD_TAG).performTextInputSelection(TextRange(1, 4))
+
+        composeRule.onNodeWithTag(FIELD_TAG).performTextInput("\n")
+        composeRule.waitForIdle()
+
+        assertThat(state.textFieldState.text.toString()).isEqualTo("hello")
+        assertThat(splitRequests).containsExactly(1 to 4)
     }
 
     @Test

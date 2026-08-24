@@ -51,6 +51,53 @@ class RichTextBlockState(
         typingStyles = stylesAt(textFieldState.selection.min)
     }
 
+    /**
+     * The link span [selection] targets: the one a collapsed caret sits inside (directly after
+     * link text counts), or any link the selection overlaps.
+     */
+    fun linkAt(selection: TextRange = textFieldState.selection): RichSpan? =
+        spans.firstOrNull { span ->
+            span.style is RichSpanStyle.Link && if (selection.collapsed) {
+                selection.min > span.start && selection.min <= span.end
+            } else {
+                selection.min < span.end && selection.max > span.start
+            }
+        }
+
+    /**
+     * Inserts or updates a link: replaces the targeted link's text (or the selection, or
+     * inserts at a collapsed caret) with [linkText] and covers it with a Link span. Other spans
+     * are remapped through the edit; the caret lands after the link.
+     */
+    fun applyLink(
+        linkText: String,
+        url: String,
+        selection: TextRange = textFieldState.selection,
+    ) {
+        if (url.isBlank()) return
+        val existing = linkAt(selection)
+        val start = existing?.start ?: selection.min
+        val end = existing?.end ?: selection.max
+        val newText = linkText.ifBlank { url }
+        val newEnd = start + newText.length
+        textFieldState.edit {
+            replace(start, end, newText)
+            this.selection = TextRange(newEnd)
+        }
+        val change = RichSpanAdjuster.TextChange(start, end, start, newEnd)
+        val remapped = RichSpanAdjuster.adjust(spans, listOf(change))
+            .filterNot { it.style is RichSpanStyle.Link && it.start < newEnd && it.end > start }
+        spans = RichSpanAdjuster.normalize(
+            remapped + RichSpan(start, newEnd, RichSpanStyle.Link(url)),
+        )
+    }
+
+    /** Unwraps the link [selection] targets back to plain text (the text itself stays). */
+    fun removeLink(selection: TextRange = textFieldState.selection) {
+        val target = linkAt(selection) ?: return
+        spans = spans - target
+    }
+
     /** The block's content as model text. */
     fun toRichText(): RichText = RichText(textFieldState.text.toString(), spans)
 }

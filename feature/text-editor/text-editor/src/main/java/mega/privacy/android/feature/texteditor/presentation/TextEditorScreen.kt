@@ -991,15 +991,16 @@ private fun RichEditToolbar(
             formats = MarkdownSelectionFormats.Empty
             return@LaunchedEffect
         }
+        // Everything the formats derive from (kind included) is read inside the snapshot flow,
+        // so structural retypes from the toolbar refresh the active states too.
         snapshotFlow {
-            Triple(
-                focused.text.textFieldState.selection,
-                focused.text.spans,
-                focused.text.typingStyles,
+            richSelectionFormats(
+                kind = focused.kind,
+                spans = focused.text.spans,
+                typingStyles = focused.text.typingStyles,
+                selection = focused.text.textFieldState.selection,
             )
-        }.collect { (selection, spans, typingStyles) ->
-            formats = richSelectionFormats(focused.kind, spans, typingStyles, selection)
-        }
+        }.collect { formats = it }
     }
     MarkdownFormattingToolbar(
         formats = formats,

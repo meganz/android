@@ -28,13 +28,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -66,6 +73,25 @@ fun RichDocumentEditor(
     val visualStyles = rememberRichSpanVisualStyles()
     val colors = rememberMarkdownColors()
     val focusRequesters = remember(state) { mutableMapOf<Int, FocusRequester>() }
+
+    LaunchedEffect(state) {
+        snapshotFlow { state.pendingFocus }.collect { request ->
+            if (request == null) return@collect
+            // Let the frame that composes a freshly split/merged block land first, so its
+            // focus requester is attached before it is used.
+            withFrameNanos { }
+            val block = state.blocks.getOrNull(request.index) as? RichTextBlockEditState
+            block?.text?.textFieldState?.edit {
+                selection = TextRange(
+                    request.selection.start.coerceIn(0, length),
+                    request.selection.end.coerceIn(0, length),
+                )
+            }
+            runCatching { focusRequesters[request.index]?.requestFocus() }
+                .onFailure { Timber.w(it, "Pending focus request failed") }
+            state.pendingFocus = null
+        }
+    }
 
     LazyColumn(
         modifier = modifier
@@ -143,7 +169,11 @@ private fun RichTextBlockRow(
             state = block.text.textFieldState,
             textStyle = blockTextStyle(kind, colors),
             cursorBrush = SolidColor(colors.text),
-            inputTransformation = remember(block) { RichSpanInputTransformation(block.text) },
+            inputTransformation = remember(block, index) {
+                RichSpanInputTransformation(block.text) { start, end ->
+                    state.splitBlock(index, start, end)
+                }
+            },
             outputTransformation = remember(block, visualStyles) {
                 RichSpanOutputTransformation(block.text, visualStyles)
             },
@@ -151,6 +181,16 @@ private fun RichTextBlockRow(
                 .weight(1f)
                 .focusRequester(focusRequester)
                 .onFocusChanged { if (it.isFocused) state.focusedIndex = index }
+                .onPreviewKeyEvent { event ->
+                    if (event.type == KeyEventType.KeyDown &&
+                        event.key == Key.Backspace &&
+                        block.text.textFieldState.selection == TextRange.Zero
+                    ) {
+                        state.mergeBlockBackward(index)
+                    } else {
+                        false
+                    }
+                }
                 .testTag(richBlockFieldTag(index)),
         )
     }

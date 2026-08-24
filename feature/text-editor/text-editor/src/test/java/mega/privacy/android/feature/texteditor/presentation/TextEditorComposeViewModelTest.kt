@@ -566,6 +566,83 @@ internal class TextEditorComposeViewModelTest {
         }
 
     @Test
+    fun `test that applyFormatAction retypes the focused rich block for structural actions`() =
+        runTest {
+            enterEditModeWith("hello")
+            underTest.ensureRichDocumentState()
+            val rich = underTest.richDocumentState.value!!
+            rich.focusedIndex = 0
+            val block = rich.blocks[0] as RichTextBlockEditState
+
+            underTest.applyFormatAction(MarkdownFormatAction.HeadingCycle)
+            assertThat(block.kind).isEqualTo(RichBlockKind.Heading(1))
+
+            underTest.applyFormatAction(MarkdownFormatAction.BulletList)
+            assertThat(block.kind)
+                .isEqualTo(RichBlockKind.Item(ordered = false, indent = 0, checked = null))
+
+            underTest.applyFormatAction(MarkdownFormatAction.OrderedList)
+            assertThat(block.kind)
+                .isEqualTo(RichBlockKind.Item(ordered = true, indent = 0, checked = null))
+
+            underTest.applyFormatAction(MarkdownFormatAction.Quote)
+            assertThat(block.kind).isEqualTo(RichBlockKind.Quote(1))
+        }
+
+    @Test
+    fun `test that applyFormatAction Link opens a prefilled dialog in rich mode`() = runTest {
+        enterEditModeWith("hello world")
+        underTest.ensureRichDocumentState()
+        val rich = underTest.richDocumentState.value!!
+        rich.focusedIndex = 0
+        rich.focusedTextBlock!!.text.textFieldState.edit { selection = TextRange(0, 5) }
+
+        underTest.applyFormatAction(MarkdownFormatAction.Link)
+
+        val dialog = underTest.uiState.value.linkDialog
+        assertThat(dialog?.text).isEqualTo("hello")
+        assertThat(dialog?.url).isEmpty()
+        assertThat(dialog?.isExistingLink).isFalse()
+    }
+
+    @Test
+    fun `test that confirmLink applies a link span to the focused rich block`() = runTest {
+        enterEditModeWith("hello world")
+        underTest.ensureRichDocumentState()
+        val rich = underTest.richDocumentState.value!!
+        rich.focusedIndex = 0
+        val block = rich.focusedTextBlock!!
+        block.text.textFieldState.edit { selection = TextRange(0, 5) }
+        underTest.applyFormatAction(MarkdownFormatAction.Link)
+
+        underTest.confirmLink("hello", "https://mega.io")
+
+        assertThat(block.text.textFieldState.text.toString()).isEqualTo("hello world")
+        assertThat(block.text.spans)
+            .containsExactly(RichSpan(0, 5, RichSpanStyle.Link("https://mega.io")))
+        assertThat(underTest.uiState.value.linkDialog).isNull()
+    }
+
+    @Test
+    fun `test that removeLink unwraps the rich link span under the cursor`() = runTest {
+        enterEditModeWith("[docs](https://mega.io) tail")
+        underTest.ensureRichDocumentState()
+        val rich = underTest.richDocumentState.value!!
+        rich.focusedIndex = 0
+        val block = rich.focusedTextBlock!!
+        assertThat(block.text.spans).isNotEmpty()
+        block.text.textFieldState.edit { selection = TextRange(2) }
+        underTest.applyFormatAction(MarkdownFormatAction.Link)
+        assertThat(underTest.uiState.value.linkDialog?.isExistingLink).isTrue()
+
+        underTest.removeLink()
+
+        assertThat(block.text.textFieldState.text.toString()).isEqualTo("docs tail")
+        assertThat(block.text.spans).isEmpty()
+        assertThat(underTest.uiState.value.linkDialog).isNull()
+    }
+
+    @Test
     fun `test that getMarkdownPreviewContent returns joined content for normal lines`() = runTest {
         doReturn(flowOf(listOf("# Title", "body"))).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
