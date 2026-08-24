@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.texteditor.components.markdown.rich
 
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentToMarkdownConverter.Companion.SpanOrder
+import javax.inject.Inject
 
 
 /**
@@ -9,7 +10,7 @@ import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocu
  * [RichBlock.RawSource] blocks are emitted verbatim — together with the converter's raw-source
  * fallback this keeps unsupported constructs byte-identical across load -> save.
  */
-class RichDocumentToMarkdownConverter {
+class RichDocumentToMarkdownConverter @Inject constructor() {
 
     fun convert(document: RichDocument): String {
         val parts = StringBuilder()

@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -68,6 +69,10 @@ import mega.privacy.android.feature.texteditor.components.markdown.MarkdownForma
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormatEdit
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownInlineStyle
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownSyntaxFormatter
+import mega.privacy.android.feature.texteditor.components.markdown.rich.MarkdownToRichDocumentConverter
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentState
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentToMarkdownConverter
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichSpanStyle
 import mega.privacy.android.feature.texteditor.presentation.model.MarkdownEditMode
 import mega.privacy.android.feature.texteditor.presentation.model.MarkdownLinkDialogUiState
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
@@ -148,6 +153,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val richToModelConverter: MarkdownToRichDocumentConverter,
+    private val richToMarkdownConverter: RichDocumentToMarkdownConverter,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -230,6 +237,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      * event only means the launch was requested.
      */
     private var activeOneShotAction: OneShotAction? = null
+
+    /** Rich text mode editing state; non-null only while rich mode is (or was) active. */
+    val richDocumentState: StateFlow<RichDocumentState?>
+        field = MutableStateFlow<RichDocumentState?>(null)
+
+    /** Canonical serialization captured when rich mode opened; dirty = export differs from it. */
+    private var richBaselineMarkdown: String? = null
 
     init {
         viewModelScope.launch {
@@ -433,7 +447,16 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      * toggles the Markdown/rich-text editing mode.
      */
     fun applyFormatAction(action: MarkdownFormatAction) {
-        val state = chunkStates[_uiState.value.focusedEditChunk] ?: return
+        if (action == MarkdownFormatAction.SwitchEditMode) {
+            toggleMarkdownEditMode()
+            return
+        }
+        val ui = _uiState.value
+        if (ui.isWysiwygCapable && ui.markdownEditMode == MarkdownEditMode.RichText) {
+            applyRichFormatAction(action)
+            return
+        }
+        val state = chunkStates[ui.focusedEditChunk] ?: return
         val text = state.text.toString()
         val selection = state.selection
         val edit = when (action) {
@@ -442,10 +465,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 return
             }
 
-            MarkdownFormatAction.SwitchEditMode -> {
-                toggleMarkdownEditMode()
-                return
-            }
+            MarkdownFormatAction.SwitchEditMode -> return
 
             MarkdownFormatAction.Bold -> MarkdownSyntaxFormatter.toggleInline(
                 formatParseCache.parse(text),
@@ -501,6 +521,11 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     fun toggleMarkdownEditMode() {
+        if (_uiState.value.markdownEditMode == MarkdownEditMode.RichText) {
+            // Leaving rich text: fold the rich edits back into the raw source.
+            flushRichEdits()
+            clearRichState()
+        }
         _uiState.update {
             it.copy(
                 markdownEditMode = when (it.markdownEditMode) {
@@ -509,6 +534,60 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 },
             )
         }
+    }
+
+    /**
+     * Builds the rich editing state from the raw source if it does not exist yet. Idempotent;
+     * called from an effect when rich text mode composes (never from composition itself).
+     * Cleared on mode switches and edit-session teardown.
+     */
+    fun ensureRichDocumentState() {
+        if (richDocumentState.value != null) return
+        val source = getOrCreateChunkState(0).text.toString()
+        val document = richToModelConverter.convert(source)
+        richBaselineMarkdown = richToMarkdownConverter.convert(document)
+        richDocumentState.value = RichDocumentState(document)
+    }
+
+    /**
+     * Dirty is export-vs-export: an untouched document serializes back to the baseline, so
+     * merely opening rich text mode never rewrites the user's file formatting.
+     */
+    private fun isRichDirty(): Boolean {
+        val rich = richDocumentState.value ?: return false
+        return richToMarkdownConverter.convert(rich.toDocument()) != richBaselineMarkdown
+    }
+
+    /** Serializes rich edits into the raw source (chunk 0) only when something changed. */
+    private fun flushRichEdits() {
+        val rich = richDocumentState.value ?: return
+        if (!isRichDirty()) return
+        val serialized = richToMarkdownConverter.convert(rich.toDocument())
+        getOrCreateChunkState(0).edit {
+            replace(0, length, serialized)
+        }
+        richBaselineMarkdown = serialized
+    }
+
+    private fun clearRichState() {
+        richDocumentState.value = null
+        richBaselineMarkdown = null
+    }
+
+    /**
+     * Toolbar actions in rich text mode operate on the focused block's spans. Structural
+     * actions (headings, lists, quotes, links) are wired up with the block-lifecycle work.
+     */
+    private fun applyRichFormatAction(action: MarkdownFormatAction) {
+        val block = richDocumentState.value?.focusedTextBlock ?: return
+        val style = when (action) {
+            MarkdownFormatAction.Bold -> RichSpanStyle.Bold
+            MarkdownFormatAction.Italic -> RichSpanStyle.Italic
+            MarkdownFormatAction.Strikethrough -> RichSpanStyle.Strikethrough
+            MarkdownFormatAction.InlineCode -> RichSpanStyle.Code
+            else -> null
+        }
+        style?.let { block.text.toggleStyle(it) }
     }
 
     private fun requestLinkDialog() {
@@ -752,7 +831,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      * Returns true when the editor has unsaved changes.
      */
     fun isContentDirty(): Boolean {
-        if (hasDisposedEdits) return true
+        if (hasDisposedEdits || isRichDirty()) return true
         return chunkStates.any { (idx, state) ->
             state.text.toString() != chunkOriginals[idx]
         }
@@ -823,6 +902,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      */
     fun setViewMode(discardChanges: Boolean = false) {
         if (discardChanges) {
+            clearRichState()
             _uiState.update { it.copy(showDiscardDialog = false, isRestoringContent = true) }
             viewModelScope.launch {
                 val lines = withContext(defaultDispatcher) { lastSavedContent.split("\n") }
@@ -842,6 +922,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             }
             return
         }
+        flushRichEdits()
         flushAllActiveChunks()
         rebuildLinesFromChunks()
         clearEditState()
@@ -947,6 +1028,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     /** Flushes all chunk edits and persists the full document. No-op in View mode. */
     fun saveFile() {
         if (_uiState.value.mode == TextEditorMode.View) return
+        flushRichEdits()
         flushAllActiveChunks()
         rebuildLinesFromChunks()
         val snapshot = fullContentLines.toList()
@@ -1281,6 +1363,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         chunkSelections.clear()
         chunkTexts.clear()
         hasDisposedEdits = false
+        clearRichState()
     }
 
     private fun rebuildStartLineCache() {

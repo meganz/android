@@ -64,6 +64,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -95,6 +96,12 @@ import mega.privacy.android.feature.texteditor.components.markdown.MarkdownForma
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownLinkDialog
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownSelectionFormats
 import mega.privacy.android.feature.texteditor.components.markdown.rememberMarkdownWysiwygOutputTransformation
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichBlockKind
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentEditor
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentState
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichSpan
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichSpanAdjuster
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichSpanStyle
 import mega.privacy.android.feature.texteditor.presentation.model.MarkdownEditMode
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeEffect
@@ -418,6 +425,9 @@ fun TextEditorScreen(
                         val useWysiwyg = isEditable &&
                                 uiState.isWysiwygCapable &&
                                 uiState.markdownEditMode == MarkdownEditMode.Markdown
+                        val useRichText = isEditable &&
+                                uiState.isWysiwygCapable &&
+                                uiState.markdownEditMode == MarkdownEditMode.RichText
                         // One parse per edit: the live-styling transformation and the toolbar's
                         // active-state detection share this memoized cache.
                         val markdownParseCache = if (showFormattingToolbar || useWysiwyg) {
@@ -429,6 +439,11 @@ fun TextEditorScreen(
                             rememberMarkdownWysiwygOutputTransformation(markdownParseCache)
                         } else {
                             null
+                        }
+                        val richDocumentState by viewModel.richDocumentState
+                            .collectAsStateWithLifecycle()
+                        LaunchedEffect(useRichText) {
+                            if (useRichText) viewModel.ensureRichDocumentState()
                         }
                         Column(
                             modifier = Modifier
@@ -442,60 +457,83 @@ fun TextEditorScreen(
                                     .fillMaxWidth()
                                     .weight(1f),
                             ) {
-                                TextEditorContent(
-                                    lazyListState = lazyListState,
-                                    chunkCount = chunkCount,
-                                    totalLineCount = uiState.totalLineCount,
-                                    chunkTextProvider = chunkTextProvider,
-                                    chunkStateProvider = chunkStateProvider,
-                                    chunkStartLineProvider = chunkStartLineProvider,
-                                    onChunkDisposed = onChunkDisposed,
-                                    isChunkReadOnly = isChunkReadOnly,
-                                    onChunkFocused = onChunkFocused,
-                                    showLineNumbers = uiState.showLineNumbers,
-                                    readOnly = !isEditable,
-                                    requestInitialFocusOnFirstChunk = uiState.mode == TextEditorMode.Create,
-                                    restoreScrollIndex = uiState.restoreScrollIndex,
-                                    restoreScrollOffset = uiState.restoreScrollOffset,
-                                    restoreScrollWithinChunkLine = uiState.restoreScrollWithinChunkLine,
-                                    onRestoreScrollConsumed = viewModel::consumeRestoreScrollIndex,
-                                    onTopLineChanged = viewModel::updateTopLine,
-                                    restoreFocusChunkIndex = uiState.restoreFocusChunkIndex,
-                                    onRestoreFocusConsumed = viewModel::consumeRestoreFocusChunkIndex,
-                                    chunkOutputTransformationProvider = wysiwygTransformation
-                                        ?.let { transformation -> { _: Int -> transformation } },
-                                    applyImePadding = !showFormattingToolbar,
-                                )
-                                TextEditorFastScrollbar(
-                                    state = lazyListState,
-                                    itemCount = chunkCount,
-                                    modifier = Modifier
-                                        .align(Alignment.CenterEnd)
-                                        .fillMaxHeight(),
-                                    tooltipText = { chunkIndex, fractionWithinChunk ->
-                                        val startLine =
-                                            chunkStartLineProvider(chunkIndex).coerceAtLeast(1)
-                                        // First line of the next chunk (or one past the last line) bounds this
-                                        // chunk's line range; interpolating with the in-chunk scroll fraction
-                                        // gives the actual top line even when the whole file is one chunk.
-                                        val nextStartLine = if (chunkIndex + 1 < chunkCount) {
-                                            chunkStartLineProvider(chunkIndex + 1)
-                                        } else {
-                                            uiState.totalLineCount + 1
-                                        }
-                                        val line = (startLine +
-                                                ((nextStartLine - startLine) * fractionWithinChunk).toInt())
-                                            .coerceIn(1, uiState.totalLineCount.coerceAtLeast(1))
-                                        lineTooltipTemplate.format(line)
-                                    },
-                                )
+                                val richState = richDocumentState
+                                if (useRichText && richState != null) {
+                                    RichDocumentEditor(
+                                        state = richState,
+                                        modifier = Modifier.fillMaxSize(),
+                                    )
+                                } else if (useRichText) {
+                                    // One frame while ensureRichDocumentState builds the model.
+                                } else {
+                                    TextEditorContent(
+                                        lazyListState = lazyListState,
+                                        chunkCount = chunkCount,
+                                        totalLineCount = uiState.totalLineCount,
+                                        chunkTextProvider = chunkTextProvider,
+                                        chunkStateProvider = chunkStateProvider,
+                                        chunkStartLineProvider = chunkStartLineProvider,
+                                        onChunkDisposed = onChunkDisposed,
+                                        isChunkReadOnly = isChunkReadOnly,
+                                        onChunkFocused = onChunkFocused,
+                                        showLineNumbers = uiState.showLineNumbers,
+                                        readOnly = !isEditable,
+                                        requestInitialFocusOnFirstChunk = uiState.mode == TextEditorMode.Create,
+                                        restoreScrollIndex = uiState.restoreScrollIndex,
+                                        restoreScrollOffset = uiState.restoreScrollOffset,
+                                        restoreScrollWithinChunkLine = uiState.restoreScrollWithinChunkLine,
+                                        onRestoreScrollConsumed = viewModel::consumeRestoreScrollIndex,
+                                        onTopLineChanged = viewModel::updateTopLine,
+                                        restoreFocusChunkIndex = uiState.restoreFocusChunkIndex,
+                                        onRestoreFocusConsumed = viewModel::consumeRestoreFocusChunkIndex,
+                                        chunkOutputTransformationProvider = wysiwygTransformation
+                                            ?.let { transformation -> { _: Int -> transformation } },
+                                        applyImePadding = !showFormattingToolbar,
+                                    )
+                                    TextEditorFastScrollbar(
+                                        state = lazyListState,
+                                        itemCount = chunkCount,
+                                        modifier = Modifier
+                                            .align(Alignment.CenterEnd)
+                                            .fillMaxHeight(),
+                                        tooltipText = { chunkIndex, fractionWithinChunk ->
+                                            val startLine =
+                                                chunkStartLineProvider(chunkIndex).coerceAtLeast(1)
+                                            // First line of the next chunk (or one past the last line) bounds this
+                                            // chunk's line range; interpolating with the in-chunk scroll fraction
+                                            // gives the actual top line even when the whole file is one chunk.
+                                            val nextStartLine = if (chunkIndex + 1 < chunkCount) {
+                                                chunkStartLineProvider(chunkIndex + 1)
+                                            } else {
+                                                uiState.totalLineCount + 1
+                                            }
+                                            val line = (startLine +
+                                                    ((nextStartLine - startLine) * fractionWithinChunk).toInt())
+                                                .coerceIn(
+                                                    1,
+                                                    uiState.totalLineCount.coerceAtLeast(1)
+                                                )
+                                            lineTooltipTemplate.format(line)
+                                        },
+                                    )
+                                }
                             }
                             if (showFormattingToolbar && markdownParseCache != null) {
-                                MarkdownEditToolbar(
-                                    viewModel = viewModel,
-                                    focusedEditChunk = uiState.focusedEditChunk,
-                                    parseCache = markdownParseCache,
-                                )
+                                if (useRichText) {
+                                    richDocumentState?.let { richState ->
+                                        RichEditToolbar(
+                                            viewModel = viewModel,
+                                            richState = richState,
+                                        )
+                                    }
+                                } else {
+                                    MarkdownEditToolbar(
+                                        viewModel = viewModel,
+                                        focusedEditChunk = uiState.focusedEditChunk,
+                                        parseCache = markdownParseCache,
+                                        showModeSwitch = uiState.isWysiwygCapable,
+                                    )
+                                }
                             }
                         }
                         uiState.linkDialog?.let { dialog ->
@@ -913,6 +951,7 @@ private fun MarkdownEditToolbar(
     viewModel: TextEditorComposeViewModel,
     focusedEditChunk: Int,
     parseCache: MarkdownEditorParseCache,
+    showModeSwitch: Boolean,
 ) {
     val chunkState = remember(focusedEditChunk) {
         viewModel.getOrCreateChunkState(focusedEditChunk)
@@ -932,5 +971,67 @@ private fun MarkdownEditToolbar(
     MarkdownFormattingToolbar(
         formats = formats,
         onAction = viewModel::applyFormatAction,
+        showModeSwitch = showModeSwitch,
+    )
+}
+
+/**
+ * Formatting toolbar for rich text mode: active states come from the focused block's spans,
+ * typing styles, and block kind, and actions route to the ViewModel's rich path.
+ */
+@Composable
+private fun RichEditToolbar(
+    viewModel: TextEditorComposeViewModel,
+    richState: RichDocumentState,
+) {
+    var formats by remember { mutableStateOf(MarkdownSelectionFormats.Empty) }
+    val focused = richState.focusedTextBlock
+    LaunchedEffect(focused) {
+        if (focused == null) {
+            formats = MarkdownSelectionFormats.Empty
+            return@LaunchedEffect
+        }
+        snapshotFlow {
+            Triple(
+                focused.text.textFieldState.selection,
+                focused.text.spans,
+                focused.text.typingStyles,
+            )
+        }.collect { (selection, spans, typingStyles) ->
+            formats = richSelectionFormats(focused.kind, spans, typingStyles, selection)
+        }
+    }
+    MarkdownFormattingToolbar(
+        formats = formats,
+        onAction = viewModel::applyFormatAction,
+        showModeSwitch = true,
+        isRichTextMode = true,
+    )
+}
+
+private fun richSelectionFormats(
+    kind: RichBlockKind,
+    spans: List<RichSpan>,
+    typingStyles: Set<RichSpanStyle>,
+    selection: TextRange,
+): MarkdownSelectionFormats {
+    fun active(style: RichSpanStyle): Boolean = if (selection.collapsed) {
+        style in typingStyles
+    } else {
+        RichSpanAdjuster.isCovered(spans, selection.min, selection.max, style)
+    }
+    return MarkdownSelectionFormats(
+        isBold = active(RichSpanStyle.Bold),
+        isItalic = active(RichSpanStyle.Italic),
+        isStrikethrough = active(RichSpanStyle.Strikethrough),
+        isInlineCode = active(RichSpanStyle.Code),
+        isLink = spans.any {
+            it.style is RichSpanStyle.Link &&
+                    selection.min > it.start && selection.max <= it.end
+        },
+        headingLevel = (kind as? RichBlockKind.Heading)?.level,
+        isBulletList = kind is RichBlockKind.Item && !kind.ordered,
+        isOrderedList = kind is RichBlockKind.Item && kind.ordered,
+        isQuote = kind is RichBlockKind.Quote,
     )
 }

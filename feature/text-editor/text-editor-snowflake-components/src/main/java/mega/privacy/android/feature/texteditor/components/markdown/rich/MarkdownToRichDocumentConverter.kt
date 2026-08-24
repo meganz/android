@@ -26,6 +26,7 @@ import org.commonmark.node.Text as CmText
 import org.commonmark.node.ThematicBreak
 import org.commonmark.parser.IncludeSourceSpans
 import org.commonmark.parser.Parser
+import javax.inject.Inject
 
 /**
  * Converts Markdown source into the rich editor's [RichDocument]. Supported constructs become
@@ -33,7 +34,7 @@ import org.commonmark.parser.Parser
  * reference definitions, and any block containing images or inline HTML — becomes a
  * [RichBlock.RawSource] carrying its verbatim source slice, so it survives save byte-identical.
  */
-class MarkdownToRichDocumentConverter {
+class MarkdownToRichDocumentConverter @Inject constructor() {
 
     private val parser: Parser = Parser.builder()
         .extensions(

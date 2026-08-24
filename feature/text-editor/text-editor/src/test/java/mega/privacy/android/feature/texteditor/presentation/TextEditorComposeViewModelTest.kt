@@ -15,12 +15,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
@@ -67,6 +67,12 @@ import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEdito
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormatAction
+import mega.privacy.android.feature.texteditor.components.markdown.rich.MarkdownToRichDocumentConverter
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichBlockKind
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentToMarkdownConverter
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichSpan
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichSpanStyle
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichTextBlockEditState
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel.Args
 import mega.privacy.android.feature.texteditor.presentation.model.MarkdownEditMode
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
@@ -252,6 +258,8 @@ internal class TextEditorComposeViewModelTest {
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            richToModelConverter = MarkdownToRichDocumentConverter(),
+            richToMarkdownConverter = RichDocumentToMarkdownConverter(),
         )
     }
 
@@ -385,6 +393,7 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that applyFormatAction wraps the selection in bold delimiters`() = runTest {
         val state = enterEditModeWith("hello world")
+        underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
         state.edit { selection = TextRange(0, 5) }
 
         underTest.applyFormatAction(MarkdownFormatAction.Bold)
@@ -396,6 +405,7 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that applyFormatAction cycles the caret line to a heading`() = runTest {
         val state = enterEditModeWith("body")
+        underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
         state.edit { selection = TextRange(2) }
 
         underTest.applyFormatAction(MarkdownFormatAction.HeadingCycle)
@@ -406,6 +416,7 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that applyFormatAction toggles a bullet list on the caret line`() = runTest {
         val state = enterEditModeWith("item")
+        underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
         state.edit { selection = TextRange(2) }
 
         underTest.applyFormatAction(MarkdownFormatAction.BulletList)
@@ -417,6 +428,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that applyFormatAction Link opens the dialog prefilled with the selection`() =
         runTest {
             val state = enterEditModeWith("hello world")
+            underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
             state.edit { selection = TextRange(0, 5) }
 
             underTest.applyFormatAction(MarkdownFormatAction.Link)
@@ -431,6 +443,7 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that confirmLink wraps the selection and dismisses the dialog`() = runTest {
         val state = enterEditModeWith("hello")
+        underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
         state.edit { selection = TextRange(0, 5) }
         underTest.applyFormatAction(MarkdownFormatAction.Link)
 
@@ -443,6 +456,7 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that removeLink unwraps the existing link under the cursor`() = runTest {
         val state = enterEditModeWith("[t](u)")
+        underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
         state.edit { selection = TextRange(2) }
         underTest.applyFormatAction(MarkdownFormatAction.Link)
         assertThat(underTest.uiState.value.linkDialog?.isExistingLink).isTrue()
@@ -456,15 +470,100 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that applyFormatAction SwitchEditMode toggles the markdown edit mode`() = runTest {
         val state = enterEditModeWith("body")
-        assertThat(underTest.uiState.value.markdownEditMode).isEqualTo(MarkdownEditMode.Markdown)
-
-        underTest.applyFormatAction(MarkdownFormatAction.SwitchEditMode)
         assertThat(underTest.uiState.value.markdownEditMode).isEqualTo(MarkdownEditMode.RichText)
 
         underTest.applyFormatAction(MarkdownFormatAction.SwitchEditMode)
         assertThat(underTest.uiState.value.markdownEditMode).isEqualTo(MarkdownEditMode.Markdown)
+
+        underTest.applyFormatAction(MarkdownFormatAction.SwitchEditMode)
+        assertThat(underTest.uiState.value.markdownEditMode).isEqualTo(MarkdownEditMode.RichText)
         assertThat(state.text.toString()).isEqualTo("body")
     }
+
+    @Test
+    fun `test that getOrCreateRichDocumentState builds the model from the raw source`() = runTest {
+        enterEditModeWith("# Title", "", "- item")
+
+        underTest.ensureRichDocumentState()
+        val rich = underTest.richDocumentState.value!!
+
+        assertThat(rich.blocks).hasSize(2)
+        assertThat((rich.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Heading(1))
+        assertThat((rich.blocks[1] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Item(ordered = false, indent = 0, checked = null))
+    }
+
+    @Test
+    fun `test that isContentDirty stays false when rich mode is opened without edits`() = runTest {
+        enterEditModeWith("# Title", "", "body")
+        underTest.ensureRichDocumentState()
+
+        assertThat(underTest.isContentDirty()).isFalse()
+    }
+
+    @Test
+    fun `test that isContentDirty is true after editing a rich block`() = runTest {
+        enterEditModeWith("# Title", "", "body")
+        underTest.ensureRichDocumentState()
+        val rich = underTest.richDocumentState.value!!
+
+        (rich.blocks[0] as RichTextBlockEditState).text.textFieldState.edit { append("!") }
+
+        assertThat(underTest.isContentDirty()).isTrue()
+    }
+
+    @Test
+    fun `test that leaving rich text mode flushes rich edits into the raw source`() = runTest {
+        val chunkState = enterEditModeWith("# Title", "", "body")
+        underTest.ensureRichDocumentState()
+        val rich = underTest.richDocumentState.value!!
+        (rich.blocks[0] as RichTextBlockEditState).text.textFieldState.edit { append("!") }
+
+        underTest.toggleMarkdownEditMode()
+
+        assertThat(chunkState.text.toString()).isEqualTo("# Title!\n\nbody")
+    }
+
+    @Test
+    fun `test that leaving rich text mode without edits keeps the raw source byte-identical`() =
+        runTest {
+            val chunkState = enterEditModeWith("# Title", "", "", "- item   ")
+            val original = chunkState.text.toString()
+            underTest.ensureRichDocumentState()
+
+            underTest.toggleMarkdownEditMode()
+
+            assertThat(chunkState.text.toString()).isEqualTo(original)
+            assertThat(underTest.isContentDirty()).isFalse()
+        }
+
+    @Test
+    fun `test that applyFormatAction toggles bold spans on the focused rich block`() = runTest {
+        enterEditModeWith("hello world")
+        underTest.ensureRichDocumentState()
+        val rich = underTest.richDocumentState.value!!
+        rich.focusedIndex = 0
+        val block = rich.focusedTextBlock!!
+        block.text.textFieldState.edit { selection = TextRange(0, 5) }
+
+        underTest.applyFormatAction(MarkdownFormatAction.Bold)
+
+        assertThat(block.text.spans)
+            .containsExactly(RichSpan(0, 5, RichSpanStyle.Bold))
+    }
+
+    @Test
+    fun `test that applyFormatAction does nothing in rich mode when no block is focused`() =
+        runTest {
+            enterEditModeWith("hello")
+            underTest.ensureRichDocumentState()
+            val rich = underTest.richDocumentState.value!!
+
+            underTest.applyFormatAction(MarkdownFormatAction.Bold)
+
+            assertThat((rich.blocks[0] as RichTextBlockEditState).text.spans).isEmpty()
+        }
 
     @Test
     fun `test that getMarkdownPreviewContent returns joined content for normal lines`() = runTest {

@@ -63,7 +63,7 @@ data class TextEditorComposeUiState(
      */
     val isSingleChunkDocument: Boolean = true,
     /** Active Markdown editing mode; only meaningful while [isWysiwygCapable] is true. */
-    val markdownEditMode: MarkdownEditMode = MarkdownEditMode.Markdown,
+    val markdownEditMode: MarkdownEditMode = MarkdownEditMode.RichText,
     /** Non-null while the insert/edit link dialog is showing. */
     val linkDialog: MarkdownLinkDialogUiState? = null,
     /**

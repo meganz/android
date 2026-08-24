@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.Title
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.VerticalDivider
@@ -72,6 +71,7 @@ fun MarkdownFormattingToolbar(
     onAction: (MarkdownFormatAction) -> Unit,
     modifier: Modifier = Modifier,
     showModeSwitch: Boolean = false,
+    isRichTextMode: Boolean = false,
 ) {
     Box(
         modifier = modifier
@@ -167,10 +167,14 @@ fun MarkdownFormattingToolbar(
                         .height(24.dp)
                         .padding(horizontal = 4.dp),
                 )
-                IconButton(
-                    onClick = { onAction(MarkdownFormatAction.SwitchEditMode) },
-                    colors = IconButtonDefaults.iconButtonColors(
+                IconToggleButton(
+                    checked = isRichTextMode,
+                    onCheckedChange = { onAction(MarkdownFormatAction.SwitchEditMode) },
+                    colors = IconButtonDefaults.iconToggleButtonColors(
+                        containerColor = DSTokens.colors.background.pageBackground,
                         contentColor = DSTokens.colors.icon.primary,
+                        checkedContainerColor = DSTokens.colors.background.surface2,
+                        checkedContentColor = DSTokens.colors.icon.accent,
                     ),
                     modifier = Modifier
                         .padding(horizontal = 2.dp)
@@ -178,8 +182,16 @@ fun MarkdownFormattingToolbar(
                         .testTag(markdownToolbarActionTag(MarkdownFormatAction.SwitchEditMode)),
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Visibility,
-                        contentDescription = "Switch editing mode",
+                        imageVector = if (isRichTextMode) {
+                            Icons.Default.Code
+                        } else {
+                            Icons.Default.Visibility
+                        },
+                        contentDescription = if (isRichTextMode) {
+                            "Show Markdown source"
+                        } else {
+                            "Rich text editing"
+                        },
                         modifier = Modifier.size(24.dp),
                     )
                 }
