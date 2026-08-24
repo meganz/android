@@ -124,7 +124,8 @@ internal fun FavouritesContent(
                 items = uiState.items,
                 isNextPageLoading = false,
                 isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
-                showHiddenNodes = false,
+                // Sensitive nodes are already excluded at fetch when required, so never re-filter here
+                showHiddenNodes = true,
                 onMenuClicked = {
                     showNodeOptionsBottomSheet(
                         NodeOptionsBottomSheetNavKey(

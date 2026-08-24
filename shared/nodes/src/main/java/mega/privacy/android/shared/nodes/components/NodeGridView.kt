@@ -58,7 +58,6 @@ internal fun <T : TypedNode> NodeGridView(
     spanCount: Int = 2,
     showChangeViewType: Boolean = true,
     inSelectionMode: Boolean = false,
-    isHiddenNodesEnabled: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     bannerHeader: (@Composable () -> Unit)? = null,
 ) {
@@ -120,8 +119,8 @@ internal fun <T : TypedNode> NodeGridView(
                 onClick = { onItemClicked(nodeUiItem.node) },
                 onLongClick = { onLongClicked(nodeUiItem.node) },
                 onMenuClick = { onMenuClicked(nodeUiItem.node) },
-                isSensitive = nodeUiItem.isSensitive && isHiddenNodesEnabled,
-                showBlurEffect = nodeUiItem.showBlurEffect && isHiddenNodesEnabled,
+                isSensitive = nodeUiItem.isSensitive,
+                showBlurEffect = nodeUiItem.showBlurEffect,
                 isHighlighted = nodeUiItem.isHighlighted,
                 showLink = nodeUiItem.showLink,
                 showFavourite = nodeUiItem.showFavourite,

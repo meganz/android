@@ -84,10 +84,13 @@ fun <T : TypedNode> NodesView(
     bannerHeader: (@Composable () -> Unit)? = null,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
-    val nodeSelectionState = rememberNodeSelectionState(
-        initialSelectedIds = items.filter { it.isSelected }
+    val initialSelectedIds = remember {
+        items.filter { it.isSelected }
             .map { it.node.id }
-            .toSet(),
+            .toSet()
+    }
+    val nodeSelectionState = rememberNodeSelectionState(
+        initialSelectedIds = initialSelectedIds,
         initialIsSelecting = inSelectionMode,
     )
 
@@ -115,11 +118,19 @@ fun <T : TypedNode> NodesView(
         onLongClicked(items.first { it.node.id == node.id })
     }
 
-    val hiddenNodesAdjustedItems = items.map {
-        it.copy(
-            isSensitive = it.isSensitive && isHiddenNodesEnabled,
-            showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
-        )
+    val hiddenNodesAdjustedItems = remember(items, isHiddenNodesEnabled, showHiddenNodes) {
+        when {
+            !isHiddenNodesEnabled -> items.map {
+                it.copy(
+                    isSensitive = false,
+                    showBlurEffect = false,
+                )
+            }
+
+            showHiddenNodes -> items
+
+            else -> items.filter { !it.isSensitive }
+        }
     }
 
     NodesView(
