@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -53,6 +54,7 @@ import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaEventQueu
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
+import mega.privacy.android.app.mediaplayer.isStreamingOverQuotaError
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
@@ -168,6 +170,7 @@ import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
@@ -234,6 +237,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     private val getVideosByParentHandleFromMegaApiFolderUseCase: GetVideosByParentHandleFromMegaApiFolderUseCase,
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
+    private val getPreviewUseCase: GetPreviewUseCase,
     private val httpServerIsRunningUseCase: HttpServerIsRunningUseCase,
     private val httpServerStartUseCase: HttpServerStartUseCase,
     private val httpServerStopUseCase: HttpServerStopUseCase,
@@ -306,6 +310,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     private var searchJob: Job? = null
     private val mutex = Mutex()
     private var playbackPositionJob: Job? = null
+    private var posterLoadJob: Job? = null
     private var hasCheckedPlaybackPosition = false
     private var currentIntent: Intent? = null
 
@@ -339,17 +344,74 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
      * player is stopped instead of retried. Leaving it idle means nothing re-requests the stream
      * until the user asks for it, which is what stops the warning from reappearing as soon as it
      * is dismissed.
+     *
+     * The monitor is backed by a state flow that replays the current value on subscription, and
+     * that value is never reset while logged in, so the initial emission is skipped: a session
+     * started after an earlier quota hit (e.g. playing a local file, or streaming after the window
+     * expired) must not start paused. Quota hits during this session still arrive as new
+     * emissions, and streaming inside an active window is caught by the quota check in
+     * onPlayerError.
      */
     private fun monitorTransferOverQuota() {
         monitorTransferOverQuotaUseCase()
+            .drop(1)
             .onEach { isOverQuota ->
-                isTransferOverQuota = isOverQuota
                 if (isOverQuota) {
-                    pausePlaybackNonUserInitiated()
+                    enterOverQuotaPausedState()
+                } else {
+                    clearOverQuotaState()
                 }
             }
             .catch { Timber.e(it) }
             .launchIn(viewModelScope)
+    }
+
+    private fun clearOverQuotaState() {
+        isTransferOverQuota = false
+        playerRetry = 0
+        uiState.update {
+            it.copy(
+                isStreamingPausedForOverQuota = false,
+                overQuotaPosterPath = null,
+            )
+        }
+    }
+
+    /**
+     * Leaves playback paused for the over-quota window instead of retrying — retries can never
+     * succeed and only keep the loading indicator spinning — and loads the node preview as a
+     * poster so the user sees the video content instead of a black surface.
+     */
+    private fun enterOverQuotaPausedState() {
+        isTransferOverQuota = true
+        pausePlaybackNonUserInitiated()
+        uiState.update { it.copy(isStreamingPausedForOverQuota = true) }
+        loadOverQuotaPoster()
+    }
+
+    private fun loadOverQuotaPoster() {
+        if (uiState.value.overQuotaPosterPath != null) return
+        val handle = uiState.value.currentPlayingHandle
+        posterLoadJob?.cancel()
+        posterLoadJob = viewModelScope.launch {
+            val poster = runCatching {
+                getVideoNodeByHandleUseCase(handle)?.let { getPreviewUseCase(it) }
+            }.onFailure { Timber.e(it, "Failed to load over-quota preview") }.getOrNull()
+                ?: runCatching { getThumbnailUseCase(handle) }
+                    .onFailure { Timber.e(it, "Failed to load over-quota thumbnail") }
+                    .getOrNull()
+            poster?.let { file ->
+                uiState.update {
+                    // Two loads can be in flight across a track change; only the one for the
+                    // still-current item may win.
+                    if (it.currentPlayingHandle == handle) {
+                        it.copy(overQuotaPosterPath = file.absolutePath)
+                    } else {
+                        it
+                    }
+                }
+            }
+        }
     }
 
     private fun loadLinkAndLoginState() {
@@ -1216,7 +1278,11 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
             it.copy(
                 isVideoNotRendered = false,
                 playerErrorType = null,
+                overQuotaPosterPath = null,
             )
+        }
+        if (uiState.value.isStreamingPausedForOverQuota) {
+            loadOverQuotaPoster()
         }
         if (isUpdateName) {
             val items = uiState.value.items
@@ -1424,11 +1490,10 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                 .onFailure { Timber.e(it) }
                 .getOrDefault(true)
             if (stillOverQuota) {
-                pausePlaybackNonUserInitiated()
+                enterOverQuotaPausedState()
                 transferOverQuotaEventQueue.emit(TransferOverQuotaSource.Streaming)
             } else {
-                isTransferOverQuota = false
-                playerRetry = 0
+                clearOverQuotaState()
                 mediaPlayerGateway.mediaPlayerRetry(true)
             }
         }
@@ -1475,7 +1540,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
             // Retrying while over quota only makes the SDK raise the warning again, so stay idle
             // until the user asks for playback.
             isTransferOverQuota -> {
-                pausePlaybackNonUserInitiated()
+                enterOverQuotaPausedState()
                 uiState.update { it.copy(playerErrorType = errorType) }
             }
 
@@ -1500,11 +1565,31 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                                 return@launch
                             }
                         }
-                    retryPlayback(errorType)
+                    pauseIfOverQuotaOrRetry(errorCode, errorType)
                 }
             }
 
-            else -> retryPlayback(errorType)
+            else -> {
+                viewModelScope.launch {
+                    pauseIfOverQuotaOrRetry(errorCode, errorType)
+                }
+            }
+        }
+    }
+
+    /**
+     * Pauses for the over-quota window when the error is the streaming quota failure mode,
+     * otherwise retries. The flag is re-checked after the suspending query: the quota monitor
+     * can set it while the query is in flight, and retrying would undo the pause.
+     */
+    private suspend fun pauseIfOverQuotaOrRetry(errorCode: Int, errorType: PlayerErrorType) {
+        if (isStreamingOverQuotaError(errorCode, isInTransferOverQuotaUseCase) ||
+            isTransferOverQuota
+        ) {
+            enterOverQuotaPausedState()
+            uiState.update { it.copy(playerErrorType = errorType) }
+        } else {
+            retryPlayback(errorType)
         }
     }
 

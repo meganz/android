@@ -30,6 +30,7 @@ import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -97,6 +98,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccess
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStreamOverQuotaEventUseCase
 import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
@@ -141,6 +143,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var monitorStreamOverQuotaEventUseCase: MonitorStreamOverQuotaEventUseCase
 
     private val transferOverQuotaWarningViewModel by viewModels<TransferOverQuotaWarningViewModel>()
 
@@ -352,6 +357,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
         setupObserver()
         observeTransferOverQuotaWarning()
+        observeTransferOverQuota()
 
         if (CallUtil.participatingInACall()) {
             showNotAllowPlayAlert()
@@ -652,6 +658,27 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private suspend fun isQuotaWarningUpsellEnabled() = runCatching {
         getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
     }.onFailure { Timber.e(it) }.getOrDefault(false)
+
+    /**
+     * Closes the player when streaming hits the bandwidth over quota: playback cannot continue
+     * (the service stops itself on the same event, which also removes the mini player), so the
+     * screen would otherwise linger over a player that can no longer play anything.
+     *
+     * The SDK's per-request stream event is observed rather than the broadcast over-quota state:
+     * the state is backed by a state flow that deduplicates values and is never reset while
+     * logged in, so a second quota hit in the same session would not be delivered through it.
+     *
+     * Collected on the bare lifecycleScope on purpose — the event must be handled while this
+     * activity is covered by the quota-warning screen or in the background, so gating the
+     * collection with repeatOnLifecycle would break the close.
+     */
+    private fun observeTransferOverQuota() {
+        lifecycleScope.launch {
+            monitorStreamOverQuotaEventUseCase()
+                .catch { Timber.e(it, "Failed to monitor streaming over quota events") }
+                .collect { stopPlayer() }
+        }
+    }
 
     private fun showNotAllowPlayAlert() {
         showSnackbar(getString(R.string.not_allow_play_alert))

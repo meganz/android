@@ -37,6 +37,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -67,6 +68,7 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.TrackAudioPlaybackInfoUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStreamOverQuotaEventUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.mobile.analytics.event.AudioPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerLoopPlayingItemEnabledEvent
@@ -107,6 +109,9 @@ class LegacyAudioPlayerService : LifecycleService(), LifecycleEventObserver, Med
 
     @Inject
     lateinit var trackAudioPlaybackInfoUseCase: TrackAudioPlaybackInfoUseCase
+
+    @Inject
+    lateinit var monitorStreamOverQuotaEventUseCase: MonitorStreamOverQuotaEventUseCase
 
     private val binder by lazy { MediaPlayerServiceBinder(this, viewModelGateway) }
 
@@ -498,9 +503,39 @@ class LegacyAudioPlayerService : LifecycleService(), LifecycleEventObserver, Med
             }
         }
 
+        observeTransferOverQuota()
+
         viewModelGateway.getPlayingThumbnail().observe(this) {
             mediaPlayerGateway.invalidatePlayerNotification()
         }
+    }
+
+    /**
+     * Streaming over quota means playback cannot continue and retrying can never succeed, so the
+     * whole audio session is closed: playback stops and the mini player is removed. The player
+     * activity observes the same event and finishes itself.
+     *
+     * The SDK's per-request stream event is observed rather than the broadcast over-quota state:
+     * the state is backed by a state flow that deduplicates values and is never reset while
+     * logged in, so a second quota hit in the same session would not be delivered through it.
+     */
+    private fun observeTransferOverQuota() {
+        lifecycleScope.launch {
+            monitorStreamOverQuotaEventUseCase()
+                .catch { Timber.e(it, "Failed to monitor streaming over quota events") }
+                .collect { stopPlayerForOverQuota() }
+        }
+    }
+
+    /**
+     * Unlike [stopPlayer], not guarded by audioClosable: that guard protects the short resume
+     * window after a call ends, but over quota is a terminal state for this session and the stop
+     * must never be swallowed.
+     */
+    private fun stopPlayerForOverQuota() {
+        mediaPlayerGateway.playerStop()
+        MiniAudioPlayerController.notifyAudioPlayerPlaying(false)
+        stopSelf()
     }
 
     private fun initMediaSession() {

@@ -12,7 +12,9 @@ import android.os.Environment.DIRECTORY_DCIM
 import android.os.Environment.getExternalStoragePublicDirectory
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
@@ -42,6 +44,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
@@ -83,8 +86,10 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R as Media3R
+import coil3.load
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import java.io.File
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -462,6 +467,9 @@ internal fun VideoPlayerScreen(
     ) { _ ->
         Box(modifier = Modifier.fillMaxSize()) {
             key(orientation) {
+                // Tracks the poster file the over-quota ImageView last requested, so update
+                // passes don't restart the image request and an item switch refreshes the image.
+                val requestedOverQuotaPosterPath = remember { mutableStateOf<String?>(null) }
                 AndroidViewBinding(
                     modifier = Modifier.fillMaxSize(),
                     factory = { inflater, parent, attachToParent ->
@@ -665,14 +673,18 @@ internal fun VideoPlayerScreen(
                     root.findViewById<View>(R.id.navigation_bar_bg).isVisible =
                         orientation != ORIENTATION_PORTRAIT
 
+                    // While streaming is paused for over quota, show the paused controls instead
+                    // of the loading indicator: buffering can never finish, and the play button
+                    // is the way to re-request the stream (which re-raises the quota warning).
+                    val isLoading = playbackState <= STATE_BUFFERING &&
+                            !uiState.isStreamingPausedForOverQuota
                     root.findViewById<View>(R.id.loading_video_player_controller_view).isVisible =
-                        playbackState <= STATE_BUFFERING
+                        isLoading
 
                     (playerComposeView.findViewById<View>(Media3R.id.exo_progress) as? PulsingTimeBar)
-                        ?.setSeekBuffering(playbackState <= STATE_BUFFERING)
+                        ?.setSeekBuffering(isLoading)
 
-                    root.findViewById<View>(R.id.exo_play_pause).isVisible =
-                        playbackState > STATE_BUFFERING
+                    root.findViewById<View>(R.id.exo_play_pause).isVisible = !isLoading
                     root.findViewById<ImageButton>(Media3R.id.exo_play_pause)
                         ?.setImageDrawable(
                             ContextCompat.getDrawable(
@@ -680,6 +692,18 @@ internal fun VideoPlayerScreen(
                                 if (isPlaying) R.drawable.ic_player_pause else R.drawable.ic_player_play
                             )
                         )
+
+                    // Poster standing in for the first frame while over quota: real media bytes
+                    // are unavailable (the streaming proxy closes the body with zero bytes), but
+                    // the preview attribute is served over a channel the quota does not limit.
+                    playerComposeView.overlayFrameLayout?.let { overlay ->
+                        updateOverQuotaPoster(
+                            overlay = overlay,
+                            posterPath = uiState.overQuotaPosterPath
+                                .takeIf { uiState.isStreamingPausedForOverQuota },
+                            requestedPath = requestedOverQuotaPosterPath,
+                        )
+                    }
                 }
 
                 AnimatedVisibility(
@@ -990,6 +1014,43 @@ private fun rememberRevampNavigationBarInsets(
 }
 
 private const val CONTROLLER_FADE_DURATION_MS = 300L
+private const val OVER_QUOTA_POSTER_TAG = "over_quota_poster"
+
+/**
+ * Shows [posterPath] as a poster in the PlayerView overlay, or removes the poster when the path
+ * is null. Rendered in the overlayFrameLayout — above the empty surface, below the controls —
+ * because the artwork mechanism hides itself whenever the player has no tracks, which is exactly
+ * the over-quota failed-to-load state. [requestedPath] keeps the last requested file so update
+ * passes do not restart the image request and a path change (item switch) refreshes the image.
+ */
+private fun updateOverQuotaPoster(
+    overlay: FrameLayout,
+    posterPath: String?,
+    requestedPath: MutableState<String?>,
+) {
+    val posterView = overlay.findViewWithTag<ImageView>(OVER_QUOTA_POSTER_TAG)
+    if (posterPath != null) {
+        val imageView = posterView ?: ImageView(overlay.context).apply {
+            tag = OVER_QUOTA_POSTER_TAG
+            scaleType = ImageView.ScaleType.FIT_CENTER
+        }.also {
+            overlay.addView(
+                it,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                ),
+            )
+        }
+        if (requestedPath.value != posterPath) {
+            requestedPath.value = posterPath
+            imageView.load(File(posterPath))
+        }
+    } else if (posterView != null) {
+        overlay.removeView(posterView)
+        requestedPath.value = null
+    }
+}
 
 @androidx.annotation.OptIn(UnstableApi::class)
 private fun PlayerView.showWithFade() {

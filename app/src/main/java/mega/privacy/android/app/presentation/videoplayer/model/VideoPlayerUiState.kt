@@ -79,6 +79,12 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isLoggedIn whether the user is currently logged in; used together with [isFromLink] to determine if session validation is required
  * @property isFromOffline whether the video was opened from offline storage; when true the player reads a local file and needs no SDK session
  * @property isVideoNotRendered whether the video cannot be rendered (audio may still play)
+ * @property isStreamingPausedForOverQuota whether streaming is paused because the transfer quota
+ *   is exceeded; the UI shows the paused state (with [overQuotaPosterPath] as a poster) instead
+ *   of a loading indicator, and pressing play re-checks the quota.
+ * @property overQuotaPosterPath local file path of the node's preview (thumbnail as fallback)
+ *   shown as a poster while [isStreamingPausedForOverQuota] is true; previews are fetched over
+ *   the attribute channel, which is not limited by the transfer quota.
  * @property isAlbumSharingLink whether the video was opened from an album sharing link specifically (as opposed to a folder link)
  * @property isPlayQueueVisible whether the play queue is shown as an in-place overlay (Compose route, which has no separate queue destination)
  * @property invalidLaunchSourceEvent one-shot event emitted when no valid launch payload was
@@ -145,6 +151,8 @@ data class VideoPlayerUiState(
     val isAlbumSharingLink: Boolean = false,
     val serializedData: String? = null,
     val isVideoNotRendered: Boolean = false,
+    val isStreamingPausedForOverQuota: Boolean = false,
+    val overQuotaPosterPath: String? = null,
     val isPlayQueueVisible: Boolean = false,
     val invalidLaunchSourceEvent: StateEvent = consumed,
     val chatId: Long? = null,

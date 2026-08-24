@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
@@ -968,10 +969,18 @@ class AudioPlayerServiceViewModel @Inject constructor(
      * Streaming over quota keeps the SDK raising the event for every streaming request, so the
      * player is left idle instead of retried: nothing re-requests the stream until the user asks
      * for it, which is what stops the warning from reappearing as soon as it is dismissed.
+     *
+     * The monitor is backed by a state flow that replays the current value on subscription, and
+     * that value is never reset while logged in, so the initial emission is skipped: a quota hit
+     * that predates this session must not make the first transient player error give up with the
+     * failure dialog instead of retrying. Quota hits during this session still arrive as new
+     * emissions, and a session streaming inside an active window is closed by the stream
+     * over-quota event observed in LegacyAudioPlayerService.
      */
     private fun monitorTransferOverQuota() {
         cancellableJobs[JOB_KEY_MONITOR_TRANSFER_OVER_QUOTA] = sharingScope.launch {
             monitorTransferOverQuotaUseCase()
+                .drop(1)
                 .catch { Timber.e(it) }
                 .collect { isTransferOverQuota = it }
         }

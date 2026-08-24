@@ -14,6 +14,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -135,6 +136,7 @@ import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
@@ -227,6 +229,7 @@ class VideoPlayerViewModelV2Test {
     private val monitorSubFolderMediaDiscoverySettingsUseCase =
         mock<MonitorSubFolderMediaDiscoverySettingsUseCase>()
     private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
+    private val getPreviewUseCase = mock<GetPreviewUseCase>()
     private val httpServerIsRunningUseCase = mock<HttpServerIsRunningUseCase>()
     private val httpServerStartUseCase = mock<HttpServerStartUseCase>()
     private val httpServerStopUseCase = mock<HttpServerStopUseCase>()
@@ -267,7 +270,8 @@ class VideoPlayerViewModelV2Test {
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
     private val isInTransferOverQuotaUseCase = mock<IsInTransferOverQuotaUseCase>()
     private var transferOverQuotaEventQueue = TransferOverQuotaEventQueue()
-    private var fakeMonitorTransferOverQuotaFlow = MutableSharedFlow<Boolean>()
+    // MutableStateFlow like production: replays the current value, which the view model skips.
+    private var fakeMonitorTransferOverQuotaFlow = MutableStateFlow(false)
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val playerErrorTypeMapper = mock<PlayerErrorTypeMapper>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
@@ -313,6 +317,7 @@ class VideoPlayerViewModelV2Test {
             getVideosByParentHandleFromMegaApiFolderUseCase = getVideosByParentHandleFromMegaApiFolderUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase = monitorSubFolderMediaDiscoverySettingsUseCase,
             getThumbnailUseCase = getThumbnailUseCase,
+            getPreviewUseCase = getPreviewUseCase,
             httpServerIsRunningUseCase = httpServerIsRunningUseCase,
             httpServerStartUseCase = httpServerStartUseCase,
             httpServerStopUseCase = httpServerStopUseCase,
@@ -385,7 +390,7 @@ class VideoPlayerViewModelV2Test {
         whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(null))
         fakeMonitorConnectivityFlow = MutableSharedFlow()
         whenever(monitorConnectivityUseCase()).thenReturn(fakeMonitorConnectivityFlow)
-        fakeMonitorTransferOverQuotaFlow = MutableSharedFlow()
+        fakeMonitorTransferOverQuotaFlow = MutableStateFlow(false)
         whenever(monitorTransferOverQuotaUseCase()).thenReturn(fakeMonitorTransferOverQuotaFlow)
         transferOverQuotaEventQueue = TransferOverQuotaEventQueue()
         whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.CANNOT_PLAY)
@@ -415,6 +420,7 @@ class VideoPlayerViewModelV2Test {
             getVideosByParentHandleFromMegaApiFolderUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase,
             getThumbnailUseCase,
+            getPreviewUseCase,
             httpServerStopUseCase,
             httpServerStartUseCase,
             httpServerIsRunningUseCase,
@@ -1659,6 +1665,113 @@ class VideoPlayerViewModelV2Test {
             underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
             advanceUntilIdle()
             verify(mediaPlayerGateway).mediaPlayerRetry(true)
+        }
+
+    @Test
+    fun `test that onPlayerError pauses playback without retry when network error occurs while over quota`() =
+        runTest {
+            whenever(isInTransferOverQuotaUseCase()).thenReturn(true)
+            initViewModel()
+            clearInvocations(mediaPlayerGateway)
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED)
+            advanceUntilIdle()
+            verify(mediaPlayerGateway, never()).mediaPlayerRetry(true)
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isStreamingPausedForOverQuota).isTrue()
+                assertThat(state.mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
+                assertThat(state.playerErrorType).isEqualTo(PlayerErrorType.CANNOT_PLAY)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onPlayerError retries when network error occurs while not over quota`() =
+        runTest {
+            whenever(isInTransferOverQuotaUseCase()).thenReturn(false)
+            initViewModel()
+            clearInvocations(mediaPlayerGateway)
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED)
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).mediaPlayerRetry(true)
+        }
+
+    @Test
+    fun `test that over quota event pauses playback and uses the node preview as poster`() =
+        runTest {
+            val previewFile = File("/cache/previewsMEGA/12345.jpg")
+            val videoNode = mock<TypedVideoNode>()
+            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(videoNode)
+            whenever(getPreviewUseCase(videoNode)).thenReturn(previewFile)
+            initViewModel()
+            fakeMonitorTransferOverQuotaFlow.emit(true)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isStreamingPausedForOverQuota).isTrue()
+                assertThat(state.overQuotaPosterPath).isEqualTo(previewFile.absolutePath)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the thumbnail is used as poster when the preview load fails`() =
+        runTest {
+            val thumbnailFile = File("/cache/thumbnailsMEGA/12345.jpg")
+            val videoNode = mock<TypedVideoNode>()
+            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(videoNode)
+            whenever(getPreviewUseCase(videoNode)).thenThrow(RuntimeException())
+            whenever(getThumbnailUseCase(any(), any())).thenReturn(thumbnailFile)
+            initViewModel()
+            fakeMonitorTransferOverQuotaFlow.emit(true)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                assertThat(awaitItem().overQuotaPosterPath)
+                    .isEqualTo(thumbnailFile.absolutePath)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that over quota state is cleared when the quota monitor emits false`() =
+        runTest {
+            val previewFile = File("/cache/previewsMEGA/12345.jpg")
+            val videoNode = mock<TypedVideoNode>()
+            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(videoNode)
+            whenever(getPreviewUseCase(videoNode)).thenReturn(previewFile)
+            initViewModel()
+            fakeMonitorTransferOverQuotaFlow.emit(true)
+            advanceUntilIdle()
+            fakeMonitorTransferOverQuotaFlow.emit(false)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isStreamingPausedForOverQuota).isFalse()
+                assertThat(state.overQuotaPosterPath).isNull()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the over quota poster is reloaded when the playing item changes`() =
+        runTest {
+            val firstPreview = File("/cache/previewsMEGA/first.jpg")
+            val secondPreview = File("/cache/previewsMEGA/second.jpg")
+            val videoNode = mock<TypedVideoNode>()
+            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(videoNode)
+            whenever(getPreviewUseCase(videoNode)).thenReturn(firstPreview, secondPreview)
+            initViewModel()
+            fakeMonitorTransferOverQuotaFlow.emit(true)
+            advanceUntilIdle()
+
+            underTest.onMediaItemTransition(testHandle.toString(), false)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().overQuotaPosterPath)
+                    .isEqualTo(secondPreview.absolutePath)
+                cancelAndConsumeRemainingEvents()
+            }
         }
 
     @Test

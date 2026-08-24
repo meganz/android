@@ -13,6 +13,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -35,6 +36,7 @@ import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaEventQueue
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
 import mega.privacy.android.app.mediaplayer.AudioPlayQueueBuilder
+import mega.privacy.android.app.mediaplayer.isStreamingOverQuotaError
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.AudioPlayQueueParams
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
@@ -50,7 +52,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioS
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.TrackAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStreamOverQuotaEventUseCase
 import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
 import mega.privacy.android.feature.mediaplayer.data.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.feature.mediaplayer.navigation.AudioPlayerScreenNavKey
@@ -103,7 +105,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     lateinit var mediaHandleStore: MediaHandleStore
 
     @Inject
-    lateinit var monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase
+    lateinit var monitorStreamOverQuotaEventUseCase: MonitorStreamOverQuotaEventUseCase
 
     @Inject
     lateinit var isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase
@@ -248,28 +250,33 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     /**
-     * Streaming over quota keeps the SDK raising the event for every streaming request, so playback
-     * is left paused instead of prepared again: nothing re-requests the stream until the user asks
-     * for it, which is what stops the warning from reappearing as soon as it is dismissed.
+     * Streaming over quota means playback cannot continue, so it is stopped instead of retried:
+     * nothing re-requests the stream until the user asks for it, which is what stops the warning
+     * from reappearing as soon as it is dismissed.
+     *
+     * The SDK's per-request stream event is observed rather than the broadcast over-quota state:
+     * the state is backed by a state flow that deduplicates values and is never reset while
+     * logged in, so a second quota hit in the same session would not be delivered through it.
+     * Reacting to the event also aborts the load before ExoPlayer's error-handling policy retries
+     * the request, which would make the SDK raise the warning again.
      */
     private fun observeTransferOverQuota() {
         lifecycleScope.launch {
-            monitorTransferOverQuotaUseCase()
-                .catch { Timber.e(it, "Failed to monitor transfer over quota") }
-                .collect { isOverQuota ->
-                    isTransferOverQuota = isOverQuota
-                    if (isOverQuota) {
-                        player?.pause()
-                    }
+            monitorStreamOverQuotaEventUseCase()
+                .catch { Timber.e(it, "Failed to monitor streaming over quota events") }
+                .collect {
+                    isTransferOverQuota = true
+                    enterOverQuotaPausedState()
                 }
         }
     }
 
     /**
-     * The player is left paused while over quota, so pressing play in the mini player or the
-     * notification cannot resume on its own. Ask the SDK whether the quota window has passed: if it
-     * has, prepare the stream again, otherwise warn the user. Pressing play is a deliberate action,
-     * so the warning is raised every time rather than only once per quota window.
+     * The player is stopped while over quota, so pressing play (in the player screen or the
+     * notification) cannot resume on its own. Ask the SDK whether the quota window has passed:
+     * if it has, prepare the stream again, otherwise stay stopped and warn the user. Pressing
+     * play is a deliberate action, so the warning is raised every time rather than only once
+     * per quota window.
      */
     private fun handlePlayRequestedWhileOverQuota() {
         lifecycleScope.launch {
@@ -277,13 +284,33 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 .onFailure { Timber.e(it) }
                 .getOrDefault(true)
             if (stillOverQuota) {
-                player?.pause()
+                enterOverQuotaPausedState()
                 transferOverQuotaEventQueue.emit(TransferOverQuotaSource.Streaming)
             } else {
                 isTransferOverQuota = false
                 player?.prepare()
             }
         }
+    }
+
+    /**
+     * Pauses playback for the over-quota window and hides the mini player: the mini player exists
+     * to keep controlling ongoing playback, but while over quota playback cannot continue, so an
+     * idle bar would only take up space. It is shown again once playback actually resumes.
+     *
+     * The player is stopped, not just paused: pausing keeps ExoPlayer loading the stream, which
+     * keeps the UI in a buffering state that can never finish and keeps re-requesting the stream,
+     * making the SDK raise the over-quota warning again. stop() aborts the loads and moves the
+     * player to idle while keeping the play queue and position, so prepare() can resume later.
+     *
+     * pause() before stop() is still required: stop() keeps playWhenReady as it is, and without
+     * resetting it the next play press would not produce the playWhenReady transition that
+     * re-checks the quota (see onPlayWhenReadyChanged).
+     */
+    private fun enterOverQuotaPausedState() {
+        player?.pause()
+        player?.stop()
+        MiniAudioPlayerController.notifyV2AudioPlayerPlaying(false)
     }
 
     private fun createPlayerListener(): Player.Listener = object : Player.Listener {
@@ -305,6 +332,10 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             if (isPlaying) {
                 isNotificationDismissed = false
                 MiniAudioPlayerController.notifyV2NotificationDismissed(false)
+                // Reconnect the mini player on every real resume: it is released while over
+                // quota, and resuming after the window passes goes through prepare() (see
+                // handlePlayRequestedWhileOverQuota), which does not re-show it itself.
+                MiniAudioPlayerController.notifyV2AudioPlayerPlaying(true)
             } else {
                 // Remove the foreground lock so the notification can be swiped away when
                 // the player is paused. MediaSessionService will re-enter foreground
@@ -324,9 +355,27 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             }
         }
 
-        override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
-            if (isTransferOverQuota) return
-            player?.prepare()
+        override fun onPlayerError(error: PlaybackException) {
+            if (isTransferOverQuota) {
+                enterOverQuotaPausedState()
+                return
+            }
+            // When over quota, playback is stopped instead of re-prepared — retries can never
+            // succeed, and pressing play re-checks the quota and re-raises the warning
+            // (see handlePlayRequestedWhileOverQuota).
+            lifecycleScope.launch {
+                val isOverQuota =
+                    isStreamingOverQuotaError(error.errorCode, isInTransferOverQuotaUseCase)
+                // The flag is re-checked after the suspending query: the over-quota event can
+                // arrive while the query is in flight, and prepare() would undo the stop it
+                // performed.
+                if (isOverQuota || isTransferOverQuota) {
+                    isTransferOverQuota = true
+                    enterOverQuotaPausedState()
+                } else {
+                    player?.prepare()
+                }
+            }
         }
     }
 
