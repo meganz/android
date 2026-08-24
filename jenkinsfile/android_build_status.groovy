@@ -458,7 +458,7 @@ pipeline {
                                 util.useGitLab() {
                                     withCredentials([string(credentialsId: 'ANTHROPIC_API_KEY', variable: 'ANTHROPIC_API_KEY')]) {
                                         try {
-                                            sh "./gradlew --no-daemon codeReview --skill '${skillFile}' --output '${CODE_REVIEW_OUTPUT_FILE}' --target-branch '${targetBranch}' --model 'claude-opus-4-6' --summary '${CODE_REVIEW_SUMMARY_FILE}' --error-report '${CODE_REVIEW_ERROR_REPORT_FILE}'"
+                                            sh "./gradlew --no-daemon codeReview --skill '${skillFile}' --output '${CODE_REVIEW_OUTPUT_FILE}' --target-branch '${targetBranch}' --summary '${CODE_REVIEW_SUMMARY_FILE}' --error-report '${CODE_REVIEW_ERROR_REPORT_FILE}'"
                                             def summary = "Code Review Report"
                                             if (fileExists(CODE_REVIEW_SUMMARY_FILE)) {
                                                 summary = readFile(CODE_REVIEW_SUMMARY_FILE).trim()

@@ -125,7 +125,6 @@ pipeline {
                                             "--mr-url '${mrUrl}' " +
                                             "--discussion-id '${discussionId}' " +
                                             "--question \"\$ASK_AI_QUESTION\" " +
-                                            "--model 'claude-sonnet-4-6' " +
                                             "--output '${ASK_AI_OUTPUT_FILE}' " +
                                             "--error-report '${ASK_AI_ERROR_REPORT_FILE}'"
                                 }
