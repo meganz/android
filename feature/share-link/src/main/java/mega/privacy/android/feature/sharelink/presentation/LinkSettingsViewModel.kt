@@ -8,6 +8,9 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -81,6 +85,9 @@ class LinkSettingsViewModel @AssistedInject constructor(
      */
     private var publicLink: String? = handle?.let(publicLinkCache::get)
 
+    /** The only grading allowed to reach the state; replaced on every change to the password. */
+    private var strengthJob: Job? = null
+
     init {
         loadLinkSettings()
         cachedPassword?.password?.let(::computeStrength)
@@ -144,13 +151,29 @@ class LinkSettingsViewModel @AssistedInject constructor(
         computeStrength(password)
     }
 
+    /**
+     * Grades [password] once typing pauses, replacing any grading still pending.
+     *
+     * A grading per keystroke both wasted an SDK call each time and let a slower grading of an
+     * earlier password land after a faster one — which, now that the grade gates Save, would refuse
+     * a strong password until the next keystroke.
+     */
     private fun computeStrength(password: String) {
-        viewModelScope.launch {
-            val strength = password.takeIf(String::isNotEmpty)
-                ?.let { runCatching { getPasswordStrengthUseCase(it) }.getOrNull() }
+        strengthJob?.cancel()
+        strengthJob = viewModelScope.launch {
+            delay(STRENGTH_DEBOUNCE)
+            val strength = gradePassword(password)
+            // runCatching below swallows the CancellationException, so without this a job
+            // cancelled while the SDK was grading would still write its result.
+            ensureActive()
             update { it.copy(passwordStrength = strength) }
         }
     }
+
+    /** Null for an empty password, or when the SDK cannot grade it. */
+    private suspend fun gradePassword(password: String): PasswordStrength? =
+        password.takeIf(String::isNotEmpty)
+            ?.let { runCatching { getPasswordStrengthUseCase(it) }.getOrNull() }
 
     fun onSave() {
         val handle = handle ?: return
@@ -159,7 +182,15 @@ class LinkSettingsViewModel @AssistedInject constructor(
 
         update { it.copy(isSaving = true) }
         viewModelScope.launch {
-            runCatching { applyChanges(handle, current) }
+            // The grade on screen is up to a debounce behind the field, so grade what is actually
+            // being saved rather than trusting the last one shown.
+            val state = current.withFreshlyGradedPassword()
+            if (!state.isValid) {
+                update { it.copy(isSaving = false, passwordStrength = state.passwordStrength) }
+                return@launch
+            }
+
+            runCatching { applyChanges(handle, state) }
                 .onSuccess { savedLink ->
                     update {
                         it.copy(isSaving = false, savedLink = savedLink, savedEvent = triggered)
@@ -170,6 +201,18 @@ class LinkSettingsViewModel @AssistedInject constructor(
                     update { it.copy(isSaving = false, errorEvent = triggered) }
                 }
         }
+    }
+
+    /**
+     * Re-grades the password being set, dropping any grading the debounce still owes. Only a
+     * password being set is graded, mirroring [isValid].
+     */
+    private suspend fun LinkSettingsUiState.withFreshlyGradedPassword(): LinkSettingsUiState {
+        val password = password
+            ?.takeIf { isPasswordEnabled && isPasswordDirty && it.isNotEmpty() }
+            ?: return this
+        strengthJob?.cancel()
+        return copy(passwordStrength = gradePassword(password))
     }
 
     fun onSavedEventConsumed() = update { it.copy(savedEvent = consumed, savedLink = null) }
@@ -342,10 +385,15 @@ class LinkSettingsViewModel @AssistedInject constructor(
             isPasswordEnabled || !password.isNullOrEmpty()
         }
 
+    /**
+     * A password too weak to protect a link blocks only while it is the one being set. A password
+     * the link already carries is left alone, so it cannot hold an unrelated change hostage.
+     */
     private val LinkSettingsUiState.isValid: Boolean
         get() = when {
             isExpiryEnabled && expiryDate == null -> false
             isPasswordEnabled && password.isNullOrBlank() -> false
+            isPasswordEnabled && isPasswordDirty && passwordStrength.isTooWeakForLink -> false
             else -> true
         }
 
@@ -363,5 +411,8 @@ class LinkSettingsViewModel @AssistedInject constructor(
 
     private companion object {
         const val CALLER_NAME = "LinkSettingsViewModel"
+
+        /** Long enough to collapse a burst of typing into one grading, short enough to feel live. */
+        val STRENGTH_DEBOUNCE = 300.milliseconds
     }
 }

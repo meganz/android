@@ -349,7 +349,7 @@ class LinkSettingsScreenTest {
     }
 
     @Test
-    fun `test that a very weak password shows the Weak label`() {
+    fun `test that a very weak password shows why it is refused rather than its level`() {
         setContent(
             uiState = loaded.copy(
                 isPasswordEnabled = true,
@@ -358,9 +358,13 @@ class LinkSettingsScreenTest {
             )
         )
 
+        composeRule.onNodeWithText(
+            context.getString(sharedR.string.password_too_weak_error_message)
+        ).performScrollTo().assertIsDisplayed()
+        // The level label is shared with the weakest password that does save, so on its own it
+        // would leave Save disabled with nothing on screen explaining why.
         composeRule.onNodeWithText(context.getString(sharedR.string.password_strength_weak))
-            .performScrollTo()
-            .assertIsDisplayed()
+            .assertDoesNotExist()
     }
 
     @Test
@@ -409,7 +413,7 @@ class LinkSettingsScreenTest {
     }
 
     @Test
-    fun `test that no strength helper text is shown for an invalid strength`() {
+    fun `test that a password the SDK will not grade shows why it is refused`() {
         setContent(
             uiState = loaded.copy(
                 isPasswordEnabled = true,
@@ -418,8 +422,9 @@ class LinkSettingsScreenTest {
             )
         )
 
-        composeRule.onNodeWithTag(LINK_SETTINGS_PASSWORD_STRENGTH_TAG, useUnmergedTree = true)
-            .assertDoesNotExist()
+        composeRule.onNodeWithText(
+            context.getString(sharedR.string.password_too_weak_error_message)
+        ).performScrollTo().assertIsDisplayed()
     }
 
     @Test

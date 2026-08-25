@@ -77,6 +77,8 @@ import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AlbumLinkSettingsScreenEvent
 import mega.privacy.mobile.analytics.event.LinkConfirmPasswordFileButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LinkConfirmPasswordFolderButtonPressedEvent
@@ -91,13 +93,13 @@ import mega.privacy.mobile.analytics.event.LinkRemovePasswordFileButtonPressedEv
 import mega.privacy.mobile.analytics.event.LinkRemovePasswordFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LinkResetPasswordFileButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LinkResetPasswordFolderButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkSeparateKeyLearnMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyAlbumButtonDisabledEvent
 import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyAlbumButtonEnabledEvent
 import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFileButtonDisabledEvent
 import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFileButtonEnabledEvent
 import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFolderButtonDisabledEvent
 import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFolderButtonEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSeparateKeyLearnMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFileButtonPressedDisabledEvent
 import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFileButtonPressedEnabledEvent
 import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFolderButtonPressedDisabledEvent
@@ -109,8 +111,6 @@ import mega.privacy.mobile.analytics.event.LinkSettingsSaveFailedEvent
 import mega.privacy.mobile.analytics.event.LinkSettingsScreenEvent
 import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFileDialogEvent
 import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFolderDialogEvent
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import java.util.Calendar
 
 /**
@@ -611,12 +611,19 @@ private fun PasswordStrengthHelpText(
     strength: PasswordStrength?,
     modifier: Modifier = Modifier,
 ) {
-    val level = strength?.toLinkPasswordStrength() ?: return
-    val label = stringResource(level.labelRes)
-    when (level) {
-        LinkPasswordStrength.Weak -> HelpTextError(modifier = modifier, text = label)
-        LinkPasswordStrength.Moderate -> HelpTextWarning(modifier = modifier, text = label)
-        LinkPasswordStrength.Strong -> HelpTextSuccess(modifier = modifier, text = label)
+    if (strength.isTooWeakForLink) {
+        HelpTextError(
+            modifier = modifier,
+            text = stringResource(sharedR.string.password_too_weak_error_message),
+        )
+    } else {
+        val level = strength?.toLinkPasswordStrength() ?: return
+        val label = stringResource(level.labelRes)
+        when (level) {
+            LinkPasswordStrength.Weak -> HelpTextError(modifier = modifier, text = label)
+            LinkPasswordStrength.Moderate -> HelpTextWarning(modifier = modifier, text = label)
+            LinkPasswordStrength.Strong -> HelpTextSuccess(modifier = modifier, text = label)
+        }
     }
 }
 
@@ -765,10 +772,12 @@ private fun LinkSettingsScreenLoadingPreview() {
 internal const val LINK_SETTINGS_APP_BAR_TAG = "link_settings_screen:app_bar"
 internal const val LINK_SETTINGS_SAVE_BUTTON_TAG = "link_settings_screen:button_save"
 internal const val LINK_SETTINGS_SEPARATE_KEY_ROW_TAG = "link_settings_screen:row_separate_key"
-internal const val LINK_SETTINGS_SEPARATE_KEY_TOGGLE_TAG = "link_settings_screen:toggle_separate_key"
+internal const val LINK_SETTINGS_SEPARATE_KEY_TOGGLE_TAG =
+    "link_settings_screen:toggle_separate_key"
 internal const val LINK_SETTINGS_UPGRADE_DIALOG_TAG = "link_settings_screen:upgrade_dialog"
 internal const val LINK_SETTINGS_PASSWORD_STRENGTH_TAG = "link_settings_screen:password_strength"
-internal const val LINK_SETTINGS_SEPARATE_KEY_LEARN_MORE_TAG = "link_settings_screen:separate_key_learn_more"
+internal const val LINK_SETTINGS_SEPARATE_KEY_LEARN_MORE_TAG =
+    "link_settings_screen:separate_key_learn_more"
 private const val LEARN_MORE_ANNOTATION = "learn_more"
 internal const val LINK_SETTINGS_EXPIRY_ROW_TAG = "link_settings_screen:row_expiry"
 internal const val LINK_SETTINGS_EXPIRY_TOGGLE_TAG = "link_settings_screen:toggle_expiry"

@@ -50,6 +50,28 @@ class LinkPasswordStrengthTest {
     }
 
     @Test
+    fun `test that only the weakest grade is refused for a link`() {
+        assertThat(PasswordStrength.VERY_WEAK.isTooWeakForLink).isTrue()
+        assertThat(PasswordStrength.INVALID.isTooWeakForLink).isTrue()
+    }
+
+    @Test
+    fun `test that every grade above the weakest is accepted for a link`() {
+        // Legacy parity: the old password screen refused PASSWORD_STRENGTH_VERYWEAK alone.
+        assertThat(PasswordStrength.WEAK.isTooWeakForLink).isFalse()
+        assertThat(PasswordStrength.MEDIUM.isTooWeakForLink).isFalse()
+        assertThat(PasswordStrength.GOOD.isTooWeakForLink).isFalse()
+        assertThat(PasswordStrength.STRONG.isTooWeakForLink).isFalse()
+    }
+
+    @Test
+    fun `test that a grade not read yet does not refuse the password`() {
+        val ungraded: PasswordStrength? = null
+
+        assertThat(ungraded.isTooWeakForLink).isFalse()
+    }
+
+    @Test
     fun `test that each level carries a distinct label`() {
         val labels = LinkPasswordStrength.entries.map { it.labelRes }
 

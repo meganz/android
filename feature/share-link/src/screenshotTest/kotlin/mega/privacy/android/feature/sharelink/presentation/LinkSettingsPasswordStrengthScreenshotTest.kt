@@ -9,11 +9,20 @@ import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 
 /**
  * One render per password-strength level the screen can show, so the collapse from the SDK's five
- * grades to these three is visible rather than only asserted.
+ * grades to these three is visible rather than only asserted, plus the refused grade, which shows
+ * an error in place of a level.
  *
  * The Moderate render doubles as the Weblate reference for `password_strength_moderate`.
  */
 class LinkSettingsPasswordStrengthScreenshotTest {
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun PasswordStrengthTooWeak() {
+        // Refused, so Save is off: the label the other levels use would not say why.
+        LinkSettingsWithPassword(PasswordStrength.VERY_WEAK, isSaveEnabled = false)
+    }
 
     @PreviewTest
     @CombinedThemePreviews
@@ -37,7 +46,10 @@ class LinkSettingsPasswordStrengthScreenshotTest {
     }
 
     @Composable
-    private fun LinkSettingsWithPassword(strength: PasswordStrength) {
+    private fun LinkSettingsWithPassword(
+        strength: PasswordStrength,
+        isSaveEnabled: Boolean = true,
+    ) {
         AndroidThemeForPreviews {
             LinkSettingsScreen(
                 uiState = LinkSettingsUiState(
@@ -47,7 +59,7 @@ class LinkSettingsPasswordStrengthScreenshotTest {
                     isPasswordEnabled = true,
                     password = PASSWORDS.getValue(strength),
                     passwordStrength = strength,
-                    isSaveEnabled = true,
+                    isSaveEnabled = isSaveEnabled,
                 ),
                 onBack = {},
                 onSeparateKeyEnabled = {},
@@ -65,7 +77,8 @@ class LinkSettingsPasswordStrengthScreenshotTest {
     private companion object {
         // Lengths that plausibly earn each grade, so the masked field looks right beside the label.
         val PASSWORDS = mapOf(
-            PasswordStrength.WEAK to "pass",
+            PasswordStrength.VERY_WEAK to "abc",
+            PasswordStrength.WEAK to "password12",
             PasswordStrength.MEDIUM to "passw0rd12",
             PasswordStrength.STRONG to "c0rrect-h0rse-battery-staple",
         )

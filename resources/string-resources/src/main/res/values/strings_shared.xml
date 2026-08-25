@@ -3821,4 +3821,6 @@
         <item quantity="one">Link copied to your clipboard</item>
         <item quantity="other">Links copied to your clipboard</item>
     </plurals>
+    <!-- Error shown below a password field when the password entered is too weak to be accepted, so it cannot be saved. For example, the password protecting a share link. -->
+    <string name="password_too_weak_error_message">Please use a stronger password.</string>
 </resources>

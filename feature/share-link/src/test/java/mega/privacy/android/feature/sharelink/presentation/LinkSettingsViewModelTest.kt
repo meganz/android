@@ -3,9 +3,11 @@ package mega.privacy.android.feature.sharelink.presentation
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,6 +45,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
@@ -322,6 +325,201 @@ class LinkSettingsViewModelTest {
                 assertThat(state.isSaveEnabled).isTrue()
                 cancelAndIgnoreRemainingEvents()
             }
+        }
+
+    @Test
+    fun `test that Save stays disabled when the password entered is too weak`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(VERY_WEAK_PASSWORD))
+                .thenReturn(PasswordStrength.VERY_WEAK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(VERY_WEAK_PASSWORD)
+                val state = awaitUntil { it.passwordStrength == PasswordStrength.VERY_WEAK }
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that Save enables when the password entered is weak but not the weakest grade`() =
+        runTest(extension.testDispatcher) {
+            // Legacy parity: the old password screen refused PASSWORD_STRENGTH_VERYWEAK alone, so
+            // everything the SDK grades above it still saves.
+            stubNode()
+            whenever(getPasswordStrengthUseCase(WEAK_PASSWORD)).thenReturn(PasswordStrength.WEAK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(WEAK_PASSWORD)
+                val state = awaitUntil { it.passwordStrength == PasswordStrength.WEAK }
+                assertThat(state.isSaveEnabled).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that Save stays disabled when the password entered cannot be graded`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(VERY_WEAK_PASSWORD))
+                .thenReturn(PasswordStrength.INVALID)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(VERY_WEAK_PASSWORD)
+                val state = awaitUntil { it.passwordStrength == PasswordStrength.INVALID }
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onSave applies nothing when the password entered is too weak`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(VERY_WEAK_PASSWORD))
+                .thenReturn(PasswordStrength.VERY_WEAK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.onPasswordEnabled(true)
+            underTest.onPasswordChanged(VERY_WEAK_PASSWORD)
+            advanceUntilIdle()
+            underTest.onSave()
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.savedEvent).isEqualTo(consumed)
+            verifyNoInteractions(encryptLinkWithPasswordUseCase)
+            verify(passwordCache, never()).set(any(), anyOrNull())
+        }
+
+    @Test
+    fun `test that a password the link already carries does not block an unrelated change`() =
+        runTest(extension.testDispatcher) {
+            // Only a password being set is graded. One the link already has predates the minimum
+            // and must not hold an expiry change hostage, with no way to clear the block.
+            stubNode()
+            stubExistingPassword(VERY_WEAK_PASSWORD)
+            whenever(getPasswordStrengthUseCase(VERY_WEAK_PASSWORD))
+                .thenReturn(PasswordStrength.VERY_WEAK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onExpiryEnabled(true)
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                val state = awaitUntil { it.expiryDate == EXPIRY_TIME }
+                assertThat(state.isSaveEnabled).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that grading waits for typing to pause`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.onPasswordEnabled(true)
+            underTest.onPasswordChanged(PASSWORD)
+
+            advanceTimeBy(HALF_OF_STRENGTH_DEBOUNCE)
+            verifyNoInteractions(getPasswordStrengthUseCase)
+
+            advanceUntilIdle()
+            verify(getPasswordStrengthUseCase).invoke(PASSWORD)
+        }
+
+    @Test
+    fun `test that a burst of keystrokes is graded once`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.onPasswordEnabled(true)
+            PASSWORD.indices.forEach { index ->
+                underTest.onPasswordChanged(PASSWORD.take(index + 1))
+            }
+            advanceUntilIdle()
+
+            // One grading for the whole word, not one per character.
+            verify(getPasswordStrengthUseCase).invoke(PASSWORD)
+            verifyNoMoreInteractions(getPasswordStrengthUseCase)
+            assertThat(underTest.uiState.value.passwordStrength)
+                .isEqualTo(PasswordStrength.STRONG)
+        }
+
+    @Test
+    fun `test that a grading already running is cancelled when the password changes again`() =
+        runTest(extension.testDispatcher) {
+            // Past the debounce, so the SDK call is genuinely in flight when the next change lands.
+            stubNode()
+            val slowGrading = CompletableDeferred<PasswordStrength>()
+            whenever { getPasswordStrengthUseCase(VERY_WEAK_PASSWORD) } doSuspendableAnswer {
+                slowGrading.await()
+            }
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.onPasswordEnabled(true)
+            underTest.onPasswordChanged(VERY_WEAK_PASSWORD)
+            advanceUntilIdle()
+
+            underTest.onPasswordChanged(PASSWORD)
+            advanceUntilIdle()
+            slowGrading.complete(PasswordStrength.VERY_WEAK)
+            advanceUntilIdle()
+
+            val state = underTest.uiState.value
+            assertThat(state.passwordStrength).isEqualTo(PasswordStrength.STRONG)
+            assertThat(state.isSaveEnabled).isTrue()
+        }
+
+    @Test
+    fun `test that onSave grades the password being saved rather than the one last shown`() =
+        runTest(extension.testDispatcher) {
+            // Inside the debounce window the label still reads Strong for a password that has
+            // already been replaced with a very weak one. Save must not go by that.
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(getPasswordStrengthUseCase(VERY_WEAK_PASSWORD))
+                .thenReturn(PasswordStrength.VERY_WEAK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.onPasswordEnabled(true)
+            underTest.onPasswordChanged(PASSWORD)
+            advanceUntilIdle()
+            assertThat(underTest.uiState.value.isSaveEnabled).isTrue()
+
+            underTest.onPasswordChanged(VERY_WEAK_PASSWORD)
+            underTest.onSave()
+            advanceUntilIdle()
+
+            val state = underTest.uiState.value
+            assertThat(state.savedEvent).isEqualTo(consumed)
+            assertThat(state.isSaving).isFalse()
+            assertThat(state.passwordStrength).isEqualTo(PasswordStrength.VERY_WEAK)
+            assertThat(state.isSaveEnabled).isFalse()
+            verifyNoInteractions(encryptLinkWithPasswordUseCase)
         }
 
     @Test
@@ -1362,6 +1560,14 @@ class LinkSettingsViewModelTest {
         const val ENCRYPTED_LINK = "https://mega.nz/#P!encrypted"
         const val PASSWORD = "Str0ngP@ss"
         const val OLD_PASSWORD = "0ldP@ssw0rd"
+
+        // The SDK grades anything shorter than eight characters as VERY_WEAK, whatever it contains.
+        // Half of LinkSettingsViewModel.STRENGTH_DEBOUNCE: far enough in to show that grading
+        // has not started yet, without depending on the exact value.
+        val HALF_OF_STRENGTH_DEBOUNCE = 150.milliseconds
+
+        const val VERY_WEAK_PASSWORD = "abc"
+        const val WEAK_PASSWORD = "password12"
         const val CALLER_NAME = "LinkSettingsViewModel"
 
         // A fixed, far-future instant (~2027) used as the expiry across the expiry tests.

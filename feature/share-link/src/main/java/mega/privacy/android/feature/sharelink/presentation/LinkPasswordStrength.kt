@@ -34,3 +34,17 @@ internal fun PasswordStrength.toLinkPasswordStrength(): LinkPasswordStrength? = 
     PasswordStrength.GOOD, PasswordStrength.STRONG -> LinkPasswordStrength.Strong
     PasswordStrength.INVALID -> null
 }
+
+/**
+ * Whether a link must not be protected with a password of this strength.
+ *
+ * Matches what the legacy password screen enforced: only the very weakest grade is refused, so
+ * anything the SDK grades above it can still be used. Because the SDK grades every password shorter
+ * than eight characters as [PasswordStrength.VERY_WEAK], this is in practice an eight-character
+ * minimum plus a floor on entropy.
+ *
+ * A null strength is a grade that has not been read yet, or one the SDK failed to give; neither is
+ * evidence the password is weak, so neither blocks.
+ */
+internal val PasswordStrength?.isTooWeakForLink: Boolean
+    get() = this == PasswordStrength.VERY_WEAK || this == PasswordStrength.INVALID
