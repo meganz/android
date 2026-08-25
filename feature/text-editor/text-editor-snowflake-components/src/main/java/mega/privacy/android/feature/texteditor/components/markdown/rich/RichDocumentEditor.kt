@@ -5,25 +5,21 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -45,7 +41,12 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.feature.texteditor.components.MarkdownBlockSpacing
+import mega.privacy.android.feature.texteditor.components.MarkdownCodeFrame
 import mega.privacy.android.feature.texteditor.components.MarkdownColors
+import mega.privacy.android.feature.texteditor.components.MarkdownListItemFrame
+import mega.privacy.android.feature.texteditor.components.MarkdownListMarker
+import mega.privacy.android.feature.texteditor.components.MarkdownQuoteFrame
 import mega.privacy.android.feature.texteditor.components.markdownHeadingStyle
 import mega.privacy.android.feature.texteditor.components.rememberMarkdownColors
 import timber.log.Timber
@@ -56,8 +57,6 @@ fun richBlockFieldTag(index: Int): String = "rich_document_editor:block_$index"
 
 const val RICH_DOCUMENT_TAIL_TAP_TAG = "rich_document_editor:tail_tap_area"
 
-private val ListIndentStep = 24.dp
-private val QuoteBarWidth = 3.dp
 private val TailTapAreaHeight = 160.dp
 
 /**
@@ -73,6 +72,17 @@ fun RichDocumentEditor(
     val visualStyles = rememberRichSpanVisualStyles()
     val colors = rememberMarkdownColors()
     val focusRequesters = remember(state) { mutableMapOf<Int, FocusRequester>() }
+
+    // Enter is only recorded by the input transformation (which runs in the text input
+    // pipeline, off the composition applier); the actual block mutation happens here, on the
+    // UI thread, after the field's edit session has committed.
+    LaunchedEffect(state) {
+        snapshotFlow { state.pendingSplit }.collect { request ->
+            if (request == null) return@collect
+            state.pendingSplit = null
+            state.splitBlock(request.index, request.start, request.end)
+        }
+    }
 
     LaunchedEffect(state) {
         snapshotFlow { state.pendingFocus }.collect { request ->
@@ -97,7 +107,9 @@ fun RichDocumentEditor(
         modifier = modifier
             .fillMaxSize()
             .testTag(RICH_DOCUMENT_EDITOR_TAG),
-        contentPadding = PaddingValues(16.dp),
+        // No top padding: matches the chunked source editor so switching edit modes does not
+        // shift the content down (the collapsing top bar already provides the top spacing).
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
     ) {
         items(count = state.blocks.size, key = { it }) { index ->
             when (val block = state.blocks[index]) {
@@ -157,21 +169,14 @@ private fun RichTextBlockRow(
         snapshotFlow { block.text.textFieldState.selection }
             .collect { block.text.syncTypingStylesToCaret() }
     }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .padding(blockRowPadding(kind)),
-        verticalAlignment = Alignment.Top,
-    ) {
-        BlockChrome(index, kind, block, state, colors)
+    val field: @Composable RowScope.() -> Unit = {
         BasicTextField(
             state = block.text.textFieldState,
             textStyle = blockTextStyle(kind, colors),
             cursorBrush = SolidColor(colors.text),
             inputTransformation = remember(block, index) {
                 RichSpanInputTransformation(block.text) { start, end ->
-                    state.splitBlock(index, start, end)
+                    state.requestSplit(index, start, end)
                 }
             },
             outputTransformation = remember(block, visualStyles) {
@@ -194,55 +199,40 @@ private fun RichTextBlockRow(
                 .testTag(richBlockFieldTag(index)),
         )
     }
-}
-
-@Composable
-private fun BlockChrome(
-    index: Int,
-    kind: RichBlockKind,
-    block: RichTextBlockEditState,
-    state: RichDocumentState,
-    colors: MarkdownColors,
-) {
     when (kind) {
-        is RichBlockKind.Item -> {
-            Spacer(modifier = Modifier.width(ListIndentStep * kind.indent))
-            when {
-                kind.checked != null -> Checkbox(
+        is RichBlockKind.Item -> MarkdownListItemFrame(
+            marker = when {
+                kind.checked != null -> MarkdownListMarker.TaskCheckbox(
                     checked = kind.checked,
                     onCheckedChange = { block.kind = kind.copy(checked = it) },
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .height(24.dp),
                 )
 
-                kind.ordered -> Text(
-                    text = "${orderedNumber(state.blocks, index)}. ",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colors.text,
-                )
+                kind.ordered -> MarkdownListMarker.Number(orderedNumber(state.blocks, index))
+                else -> MarkdownListMarker.Bullet
+            },
+            colors = colors,
+            indent = kind.indent,
+            content = field,
+        )
 
-                else -> Text(
-                    text = "•  ",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colors.text,
-                )
-            }
-        }
+        is RichBlockKind.Quote -> MarkdownQuoteFrame(
+            depth = kind.depth,
+            colors = colors,
+            content = field,
+        )
 
-        is RichBlockKind.Quote -> {
-            repeat(kind.depth) {
-                Box(
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .width(QuoteBarWidth)
-                        .fillMaxHeight()
-                        .background(colors.quoteBar),
-                )
-            }
-        }
-
-        RichBlockKind.Paragraph, is RichBlockKind.Heading -> Unit
+        RichBlockKind.Paragraph, is RichBlockKind.Heading -> Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    when (kind) {
+                        is RichBlockKind.Heading -> MarkdownBlockSpacing.heading(kind.level)
+                        else -> MarkdownBlockSpacing.block
+                    },
+                ),
+            verticalAlignment = Alignment.Top,
+            content = { field() },
+        )
     }
 }
 
@@ -253,21 +243,23 @@ private fun CodeBlockRow(
     state: RichDocumentState,
     colors: MarkdownColors,
 ) {
-    BasicTextField(
-        state = block.code,
-        textStyle = MaterialTheme.typography.bodyMedium.copy(
-            fontFamily = FontFamily.Monospace,
-            color = colors.text,
-        ),
-        cursorBrush = SolidColor(colors.text),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 12.dp)
-            .background(colors.codeBackground, RoundedCornerShape(8.dp))
-            .padding(12.dp)
-            .onFocusChanged { if (it.isFocused) state.focusedIndex = index }
-            .testTag(richBlockFieldTag(index)),
-    )
+    MarkdownCodeFrame(
+        colors = colors,
+        modifier = Modifier.padding(MarkdownBlockSpacing.block),
+    ) {
+        BasicTextField(
+            state = block.code,
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                fontFamily = FontFamily.Monospace,
+                color = colors.text,
+            ),
+            cursorBrush = SolidColor(colors.text),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { if (it.isFocused) state.focusedIndex = index }
+                .testTag(richBlockFieldTag(index)),
+        )
+    }
 }
 
 @Composable
@@ -294,14 +286,6 @@ private fun RawSourceRow(block: RawSourceEditState, colors: MarkdownColors) {
 private fun blockTextStyle(kind: RichBlockKind, colors: MarkdownColors): TextStyle = when (kind) {
     is RichBlockKind.Heading -> markdownHeadingStyle(kind.level).copy(color = colors.text)
     else -> MaterialTheme.typography.bodyMedium.copy(color = colors.text)
-}
-
-private fun blockRowPadding(kind: RichBlockKind): PaddingValues = when (kind) {
-    is RichBlockKind.Heading ->
-        PaddingValues(top = if (kind.level <= 2) 20.dp else 14.dp, bottom = 6.dp)
-
-    is RichBlockKind.Item, is RichBlockKind.Quote -> PaddingValues(vertical = 2.dp)
-    RichBlockKind.Paragraph -> PaddingValues(bottom = 12.dp)
 }
 
 /** 1-based number of an ordered item: counts ordered predecessors at the same indent. */

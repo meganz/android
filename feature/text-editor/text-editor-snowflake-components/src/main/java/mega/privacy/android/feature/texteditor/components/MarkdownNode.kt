@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.texteditor.components
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -111,11 +109,11 @@ internal fun rememberMarkdownColors(): MarkdownColors = MarkdownColors(
  * (inside list items / quotes) use a tighter, uniform gap.
  */
 private fun blockSpacing(node: Node, nested: Boolean): Modifier {
-    if (nested) return Modifier.padding(bottom = 4.dp)
+    if (nested) return Modifier.padding(MarkdownBlockSpacing.nested)
     return when (node) {
-        is Heading -> Modifier.padding(top = if (node.level <= 2) 20.dp else 14.dp, bottom = 6.dp)
-        is ThematicBreak -> Modifier.padding(vertical = 12.dp)
-        else -> Modifier.padding(bottom = 12.dp)
+        is Heading -> Modifier.padding(MarkdownBlockSpacing.heading(node.level))
+        is ThematicBreak -> Modifier.padding(MarkdownBlockSpacing.thematicBreak)
+        else -> Modifier.padding(MarkdownBlockSpacing.block)
     }
 }
 
@@ -176,7 +174,8 @@ internal fun markdownHeadingStyle(level: Int): TextStyle {
 
 /**
  * Inline Markdown span styles. Single source of truth shared by the read-only preview
- * ([appendInline]) and the WYSIWYG editor ([mega.privacy.android.feature.texteditor.components.markdown.rememberMarkdownWysiwygStyles]).
+ * ([appendInline]) and the rich editor's span visuals
+ * ([mega.privacy.android.feature.texteditor.components.markdown.rich.rememberRichSpanVisualStyles]).
  */
 internal object MarkdownInlineStyles {
     val bold = SpanStyle(fontWeight = FontWeight.Bold)
@@ -207,17 +206,14 @@ private fun MarkdownList(
         var index = start
         while (item != null) {
             if (item is ListItem) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 2.dp)) {
-                    // The marker is decoration, not content — keep it out of copied text.
-                    DisableSelection {
-                        Text(
-                            text = if (ordered) "$index. " else "•  ",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = colors.text,
-                        )
-                    }
+                MarkdownListItemFrame(
+                    marker = if (ordered) {
+                        MarkdownListMarker.Number(index)
+                    } else {
+                        MarkdownListMarker.Bullet
+                    },
+                    colors = colors,
+                ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         var child = item.firstChild
                         while (child != null) {
@@ -241,12 +237,10 @@ private fun CodeBlock(
     modifier: Modifier = Modifier,
 ) {
     val codeStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(colors.codeBackground, RoundedCornerShape(8.dp))
-            .horizontalScroll(rememberBlockScrollState(node))
-            .padding(12.dp),
+    MarkdownCodeFrame(
+        colors = colors,
+        modifier = modifier,
+        scrollState = rememberBlockScrollState(node),
     ) {
         // Split very long code into multiple Texts so a single line can't ANR text measurement.
         var start = 0
@@ -291,17 +285,7 @@ private fun BlockQuoteBlock(
     colors: MarkdownColors,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp),
-    ) {
-        HorizontalDivider(
-            modifier = Modifier
-                .width(3.dp)
-                .padding(end = 8.dp),
-            color = colors.quoteBar,
-        )
+    MarkdownQuoteFrame(depth = 1, colors = colors, modifier = modifier) {
         Column(modifier = Modifier.fillMaxWidth()) {
             var child = quote.firstChild
             while (child != null) {

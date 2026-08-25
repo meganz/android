@@ -1,5 +1,8 @@
 package mega.privacy.android.feature.texteditor.presentation.model
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DataObject
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -38,6 +41,28 @@ sealed interface TextEditorTopBarAction : MenuActionWithIcon {
         @Composable
         override fun getIconPainter(): Painter =
             painterResource(R.drawable.icon_text_editor_show_line_numbers)
+    }
+
+    /**
+     * Switches between rich text and Markdown-source editing for Markdown files. Icon and
+     * description are mode-aware: eye = switch to rich text, braces = show the Markdown
+     * source (DataObject rather than Code, so it can't be confused with the formatting
+     * toolbar's inline-code button). Icons come from the material extended set for now,
+     * until icon-pack assets exist.
+     */
+    // TODO Replace the hardcoded descriptions with shared string resources and run the
+    //  Weblate flow.
+    data class SwitchEditMode(val isRichTextMode: Boolean) : TextEditorTopBarAction {
+        override val testTag: String = "text_editor_top_bar:switch_edit_mode"
+
+        @Composable
+        override fun getDescription(): String =
+            if (isRichTextMode) "Show Markdown source" else "Rich text editing"
+
+        @Composable
+        override fun getIconPainter(): Painter = rememberVectorPainter(
+            if (isRichTextMode) Icons.Default.DataObject else Icons.Default.Visibility,
+        )
     }
 
     data object GetLink : TextEditorTopBarAction {

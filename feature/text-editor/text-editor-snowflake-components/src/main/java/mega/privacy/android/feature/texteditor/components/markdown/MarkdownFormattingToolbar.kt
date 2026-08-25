@@ -19,12 +19,10 @@ import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.FormatStrikethrough
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Title
-import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,7 +44,6 @@ enum class MarkdownFormatAction {
     OrderedList,
     Quote,
     Link,
-    SwitchEditMode,
 }
 
 const val MARKDOWN_TOOLBAR_TAG = "markdown_formatting_toolbar"
@@ -58,9 +55,8 @@ fun markdownToolbarActionTag(action: MarkdownFormatAction): String =
     "markdown_formatting_toolbar:action_${action.name.lowercase()}"
 
 /**
- * Text formatting toolbar docked above the keyboard while editing Markdown. Toggle buttons
- * reflect the formats covering the current cursor/selection; the trailing slot switches between
- * the Markdown and rich text edit modes.
+ * Text formatting toolbar docked above the keyboard while editing Markdown in rich text mode.
+ * Toggle buttons reflect the formats covering the current cursor/selection.
  *
  * Icons are intentionally isolated here (material extended set) so a later swap to icon-pack
  * assets touches one file.
@@ -70,8 +66,6 @@ fun MarkdownFormattingToolbar(
     formats: MarkdownSelectionFormats,
     onAction: (MarkdownFormatAction) -> Unit,
     modifier: Modifier = Modifier,
-    showModeSwitch: Boolean = false,
-    isRichTextMode: Boolean = false,
 ) {
     Box(
         modifier = modifier
@@ -160,42 +154,6 @@ fun MarkdownFormattingToolbar(
                     onAction = onAction,
                 )
             }
-            if (showModeSwitch) {
-                VerticalDivider(
-                    color = DSTokens.colors.border.subtle,
-                    modifier = Modifier
-                        .height(24.dp)
-                        .padding(horizontal = 4.dp),
-                )
-                IconToggleButton(
-                    checked = isRichTextMode,
-                    onCheckedChange = { onAction(MarkdownFormatAction.SwitchEditMode) },
-                    colors = IconButtonDefaults.iconToggleButtonColors(
-                        containerColor = DSTokens.colors.background.pageBackground,
-                        contentColor = DSTokens.colors.icon.primary,
-                        checkedContainerColor = DSTokens.colors.background.surface2,
-                        checkedContentColor = DSTokens.colors.icon.accent,
-                    ),
-                    modifier = Modifier
-                        .padding(horizontal = 2.dp)
-                        .size(40.dp)
-                        .testTag(markdownToolbarActionTag(MarkdownFormatAction.SwitchEditMode)),
-                ) {
-                    Icon(
-                        imageVector = if (isRichTextMode) {
-                            Icons.Default.Code
-                        } else {
-                            Icons.Default.Visibility
-                        },
-                        contentDescription = if (isRichTextMode) {
-                            "Show Markdown source"
-                        } else {
-                            "Rich text editing"
-                        },
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
-            }
         }
     }
 }
@@ -238,7 +196,6 @@ private fun MarkdownFormattingToolbarPreview() {
         MarkdownFormattingToolbar(
             formats = MarkdownSelectionFormats.Empty,
             onAction = {},
-            showModeSwitch = true,
         )
     }
 }
@@ -255,7 +212,6 @@ private fun MarkdownFormattingToolbarActiveFormatsPreview() {
                 isBulletList = true,
             ),
             onAction = {},
-            showModeSwitch = true,
         )
     }
 }

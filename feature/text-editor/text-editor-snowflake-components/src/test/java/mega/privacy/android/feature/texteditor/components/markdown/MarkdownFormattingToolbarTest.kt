@@ -20,14 +20,12 @@ class MarkdownFormattingToolbarTest {
 
     private fun setToolbar(
         formats: MarkdownSelectionFormats = MarkdownSelectionFormats.Empty,
-        showModeSwitch: Boolean = false,
     ) {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 MarkdownFormattingToolbar(
                     formats = formats,
                     onAction = receivedActions::add,
-                    showModeSwitch = showModeSwitch,
                 )
             }
         }
@@ -63,23 +61,4 @@ class MarkdownFormattingToolbarTest {
         assertThat(receivedActions).containsExactly(MarkdownFormatAction.Bold)
     }
 
-    @Test
-    fun `test that the mode switch is hidden by default`() {
-        setToolbar()
-
-        composeRule
-            .onNodeWithTag(markdownToolbarActionTag(MarkdownFormatAction.SwitchEditMode))
-            .assertDoesNotExist()
-    }
-
-    @Test
-    fun `test that the mode switch emits its action when shown`() {
-        setToolbar(showModeSwitch = true)
-
-        composeRule
-            .onNodeWithTag(markdownToolbarActionTag(MarkdownFormatAction.SwitchEditMode))
-            .performClick()
-
-        assertThat(receivedActions).containsExactly(MarkdownFormatAction.SwitchEditMode)
-    }
 }

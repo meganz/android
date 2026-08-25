@@ -124,7 +124,9 @@ class RichDocumentEditorTest {
         val second = state.blocks[1] as RichTextBlockEditState
         assertThat(first.text.textFieldState.text.toString()).isEqualTo("hello ")
         assertThat(second.text.textFieldState.text.toString()).isEqualTo("world")
-        assertThat(state.pendingFocus).isNull() // consumed by the editor
+        // Both one-shot requests (split, then focus) were consumed by the editor.
+        assertThat(state.pendingSplit).isNull()
+        assertThat(state.pendingFocus).isNull()
 
         composeRule.onNodeWithTag(richBlockFieldTag(1)).performTextInput("!")
         composeRule.waitForIdle()

@@ -45,6 +45,9 @@ class RawSourceEditState(val source: String) : RichBlockEditState
 /** A one-shot request to focus a block and place its selection, consumed by the editor UI. */
 data class RichFocusRequest(val index: Int, val selection: TextRange)
 
+/** A one-shot request to split a block (Enter), consumed by the editor UI on the UI thread. */
+data class RichSplitRequest(val index: Int, val start: Int, val end: Int)
+
 /**
  * Editing state of a whole rich document: the observable block list plus which block holds
  * focus. Bridges the immutable [RichDocument] model to always-editable per-block state, and
@@ -60,9 +63,21 @@ class RichDocumentState(document: RichDocument) {
 
     var pendingFocus: RichFocusRequest? by mutableStateOf(null)
 
+    var pendingSplit: RichSplitRequest? by mutableStateOf(null)
+
     /** The focused text-bearing block, or null (no focus, or a non-text block). */
     val focusedTextBlock: RichTextBlockEditState?
         get() = focusedIndex?.let { blocks.getOrNull(it) } as? RichTextBlockEditState
+
+    /**
+     * Records a split request from the field's input transformation. Only a snapshot-state
+     * write (thread-safe): the input pipeline gives no main-thread guarantee and the field's
+     * edit session is still open, so the actual [splitBlock] runs when the editor consumes
+     * [pendingSplit] on the UI thread, after the session has committed.
+     */
+    fun requestSplit(index: Int, start: Int, end: Int = start) {
+        pendingSplit = RichSplitRequest(index, start, end)
+    }
 
     /**
      * Enter semantics: splits the text block at [index] into two, deleting [start]..[end]
@@ -71,9 +86,8 @@ class RichDocumentState(document: RichDocument) {
      * end of a heading starts a paragraph; Enter on an EMPTY item or quote steps out one level
      * instead of adding another marker.
      *
-     * Both halves get fresh block states rather than editing in place, so this is safe to call
-     * from inside the field's input transformation (the active [TextFieldState] is never
-     * reentered).
+     * Must run on the UI thread outside any edit session of the affected block — Enter arrives
+     * through [requestSplit]/[pendingSplit] instead of calling this directly.
      */
     fun splitBlock(index: Int, start: Int, end: Int = start) {
         val block = blocks.getOrNull(index) as? RichTextBlockEditState ?: return
@@ -95,10 +109,8 @@ class RichDocumentState(document: RichDocument) {
             kind is RichBlockKind.Item -> kind.copy(checked = kind.checked?.let { false })
             else -> kind
         }
-        blocks[index] = RichTextBlockEditState(
-            kind = kind,
-            text = RichTextBlockState(text.substring(0, splitAt), beforeSpans),
-        )
+        block.text.textFieldState.edit { replace(splitAt, length, "") }
+        block.text.spans = beforeSpans
         blocks.add(
             index + 1,
             RichTextBlockEditState(newKind, RichTextBlockState(afterText, afterSpans)),

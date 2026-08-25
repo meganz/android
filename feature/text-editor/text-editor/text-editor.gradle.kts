@@ -22,6 +22,7 @@ dependencies {
     implementation(platform(androidx.compose.bom))
     implementation(androidx.compose.material)
     implementation(androidx.compose.icons)
+    implementation(androidx.compose.icons.extended)
     implementation(androidx.hilt.navigation)
     implementation(androidx.material3)
     implementation(androidx.navigation3.runtime)

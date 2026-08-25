@@ -177,7 +177,13 @@ fun MarkdownPreview(
                     LazyColumn(
                         state = lazyListState,
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
+                        // No top padding: aligns with the collapsing top bar and with the
+                        // editors, so switching View <-> Edit does not shift the content.
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 16.dp,
+                        ),
                     ) {
                         items(parsed.size) { index ->
                             key(selectionResetKey) {
@@ -250,7 +256,8 @@ private fun FullSelectionPreview(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(scrollState)
-                        .padding(16.dp),
+                        // No top padding — same alignment rule as the LazyColumn path.
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 ) {
                     blocks.forEachIndexed { index, node ->
                         MarkdownBlock(
@@ -282,7 +289,7 @@ private val markdownParser: Parser by lazy {
 private fun Node.startLine(): Int = sourceSpans.firstOrNull()?.lineIndex ?: 0
 
 /** Parses [content] and returns its top-level block nodes (document children). */
-private fun parseTopLevelBlocks(content: String): List<Node> {
+internal fun parseTopLevelBlocks(content: String): List<Node> {
     val document = markdownParser.parse(content)
     return buildList {
         var node = document.firstChild

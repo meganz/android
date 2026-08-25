@@ -391,91 +391,26 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
-    fun `test that applyFormatAction wraps the selection in bold delimiters`() = runTest {
+    fun `test that applyFormatAction does nothing in Markdown source mode`() = runTest {
         val state = enterEditModeWith("hello world")
-        underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
+        underTest.toggleMarkdownEditMode() // switch to source mode
+        val original = state.text.toString()
         state.edit { selection = TextRange(0, 5) }
 
         underTest.applyFormatAction(MarkdownFormatAction.Bold)
 
-        assertThat(state.text.toString()).isEqualTo("**hello** world")
-        assertThat(state.selection).isEqualTo(TextRange(2, 7))
+        assertThat(state.text.toString()).isEqualTo(original)
     }
 
     @Test
-    fun `test that applyFormatAction cycles the caret line to a heading`() = runTest {
-        val state = enterEditModeWith("body")
-        underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
-        state.edit { selection = TextRange(2) }
-
-        underTest.applyFormatAction(MarkdownFormatAction.HeadingCycle)
-
-        assertThat(state.text.toString()).isEqualTo("# body")
-    }
-
-    @Test
-    fun `test that applyFormatAction toggles a bullet list on the caret line`() = runTest {
-        val state = enterEditModeWith("item")
-        underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
-        state.edit { selection = TextRange(2) }
-
-        underTest.applyFormatAction(MarkdownFormatAction.BulletList)
-
-        assertThat(state.text.toString()).isEqualTo("- item")
-    }
-
-    @Test
-    fun `test that applyFormatAction Link opens the dialog prefilled with the selection`() =
-        runTest {
-            val state = enterEditModeWith("hello world")
-            underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
-            state.edit { selection = TextRange(0, 5) }
-
-            underTest.applyFormatAction(MarkdownFormatAction.Link)
-
-            val dialog = underTest.uiState.value.linkDialog
-            assertThat(dialog).isNotNull()
-            assertThat(dialog?.text).isEqualTo("hello")
-            assertThat(dialog?.url).isEmpty()
-            assertThat(dialog?.isExistingLink).isFalse()
-        }
-
-    @Test
-    fun `test that confirmLink wraps the selection and dismisses the dialog`() = runTest {
-        val state = enterEditModeWith("hello")
-        underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
-        state.edit { selection = TextRange(0, 5) }
-        underTest.applyFormatAction(MarkdownFormatAction.Link)
-
-        underTest.confirmLink("hello", "https://mega.io")
-
-        assertThat(state.text.toString()).isEqualTo("[hello](https://mega.io)")
-        assertThat(underTest.uiState.value.linkDialog).isNull()
-    }
-
-    @Test
-    fun `test that removeLink unwraps the existing link under the cursor`() = runTest {
-        val state = enterEditModeWith("[t](u)")
-        underTest.toggleMarkdownEditMode() // formatter tests target Markdown mode
-        state.edit { selection = TextRange(2) }
-        underTest.applyFormatAction(MarkdownFormatAction.Link)
-        assertThat(underTest.uiState.value.linkDialog?.isExistingLink).isTrue()
-
-        underTest.removeLink()
-
-        assertThat(state.text.toString()).isEqualTo("t")
-        assertThat(underTest.uiState.value.linkDialog).isNull()
-    }
-
-    @Test
-    fun `test that applyFormatAction SwitchEditMode toggles the markdown edit mode`() = runTest {
+    fun `test that onMenuAction SwitchEditMode toggles the markdown edit mode`() = runTest {
         val state = enterEditModeWith("body")
         assertThat(underTest.uiState.value.markdownEditMode).isEqualTo(MarkdownEditMode.RichText)
 
-        underTest.applyFormatAction(MarkdownFormatAction.SwitchEditMode)
+        underTest.onMenuAction(TextEditorTopBarAction.SwitchEditMode(isRichTextMode = true))
         assertThat(underTest.uiState.value.markdownEditMode).isEqualTo(MarkdownEditMode.Markdown)
 
-        underTest.applyFormatAction(MarkdownFormatAction.SwitchEditMode)
+        underTest.onMenuAction(TextEditorTopBarAction.SwitchEditMode(isRichTextMode = false))
         assertThat(underTest.uiState.value.markdownEditMode).isEqualTo(MarkdownEditMode.RichText)
         assertThat(state.text.toString()).isEqualTo("body")
     }

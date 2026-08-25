@@ -18,8 +18,10 @@ import mega.privacy.android.feature.texteditor.components.rememberMarkdownColors
  * mutating text directly must adjust spans themselves.
  *
  * A lone newline never reaches the text: blocks are single units, so Enter is reverted and
- * reported through [onSplit] with the replaced range, for the document state to split the
- * block. [onSplit] must not reenter the field's own [androidx.compose.foundation.text.input.TextFieldState].
+ * reported through [onSplit] with the replaced range. [onSplit] runs inside the text input
+ * pipeline — no main-thread guarantee, and the field's edit session is still open — so it must
+ * only RECORD the request (a snapshot-state write, e.g. [RichDocumentState.requestSplit]); the
+ * actual document mutation happens when the editor consumes the request on the UI thread.
  */
 @OptIn(ExperimentalFoundationApi::class)
 class RichSpanInputTransformation(

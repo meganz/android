@@ -64,11 +64,7 @@ import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFolderLin
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SetShowLineNumbersPreferenceUseCase
-import mega.privacy.android.feature.texteditor.components.markdown.MarkdownEditorParseCache
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormatAction
-import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormatEdit
-import mega.privacy.android.feature.texteditor.components.markdown.MarkdownInlineStyle
-import mega.privacy.android.feature.texteditor.components.markdown.MarkdownSyntaxFormatter
 import mega.privacy.android.feature.texteditor.components.markdown.rich.MarkdownToRichDocumentConverter
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentState
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentToMarkdownConverter
@@ -225,9 +221,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     /** Active content-load job; cancelled if connectivity drops during a network load. */
     private var loadJob: Job? = null
-
-    /** Parses the focused chunk for formatting-toolbar actions; memoizes the last parse. */
-    private val formatParseCache = MarkdownEditorParseCache()
 
     /** Active download request; while it runs, a repeated download request is dropped. */
     private var downloadJob: Job? = null
@@ -443,82 +436,14 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     /**
-     * Applies a formatting-toolbar action to the focused chunk's text. [MarkdownFormatAction.Link]
-     * opens the link dialog instead of editing directly; [MarkdownFormatAction.SwitchEditMode]
-     * toggles the Markdown/rich-text editing mode.
+     * Applies a formatting-toolbar action to the rich editor's focused block.
+     * [MarkdownFormatAction.Link] opens the link dialog instead of editing directly. The
+     * toolbar only shows in rich text mode, so actions arriving outside it are dropped.
      */
     fun applyFormatAction(action: MarkdownFormatAction) {
-        if (action == MarkdownFormatAction.SwitchEditMode) {
-            toggleMarkdownEditMode()
-            return
-        }
         val ui = _uiState.value
-        if (ui.isWysiwygCapable && ui.markdownEditMode == MarkdownEditMode.RichText) {
-            applyRichFormatAction(action)
-            return
-        }
-        val state = chunkStates[ui.focusedEditChunk] ?: return
-        val text = state.text.toString()
-        val selection = state.selection
-        val edit = when (action) {
-            MarkdownFormatAction.Link -> {
-                requestLinkDialog()
-                return
-            }
-
-            MarkdownFormatAction.SwitchEditMode -> return
-
-            MarkdownFormatAction.Bold -> MarkdownSyntaxFormatter.toggleInline(
-                formatParseCache.parse(text),
-                selection.min,
-                selection.max,
-                MarkdownInlineStyle.Bold,
-            )
-
-            MarkdownFormatAction.Italic -> MarkdownSyntaxFormatter.toggleInline(
-                formatParseCache.parse(text),
-                selection.min,
-                selection.max,
-                MarkdownInlineStyle.Italic,
-            )
-
-            MarkdownFormatAction.Strikethrough -> MarkdownSyntaxFormatter.toggleInline(
-                formatParseCache.parse(text),
-                selection.min,
-                selection.max,
-                MarkdownInlineStyle.Strikethrough,
-            )
-
-            MarkdownFormatAction.InlineCode -> MarkdownSyntaxFormatter.toggleInline(
-                formatParseCache.parse(text),
-                selection.min,
-                selection.max,
-                MarkdownInlineStyle.Code,
-            )
-
-            MarkdownFormatAction.HeadingCycle ->
-                MarkdownSyntaxFormatter.cycleHeading(text, selection.min, selection.max)
-
-            MarkdownFormatAction.BulletList ->
-                MarkdownSyntaxFormatter.toggleList(
-                    text,
-                    selection.min,
-                    selection.max,
-                    ordered = false
-                )
-
-            MarkdownFormatAction.OrderedList ->
-                MarkdownSyntaxFormatter.toggleList(
-                    text,
-                    selection.min,
-                    selection.max,
-                    ordered = true
-                )
-
-            MarkdownFormatAction.Quote ->
-                MarkdownSyntaxFormatter.toggleQuote(text, selection.min, selection.max)
-        }
-        applyFormatEdit(state, edit)
+        if (!ui.isWysiwygCapable || ui.markdownEditMode != MarkdownEditMode.RichText) return
+        applyRichFormatAction(action)
     }
 
     fun toggleMarkdownEditMode() {
@@ -599,7 +524,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             MarkdownFormatAction.OrderedList -> rich.toggleFocusedListItem(ordered = true)
             MarkdownFormatAction.Quote -> rich.toggleFocusedQuote()
             MarkdownFormatAction.Link -> requestRichLinkDialog(rich)
-            MarkdownFormatAction.SwitchEditMode -> Unit
         }
     }
 
@@ -614,7 +538,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     text = existing?.let { span -> text.substring(span.start, span.end) }
                         ?: text.substring(selection.min, selection.max),
                     url = (existing?.style as? RichSpanStyle.Link)?.url.orEmpty(),
-                    isRichExistingLink = existing != null,
+                    isExistingLink = existing != null,
                 ),
             )
         }
@@ -627,80 +551,18 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         return richDocumentState.value?.focusedTextBlock
     }
 
-    private fun requestLinkDialog() {
-        val state = chunkStates[_uiState.value.focusedEditChunk] ?: return
-        val text = state.text.toString()
-        val selection = state.selection
-        val existing =
-            MarkdownSyntaxFormatter.linkAt(
-                formatParseCache.parse(text),
-                selection.min,
-                selection.max
-            )
-        _uiState.update {
-            it.copy(
-                linkDialog = MarkdownLinkDialogUiState(
-                    text = existing?.text ?: text.substring(selection.min, selection.max),
-                    url = existing?.url.orEmpty(),
-                    existingLink = existing,
-                ),
-            )
-        }
-    }
-
     fun confirmLink(linkText: String, url: String) {
-        richTextBlockForLink()?.let { block ->
-            block.text.applyLink(linkText, url)
-            return dismissLinkDialog()
-        }
-        val state = chunkStates[_uiState.value.focusedEditChunk] ?: return dismissLinkDialog()
-        val selection = state.selection
-        val edit = MarkdownSyntaxFormatter.applyLink(
-            selectionStart = selection.min,
-            selectionEnd = selection.max,
-            existing = _uiState.value.linkDialog?.existingLink,
-            linkText = linkText.ifBlank { url },
-            url = url,
-        )
-        applyFormatEdit(state, edit)
+        richTextBlockForLink()?.text?.applyLink(linkText, url)
         dismissLinkDialog()
     }
 
     fun removeLink() {
-        richTextBlockForLink()?.let { block ->
-            block.text.removeLink()
-            return dismissLinkDialog()
-        }
-        val existing = _uiState.value.linkDialog?.existingLink ?: return dismissLinkDialog()
-        val state = chunkStates[_uiState.value.focusedEditChunk] ?: return dismissLinkDialog()
-        val selection = state.selection
-        val edit = MarkdownSyntaxFormatter.applyLink(
-            selectionStart = selection.min,
-            selectionEnd = selection.max,
-            existing = existing,
-            linkText = existing.text,
-            url = "",
-        )
-        applyFormatEdit(state, edit)
+        richTextBlockForLink()?.text?.removeLink()
         dismissLinkDialog()
     }
 
     fun dismissLinkDialog() {
         _uiState.update { it.copy(linkDialog = null) }
-    }
-
-    /** Applies all replacements and the restored selection as one edit (a single undo step). */
-    private fun applyFormatEdit(state: TextFieldState, edit: MarkdownFormatEdit) {
-        if (edit.replacements.isEmpty()) return
-        state.edit {
-            edit.replacements.sortedByDescending { it.start }.forEach {
-                replace(it.start, it.end, it.text)
-            }
-            selection = TextRange(
-                edit.selectionStart.coerceIn(0, length),
-                edit.selectionEnd.coerceIn(0, length),
-            )
-        }
     }
 
     /** Resolves the Markdown feature flags; also called in Create mode (new .md files). */
@@ -1180,6 +1042,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             TextEditorTopBarAction.GetLink -> emitManageLinkEffect()
             TextEditorTopBarAction.Share -> emitShareEffect()
             TextEditorTopBarAction.SendToChat -> emitSendToChatEffect()
+
+            is TextEditorTopBarAction.SwitchEditMode -> toggleMarkdownEditMode()
 
             TextEditorTopBarAction.Save,
             TextEditorTopBarAction.More,

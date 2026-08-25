@@ -74,7 +74,6 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
@@ -91,11 +90,9 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.texteditor.components.MarkdownPreview
 import mega.privacy.android.feature.texteditor.components.TextEditorContent
 import mega.privacy.android.feature.texteditor.components.TextEditorFastScrollbar
-import mega.privacy.android.feature.texteditor.components.markdown.MarkdownEditorParseCache
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormattingToolbar
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownLinkDialog
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownSelectionFormats
-import mega.privacy.android.feature.texteditor.components.markdown.rememberMarkdownWysiwygOutputTransformation
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichBlockKind
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentEditor
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentState
@@ -356,6 +353,9 @@ fun TextEditorScreen(
                     onBack = onBack,
                     onOpenNodeOptions = onOpenNodeOptions,
                     isMarkdownPreview = showMarkdownPreview,
+                    isMarkdown = uiState.isMarkdown,
+                    showEditModeSwitch = uiState.isWysiwygCapable,
+                    isRichTextMode = uiState.markdownEditMode == MarkdownEditMode.RichText,
                 )
             },
         ) { paddingValues ->
@@ -419,27 +419,9 @@ fun TextEditorScreen(
                     }
 
                     else -> {
-                        val showFormattingToolbar = isEditable &&
-                                uiState.isMarkdown &&
-                                uiState.isWysiwygEnabled
-                        val useWysiwyg = isEditable &&
-                                uiState.isWysiwygCapable &&
-                                uiState.markdownEditMode == MarkdownEditMode.Markdown
                         val useRichText = isEditable &&
                                 uiState.isWysiwygCapable &&
                                 uiState.markdownEditMode == MarkdownEditMode.RichText
-                        // One parse per edit: the live-styling transformation and the toolbar's
-                        // active-state detection share this memoized cache.
-                        val markdownParseCache = if (showFormattingToolbar || useWysiwyg) {
-                            remember { MarkdownEditorParseCache() }
-                        } else {
-                            null
-                        }
-                        val wysiwygTransformation = if (useWysiwyg && markdownParseCache != null) {
-                            rememberMarkdownWysiwygOutputTransformation(markdownParseCache)
-                        } else {
-                            null
-                        }
                         val richDocumentState by viewModel.richDocumentState
                             .collectAsStateWithLifecycle()
                         LaunchedEffect(useRichText) {
@@ -449,7 +431,7 @@ fun TextEditorScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .then(
-                                    if (showFormattingToolbar) Modifier.imePadding() else Modifier,
+                                    if (useRichText) Modifier.imePadding() else Modifier,
                                 ),
                         ) {
                             Box(
@@ -486,9 +468,6 @@ fun TextEditorScreen(
                                         onTopLineChanged = viewModel::updateTopLine,
                                         restoreFocusChunkIndex = uiState.restoreFocusChunkIndex,
                                         onRestoreFocusConsumed = viewModel::consumeRestoreFocusChunkIndex,
-                                        chunkOutputTransformationProvider = wysiwygTransformation
-                                            ?.let { transformation -> { _: Int -> transformation } },
-                                        applyImePadding = !showFormattingToolbar,
                                     )
                                     TextEditorFastScrollbar(
                                         state = lazyListState,
@@ -518,20 +497,11 @@ fun TextEditorScreen(
                                     )
                                 }
                             }
-                            if (showFormattingToolbar && markdownParseCache != null) {
-                                if (useRichText) {
-                                    richDocumentState?.let { richState ->
-                                        RichEditToolbar(
-                                            viewModel = viewModel,
-                                            richState = richState,
-                                        )
-                                    }
-                                } else {
-                                    MarkdownEditToolbar(
+                            if (useRichText) {
+                                richDocumentState?.let { richState ->
+                                    RichEditToolbar(
                                         viewModel = viewModel,
-                                        focusedEditChunk = uiState.focusedEditChunk,
-                                        parseCache = markdownParseCache,
-                                        showModeSwitch = uiState.isWysiwygCapable,
+                                        richState = richState,
                                     )
                                 }
                             }
@@ -609,6 +579,9 @@ private fun CollapsingTopBar(
     onBack: () -> Unit,
     onOpenNodeOptions: (() -> Unit)?,
     isMarkdownPreview: Boolean,
+    isMarkdown: Boolean,
+    showEditModeSwitch: Boolean,
+    isRichTextMode: Boolean,
 ) {
     Column {
         // Reserve the status-bar height permanently via a window-insets modifier so the content and
@@ -646,6 +619,9 @@ private fun CollapsingTopBar(
                             onSave = onSaveToolbar,
                             onMenuAction = viewModel::onMenuAction,
                             onTitleClick = onTitleClick,
+                            isMarkdown = isMarkdown,
+                            showEditModeSwitch = showEditModeSwitch,
+                            isRichTextMode = isRichTextMode,
                         )
 
                         else -> TextEditorViewModeTopAppBar(
@@ -873,7 +849,10 @@ private fun TextEditorDiscardDialog(
 
 /**
  * Edit-mode top app bar. [onTitleClick] scrolls to top and reveals the bar; action buttons
- * (Save, Line numbers) use their own hit targets and are not affected.
+ * (Save, Line numbers, mode switch) use their own hit targets and are not affected.
+ *
+ * Line numbers are a plain-text affordance and disappear for Markdown files; the rich/source
+ * mode switch appears (in both edit modes) only when the document is WYSIWYG-capable.
  */
 @Composable
 private fun TextEditorEditModeTopAppBar(
@@ -882,14 +861,20 @@ private fun TextEditorEditModeTopAppBar(
     onSave: () -> Unit,
     onMenuAction: (TextEditorTopBarAction) -> Unit,
     onTitleClick: () -> Unit,
+    isMarkdown: Boolean,
+    showEditModeSwitch: Boolean,
+    isRichTextMode: Boolean,
 ) {
     MegaTopAppBar(
         title = title,
         navigationType = AppBarNavigationType.Close(onClose),
-        actions = listOf(
-            TextEditorTopBarAction.LineNumbers,
-            TextEditorTopBarAction.Save,
-        ),
+        actions = buildList {
+            if (!isMarkdown) add(TextEditorTopBarAction.LineNumbers)
+            if (showEditModeSwitch) {
+                add(TextEditorTopBarAction.SwitchEditMode(isRichTextMode))
+            }
+            add(TextEditorTopBarAction.Save)
+        },
         onActionPressed = {
             when (it) {
                 is TextEditorTopBarAction.Save -> onSave()
@@ -943,39 +928,6 @@ private fun TextEditorViewModeTopAppBar(
 }
 
 /**
- * Formatting toolbar wired to the focused chunk: observes its selection/text to derive the
- * active-format toggle states, and forwards actions to the ViewModel.
- */
-@Composable
-private fun MarkdownEditToolbar(
-    viewModel: TextEditorComposeViewModel,
-    focusedEditChunk: Int,
-    parseCache: MarkdownEditorParseCache,
-    showModeSwitch: Boolean,
-) {
-    val chunkState = remember(focusedEditChunk) {
-        viewModel.getOrCreateChunkState(focusedEditChunk)
-    }
-    var formats by remember { mutableStateOf(MarkdownSelectionFormats.Empty) }
-    LaunchedEffect(chunkState) {
-        snapshotFlow { chunkState.selection to chunkState.text.toString() }
-            .distinctUntilChanged()
-            .collect { (selection, text) ->
-                formats = MarkdownSelectionFormats.from(
-                    parseCache.parse(text),
-                    selection.min,
-                    selection.max,
-                )
-            }
-    }
-    MarkdownFormattingToolbar(
-        formats = formats,
-        onAction = viewModel::applyFormatAction,
-        showModeSwitch = showModeSwitch,
-    )
-}
-
-/**
  * Formatting toolbar for rich text mode: active states come from the focused block's spans,
  * typing styles, and block kind, and actions route to the ViewModel's rich path.
  */
@@ -1005,8 +957,6 @@ private fun RichEditToolbar(
     MarkdownFormattingToolbar(
         formats = formats,
         onAction = viewModel::applyFormatAction,
-        showModeSwitch = true,
-        isRichTextMode = true,
     )
 }
 
