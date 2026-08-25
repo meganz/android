@@ -243,6 +243,15 @@ enum class ApiFeatures(
     ),
 
     /**
+     * On-device voice message transcription using Gemma via LiteRT-LM.
+     */
+    VoiceTranscription(
+        experimentName = "vmtxt",
+        description = "Enable on-device transcription of chat voice clip messages using Gemma",
+        defaultValue = false,
+    ),
+
+    /**
      * Home configuration feature flag for Home Revamp Phase 2
      * Enable home configuration to reorder widgets
      */
