@@ -84,12 +84,14 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSort
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
-import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineSortDialog
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampScreen
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampSortConfiguration
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampSortConfiguration.Companion.toLegacySort as toLegacyRevampSort
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampUiState
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.component.TimelineRevampSortBottomSheet
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewModel
@@ -449,7 +451,7 @@ fun MediaMainScreen(
     setEnableCUPage: (Boolean) -> Unit,
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
-    onTimelineRevampSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
+    onTimelineRevampSortOptionChange: (value: TimelineRevampSortConfiguration) -> Unit,
     onTimelineApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
     timelineRevampFilterUiState: TimelineFilterUiState,
     onTimelineRevampApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
@@ -501,17 +503,10 @@ fun MediaMainScreen(
         if (isTimelineRevampEnabled) timelineRevampSelectedTimePeriod else selectedTimePeriod
     val onApplyTimelineFilter =
         if (isTimelineRevampEnabled) onTimelineRevampApplyFilterClick else onTimelineApplyFilterClick
-    val effectiveOnSortOptionChange =
-        if (isTimelineRevampEnabled) onTimelineRevampSortOptionChange else onTimelineSortOptionChange
     val effectiveOnMediaTimePeriodSelected =
         if (isTimelineRevampEnabled) onTimelineRevampMediaTimePeriodSelected else onMediaTimePeriodSelected
-    val effectiveCurrentSort =
-        if (isTimelineRevampEnabled) {
-            (timelineRevampUiState as? TimelineRevampUiState.Data)?.currentSort
-                ?: TimelineTabSortOptions.Newest
-        } else {
-            timelineTabUiState.currentSort
-        }
+    val revampCurrentSort = (timelineRevampUiState as? TimelineRevampUiState.Data)?.currentSort
+        ?: TimelineRevampSortConfiguration.Default
     val showEnableCameraUploadsPageForRevamp = isTimelineRevampEnabled &&
             mediaCameraUploadUiState.enableCameraUploadPageShowing &&
             timelineRevampFilterUiState.mediaSource != FilterMediaSource.CloudDrive
@@ -727,7 +722,11 @@ fun MediaMainScreen(
                                         showTimelineSortDialog = false
                                     },
                                     onTimelineSortOptionChange = {
-                                        effectiveOnSortOptionChange(it)
+                                        onTimelineSortOptionChange(it)
+                                        showTimelineSortDialog = false
+                                    },
+                                    onTimelineRevampSortChange = {
+                                        onTimelineRevampSortOptionChange(it)
                                         showTimelineSortDialog = false
                                     },
                                     onTimelinePhotoClick = { id, anchorIndex, totalCount, thumbnailPath ->
@@ -738,7 +737,16 @@ fun MediaMainScreen(
                                             onNavigateToTimelinePhotoPreview(
                                                 MediaTimelinePhotoPreviewNavKey(
                                                     id = id,
-                                                    sortType = effectiveCurrentSort.toLegacySort().name,
+                                                    sortType = if (isTimelineRevampEnabled) {
+                                                        revampCurrentSort.toLegacyRevampSort().name
+                                                    } else {
+                                                        timelineTabUiState.currentSort.toLegacySort().name
+                                                    },
+                                                    sortOrder = if (isTimelineRevampEnabled) {
+                                                        revampCurrentSort.sortOrder.name
+                                                    } else {
+                                                        timelineTabUiState.currentSort.sortOrder.name
+                                                    },
                                                     filterType = effectiveTimelineFilterUiState.mediaType.name,
                                                     mediaSource = effectiveTimelineFilterUiState.mediaSource.toLegacyPhotosSource().name,
                                                     anchorIndex = anchorIndex,
@@ -837,6 +845,7 @@ private fun MediaScreen.MediaContent(
     onTimelineSortDialogDismissed: () -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     onTimelinePhotoClick: (id: Long, anchorIndex: Int, totalCount: Int, thumbnailPath: String?) -> Unit,
+    onTimelineRevampSortChange: (value: TimelineRevampSortConfiguration) -> Unit,
     onTimelinePhotoSelected: (id: Long) -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
@@ -933,11 +942,11 @@ private fun MediaScreen.MediaContent(
                     }
 
                     if (showTimelineSortDialog) {
-                        TimelineSortDialog(
+                        TimelineRevampSortBottomSheet(
                             selected = (timelineRevampUiState as? TimelineRevampUiState.Data)
-                                ?.currentSort ?: TimelineTabSortOptions.Newest,
+                                ?.currentSort ?: TimelineRevampSortConfiguration.Default,
                             onDismissRequest = onTimelineSortDialogDismissed,
-                            onOptionSelected = onTimelineSortOptionChange,
+                            onSortChange = onTimelineRevampSortChange,
                         )
                     }
                 }

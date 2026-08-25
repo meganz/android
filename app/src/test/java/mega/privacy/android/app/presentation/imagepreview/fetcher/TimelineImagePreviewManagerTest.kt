@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.ImageNodeInfo
-import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadFolderHandlesUseCase
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
@@ -72,7 +71,7 @@ class TimelineImagePreviewManagerTest {
             .thenReturn(listOf(section("A", 3), section("B", 2)))
 
         val total = underTest.initialize(
-            sort = Sort.NEWEST,
+            sortOrder = SortOrder.ORDER_MODIFICATION_DESC,
             mediaType = FilterMediaType.ALL_MEDIA,
             source = TimelinePhotosSource.ALL_PHOTOS,
             hideSensitive = false,
@@ -84,7 +83,7 @@ class TimelineImagePreviewManagerTest {
     @Test
     fun `test that initialize uses the known total and skips the sections query`() = runTest {
         val total = underTest.initialize(
-            sort = Sort.NEWEST,
+            sortOrder = SortOrder.ORDER_MODIFICATION_DESC,
             mediaType = FilterMediaType.ALL_MEDIA,
             source = TimelinePhotosSource.ALL_PHOTOS,
             hideSensitive = false,
@@ -101,7 +100,7 @@ class TimelineImagePreviewManagerTest {
         val filterCaptor = argumentCaptor<MediaTimelineFilter>()
 
         underTest.initialize(
-            sort = Sort.NEWEST,
+            sortOrder = SortOrder.ORDER_MODIFICATION_DESC,
             mediaType = FilterMediaType.IMAGES,
             source = TimelinePhotosSource.ALL_PHOTOS,
             hideSensitive = false,
@@ -115,13 +114,13 @@ class TimelineImagePreviewManagerTest {
     }
 
     @Test
-    fun `test that initialize hides sensitive nodes and uses ascending order when requested`() =
+    fun `test that initialize hides sensitive nodes and passes the ascending order through`() =
         runTest {
             whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
             val filterCaptor = argumentCaptor<MediaTimelineFilter>()
 
             underTest.initialize(
-                sort = Sort.OLDEST,
+                sortOrder = SortOrder.ORDER_MODIFICATION_ASC,
                 mediaType = FilterMediaType.ALL_MEDIA,
                 source = TimelinePhotosSource.ALL_PHOTOS,
                 hideSensitive = true,
@@ -140,10 +139,10 @@ class TimelineImagePreviewManagerTest {
         stubRefPages()
         whenever(getImageNodeByIdUseCase(NodeId(5L))).thenReturn(node)
         underTest.initialize(
-            Sort.NEWEST,
+            SortOrder.ORDER_MODIFICATION_DESC,
             FilterMediaType.ALL_MEDIA,
             TimelinePhotosSource.ALL_PHOTOS,
-            false
+            false,
         )
 
         val result = underTest.getImageNodeAtIndex(5)
@@ -158,11 +157,11 @@ class TimelineImagePreviewManagerTest {
             stubSections(total = 10)
             stubRefPages()
             underTest.initialize(
-                Sort.NEWEST,
-                FilterMediaType.ALL_MEDIA,
-                TimelinePhotosSource.ALL_PHOTOS,
-                false
-            )
+            SortOrder.ORDER_MODIFICATION_DESC,
+            FilterMediaType.ALL_MEDIA,
+            TimelinePhotosSource.ALL_PHOTOS,
+            false,
+        )
 
             val result = underTest.getImageNodeAtIndex(20)
 
@@ -175,10 +174,10 @@ class TimelineImagePreviewManagerTest {
         stubSections(total = 100)
         stubRefPages()
         underTest.initialize(
-            Sort.NEWEST,
+            SortOrder.ORDER_MODIFICATION_DESC,
             FilterMediaType.ALL_MEDIA,
             TimelinePhotosSource.ALL_PHOTOS,
-            false
+            false,
         )
 
         val index = underTest.indexOfImageNode(preferredIndex = 5, nodeId = NodeId(7L))
@@ -192,11 +191,11 @@ class TimelineImagePreviewManagerTest {
             stubSections(total = 100)
             stubRefPages()
             underTest.initialize(
-                Sort.NEWEST,
-                FilterMediaType.ALL_MEDIA,
-                TimelinePhotosSource.ALL_PHOTOS,
-                false
-            )
+            SortOrder.ORDER_MODIFICATION_DESC,
+            FilterMediaType.ALL_MEDIA,
+            TimelinePhotosSource.ALL_PHOTOS,
+            false,
+        )
 
             val index = underTest.indexOfImageNode(preferredIndex = 5, nodeId = NodeId(999L))
 
@@ -217,7 +216,7 @@ class TimelineImagePreviewManagerTest {
                     )
                 )
             underTest.initialize(
-                sort = Sort.NEWEST,
+                sortOrder = SortOrder.ORDER_MODIFICATION_DESC,
                 mediaType = FilterMediaType.ALL_MEDIA,
                 source = TimelinePhotosSource.ALL_PHOTOS,
                 hideSensitive = true,
@@ -253,7 +252,7 @@ class TimelineImagePreviewManagerTest {
         runTest {
             stubSections(total = 0)
             underTest.initialize(
-                sort = Sort.NEWEST,
+                sortOrder = SortOrder.ORDER_MODIFICATION_DESC,
                 mediaType = FilterMediaType.ALL_MEDIA,
                 source = TimelinePhotosSource.ALL_PHOTOS,
                 hideSensitive = false,

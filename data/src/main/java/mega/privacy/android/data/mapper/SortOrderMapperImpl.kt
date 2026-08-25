@@ -29,6 +29,8 @@ internal class SortOrderMapperImpl @Inject constructor() : SortOrderMapper {
         MegaApiJava.ORDER_LABEL_DESC -> SortOrder.ORDER_LABEL_DESC
         MegaApiJava.ORDER_FAV_ASC -> SortOrder.ORDER_FAV_ASC
         MegaApiJava.ORDER_FAV_DESC -> SortOrder.ORDER_FAV_DESC
+        MegaApiJava.ORDER_MEDIATS_ASC -> SortOrder.ORDER_MEDIATS_ASC
+        MegaApiJava.ORDER_MEDIATS_DESC -> SortOrder.ORDER_MEDIATS_DESC
         else -> null
     }
 }

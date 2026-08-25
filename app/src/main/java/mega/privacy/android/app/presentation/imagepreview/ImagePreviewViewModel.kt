@@ -33,12 +33,14 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentIm
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImagePreviewManager
+import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImagePreviewManager.Companion.toSortOrder
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
@@ -343,8 +345,9 @@ class ImagePreviewViewModel @Inject constructor(
         val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
 
         val total = timelineImagePreviewManager.initialize(
-            sort = params.readEnum<Sort>(TimelineImageNodeFetcher.TIMELINE_SORT_TYPE)
-                ?: Sort.NEWEST,
+            sortOrder = params.readEnum<SortOrder>(TimelineImageNodeFetcher.TIMELINE_SORT_ORDER)
+                ?: (params.readEnum<Sort>(TimelineImageNodeFetcher.TIMELINE_SORT_TYPE)
+                    ?: Sort.NEWEST).toSortOrder(),
             mediaType = params.readEnum<FilterMediaType>(TimelineImageNodeFetcher.TIMELINE_FILTER_TYPE)
                 ?: FilterMediaType.ALL_MEDIA,
             source = params.readEnum<TimelinePhotosSource>(TimelineImageNodeFetcher.TIMELINE_MEDIA_SOURCE)
@@ -475,7 +478,7 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun isSlideshowMenuVisible(imageNode: ImageNode): Boolean {
-        return menu?.isSlideshowMenuVisible(imageNode) ?: false && _state.value.imageNodes.size > 1
+        return menu?.isSlideshowMenuVisible(imageNode) ?: false && _state.value.pageCount > 1
     }
 
     suspend fun isFavouriteMenuVisible(imageNode: ImageNode): Boolean {

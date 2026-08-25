@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.FilterMediaType
@@ -45,7 +46,6 @@ import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
-import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
@@ -625,13 +625,14 @@ internal class TimelineRevampViewModelTest {
         }
 
     @Test
-    fun `test that uiState Data defaults the sort option to Newest`() = runTest {
+    fun `test that uiState Data defaults the sort option to Date added newest first`() = runTest {
         whenever(getMediaTimelineSectionsUseCase(any(), any()))
             .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
         initUnderTest()
 
         underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
-            assertThat(awaitItem().currentSort).isEqualTo(TimelineTabSortOptions.Newest)
+            assertThat(awaitItem().currentSort)
+                .isEqualTo(TimelineRevampSortConfiguration.Default)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -644,30 +645,77 @@ internal class TimelineRevampViewModelTest {
 
         underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
             awaitItem()
-            underTest.onSortOptionsChange(TimelineTabSortOptions.Oldest)
+            underTest.onSortOptionsChange(DATE_TAKEN_OLDEST)
             var data = awaitItem()
-            while (data.currentSort != TimelineTabSortOptions.Oldest) data = awaitItem()
-            assertThat(data.currentSort).isEqualTo(TimelineTabSortOptions.Oldest)
+            while (data.currentSort != DATE_TAKEN_OLDEST) data = awaitItem()
+            assertThat(data.currentSort).isEqualTo(DATE_TAKEN_OLDEST)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test that changing sort to Oldest reloads the sections with ascending order`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
-        initUnderTest()
+    fun `test that changing sort to Date taken oldest reloads the sections with ascending capture order`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
+            initUnderTest()
 
-        underTest.uiState.test {
-            awaitItem()
-            advanceUntilIdle()
-            underTest.onSortOptionsChange(TimelineTabSortOptions.Oldest)
-            advanceUntilIdle()
-            cancelAndIgnoreRemainingEvents()
+            underTest.uiState.test {
+                awaitItem()
+                advanceUntilIdle()
+                underTest.onSortOptionsChange(DATE_TAKEN_OLDEST)
+                advanceUntilIdle()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(getMediaTimelineSectionsUseCase)
+                .invoke(any(), eq(SortOrder.ORDER_MEDIATS_ASC))
         }
 
-        verify(getMediaTimelineSectionsUseCase)
-            .invoke(any(), eq(SortOrder.ORDER_MODIFICATION_ASC))
-    }
+    @Test
+    fun `test that changing sort to Date taken newest reloads the sections with descending capture order`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
+            initUnderTest()
+
+            underTest.uiState.test {
+                awaitItem()
+                advanceUntilIdle()
+                underTest.onSortOptionsChange(
+                    TimelineRevampSortConfiguration(
+                        option = TimelineRevampSortOption.DateTaken,
+                        direction = SortDirection.Descending,
+                    )
+                )
+                advanceUntilIdle()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(getMediaTimelineSectionsUseCase)
+                .invoke(any(), eq(SortOrder.ORDER_MEDIATS_DESC))
+        }
+
+    @Test
+    fun `test that changing sort to Date added oldest reloads the sections with ascending modification order`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
+            initUnderTest()
+
+            underTest.uiState.test {
+                awaitItem()
+                advanceUntilIdle()
+                underTest.onSortOptionsChange(
+                    TimelineRevampSortConfiguration(
+                        option = TimelineRevampSortOption.DateAdded,
+                        direction = SortDirection.Ascending,
+                    )
+                )
+                advanceUntilIdle()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(getMediaTimelineSectionsUseCase)
+                .invoke(any(), eq(SortOrder.ORDER_MODIFICATION_ASC))
+        }
 
     @Test
     fun `test that the per-section page query uses the selected sort order`() = runTest {
@@ -680,7 +728,7 @@ internal class TimelineRevampViewModelTest {
 
         underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
             awaitItem()
-            underTest.onSortOptionsChange(TimelineTabSortOptions.Oldest)
+            underTest.onSortOptionsChange(DATE_TAKEN_OLDEST)
             advanceUntilIdle()
             underTest.onVisibleRangeChanged(firstIndex = 0, lastIndex = 4)
             advanceUntilIdle()
@@ -690,7 +738,7 @@ internal class TimelineRevampViewModelTest {
         verify(listMediaNodesByOffsetUseCase).invoke(
             filter = any(),
             section = any(),
-            order = eq(SortOrder.ORDER_MODIFICATION_ASC),
+            order = eq(SortOrder.ORDER_MEDIATS_ASC),
             maxElements = any(),
             offset = any(),
         )
@@ -1027,6 +1075,11 @@ internal class TimelineRevampViewModelTest {
             category = MediaTimelineFilter.Category.All,
             location = MediaTimelineFilter.Location.CloudDriveAndVault,
             sensitivity = MediaTimelineFilter.Sensitivity.ShowAll,
+        )
+
+        val DATE_TAKEN_OLDEST = TimelineRevampSortConfiguration(
+            option = TimelineRevampSortOption.DateTaken,
+            direction = SortDirection.Ascending,
         )
     }
 }

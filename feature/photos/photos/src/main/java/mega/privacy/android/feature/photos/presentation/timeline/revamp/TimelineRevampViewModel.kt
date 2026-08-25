@@ -69,7 +69,6 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterU
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFormatters
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNormalModeActionUiState
-import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
@@ -145,10 +144,10 @@ class TimelineRevampViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, TimelineGridSize.Default)
 
     /**
-     * The selected sort option (Newest / Oldest). Drives the section order and the per-section page
+     * The selected timestamp column and direction. Drives the section order and the per-section page
      * order; changing it reloads the timeline (via [monitorTimelineSections]).
      */
-    private val sortOptionsFlow = MutableStateFlow(TimelineTabSortOptions.Newest)
+    private val sortOptionsFlow = MutableStateFlow(TimelineRevampSortConfiguration.Default)
 
     /**
      * Whether the sort toolbar action is enabled. Mirrors the tab: disabled when there is no content
@@ -412,12 +411,17 @@ class TimelineRevampViewModel @Inject constructor(
         }
     }
 
+    /**
+     * The card's date comes from the section, not from the representative node: the section is the
+     * capture-time bucket the grid headers and the card-to-grid navigation both key on, whereas the
+     * node's modification time can fall in a different month entirely.
+     */
     private fun buildPeriodCard(
         period: MediaTimePeriod,
         section: MediaTimelineSection,
         node: TypedFileNode,
     ): PhotosNodeListCard {
-        val zonedDateTime = TimelineDateCache.get(node.modificationTime)
+        val zonedDateTime = TimelineDateCache.get(section.startDate)
         val isCurrentYear = zonedDateTime.year == Year.now().value
         val cardPeriod: PhotosNodeListCardPeriod
         val formattedDate: String
@@ -547,7 +551,7 @@ class TimelineRevampViewModel @Inject constructor(
         loaded: Map<Int, PhotosNodeContentItemV2>,
         isHiddenNodesEnabled: Boolean,
         gridSize: TimelineGridSize,
-        currentSort: TimelineTabSortOptions,
+        currentSort: TimelineRevampSortConfiguration,
         selectedPeriod: MediaTimePeriod,
         periodCards: List<PhotosNodeListCard>,
         arePeriodCardsLoading: Boolean,
@@ -920,10 +924,10 @@ class TimelineRevampViewModel @Inject constructor(
     }
 
     /**
-     * Updates the sort option (Newest / Oldest). Changing it reloads the timeline through
-     * [monitorTimelineSections], flipping the section order and the per-section page order.
+     * Updates the timestamp column and direction to sort by. Changing it reloads the timeline through
+     * [monitorTimelineSections], re-bucketing the sections and re-ordering the per-section pages.
      */
-    fun onSortOptionsChange(value: TimelineTabSortOptions) {
+    fun onSortOptionsChange(value: TimelineRevampSortConfiguration) {
         sortOptionsFlow.update { value }
     }
 
@@ -1036,7 +1040,7 @@ class TimelineRevampViewModel @Inject constructor(
         val loadedNodes: Map<Int, PhotosNodeContentItemV2>,
         val isHiddenNodesEnabled: Boolean,
         val gridSize: TimelineGridSize,
-        val currentSort: TimelineTabSortOptions,
+        val currentSort: TimelineRevampSortConfiguration,
     )
 
     private data class PeriodCards(

@@ -33,7 +33,9 @@ class SortOrderMapperTest {
         MegaApiJava.ORDER_LABEL_ASC to SortOrder.ORDER_LABEL_ASC,
         MegaApiJava.ORDER_LABEL_DESC to SortOrder.ORDER_LABEL_DESC,
         MegaApiJava.ORDER_FAV_ASC to SortOrder.ORDER_FAV_ASC,
-        MegaApiJava.ORDER_FAV_DESC to SortOrder.ORDER_FAV_DESC
+        MegaApiJava.ORDER_FAV_DESC to SortOrder.ORDER_FAV_DESC,
+        MegaApiJava.ORDER_MEDIATS_ASC to SortOrder.ORDER_MEDIATS_ASC,
+        MegaApiJava.ORDER_MEDIATS_DESC to SortOrder.ORDER_MEDIATS_DESC
     )
 
     @Test

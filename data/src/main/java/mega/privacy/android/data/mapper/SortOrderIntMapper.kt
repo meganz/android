@@ -36,6 +36,8 @@ class SortOrderIntMapper @Inject constructor() {
         SortOrder.ORDER_LABEL_DESC -> MegaApiJava.ORDER_LABEL_DESC
         SortOrder.ORDER_FAV_ASC -> MegaApiJava.ORDER_FAV_ASC
         SortOrder.ORDER_FAV_DESC -> MegaApiJava.ORDER_FAV_DESC
+        SortOrder.ORDER_MEDIATS_ASC -> MegaApiJava.ORDER_MEDIATS_ASC
+        SortOrder.ORDER_MEDIATS_DESC -> MegaApiJava.ORDER_MEDIATS_DESC
     }
 
     private fun SortOrderSource.isOutgoingShares(): Boolean =

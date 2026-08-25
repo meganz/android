@@ -3823,4 +3823,8 @@
     </plurals>
     <!-- Error shown below a password field when the password entered is too weak to be accepted, so it cannot be saved. For example, the password protecting a share link. -->
     <string name="password_too_weak_error_message">Please use a stronger password.</string>
+    <!-- Media timeline sort option for the bottom sheet to sort by "Date added" -->
+    <string name="media_timeline_sort_option_date_added">Date added</string>
+    <!-- Media timeline sort option for the bottom sheet to sort by "Date taken" -->
+    <string name="media_timeline_sort_option_date_taken">Date taken</string>
 </resources>

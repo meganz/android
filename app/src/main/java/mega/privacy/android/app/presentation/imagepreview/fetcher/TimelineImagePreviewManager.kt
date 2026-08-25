@@ -56,16 +56,19 @@ class TimelineImagePreviewManager @Inject constructor(
      * Builds the filter/order and resolves the total media count. Runs once per session and unblocks
      * [getImageNodeAtIndex]/[indexOfImageNode]. When [knownTotal] is positive (the grid already
      * summed the sections) it's used directly, skipping the expensive sections aggregate.
+     *
+     * @param sortOrder must be the ordering the grid queried with, otherwise the anchor index the
+     * grid computed points at a different node.
      */
     suspend fun initialize(
-        sort: Sort,
+        sortOrder: SortOrder,
         mediaType: FilterMediaType,
         source: TimelinePhotosSource,
         hideSensitive: Boolean,
         knownTotal: Int = 0,
     ): Int = withContext(ioDispatcher) {
         try {
-            order = sort.toSortOrder()
+            order = sortOrder
             mediaSource = source
             this@TimelineImagePreviewManager.hideSensitive = hideSensitive
             filter = buildFilter(mediaType, source, hideSensitive)
@@ -201,13 +204,13 @@ class TimelineImagePreviewManager @Inject constructor(
         TimelinePhotosSource.CAMERA_UPLOAD -> FilterMediaSource.CameraUpload
     }
 
-    private fun Sort.toSortOrder(): SortOrder = when (this) {
-        Sort.OLDEST -> SortOrder.ORDER_MODIFICATION_ASC
-        else -> SortOrder.ORDER_MODIFICATION_DESC
-    }
-
     companion object {
         private const val PAGE_SIZE = 30
+
+        internal fun Sort.toSortOrder(): SortOrder = when (this) {
+            Sort.OLDEST -> SortOrder.ORDER_MODIFICATION_ASC
+            else -> SortOrder.ORDER_MODIFICATION_DESC
+        }
 
         // Generous ceiling for awaiting the ordering init before a play tap gives up and
         // falls back to the default queue; init normally completes long before a tap, so the

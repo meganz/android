@@ -77,5 +77,21 @@ enum class SortOrder {
     /**
      * Order ORDER_FAV_DESC refers to MegaApiJava.ORDER_FAV_DESC
      */
-    ORDER_FAV_DESC
+    ORDER_FAV_DESC,
+
+    /**
+     * Order ORDER_MEDIATS_ASC refers to MegaApiJava.ORDER_MEDIATS_ASC
+     *
+     * Sorts by media capture timestamp, oldest first. Only meaningful for media nodes — the
+     * timestamp is 0 for everything else.
+     */
+    ORDER_MEDIATS_ASC,
+
+    /**
+     * Order ORDER_MEDIATS_DESC refers to MegaApiJava.ORDER_MEDIATS_DESC
+     *
+     * Sorts by media capture timestamp, newest first. Only meaningful for media nodes — the
+     * timestamp is 0 for everything else.
+     */
+    ORDER_MEDIATS_DESC
 }

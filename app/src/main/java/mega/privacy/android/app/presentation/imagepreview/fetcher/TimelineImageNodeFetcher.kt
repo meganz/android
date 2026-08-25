@@ -75,6 +75,13 @@ class TimelineImageNodeFetcher @Inject constructor(
 
     internal companion object {
         const val TIMELINE_SORT_TYPE = "sortType"
+
+        /**
+         * The exact [mega.privacy.android.domain.entity.SortOrder] the grid queried with. Read by the
+         * paginated viewer ([TimelineImagePreviewManager]), which re-queries the timeline and so needs
+         * the timestamp column too, not just the newest / oldest direction of [TIMELINE_SORT_TYPE].
+         */
+        const val TIMELINE_SORT_ORDER = "sortOrder"
         const val TIMELINE_FILTER_TYPE = "filterType"
         const val TIMELINE_MEDIA_SOURCE = "MediaSource"
     }

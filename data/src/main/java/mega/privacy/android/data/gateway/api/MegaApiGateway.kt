@@ -4158,14 +4158,24 @@ interface MegaApiGateway {
      *
      * Same scope / sensitivity / file-version exclusion as
      * MegaApi::listAllNodesByPage; any FILE_TYPE_* the latter accepts is
-     * accepted here. Nodes with mtime <= 0 are excluded so the section
-     * list does not contain a spurious "1970-01-01" bucket. Sections with
+     * accepted here, except that ORDER_MEDIATS_* additionally requires a
+     * media category (see below). Nodes with no timestamp in the active
+     * column (mtime <= 0, or mediats == 0) are excluded so the section list
+     * does not contain a spurious "1970-01-01" bucket. Sections with
      * zero remaining items are omitted.
      *
      * Always returns the section list across the entire filter scope.
      *
      * Supported sort orders (@p order):
      *   - ORDER_MODIFICATION_ASC / ORDER_MODIFICATION_DESC
+     *   - ORDER_MEDIATS_ASC      / ORDER_MEDIATS_DESC
+     *
+     * ORDER_MEDIATS_* groups by media capture timestamp rather than
+     * modification time, and requires @p filter->byCategory() to be one of
+     * FILE_TYPE_PHOTO / FILE_TYPE_VIDEO / FILE_TYPE_AUDIO /
+     * FILE_TYPE_ALL_VISUAL_MEDIA: mediats is 0 for every other category, so
+     * the grouping would have no rows to bucket. Any other combination is
+     * rejected (empty list + warning).
      *
      * Other order values are rejected (empty list + warning).
      *
@@ -4208,8 +4218,9 @@ interface MegaApiGateway {
      * @param filter       Required. Scope/category filter; may carry byTimestampAnchor.
      * @param order        Sort order constant. Accepts the same set as
      *                     listAllNodesByPage (ORDER_DEFAULT / SIZE / MODIFICATION /
-     *                     LABEL / FAV, each ASC/DESC); the fast-scroller flow uses
-     *                     NEWEST/OLDEST = ORDER_MODIFICATION_DESC/ASC.
+     *                     LABEL / FAV / MEDIATS, each ASC/DESC); the fast-scroller
+     *                     flow uses NEWEST/OLDEST = ORDER_MODIFICATION_DESC/ASC, or
+     *                     the ORDER_MEDIATS_* pair for a capture-time timeline.
      * @param cancelToken  Optional; may be null.
      * @param maxElements  Window size (limit). 0 means no limit.
      * @param offset       Leading nodes to skip; must be >= 0 (negative => empty list).

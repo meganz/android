@@ -19,7 +19,11 @@ import mega.privacy.android.app.components.largebundle.LargeBundleHolder
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewVideoLauncher
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
+import android.os.Bundle
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.FETCHER_PARAMS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
+import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_PUBLIC_LINK_URL
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_INDEX
@@ -1400,6 +1404,65 @@ class ImagePreviewViewModelTest {
             assertThat(state.currentImageNode).isEqualTo(anchorNode)
             assertThat(underTest.resolveImageNode(3)).isEqualTo(anchorNode)
         }
+
+    @Test
+    fun `test that timeline pagination derives the order from sortType when no sortOrder is supplied`() =
+        runTest {
+            stubTimelinePaginationSession(
+                params = mapOf(TimelineImageNodeFetcher.TIMELINE_SORT_TYPE to "OLDEST"),
+            )
+            initViewModel()
+
+            advanceUntilIdle()
+
+            verify(timelineImagePreviewManager).initialize(
+                eq(SortOrder.ORDER_MODIFICATION_ASC),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        }
+
+    @Test
+    fun `test that timeline pagination prefers sortOrder over sortType when both are supplied`() =
+        runTest {
+            stubTimelinePaginationSession(
+                params = mapOf(
+                    TimelineImageNodeFetcher.TIMELINE_SORT_TYPE to "NEWEST",
+                    TimelineImageNodeFetcher.TIMELINE_SORT_ORDER to "ORDER_MEDIATS_ASC",
+                ),
+            )
+            initViewModel()
+
+            advanceUntilIdle()
+
+            verify(timelineImagePreviewManager).initialize(
+                eq(SortOrder.ORDER_MEDIATS_ASC),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        }
+
+    /**
+     * Puts the ViewModel on the paginated timeline path with [params] readable as the fetcher bundle.
+     */
+    private suspend fun stubTimelinePaginationSession(params: Map<String, String>) {
+        val bundle = mock<Bundle> {
+            params.forEach { (key, value) -> on { getString(key) } doReturn value }
+        }
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+        whenever(savedStateHandle.get<String>(FETCHER_PARAMS)).thenReturn("params")
+        whenever(largeBundleHolder.get("params")).thenReturn(bundle)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any(), any()))
+            .thenReturn(0)
+    }
 
     @Test
     fun `test that timeline pagination corrects the anchor index when the tapped node moved`() =

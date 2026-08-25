@@ -6,7 +6,6 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
-import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 
@@ -38,8 +37,8 @@ sealed interface TimelineRevampUiState {
      * @property isHiddenNodesEnabled whether the hidden-nodes feature is enabled for the account;
      * drives the sensitive-item blur in the grid.
      * @property gridSize the selected grid size, driving the number of columns in the grid.
-     * @property currentSort the selected sort option (Newest / Oldest), shown as the checked option in
-     * the sort dialog.
+     * @property currentSort the selected timestamp column and direction, shown as the checked row of
+     * the sort bottom sheet.
      * @property selectedPeriod the selected time period, deciding whether the grid or a Year / Month
      * card list is shown.
      * @property periodCards the Year or Month summary cards shown when [selectedPeriod] is
@@ -55,7 +54,7 @@ sealed interface TimelineRevampUiState {
         val loadedNodes: Map<Int, PhotosNodeContentItemV2>,
         val isHiddenNodesEnabled: Boolean = false,
         val gridSize: TimelineGridSize = TimelineGridSize.Default,
-        val currentSort: TimelineTabSortOptions = TimelineTabSortOptions.Newest,
+        val currentSort: TimelineRevampSortConfiguration = TimelineRevampSortConfiguration.Default,
         val selectedPeriod: MediaTimePeriod = MediaTimePeriod.All,
         val periodCards: List<PhotosNodeListCard> = emptyList(),
         val arePeriodCardsLoading: Boolean = false,
