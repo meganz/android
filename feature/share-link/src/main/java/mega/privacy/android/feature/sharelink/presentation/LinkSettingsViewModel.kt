@@ -31,9 +31,7 @@ import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCa
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
-import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
-import mega.privacy.android.feature.sharelink.session.ShareLinkPublicLinkCache
-import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkSession
 import timber.log.Timber
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -49,22 +47,19 @@ import kotlin.time.Duration.Companion.seconds
 @HiltViewModel(assistedFactory = LinkSettingsViewModel.Factory::class)
 class LinkSettingsViewModel @AssistedInject constructor(
     @Assisted private val args: Args,
+    @Assisted private val session: ShareLinkSession,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
     private val getPasswordStrengthUseCase: GetPasswordStrengthUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val splitLinkAndKeyUseCase: SplitLinkAndKeyUseCase,
-    private val passwordCache: ShareLinkPasswordCache,
-    private val separateKeyCache: ShareLinkSeparateKeyCache,
-    private val publicLinkCache: ShareLinkPublicLinkCache,
 ) : ViewModel() {
 
     private val handle: Long? = args.subject.cacheKey
     private val isAlbum: Boolean = args.subject is ShareLinkSubject.Album
-    private val cachedPassword: LinkPassword? =
-        handle?.takeUnless { isAlbum }?.let(passwordCache::get)
-    private val cachedSeparateKey: Boolean = handle?.let(separateKeyCache::get) ?: false
+    private val cachedPassword: LinkPassword? = session.password.value
+    private val cachedSeparateKey: Boolean = session.isKeySeparate.value
 
     private val _uiState = MutableStateFlow(
         LinkSettingsUiState(
@@ -83,7 +78,7 @@ class LinkSettingsViewModel @AssistedInject constructor(
      * The link being edited, seeded from what the Share link screen resolved. An album is not a
      * node, so [loadNode] can never find one for it; a node overwrites this with its own once read.
      */
-    private var publicLink: String? = handle?.let(publicLinkCache::get)
+    private var publicLink: String? = session.publicLink
 
     /** The only grading allowed to reach the state; replaced on every change to the password. */
     private var strengthJob: Job? = null
@@ -221,7 +216,7 @@ class LinkSettingsViewModel @AssistedInject constructor(
 
     /**
      * Applies the pending changes, writing any password change/removal to the shared
-     * [ShareLinkPasswordCache] so the Share link screen reflects it.
+     * [ShareLinkSession] so the Share link screen reflects it.
      *
      * @return The link as it stands once the changes are applied, for the Share link screen to put
      * back on the clipboard, or null when no link is known (an album).
@@ -258,18 +253,16 @@ class LinkSettingsViewModel @AssistedInject constructor(
         }
 
         if (state.isSeparateKeyDirty) {
-            separateKeyCache.set(handle, state.isSeparateKeyEnabled)
+            session.isKeySeparate.value = state.isSeparateKeyEnabled
         }
         // The cache write and the choice of link to copy are settled separately. Deciding both in
         // one `when` let removing a password return the full link and shadow a separate-key change
         // made in the same save, putting the decryption key on the clipboard.
         if (password != null) {
-            passwordCache.set(
-                handle,
-                LinkPassword(password = password, linkWithPassword = encryptedLink),
-            )
+            session.password.value =
+                LinkPassword(password = password, linkWithPassword = encryptedLink)
         } else if (state.isPasswordAlreadySet) {
-            passwordCache.set(handle, null)
+            session.password.value = null
         }
 
         // Mirrors the Share link screen's own rule for the link it shows: password-encrypted if
@@ -406,7 +399,7 @@ class LinkSettingsViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(args: Args): LinkSettingsViewModel
+        fun create(args: Args, session: ShareLinkSession): LinkSettingsViewModel
     }
 
     private companion object {

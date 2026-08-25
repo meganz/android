@@ -18,11 +18,16 @@ import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.feature.sharelink.session.ShareLinkSession
 import mega.privacy.android.navigation.ExtraConstant.TYPE_TEXT_PLAIN
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.contract.shared.provideSharedViewModelScope
+import mega.privacy.android.navigation.contract.shared.sharedViewModel
+import mega.privacy.android.navigation.contract.shared.withSharedViewModelStoreKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.LinkSettingsNavKey
@@ -40,11 +45,16 @@ import mega.privacy.android.shared.resources.R as sharedR
  *
  * An album only reaches here with the flag on, since the album entry point gates before
  * navigating; the disabled branch covers the flag being turned off mid-session.
+ *
+ * This entry owns the [SHARE_LINK_FLOW_SCOPE] shared ViewModel scope that holds the flow's
+ * [ShareLinkSession]; popping it ends the session. @see [ShareLinkSession] for why that matters.
  */
 fun EntryProviderScope<NavKey>.shareLinkScreen(
     navigationHandler: NavigationHandler,
 ) {
-    entry<ShareLinkNavKey> { key ->
+    entry<ShareLinkNavKey>(
+        metadata = buildMetadata { provideSharedViewModelScope(SHARE_LINK_FLOW_SCOPE) },
+    ) { key ->
         FeatureFlagGate(
             feature = ApiFeatures.ShareLinkRevamp,
             disabled = {
@@ -57,9 +67,10 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
                 }
             }
         ) {
+            val session = sharedViewModel<ShareLinkSessionViewModel>().session
             val viewModel =
                 hiltViewModel<ShareLinkViewModel, ShareLinkViewModel.Factory> { factory ->
-                    factory.create(ShareLinkViewModel.Args(key.subject()))
+                    factory.create(ShareLinkViewModel.Args(key.subject()), session)
                 }
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val resources = LocalResources.current
@@ -139,15 +150,19 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
 
 /**
  * Registers the revamped Link settings editor screen entry. Only reachable from the
- * gear action of [shareLinkScreen], so it inherits the [ApiFeatures.ShareLinkRevamp] gate.
+ * gear action of [shareLinkScreen], so it inherits the [ApiFeatures.ShareLinkRevamp] gate and
+ * joins the [SHARE_LINK_FLOW_SCOPE] that entry owns, sharing its [ShareLinkSession].
  */
 fun EntryProviderScope<NavKey>.linkSettingsScreen(
     navigationHandler: NavigationHandler,
 ) {
-    entry<LinkSettingsNavKey> { key ->
+    entry<LinkSettingsNavKey>(
+        metadata = buildMetadata { withSharedViewModelStoreKey(SHARE_LINK_FLOW_SCOPE) },
+    ) { key ->
+        val session = sharedViewModel<ShareLinkSessionViewModel>().session
         val viewModel =
             hiltViewModel<LinkSettingsViewModel, LinkSettingsViewModel.Factory> { factory ->
-                factory.create(LinkSettingsViewModel.Args(key.subject()))
+                factory.create(LinkSettingsViewModel.Args(key.subject()), session)
             }
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val resources = LocalResources.current
@@ -228,6 +243,12 @@ internal fun ShareLinkNavKey.subject(): ShareLinkSubject =
 /** @see ShareLinkNavKey.subject */
 internal fun LinkSettingsNavKey.subject(): ShareLinkSubject =
     albumId?.let(ShareLinkSubject::Album) ?: ShareLinkSubject.Nodes(handles)
+
+/**
+ * Names the shared ViewModel scope the two screens of the Share link flow live in, owned by the
+ * Share link entry.
+ */
+private const val SHARE_LINK_FLOW_SCOPE = "share_link_flow"
 
 /** MEGA security help page opened from the "Separate link and key" learn-more link. */
 private const val SEPARATE_KEY_LEARN_MORE_URL =

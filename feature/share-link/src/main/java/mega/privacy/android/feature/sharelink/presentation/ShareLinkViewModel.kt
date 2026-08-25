@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.core.coroutine.asUiStateFlow
@@ -43,9 +42,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
-import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
-import mega.privacy.android.feature.sharelink.session.ShareLinkPublicLinkCache
-import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkSession
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import timber.log.Timber
@@ -67,6 +64,7 @@ import kotlin.time.Duration.Companion.seconds
 @HiltViewModel(assistedFactory = ShareLinkViewModel.Factory::class)
 class ShareLinkViewModel @AssistedInject constructor(
     @Assisted private val args: Args,
+    @Assisted private val session: ShareLinkSession,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val exportNodesUseCase: ExportNodesUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
@@ -82,9 +80,6 @@ class ShareLinkViewModel @AssistedInject constructor(
     private val exportAlbumsUseCase: ExportAlbumsUseCase,
     private val albumHasSensitiveContentUseCase: AlbumHasSensitiveContentUseCase,
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
-    private val passwordCache: ShareLinkPasswordCache,
-    private val separateKeyCache: ShareLinkSeparateKeyCache,
-    private val publicLinkCache: ShareLinkPublicLinkCache,
 ) : ViewModel() {
 
     /**
@@ -110,15 +105,11 @@ class ShareLinkViewModel @AssistedInject constructor(
         val accountTypeFlow = monitorAccountDetailUseCase()
             .map { it.levelDetail?.accountType }
             .onStart { emit(null) }
-        // Albums support no password, so only a node subject reaches the password cache.
-        val nodeHandle = (args.subject as? ShareLinkSubject.Nodes)?.handles?.firstOrNull()
-        val passwordFlow = nodeHandle?.let(passwordCache::monitor) ?: flowOf(null)
-        val separateKeyFlow = args.subject.cacheKey?.let(separateKeyCache::monitor) ?: flowOf(false)
         combine(
             linkFlow,
             accountTypeFlow,
-            passwordFlow,
-            separateKeyFlow,
+            session.password,
+            session.isKeySeparate,
         ) { state, accountType, password, isKeySeparate ->
             if (state !is ShareLinkUiState.Data) return@combine state
             state.copy(
@@ -206,8 +197,11 @@ class ShareLinkViewModel @AssistedInject constructor(
             return@flow
         }
         // The Link settings screen reads the node itself, but publishing here keeps the two in
-        // step and survives a node read that fails there.
-        nodeLinks.first().let { publicLinkCache.set(it.handle, it.link) }
+        // step and survives a node read that fails there. Only the subject's own link is published:
+        // a node whose export failed is dropped above, so the first item left is not necessarily
+        // the node Link settings edits, and publishing that one would hand it a stranger's link.
+        nodeLinks.firstOrNull { it.handle == args.subject.cacheKey }
+            ?.let { session.publicLink = it.link }
 
         val hasNewLinks = exportedLinks.isNotEmpty()
         emit(
@@ -250,7 +244,7 @@ class ShareLinkViewModel @AssistedInject constructor(
         // An album is not a node, so the Link settings screen cannot read this link for itself.
         // Without it, saving an album's settings copied nothing and left the user holding the
         // earlier link, key included.
-        publicLinkCache.set(albumId, link)
+        session.publicLink = link
 
         emitAll(
             combine(
@@ -435,9 +429,10 @@ class ShareLinkViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         /**
-         * Create a [ShareLinkViewModel] for the given [args].
+         * Create a [ShareLinkViewModel] for the given [args], sharing [session] with the Link
+         * settings screen.
          */
-        fun create(args: Args): ShareLinkViewModel
+        fun create(args: Args, session: ShareLinkSession): ShareLinkViewModel
     }
 
     private companion object {

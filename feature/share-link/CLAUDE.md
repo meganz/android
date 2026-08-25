@@ -14,6 +14,7 @@ Single tree under `mega.privacy.android.feature.sharelink`:
 - `presentation/` — `*Screen` composables, `*ScreenDestination` entry-providers, `*ViewModel` (assisted-injected, mirroring `FileLinkViewModel`), `*UiState`.
 - `navigation/` — `ShareLinkFeatureGraph` (implements `FeatureDestination`).
 - `di/` — `ShareLinkModule` contributes the destination `@IntoSet`.
+- `session/` — `ShareLinkSession`, the flow-scoped state holder (password, separate-key choice, resolved link).
 
 NavKeys (`ShareLinkNavKey`, `LinkSettingsNavKey`) live in `:navigation` (`destination/ShareLinkDestinations.kt`), not here.
 
@@ -22,6 +23,13 @@ The `{GetLink,ManageLink}ActionClickHandler` (currently in deprecated `:core:ui-
 
 ## Testing
 JUnit 5 + Mockito + Turbine + Truth for ViewModels; Compose UI tests per screen. Run: `./gradlew feature:share-link:testDebugUnitTest`.
+
+## Flow-scoped session
+Link passwords, the "separate link and key" choice and the resolved link are client-side state the SDK cannot report back, so both screens read them from a shared `ShareLinkSession`. It is owned by `ShareLinkSessionViewModel` in the `share_link_flow` shared ViewModel scope: the `ShareLinkNavKey` entry declares `provideSharedViewModelScope`, `LinkSettingsNavKey` joins with `withSharedViewModelStoreKey`, and popping the Share link entry discards the session.
+
+The lifetime is load-bearing, not incidental. This state used to be held process-wide and keyed by node handle, and a handle outlives its link, so anything held past the flow re-attached to a link recreated for the same node (AND-24697). `ShareLinkSession` is deliberately not injectable — the shared scope is the only way to reach one.
+
+**One session serves one subject**, so the state is held directly rather than in a map: the flow opens for a single album or node selection (of which only the first is editable, `ShareLinkSubject.cacheKey`), and it is a leaf — nothing reachable from it opens another Share link screen. A second entry point on top of itself would break that assumption.
 
 ## Notes & Gotchas
 - New components only where the design system lacks them: `ShareLinkDetailRow`, `ShareLinkDetails`, `MegaDatePickerDialog`. Everything else maps to existing `mega.android.core.ui` components — never hardcode hex; use `DSTokens`.

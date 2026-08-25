@@ -39,9 +39,7 @@ import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCas
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
-import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
-import mega.privacy.android.feature.sharelink.session.ShareLinkPublicLinkCache
-import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkSession
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.AfterEach
@@ -77,11 +75,8 @@ class ShareLinkViewModelTest {
     private val hasSensitiveDescendantUseCase = mock<HasSensitiveDescendantUseCase>()
     private val shouldShowCopyrightUseCase = mock<ShouldShowCopyrightUseCase>()
     private val setShowCopyrightUseCase = mock<SetShowCopyrightUseCase>()
-    private val passwordCache = mock<ShareLinkPasswordCache>()
-    private val separateKeyCache = mock<ShareLinkSeparateKeyCache>()
-
-    // Real instance: a plain in-memory map, so a mock would only restate what it already does.
-    private val publicLinkCache = ShareLinkPublicLinkCache()
+    // Real instance: a plain state holder, so a mock would only restate what it already does.
+    private val session = ShareLinkSession()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorUserAlbumByIdUseCase = mock<MonitorUserAlbumByIdUseCase>()
     private val getAlbumPhotosUseCase = mock<GetAlbumPhotosUseCase>()
@@ -95,8 +90,6 @@ class ShareLinkViewModelTest {
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(AccountDetail()))
         whenever(splitLinkAndKeyUseCase(any())).thenReturn(LinkAndKey(null, null))
         whenever(fileTypeIconMapper(any(), any())).thenReturn(FILE_ICON_RES)
-        whenever(passwordCache.monitor(any())).thenReturn(flowOf(null))
-        whenever(separateKeyCache.monitor(any())).thenReturn(flowOf(false))
         whenever(monitorNodeUpdatesUseCase()).thenReturn(nodeUpdates)
         whenever { hasSensitiveInheritedUseCase(any()) }.thenReturn(false)
         whenever { hasSensitiveDescendantUseCase(any()) }.thenReturn(false)
@@ -124,9 +117,7 @@ class ShareLinkViewModelTest {
         exportAlbumsUseCase = exportAlbumsUseCase,
         albumHasSensitiveContentUseCase = albumHasSensitiveContentUseCase,
         downloadThumbnailUseCase = downloadThumbnailUseCase,
-        passwordCache = passwordCache,
-        separateKeyCache = separateKeyCache,
-        publicLinkCache = publicLinkCache,
+        session = session,
     )
 
     @AfterEach
@@ -147,8 +138,6 @@ class ShareLinkViewModelTest {
             exportAlbumsUseCase,
             albumHasSensitiveContentUseCase,
             downloadThumbnailUseCase,
-            passwordCache,
-            separateKeyCache,
         )
     }
 
@@ -318,8 +307,7 @@ class ShareLinkViewModelTest {
                 on { type } doReturn PdfFileTypeInfo
             }
             whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
-            whenever(passwordCache.monitor(NODE_HANDLE))
-                .thenReturn(flowOf(LinkPassword("Str0ngP@ss", ENCRYPTED_LINK)))
+            session.password.value = LinkPassword("Str0ngP@ss", ENCRYPTED_LINK)
 
             underTest.uiState.test {
                 val data = awaitData { it.isPasswordSet }
@@ -341,7 +329,7 @@ class ShareLinkViewModelTest {
             whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
             whenever(splitLinkAndKeyUseCase("https://mega.nz/file/abc#key123"))
                 .thenReturn(LinkAndKey("https://mega.nz/file/abc", "key123"))
-            whenever(separateKeyCache.monitor(NODE_HANDLE)).thenReturn(flowOf(true))
+            session.isKeySeparate.value = true
 
             underTest.uiState.test {
                 val node = awaitData { it.isKeySeparate }.primary
@@ -382,13 +370,11 @@ class ShareLinkViewModelTest {
             whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
             whenever(splitLinkAndKeyUseCase("https://mega.nz/file/abc#key123"))
                 .thenReturn(LinkAndKey("https://mega.nz/file/abc", "key123"))
-            val separateKeyFlow = MutableStateFlow(false)
-            whenever(separateKeyCache.monitor(NODE_HANDLE)).thenReturn(separateKeyFlow)
 
             underTest.uiState.test {
                 assertThat(awaitData().isKeySeparate).isFalse()
 
-                separateKeyFlow.value = true
+                session.isKeySeparate.value = true
 
                 val node = awaitData { it.isKeySeparate }.primary
                 assertThat(node.linkWithoutKey).isEqualTo("https://mega.nz/file/abc")
@@ -431,6 +417,59 @@ class ShareLinkViewModelTest {
         }
         verifyNoInteractions(exportNodesUseCase)
     }
+
+    @Test
+    fun `test that the session holds the link of the node Link settings edits`() = runTest {
+        val first = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "Documents"
+            on { exportedData } doReturn ExportedData("https://mega.nz/folder/fid#fkey", 0L)
+        }
+        val second = mock<TypedFileNode> {
+            on { id } doReturn NodeId(SECOND_HANDLE)
+            on { name } doReturn "report.pdf"
+            on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
+            on { type } doReturn PdfFileTypeInfo
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(first)
+        whenever(getNodeByIdUseCase(NodeId(SECOND_HANDLE))).thenReturn(second)
+
+        buildViewModel(listOf(NODE_HANDLE, SECOND_HANDLE)).uiState.test {
+            awaitData()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertThat(session.publicLink).isEqualTo("https://mega.nz/folder/fid#fkey")
+    }
+
+    @Test
+    fun `test that the session holds no link when the node Link settings edits has none`() =
+        runTest {
+            // A node whose export fails is dropped from the list, so the first item left belongs to
+            // a different node. Publishing that one would hand Link settings a stranger's link to
+            // encrypt and copy.
+            val unexported = mock<TypedFolderNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
+                on { name } doReturn "Documents"
+                on { exportedData } doReturn null
+            }
+            val second = mock<TypedFileNode> {
+                on { id } doReturn NodeId(SECOND_HANDLE)
+                on { name } doReturn "report.pdf"
+                on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
+                on { type } doReturn PdfFileTypeInfo
+            }
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(unexported)
+            whenever(getNodeByIdUseCase(NodeId(SECOND_HANDLE))).thenReturn(second)
+            whenever(exportNodesUseCase(listOf(NODE_HANDLE), CALLER_NAME)).thenReturn(emptyMap())
+
+            buildViewModel(listOf(NODE_HANDLE, SECOND_HANDLE)).uiState.test {
+                awaitData()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(session.publicLink).isNull()
+        }
 
     @Test
     fun `test that only nodes without a public link are batch exported`() = runTest {
@@ -1134,7 +1173,7 @@ class ShareLinkViewModelTest {
     @Test
     fun `test that the album separate key option is read from the separate key cache`() = runTest {
         stubAlbum()
-        whenever(separateKeyCache.monitor(ALBUM_ID)).thenReturn(flowOf(true))
+        session.isKeySeparate.value = true
 
         buildAlbumViewModel().uiState.test {
             assertThat(awaitData { it.isKeySeparate }.isKeySeparate).isTrue()
@@ -1143,7 +1182,7 @@ class ShareLinkViewModelTest {
     }
 
     @Test
-    fun `test that an album never reads the password cache`() = runTest {
+    fun `test that an album never has a session password`() = runTest {
         stubAlbum()
 
         buildAlbumViewModel().uiState.test {
@@ -1151,7 +1190,7 @@ class ShareLinkViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        verifyNoInteractions(passwordCache)
+        assertThat(session.password.value).isNull()
     }
 
     @Test

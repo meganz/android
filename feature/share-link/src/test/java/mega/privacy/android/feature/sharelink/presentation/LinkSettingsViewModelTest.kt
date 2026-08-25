@@ -29,9 +29,7 @@ import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCa
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
-import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
-import mega.privacy.android.feature.sharelink.session.ShareLinkPublicLinkCache
-import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkSession
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -59,11 +57,8 @@ class LinkSettingsViewModelTest {
     private val encryptLinkWithPasswordUseCase = mock<EncryptLinkWithPasswordUseCase>()
     private val getPasswordStrengthUseCase = mock<GetPasswordStrengthUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
-    private val passwordCache = mock<ShareLinkPasswordCache>()
-    private val separateKeyCache = mock<ShareLinkSeparateKeyCache>()
-
-    // Real instance: a plain in-memory map, so a mock would only restate what it already does.
-    private val publicLinkCache = ShareLinkPublicLinkCache()
+    // Real instance: a plain state holder, so a mock would only restate what it already does.
+    private val session = ShareLinkSession()
     private val splitLinkAndKeyUseCase = SplitLinkAndKeyUseCase()
 
     @BeforeEach
@@ -79,8 +74,6 @@ class LinkSettingsViewModelTest {
             encryptLinkWithPasswordUseCase,
             getPasswordStrengthUseCase,
             monitorAccountDetailUseCase,
-            passwordCache,
-            separateKeyCache,
         )
     }
 
@@ -120,15 +113,16 @@ class LinkSettingsViewModelTest {
     }
 
     private fun stubExistingPassword(password: String = OLD_PASSWORD) {
-        whenever(passwordCache.get(NODE_HANDLE)).thenReturn(LinkPassword(password, PUBLIC_LINK))
+        session.password.value = LinkPassword(password, PUBLIC_LINK)
     }
 
     private fun stubCachedSeparateKey() {
-        whenever(separateKeyCache.get(NODE_HANDLE)).thenReturn(true)
+        session.isKeySeparate.value = true
     }
 
     private fun createUnderTest(
         subject: ShareLinkSubject = ShareLinkSubject.Nodes(listOf(NODE_HANDLE)),
+        session: ShareLinkSession = this.session,
     ) = LinkSettingsViewModel(
         args = LinkSettingsViewModel.Args(subject = subject),
         getNodeByIdUseCase = getNodeByIdUseCase,
@@ -137,9 +131,7 @@ class LinkSettingsViewModelTest {
         getPasswordStrengthUseCase = getPasswordStrengthUseCase,
         monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         splitLinkAndKeyUseCase = splitLinkAndKeyUseCase,
-        passwordCache = passwordCache,
-        separateKeyCache = separateKeyCache,
-        publicLinkCache = publicLinkCache,
+        session = session,
     )
 
     private suspend fun ReceiveTurbine<LinkSettingsUiState>.awaitUntil(
@@ -402,7 +394,7 @@ class LinkSettingsViewModelTest {
 
             assertThat(underTest.uiState.value.savedEvent).isEqualTo(consumed)
             verifyNoInteractions(encryptLinkWithPasswordUseCase)
-            verify(passwordCache, never()).set(any(), anyOrNull())
+            assertThat(session.password.value).isNull()
         }
 
     @Test
@@ -683,7 +675,7 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(passwordCache).set(NODE_HANDLE, null)
+            assertThat(session.password.value).isNull()
         }
 
     @Test
@@ -709,7 +701,7 @@ class LinkSettingsViewModelTest {
 
             // Enabling the separate key turns the password off on its own, so the removal applies
             // even without an explicit toggle.
-            verify(passwordCache).set(NODE_HANDLE, null)
+            assertThat(session.password.value).isNull()
         }
 
     @Test
@@ -734,8 +726,9 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(separateKeyCache, never()).set(any(), any())
-            verify(passwordCache, never()).set(any(), anyOrNull())
+            // Still what it was before the save: turning it off was never committed.
+            assertThat(session.isKeySeparate.value).isTrue()
+            assertThat(session.password.value).isNull()
         }
 
     @Test
@@ -761,8 +754,8 @@ class LinkSettingsViewModelTest {
             }
 
             verifyNoInteractions(exportNodeUseCase)
-            verify(passwordCache, never()).set(any(), anyOrNull())
-            verify(separateKeyCache, never()).set(any(), any())
+            assertThat(session.password.value).isNull()
+            assertThat(session.isKeySeparate.value).isFalse()
         }
 
     @Test
@@ -807,7 +800,7 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, null))
+            assertThat(session.password.value).isEqualTo(LinkPassword(PASSWORD, null))
         }
 
     @Test
@@ -817,7 +810,7 @@ class LinkSettingsViewModelTest {
             // copied nothing. The clipboard kept the link the Share link screen had put there on
             // arrival — key included — so a user who had just separated the link and key pasted
             // the key anyway.
-            publicLinkCache.set(ALBUM_ID, ALBUM_LINK_WITH_KEY)
+            session.publicLink = ALBUM_LINK_WITH_KEY
             val underTest = createUnderTest(ShareLinkSubject.Album(ALBUM_ID))
             advanceUntilIdle()
 
@@ -831,15 +824,15 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(separateKeyCache).set(ALBUM_ID, true)
+            assertThat(session.isKeySeparate.value).isTrue()
             verifyNoInteractions(exportNodeUseCase)
         }
 
     @Test
     fun `test that an album save carries the full link again when the key is no longer separate`() =
         runTest(extension.testDispatcher) {
-            publicLinkCache.set(ALBUM_ID, ALBUM_LINK_WITH_KEY)
-            whenever(separateKeyCache.get(ALBUM_ID)).thenReturn(true)
+            session.publicLink = ALBUM_LINK_WITH_KEY
+            session.isKeySeparate.value = true
             val underTest = createUnderTest(ShareLinkSubject.Album(ALBUM_ID))
             advanceUntilIdle()
 
@@ -857,7 +850,7 @@ class LinkSettingsViewModelTest {
     fun `test that a failed node read keeps the link the Share link screen resolved`() =
         runTest(extension.testDispatcher) {
             // A transient node read failure used to null the link, turning the next save silent.
-            publicLinkCache.set(NODE_HANDLE, LINK_WITH_KEY)
+            session.publicLink = LINK_WITH_KEY
             whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE)))
                 .thenAnswer { throw RuntimeException("node read failed") }
             val underTest = createUnderTest()
@@ -948,6 +941,72 @@ class LinkSettingsViewModelTest {
         }
 
     @Test
+    fun `test that a password saved in one session is not seen by the next session`() =
+        runTest(extension.testDispatcher) {
+            // Removing a link and creating a new one reuses the node handle, so a password kept
+            // beyond the flow would re-attach itself to a link it was never set on.
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(encryptLinkWithPasswordUseCase(PUBLIC_LINK, PASSWORD)).thenReturn(ENCRYPTED_LINK)
+            val firstVisit = createUnderTest(session = ShareLinkSession())
+            advanceUntilIdle()
+            firstVisit.onPasswordEnabled(true)
+            firstVisit.onPasswordChanged(PASSWORD)
+            advanceUntilIdle()
+            firstVisit.onSave()
+            advanceUntilIdle()
+
+            val nextVisit = createUnderTest(session = ShareLinkSession())
+            advanceUntilIdle()
+
+            val state = nextVisit.uiState.value
+            assertThat(state.isPasswordEnabled).isFalse()
+            assertThat(state.isPasswordAlreadySet).isFalse()
+            assertThat(state.password).isNull()
+        }
+
+    @Test
+    fun `test that a password saved stays visible for the rest of the same session`() =
+        runTest(extension.testDispatcher) {
+            // The other half of the contract: the flow keeps the password while the user is still
+            // in it, so returning to Link settings still pre-fills what they set.
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(encryptLinkWithPasswordUseCase(PUBLIC_LINK, PASSWORD)).thenReturn(ENCRYPTED_LINK)
+            val session = ShareLinkSession()
+            val firstOpen = createUnderTest(session = session)
+            advanceUntilIdle()
+            firstOpen.onPasswordEnabled(true)
+            firstOpen.onPasswordChanged(PASSWORD)
+            advanceUntilIdle()
+            firstOpen.onSave()
+            advanceUntilIdle()
+
+            val reopened = createUnderTest(session = session)
+            advanceUntilIdle()
+
+            val state = reopened.uiState.value
+            assertThat(state.isPasswordAlreadySet).isTrue()
+            assertThat(state.password).isEqualTo(PASSWORD)
+        }
+
+    @Test
+    fun `test that a separate key choice made in one session is not seen by the next session`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            val firstVisit = createUnderTest(session = ShareLinkSession())
+            advanceUntilIdle()
+            firstVisit.onSeparateKeyEnabled(true)
+            firstVisit.onSave()
+            advanceUntilIdle()
+
+            val nextVisit = createUnderTest(session = ShareLinkSession())
+            advanceUntilIdle()
+
+            assertThat(nextVisit.uiState.value.isSeparateKeyEnabled).isFalse()
+        }
+
+    @Test
     fun `test that removing an existing password enables Save and clears the cached password`() =
         runTest(extension.testDispatcher) {
             stubNode()
@@ -967,7 +1026,7 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(passwordCache).set(NODE_HANDLE, null)
+            assertThat(session.password.value).isNull()
             verifyNoInteractions(encryptLinkWithPasswordUseCase)
         }
 
@@ -990,7 +1049,7 @@ class LinkSettingsViewModelTest {
             }
 
             verify(encryptLinkWithPasswordUseCase).invoke(PUBLIC_LINK, PASSWORD)
-            verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, ENCRYPTED_LINK))
+            assertThat(session.password.value).isEqualTo(LinkPassword(PASSWORD, ENCRYPTED_LINK))
         }
 
     @Test
@@ -1054,7 +1113,7 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, ENCRYPTED_LINK))
+            assertThat(session.password.value).isEqualTo(LinkPassword(PASSWORD, ENCRYPTED_LINK))
         }
 
     @Test
@@ -1074,7 +1133,7 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, null))
+            assertThat(session.password.value).isEqualTo(LinkPassword(PASSWORD, null))
             verifyNoInteractions(encryptLinkWithPasswordUseCase)
         }
 
@@ -1243,7 +1302,7 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(passwordCache, never()).set(any(), anyOrNull())
+            assertThat(session.password.value).isNull()
             verifyNoInteractions(encryptLinkWithPasswordUseCase)
         }
 
@@ -1300,7 +1359,7 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(separateKeyCache).set(NODE_HANDLE, true)
+            assertThat(session.isKeySeparate.value).isTrue()
             verifyNoInteractions(exportNodeUseCase)
         }
 
@@ -1362,8 +1421,8 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(separateKeyCache).set(NODE_HANDLE, true)
-            verify(passwordCache).set(NODE_HANDLE, null)
+            assertThat(session.isKeySeparate.value).isTrue()
+            assertThat(session.password.value).isNull()
             verifyNoInteractions(encryptLinkWithPasswordUseCase)
         }
 
@@ -1403,8 +1462,8 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(separateKeyCache).set(NODE_HANDLE, false)
-            verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, ENCRYPTED_LINK))
+            assertThat(session.isKeySeparate.value).isFalse()
+            assertThat(session.password.value).isEqualTo(LinkPassword(PASSWORD, ENCRYPTED_LINK))
         }
 
     @Test
@@ -1467,7 +1526,7 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(separateKeyCache).set(NODE_HANDLE, false)
+            assertThat(session.isKeySeparate.value).isFalse()
         }
 
     @Test
@@ -1483,13 +1542,13 @@ class LinkSettingsViewModelTest {
             }
 
             verifyNoInteractions(getNodeByIdUseCase)
-            verifyNoInteractions(passwordCache)
+            assertThat(session.password.value).isNull()
         }
 
     @Test
-    fun `test that the album separate key preference is seeded from the cache by album id`() =
+    fun `test that the album separate key preference is seeded from the session`() =
         runTest(extension.testDispatcher) {
-            whenever(separateKeyCache.get(ALBUM_ID)).thenReturn(true)
+            session.isKeySeparate.value = true
 
             val underTest = createUnderTest(ShareLinkSubject.Album(ALBUM_ID))
 
@@ -1540,7 +1599,7 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(separateKeyCache).set(ALBUM_ID, true)
+            assertThat(session.isKeySeparate.value).isTrue()
             verifyNoInteractions(exportNodeUseCase)
             verifyNoInteractions(encryptLinkWithPasswordUseCase)
         }
