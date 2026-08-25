@@ -49,6 +49,7 @@ class MediaPlaybackInfoEntityMapperTest {
                 { assertThat(it.totalDuration).isEqualTo(expectedTotalDuration) },
                 { assertThat(it.currentPosition).isEqualTo(expectedCurrentPosition) },
                 { assertThat(it.mediaType).isEqualTo(expectedMediaType) },
+                { assertThat(it.updatedAt).isGreaterThan(0L) },
             )
         }
     }

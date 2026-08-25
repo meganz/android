@@ -408,6 +408,17 @@ interface MediaPlayerRepository {
     suspend fun updateAudioPlaybackInfo(info: MediaPlaybackInfo)
 
     /**
+     * Update audio playback info and persist it immediately
+     *
+     * Unlike [updateAudioPlaybackInfo], which caches the info in memory until
+     * [saveAudioPlaybackInfo] runs, this writes straight to storage so the position survives
+     * a process kill, crash, or device restart.
+     *
+     * @param info the new playback info
+     */
+    suspend fun updateAndPersistAudioPlaybackInfo(info: MediaPlaybackInfo)
+
+    /**
      * Get media playback info by handle
      *
      * @param handle the media handle

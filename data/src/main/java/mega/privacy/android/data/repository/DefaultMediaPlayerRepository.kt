@@ -323,6 +323,13 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         }
     }
 
+    override suspend fun updateAndPersistAudioPlaybackInfo(info: MediaPlaybackInfo) {
+        if (info.mediaHandle == -1L) return
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.insertOrUpdatePlaybackInfo(info)
+        }
+    }
+
     override suspend fun getMediaPlaybackInfo(handle: Long): MediaPlaybackInfo? =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getMediaPlaybackInfo(handle)
