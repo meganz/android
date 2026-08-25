@@ -187,7 +187,10 @@ class SearchViewModel @AssistedInject constructor(
                 is SearchFilterResult.Type -> state.copy(typeFilterOption = result.option)
                 is SearchFilterResult.DateModified -> state.copy(dateModifiedFilterOption = result.option)
                 is SearchFilterResult.DateAdded -> state.copy(dateAddedFilterOption = result.option)
-            }.copy(nodesLoadingState = NodesLoadingState.Loading)
+            }.copy(
+                items = emptyList(),
+                nodesLoadingState = NodesLoadingState.Loading,
+            )
         }
         launchSearch(_uiState.value.searchText)
     }
@@ -196,6 +199,7 @@ class SearchViewModel @AssistedInject constructor(
         _uiState.update {
             it.copy(
                 searchText = text,
+                items = emptyList(),
                 nodesLoadingState = NodesLoadingState.Loading
             )
         }
@@ -245,7 +249,6 @@ class SearchViewModel @AssistedInject constructor(
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
                 nodeSourceType = args.nodeSourceType,
-                existingItems = _uiState.value.items,
                 isPublicNodes = args.nodeSourceType == NodeSourceType.FOLDER_LINK,
             )
             _uiState.update { state ->
@@ -638,6 +641,7 @@ class SearchViewModel @AssistedInject constructor(
         _uiState.update {
             it.copy(
                 tagFilterOption = tag,
+                items = emptyList(),
                 nodesLoadingState = NodesLoadingState.Loading,
             )
         }
@@ -651,6 +655,7 @@ class SearchViewModel @AssistedInject constructor(
         _uiState.update {
             it.copy(
                 tagFilterOption = null,
+                items = emptyList(),
                 nodesLoadingState = NodesLoadingState.Loading,
             )
         }

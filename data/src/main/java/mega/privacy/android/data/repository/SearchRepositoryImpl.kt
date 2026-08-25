@@ -14,6 +14,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
+import mega.privacy.android.data.mapper.search.MegaSearchPageMapper
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaSearchPage
 import javax.inject.Inject
 
 /**
@@ -42,6 +44,7 @@ internal class SearchRepositoryImpl @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
+    private val megaSearchPageMapper: MegaSearchPageMapper,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
@@ -74,6 +77,7 @@ internal class SearchRepositoryImpl @Inject constructor(
                 filter = queryFilter,
                 order = sortOrderIntMapper(order),
                 megaCancelToken = megaCancelToken,
+                megaSearchPage = resultsLimitPage(),
             )
         }
         mapMegaNodesToUnTypedNodes(searchList.await(), offlineItems.await())
@@ -102,6 +106,7 @@ internal class SearchRepositoryImpl @Inject constructor(
                 filter = filter,
                 order = sortOrderIntMapper(order),
                 megaCancelToken = megaCancelToken,
+                megaSearchPage = resultsLimitPage(),
             )
         }
         mapMegaNodesToUnTypedNodes(searchList.await(), offlineItems.await())
@@ -129,8 +134,17 @@ internal class SearchRepositoryImpl @Inject constructor(
             filter = filter,
             order = sortOrderIntMapper(order),
             megaCancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+            megaSearchPage = resultsLimitPage(),
         ).mapNotNull { nodeMapper(megaNode = it, fromFolderLink = true) }
     }
+
+    /**
+     * Page capping how many nodes a single search materializes — mapping every node of an
+     * unbounded result set to domain entities can exhaust the heap. The SDK sorts before
+     * paging, so the cap keeps the top results in the requested order.
+     */
+    private fun resultsLimitPage(): MegaSearchPage =
+        megaSearchPageMapper(offset = 0, limit = MAX_SEARCH_RESULTS.toLong())
 
     private suspend fun getAllOfflineNodeHandle() =
         megaLocalRoomGateway.getAllOfflineInfo().associateBy { it.handle }
@@ -224,5 +238,12 @@ internal class SearchRepositoryImpl @Inject constructor(
 
     override suspend fun clearRecentSearches() {
         recentSearchDao.clearRecentSearches()
+    }
+
+    companion object {
+        /**
+         * Upper bound on nodes materialized from a single search
+         */
+        internal const val MAX_SEARCH_RESULTS = 10_000
     }
 }

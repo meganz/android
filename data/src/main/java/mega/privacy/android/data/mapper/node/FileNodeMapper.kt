@@ -21,6 +21,7 @@ import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * File node mapper
@@ -52,7 +53,7 @@ internal class FileNodeMapper @Inject constructor(
         megaNode: MegaNode,
         requireSerializedData: Boolean,
         offline: Offline?,
-    ): FileNode? = runCatching {
+    ): FileNode? = try {
         DefaultFileNode(
             id = NodeId(megaNode.handle),
             name = megaNode.name,
@@ -98,9 +99,12 @@ internal class FileNodeMapper @Inject constructor(
             description = megaNode.description,
             tags = megaNode.tags?.let { stringListMapper(it) }
         )
-    }.onFailure {
-        Timber.e(it, "FileNodeMapper failed for handle=${megaNode.handle}")
-    }.getOrNull()
+    } catch (exception: CancellationException) {
+        throw exception
+    } catch (exception: Exception) {
+        Timber.e(exception, "FileNodeMapper failed for handle=${megaNode.handle}")
+        null
+    }
 
     private fun resolveType(megaNode: MegaNode): FileTypeInfo {
         val nameType = fileTypeInfoMapper(megaNode.name, megaNode.duration)
