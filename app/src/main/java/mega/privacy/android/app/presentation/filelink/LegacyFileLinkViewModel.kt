@@ -37,10 +37,8 @@ import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -88,7 +86,6 @@ class LegacyFileLinkViewModel @Inject constructor(
     private val queryAdsUseCase: QueryAdsUseCase,
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
     private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -187,10 +184,6 @@ class LegacyFileLinkViewModel @Inject constructor(
 
     private fun removeViewedFileLinkEntry(url: String) {
         viewModelScope.launch {
-            val isEnabled = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
-            }.getOrDefault(false)
-            if (!isEnabled) return@launch
             runCatching { removeViewedLinkByUrlUseCase(url) }
                 .onFailure { Timber.e(it, "Failed to remove viewed link for $url") }
         }
@@ -198,11 +191,6 @@ class LegacyFileLinkViewModel @Inject constructor(
 
     private fun saveViewedNode(link: String, node: TypedFileNode) {
         viewModelScope.launch {
-            val isEnabled = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
-            }.getOrDefault(false)
-            if (!isEnabled) return@launch
-
             runCatching {
                 saveViewedLinkUseCase(
                     ViewedLink(

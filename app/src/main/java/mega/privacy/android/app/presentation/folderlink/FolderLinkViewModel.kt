@@ -50,7 +50,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
@@ -63,7 +62,6 @@ import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
@@ -145,7 +143,6 @@ class FolderLinkViewModel @Inject constructor(
     private val queryAdsUseCase: QueryAdsUseCase,
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
     private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     /**
@@ -251,10 +248,6 @@ class FolderLinkViewModel @Inject constructor(
 
     private fun removeViewedFolderLinkEntry(url: String) {
         viewModelScope.launch {
-            val isEnabled = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
-            }.getOrDefault(false)
-            if (!isEnabled) return@launch
             runCatching { removeViewedLinkByUrlUseCase(url) }
                 .onFailure { Timber.e(it, "Failed to remove viewed link for $url") }
         }
@@ -515,11 +508,6 @@ class FolderLinkViewModel @Inject constructor(
 
     private fun saveViewedFolderLink(link: String, rootNode: TypedFolderNode) {
         viewModelScope.launch {
-            val isEnabled = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
-            }.getOrDefault(false)
-            if (!isEnabled) return@launch
-
             runCatching {
                 saveViewedLinkUseCase(
                     ViewedLink(

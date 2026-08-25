@@ -34,18 +34,14 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
-import mega.privacy.android.domain.entity.Feature
-import mega.privacy.android.domain.entity.navigation.Flagged
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.destination.FileLinkNavKey
@@ -61,13 +57,12 @@ import javax.inject.Inject
 /**
  * Home widget that displays recently viewed file and folder links.
  */
-class ViewedLinksWidget @Inject constructor() : HomeWidget, Flagged {
+class ViewedLinksWidget @Inject constructor() : HomeWidget {
     override val identifier: String = "ViewedLinksWidget"
     override val defaultOrder: HomeWidgetOrder = HomeWidgetOrder.ViewedLinks
     override val canDelete: Boolean = true
     override val isConfigurable: Boolean = true
     override val isDraggable: Boolean = true
-    override val feature: Feature = ApiFeatures.ViewedLinks
 
     override suspend fun getWidgetName() =
         LocalizedText.StringRes(sharedR.string.home_widget_viewed_links_section_header)
@@ -78,34 +73,32 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget, Flagged {
         navigationHandler: NavigationHandler,
         transferHandler: TransferHandler,
     ) {
-        FeatureFlagGate(feature = feature) {
-            val viewModel: ViewedLinksViewModel = hiltViewModel()
-            val lazyItems = viewModel.previewItems.collectAsLazyPagingItems()
-            val nodeOptionsActionViewModel =
-                hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
-                    creationCallback = { it.create(NodeSourceType.FOLDER_LINK) }
-                )
-
-            HandleNodeOptionsActionResult(
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                navigationHandler = navigationHandler,
-                onTransfer = transferHandler::setTransferEvent,
+        val viewModel: ViewedLinksViewModel = hiltViewModel()
+        val lazyItems = viewModel.previewItems.collectAsLazyPagingItems()
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(NodeSourceType.FOLDER_LINK) }
             )
 
-            ViewedLinksView(
-                lazyItems = lazyItems,
-                modifier = modifier,
-                onFolderLinkClicked = { link ->
-                    navigationHandler.navigate(FolderLinkNavKey(link))
-                },
-                onFileLinkClicked = { link ->
-                    navigationHandler.navigate(FileLinkNavKey(link))
-                },
-                onViewAllClicked = {
-                    navigationHandler.navigate(ViewedLinksScreenNavKey)
-                },
-            )
-        }
+        HandleNodeOptionsActionResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            onTransfer = transferHandler::setTransferEvent,
+        )
+
+        ViewedLinksView(
+            lazyItems = lazyItems,
+            modifier = modifier,
+            onFolderLinkClicked = { link ->
+                navigationHandler.navigate(FolderLinkNavKey(link))
+            },
+            onFileLinkClicked = { link ->
+                navigationHandler.navigate(FileLinkNavKey(link))
+            },
+            onViewAllClicked = {
+                navigationHandler.navigate(ViewedLinksScreenNavKey)
+            },
+        )
     }
 }
 

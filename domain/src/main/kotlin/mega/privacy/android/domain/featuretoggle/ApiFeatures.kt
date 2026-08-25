@@ -233,16 +233,6 @@ enum class ApiFeatures(
     ),
 
     /**
-     * Viewed links feature flag for Home Revamp Phase 2
-     * Enable viewed links section on Home Screen
-     */
-    ViewedLinks(
-        experimentName = "hrvl",
-        description = "Enable viewed links section on Home Screen (Home Revamp Phase 2)",
-        defaultValue = false
-    ),
-
-    /**
      * On-device voice message transcription using Gemma via LiteRT-LM.
      */
     VoiceTranscription(

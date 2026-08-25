@@ -23,10 +23,8 @@ import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.exception.PublicNodeException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -79,7 +77,6 @@ class LegacyFileLinkViewModelTest {
     private val queryAdsUseCase = mock<QueryAdsUseCase>()
     private val saveViewedLinkUseCase = mock<SaveViewedLinkUseCase>()
     private val removeViewedLinkByUrlUseCase = mock<RemoveViewedLinkByUrlUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val url = "https://mega.co.nz/abc"
     private val filePreviewPath = "data/cache/xyz.jpg"
@@ -106,8 +103,7 @@ class LegacyFileLinkViewModelTest {
             getNodePreviewFileUseCase,
             queryAdsUseCase,
             saveViewedLinkUseCase,
-            removeViewedLinkByUrlUseCase,
-            getFeatureFlagValueUseCase
+            removeViewedLinkByUrlUseCase
         )
         initViewModel()
     }
@@ -131,8 +127,7 @@ class LegacyFileLinkViewModelTest {
             monitorMiscLoadedUseCase = mock(),
             queryAdsUseCase = queryAdsUseCase,
             saveViewedLinkUseCase = saveViewedLinkUseCase,
-            removeViewedLinkByUrlUseCase = removeViewedLinkByUrlUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            removeViewedLinkByUrlUseCase = removeViewedLinkByUrlUseCase
         )
     }
 
@@ -246,11 +241,10 @@ class LegacyFileLinkViewModelTest {
     }
 
     @Test
-    fun `test that saveViewedLinkUseCase is called after successful getPublicNode when feature is enabled`() =
+    fun `test that saveViewedLinkUseCase is called after successful getPublicNode`() =
         runTest {
             val publicNode = mockFileNode()
             whenever(getPublicNodeUseCase(url)).thenReturn(publicNode)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
 
             underTest.getPublicNode(url)
 
@@ -264,17 +258,6 @@ class LegacyFileLinkViewModelTest {
                 )
             )
         }
-
-    @Test
-    fun `test that saveViewedLinkUseCase is not called when feature is disabled`() = runTest {
-        val publicNode = mockFileNode()
-        whenever(getPublicNodeUseCase(url)).thenReturn(publicNode)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
-
-        underTest.getPublicNode(url)
-
-        verify(saveViewedLinkUseCase, never()).invoke(any())
-    }
 
     @Test
     fun `test that saveViewedLinkUseCase is not called when getPublicNode fails`() = runTest {

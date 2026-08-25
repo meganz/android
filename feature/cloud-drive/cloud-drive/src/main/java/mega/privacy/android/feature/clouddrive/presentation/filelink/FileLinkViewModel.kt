@@ -21,10 +21,8 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.toDuration
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.PublicNodeException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
@@ -43,7 +41,6 @@ internal class FileLinkViewModel @AssistedInject constructor(
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
     private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val queryAdsUseCase: QueryAdsUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
@@ -155,10 +152,6 @@ internal class FileLinkViewModel @AssistedInject constructor(
 
     private fun removeViewedFileLinkEntry(url: String) {
         viewModelScope.launch {
-            val isEnabled = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
-            }.getOrDefault(false)
-            if (!isEnabled) return@launch
             runCatching { removeViewedLinkByUrlUseCase(url) }
                 .onFailure { Timber.e(it, "Failed to remove viewed link for $url") }
         }
@@ -186,10 +179,6 @@ internal class FileLinkViewModel @AssistedInject constructor(
 
     private fun saveViewedFileLink(link: String, node: TypedFileNode) {
         viewModelScope.launch {
-            val isEnabled = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
-            }.getOrDefault(false)
-            if (!isEnabled) return@launch
             runCatching {
                 saveViewedLinkUseCase(
                     ViewedLink(

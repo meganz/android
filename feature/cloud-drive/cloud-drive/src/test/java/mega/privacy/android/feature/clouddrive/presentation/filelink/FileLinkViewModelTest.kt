@@ -16,10 +16,8 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.exception.PublicNodeException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
@@ -51,7 +49,6 @@ internal class FileLinkViewModelTest {
     private val hasCredentialsUseCase: HasCredentialsUseCase = mock()
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase = mock()
     private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val queryAdsUseCase: QueryAdsUseCase = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
     private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
@@ -66,7 +63,6 @@ internal class FileLinkViewModelTest {
             hasCredentialsUseCase,
             saveViewedLinkUseCase,
             removeViewedLinkByUrlUseCase,
-            getFeatureFlagValueUseCase,
             queryAdsUseCase,
             fileTypeIconMapper,
         )
@@ -78,7 +74,6 @@ internal class FileLinkViewModelTest {
             hasCredentialsUseCase = hasCredentialsUseCase,
             saveViewedLinkUseCase = saveViewedLinkUseCase,
             removeViewedLinkByUrlUseCase = removeViewedLinkByUrlUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             queryAdsUseCase = queryAdsUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
@@ -144,7 +139,6 @@ internal class FileLinkViewModelTest {
         }
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(getPublicNodeUseCase(url)).thenReturn(node)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
         initViewModel(uriString = url)
         advanceUntilIdle()
 
@@ -163,7 +157,6 @@ internal class FileLinkViewModelTest {
         val node = mockFileNode()
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(getPublicNodeUseCase(url)).thenReturn(node)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
         pendingFileLinkPreviewAutoOpen.arm()
         initViewModel(uriString = url)
         advanceUntilIdle()
@@ -179,7 +172,6 @@ internal class FileLinkViewModelTest {
         val node = mockFileNode()
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(getPublicNodeUseCase(url)).thenReturn(node)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
         initViewModel(uriString = url)
         advanceUntilIdle()
 
@@ -203,7 +195,6 @@ internal class FileLinkViewModelTest {
         }
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(getPublicNodeUseCase(url)).thenReturn(node)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
         initViewModel(uriString = url)
         advanceUntilIdle()
 
@@ -222,7 +213,6 @@ internal class FileLinkViewModelTest {
         val node = mockFileNode()
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(getPublicNodeUseCase(url)).thenReturn(node)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
         initViewModel(uriString = url)
         advanceUntilIdle()
 
@@ -241,7 +231,6 @@ internal class FileLinkViewModelTest {
             val node = mockFileNode()
             whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(getPublicNodeUseCase(url)).thenReturn(node)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
             initViewModel(uriString = url)
             advanceUntilIdle()
 
@@ -328,7 +317,6 @@ internal class FileLinkViewModelTest {
             whenever(getPublicNodeUseCase(url))
                 .thenThrow(PublicNodeException.DecryptionKeyRequired())
             whenever(getPublicNodeUseCase(combined)).thenReturn(mockFileNode())
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
             initViewModel(uriString = url)
             advanceUntilIdle()
 
@@ -353,7 +341,6 @@ internal class FileLinkViewModelTest {
             whenever(getPublicNodeUseCase(url))
                 .thenThrow(PublicNodeException.DecryptionKeyRequired())
             whenever(getPublicNodeUseCase(combined)).thenReturn(mockFileNode())
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
             initViewModel(uriString = url)
             advanceUntilIdle()
 
@@ -423,12 +410,11 @@ internal class FileLinkViewModelTest {
     }
 
     @Test
-    fun `test that viewed link is saved when ViewedLinks feature flag is enabled`() = runTest {
+    fun `test that viewed link is saved when getPublicNode succeeds`() = runTest {
         val url = "https://mega.nz/file/abc#key"
         val node = mockFileNode(id = 42L, name = "doc.pdf")
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(getPublicNodeUseCase(url)).thenReturn(node)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
         initViewModel(uriString = url)
         advanceUntilIdle()
 
@@ -444,53 +430,26 @@ internal class FileLinkViewModelTest {
     }
 
     @Test
-    fun `test that viewed link is not saved when ViewedLinks feature flag is disabled`() = runTest {
-        val url = "https://mega.nz/file/abc#key"
-        val node = mockFileNode()
-        whenever(hasCredentialsUseCase()).thenReturn(false)
-        whenever(getPublicNodeUseCase(url)).thenReturn(node)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
-        initViewModel(uriString = url)
-        advanceUntilIdle()
-
-        verify(saveViewedLinkUseCase, never()).invoke(any())
-    }
-
-    @Test
-    fun `test that viewed link is removed when getPublicNode throws and ViewedLinks flag is enabled`() =
+    fun `test that viewed link is removed when getPublicNode throws`() =
         runTest {
             val url = "https://mega.nz/file/abc"
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getPublicNodeUseCase(url)).thenThrow(PublicNodeException.GenericError())
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
             initViewModel(uriString = url)
 
             verify(removeViewedLinkByUrlUseCase).invoke(url)
         }
 
     @Test
-    fun `test that viewed link is removed when DecryptionKeyRequired exception is thrown and ViewedLinks flag is enabled`() =
+    fun `test that viewed link is removed when DecryptionKeyRequired exception is thrown`() =
         runTest {
             val url = "https://mega.nz/file/abc"
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getPublicNodeUseCase(url))
                 .thenThrow(PublicNodeException.DecryptionKeyRequired())
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
             initViewModel(uriString = url)
 
             verify(removeViewedLinkByUrlUseCase).invoke(url)
-        }
-
-    @Test
-    fun `test that viewed link is not removed when getPublicNode throws but ViewedLinks flag is disabled`() =
-        runTest {
-            val url = "https://mega.nz/file/abc"
-            whenever(hasCredentialsUseCase()).thenReturn(false)
-            whenever(getPublicNodeUseCase(url)).thenThrow(PublicNodeException.GenericError())
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
-            initViewModel(uriString = url)
-
-            verify(removeViewedLinkByUrlUseCase, never()).invoke(any())
         }
 
     @Test
@@ -499,7 +458,6 @@ internal class FileLinkViewModelTest {
         val node = mockFileNode()
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(getPublicNodeUseCase(url)).thenReturn(node)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
         initViewModel(uriString = url)
 
         verify(removeViewedLinkByUrlUseCase, never()).invoke(any())
@@ -512,7 +470,6 @@ internal class FileLinkViewModelTest {
             val node = mockFileNode(id = 99L)
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getPublicNodeUseCase(url)).thenReturn(node)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
             whenever(queryAdsUseCase(99L)).thenReturn(true)
             initViewModel(uriString = url)
             advanceUntilIdle()
@@ -528,7 +485,6 @@ internal class FileLinkViewModelTest {
         val node = mockFileNode(id = 99L)
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(getPublicNodeUseCase(url)).thenReturn(node)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
         whenever(queryAdsUseCase(99L)).thenReturn(false)
         initViewModel(uriString = url)
         advanceUntilIdle()

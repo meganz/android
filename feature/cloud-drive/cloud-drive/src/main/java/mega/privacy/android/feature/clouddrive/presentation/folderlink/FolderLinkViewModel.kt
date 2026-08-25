@@ -34,13 +34,11 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
@@ -86,7 +84,6 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private val stopAudioService: StopAudioService,
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
     private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val queryAdsUseCase: QueryAdsUseCase,
     private val handleToBase64UseCase: HandleToBase64UseCase,
     private val monitorFolderViewTypeUseCase: MonitorFolderViewTypeUseCase,
@@ -365,10 +362,6 @@ internal class FolderLinkViewModel @AssistedInject constructor(
 
     private fun removeViewedFolderLinkEntry(url: String) {
         viewModelScope.launch {
-            val isEnabled = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
-            }.getOrDefault(false)
-            if (!isEnabled) return@launch
             runCatching { removeViewedLinkByUrlUseCase(url) }
                 .onFailure { Timber.e(it, "Failed to remove viewed link for $url") }
         }
@@ -450,11 +443,6 @@ internal class FolderLinkViewModel @AssistedInject constructor(
 
     private fun saveViewedFolderLink(link: String, rootNode: TypedFolderNode) {
         viewModelScope.launch {
-            val isEnabled = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
-            }.getOrDefault(false)
-            if (!isEnabled) return@launch
-
             runCatching {
                 saveViewedLinkUseCase(
                     ViewedLink(
