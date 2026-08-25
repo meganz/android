@@ -1082,17 +1082,53 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     fun playVideo(
-        context: Context,
+        activityContext: Context,
         imageNode: ImageNode,
     ) = viewModelScope.launch {
         val params = loadParams()
+        val albumTitle = params.getString(AlbumContentImageNodeFetcher.ALBUM_TITLE)
+        // The timeline and albums order media across folders, so the player's queue must
+        // follow the browsing order rather than the video's storage folder.
+        val orderedVideoHandles = when (imagePreviewFetcherSource) {
+            ImagePreviewFetcherSource.TIMELINE ->
+                timelineImagePreviewManager.getVideoHandlesInOrder()
+
+            // Album nodes load as one complete list (the fetcher contract has no paging),
+            // so imageNodes is the full album in browsing order.
+            ImagePreviewFetcherSource.ALBUM_CONTENT ->
+                _state.value.imageNodes
+                    .filter { it.type is VideoFileTypeInfo }
+                    .map { it.id.longValue }
+
+            else -> null
+        }?.takeIf { it.isNotEmpty() }
+            ?.let { handles ->
+                if (handles.size > MAX_ORDERED_VIDEO_HANDLES) {
+                    Timber.w(
+                        "Ordered video queue of ${handles.size} items exceeds the intent " +
+                                "extras budget — falling back to the folder-based queue"
+                    )
+                    null
+                } else {
+                    handles
+                }
+            }
+        val mediaQueueTitle = orderedVideoHandles?.let {
+            if (imagePreviewFetcherSource == ImagePreviewFetcherSource.TIMELINE) {
+                context.getString(sharedR.string.media_timeline_tab_title)
+            } else {
+                albumTitle
+            }
+        }
         imagePreviewVideoLauncher.launchVideoScreen(
-            context = context,
+            context = activityContext,
             imageNode = imageNode,
             source = imagePreviewFetcherSource,
-            albumTitle = params.getString(AlbumContentImageNodeFetcher.ALBUM_TITLE),
+            albumTitle = albumTitle,
             albumId = params.getLong(AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID),
             publicLinkUrl = savedStateHandle[IMAGE_PREVIEW_PUBLIC_LINK_URL],
+            orderedVideoHandles = orderedVideoHandles,
+            mediaQueueTitle = mediaQueueTitle,
         )
     }
 
@@ -1165,8 +1201,14 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     companion object {
+        // Ceiling for passing an ordered play queue through intent extras: 10k handles is
+        // ~80KB, well below the ~500KB practical binder transaction budget shared by all
+        // of the intent's extras. Beyond it the player falls back to its folder-based queue.
+        private const val MAX_ORDERED_VIDEO_HANDLES = 10_000
+
         // file:// scheme for loading a local cached path (e.g. the anchor thumbnail) with Coil.
         private const val FILE_SCHEME = "file://"
+
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"
         const val IMAGE_PREVIEW_MENU_OPTIONS = "image_preview_menu_options"
         const val FETCHER_PARAMS = "fetcher_params"

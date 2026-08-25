@@ -139,7 +139,12 @@ class TimelineImagePreviewManagerTest {
         stubSections(total = 100)
         stubRefPages()
         whenever(getImageNodeByIdUseCase(NodeId(5L))).thenReturn(node)
-        underTest.initialize(Sort.NEWEST, FilterMediaType.ALL_MEDIA, TimelinePhotosSource.ALL_PHOTOS, false)
+        underTest.initialize(
+            Sort.NEWEST,
+            FilterMediaType.ALL_MEDIA,
+            TimelinePhotosSource.ALL_PHOTOS,
+            false
+        )
 
         val result = underTest.getImageNodeAtIndex(5)
 
@@ -152,7 +157,12 @@ class TimelineImagePreviewManagerTest {
         runTest {
             stubSections(total = 10)
             stubRefPages()
-            underTest.initialize(Sort.NEWEST, FilterMediaType.ALL_MEDIA, TimelinePhotosSource.ALL_PHOTOS, false)
+            underTest.initialize(
+                Sort.NEWEST,
+                FilterMediaType.ALL_MEDIA,
+                TimelinePhotosSource.ALL_PHOTOS,
+                false
+            )
 
             val result = underTest.getImageNodeAtIndex(20)
 
@@ -164,7 +174,12 @@ class TimelineImagePreviewManagerTest {
     fun `test that indexOfImageNode returns the index where the node actually sits`() = runTest {
         stubSections(total = 100)
         stubRefPages()
-        underTest.initialize(Sort.NEWEST, FilterMediaType.ALL_MEDIA, TimelinePhotosSource.ALL_PHOTOS, false)
+        underTest.initialize(
+            Sort.NEWEST,
+            FilterMediaType.ALL_MEDIA,
+            TimelinePhotosSource.ALL_PHOTOS,
+            false
+        )
 
         val index = underTest.indexOfImageNode(preferredIndex = 5, nodeId = NodeId(7L))
 
@@ -176,11 +191,78 @@ class TimelineImagePreviewManagerTest {
         runTest {
             stubSections(total = 100)
             stubRefPages()
-            underTest.initialize(Sort.NEWEST, FilterMediaType.ALL_MEDIA, TimelinePhotosSource.ALL_PHOTOS, false)
+            underTest.initialize(
+                Sort.NEWEST,
+                FilterMediaType.ALL_MEDIA,
+                TimelinePhotosSource.ALL_PHOTOS,
+                false
+            )
 
             val index = underTest.indexOfImageNode(preferredIndex = 5, nodeId = NodeId(999L))
 
             assertThat(index).isEqualTo(5)
+        }
+
+    @Test
+    fun `test that getVideoHandlesInOrder queries a videos-only filter and returns the ordered handles`() =
+        runTest {
+            stubSections(total = 3)
+            val filterCaptor = argumentCaptor<MediaTimelineFilter>()
+            whenever(listTimelineImageNodeInfoByOffsetUseCase(any(), eq(null), any(), any(), any()))
+                .thenReturn(
+                    listOf(
+                        ImageNodeInfo(NodeId(30L), "c.mp4"),
+                        ImageNodeInfo(NodeId(10L), "a.mp4"),
+                        ImageNodeInfo(NodeId(20L), "b.mp4"),
+                    )
+                )
+            underTest.initialize(
+                sort = Sort.NEWEST,
+                mediaType = FilterMediaType.ALL_MEDIA,
+                source = TimelinePhotosSource.ALL_PHOTOS,
+                hideSensitive = true,
+            )
+
+            val handles = underTest.getVideoHandlesInOrder()
+
+            assertThat(handles).containsExactly(30L, 10L, 20L).inOrder()
+            verify(listTimelineImageNodeInfoByOffsetUseCase).invoke(
+                filterCaptor.capture(),
+                eq(null),
+                eq(SortOrder.ORDER_MODIFICATION_DESC),
+                eq(3),
+                eq(0L),
+            )
+            assertThat(filterCaptor.firstValue.category)
+                .isEqualTo(MediaTimelineFilter.Category.Videos)
+            assertThat(filterCaptor.firstValue.sensitivity)
+                .isEqualTo(MediaTimelineFilter.Sensitivity.HideSensitive)
+        }
+
+    @Test
+    fun `test that getVideoHandlesInOrder returns empty when the ordering is never initialized`() =
+        runTest {
+            val handles = underTest.getVideoHandlesInOrder()
+
+            assertThat(handles).isEmpty()
+            verifyNoInteractions(listTimelineImageNodeInfoByOffsetUseCase)
+        }
+
+    @Test
+    fun `test that getVideoHandlesInOrder returns empty when the timeline has no media`() =
+        runTest {
+            stubSections(total = 0)
+            underTest.initialize(
+                sort = Sort.NEWEST,
+                mediaType = FilterMediaType.ALL_MEDIA,
+                source = TimelinePhotosSource.ALL_PHOTOS,
+                hideSensitive = false,
+            )
+
+            val handles = underTest.getVideoHandlesInOrder()
+
+            assertThat(handles).isEmpty()
+            verifyNoInteractions(listTimelineImageNodeInfoByOffsetUseCase)
         }
 
     @Test

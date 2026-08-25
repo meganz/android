@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -23,6 +24,7 @@ import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * The image viewer's paged timeline source. After [initialize] it knows the media count and resolves
@@ -38,7 +40,12 @@ class TimelineImagePreviewManager @Inject constructor(
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
+    // All session fields are written in initialize() before ready.complete() and only read
+    // after ready.await() — the CompletableDeferred provides the happens-before guarantee,
+    // so no further synchronization is needed.
     private lateinit var filter: MediaTimelineFilter
+    private var mediaSource: TimelinePhotosSource = TimelinePhotosSource.ALL_PHOTOS
+    private var hideSensitive: Boolean = false
     private var order: SortOrder = SortOrder.ORDER_MODIFICATION_DESC
     private var total: Int = 0
     private val loadedInfos = mutableMapOf<Int, ImageNodeInfo>()
@@ -57,19 +64,26 @@ class TimelineImagePreviewManager @Inject constructor(
         hideSensitive: Boolean,
         knownTotal: Int = 0,
     ): Int = withContext(ioDispatcher) {
-        order = sort.toSortOrder()
-        filter = buildFilter(mediaType, source, hideSensitive)
-        total = if (knownTotal > 0) {
-            knownTotal
-        } else {
-            runCatching { getMediaTimelineSectionsUseCase(filter, order) }
-                .onFailure { Timber.e(it, "Failed to load timeline sections") }
-                .getOrDefault(emptyList())
-                .distinctBy { it.groupId }
-                .sumOf { it.count.toInt() }
+        try {
+            order = sort.toSortOrder()
+            mediaSource = source
+            this@TimelineImagePreviewManager.hideSensitive = hideSensitive
+            filter = buildFilter(mediaType, source, hideSensitive)
+            total = if (knownTotal > 0) {
+                knownTotal
+            } else {
+                runCatching { getMediaTimelineSectionsUseCase(filter, order) }
+                    .onFailure { Timber.e(it, "Failed to load timeline sections") }
+                    .getOrDefault(emptyList())
+                    .distinctBy { it.groupId }
+                    .sumOf { it.count.toInt() }
+            }
+            total
+        } finally {
+            // Completed even on failure so awaiting callers fall through to their
+            // empty/null fallbacks instead of suspending forever.
+            ready.complete(Unit)
         }
-        ready.complete(Unit)
-        total
     }
 
     /**
@@ -102,6 +116,35 @@ class TimelineImagePreviewManager @Inject constructor(
             } else {
                 loadedInfos.entries.firstOrNull { it.value.id == nodeId }?.key ?: preferredIndex
             }
+        }
+    }
+
+    /**
+     * All video handles of the current timeline in timeline order, restricting the session's
+     * filter to videos — the play queue for a video opened from this viewer. Empty when the
+     * ordering failed to load.
+     */
+    suspend fun getVideoHandlesInOrder(): List<Long> {
+        // Guard against a session where initialize never ran — the caller falls back to the
+        // default queue instead of suspending forever on a play tap.
+        withTimeoutOrNull(ORDERING_READY_TIMEOUT) { ready.await() } ?: run {
+            Timber.e("Timeline ordering not ready within $ORDERING_READY_TIMEOUT")
+            return emptyList()
+        }
+        if (total <= 0) return emptyList()
+        val videoFilter = buildFilter(FilterMediaType.VIDEOS, mediaSource, hideSensitive)
+        return withContext(ioDispatcher) {
+            runCatching {
+                listTimelineImageNodeInfoByOffsetUseCase(
+                    filter = videoFilter,
+                    section = null,
+                    order = order,
+                    maxElements = total,
+                    offset = 0,
+                )
+            }.onFailure { Timber.e(it, "Failed to load timeline video handles") }
+                .getOrDefault(emptyList())
+                .map { it.id.longValue }
         }
     }
 
@@ -165,5 +208,12 @@ class TimelineImagePreviewManager @Inject constructor(
 
     companion object {
         private const val PAGE_SIZE = 30
+
+        // Generous ceiling for awaiting the ordering init before a play tap gives up and
+        // falls back to the default queue; init normally completes long before a tap, so the
+        // normal path waits zero. Kept generous on purpose: on huge accounts the init
+        // aggregate can be slow, and timing out too eagerly would silently fall back to the
+        // storage-folder queue — reintroducing the ordering bug intermittently.
+        private val ORDERING_READY_TIMEOUT = 10.seconds
     }
 }

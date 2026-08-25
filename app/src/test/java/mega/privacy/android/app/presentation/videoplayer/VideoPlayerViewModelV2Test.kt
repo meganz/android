@@ -1167,6 +1167,210 @@ class VideoPlayerViewModelV2Test {
         }
 
     @Test
+    fun `test that state is updated correctly when launch source is FROM_IMAGE_VIEWER and ordered handles are provided`() =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(intent.getStringExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE)).thenReturn(testTitle)
+            whenever(intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)).thenReturn(
+                longArrayOf(1, 2, 3)
+            )
+            testStateIsUpdatedCorrectlyByLaunchSource(
+                intent = intent,
+                launchSource = FROM_IMAGE_VIEWER
+            ) {
+                getVideoNodesByHandlesUseCase(any())
+            }
+        }
+
+    @Test
+    fun `test that buildPlaybackSources keeps the remaining items when one item fails to resolve`() =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(intent.getStringExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE)).thenReturn(testTitle)
+            whenever(intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)).thenReturn(
+                longArrayOf(1, 2, 3)
+            )
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = FROM_IMAGE_VIEWER,
+                data = mock(),
+                handle = 1L,
+                fileName = "test.mp4"
+            )
+            whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(true)
+            whenever(context.getString(any())).thenReturn(testTitle)
+
+            val testVideoNodes = listOf(1L, 2L, 3L).map { initVideoNode(it) }
+            whenever(getVideoNodesByHandlesUseCase(any())).thenReturn(testVideoNodes)
+            whenever(getLocalFilePathUseCase(testVideoNodes[1]))
+                .thenThrow(RuntimeException("resolution failed"))
+            whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn(testAbsolutePath)
+            whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
+
+            val remainingNodes = listOf(testVideoNodes[0], testVideoNodes[2])
+            val entities = remainingNodes.map { initVideoPlayerItem(it.id.longValue, it.name) }
+            entities.onEach {
+                whenever(it.copy(type = MediaQueueItemType.Playing)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Previous)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Next)).thenReturn(it)
+            }
+            whenever(
+                videoPlayerItemMapper(
+                    testVideoNodes[0].id.longValue,
+                    testVideoNodes[0].name,
+                    null,
+                    MediaQueueItemType.Playing,
+                    testVideoNodes[0].size,
+                    false,
+                    testVideoNodes[0].duration
+                )
+            ).thenReturn(entities[0])
+            whenever(
+                videoPlayerItemMapper(
+                    testVideoNodes[2].id.longValue,
+                    testVideoNodes[2].name,
+                    null,
+                    MediaQueueItemType.Next,
+                    testVideoNodes[2].size,
+                    false,
+                    testVideoNodes[2].duration
+                )
+            ).thenReturn(entities[1])
+
+            initViewModel()
+            mockStatic(Uri::class.java).use {
+                whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
+                underTest.initVideoPlayerData(intent)
+                underTest.uiState.test {
+                    val actual = awaitItem()
+                    assertThat(actual.items.size).isEqualTo(2)
+                    assertThat(actual.items[0]).isEqualTo(entities[0])
+                    assertThat(actual.items[1]).isEqualTo(entities[1])
+                    assertThat(actual.mediaPlaySources?.mediaItems?.size).isEqualTo(2)
+                    assertThat(actual.currentPlayingIndex).isEqualTo(0)
+                    cancelAndConsumeRemainingEvents()
+                }
+            }
+        }
+
+    @Test
+    fun `test that buildPlaybackSources results in an empty queue when every item fails to resolve`() =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(intent.getStringExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE)).thenReturn(testTitle)
+            whenever(intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)).thenReturn(
+                longArrayOf(1, 2, 3)
+            )
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = FROM_IMAGE_VIEWER,
+                data = mock(),
+                handle = 1L,
+                fileName = "test.mp4"
+            )
+            whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(true)
+            whenever(context.getString(any())).thenReturn(testTitle)
+
+            val testVideoNodes = listOf(1L, 2L, 3L).map { initVideoNode(it) }
+            whenever(getVideoNodesByHandlesUseCase(any())).thenReturn(testVideoNodes)
+            testVideoNodes.forEach { node ->
+                whenever(getLocalFilePathUseCase(node))
+                    .thenThrow(RuntimeException("resolution failed"))
+            }
+            whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
+
+            initViewModel()
+            underTest.initVideoPlayerData(intent)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.items).isEmpty()
+                assertThat(actual.mediaPlaySources?.mediaItems).isEmpty()
+                assertThat(actual.currentPlayingIndex).isEqualTo(-1)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that currentPlayingIndex points at the playing item in the final queue when a preceding item fails`() =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(intent.getStringExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE)).thenReturn(testTitle)
+            whenever(intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)).thenReturn(
+                longArrayOf(1, 2, 3)
+            )
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = FROM_IMAGE_VIEWER,
+                data = mock(),
+                handle = 3L,
+                fileName = "test.mp4"
+            )
+            whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(true)
+            whenever(context.getString(any())).thenReturn(testTitle)
+
+            val testVideoNodes = listOf(1L, 2L, 3L).map { initVideoNode(it) }
+            whenever(getVideoNodesByHandlesUseCase(any())).thenReturn(testVideoNodes)
+            whenever(getLocalFilePathUseCase(testVideoNodes[1]))
+                .thenThrow(RuntimeException("resolution failed"))
+            whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn(testAbsolutePath)
+            whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
+
+            val remainingNodes = listOf(testVideoNodes[0], testVideoNodes[2])
+            val entities = remainingNodes.map { initVideoPlayerItem(it.id.longValue, it.name) }
+            entities.onEach {
+                whenever(it.copy(type = MediaQueueItemType.Playing)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Previous)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Next)).thenReturn(it)
+            }
+            whenever(
+                videoPlayerItemMapper(
+                    testVideoNodes[0].id.longValue,
+                    testVideoNodes[0].name,
+                    null,
+                    MediaQueueItemType.Previous,
+                    testVideoNodes[0].size,
+                    false,
+                    testVideoNodes[0].duration
+                )
+            ).thenReturn(entities[0])
+            whenever(
+                videoPlayerItemMapper(
+                    testVideoNodes[2].id.longValue,
+                    testVideoNodes[2].name,
+                    null,
+                    MediaQueueItemType.Playing,
+                    testVideoNodes[2].size,
+                    false,
+                    testVideoNodes[2].duration
+                )
+            ).thenReturn(entities[1])
+
+            initViewModel()
+            mockStatic(Uri::class.java).use {
+                whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
+                underTest.initVideoPlayerData(intent)
+                underTest.uiState.test {
+                    val actual = awaitItem()
+                    assertThat(actual.items.size).isEqualTo(2)
+                    assertThat(actual.currentPlayingIndex).isEqualTo(1)
+                    assertThat(actual.mediaPlaySources?.newIndexForCurrentItem).isEqualTo(1)
+                    cancelAndConsumeRemainingEvents()
+                }
+            }
+        }
+
+    @Test
     fun `test that state is updated correctly when launch source is CONTACT_FILE_ADAPTER and parentHandle is INVALID_HANDLE`() =
         runTest {
             val intent = mock<Intent>()
@@ -1805,7 +2009,12 @@ class VideoPlayerViewModelV2Test {
     @Test
     fun `test that onPlayerError sets isVideoNotRendered when error type is VIDEO_NOT_RENDERED`() =
         runTest {
-            whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.VIDEO_NOT_RENDERED)
+            whenever(
+                playerErrorTypeMapper(
+                    any(),
+                    any()
+                )
+            ).thenReturn(PlayerErrorType.VIDEO_NOT_RENDERED)
             initViewModel()
             underTest.onPlayerError(PlaybackException.ERROR_CODE_DECODER_INIT_FAILED)
             underTest.uiState.test {
@@ -1860,7 +2069,12 @@ class VideoPlayerViewModelV2Test {
     @Test
     fun `test that onPlayerError triggers retryFailedEvent immediately when error type is FILE_NOT_SUPPORTED`() =
         runTest {
-            whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.FILE_NOT_SUPPORTED)
+            whenever(
+                playerErrorTypeMapper(
+                    any(),
+                    any()
+                )
+            ).thenReturn(PlayerErrorType.FILE_NOT_SUPPORTED)
             initViewModel()
             underTest.onPlayerError(PlaybackException.ERROR_CODE_DECODING_FORMAT_UNSUPPORTED)
             underTest.uiState.test {
@@ -2385,7 +2599,12 @@ class VideoPlayerViewModelV2Test {
     @Test
     fun `test that isVideoNotRendered is cleared after onMediaItemTransition is invoked`() =
         runTest {
-            whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.VIDEO_NOT_RENDERED)
+            whenever(
+                playerErrorTypeMapper(
+                    any(),
+                    any()
+                )
+            ).thenReturn(PlayerErrorType.VIDEO_NOT_RENDERED)
             initViewModel()
             underTest.onPlayerError(PlaybackException.ERROR_CODE_DECODER_INIT_FAILED)
             underTest.uiState.test {
@@ -3560,7 +3779,9 @@ class VideoPlayerViewModelV2Test {
                     assertThat(state.items.size).isEqualTo(2)
                     assertThat(state.items.none { it.nodeHandle == 1L }).isTrue()
                     assertThat(state.currentPlayingIndex).isEqualTo(1)
-                    assertThat(state.mediaPlaySources?.newIndexForCurrentItem).isEqualTo(INVALID_VALUE)
+                    assertThat(state.mediaPlaySources?.newIndexForCurrentItem).isEqualTo(
+                        INVALID_VALUE
+                    )
                     assertThat(state.currentPlayingItemName).isEqualTo("2.mp4")
                 }
                 cancelAndConsumeRemainingEvents()
@@ -3591,7 +3812,9 @@ class VideoPlayerViewModelV2Test {
                     assertThat(state.items.size).isEqualTo(2)
                     assertThat(state.items.none { it.nodeHandle == 2L }).isTrue()
                     assertThat(state.currentPlayingIndex).isEqualTo(1)
-                    assertThat(state.mediaPlaySources?.newIndexForCurrentItem).isEqualTo(INVALID_VALUE)
+                    assertThat(state.mediaPlaySources?.newIndexForCurrentItem).isEqualTo(
+                        INVALID_VALUE
+                    )
                     assertThat(state.currentPlayingItemName).isEqualTo("1.mp4")
                 }
                 cancelAndConsumeRemainingEvents()

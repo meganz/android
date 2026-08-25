@@ -214,7 +214,9 @@ interface AppNavigator {
      * @param isFolderLink whether the file is a folder link
      * @param isMediaQueueAvailable whether the media queue is available
      * @param searchedItems the list of searched items, this is only used under the search mode
-     * @param mediaQueueTitle the title of the media queue
+     * @param mediaQueueTitle the title of the play queue when the queue is built from an
+     *   explicitly passed item list ([searchedItems]) — e.g. search results, the Timeline, or
+     *   an album. Ignored when the queue is built from a storage folder.
      * @param collectionTitle the title of the video collection
      * @param enableAddToAlbum the flag to show add to album in context menu
      * @param publicLinkUrl the public file link URL, used when the video is opened from a file link
@@ -251,6 +253,9 @@ interface AppNavigator {
      * @param isFolderLink whether the file is a folder link
      * @param isMediaQueueAvailable whether the media queue is available
      * @param searchedItems the list of searched items, this is only used under the search mode
+     * @param mediaQueueTitle the title of the play queue when the queue is built from an
+     *   explicitly passed item list ([searchedItems]) — e.g. search results, the Timeline, or
+     *   an album. Ignored when the queue is built from a storage folder.
      * @param collectionTitle the title of the video collection
      */
     suspend fun openMediaPlayerActivityByLocalFile(
@@ -265,6 +270,7 @@ interface AppNavigator {
         isFolderLink: Boolean = false,
         isMediaQueueAvailable: Boolean = true,
         searchedItems: List<Long>? = null,
+        mediaQueueTitle: String? = null,
         collectionTitle: String? = null,
         collectionId: Long? = null,
         publicLinkUrl: String? = null,
@@ -317,7 +323,9 @@ interface AppNavigator {
      * @param isFolderLink whether the file is a folder link
      * @param isMediaQueueAvailable whether the media queue is available
      * @param searchedItems the list of searched items, this is only used under the search mode
-     * @param mediaQueueTitle the title of the media queue
+     * @param mediaQueueTitle the title of the play queue when the queue is built from an
+     *   explicitly passed item list ([searchedItems]) — e.g. search results, the Timeline, or
+     *   an album. Ignored when the queue is built from a storage folder.
      * @param nodeHandles node handle list
      */
     suspend fun openMediaPlayerActivity(

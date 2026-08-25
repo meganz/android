@@ -28,9 +28,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -46,7 +50,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -577,13 +583,23 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
 
     private fun initVideoPlaybackSources() {
         viewModelScope.launch {
-            buildPlaybackSources(currentIntent)
-            trackPlaybackPositionUseCase {
-                PlaybackInformation(
-                    mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong(),
-                    mediaPlayerGateway.getCurrentItemDuration(),
-                    mediaPlayerGateway.getCurrentPlayingPosition()
-                )
+            runCatching {
+                buildPlaybackSources(currentIntent)
+            }.onFailure {
+                if (it is CancellationException) throw it
+                Timber.e(it, "Failed to build playback sources")
+            }
+            runCatching {
+                trackPlaybackPositionUseCase {
+                    PlaybackInformation(
+                        mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong(),
+                        mediaPlayerGateway.getCurrentItemDuration(),
+                        mediaPlayerGateway.getCurrentPlayingPosition()
+                    )
+                }
+            }.onFailure {
+                if (it is CancellationException) throw it
+                Timber.e(it, "Failed to track playback position")
             }
         }
     }
@@ -953,6 +969,8 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     ) {
         val parentHandle = intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
         val order = getSortOrderFromIntent(intent)
+        val orderedHandlesFromViewer =
+            intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
         val (title, videoNodes) = when (launchSource) {
             VIDEO_BROWSE_ADAPTER ->
                 context.getString(R.string.sortby_type_video_first) to getVideoNodesUseCase(order)
@@ -988,6 +1006,16 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                         getVideoNodesByHandlesUseCase(handles.toList())
                     }.orEmpty()
                 title to videoNodes
+            }
+
+            // The image preview passes its own ordered video list when its browsing context
+            // (e.g. the Timeline's date order) differs from the storage-folder order, so
+            // "next" follows the order the user was actually browsing in. Without handles
+            // FROM_IMAGE_VIEWER falls through to the folder-based branch below — this
+            // guarded branch must stay above it.
+            FROM_IMAGE_VIEWER if orderedHandlesFromViewer != null -> {
+                val title = intent.getStringExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE).orEmpty()
+                title to getVideoNodesByHandlesUseCase(orderedHandlesFromViewer.toList())
             }
 
             FILE_BROWSER_ADAPTER,
@@ -1140,36 +1168,52 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         videoNodes: List<TypedVideoNode>,
         firstPlayHandle: Long,
         launchSource: Int,
-    ) {
-        val mediaItems = mutableListOf<MediaItem>()
-        var currentPlayingIndex = -1
-        val videoPlayerItems = videoNodes.mapIndexed { index, node ->
-            runCatching {
-                if (node.id.longValue == firstPlayHandle) currentPlayingIndex = index
+    ) = coroutineScope {
+        val currentPlayingIndex =
+            videoNodes.indexOfFirst { it.id.longValue == firstPlayHandle }
+        // Resolving each node's playback URI checks for a local copy (per-file I/O, with a
+        // fingerprint computed over the file's content when a candidate exists) or asks the
+        // SDK for a streaming link. Done sequentially this takes minutes on 1000+ item
+        // queues, so the per-node work runs concurrently, bounded to keep I/O sane.
+        val semaphore = Semaphore(BUILD_PLAYBACK_SOURCES_CONCURRENCY)
+        val builtItems = videoNodes.mapIndexed { index, node ->
+            async {
+                semaphore.withPermit {
+                    runCatching {
+                        val mediaItem = getMediaItemForNode(node, launchSource)
+                        val videoPlayerItem = videoPlayerItemMapper(
+                            nodeHandle = node.id.longValue,
+                            nodeName = node.name,
+                            thumbnail = node.thumbnailPath?.let { path ->
+                                File(path)
+                            },
+                            type = getMediaQueueItemType(index, currentPlayingIndex),
+                            size = node.size,
+                            duration = node.duration,
+                            isSensitive = node.isMarkedSensitive || node.isSensitiveInherited
+                        )
+                        videoPlayerItem to mediaItem
+                    }.onFailure {
+                        // Cancellation must propagate (and not spam the log with one
+                        // entry per in-flight item when the player is left mid-build).
+                        if (it is CancellationException) throw it
+                        Timber.e(it)
+                    }.getOrNull()
+                }
+            }
+        }.awaitAll().filterNotNull()
 
-                getMediaItemForNode(node, launchSource)?.let { mediaItems.add(it) }
-
-                videoPlayerItemMapper(
-                    nodeHandle = node.id.longValue,
-                    nodeName = node.name,
-                    thumbnail = node.thumbnailPath?.let { path ->
-                        File(path)
-                    },
-                    type = getMediaQueueItemType(index, currentPlayingIndex),
-                    size = node.size,
-                    duration = node.duration,
-                    isSensitive = node.isMarkedSensitive || node.isSensitiveInherited
-                )
-            }.onFailure {
-                Timber.e(it)
-            }.getOrNull()
-        }.filterNotNull()
+        // Failed items are dropped from the queue, so the playing index must be located in
+        // the final list — the precomputed full-list index only drives the
+        // Previous/Playing/Next labels, which stay valid relative to the playing item.
+        val playingIndexInQueue =
+            builtItems.indexOfFirst { it.first.nodeHandle == firstPlayHandle }
 
         updatePlaybackSources(
-            videoPlayerItems = videoPlayerItems,
-            mediaItems = mediaItems,
+            videoPlayerItems = builtItems.map { it.first },
+            mediaItems = builtItems.mapNotNull { it.second },
             title = title,
-            currentPlayingIndex = currentPlayingIndex,
+            currentPlayingIndex = playingIndexInQueue,
             firstPlayHandle = firstPlayHandle
         )
     }
@@ -2212,6 +2256,14 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     companion object {
         private const val MEDIA_PLAYER_STATE_ENDED = 4
         private const val MEDIA_PLAYER_STATE_READY = 3
+
+        // Concurrency cap for resolving playback URIs while building the play queue —
+        // high enough to collapse minutes into seconds on 1000+ item queues, low enough
+        // not to saturate disk I/O and the SDK with parallel requests. Measured on a
+        // Samsung Galaxy S21 (Android 15) with a ~2600-video queue: 16 and 32 both land
+        // at ~22-26s (the SDK's internal request serialization is the floor), so higher
+        // values add pressure without gain.
+        private const val BUILD_PLAYBACK_SOURCES_CONCURRENCY = 16
 
         private const val MAX_RETRY = 6
 

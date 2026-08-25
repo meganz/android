@@ -95,6 +95,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.never
@@ -1013,7 +1014,15 @@ class ImagePreviewViewModelTest {
             val typedNode = mock<TypedImageNode>()
             val expected = ImageResult(isFullyLoaded = true)
             whenever(addImageTypeUseCase(imageNode)).thenReturn(typedNode)
-            whenever(getImageUseCase(any(), any(), any(), any(), any())).thenReturn(flowOf(expected))
+            whenever(
+                getImageUseCase(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            ).thenReturn(flowOf(expected))
 
             val result = underTest.monitorImageResult(imageNode).toList()
 
@@ -1290,6 +1299,33 @@ class ImagePreviewViewModelTest {
         }
 
     @Test
+    fun `test that playVideo falls back to a null ordered queue when the timeline video list exceeds the intent budget`() =
+        runTest {
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+            whenever(timelineImagePreviewManager.getVideoHandlesInOrder())
+                .thenReturn(List(10_001) { it.toLong() })
+            initViewModel()
+            val context = mock<Context>()
+            val imageNode = mock<ImageNode>()
+
+            underTest.playVideo(context, imageNode)
+            advanceUntilIdle()
+
+            verify(imagePreviewVideoLauncher).launchVideoScreen(
+                context = any(),
+                imageNode = any(),
+                source = any(),
+                adapterType = any(),
+                albumTitle = anyOrNull(),
+                albumId = anyOrNull(),
+                publicLinkUrl = anyOrNull(),
+                orderedVideoHandles = isNull(),
+                mediaQueueTitle = isNull(),
+            )
+        }
+
+    @Test
     fun `test that playVideo passes publicLinkUrl from savedStateHandle to imagePreviewVideoLauncher`() =
         runTest {
             val expectedUrl = "https://mega.nz/album/test#key"
@@ -1307,6 +1343,8 @@ class ImagePreviewViewModelTest {
                 albumTitle = anyOrNull(),
                 albumId = anyOrNull(),
                 publicLinkUrl = eq(expectedUrl),
+                orderedVideoHandles = anyOrNull(),
+                mediaQueueTitle = anyOrNull(),
             )
         }
 
@@ -1335,10 +1373,20 @@ class ImagePreviewViewModelTest {
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
             whenever(savedStateHandle.get<Int>(PARAMS_CURRENT_IMAGE_NODE_INDEX)).thenReturn(3)
             whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE)).thenReturn(3L)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(
+                true
+            )
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any(), any())).thenReturn(10)
+            whenever(
+                timelineImagePreviewManager.initialize(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            ).thenReturn(10)
             whenever(timelineImagePreviewManager.indexOfImageNode(3, NodeId(3L))).thenReturn(3)
             whenever(timelineImagePreviewManager.getImageNodeAtIndex(3)).thenReturn(anchorNode)
             initViewModel()
@@ -1361,10 +1409,20 @@ class ImagePreviewViewModelTest {
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
             whenever(savedStateHandle.get<Int>(PARAMS_CURRENT_IMAGE_NODE_INDEX)).thenReturn(3)
             whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE)).thenReturn(4L)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(
+                true
+            )
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any(), any())).thenReturn(10)
+            whenever(
+                timelineImagePreviewManager.initialize(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            ).thenReturn(10)
             whenever(timelineImagePreviewManager.indexOfImageNode(3, NodeId(4L))).thenReturn(4)
             whenever(timelineImagePreviewManager.getImageNodeAtIndex(4)).thenReturn(tappedNode)
             initViewModel()
@@ -1399,10 +1457,20 @@ class ImagePreviewViewModelTest {
             whenever(savedStateHandle.get<Int>(PARAMS_CURRENT_IMAGE_NODE_INDEX)).thenReturn(3)
             whenever(savedStateHandle.get<Int>(PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT)).thenReturn(10)
             whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE)).thenReturn(3L)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(
+                true
+            )
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-            whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any(), any())).thenReturn(10)
+            whenever(
+                timelineImagePreviewManager.initialize(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            ).thenReturn(10)
             whenever(timelineImagePreviewManager.getImageNode(NodeId(3L))).thenReturn(anchorNode)
             whenever(timelineImagePreviewManager.indexOfImageNode(3, NodeId(3L))).thenReturn(3)
             initViewModel()
@@ -1428,7 +1496,15 @@ class ImagePreviewViewModelTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-        whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any(), any())).thenReturn(100)
+        whenever(
+            timelineImagePreviewManager.initialize(
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        ).thenReturn(100)
         whenever(timelineImagePreviewManager.indexOfImageNode(0, NodeId(0L))).thenReturn(0)
         initViewModel()
         advanceUntilIdle()
@@ -1451,7 +1527,15 @@ class ImagePreviewViewModelTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)).thenReturn(true)
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-        whenever(timelineImagePreviewManager.initialize(any(), any(), any(), any(), any())).thenReturn(100)
+        whenever(
+            timelineImagePreviewManager.initialize(
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        ).thenReturn(100)
         whenever(timelineImagePreviewManager.indexOfImageNode(0, NodeId(0L))).thenReturn(0)
         val nodes = mutableMapOf<Int, ImageNode>()
         (46..50).forEach { index ->

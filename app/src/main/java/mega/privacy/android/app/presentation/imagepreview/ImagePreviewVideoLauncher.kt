@@ -42,6 +42,8 @@ class ImagePreviewVideoLauncher @Inject constructor(
         albumTitle: String? = null,
         albumId: Long? = null,
         publicLinkUrl: String? = null,
+        orderedVideoHandles: List<Long>? = null,
+        mediaQueueTitle: String? = null,
     ) {
         runCatching {
             val viewType = when (source) {
@@ -62,7 +64,10 @@ class ImagePreviewVideoLauncher @Inject constructor(
                     parentId = imageNode.parentId.longValue,
                     isMediaQueueAvailable = isMediaQueueAvailable,
                     collectionTitle = albumTitle,
-                    collectionId = albumId
+                    collectionId = albumId,
+                    // Reuses the searchedItems intent slot to pass an explicitly ordered play queue.
+                    searchedItems = orderedVideoHandles,
+                    mediaQueueTitle = mediaQueueTitle,
                 )
             } ?: run {
                 val typedFileNode = addImageTypeUseCase(imageNode)
@@ -85,6 +90,9 @@ class ImagePreviewVideoLauncher @Inject constructor(
                     collectionId = albumId,
                     serializedData = typedFileNode.serializedData,
                     publicLinkUrl = publicLinkUrl,
+                    // Reuses the searchedItems intent slot to pass an explicitly ordered play queue.
+                    searchedItems = orderedVideoHandles,
+                    mediaQueueTitle = mediaQueueTitle,
                 )
             }
         }.onFailure { Timber.e(it) }
