@@ -18,11 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -33,7 +28,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.badge.Badge
@@ -46,7 +40,6 @@ import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Content of the full-screen subscription offer landing screen (DSN-3130): the campaign artwork
@@ -54,8 +47,8 @@ import kotlin.time.Duration.Companion.seconds
  * affordance, a promotional header (badge, title, campaign name, countdown), the discounted plan
  * as an [OfferPriceCard] (without its own buy button) and a pinned [BuyPlanBottomBar] CTA.
  *
- * The countdown is driven by [validUntil] and recomputed once a minute; it is hidden while
- * [validUntil] is null or already elapsed.
+ * The countdown is shown whenever the offer carries an expiry, including after it has passed, where
+ * it settles on all zeros so the user watching the deal run out sees it end.
  *
  * @param campaignText the campaign name (e.g. "Black Friday: 50% off"), shown as the header
  * subtitle and as the plan card badge
@@ -199,8 +192,10 @@ fun SubscriptionOfferScreenContent(
 }
 
 /**
- * Renders the offer countdown driven by [validUntil] (epoch seconds). Renders nothing once
- * elapsed; the remaining time is recomputed once a minute.
+ * Renders the offer countdown driven by [validUntil] (epoch seconds).
+ *
+ * Unlike the banners, this stays on screen at "00 / 00 / 00" once elapsed (DSN-3130), and shares
+ * [rememberOfferRemaining] with the buy CTA so the two agree on when the deal is over.
  */
 @Composable
 private fun OfferCountdownSection(
@@ -208,36 +203,23 @@ private fun OfferCountdownSection(
     validUntilText: String,
     modifier: Modifier = Modifier,
 ) {
-    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
-    LaunchedEffect(validUntil) {
-        while (true) {
-            now = System.currentTimeMillis()
-            if (validUntil * 1000L - now <= 0L) break
-            delay(60.seconds)
-        }
-    }
-    val remainingMillis = validUntil * 1000L - now
-    if (remainingMillis <= 0L) return
-    val totalMinutes = remainingMillis / 60_000L
-    val days = totalMinutes / (60L * 24L)
-    val hours = totalMinutes / 60L % 24L
-    val minutes = totalMinutes % 60L
+    val units = offerCountdownUnits(rememberOfferRemaining(validUntil))
     OfferCountdown(
         validUntilText = validUntilText,
-        days = days.toString().padStart(2, '0'),
-        hours = hours.toString().padStart(2, '0'),
-        minutes = minutes.toString().padStart(2, '0'),
+        days = units.daysText,
+        hours = units.hoursText,
+        minutes = units.minutesText,
         daysLabel = pluralStringResource(
             sharedR.plurals.subscription_offer_countdown_days,
-            days.toInt(),
+            units.days.toInt(),
         ),
         hoursLabel = pluralStringResource(
             sharedR.plurals.subscription_offer_countdown_hours,
-            hours.toInt(),
+            units.hours.toInt(),
         ),
         minutesLabel = pluralStringResource(
             sharedR.plurals.subscription_offer_countdown_minutes,
-            minutes.toInt(),
+            units.minutes.toInt(),
         ),
         modifier = modifier,
     )

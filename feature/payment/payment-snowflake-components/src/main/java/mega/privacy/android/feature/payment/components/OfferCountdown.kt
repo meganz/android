@@ -22,6 +22,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
+import kotlin.time.Duration
 
 /**
  * Countdown shown on the offer/discount subscription page. Displays a "valid until" caption above a
@@ -142,6 +143,55 @@ private fun OfferCountdownPreview() {
             modifier = Modifier.padding(16.dp),
         )
     }
+}
+
+/**
+ * Splits [remaining] into the days/hours/minutes units an offer countdown displays.
+ *
+ * A running offer never reads as all zeros — under a minute left still shows one minute. All zeros
+ * mean the offer has actually elapsed, which the landing screen keeps on screen.
+ *
+ * @param remaining the time left before the offer expires, zero or negative once it has elapsed
+ */
+fun offerCountdownUnits(remaining: Duration): OfferCountdownUnits {
+    val totalMinutes = if (remaining <= Duration.ZERO) {
+        0L
+    } else {
+        remaining.inWholeMinutes.coerceAtLeast(1L)
+    }
+    return OfferCountdownUnits(
+        days = totalMinutes / (60L * 24L),
+        hours = totalMinutes / 60L % 24L,
+        minutes = totalMinutes % 60L,
+    )
+}
+
+/**
+ * An offer countdown split into units: counts for the unit labels, zero-padded text for the values.
+ *
+ * @property days the whole days left
+ * @property hours the whole hours left within the day
+ * @property minutes the whole minutes left within the hour
+ */
+data class OfferCountdownUnits(
+    val days: Long,
+    val hours: Long,
+    val minutes: Long,
+) {
+    /**
+     * [days] zero-padded to two digits
+     */
+    val daysText: String = days.toString().padStart(2, '0')
+
+    /**
+     * [hours] zero-padded to two digits
+     */
+    val hoursText: String = hours.toString().padStart(2, '0')
+
+    /**
+     * [minutes] zero-padded to two digits
+     */
+    val minutesText: String = minutes.toString().padStart(2, '0')
 }
 
 /**

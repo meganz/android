@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.feature.payment.components.SubscriptionOfferScreenContent
 import mega.privacy.android.feature.payment.components.SubscriptionOfferScreenError
 import mega.privacy.android.feature.payment.components.SubscriptionOfferScreenSkeleton
+import mega.privacy.android.feature.payment.components.rememberOfferExpired
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
 import mega.privacy.android.feature.payment.presentation.upgrade.billedDescription
@@ -29,9 +30,11 @@ import java.util.Date
  * buy CTA so the other discounted plans stay reachable.
  *
  * @param uiState the offer to promote
- * @param onBuyClick called with the promoted [Subscription] when the buy CTA is tapped
+ * @param onBuyClick called with the promoted [Subscription] when the buy CTA is tapped while the
+ * offer is still running
  * @param onDismiss called when the dismiss (X) icon is tapped
- * @param onViewAllPlansClick called when the "View all plans" text button is tapped
+ * @param onViewAllPlansClick called when the "View all plans" text button is tapped, and when the
+ * buy CTA is tapped after the offer has expired — both open the regular upgrade screen
  * @param onRetryClick called when the error state's "Try again" button is tapped
  * @param modifier
  */
@@ -78,9 +81,10 @@ internal fun SubscriptionOfferScreen(
  * @param uiState the offer to promote
  * @param offerSubscription the discounted plan to promote
  * @param subscription the promoted [offerSubscription] on the billing period the offer applies to
- * @param onBuyClick called with [subscription] when the buy CTA is tapped
+ * @param onBuyClick called with [subscription] when the buy CTA is tapped while the offer is running
  * @param onDismiss called when the dismiss (X) icon is tapped
- * @param onViewAllPlansClick called when the "View all plans" text button is tapped
+ * @param onViewAllPlansClick called when the "View all plans" text button is tapped, and when the
+ * buy CTA is tapped after the offer has expired
  * @param modifier
  */
 @Composable
@@ -97,6 +101,9 @@ private fun SubscriptionOfferLoadedContent(
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
     val planName = stringResource(offerSubscription.accountType.toUIAccountType().textValue)
+
+    // The discount UI stays after the deal ends (DSN-3130), so the CTA is what stops honouring it.
+    val isOfferEnded = rememberOfferExpired(uiState.offerValidUntil ?: 0L)
 
     val storageFormatted = offerSubscription.formatStorageSize()
     val transferFormatted = offerSubscription.formatTransferSize(isMonthly)
@@ -167,7 +174,9 @@ private fun SubscriptionOfferLoadedContent(
             sharedR.string.subscription_revamp_get_plan_button,
             planName,
         ),
-        onBuyClick = { onBuyClick(subscription) },
+        onBuyClick = {
+            if (isOfferEnded) onViewAllPlansClick() else onBuyClick(subscription)
+        },
         onDismissClick = onDismiss,
         modifier = modifier,
         monthlyPriceText = monthlyPriceText,

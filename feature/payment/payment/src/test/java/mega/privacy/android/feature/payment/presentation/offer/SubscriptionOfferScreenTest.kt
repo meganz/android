@@ -7,10 +7,19 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.domain.entity.account.OfferPeriod
+import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_SUBSCRIPTION_OFFER_SCREEN_DISMISS
 import mega.privacy.android.feature.payment.components.TEST_TAG_SUBSCRIPTION_OFFER_SCREEN_ERROR
 import mega.privacy.android.feature.payment.components.TEST_TAG_SUBSCRIPTION_OFFER_SCREEN_RETRY
 import mega.privacy.android.feature.payment.components.TEST_TAG_SUBSCRIPTION_OFFER_SCREEN_SKELETON
+import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
+import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -26,17 +35,44 @@ class SubscriptionOfferScreenTest {
         state: SubscriptionOfferState,
         onRetryClick: () -> Unit = {},
         onDismiss: () -> Unit = {},
+        onBuyClick: (Subscription) -> Unit = {},
+        onViewAllPlansClick: () -> Unit = {},
     ) {
         composeRule.setContent {
             SubscriptionOfferScreen(
                 uiState = state,
-                onBuyClick = {},
+                onBuyClick = onBuyClick,
                 onDismiss = onDismiss,
-                onViewAllPlansClick = {},
+                onViewAllPlansClick = onViewAllPlansClick,
                 onRetryClick = onRetryClick,
             )
         }
     }
+
+    private val offerSubscription = LocalisedSubscription(
+        monthlySubscription = Subscription(
+            sku = "pro_i_monthly",
+            accountType = AccountType.PRO_I,
+            handle = 370834413380951543,
+            storage = 2048,
+            transfer = 2048,
+            amount = CurrencyAmount(9.99F, Currency("EUR")),
+            discountedAmountMonthly = CurrencyAmount(4.99F, Currency("EUR")),
+            discountedPercentage = 50,
+            discountName = "Black Friday",
+            offerPeriod = OfferPeriod.Month(12),
+        ),
+        yearlySubscription = null,
+        localisedPriceCurrencyCode = LocalisedPriceCurrencyCodeStringMapper(),
+        formattedSize = FormattedSizeMapper(),
+    )
+
+    private fun loadedState(validUntil: Long) = SubscriptionOfferState(
+        isLoading = false,
+        offerSubscription = offerSubscription,
+        isMonthly = true,
+        offerValidUntil = validUntil,
+    )
 
     @Test
     fun `test that loading state shows the skeleton`() {
@@ -103,6 +139,38 @@ class SubscriptionOfferScreenTest {
         composeRule.onNodeWithTag(TEST_TAG_SUBSCRIPTION_OFFER_SCREEN_RETRY).performClick()
 
         assertThat(retried).isTrue()
+    }
+
+    @Test
+    fun `test that buy CTA starts the purchase while the offer is running`() {
+        var bought: Subscription? = null
+        var viewedAllPlans = false
+        setScreen(
+            state = loadedState(validUntil = System.currentTimeMillis() / 1000L + 3600L),
+            onBuyClick = { bought = it },
+            onViewAllPlansClick = { viewedAllPlans = true },
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON).performClick()
+
+        assertThat(bought).isNotNull()
+        assertThat(viewedAllPlans).isFalse()
+    }
+
+    @Test
+    fun `test that buy CTA opens the upgrade screen when the offer has expired`() {
+        var bought: Subscription? = null
+        var viewedAllPlans = false
+        setScreen(
+            state = loadedState(validUntil = System.currentTimeMillis() / 1000L - 60L),
+            onBuyClick = { bought = it },
+            onViewAllPlansClick = { viewedAllPlans = true },
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON).performClick()
+
+        assertThat(viewedAllPlans).isTrue()
+        assertThat(bought).isNull()
     }
 
     @Test

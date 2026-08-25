@@ -2,7 +2,9 @@ package mega.privacy.android.feature.payment.components
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -90,9 +92,17 @@ class SubscriptionOfferScreenContentTest {
     }
 
     @Test
-    fun `test that SubscriptionOfferScreenContent hides countdown when offer has elapsed`() {
+    fun `test that SubscriptionOfferScreenContent keeps the countdown at zero when offer has elapsed`() {
         setContent(validUntil = System.currentTimeMillis() / 1000L - 60L)
-        composeRule.onNodeWithTag(TEST_TAG_OFFER_COUNTDOWN).assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_COUNTDOWN).assertExists()
+        composeRule.onAllNodesWithText("00").assertCountEquals(3)
+    }
+
+    @Test
+    fun `test that SubscriptionOfferScreenContent shows one minute when under a minute is left`() {
+        setContent(validUntil = System.currentTimeMillis() / 1000L + 30L)
+        composeRule.onAllNodesWithText("00").assertCountEquals(2)
+        composeRule.onNodeWithText("01").assertIsDisplayed()
     }
 
     @Test

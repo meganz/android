@@ -10,8 +10,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -27,7 +25,8 @@ import mega.privacy.android.domain.entity.account.OfferPeriod
 import mega.privacy.android.feature.payment.components.BillingPeriodSelector
 import mega.privacy.android.feature.payment.components.OfferCountdown
 import mega.privacy.android.feature.payment.components.OfferPriceCard
-import mega.privacy.android.feature.payment.components.offerCountdownFlow
+import mega.privacy.android.feature.payment.components.offerCountdownUnits
+import mega.privacy.android.feature.payment.components.rememberOfferRemaining
 import mega.privacy.android.feature.payment.components.upgradeAccountSkeleton
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.OfferHighlight
@@ -38,7 +37,6 @@ import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * The [LocalisedSubscription]s that carry an active discount for [isMonthly] and are not the user's
@@ -306,12 +304,11 @@ private fun OfferHeader(
 }
 
 /**
- * Renders the offer countdown driven by [validUntil] (epoch seconds), ticked by [offerCountdownFlow].
- * Renders nothing while [validUntil] is null or already elapsed.
+ * Renders the offer countdown driven by [validUntil] (epoch seconds), ticked by
+ * [rememberOfferRemaining]. Renders nothing while [validUntil] is null or already elapsed.
  *
- * [onExpired] is called when the offer runs out while the page is open — [offerCountdownFlow] only
- * completes once that happens. It is not called for an offer that had already elapsed when the page
- * was opened.
+ * [onExpired] is called when the offer runs out while the page is open. It is not called for an
+ * offer that had already elapsed when the page was opened.
  */
 @Composable
 private fun OfferCountdownSection(
@@ -320,38 +317,33 @@ private fun OfferCountdownSection(
     onExpired: () -> Unit,
 ) {
     if (validUntil == null) return
-    val initialRemaining = remember(validUntil) {
-        (validUntil * 1000L - System.currentTimeMillis()).coerceAtLeast(0L).milliseconds
+    val remaining = rememberOfferRemaining(validUntil)
+    val elapsed = remaining <= Duration.ZERO
+    val elapsedOnEntry = remember(validUntil) { elapsed }
+    LaunchedEffect(elapsed, elapsedOnEntry) {
+        if (elapsed && !elapsedOnEntry) onExpired()
     }
-    val remaining by remember(validUntil) { offerCountdownFlow(validUntil) }
-        .collectAsState(initial = initialRemaining)
-    LaunchedEffect(remaining, initialRemaining) {
-        if (Duration.ZERO in remaining..<initialRemaining) onExpired()
-    }
-    if (remaining <= Duration.ZERO) return
-    val totalMinutes = remaining.inWholeMinutes
-    val days = totalMinutes / (60L * 24L)
-    val hours = totalMinutes / 60L % 24L
-    val minutes = totalMinutes % 60L
+    if (elapsed) return
+    val units = offerCountdownUnits(remaining)
     OfferCountdown(
         validUntilText = stringResource(
             sharedR.string.subscription_offer_countdown_valid_until,
             DateFormat.getDateInstance(DateFormat.LONG, locale).format(Date(validUntil * 1000L)),
         ),
-        days = days.toString().padStart(2, '0'),
-        hours = hours.toString().padStart(2, '0'),
-        minutes = minutes.toString().padStart(2, '0'),
+        days = units.daysText,
+        hours = units.hoursText,
+        minutes = units.minutesText,
         daysLabel = pluralStringResource(
             sharedR.plurals.subscription_offer_countdown_days,
-            days.toInt()
+            units.days.toInt()
         ),
         hoursLabel = pluralStringResource(
             sharedR.plurals.subscription_offer_countdown_hours,
-            hours.toInt()
+            units.hours.toInt()
         ),
         minutesLabel = pluralStringResource(
             sharedR.plurals.subscription_offer_countdown_minutes,
-            minutes.toInt()
+            units.minutes.toInt()
         ),
     )
 }

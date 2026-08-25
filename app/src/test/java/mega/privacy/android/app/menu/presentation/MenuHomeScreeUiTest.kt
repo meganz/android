@@ -166,6 +166,20 @@ class MenuHomeScreeUiTest {
     }
 
     @Test
+    fun `test that offer banner is not displayed when the offer has expired`() {
+        setupRule(
+            uiState = createDefaultMenuUiState().copy(
+                offerBanner = offerBanner.copy(
+                    validUntil = System.currentTimeMillis() / 1000L - 3600L,
+                ),
+            )
+        )
+
+        composeRule.onNodeWithTag(OFFER_BANNER).assertDoesNotExist()
+        composeRule.onNodeWithText("Black Friday · Get 50% off").assertDoesNotExist()
+    }
+
+    @Test
     fun `test that offer banner button navigates to the subscription offer screen`() {
         val navigateToFeature = mock<(NavKey) -> Unit>()
         setupRule(

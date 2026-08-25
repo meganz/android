@@ -14,8 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
@@ -51,16 +52,16 @@ import kotlin.time.Duration.Companion.seconds
  * Renders the campaign artwork as a full-bleed background with a headline, a compact
  * days/hours/minutes countdown and an action button, plus a dismiss (X) affordance.
  *
- * The countdown is driven by [validUntil] and recomputed periodically; it is hidden once the
- * offer has elapsed. The caller remains responsible for hiding the banner entirely when the
- * campaign is no longer active.
+ * The whole banner hides itself once the countdown runs out. An offer carrying no expiry
+ * ([validUntil] of 0 or less) never elapses and simply shows no countdown. Callers that also need to
+ * drop what surrounds the banner should gate on [rememberOfferExpired].
  *
  * The design uses the same light campaign artwork in both themes, so the whole banner is pinned
  * to the light palette to keep text and button contrast against the artwork.
  *
  * @param title the headline text (e.g. "Black Friday · Get 50% off")
  * @param subtitle the supporting text (e.g. "€4.99/month for Pro I")
- * @param validUntil the offer expiry as epoch seconds
+ * @param validUntil the offer expiry as epoch seconds, 0 or less when the offer has no expiry
  * @param actionButtonText the action button label (e.g. "Grab deal")
  * @param onActionClick called when the action button is tapped
  * @param onDismissClick called when the dismiss (X) icon is tapped
@@ -108,18 +109,58 @@ fun offerCountdownFlow(
         val remainingMillis = validUntil * 1000L - currentTimeMillis()
         emit(remainingMillis.coerceAtLeast(0L).milliseconds)
         if (remainingMillis <= 0L) break
-        delay(COUNTDOWN_TICK)
+        delay(minOf(COUNTDOWN_TICK, remainingMillis.milliseconds))
     }
 }
 
 private val COUNTDOWN_TICK = 30.seconds
 
 /**
- * Banner layout, themed by the forced-light [AndroidTheme] wrapper in [OfferBanner].
+ * Whether the offer expiring at [validUntil] (epoch seconds) has elapsed, flipping to true while the
+ * caller is on screen. An offer with no expiry ([validUntil] of 0 or less) never elapses.
+ *
+ * Derived state, so the caller is invalidated only when the offer flips to expired rather than on
+ * every countdown tick. Use [rememberOfferRemaining] to render the countdown itself.
+ *
+ * @param validUntil the offer expiry as epoch seconds, 0 or less when the offer has no expiry
+ */
+@Composable
+fun rememberOfferExpired(validUntil: Long): Boolean {
+    if (validUntil <= 0L) return false
+    val remaining = rememberOfferRemainingState(validUntil)
+    val expired = remember(remaining) { derivedStateOf { remaining.value <= Duration.ZERO } }
+    return expired.value
+}
+
+/**
+ * The time left before the offer expiring at [validUntil] (epoch seconds) runs out, [Duration.ZERO]
+ * once elapsed. Invalidates the caller on every tick, as a rendered countdown needs.
+ *
+ * @param validUntil the offer expiry as epoch seconds
+ */
+@Composable
+fun rememberOfferRemaining(validUntil: Long): Duration =
+    rememberOfferRemainingState(validUntil).value
+
+/**
+ * The countdown for [validUntil] as an unread [State], so callers choose what to subscribe to.
+ */
+@Composable
+private fun rememberOfferRemainingState(validUntil: Long): State<Duration> {
+    val initialRemaining = remember(validUntil) {
+        (validUntil * 1000L - System.currentTimeMillis()).coerceAtLeast(0L).milliseconds
+    }
+    return remember(validUntil) { offerCountdownFlow(validUntil) }
+        .collectAsState(initial = initialRemaining)
+}
+
+/**
+ * Banner layout, themed by the forced-light [AndroidTheme] wrapper in [OfferBanner]. Renders nothing
+ * once the offer has elapsed.
  *
  * @param title the headline text (e.g. "Black Friday · Get 50% off")
  * @param subtitle the supporting text (e.g. "€4.99/month for Pro I")
- * @param validUntil the offer expiry as epoch seconds
+ * @param validUntil the offer expiry as epoch seconds, 0 or less when the offer has no expiry
  * @param actionButtonText the action button label (e.g. "Grab deal")
  * @param onActionClick called when the action button is tapped
  * @param onDismissClick called when the dismiss (X) icon is tapped
@@ -135,11 +176,8 @@ private fun OfferBannerContent(
     onDismissClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val remaining by remember(validUntil) { offerCountdownFlow(validUntil) }
-        .collectAsState(
-            initial = (validUntil * 1000L - System.currentTimeMillis())
-                .coerceAtLeast(0L).milliseconds,
-        )
+    val remaining = rememberOfferRemaining(validUntil)
+    if (validUntil > 0L && remaining <= Duration.ZERO) return
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -216,35 +254,32 @@ private fun OfferBannerCountdown(
     modifier: Modifier = Modifier,
 ) {
     if (remaining <= Duration.ZERO) return
-    val totalMinutes = remaining.inWholeMinutes
-    val days = totalMinutes / (60L * 24L)
-    val hours = totalMinutes / 60L % 24L
-    val minutes = totalMinutes % 60L
+    val units = offerCountdownUnits(remaining)
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         CountdownUnit(
-            value = days.toString().padStart(2, '0'),
+            value = units.daysText,
             label = pluralStringResource(
                 sharedR.plurals.subscription_offer_countdown_days,
-                days.toInt(),
+                units.days.toInt(),
             ),
             modifier = Modifier.testTag(TEST_TAG_OFFER_BANNER_DAYS),
         )
         CountdownUnit(
-            value = hours.toString().padStart(2, '0'),
+            value = units.hoursText,
             label = pluralStringResource(
                 sharedR.plurals.subscription_offer_countdown_hours,
-                hours.toInt(),
+                units.hours.toInt(),
             ),
             modifier = Modifier.testTag(TEST_TAG_OFFER_BANNER_HOURS),
         )
         CountdownUnit(
-            value = minutes.toString().padStart(2, '0'),
+            value = units.minutesText,
             label = pluralStringResource(
                 sharedR.plurals.subscription_offer_countdown_minutes,
-                minutes.toInt(),
+                units.minutes.toInt(),
             ),
             modifier = Modifier.testTag(TEST_TAG_OFFER_BANNER_MINUTES),
         )

@@ -63,8 +63,20 @@ class OfferBannerTest {
     }
 
     @Test
-    fun `test that OfferBanner hides the countdown when the offer has elapsed`() {
+    fun `test that OfferBanner hides the whole banner when the offer has elapsed`() {
         setContent(validUntil = System.currentTimeMillis() / 1000L - 60L)
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_BANNER).assertDoesNotExist()
+        composeRule.onNodeWithText("Black Friday · Get 50% off").assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_BANNER_DAYS).assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_BANNER_HOURS).assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_BANNER_MINUTES).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that OfferBanner shows the banner without a countdown when the offer has no expiry`() {
+        setContent(validUntil = 0L)
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_BANNER).assertExists()
+        composeRule.onNodeWithText("Black Friday · Get 50% off").assertIsDisplayed()
         composeRule.onNodeWithTag(TEST_TAG_OFFER_BANNER_DAYS).assertDoesNotExist()
         composeRule.onNodeWithTag(TEST_TAG_OFFER_BANNER_HOURS).assertDoesNotExist()
         composeRule.onNodeWithTag(TEST_TAG_OFFER_BANNER_MINUTES).assertDoesNotExist()

@@ -12,12 +12,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import mega.android.core.ui.components.banner.HomeBanner
 import mega.android.core.ui.extensions.LaunchedOncePerAppEffect
 import mega.android.core.ui.theme.devicetype.DeviceType
@@ -29,10 +35,15 @@ import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.Subscript
 import mega.privacy.mobile.home.presentation.home.widget.banner.model.SubscriptionOfferBannerUiModel
 import mega.privacy.android.domain.entity.banner.PromotionalBanner as DomainPromoBanner
 import mega.privacy.android.shared.resources.R as sharedR
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Scrollable banner component that displays the subscription offer banner (if any) followed by the
  * promotional banners horizontally.
+ *
+ * An expired offer is dropped from the carousel rather than hidden in place, so the remaining cards
+ * keep their width and spacing and no impression is tracked for a card the user never saw.
  *
  * @param offerBanner The locally-built subscription offer banner shown first, or null when inactive
  * @param banners List of domain PromoBanner entities to display
@@ -48,13 +59,14 @@ fun ScrollableBanner(
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val totalCount = (if (offerBanner != null) 1 else 0) + banners.size
+    val activeOfferBanner = offerBanner?.takeUnless { rememberOfferExpired(it.validUntil) }
+    val totalCount = (if (activeOfferBanner != null) 1 else 0) + banners.size
     if (totalCount == 0) return
 
     val listState = rememberLazyListState()
     val cardWidth = rememberBannerCardWidth(bannerCount = totalCount)
 
-    val hasOfferBanner = offerBanner != null
+    val hasOfferBanner = activeOfferBanner != null
     LaunchedEffect(hasOfferBanner) {
         if (hasOfferBanner) listState.scrollToItem(0)
     }
@@ -66,7 +78,7 @@ fun ScrollableBanner(
         horizontalArrangement = Arrangement.spacedBy(BANNER_SPACING),
         contentPadding = PaddingValues(horizontal = BANNER_HORIZONTAL_PADDING),
     ) {
-        offerBanner?.let { offer ->
+        activeOfferBanner?.let { offer ->
             item(key = SubscriptionOfferBannerMapper.SUBSCRIPTION_OFFER_BANNER_ID) {
                 // Once per process: the carousel item recomposes every time it is scrolled back
                 // into view, which would otherwise inflate the impression count.
@@ -177,6 +189,45 @@ private fun calculateCardWidth(
         // Phone Portrait: "Peeking" effect to indicate
         else -> screenWidth - 64.dp
     }
+}
+
+/**
+ * Emits false while the offer expiring at [validUntil] (epoch seconds) runs, then true once elapsed.
+ *
+ * Polls the wall clock rather than sleeping through the offer in one [delay]: coroutine delays stop
+ * advancing while the device dozes. The last poll is clamped so the flip still lands on the expiry.
+ *
+ * @param validUntil the offer expiry as epoch seconds
+ * @param currentTimeMillis source of the current wall-clock time in millis; overridable for tests
+ */
+internal fun offerExpiryFlow(
+    validUntil: Long,
+    currentTimeMillis: () -> Long = System::currentTimeMillis,
+): Flow<Boolean> = flow {
+    while (true) {
+        val remainingMillis = validUntil * 1000L - currentTimeMillis()
+        if (remainingMillis <= 0L) break
+        emit(false)
+        delay(minOf(EXPIRY_POLL, remainingMillis.milliseconds))
+    }
+    emit(true)
+}.distinctUntilChanged()
+
+private val EXPIRY_POLL = 10.seconds
+
+/**
+ * Whether the offer expiring at [validUntil] (epoch seconds) has elapsed, flipping to true while the
+ * carousel is on screen. An offer with no expiry ([validUntil] of 0 or less) never elapses.
+ */
+@Composable
+private fun rememberOfferExpired(validUntil: Long): Boolean {
+    if (validUntil <= 0L) return false
+    val alreadyElapsed = remember(validUntil) {
+        validUntil * 1000L <= System.currentTimeMillis()
+    }
+    val expired by remember(validUntil) { offerExpiryFlow(validUntil) }
+        .collectAsState(initial = alreadyElapsed)
+    return expired
 }
 
 private val BANNER_SPACING = 12.dp

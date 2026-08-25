@@ -75,6 +75,7 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLB
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialogM3NavKey
 import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
 import mega.privacy.android.feature.payment.components.OfferBanner
+import mega.privacy.android.feature.payment.components.rememberOfferExpired
 import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
@@ -140,6 +141,9 @@ fun MenuHomeScreenUi(
     ) {
         navigateToFeature(LogoutConfirmationDialogM3NavKey)
     }
+
+    val activeOfferBanner = uiState.offerBanner
+        ?.takeUnless { rememberOfferExpired(it.validUntil) }
 
     @OptIn(ExperimentalMaterial3Api::class)
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -228,7 +232,7 @@ fun MenuHomeScreenUi(
                 )
             }
 
-            uiState.offerBanner?.let { offerBanner ->
+            activeOfferBanner?.let { offerBanner ->
                 item(key = OFFER_BANNER) {
                     // Once per process: the list item recomposes each time it is scrolled back
                     // into view, which would otherwise inflate the impression count.

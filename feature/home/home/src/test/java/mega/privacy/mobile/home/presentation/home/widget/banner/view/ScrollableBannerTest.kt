@@ -57,7 +57,7 @@ class ScrollableBannerTest {
         discountPercentage = 50,
         formattedPrice = "€4.99",
         planNameRes = sharedR.string.pro1_account,
-        validUntil = 1_785_000_000L,
+        validUntil = System.currentTimeMillis() / 1000L + 28L * 24L * 3600L,
         campaignId = 90210L,
     )
 
@@ -218,6 +218,62 @@ class ScrollableBannerTest {
             .assertIsDisplayed()
         composeRule.onNodeWithText("€4.99/month for Pro I", substring = true).assertIsDisplayed()
         composeRule.onNodeWithText("Grab deal").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the offer banner is not displayed when its offer has expired`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                ScrollableBanner(
+                    offerBanner = offerBanner.copy(
+                        validUntil = System.currentTimeMillis() / 1000L - 3600L,
+                    ),
+                    banners = emptyList(),
+                    onDismiss = { _, _ -> },
+                    onClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Black Friday · Get 50% off", substring = true)
+            .assertDoesNotExist()
+        composeRule.onNodeWithText("Grab deal").assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the offer banner is displayed when its offer carries no expiry`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                ScrollableBanner(
+                    offerBanner = offerBanner.copy(validUntil = 0L),
+                    banners = emptyList(),
+                    onDismiss = { _, _ -> },
+                    onClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Black Friday · Get 50% off", substring = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the promo banners are still displayed when the offer has expired`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                ScrollableBanner(
+                    offerBanner = offerBanner.copy(
+                        validUntil = System.currentTimeMillis() / 1000L - 3600L,
+                    ),
+                    banners = listOf(banner1),
+                    onDismiss = { _, _ -> },
+                    onClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText(banner1.title).assertIsDisplayed()
+        composeRule.onNodeWithText("Grab deal").assertDoesNotExist()
     }
 
     /**
