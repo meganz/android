@@ -78,6 +78,16 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
             val snackbarQueue = rememberSnackBarQueue()
             val coroutineScope = rememberCoroutineScope()
 
+            val noConnectionEvent by viewModel.noConnectionEvent.collectAsStateWithLifecycle()
+            EventEffect(
+                event = noConnectionEvent,
+                onConsumed = viewModel::onNoConnectionEventConsumed,
+            ) {
+                snackbarQueue.queueMessage(
+                    resources.getString(sharedR.string.error_no_internet_title)
+                )
+            }
+
             ShareLinkScreen(
                 uiState = uiState,
                 isAlbum = key.albumId != null,
@@ -184,11 +194,16 @@ fun EntryProviderScope<NavKey>.linkSettingsScreen(
             }
             navigationHandler.back()
         }
-        EventEffect(event = uiState.errorEvent, onConsumed = viewModel::onErrorEventConsumed) {
+        EventEffect(
+            event = uiState.errorEvent,
+            onConsumed = viewModel::onErrorEventConsumed,
+        ) { failure ->
+            val message = when (failure) {
+                ShareLinkFailure.NoConnection -> sharedR.string.error_no_internet_title
+                ShareLinkFailure.Generic -> sharedR.string.general_request_failed_message
+            }
             coroutineScope.launch {
-                snackbarQueue.queueMessage(
-                    resources.getString(sharedR.string.general_request_failed_message)
-                )
+                snackbarQueue.queueMessage(resources.getString(message))
             }
         }
 

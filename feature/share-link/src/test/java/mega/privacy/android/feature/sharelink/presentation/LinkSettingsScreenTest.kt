@@ -13,7 +13,6 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.triggered
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
@@ -39,7 +38,6 @@ import mega.privacy.mobile.analytics.event.LinkSeparateKeyLearnMoreButtonPressed
 import mega.privacy.mobile.analytics.event.LinkSetPasswordFileButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LinkSetPasswordFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LinkSettingsSaveButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkSettingsSaveFailedEvent
 import mega.privacy.mobile.analytics.event.LinkSettingsScreenEvent
 import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFileDialogEvent
 import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFolderDialogEvent
@@ -812,20 +810,6 @@ class LinkSettingsScreenTest {
             .performClick()
 
         assertThat(analyticsRule.events).contains(LinkDiscardChangesCancelButtonPressedEvent)
-    }
-
-    @Test
-    fun `test that a triggered error event tracks the save failed event`() {
-        setContent(uiState = loaded.copy(errorEvent = triggered))
-
-        assertThat(analyticsRule.events).contains(LinkSettingsSaveFailedEvent)
-    }
-
-    @Test
-    fun `test that the save failed event is not tracked without an error`() {
-        setContent(uiState = loaded)
-
-        assertThat(analyticsRule.events).doesNotContain(LinkSettingsSaveFailedEvent)
     }
 
     @Test

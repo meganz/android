@@ -42,7 +42,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -107,7 +106,6 @@ import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFolderButtonPressedE
 import mega.privacy.mobile.analytics.event.LinkSetPasswordFileButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LinkSetPasswordFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LinkSettingsSaveButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkSettingsSaveFailedEvent
 import mega.privacy.mobile.analytics.event.LinkSettingsScreenEvent
 import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFileDialogEvent
 import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFolderDialogEvent
@@ -156,11 +154,6 @@ fun LinkSettingsScreen(
     }
     LaunchedEffect(showDiscardDialog) {
         if (showDiscardDialog) Analytics.tracker.trackEvent(LinkDiscardChangesDialogEvent)
-    }
-    LaunchedEffect(uiState.errorEvent) {
-        if (uiState.errorEvent == triggered) {
-            Analytics.tracker.trackEvent(LinkSettingsSaveFailedEvent)
-        }
     }
 
     val onSeparateKeyToggled = { enabled: Boolean ->

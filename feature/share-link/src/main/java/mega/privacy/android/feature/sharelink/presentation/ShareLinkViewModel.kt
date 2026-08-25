@@ -6,10 +6,14 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -37,6 +41,7 @@ import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
 import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
@@ -80,6 +85,7 @@ class ShareLinkViewModel @AssistedInject constructor(
     private val exportAlbumsUseCase: ExportAlbumsUseCase,
     private val albumHasSensitiveContentUseCase: AlbumHasSensitiveContentUseCase,
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) : ViewModel() {
 
     /**
@@ -95,6 +101,15 @@ class ShareLinkViewModel @AssistedInject constructor(
      * (false). Internal plumbing, not UI state.
      */
     private val copyrightApproval = MutableStateFlow<Boolean?>(null)
+
+    private val _noConnectionEvent = MutableStateFlow<StateEvent>(consumed)
+
+    /**
+     * Raised when a load stopped for want of a connection, for the screen to say so. An event
+     * rather than part of [uiState], so it is shown once per attempt instead of every time the
+     * error state is recomposed or the screen recreated.
+     */
+    val noConnectionEvent: StateFlow<StateEvent> = _noConnectionEvent.asStateFlow()
 
     /**
      * Share link UI state.
@@ -138,9 +153,28 @@ class ShareLinkViewModel @AssistedInject constructor(
         emitAll(
             subjectFlow.catch { throwable ->
                 Timber.e(throwable, "Failed to load or create the share links")
-                emit(ShareLinkUiState.Error)
+                emit(errorState())
             }
         )
+    }
+
+    /** The error state for a load that failed, with the connection checked for the cause. */
+    private fun errorState() = errorState(isOffline = !isConnectedToInternetUseCase())
+
+    /**
+     * The error state to emit, raising [noConnectionEvent] when the connection is what stopped the
+     * load so the screen can say why rather than only that it failed.
+     */
+    private fun errorState(isOffline: Boolean): ShareLinkUiState {
+        if (isOffline) {
+            _noConnectionEvent.value = triggered
+        }
+        return ShareLinkUiState.Error
+    }
+
+    /** Consumes [noConnectionEvent]. */
+    fun onNoConnectionEventConsumed() {
+        _noConnectionEvent.value = consumed
     }
 
     /**
@@ -164,10 +198,16 @@ class ShareLinkViewModel @AssistedInject constructor(
         val pendingHandles = nodes
             .filter { it.exportedData?.publicLink.isNullOrEmpty() }
             .map { it.id.longValue }
-        val exportedLinks = if (pendingHandles.isNotEmpty()) {
-            exportNodesUseCase(nodes = pendingHandles, callerName = CALLER_NAME)
-        } else {
+        val exportedLinks = if (pendingHandles.isEmpty()) {
             emptyMap()
+        } else {
+            // Nodes that already have a link need no request, which is why only creating one is
+            // refused offline.
+            if (!isConnectedToInternetUseCase()) {
+                emit(errorState(isOffline = true))
+                return@flow
+            }
+            exportNodesUseCase(nodes = pendingHandles, callerName = CALLER_NAME)
         }
 
         val nodeLinks = nodes.mapNotNull { node ->
@@ -193,7 +233,7 @@ class ShareLinkViewModel @AssistedInject constructor(
         }
 
         if (nodeLinks.isEmpty()) {
-            emit(ShareLinkUiState.Error)
+            emit(errorState())
             return@flow
         }
         // The Link settings screen reads the node itself, but publishing here keeps the two in
@@ -231,12 +271,18 @@ class ShareLinkViewModel @AssistedInject constructor(
         // Read before exporting: exportAlbumsUseCase returns the existing link for an album that
         // already has one, so afterwards there is no way to tell the two cases apart.
         val wasExported = monitorUserAlbumByIdUseCase(id).first()?.isExported == true
+        // An album that is already exported is exported again without a request, so as with nodes
+        // only creating the link is refused offline.
+        if (!wasExported && !isConnectedToInternetUseCase()) {
+            emit(errorState(isOffline = true))
+            return@flow
+        }
 
         val link = exportAlbumsUseCase(albumIds = listOf(id))
             .firstOrNull { it.first == id }
             ?.second?.link?.takeIf(String::isNotEmpty)
         if (link == null) {
-            emit(ShareLinkUiState.Error)
+            emit(errorState())
             return@flow
         }
         val (linkWithoutKey, key) = splitLinkAndKeyUseCase(link)

@@ -115,6 +115,26 @@ enum class SensitiveWarningType {
 }
 
 /**
+ * Why a link could not be created, or its settings saved, choosing the message the user is shown.
+ */
+enum class ShareLinkFailure {
+    /** The request failed, or failed for a reason that cannot be named more precisely. */
+    Generic,
+
+    /**
+     * There is no internet connection, so the request was either never attempted or could not
+     * complete. Worth naming apart: the SDK retries a request it cannot send indefinitely and
+     * never reports a failure, so offline the operation is refused up front rather than tried.
+     */
+    NoConnection;
+
+    internal companion object {
+        /** The failure to report for an operation that could not produce a result. */
+        fun of(isConnected: Boolean) = if (isConnected) Generic else NoConnection
+    }
+}
+
+/**
  * A single shared subject and its public link — a node, or the album when one is being shared.
  *
  * @property handle Node handle, or the album id for an album.

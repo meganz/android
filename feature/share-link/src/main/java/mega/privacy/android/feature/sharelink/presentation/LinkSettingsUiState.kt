@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sharelink.presentation
 
 import androidx.compose.runtime.Stable
 import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
@@ -50,7 +51,7 @@ data class LinkSettingsUiState(
     val isSaving: Boolean = false,
     val savedLink: String? = null,
     val savedEvent: StateEvent = consumed,
-    val errorEvent: StateEvent = consumed,
+    val errorEvent: StateEventWithContent<ShareLinkFailure> = consumed(),
 ) {
     /**
      * Whether the Pro-only rows (expiry, password) are locked for the current account — true for

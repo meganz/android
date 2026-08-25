@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sharelink.presentation
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.flowOf
@@ -13,6 +14,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -27,9 +29,11 @@ import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
 import mega.privacy.android.feature.sharelink.session.ShareLinkSession
+import mega.privacy.mobile.analytics.event.LinkSettingsSaveFailedEvent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -60,10 +64,12 @@ class LinkSettingsViewModelTest {
     // Real instance: a plain state holder, so a mock would only restate what it already does.
     private val session = ShareLinkSession()
     private val splitLinkAndKeyUseCase = SplitLinkAndKeyUseCase()
+    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
 
     @BeforeEach
     fun setUp() {
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(AccountDetail()))
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
     }
 
     @AfterEach
@@ -74,6 +80,7 @@ class LinkSettingsViewModelTest {
             encryptLinkWithPasswordUseCase,
             getPasswordStrengthUseCase,
             monitorAccountDetailUseCase,
+            isConnectedToInternetUseCase,
         )
     }
 
@@ -131,6 +138,7 @@ class LinkSettingsViewModelTest {
         getPasswordStrengthUseCase = getPasswordStrengthUseCase,
         monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         splitLinkAndKeyUseCase = splitLinkAndKeyUseCase,
+        isConnectedToInternetUseCase = isConnectedToInternetUseCase,
         session = session,
     )
 
@@ -722,7 +730,7 @@ class LinkSettingsViewModelTest {
                 underTest.onExpiryEnabled(true)
                 underTest.onExpiryDateChanged(EXPIRY_TIME)
                 underTest.onSave()
-                awaitUntil { it.errorEvent == triggered }
+                awaitUntil { it.errorEvent is StateEventWithContentTriggered }
                 cancelAndIgnoreRemainingEvents()
             }
 
@@ -749,7 +757,7 @@ class LinkSettingsViewModelTest {
                 underTest.onPasswordEnabled(true)
                 underTest.onPasswordChanged(PASSWORD)
                 underTest.onSave()
-                awaitUntil { it.errorEvent == triggered }
+                awaitUntil { it.errorEvent is StateEventWithContentTriggered }
                 cancelAndIgnoreRemainingEvents()
             }
 
@@ -901,10 +909,205 @@ class LinkSettingsViewModelTest {
                 underTest.onExpiryEnabled(true)
                 underTest.onExpiryDateChanged(EXPIRY_TIME)
                 underTest.onSave()
-                val state = awaitUntil { it.errorEvent == triggered }
+                val state = awaitUntil { it.errorEvent is StateEventWithContentTriggered }
                 assertThat(state.isSaving).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
+        }
+
+    @Test
+    fun `test that onSave does not apply an expiry change offline`() =
+        runTest(extension.testDispatcher) {
+            // The export would never resume: the SDK retries a request it cannot send and reports
+            // nothing back, so attempting it offline left Save spinning instead of failing.
+            stubNode()
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onExpiryEnabled(true)
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                underTest.onSave()
+                val state = awaitUntil { it.errorEvent is StateEventWithContentTriggered }
+                assertThat((state.errorEvent as StateEventWithContentTriggered).content)
+                    .isEqualTo(ShareLinkFailure.NoConnection)
+                assertThat(state.isSaving).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verifyNoInteractions(exportNodeUseCase)
+        }
+
+    @Test
+    fun `test that onSave does not apply a password change offline`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                underTest.onSave()
+                val state = awaitUntil { it.errorEvent is StateEventWithContentTriggered }
+                assertThat((state.errorEvent as StateEventWithContentTriggered).content)
+                    .isEqualTo(ShareLinkFailure.NoConnection)
+                assertThat(state.isSaving).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            // Refused before anything was applied, so the link is left as it was.
+            assertThat(session.password.value).isNull()
+            verifyNoInteractions(encryptLinkWithPasswordUseCase)
+            verifyNoInteractions(exportNodeUseCase)
+        }
+
+    @Test
+    fun `test that onSave does not remove a password offline`() =
+        runTest(extension.testDispatcher) {
+            // Removing one is refused the same way as setting one: both leave the link carrying
+            // something other than what the screen would report.
+            stubNode()
+            stubExistingPassword()
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(false)
+                underTest.onSave()
+                val state = awaitUntil { it.errorEvent is StateEventWithContentTriggered }
+                assertThat((state.errorEvent as StateEventWithContentTriggered).content)
+                    .isEqualTo(ShareLinkFailure.NoConnection)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(session.password.value)
+                .isEqualTo(LinkPassword(OLD_PASSWORD, PUBLIC_LINK))
+        }
+
+    @Test
+    fun `test that onSave does not apply a separate key change offline`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(true)
+                underTest.onSave()
+                val state = awaitUntil { it.errorEvent is StateEventWithContentTriggered }
+                assertThat((state.errorEvent as StateEventWithContentTriggered).content)
+                    .isEqualTo(ShareLinkFailure.NoConnection)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(session.isKeySeparate.value).isFalse()
+        }
+
+    @Test
+    fun `test that onSave does not enter the saving state offline`() =
+        runTest(extension.testDispatcher) {
+            // Refused before the save is even started, so the button never shows progress for
+            // something that was never going to be applied.
+            stubNode()
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.onExpiryEnabled(true)
+            underTest.onExpiryDateChanged(EXPIRY_TIME)
+            underTest.onSave()
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.isSaving).isFalse()
+            assertThat(underTest.uiState.value.savedEvent).isEqualTo(consumed)
+            verifyNoInteractions(exportNodeUseCase)
+        }
+
+    @Test
+    fun `test that onSave reports no connection when the export fails offline`() =
+        runTest(extension.testDispatcher) {
+            // Connected when the save starts and offline by the time it fails: the message names
+            // the connection rather than blaming the request.
+            stubNode()
+            whenever(isConnectedToInternetUseCase()).thenReturn(true, false)
+            whenever(exportNodeUseCase(any(), anyOrNull(), any()))
+                .thenAnswer { throw RuntimeException("boom") }
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onExpiryEnabled(true)
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                underTest.onSave()
+                val state = awaitUntil { it.errorEvent is StateEventWithContentTriggered }
+                assertThat((state.errorEvent as StateEventWithContentTriggered).content)
+                    .isEqualTo(ShareLinkFailure.NoConnection)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(exportNodeUseCase)
+                .invoke(NodeId(NODE_HANDLE), EXPIRY_TIME_SECONDS, CALLER_NAME)
+        }
+
+    @Test
+    fun `test that onSave tracks the save failed event when applying changes fails`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(exportNodeUseCase(any(), anyOrNull(), any()))
+                .thenAnswer { throw RuntimeException("boom") }
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.onExpiryEnabled(true)
+            underTest.onExpiryDateChanged(EXPIRY_TIME)
+            underTest.onSave()
+            advanceUntilIdle()
+
+            assertThat(analyticsExtension.events).contains(LinkSettingsSaveFailedEvent)
+        }
+
+    @Test
+    fun `test that onSave tracks the save failed event when it is refused offline`() =
+        runTest(extension.testDispatcher) {
+            // A refusal still counts as a failed save, which is what the event reported before it
+            // moved here; whether it should is for the analytics owner to settle.
+            stubNode()
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.onExpiryEnabled(true)
+            underTest.onExpiryDateChanged(EXPIRY_TIME)
+            underTest.onSave()
+            advanceUntilIdle()
+
+            assertThat(analyticsExtension.events).contains(LinkSettingsSaveFailedEvent)
+        }
+
+    @Test
+    fun `test that onSave does not track the save failed event when it succeeds`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.onExpiryEnabled(true)
+            underTest.onExpiryDateChanged(EXPIRY_TIME)
+            underTest.onSave()
+            advanceUntilIdle()
+
+            assertThat(analyticsExtension.events).doesNotContain(LinkSettingsSaveFailedEvent)
         }
 
     @Test
@@ -1637,5 +1840,9 @@ class LinkSettingsViewModelTest {
         @JvmField
         @RegisterExtension
         val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
     }
 }

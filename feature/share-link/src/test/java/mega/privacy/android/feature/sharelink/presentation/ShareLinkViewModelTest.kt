@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -35,6 +37,7 @@ import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
@@ -83,6 +86,7 @@ class ShareLinkViewModelTest {
     private val exportAlbumsUseCase = mock<ExportAlbumsUseCase>()
     private val albumHasSensitiveContentUseCase = mock<AlbumHasSensitiveContentUseCase>()
     private val downloadThumbnailUseCase = mock<DownloadThumbnailUseCase>()
+    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val nodeUpdates = MutableSharedFlow<NodeUpdate>()
 
     @BeforeEach
@@ -94,6 +98,7 @@ class ShareLinkViewModelTest {
         whenever { hasSensitiveInheritedUseCase(any()) }.thenReturn(false)
         whenever { hasSensitiveDescendantUseCase(any()) }.thenReturn(false)
         whenever { shouldShowCopyrightUseCase() }.thenReturn(false)
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         underTest = buildViewModel(listOf(NODE_HANDLE))
     }
 
@@ -117,6 +122,7 @@ class ShareLinkViewModelTest {
         exportAlbumsUseCase = exportAlbumsUseCase,
         albumHasSensitiveContentUseCase = albumHasSensitiveContentUseCase,
         downloadThumbnailUseCase = downloadThumbnailUseCase,
+        isConnectedToInternetUseCase = isConnectedToInternetUseCase,
         session = session,
     )
 
@@ -138,6 +144,7 @@ class ShareLinkViewModelTest {
             exportAlbumsUseCase,
             albumHasSensitiveContentUseCase,
             downloadThumbnailUseCase,
+            isConnectedToInternetUseCase,
         )
     }
 
@@ -294,8 +301,71 @@ class ShareLinkViewModelTest {
             assertThat(item).isEqualTo(ShareLinkUiState.Error)
             cancelAndIgnoreRemainingEvents()
         }
+        assertThat(underTest.noConnectionEvent.value).isEqualTo(consumed)
         verifyNoInteractions(exportNodesUseCase)
     }
+
+    @Test
+    fun `test that uiState reports no connection and does not export when a link must be created offline`() =
+        runTest {
+            // The export never resumed offline — the SDK retries a request it cannot send and
+            // reports nothing back — so the screen shimmered indefinitely instead of failing.
+            val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
+                on { name } doReturn "video.mp4"
+                on { exportedData } doReturn null
+                on { type } doReturn UnknownFileTypeInfo(mimeType = "video/mp4", extension = "mp4")
+            }
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+
+            underTest.uiState.test {
+                awaitErrorState()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(underTest.noConnectionEvent.value).isEqualTo(triggered)
+            verifyNoInteractions(exportNodesUseCase)
+        }
+
+    @Test
+    fun `test that uiState is Data offline when the node already has a link`() =
+        runTest {
+            // Opening an existing link needs no request, so it must keep working offline: only
+            // creating one is refused.
+            stubExportedNode(expirationSeconds = null)
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+
+            underTest.uiState.test {
+                assertThat(awaitData().primary.link).isEqualTo(LINK)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verifyNoInteractions(exportNodesUseCase)
+        }
+
+    @Test
+    fun `test that uiState reports no connection when the export produces no link offline`() =
+        runTest {
+            // Connected when the export starts and offline by the time it comes back empty: the
+            // screen names the connection rather than blaming the request.
+            val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
+                on { name } doReturn "video.mp4"
+                on { exportedData } doReturn null
+                on { type } doReturn UnknownFileTypeInfo(mimeType = "video/mp4", extension = "mp4")
+            }
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(isConnectedToInternetUseCase()).thenReturn(true, false)
+            whenever(exportNodesUseCase(listOf(NODE_HANDLE), CALLER_NAME)).thenReturn(emptyMap())
+
+            underTest.uiState.test {
+                awaitErrorState()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(underTest.noConnectionEvent.value).isEqualTo(triggered)
+        }
 
     @Test
     fun `test that a cached password marks the link as password protected`() =
@@ -981,9 +1051,10 @@ class ShareLinkViewModelTest {
         cover: TypedFileNode? = null,
         photos: List<Photo> = emptyList(),
         link: String = ALBUM_LINK,
+        isExported: Boolean = true,
     ) {
         whenever(monitorUserAlbumByIdUseCase(AlbumId(ALBUM_ID)))
-            .thenReturn(flowOf(userAlbum(title = title, cover = cover)))
+            .thenReturn(flowOf(userAlbum(title = title, cover = cover, isExported = isExported)))
         whenever(getAlbumPhotosUseCase(AlbumId(ALBUM_ID), false)).thenReturn(flowOf(photos))
         whenever { albumHasSensitiveContentUseCase(AlbumId(ALBUM_ID)) }.thenReturn(false)
         whenever { exportAlbumsUseCase(listOf(AlbumId(ALBUM_ID))) }
@@ -992,15 +1063,18 @@ class ShareLinkViewModelTest {
             .thenReturn(LinkAndKey(ALBUM_LINK_WITHOUT_KEY, ALBUM_KEY))
     }
 
-    private fun userAlbum(title: String = ALBUM_TITLE, cover: TypedFileNode? = null) =
-        MediaAlbum.User(
-            id = AlbumId(ALBUM_ID),
-            title = title,
-            creationTime = 0L,
-            modificationTime = 0L,
-            isExported = true,
-            cover = cover,
-        )
+    private fun userAlbum(
+        title: String = ALBUM_TITLE,
+        cover: TypedFileNode? = null,
+        isExported: Boolean = true,
+    ) = MediaAlbum.User(
+        id = AlbumId(ALBUM_ID),
+        title = title,
+        creationTime = 0L,
+        modificationTime = 0L,
+        isExported = isExported,
+        cover = cover,
+    )
 
     private fun photo(id: Long, thumbnailFilePath: String?, modifiedYear: Int) = Photo.Image(
         id = id,
@@ -1099,6 +1173,37 @@ class ShareLinkViewModelTest {
             awaitErrorState()
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that uiState reports no connection and does not export when an album link must be created offline`() =
+        runTest {
+            stubAlbum(isExported = false)
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            val underTest = buildAlbumViewModel()
+
+            underTest.uiState.test {
+                awaitErrorState()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(underTest.noConnectionEvent.value).isEqualTo(triggered)
+            verifyNoInteractions(exportAlbumsUseCase)
+        }
+
+    @Test
+    fun `test that uiState is Data offline when the album is already exported`() = runTest {
+        // Exporting an album that is already exported needs no request, so as with nodes only
+        // creating the link is refused.
+        stubAlbum()
+        whenever(isConnectedToInternetUseCase()).thenReturn(false)
+
+        buildAlbumViewModel().uiState.test {
+            assertThat(awaitData().primary.link).isEqualTo(ALBUM_LINK)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(exportAlbumsUseCase).invoke(listOf(AlbumId(ALBUM_ID)))
     }
 
     @Test

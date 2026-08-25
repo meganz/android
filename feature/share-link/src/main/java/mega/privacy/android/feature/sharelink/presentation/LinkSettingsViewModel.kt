@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -29,9 +30,11 @@ import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
 import mega.privacy.android.feature.sharelink.session.ShareLinkSession
+import mega.privacy.mobile.analytics.event.LinkSettingsSaveFailedEvent
 import timber.log.Timber
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -54,6 +57,7 @@ class LinkSettingsViewModel @AssistedInject constructor(
     private val getPasswordStrengthUseCase: GetPasswordStrengthUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val splitLinkAndKeyUseCase: SplitLinkAndKeyUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) : ViewModel() {
 
     private val handle: Long? = args.subject.cacheKey
@@ -175,6 +179,11 @@ class LinkSettingsViewModel @AssistedInject constructor(
         val current = _uiState.value
         if (current.isSaving || !current.isDirty || !current.isValid) return
 
+        if (!isConnectedToInternetUseCase()) {
+            reportFailure(ShareLinkFailure.NoConnection)
+            return
+        }
+
         update { it.copy(isSaving = true) }
         viewModelScope.launch {
             // The grade on screen is up to a debounce behind the field, so grade what is actually
@@ -193,7 +202,7 @@ class LinkSettingsViewModel @AssistedInject constructor(
                 }
                 .onFailure { throwable ->
                     Timber.e(throwable, "Failed to save link settings")
-                    update { it.copy(isSaving = false, errorEvent = triggered) }
+                    reportFailure(ShareLinkFailure.of(isConnectedToInternetUseCase()))
                 }
         }
     }
@@ -212,7 +221,19 @@ class LinkSettingsViewModel @AssistedInject constructor(
 
     fun onSavedEventConsumed() = update { it.copy(savedEvent = consumed, savedLink = null) }
 
-    fun onErrorEventConsumed() = update { it.copy(errorEvent = consumed) }
+    fun onErrorEventConsumed() = update { it.copy(errorEvent = consumed()) }
+
+    /**
+     * Ends the save with [failure], leaving the link as it was.
+     *
+     * A refusal for want of a connection still counts as a failed save, matching what the event
+     * has always reported; whether an attempt that never reached the API belongs in that metric is
+     * for the analytics owner to say.
+     */
+    private fun reportFailure(failure: ShareLinkFailure) {
+        Analytics.tracker.trackEvent(LinkSettingsSaveFailedEvent)
+        update { it.copy(isSaving = false, errorEvent = triggered(failure)) }
+    }
 
     /**
      * Applies the pending changes, writing any password change/removal to the shared
