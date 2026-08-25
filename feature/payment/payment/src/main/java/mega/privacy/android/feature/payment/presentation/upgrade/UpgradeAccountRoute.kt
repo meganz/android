@@ -6,6 +6,7 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.extensions.LaunchedOnceEffect
@@ -22,13 +23,8 @@ import mega.privacy.android.navigation.payment.toSource
 import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
-import mega.privacy.mobile.analytics.event.BuyProIEvent
-import mega.privacy.mobile.analytics.event.BuyProIIEvent
-import mega.privacy.mobile.analytics.event.BuyProIIIEvent
-import mega.privacy.mobile.analytics.event.BuyProLiteEvent
 import mega.privacy.mobile.analytics.event.GetStartedForFreeUpgradePlanButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MaybeLaterUpgradeAccountButtonPressedEvent
-import mega.privacy.mobile.analytics.event.UpgradeAccountPlanScreenEvent
 
 @Composable
 fun UpgradeAccountRoute(
@@ -46,11 +42,19 @@ fun UpgradeAccountRoute(
     val accountStorageUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
     val megaNavigator = rememberMegaNavigator()
     val activity = LocalActivity.current
+    val events = remember(uiState.currentSubscriptionPlan) {
+        upgradeAccountEvents(uiState.currentSubscriptionPlan)
+    }
+    // The current plan is only monitored for the upgrade flow; the onboarding flow always shows a
+    // free account, so its screen-view event does not have to wait for one.
+    val isAccountResolved = !isUpgradeAccount || uiState.currentSubscriptionPlan != null
 
     BackHandler(onBack = onBack)
 
-    LaunchedOnceEffect(Unit) {
-        Analytics.tracker.trackEvent(UpgradeAccountPlanScreenEvent)
+    LaunchedOnceEffect(isAccountResolved) {
+        if (isAccountResolved) {
+            Analytics.tracker.trackEvent(events.screenView)
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -102,7 +106,8 @@ fun UpgradeAccountRoute(
                     isUpgradeAccount = isUpgradeAccount,
                     openFromSource = openFromSource,
                     planType = subscription.accountType,
-                    isUpgradeAccountDueToAds = accountStorageViewModel.isUpgradeAccountDueToAds()
+                    isUpgradeAccountDueToAds = accountStorageViewModel.isUpgradeAccountDueToAds(),
+                    events = events,
                 )
                 activity?.let {
                     billingViewModel.startPurchase(
@@ -148,6 +153,7 @@ private fun sendAccountTypeAnalytics(
     openFromSource: UpgradeAccountSource,
     planType: AccountType,
     isUpgradeAccountDueToAds: Boolean,
+    events: UpgradeAccountEvents,
 ) {
     if (isUpgradeAccount) {
         if (openFromSource == UpgradeAccountSource.ADS_FREE_SCREEN) {
@@ -156,17 +162,7 @@ private fun sendAccountTypeAnalytics(
             Analytics.tracker.trackEvent(AdsUpgradeAccountPlanPageBuyButtonPressedEvent)
         }
     }
-    when (planType) {
-        AccountType.PRO_I -> Analytics.tracker.trackEvent(BuyProIEvent)
-
-        AccountType.PRO_II -> Analytics.tracker.trackEvent(BuyProIIEvent)
-
-        AccountType.PRO_III -> Analytics.tracker.trackEvent(BuyProIIIEvent)
-
-        AccountType.PRO_LITE -> Analytics.tracker.trackEvent(BuyProLiteEvent)
-
-        else -> Unit
-    }
+    events.buyPlanPressed[planType]?.let { Analytics.tracker.trackEvent(it) }
 }
 
 private fun onFreeClick(

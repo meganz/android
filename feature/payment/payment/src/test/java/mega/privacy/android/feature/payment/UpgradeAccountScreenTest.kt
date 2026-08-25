@@ -32,8 +32,9 @@ import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.feature.payment.components.TEST_TAG_BILLING_PERIOD_MONTHLY
 import mega.privacy.android.feature.payment.components.TEST_TAG_BILLING_PERIOD_SELECTOR
 import mega.privacy.android.feature.payment.components.TEST_TAG_BILLING_PERIOD_YEARLY
-import mega.privacy.mobile.analytics.event.UpgradeAccountPlanMonthlyPeriodTogglePressedEvent
-import mega.privacy.mobile.analytics.event.UpgradeAccountPlanYearlyPeriodTogglePressedEvent
+import mega.privacy.mobile.analytics.event.FreeUserUpgradeAccountPlanMonthlyPeriodTogglePressedEvent
+import mega.privacy.mobile.analytics.event.FreeUserUpgradeAccountPlanYearlyPeriodTogglePressedEvent
+import mega.privacy.mobile.analytics.event.PaidUserUpgradeAccountPlanMonthlyPeriodTogglePressedEvent
 import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_CURRENT_PLAN_CARD
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
@@ -714,7 +715,7 @@ class UpgradeAccountScreenTest {
     }
 
     @Test
-    fun `test that selecting monthly period tracks the monthly toggle event`() {
+    fun `test that selecting monthly period tracks the free user monthly toggle event`() {
         setContent(isSubscriptionRevampEnabled = true)
 
         composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
@@ -722,11 +723,27 @@ class UpgradeAccountScreenTest {
         composeRule.onNodeWithTag(TEST_TAG_BILLING_PERIOD_MONTHLY).performClick()
 
         assertThat(analyticsRule.events)
-            .containsExactly(UpgradeAccountPlanMonthlyPeriodTogglePressedEvent)
+            .containsExactly(FreeUserUpgradeAccountPlanMonthlyPeriodTogglePressedEvent)
     }
 
     @Test
-    fun `test that switching back to yearly tracks the yearly toggle event`() {
+    fun `test that selecting monthly period tracks the paid user monthly toggle event when the account is paid`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(currentPlan = AccountType.PRO_I),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_BILLING_PERIOD_MONTHLY))
+        composeRule.onNodeWithTag(TEST_TAG_BILLING_PERIOD_MONTHLY).performClick()
+
+        assertThat(analyticsRule.events)
+            .containsExactly(PaidUserUpgradeAccountPlanMonthlyPeriodTogglePressedEvent)
+    }
+
+    @Test
+    fun `test that switching back to yearly tracks the free user yearly toggle event`() {
         setContent(isSubscriptionRevampEnabled = true)
 
         composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
@@ -735,8 +752,8 @@ class UpgradeAccountScreenTest {
         composeRule.onNodeWithTag(TEST_TAG_BILLING_PERIOD_YEARLY).performClick()
 
         assertThat(analyticsRule.events).containsExactly(
-            UpgradeAccountPlanMonthlyPeriodTogglePressedEvent,
-            UpgradeAccountPlanYearlyPeriodTogglePressedEvent,
+            FreeUserUpgradeAccountPlanMonthlyPeriodTogglePressedEvent,
+            FreeUserUpgradeAccountPlanYearlyPeriodTogglePressedEvent,
         ).inOrder()
     }
 

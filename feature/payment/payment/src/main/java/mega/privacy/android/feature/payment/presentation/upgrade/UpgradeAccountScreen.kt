@@ -87,8 +87,6 @@ import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.mobile.analytics.event.UpgradeAccountPlanMonthlyPeriodTogglePressedEvent
-import mega.privacy.mobile.analytics.event.UpgradeAccountPlanYearlyPeriodTogglePressedEvent
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,14 +108,13 @@ fun UpgradeAccountScreen(
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
     var isMonthly by rememberSaveable { mutableStateOf(false) }
     var showOfferExpiredDialog by rememberSaveable { mutableStateOf(false) }
+    val events = remember(uiState.currentSubscriptionPlan) {
+        upgradeAccountEvents(uiState.currentSubscriptionPlan)
+    }
     val onMonthlyChange: (Boolean) -> Unit = { monthly ->
         if (monthly != isMonthly) {
             Analytics.tracker.trackEvent(
-                if (monthly) {
-                    UpgradeAccountPlanMonthlyPeriodTogglePressedEvent
-                } else {
-                    UpgradeAccountPlanYearlyPeriodTogglePressedEvent
-                }
+                if (monthly) events.monthlyTogglePressed else events.yearlyTogglePressed
             )
         }
         isMonthly = monthly
