@@ -68,6 +68,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param modifier
  * @param monthlyPriceText the per-month price shown above the yearly total (e.g. "€4.99/month"),
  * null for monthly plans
+ * @param useBrandButton whether the CTA uses the brand (campaign) button; false renders the plain
+ * button the deal-ended state uses
  * @param viewAllPlansText label of the text button below the CTA that opens the full list of plans,
  * null when only the promoted plan carries the campaign
  * @param onViewAllPlansClick called when the view-all-plans text button is tapped
@@ -88,6 +90,7 @@ fun SubscriptionOfferScreenContent(
     onDismissClick: () -> Unit,
     modifier: Modifier = Modifier,
     monthlyPriceText: String? = null,
+    useBrandButton: Boolean = true,
     viewAllPlansText: String? = null,
     onViewAllPlansClick: () -> Unit = {},
 ) {
@@ -103,7 +106,7 @@ fun SubscriptionOfferScreenContent(
                 textOnlyButtonText = viewAllPlansText,
                 onTextOnlyButtonClick = onViewAllPlansClick,
                 maxContentWidth = SUBSCRIPTION_OFFER_CONTENT_MAX_WIDTH,
-                useBrandButton = true,
+                useBrandButton = useBrandButton,
                 modifier = Modifier.navigationBarsPadding(),
             )
         },

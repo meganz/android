@@ -102,8 +102,10 @@ private fun SubscriptionOfferLoadedContent(
     val locale = LocalLocale.current.platformLocale
     val planName = stringResource(offerSubscription.accountType.toUIAccountType().textValue)
 
-    // The discount UI stays after the deal ends (DSN-3130), so the CTA is what stops honouring it.
+    // The discount UI stays after the deal ends (DSN-3130), so the CTA is what stops honouring it:
+    // it turns into the plain "View all plans" button and leads to the upgrade screen.
     val isOfferEnded = rememberOfferExpired(uiState.offerValidUntil ?: 0L)
+    val viewAllPlansText = stringResource(sharedR.string.subscription_quota_view_all_plans)
 
     val storageFormatted = offerSubscription.formatStorageSize()
     val transferFormatted = offerSubscription.formatTransferSize(isMonthly)
@@ -170,18 +172,20 @@ private fun SubscriptionOfferLoadedContent(
         ),
         storageText = storageText,
         transferText = transferText,
-        buyButtonText = stringResource(
-            sharedR.string.subscription_revamp_get_plan_button,
-            planName,
-        ),
+        buyButtonText = if (isOfferEnded) {
+            viewAllPlansText
+        } else {
+            stringResource(sharedR.string.subscription_revamp_get_plan_button, planName)
+        },
         onBuyClick = {
             if (isOfferEnded) onViewAllPlansClick() else onBuyClick(subscription)
         },
         onDismissClick = onDismiss,
         modifier = modifier,
         monthlyPriceText = monthlyPriceText,
-        viewAllPlansText = stringResource(sharedR.string.subscription_quota_view_all_plans)
-            .takeIf { uiState.hasMultipleOffers },
+        useBrandButton = !isOfferEnded,
+        viewAllPlansText = viewAllPlansText
+            .takeIf { uiState.hasMultipleOffers && !isOfferEnded },
         onViewAllPlansClick = onViewAllPlansClick,
     )
 }
