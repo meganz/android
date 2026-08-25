@@ -13,6 +13,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -53,6 +54,7 @@ import mega.privacy.android.app.appstate.content.navigation.view.StorageQuotaWar
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
+import mega.privacy.android.app.appstate.global.call.OngoingCallBanner
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaWarningEffect
@@ -405,6 +407,12 @@ class MegaActivity : FragmentActivity() {
                                         event = transferState.transferEvent,
                                         onConsumeEvent = appTransferViewModel::consumedTransferEvent,
                                         isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
+                                    )
+
+                                    OngoingCallBanner(
+                                        modifier = Modifier
+                                            .align(Alignment.TopCenter)
+                                            .statusBarsPadding(),
                                     )
 
                                     if (currentNavKey !is HomeScreensNavKey && (currentNavKey == null || !navigationHandler.isFetchNodeDestination(

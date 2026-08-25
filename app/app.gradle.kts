@@ -260,6 +260,7 @@ dependencies {
     implementation(project(":feature:media-player:media-player-snowflake-components"))
     implementation(project(":feature:transfers:transfers"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))
+    implementation(project(":feature:chat:chat-snowflake-components"))
     implementation(project(":feature:payment:payment-snowflake-components"))
     implementation(project(":feature:payment:payment"))
     implementation(project(":feature:home:home"))
