@@ -3843,4 +3843,18 @@
         <item quantity="one">Anyone with this link will no longer be able to access the file or folder</item>
         <item quantity="other">Anyone with these links will no longer be able to access the files or folders</item>
     </plurals>
+    <!-- My Account: subscription notice when the plan renews later today -->
+    <string name="account_info_renews_today">Renews today</string>
+    <!-- My Account: subscription notice when the plan renews the next day. Placeholder is that date, e.g. "22 Jul 2026" -->
+    <string name="account_info_renews_tomorrow_date">Renews tomorrow, %1$s</string>
+    <!-- My Account: subscription notice for any other renewal date. Placeholder is that date, e.g. "22 Jul 2026" or "Sunday, 22 Jul 2026" -->
+    <string name="account_info_renews_on_date">Renews on %1$s</string>
+    <!-- My Account: subscription notice when the plan expires later today -->
+    <string name="account_info_expires_today">Expires today</string>
+    <!-- My Account: subscription notice when the plan expires the next day. Placeholder is that date, e.g. "22 Jul 2026" -->
+    <string name="account_info_expires_tomorrow_date">Expires tomorrow, %1$s</string>
+    <!-- My Account: subscription notice when the plan expired the previous day -->
+    <string name="account_info_expired_yesterday">Expired yesterday</string>
+    <!-- My Account: subscription notice for any other expiry date. Placeholder is that date, e.g. "22 Jul 2026" or "Sunday, 22 Jul 2026" -->
+    <string name="account_info_expires_on_date">Expires on %1$s</string>
 </resources>

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
@@ -15,8 +14,7 @@ import mega.android.core.ui.components.divider.StrongDivider
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.formatter.stripLinkAnnotations
+import mega.privacy.android.core.formatter.formatSubscriptionDate
 import mega.privacy.android.feature.myaccount.presentation.usage.MyAccountUsageUiState
 import mega.privacy.android.feature.myaccount.presentation.usage.PaymentAlertType
 
@@ -42,23 +40,17 @@ internal fun PaymentAlertSection(
         }
 
         PaymentAlertType.AccountRenewsOn -> {
-            val date = TimeUtils.formatDate(
+            formatSubscriptionDate(
                 timestamp = uiState.paymentAlertDate,
-                format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                context = LocalContext.current,
-            )
-            stringResource(R.string.account_info_renews_on, date)
-                .stripLinkAnnotations() to TextColor.Secondary
+                renewing = true,
+            ).text to TextColor.Secondary
         }
 
         PaymentAlertType.AccountExpiresOn -> {
-            val date = TimeUtils.formatDate(
+            formatSubscriptionDate(
                 timestamp = uiState.paymentAlertDate,
-                format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                context = LocalContext.current,
-            )
-            stringResource(R.string.account_info_expires_on, date)
-                .stripLinkAnnotations() to TextColor.Secondary
+                renewing = false,
+            ).text to TextColor.Secondary
         }
 
         PaymentAlertType.None -> return // Don't show anything

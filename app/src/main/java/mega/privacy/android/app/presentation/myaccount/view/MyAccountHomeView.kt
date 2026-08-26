@@ -107,6 +107,8 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRAN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_SECTION
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
+import mega.privacy.android.core.formatter.formatSubscriptionDate
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -118,9 +120,7 @@ import mega.privacy.android.feature.myaccount.presentation.view.MyAccountQuotaPr
 import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -445,28 +445,18 @@ private fun PaymentAlertSection(
             .testTag(PAYMENT_ALERT_INFO)
             .padding(start = 14.dp, bottom = 10.dp)
     ) {
-        MegaSpannedText(
+        Text(
             modifier = Modifier
                 .fillMaxWidth(),
-            value = stringResource(
-                if (hasRenewableSubscription) R.string.account_info_renews_on else R.string.account_info_expires_on,
-                TimeUtils.formatDate(
-                    timestamp = if (hasRenewableSubscription) renewTime else expirationTime,
-                    format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                    context = LocalContext.current
-                )
+            text = formatSubscriptionDate(
+                timestamp = if (hasRenewableSubscription) renewTime else expirationTime,
+                renewing = hasRenewableSubscription,
+            ).text,
+            style = MaterialTheme.typography.subtitle2.copy(
+                color = MaterialTheme.colors.black_white,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
             ),
-            baseStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.black_white),
-            styles = hashMapOf(
-                SpanIndicator('A') to SpanStyle(
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal
-                ),
-                SpanIndicator('B') to SpanStyle(
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal
-                )
-            )
         )
     }
 }
@@ -643,7 +633,7 @@ private fun AccountInfoSection(
                 TimeUtils.formatDateAndTime(
                     LocalContext.current,
                     it,
-                    TimeUtils.DATE_LONG_FORMAT
+                    DATE_LONG_FORMAT
                 )
             } ?: stringResource(id = R.string.recovering_info),
             isIconMode = true,

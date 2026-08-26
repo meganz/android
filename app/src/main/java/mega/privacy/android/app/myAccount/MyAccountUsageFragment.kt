@@ -18,7 +18,6 @@ import mega.privacy.android.app.databinding.FragmentMyAccountUsageBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.interfaces.Scrollable
-import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.ActiveFragment
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessOrProFlexiUpdate
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
@@ -174,7 +173,6 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 viewModel.hasExpirableSubscription(),
                 megaApi,
                 true,
-                ActiveFragment.MY_ACCOUNT_USAGE,
                 false
             )
             paymentAlertBinding.root.isVisible = true
@@ -193,7 +191,6 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 viewModel.hasExpirableSubscription(),
                 megaApi,
                 true,
-                ActiveFragment.MY_ACCOUNT_USAGE,
                 true
             )
             paymentAlertBinding.root.isVisible = true
@@ -218,7 +215,6 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 viewModel.hasRenewableSubscription(),
                 viewModel.hasExpirableSubscription(),
                 viewModel.isFreeAccount(),
-                ActiveFragment.MY_ACCOUNT_USAGE
             )
             binding.upgradeButton.isVisible = true
         }

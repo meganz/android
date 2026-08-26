@@ -12,7 +12,7 @@ import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.core.formatter.formatSubscriptionDate
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
@@ -23,13 +23,6 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 
 object MyAccountViewUtil {
-
-    /**
-     * Enum class defining the active fragment.
-     */
-    enum class ActiveFragment {
-        MY_ACCOUNT, MY_ACCOUNT_USAGE
-    }
 
     private fun getGettingInfo(context: Context) = context.getString(R.string.recovering_info)
 
@@ -150,8 +143,6 @@ object MyAccountViewUtil {
 
     /**
      * Updates the views related to payments for all type of accounts except business ones.
-     *
-     * @param fragment Value from `ActiveFragment` enum indicating what is the active fragment.
      */
     fun MyAccountPaymentInfoContainerBinding.update(
         renewTime: Long,
@@ -159,12 +150,11 @@ object MyAccountViewUtil {
         hasRenewableSubscription: Boolean = false,
         hasExpirableSubscription: Boolean = false,
         isFreeAccount: Boolean,
-        fragment: ActiveFragment,
     ): Boolean {
         businessStatusText.isVisible = false
 
         return if ((hasRenewableSubscription || hasExpirableSubscription) && !isFreeAccount) {
-            setRenewOrExpiryDate(renewTime, expirationTime, hasRenewableSubscription, fragment)
+            setRenewOrExpiryDate(renewTime, expirationTime, hasRenewableSubscription)
             true
         } else false
     }
@@ -174,7 +164,6 @@ object MyAccountViewUtil {
      *
      * @param megaApi       MegaApiAndroid to check business status.
      * @param expandedView  True if the binding is in the expanded view, false otherwise.
-     * @param fragment      Value from `ActiveFragment` enum indicating what is the active fragment.
      */
     fun MyAccountPaymentInfoContainerBinding.businessOrProFlexiUpdate(
         context: Context,
@@ -184,7 +173,6 @@ object MyAccountViewUtil {
         hasExpirableSubscription: Boolean = false,
         megaApi: MegaApiAndroid,
         expandedView: Boolean,
-        fragment: ActiveFragment,
         isProFlexi: Boolean,
     ) {
         if (!megaApi.isMasterBusinessAccount && !isProFlexi) {
@@ -203,7 +191,7 @@ object MyAccountViewUtil {
             }
 
             hasRenewableSubscription || hasExpirableSubscription -> {
-                setRenewOrExpiryDate(renewTime, expirationTime, hasRenewableSubscription, fragment)
+                setRenewOrExpiryDate(renewTime, expirationTime, hasRenewableSubscription)
             }
         }
     }
@@ -214,42 +202,20 @@ object MyAccountViewUtil {
      * @param renewTime
      * @param expirationTime
      * @param renewable True if the subscriptions is renewable, false otherwise.
-     * @param fragment  Value from `ActiveFragment` enum indicating what is the active fragment.
      */
     private fun MyAccountPaymentInfoContainerBinding.setRenewOrExpiryDate(
         renewTime: Long,
         expirationTime: Long,
         renewable: Boolean,
-        fragment: ActiveFragment,
     ) {
         businessStatusText.isVisible = false
 
         renewExpiryText.apply {
             isVisible = true
-            text = context.getString(
-                if (renewable) R.string.account_info_renews_on else R.string.account_info_expires_on,
-                TimeUtils.formatDate(
-                    timestamp = if (renewable) renewTime else expirationTime,
-                    format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                    context = context,
-                )
-            )
-
-            text = when (fragment) {
-                ActiveFragment.MY_ACCOUNT -> {
-                    text.toString()
-                        .formatColorTag(context, 'A', R.color.grey_087_white_054)
-                        .formatColorTag(context, 'B', R.color.grey_087_white_054)
-                        .toSpannedHtmlText()
-                }
-
-                ActiveFragment.MY_ACCOUNT_USAGE -> {
-                    text.toString()
-                        .formatColorTag(context, 'A', R.color.grey_087_white_054)
-                        .formatColorTag(context, 'B', R.color.grey_087_white_054)
-                        .toSpannedHtmlText()
-                }
-            }
+            text = formatSubscriptionDate(
+                timestamp = if (renewable) renewTime else expirationTime,
+                renewing = renewable,
+            ).get(context)
         }
     }
 
