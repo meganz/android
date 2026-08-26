@@ -449,8 +449,9 @@ internal class DefaultPhotosRepository @Inject constructor(
                 val isNodeInRubbishBin = nodeRepository.isNodeInRubbishBin(NodeId(node.handle))
                 if (isNodeInRubbishBin) return@mapNotNull null
 
+                val fileName = node.name ?: return@mapNotNull null
                 val fileType = fileTypeInfoMapper(
-                    fileName = node.name,
+                    fileName = fileName,
                     duration = node.duration
                 )
                 if (

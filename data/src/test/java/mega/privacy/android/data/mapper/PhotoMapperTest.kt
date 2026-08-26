@@ -20,9 +20,11 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.time.LocalDateTime
@@ -182,6 +184,32 @@ class PhotoMapperTest {
     }
 
     @Test
+    fun `test that node without name returns null`() = runTest {
+        val fileTypeInfoMapper: FileTypeInfoMapper = mock {
+            on { invoke(anyOrNull(), any()) }.thenReturn(
+                StaticImageFileTypeInfo(mimeType = "image/jpeg", extension = "jpg")
+            )
+        }
+        val mapper = PhotoMapper(
+            fileTypeInfoMapper = fileTypeInfoMapper,
+            dateUtilFacade = dateUtilWrapper,
+            thumbnailPreviewRepository = thumbnailPreviewRepository,
+            megaApiGateway = megaApiGateway,
+            nodeLabelMapper = nodeLabelMapper,
+            stringListMapper = stringListMapper
+        )
+        val megaNode = createMockMegaNode(
+            handle = testNodeHandle,
+            name = null,
+        )
+
+        val result = mapper(megaNode, null)
+
+        assertThat(result).isNull()
+        verifyNoInteractions(fileTypeInfoMapper)
+    }
+
+    @Test
     fun `test that null thumbnail path returns null thumbnail file path`() = runTest {
         val imageFileType = StaticImageFileTypeInfo(
             mimeType = "image/jpeg",
@@ -237,7 +265,7 @@ class PhotoMapperTest {
     private fun createMockMegaNode(
         handle: Long = testNodeHandle,
         parentHandle: Long = testParentHandle,
-        name: String = testNodeName,
+        name: String? = testNodeName,
         isFavourite: Boolean = false,
         isTakenDown: Boolean = false,
         isMarkedSensitive: Boolean = false,

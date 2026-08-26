@@ -64,14 +64,15 @@ internal class PhotoMapper @Inject constructor(
         requireSerializedData: Boolean = false,
         isAvailableOffline: Boolean = false,
     ): Photo? {
-        return when (val fileType = fileTypeInfoMapper(node.name, node.duration)) {
+        val name = node.name ?: return null
+        return when (val fileType = fileTypeInfoMapper(name, node.duration)) {
             is ImageFileTypeInfo -> {
                 toImage(
                     args = PhotoMapperArgs(
                         id = node.handle,
                         albumPhotoId = albumPhotoId?.id,
                         parentId = node.parentHandle,
-                        name = node.name,
+                        name = name,
                         isFavourite = node.isFavourite,
                         creationTime = dateUtilFacade.fromEpoch(node.creationTime),
                         modificationTime = dateUtilFacade.fromEpoch(node.modificationTime),
@@ -108,7 +109,7 @@ internal class PhotoMapper @Inject constructor(
                         id = node.handle,
                         albumPhotoId = albumPhotoId?.id,
                         parentId = node.parentHandle,
-                        name = node.name,
+                        name = name,
                         isFavourite = node.isFavourite,
                         creationTime = dateUtilFacade.fromEpoch(node.creationTime),
                         modificationTime = dateUtilFacade.fromEpoch(node.modificationTime),
