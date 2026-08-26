@@ -110,7 +110,6 @@ import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
-import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
@@ -120,6 +119,7 @@ import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
+import mega.privacy.android.navigation.destination.ShareLinkNavKey
 import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
@@ -866,9 +866,12 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
 
         val handlesList = handles.toList()
+        // ShareLinkNavKey, not GetLinkNavKey: the ShareLinkRevamp flag is read by the share-link
+        // destination, which falls back to GetLinkNavKey when it is off. Targeting the legacy key
+        // here would skip that gate and pin every caller to the old screen.
         navigateForSingleActivity(
             context = context,
-            singleActivityDestination = GetLinkNavKey(handles = handlesList)
+            singleActivityDestination = ShareLinkNavKey(handles = handlesList)
         )
     }
 

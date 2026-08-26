@@ -129,6 +129,7 @@ internal fun ImagePreviewScreen(
     onClickImport: (ImageNode) -> Unit = {},
     onSwitchAvailableOffline: ((checked: Boolean, ImageNode) -> Unit)? = null,
     onClickGetLink: (ImageNode) -> Unit = {},
+    onClickRemoveLink: (ImageNode) -> Unit = {},
     onClickSendTo: (ImageNode) -> Unit = {},
     onClickShare: (ImageNode) -> Unit = {},
     onClickRename: (ImageNode) -> Unit = {},
@@ -176,7 +177,6 @@ internal fun ImagePreviewScreen(
         }
     } else {
         val isCurrentImageNodeAvailableOffline = viewState.isCurrentImageNodeAvailableOffline
-        var showRemoveLinkDialog by rememberSaveable { mutableStateOf(false) }
         var showMoveToRubbishBinDialog by rememberSaveable { mutableStateOf(false) }
         var showRemoveDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -222,22 +222,6 @@ internal fun ImagePreviewScreen(
                 )
                 viewModel.hideDeletedMessage()
             }
-        }
-
-        if (showRemoveLinkDialog) {
-            MegaAlertDialog(
-                text = stringResource(sharedR.string.remove_links_warning_message),
-                confirmButtonText = stringResource(id = R.string.general_remove),
-                cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                onConfirm = {
-                    viewModel.disableExport(currentImageNode)
-                    hideBottomSheet(coroutineScope, modalSheetState)
-                    showRemoveLinkDialog = false
-                },
-                onDismiss = {
-                    showRemoveLinkDialog = false
-                },
-            )
         }
 
         if (showMoveToRubbishBinDialog) {
@@ -437,7 +421,7 @@ internal fun ImagePreviewScreen(
                             },
                             onClickRemoveLink = {
                                 if (!currentImageNode.isTakenDown) {
-                                    showRemoveLinkDialog = true
+                                    onClickRemoveLink(currentImageNode)
                                 }
                                 hideBottomSheet(coroutineScope, modalSheetState)
                             },

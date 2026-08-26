@@ -1621,6 +1621,16 @@
     <string name="public_link_node_removal_error_message">Link removal failed, try again later</string>
     <!-- Warning that appears prior to remove links of files-->
     <string name="remove_links_warning_message">Removing a link means its contents won’t be publicly accessible anymore</string>
+    <!-- Title of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
+    <plurals name="remove_link_dialog_title">
+        <item quantity="one">Remove link?</item>
+        <item quantity="other">Remove links?</item>
+    </plurals>
+    <!-- Explanation text of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
+    <plurals name="remove_link_dialog_description">
+        <item quantity="one">People you have shared this link with will no longer be able to access it.</item>
+        <item quantity="other">People you have shared these links with will no longer be able to access them.</item>
+    </plurals>
     <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="stop_sharing_folder_success_message">Folder sharing stopped</string>
     <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->

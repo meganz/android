@@ -3,6 +3,7 @@ package mega.privacy.android.shared.nodes.dialog.removelink
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -18,15 +19,29 @@ fun RemoveNodeLinkDialogM3(
     onDismiss: () -> Unit,
     viewModel: RemoveNodeLinkViewModel = hiltViewModel()
 ) {
-    BasicDialog(
-        modifier = Modifier.testTag(REMOVE_NODE_LINK_DIALOG_TAG),
-        description = stringResource(sharedR.string.remove_links_warning_message),
-        positiveButtonText = stringResource(id = sharedR.string.general_remove),
-        negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
-        onPositiveButtonClicked = {
+    RemoveNodeLinkDialogBodyM3(
+        count = nodes.size,
+        onConfirm = {
             viewModel.disableExport(nodes)
             onDismiss()
         },
+        onDismiss = onDismiss,
+    )
+}
+
+@Composable
+internal fun RemoveNodeLinkDialogBodyM3(
+    count: Int,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    BasicDialog(
+        modifier = Modifier.testTag(REMOVE_NODE_LINK_DIALOG_TAG),
+        title = pluralStringResource(sharedR.plurals.remove_link_dialog_title, count),
+        description = pluralStringResource(sharedR.plurals.remove_link_dialog_description, count),
+        positiveButtonText = stringResource(id = sharedR.string.general_remove),
+        negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
+        onPositiveButtonClicked = onConfirm,
         onNegativeButtonClicked = onDismiss,
     )
 }
@@ -34,22 +49,19 @@ fun RemoveNodeLinkDialogM3(
 @CombinedThemePreviews
 @Composable
 private fun RemoveNodeLinkDialogM3PreviewPlurals(
-    @PreviewParameter(CountProvider::class) nodes: List<Long>,
+    @PreviewParameter(CountProvider::class) count: Int,
 ) {
     AndroidThemeForPreviews {
-        RemoveNodeLinkDialogM3(
-            nodes = nodes,
+        RemoveNodeLinkDialogBodyM3(
+            count = count,
+            onConfirm = {},
             onDismiss = {},
         )
     }
 }
 
-
-private class CountProvider : PreviewParameterProvider<List<Long>> {
-    override val values = listOf(
-        listOf(1L),
-        listOf(1L, 2L)
-    ).asSequence()
+private class CountProvider : PreviewParameterProvider<Int> {
+    override val values = sequenceOf(1, 2)
 }
 
 internal const val REMOVE_NODE_LINK_DIALOG_TAG = "remove_node_link:dialog"

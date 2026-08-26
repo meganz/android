@@ -27,6 +27,9 @@ class RemoveNodeLinkDialogM3Test {
 
     private fun string(id: Int): String = context.getString(id)
 
+    private fun plural(id: Int, quantity: Int): String =
+        context.resources.getQuantityString(id, quantity)
+
     @Test
     fun `test that the dialog and its buttons are shown`() {
         composeTestRule.setContent {
@@ -34,11 +37,34 @@ class RemoveNodeLinkDialogM3Test {
         }
 
         composeTestRule.onNodeWithTag(REMOVE_NODE_LINK_DIALOG_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithText(string(sharedR.string.remove_links_warning_message))
-            .assertIsDisplayed()
         composeTestRule.onNodeWithText(string(sharedR.string.general_remove)).assertIsDisplayed()
         composeTestRule.onNodeWithText(string(sharedR.string.general_dialog_cancel_button))
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that a single link shows the singular title and description`() {
+        composeTestRule.setContent {
+            RemoveNodeLinkDialogM3(nodes = listOf(1L), onDismiss = {}, viewModel = viewModel)
+        }
+
+        composeTestRule.onNodeWithText(plural(sharedR.plurals.remove_link_dialog_title, 1))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(plural(sharedR.plurals.remove_link_dialog_description, 1))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that multiple links show the plural title and description`() {
+        composeTestRule.setContent {
+            RemoveNodeLinkDialogM3(nodes = nodes, onDismiss = {}, viewModel = viewModel)
+        }
+
+        composeTestRule.onNodeWithText(plural(sharedR.plurals.remove_link_dialog_title, nodes.size))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(
+            plural(sharedR.plurals.remove_link_dialog_description, nodes.size)
+        ).assertIsDisplayed()
     }
 
     @Test

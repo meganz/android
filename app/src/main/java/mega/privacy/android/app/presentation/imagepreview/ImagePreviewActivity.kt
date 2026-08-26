@@ -90,7 +90,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywall
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
@@ -113,7 +112,9 @@ import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.transition.opaqueFadeBackwardTransition
 import mega.privacy.android.navigation.contract.transition.opaqueFadeForwardTransition
+import mega.privacy.android.navigation.destination.ShareLinkNavKey
 import mega.privacy.android.navigation.destination.VideoEditorScreenNavKey
+import mega.privacy.android.shared.nodes.dialog.removelink.RemoveNodeLinkDialogNavKey
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -242,6 +243,16 @@ class ImagePreviewActivity : BaseActivity() {
                         onEditVideo = { imageNode ->
                             navigationHandler.navigate(VideoEditorScreenNavKey(imageNode.id.longValue))
                         },
+                        onRemoveLink = { imageNode ->
+                            navigationHandler.navigate(
+                                RemoveNodeLinkDialogNavKey(handles = listOf(imageNode.id.longValue))
+                            )
+                        },
+                        onGetLink = { imageNode ->
+                            navigationHandler.navigate(
+                                ShareLinkNavKey(handles = listOf(imageNode.id.longValue))
+                            )
+                        },
                     )
                 }
             }
@@ -250,7 +261,11 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     @Composable
-    private fun ImagePreviewContent(onEditVideo: (ImageNode) -> Unit) {
+    private fun ImagePreviewContent(
+        onEditVideo: (ImageNode) -> Unit,
+        onRemoveLink: (ImageNode) -> Unit,
+        onGetLink: (ImageNode) -> Unit,
+    ) {
         val themeMode by monitorThemeModeUseCase()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val isDarkMode = themeMode.isDarkMode()
@@ -287,7 +302,8 @@ class ImagePreviewActivity : BaseActivity() {
                 onClickSaveToDevice = ::saveNodeToDevice,
                 onClickImport = ::importNode,
                 onSwitchAvailableOffline = ::setAvailableOffline,
-                onClickGetLink = ::getNodeLink,
+                onClickGetLink = { getNodeLink(it, onGetLink) },
+                onClickRemoveLink = onRemoveLink,
                 onClickSendTo = {
                     nodeAttachmentViewModel.startAttachNodes(listOf(it.id))
                 },
@@ -474,13 +490,13 @@ class ImagePreviewActivity : BaseActivity() {
         )
     }
 
-    private fun getNodeLink(imageNode: ImageNode) {
+    private fun getNodeLink(imageNode: ImageNode, onGetLink: (ImageNode) -> Unit) {
         Analytics.tracker.trackEvent(ImagePreviewGetLinkMenuItemEvent)
         if (getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning()
             return
         }
-        LinksUtil.showGetLinkActivity(this, imageNode.id.longValue)
+        onGetLink(imageNode)
     }
 
     private fun shareNode(imageNode: ImageNode) {

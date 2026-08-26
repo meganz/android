@@ -54,6 +54,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.FileStorageNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
+import mega.privacy.android.navigation.destination.ShareLinkNavKey
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -221,7 +222,8 @@ fun CompletedTransferActionsBottomSheet(
                     shareLinkEvent = event,
                     activity = it,
                     coroutineScope = coroutineScope,
-                    snackbarHostState = snackbarHostState
+                    snackbarHostState = snackbarHostState,
+                    navigationHandler = navigationHandler,
                 )
             }
             onDismissSheet()
@@ -344,6 +346,7 @@ private fun shareLink(
     activity: Activity,
     coroutineScope: CoroutineScope,
     snackbarHostState: SnackbarHostState?,
+    navigationHandler: NavigationHandler?,
 ) {
     with(shareLinkEvent) {
         when {
@@ -351,10 +354,13 @@ private fun shareLink(
                 snackbarHostState?.showSnackbar(activity.getString(R.string.error_download_takendown_node))
             }
 
-            isValid -> activity.startActivity(
-                Intent(activity, GetLinkActivity::class.java)
-                    .putExtra(Constants.HANDLE, node?.id?.longValue)
-            )
+            isValid -> node?.id?.longValue?.let { handle ->
+                navigationHandler?.navigate(ShareLinkNavKey(handles = listOf(handle)))
+                    ?: activity.startActivity(
+                        Intent(activity, GetLinkActivity::class.java)
+                            .putExtra(Constants.HANDLE, handle)
+                    )
+            }
 
             else -> coroutineScope.launch {
                 snackbarHostState?.showSnackbar(activity.getString(R.string.warning_node_not_exists_in_cloud))
