@@ -34,6 +34,7 @@ import mega.privacy.mobile.analytics.event.ShareLinkScreenEvent
 import mega.privacy.mobile.analytics.event.SingleAlbumLinkScreenEvent
 import mega.privacy.android.feature.sharelink.presentation.component.SHARE_LINK_DETAILS_TAG
 import mega.privacy.android.feature.sharelink.presentation.component.SHARE_LINK_EXPIRED_TAG
+import mega.privacy.android.core.sharedcomponents.button.DEFAULT_DEBOUNCE_DURATION
 import mega.privacy.android.feature.sharelink.presentation.component.SHARE_LINK_KEY_COPY_TAG
 import mega.privacy.android.feature.sharelink.presentation.component.SHARE_LINK_KEY_DETAILS_TAG
 import mega.privacy.android.feature.sharelink.presentation.component.SHARE_LINK_PASSWORD_COPY_TAG
@@ -294,6 +295,43 @@ class ShareLinkScreenTest {
         composeRule.waitForIdle()
 
         assertThat(clipboard.clipEntry?.clipData?.getItemAt(0)?.text).isEqualTo(data.primary.link)
+    }
+
+    @Test
+    fun `test that repeated copy taps in quick succession copy once`() {
+        var copyCount = 0
+        val clipboard = FakeClipboard()
+        setContent(uiState = data, clipboard = clipboard, onCopyLink = { copyCount++ })
+        val copyIcon =
+            composeRule.onNodeWithContentDescription(context.getString(sharedR.string.general_copy))
+
+        composeRule.mainClock.autoAdvance = false
+        repeat(3) {
+            copyIcon.performClick()
+            composeRule.mainClock.advanceTimeBy(50)
+        }
+        composeRule.mainClock.autoAdvance = true
+        composeRule.waitForIdle()
+
+        assertThat(copyCount).isEqualTo(1)
+        assertThat(clipboard.writeCount).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that a copy tap after the debounce window copies again`() {
+        var copyCount = 0
+        setContent(uiState = data, onCopyLink = { copyCount++ })
+        val copyIcon =
+            composeRule.onNodeWithContentDescription(context.getString(sharedR.string.general_copy))
+
+        composeRule.mainClock.autoAdvance = false
+        copyIcon.performClick()
+        composeRule.mainClock.advanceTimeBy(DEFAULT_DEBOUNCE_DURATION.inWholeMilliseconds + 100)
+        copyIcon.performClick()
+        composeRule.mainClock.autoAdvance = true
+        composeRule.waitForIdle()
+
+        assertThat(copyCount).isEqualTo(2)
     }
 
     @Test
@@ -923,10 +961,14 @@ class ShareLinkScreenTest {
         var clipEntry: ClipEntry? = null
             private set
 
+        var writeCount: Int = 0
+            private set
+
         override suspend fun getClipEntry(): ClipEntry? = clipEntry
 
         override suspend fun setClipEntry(clipEntry: ClipEntry?) {
             this.clipEntry = clipEntry
+            writeCount++
         }
 
         override val nativeClipboard: NativeClipboard

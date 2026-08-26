@@ -33,6 +33,7 @@ dependencies {
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:coroutine"))
     implementation(project(":core:formatter"))
+    implementation(project(":core:ui-components:shared-components"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":shared:nodes"))

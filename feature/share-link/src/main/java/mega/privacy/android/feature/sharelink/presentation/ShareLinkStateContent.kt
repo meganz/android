@@ -55,6 +55,7 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
+import mega.privacy.android.core.sharedcomponents.button.rememberDebouncedCallback
 import mega.privacy.android.feature.sharelink.presentation.component.ShareLinkDetails
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
@@ -100,8 +101,7 @@ internal fun ShareLinkContent(
     modifier: Modifier = Modifier,
     onCopyPassword: () -> Unit = {},
 ) {
-    val clipboard = LocalClipboard.current
-    val coroutineScope = rememberCoroutineScope()
+    val copy = rememberCopyRequestHandler()
     val primary = uiState.primary
     val password = uiState.password?.takeIf { uiState.isPasswordSet }
     val displayLink = uiState.resolvedSingleLink()
@@ -141,33 +141,42 @@ internal fun ShareLinkContent(
             ShareLinkDetails(
                 link = displayLink,
                 onCopyLink = {
-                    coroutineScope.launch {
-                        clipboard.setClipEntry(
-                            ClipData.newPlainText(COPIED_LINK_LABEL, displayLink).toClipEntry(),
+                    copy(
+                        CopyRequest(
+                            key = COPIED_LINK_LABEL,
+                            entry = {
+                                ClipData.newPlainText(COPIED_LINK_LABEL, displayLink).toClipEntry()
+                            },
+                            onCopied = onCopyLink,
                         )
-                    }
-                    onCopyLink()
+                    )
                 },
                 key = separateKey,
                 onCopyKey = {
                     separateKey?.let {
-                        coroutineScope.launch {
-                            clipboard.setClipEntry(
-                                ClipData.newPlainText(COPIED_KEY_LABEL, it).toClipEntry(),
+                        copy(
+                            CopyRequest(
+                                key = COPIED_KEY_LABEL,
+                                entry = {
+                                    ClipData.newPlainText(COPIED_KEY_LABEL, it).toClipEntry()
+                                },
+                                onCopied = onCopyKey,
                             )
-                        }
+                        )
                     }
-                    onCopyKey()
                 },
                 passwordProtected = uiState.isPasswordSet,
                 maskedPassword = password?.let { "•".repeat(it.length) },
                 onCopyPassword = {
                     password?.let {
-                        coroutineScope.launch {
-                            clipboard.setClipEntry(sensitiveClip(COPIED_PASSWORD_LABEL, it))
-                        }
+                        copy(
+                            CopyRequest(
+                                key = COPIED_PASSWORD_LABEL,
+                                entry = { sensitiveClip(COPIED_PASSWORD_LABEL, it) },
+                                onCopied = onCopyPassword,
+                            )
+                        )
                     }
-                    onCopyPassword()
                 },
                 expirationTime = uiState.primary.expirationTime,
                 isExpired = uiState.primary.isExpired,
@@ -224,8 +233,7 @@ internal fun MultiNodeContent(
     onCopyLink: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val clipboard = LocalClipboard.current
-    val coroutineScope = rememberCoroutineScope()
+    val copy = rememberCopyRequestHandler()
 
     Column(
         modifier = modifier
@@ -251,12 +259,16 @@ internal fun MultiNodeContent(
                 ShareLinkDetails(
                     link = node.link,
                     onCopyLink = {
-                        coroutineScope.launch {
-                            clipboard.setClipEntry(
-                                ClipData.newPlainText(COPIED_LINK_LABEL, node.link).toClipEntry(),
+                        copy(
+                            CopyRequest(
+                                key = node.handle,
+                                entry = {
+                                    ClipData.newPlainText(COPIED_LINK_LABEL, node.link)
+                                        .toClipEntry()
+                                },
+                                onCopied = onCopyLink,
                             )
-                        }
-                        onCopyLink()
+                        )
                     },
                     expirationTime = node.expirationTime,
                     isExpired = node.isExpired,
@@ -552,6 +564,33 @@ private fun ShareLinkUiState.Data.resolvedSingleLink(): String = when {
  * A plain-text clip flagged sensitive on API 33+, so the OS keeps it out of the clipboard preview
  * (used for the copied password).
  */
+/**
+ * One copy affordance's payload. [key] scopes the debounce window, so copying the link and then
+ * the password in quick succession both land, while double-tapping either one does not.
+ */
+private class CopyRequest(
+    val key: Any,
+    val entry: () -> ClipEntry,
+    val onCopied: () -> Unit,
+)
+
+/**
+ * Writes a [CopyRequest] to the clipboard and reports it, dropping repeat taps on the same
+ * affordance.
+ *
+ * A tap both writes the clipboard and queues a snackbar, so without this a double-tap wrote the
+ * same text twice and stacked two snackbars (T21407248).
+ */
+@Composable
+private fun rememberCopyRequestHandler(): (CopyRequest) -> Unit {
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
+    return rememberDebouncedCallback(key = CopyRequest::key) { request ->
+        coroutineScope.launch { clipboard.setClipEntry(request.entry()) }
+        request.onCopied()
+    }
+}
+
 private fun sensitiveClip(label: String, text: String): ClipEntry {
     val clip = ClipData.newPlainText(label, text)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
