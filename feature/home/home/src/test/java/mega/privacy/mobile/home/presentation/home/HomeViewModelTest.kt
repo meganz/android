@@ -10,10 +10,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorHomeConfigurationTooltipShownUseCase
 import mega.privacy.android.domain.usecase.SetHomeConfigurationTooltipShownUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
@@ -25,7 +23,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -48,7 +45,6 @@ class HomeViewModelTest {
         mock<MonitorHomeWidgetConfigurationUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val hasOfflineFilesUseCase = mock<HasOfflineFilesUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorHomeConfigurationTooltipShownUseCase =
         mock<MonitorHomeConfigurationTooltipShownUseCase>()
     private val setHomeConfigurationTooltipShownUseCase =
@@ -56,14 +52,12 @@ class HomeViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        stubFeatureFlag()
         stubTooltipShown(shown = true)
         underTest = HomeViewModel(
             widgetProviders = homeWidgetProviders,
             monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             hasOfflineFilesUseCase = hasOfflineFilesUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
             setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
         )
@@ -77,7 +71,6 @@ class HomeViewModelTest {
             monitorHomeWidgetConfigurationUseCase,
             monitorConnectivityUseCase,
             hasOfflineFilesUseCase,
-            getFeatureFlagValueUseCase,
             monitorHomeConfigurationTooltipShownUseCase,
             setHomeConfigurationTooltipShownUseCase,
         )
@@ -321,12 +314,6 @@ class HomeViewModelTest {
         }
     }
 
-    private fun stubFeatureFlag(enabled: Boolean = false) {
-        getFeatureFlagValueUseCase.stub {
-            on { invoke(ApiFeatures.HomeConfiguration) } doReturn enabled
-        }
-    }
-
     private fun stubTooltipShown(shown: Boolean) {
         monitorHomeConfigurationTooltipShownUseCase.stub {
             on { invoke() } doReturn flowOf(shown)
@@ -334,10 +321,9 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `test that showHomeConfigurationTooltip is true when feature flag enabled and tooltip not shown before`() =
+    fun `test that showHomeConfigurationTooltip is true when tooltip not shown before`() =
         runTest {
             stubConnectivity(connected = true)
-            stubFeatureFlag(enabled = true)
             stubTooltipShown(shown = false)
             stubWidgetProviders()
             monitorHomeWidgetConfigurationUseCase.stub {
@@ -351,7 +337,6 @@ class HomeViewModelTest {
                 monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
                 monitorConnectivityUseCase = monitorConnectivityUseCase,
                 hasOfflineFilesUseCase = hasOfflineFilesUseCase,
-                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
                 monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
                 setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
             )
@@ -363,10 +348,9 @@ class HomeViewModelTest {
         }
 
     @Test
-    fun `test that showHomeConfigurationTooltip is false when feature flag enabled but tooltip already shown`() =
+    fun `test that showHomeConfigurationTooltip is false when tooltip already shown`() =
         runTest {
             stubConnectivity(connected = true)
-            stubFeatureFlag(enabled = true)
             stubTooltipShown(shown = true)
             stubWidgetProviders()
             monitorHomeWidgetConfigurationUseCase.stub {
@@ -380,36 +364,6 @@ class HomeViewModelTest {
                 monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
                 monitorConnectivityUseCase = monitorConnectivityUseCase,
                 hasOfflineFilesUseCase = hasOfflineFilesUseCase,
-                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-                monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
-                setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
-            )
-
-            underTest.state.test {
-                val actual = awaitItem() as HomeUiState.Data
-                assertThat(actual.showHomeConfigurationTooltip).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that showHomeConfigurationTooltip is false when feature flag disabled even if tooltip not shown before`() =
-        runTest {
-            stubConnectivity(connected = true)
-            stubFeatureFlag(enabled = false)
-            stubTooltipShown(shown = false)
-            stubWidgetProviders()
-            monitorHomeWidgetConfigurationUseCase.stub {
-                on { invoke() } doReturn flow {
-                    emit(emptyList())
-                    awaitCancellation()
-                }
-            }
-            underTest = HomeViewModel(
-                widgetProviders = homeWidgetProviders,
-                monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
-                monitorConnectivityUseCase = monitorConnectivityUseCase,
-                hasOfflineFilesUseCase = hasOfflineFilesUseCase,
-                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
                 monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
                 setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
             )
@@ -424,7 +378,6 @@ class HomeViewModelTest {
     fun `test that onHomeConfigurationTooltipDismissed hides the tooltip and calls SetHomeConfigurationTooltipShownUseCase`() =
         runTest {
             stubConnectivity(connected = true)
-            stubFeatureFlag(enabled = true)
             // Simulate DataStore reactivity: the monitor flow re-emits whenever the
             // "shown" preference is written. The fake set use-case flips the same flow,
             // so dismissing through the ViewModel naturally drives the state to hidden.
@@ -450,7 +403,6 @@ class HomeViewModelTest {
                 monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
                 monitorConnectivityUseCase = monitorConnectivityUseCase,
                 hasOfflineFilesUseCase = hasOfflineFilesUseCase,
-                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
                 monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
                 setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
             )
@@ -466,7 +418,6 @@ class HomeViewModelTest {
     @Test
     fun `test that init does not call SetHomeConfigurationTooltipShownUseCase`() = runTest {
         stubConnectivity(connected = true)
-        stubFeatureFlag(enabled = true)
         stubTooltipShown(shown = false)
         stubWidgetProviders()
         monitorHomeWidgetConfigurationUseCase.stub {
@@ -480,7 +431,6 @@ class HomeViewModelTest {
             monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             hasOfflineFilesUseCase = hasOfflineFilesUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
             setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
         )
@@ -489,15 +439,11 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `test that isHomeCustomizationEnabled is re-evaluated when connectivity is restored`() =
+    fun `test that state returns to Data when connectivity is restored`() =
         runTest {
             val connectivityFlow = MutableStateFlow(true)
             monitorConnectivityUseCase.stub {
                 on { invoke() } doReturn connectivityFlow
-            }
-            var currentFlagValue = false
-            getFeatureFlagValueUseCase.stub {
-                on { invoke(ApiFeatures.HomeConfiguration) } doAnswer { currentFlagValue }
             }
             stubHasOfflineFiles(hasOfflineFiles = false)
             stubTooltipShown(shown = true)
@@ -513,40 +459,26 @@ class HomeViewModelTest {
                 monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
                 monitorConnectivityUseCase = monitorConnectivityUseCase,
                 hasOfflineFilesUseCase = hasOfflineFilesUseCase,
-                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
                 monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
                 setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
             )
 
             underTest.state.test {
-                // Initial state: online with flag = false
                 var item: HomeUiState = awaitItem()
                 while (item is HomeUiState.Loading) {
                     item = awaitItem()
                 }
                 assertThat(item).isInstanceOf(HomeUiState.Data::class.java)
-                assertThat((item as HomeUiState.Data).isHomeCustomizationEnabled).isFalse()
 
-                // Drop connectivity
-                currentFlagValue = true
                 connectivityFlow.update { false }
                 val offline = awaitItem()
                 assertThat(offline).isInstanceOf(HomeUiState.Offline::class.java)
                 assertThat((offline as HomeUiState.Offline).hasOfflineFiles).isFalse()
 
-                // Restore connectivity — skip one stale Data if present, then assert re-resolved flag
                 connectivityFlow.update { true }
-                var afterReconnect = awaitItem()
-                assertThat(afterReconnect).isInstanceOf(HomeUiState.Data::class.java)
-                if (!(afterReconnect as HomeUiState.Data).isHomeCustomizationEnabled) {
-                    afterReconnect = awaitItem()
-                    assertThat(afterReconnect).isInstanceOf(HomeUiState.Data::class.java)
-                }
-                assertThat((afterReconnect as HomeUiState.Data).isHomeCustomizationEnabled).isTrue()
+                assertThat(awaitItem()).isInstanceOf(HomeUiState.Data::class.java)
 
                 cancelAndIgnoreRemainingEvents()
             }
-
-            verify(getFeatureFlagValueUseCase, atLeast(2)).invoke(ApiFeatures.HomeConfiguration)
         }
 }

@@ -191,28 +191,26 @@ internal fun HomeScreen(
                             )
                         }
 
-                        if (state.isHomeCustomizationEnabled) {
-                            IconButton(
-                                modifier = Modifier
-                                    .testTag(HomeScreenAction.Customize.testTag)
-                                    .align(Alignment.CenterVertically)
-                                    .onGloballyPositioned { coordinates ->
-                                        homeConfigurationIconCoordinates = coordinates
-                                    },
-                                onClick = {
-                                    onHomeConfigurationTooltipDismissed()
-                                    navigationHandler.navigate(HomeConfiguration)
+                        IconButton(
+                            modifier = Modifier
+                                .testTag(HomeScreenAction.Customize.testTag)
+                                .align(Alignment.CenterVertically)
+                                .onGloballyPositioned { coordinates ->
+                                    homeConfigurationIconCoordinates = coordinates
                                 },
-                            ) {
-                                MegaIcon(
-                                    painter = HomeScreenAction.Customize.getIconPainter(),
-                                    contentDescription = HomeScreenAction.Customize.getDescription(),
-                                )
-                            }
-                            DisposableEffect(Unit) {
-                                onDispose {
-                                    homeConfigurationIconCoordinates = null
-                                }
+                            onClick = {
+                                onHomeConfigurationTooltipDismissed()
+                                navigationHandler.navigate(HomeConfiguration)
+                            },
+                        ) {
+                            MegaIcon(
+                                painter = HomeScreenAction.Customize.getIconPainter(),
+                                contentDescription = HomeScreenAction.Customize.getDescription(),
+                            )
+                        }
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                homeConfigurationIconCoordinates = null
                             }
                         }
                     }

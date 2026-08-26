@@ -7,15 +7,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorHomeConfigurationTooltipShownUseCase
 import mega.privacy.android.domain.usecase.SetHomeConfigurationTooltipShownUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
@@ -33,7 +29,6 @@ class HomeViewModel @Inject constructor(
     private val monitorHomeWidgetConfigurationUseCase: MonitorHomeWidgetConfigurationUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val hasOfflineFilesUseCase: HasOfflineFilesUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorHomeConfigurationTooltipShownUseCase: MonitorHomeConfigurationTooltipShownUseCase,
     private val setHomeConfigurationTooltipShownUseCase: SetHomeConfigurationTooltipShownUseCase,
 ) : ViewModel() {
@@ -65,14 +60,12 @@ class HomeViewModel @Inject constructor(
                     list
                 },
             monitorConnectivityUseCase().catch { Timber.e(it) },
-            monitorHomeCustomizationFeatureFlag().catch { Timber.e(it) },
             monitorHomeConfigurationTooltipShownUseCase().catch { Timber.e(it) },
-        ) { widgets, hasInternetConnection, isHomeCustomizationEnabled, isTooltipShown ->
+        ) { widgets, hasInternetConnection, isTooltipShown ->
             if (hasInternetConnection) {
                 HomeUiState.Data(
                     widgets = widgets,
-                    isHomeCustomizationEnabled = isHomeCustomizationEnabled,
-                    showHomeConfigurationTooltip = isHomeCustomizationEnabled && !isTooltipShown,
+                    showHomeConfigurationTooltip = !isTooltipShown,
                 )
             } else {
                 val hasOfflineFiles =
@@ -84,18 +77,6 @@ class HomeViewModel @Inject constructor(
             HomeUiState.Loading,
         )
     }
-
-    private fun monitorHomeCustomizationFeatureFlag() =
-        monitorConnectivityUseCase()
-            .runningFold(false) { previous, isOnline ->
-                if (isOnline) {
-                    getFeatureFlagValueUseCase(ApiFeatures.HomeConfiguration)
-                } else {
-                    previous
-                }
-            }
-            .distinctUntilChanged()
-
 
     fun onHomeConfigurationTooltipDismissed() {
         viewModelScope.launch {

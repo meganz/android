@@ -57,34 +57,12 @@ class HomeConfigurationTooltipTest {
     }
 
     @Test
-    fun `test that tooltip is not displayed when isHomeCustomizationEnabled is false`() {
-        composeRule.setContent {
-            AndroidThemeForPreviews {
-                HomeConfigurationTooltip(
-                    state = HomeUiState.Data(
-                        widgets = emptyList(),
-                        isHomeCustomizationEnabled = false,
-                        showHomeConfigurationTooltip = true,
-                    ),
-                    iconCoordinates = attachedCoordinates,
-                    onDismiss = {},
-                    onNavigateToConfiguration = {},
-                )
-            }
-        }
-
-        composeRule.onNodeWithTag(HOME_CONFIGURATION_TOOLTIP_TAG, useUnmergedTree = true)
-            .assertDoesNotExist()
-    }
-
-    @Test
     fun `test that tooltip is not displayed when showHomeConfigurationTooltip is false`() {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 HomeConfigurationTooltip(
                     state = HomeUiState.Data(
                         widgets = emptyList(),
-                        isHomeCustomizationEnabled = true,
                         showHomeConfigurationTooltip = false,
                     ),
                     iconCoordinates = attachedCoordinates,
@@ -105,7 +83,6 @@ class HomeConfigurationTooltipTest {
                 HomeConfigurationTooltip(
                     state = HomeUiState.Data(
                         widgets = emptyList(),
-                        isHomeCustomizationEnabled = true,
                         showHomeConfigurationTooltip = true,
                     ),
                     iconCoordinates = null,
@@ -130,7 +107,6 @@ class HomeConfigurationTooltipTest {
                 HomeConfigurationTooltip(
                     state = HomeUiState.Data(
                         widgets = emptyList(),
-                        isHomeCustomizationEnabled = true,
                         showHomeConfigurationTooltip = true,
                     ),
                     iconCoordinates = detachedCoordinates,
@@ -151,7 +127,6 @@ class HomeConfigurationTooltipTest {
                 HomeConfigurationTooltip(
                     state = HomeUiState.Data(
                         widgets = emptyList(),
-                        isHomeCustomizationEnabled = true,
                         showHomeConfigurationTooltip = true,
                     ),
                     iconCoordinates = attachedCoordinates,

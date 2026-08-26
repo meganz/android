@@ -23,9 +23,8 @@ import mega.privacy.mobile.home.presentation.home.model.HomeUiState
  *
  * The tooltip uses [LayoutCoordinates] captured via `onGloballyPositioned`, which can
  * become stale or detached during state transitions. The visibility is guarded by:
- *  1. [HomeUiState.Data.isHomeCustomizationEnabled] — the anchor icon must actually be present
- *  2. [LayoutCoordinates.isAttached] — the captured coordinates must still be valid
- *  3. Lifecycle state — the screen must be resumed (popup is a separate window)
+ *  1. [LayoutCoordinates.isAttached] — the captured coordinates must still be valid
+ *  2. Lifecycle state — the screen must be resumed (popup is a separate window)
  *
  */
 @Composable
@@ -39,7 +38,6 @@ internal fun HomeConfigurationTooltip(
     val isHomeResumed = lifecycleState.isAtLeast(Lifecycle.State.RESUMED)
     val showTooltip = isHomeResumed
             && state is HomeUiState.Data
-            && state.isHomeCustomizationEnabled
             && state.showHomeConfigurationTooltip
     if (!showTooltip) return
 
