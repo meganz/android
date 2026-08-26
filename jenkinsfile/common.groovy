@@ -857,6 +857,33 @@ private String formatBuildStatsTimestamp(long ms) {
     return new Date(ms).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("UTC"))
 }
 
+/**
+ * Clone the Android process-skills repo into the workspace and return the path of one skill file.
+ *
+ * The Code Review and Ask AI stages feed a SKILL.md to the Claude API through Gradle. Those skills
+ * live in mobile/android/android-process-skills, not in this repository, so they are fetched per
+ * build. `main` is tracked on purpose: a skill fix reaches CI on the next build with no change
+ * needed here.
+ *
+ * @param skillName directory name under plugins/mega/skills, e.g. 'android-code-review'
+ * @return path of that skill's SKILL.md
+ */
+String checkoutProcessSkill(String skillName) {
+    String dir = "${WORKSPACE}/.process-skills"
+    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
+        sh """
+            rm -rf ${dir}
+            git clone --depth 1 --branch main ${env.GITLAB_BASE_URL}/mobile/android/android-process-skills.git ${dir}
+        """
+    }
+    String skillFile = "${dir}/plugins/mega/skills/${skillName}/SKILL.md"
+    if (!fileExists(skillFile)) {
+        error("Process skill not found after clone: ${skillFile}")
+    }
+    println("[process-skills] ${skillName} -> ${skillFile}")
+    return skillFile
+}
+
 return this
 
 

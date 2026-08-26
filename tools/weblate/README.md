@@ -3,8 +3,8 @@
 New or changed strings in
 `resources/string-resources/src/main/res/values/strings_shared.xml` must be uploaded to the
 branch's Weblate component (`strings_shared-<sanitized-branch>`) **with a description and a
-mapped screenshot** before the branch is pushed / the MR is merged. The `/weblate` Claude Code
-skill (`.claude/skills/weblate/SKILL.md`) performs the full upload flow.
+mapped screenshot** before the branch is pushed / the MR is merged. The `/mega:weblate` Claude Code
+skill performs the full upload flow.
 
 `weblate_gate.sh` verifies this and is enforced in two places:
 

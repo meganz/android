@@ -178,7 +178,7 @@ if [[ -n "$elsewhere" ]]; then
 fi
 
 if [[ "$violations" == 1 ]]; then
-    echo "Run /weblate (see .claude/skills/weblate/SKILL.md) to upload strings with descriptions and screenshots."
+    echo "Run /mega:weblate to upload strings with descriptions and screenshots."
     exit 1
 fi
 

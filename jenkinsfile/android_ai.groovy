@@ -79,7 +79,6 @@ pipeline {
                     script {
                         BUILD_STEP = 'Ask AI'
 
-                        def skillFile = "${WORKSPACE}/.claude/skills/ask-ai/SKILL.md"
                         def mrUrl = resolveMrUrl()
                         // Pass the comment verbatim; the model understands that @ai
                         // refers to itself (see SKILL.md). Preserves capitalization,
@@ -92,9 +91,8 @@ pipeline {
                         if (!question) {
                             error("${ASK_AI_CMD}: empty comment body from gitlabTriggerPhrase")
                         }
-                        if (!fileExists(skillFile)) {
-                            error("${ASK_AI_CMD}: skill file not found at ${skillFile}")
-                        }
+
+                        def skillFile = common.checkoutProcessSkill('ask-ai')
 
                         echo "${ASK_AI_CMD} MR: ${mrUrl}"
                         echo "${ASK_AI_CMD} Q:  ${question}"

@@ -97,5 +97,5 @@ screenshot tests where applicable. Run with
 
 ## Source of truth
 - Enforced rules & layer detection: `build-logic/convention/src/main/kotlin/ArchitecturePlugin.kt`.
-- Creating a module: `.claude/skills/create-module/SKILL.md` (or `/create-module`).
+- Creating a module: `/mega:create-module` (MEGA Android process-skills plugin).
 - Global conventions (indentation, naming, testing): root `.claude/CLAUDE.md`.

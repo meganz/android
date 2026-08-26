@@ -34,6 +34,14 @@ common = load('jenkinsfile/common.groovy')
 ```
 `common.groovy` must end with `return this` so it can be loaded as an object.
 
+### Claude skills (`android-process-skills`)
+
+The Code Review and Ask AI stages prompt Claude with a `SKILL.md` that lives in
+`mobile/android/android-process-skills`, not in this repository. `common.checkoutProcessSkill(name)`
+shallow-clones that repo's `main` into `$WORKSPACE/.process-skills` and returns the path of
+`plugins/mega/skills/<name>/SKILL.md`. Editing a prompt therefore means a push to that repo, not an
+MR here.
+
 ### Shared library (`jenkins-android-shared-lib`)
 
 Some pipelines also use `@Library('jenkins-android-shared-lib') _` which provides a `util` global object with methods like `util.useArtifactory()`, `util.useGitLab()`, `util.useGpg()`, `util.failPipeline()`.

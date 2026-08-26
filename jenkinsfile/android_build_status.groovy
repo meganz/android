@@ -453,7 +453,7 @@ pipeline {
                     steps {
                         gitlabCommitStatus(name: 'Code Review') {
                             script {
-                                def skillFile = "${WORKSPACE}/.claude/skills/android-code-review/SKILL.md"
+                                def skillFile = common.checkoutProcessSkill('android-code-review')
                                 def targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: 'develop'
 
                                 util.useGitLab() {

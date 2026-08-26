@@ -61,5 +61,5 @@ one, use the project's JUnit 5 setup (see root `.claude/CLAUDE.md`).
 
 ## Source of truth
 - Enforced rules & layer detection: `build-logic/convention/src/main/kotlin/ArchitecturePlugin.kt`.
-- String upload flow: the `/weblate` skill.
+- String upload flow: the `/mega:weblate` skill.
 - Global conventions: root `.claude/CLAUDE.md`.

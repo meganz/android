@@ -737,7 +737,7 @@ The new string `text_editor_toggle_markdown_view` must go to Weblate before merg
 ```bash
 ./gradlew :feature:text-editor:text-editor:testDebugUnitTest :feature:text-editor:text-editor-snowflake-components:testDebugUnitTest :domain:test --tests "*MarkdownFileExtensionTest*"
 ```
-Then run `/android-code-review` on the branch before opening the MR.
+Then run `/mega:android-code-review` on the branch before opening the MR.
 
 ---
 

@@ -91,14 +91,14 @@ replay_pid*
 !.cursor/rules/
 .claude/*
 
-!/.claude/skills/
+!/.claude/conventions/
 !/.claude/hooks/
 !/.claude/settings.json
 .claude/settings.local.json
 /.claude/temp
-/.claude/skills/ht-*/
-/.claude/skills/release-checklist/local-constants.md
-/.claude/skills/**/__pycache__/
+
+# Process-skills repo, cloned by the Jenkins Code Review / Ask AI stages
+/.process-skills/
 ./review.md
 review.md
 .trees
