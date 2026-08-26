@@ -5,7 +5,9 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
@@ -256,6 +258,105 @@ class SearchViewModelTest {
             assertThat(state.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
         }
     }
+
+    @Test
+    fun `test that sort order change shows loading state immediately when item count is large`() =
+        runTest {
+            val typedFileNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(123L))
+                on { name }.thenReturn("file.txt")
+            }
+            val nodes = List(SearchViewModel.SORT_LOADING_ITEMS_THRESHOLD + 1) { typedFileNode }
+            setupTestData(nodes)
+            whenever(
+                searchUseCase(
+                    parentHandle = any(),
+                    nodeSourceType = any(),
+                    searchParameters = any(),
+                )
+            ).thenReturn(nodes).doSuspendableAnswer { awaitCancellation() }
+            val sortOrderFlow = MutableSharedFlow<SortOrder>()
+            whenever(monitorSortCloudOrderUseCase()).thenReturn(sortOrderFlow)
+            whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_MODIFICATION_DESC))
+                .thenReturn(NodeSortConfiguration.default)
+
+            val underTest = createViewModel()
+            underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+            advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().nodesLoadingState)
+                    .isEqualTo(NodesLoadingState.FullyLoaded)
+
+                sortOrderFlow.emit(SortOrder.ORDER_MODIFICATION_DESC)
+                advanceUntilIdle()
+
+                val state = expectMostRecentItem()
+                assertThat(state.nodesLoadingState).isEqualTo(NodesLoadingState.Loading)
+                assertThat(state.items).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that sort order change keeps current results when item count is small`() =
+        runTest {
+            val typedFileNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(123L))
+                on { name }.thenReturn("file.txt")
+            }
+            setupTestData(listOf(typedFileNode))
+            whenever(
+                searchUseCase(
+                    parentHandle = any(),
+                    nodeSourceType = any(),
+                    searchParameters = any(),
+                )
+            ).thenReturn(listOf(typedFileNode)).doSuspendableAnswer { awaitCancellation() }
+            val sortOrderFlow = MutableSharedFlow<SortOrder>()
+            whenever(monitorSortCloudOrderUseCase()).thenReturn(sortOrderFlow)
+            whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_MODIFICATION_DESC))
+                .thenReturn(NodeSortConfiguration.default)
+
+            val underTest = createViewModel()
+            underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+            advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().nodesLoadingState)
+                    .isEqualTo(NodesLoadingState.FullyLoaded)
+
+                sortOrderFlow.emit(SortOrder.ORDER_MODIFICATION_DESC)
+                advanceUntilIdle()
+
+                val state = expectMostRecentItem()
+                assertThat(state.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
+                assertThat(state.items).hasSize(1)
+            }
+        }
+
+    @Test
+    fun `test that sort order emission does not show loading state when no search is active`() =
+        runTest {
+            val sortOrderFlow = MutableSharedFlow<SortOrder>()
+            whenever(monitorSortCloudOrderUseCase()).thenReturn(sortOrderFlow)
+            whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_MODIFICATION_DESC))
+                .thenReturn(NodeSortConfiguration.default)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().nodesLoadingState).isEqualTo(NodesLoadingState.Idle)
+
+                sortOrderFlow.emit(SortOrder.ORDER_MODIFICATION_DESC)
+                advanceUntilIdle()
+
+                assertThat(expectMostRecentItem().nodesLoadingState)
+                    .isEqualTo(NodesLoadingState.Idle)
+            }
+        }
 
     @Test
     fun `test that empty query clears items and sets state to idle`() = runTest {

@@ -187,22 +187,13 @@ class SearchViewModel @AssistedInject constructor(
                 is SearchFilterResult.Type -> state.copy(typeFilterOption = result.option)
                 is SearchFilterResult.DateModified -> state.copy(dateModifiedFilterOption = result.option)
                 is SearchFilterResult.DateAdded -> state.copy(dateAddedFilterOption = result.option)
-            }.copy(
-                items = emptyList(),
-                nodesLoadingState = NodesLoadingState.Loading,
-            )
+            }.withSearchLoadingIfActive()
         }
         launchSearch(_uiState.value.searchText)
     }
 
     private fun updateSearchText(text: String) {
-        _uiState.update {
-            it.copy(
-                searchText = text,
-                items = emptyList(),
-                nodesLoadingState = NodesLoadingState.Loading
-            )
-        }
+        _uiState.update { it.copy(searchText = text).withSearchLoadingIfActive() }
         searchQueryFlow.value = text
     }
 
@@ -472,20 +463,42 @@ class SearchViewModel @AssistedInject constructor(
         monitorSortCloudOrderUseCase()
             .catch { Timber.e(it) }
             .filterNotNull()
-            .onEach {
-                updateSortOrder(it)
+            .onEach { sortOrder ->
+                updateSortOrder(sortOrder)
                 launchSearch()
             }
             .launchIn(viewModelScope)
     }
 
+    /**
+     * Reset to the loading state when a search is about to run; apply within the same update as
+     * the change triggering the search, so the condition sees the new values and both land in a
+     * single emission. Left unchanged when the change leads back to the pre-search state, so the
+     * landing view shows directly.
+     *
+     * @param itemCountThreshold minimum item count required to reset — lists below it reload
+     * near-instantly, so they stay visible instead of flashing the loading state
+     */
+    private fun SearchUiState.withSearchLoadingIfActive(itemCountThreshold: Int = 0): SearchUiState =
+        if (items.size >= itemCountThreshold &&
+            (searchText.isNotEmpty() || searchedQuery.isNotEmpty() ||
+                    tagFilterOption != null || hasActiveFilters)
+        ) {
+            copy(
+                items = emptyList(),
+                nodesLoadingState = NodesLoadingState.Loading,
+            )
+        } else {
+            this
+        }
+
     private fun updateSortOrder(sortOrder: SortOrder) {
         val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
-        _uiState.update {
-            it.copy(
+        _uiState.update { state ->
+            state.copy(
                 selectedSortConfiguration = sortOrderPair,
                 selectedSortOrder = sortOrder
-            )
+            ).withSearchLoadingIfActive(itemCountThreshold = SORT_LOADING_ITEMS_THRESHOLD)
         }
     }
 
@@ -638,13 +651,7 @@ class SearchViewModel @AssistedInject constructor(
      * Activate a tag filter without touching the search field
      */
     private fun onSelectTag(tag: String) {
-        _uiState.update {
-            it.copy(
-                tagFilterOption = tag,
-                items = emptyList(),
-                nodesLoadingState = NodesLoadingState.Loading,
-            )
-        }
+        _uiState.update { it.copy(tagFilterOption = tag).withSearchLoadingIfActive() }
         launchSearch(_uiState.value.searchText)
     }
 
@@ -652,13 +659,7 @@ class SearchViewModel @AssistedInject constructor(
      * Clear the tag filter, falling back to a plain text search or the pre-search state
      */
     private fun onClearTagFilter() {
-        _uiState.update {
-            it.copy(
-                tagFilterOption = null,
-                items = emptyList(),
-                nodesLoadingState = NodesLoadingState.Loading,
-            )
-        }
+        _uiState.update { it.copy(tagFilterOption = null).withSearchLoadingIfActive() }
         launchSearch(_uiState.value.searchText)
     }
 
@@ -773,6 +774,12 @@ class SearchViewModel @AssistedInject constructor(
 
     companion object {
         const val SEARCH_DEBOUNCE_MS = 300L
+
+        /**
+         * Item count from which a sort change resets to the loading state instead of keeping
+         * the current results on screen while they re-sort
+         */
+        const val SORT_LOADING_ITEMS_THRESHOLD = 1000
         private const val SHELL_STATE_STOP_TIMEOUT_MS = 5_000L
     }
 }
