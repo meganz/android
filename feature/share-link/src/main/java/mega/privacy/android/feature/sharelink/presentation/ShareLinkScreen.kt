@@ -268,17 +268,12 @@ fun ShareLinkScreen(
             data.shareableLinksText(),
             sharePassword,
         )
-        BasicDialog(
-            modifier = Modifier.testTag(SHARE_LINK_PASSWORD_DIALOG_TAG),
-            title = stringResource(sharedR.string.share_link_password_dialog_title),
-            description = stringResource(sharedR.string.share_link_password_dialog_message),
-            positiveButtonText = stringResource(sharedR.string.general_share),
-            onPositiveButtonClicked = {
+        SharePasswordDialog(
+            onShareWithPassword = {
                 showSharePasswordDialog = false
                 onShareLink(linkAndPassword)
             },
-            negativeButtonText = stringResource(sharedR.string.general_dismiss_dialog),
-            onNegativeButtonClicked = {
+            onShareLinkOnly = {
                 showSharePasswordDialog = false
                 onShareLink(data.shareableLinksText())
             },
@@ -314,6 +309,28 @@ fun ShareLinkScreen(
             onDismiss = { showShareKeyDialog = false },
         )
     }
+}
+
+/**
+ * Asks whether the link's password should be shared alongside the link, before the share sheet
+ * opens. Stateless so it can be rendered on its own for previews and Weblate screenshots.
+ */
+@Composable
+internal fun SharePasswordDialog(
+    onShareWithPassword: () -> Unit,
+    onShareLinkOnly: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    BasicDialog(
+        modifier = Modifier.testTag(SHARE_LINK_PASSWORD_DIALOG_TAG),
+        title = stringResource(sharedR.string.share_link_password_dialog_title),
+        description = stringResource(sharedR.string.share_link_password_dialog_message),
+        positiveButtonText = stringResource(sharedR.string.general_share),
+        onPositiveButtonClicked = onShareWithPassword,
+        negativeButtonText = stringResource(sharedR.string.general_dismiss_dialog),
+        onNegativeButtonClicked = onShareLinkOnly,
+        onDismiss = onDismiss,
+    )
 }
 
 /**

@@ -3602,7 +3602,7 @@
     <!-- Share link revamp: warning under the link when its expiry date has already passed -->
     <string name="share_link_expired">Link expired</string>
     <!-- Share link revamp: title of the dialog asking whether to share the link password too -->
-    <string name="share_link_password_dialog_title">Share link password</string>
+    <string name="share_link_password_dialog_title">Link password</string>
     <!-- Share link revamp: body of the dialog asking whether to share the link password too -->
     <string name="share_link_password_dialog_message">Do you want to share the password for this link?</string>
     <!-- Share link revamp: shared text when the user chooses to send the password with the link. %1$s is the link, %2$s is the password -->
