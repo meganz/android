@@ -3064,4 +3064,66 @@
         <item quantity="many">%1$d contatos</item>
         <item quantity="other">%1$d contatos</item>
     </plurals>
+    <string name="invite_contacts_share_link_action">Convidar via link</string>
+    <string name="invite_contacts_manual_input_placeholder">Digite o email ou o telefone</string>
+    <string name="invite_contacts_already_contact_error">Já existe um contato com este email</string>
+    <string name="invite_contacts_pending_error">Já foi enviado um convite para este email</string>
+    <string name="invite_contacts_invalid_input_error">Digite um email ou telefone válido</string>
+    <string name="settings_customise_navigation_tooltip_body">Escolha quais itens aparecem na navegação</string>
+    <string name="settings_customise_navigation_tooltip_action">Explorar</string>
+    <string name="settings_customise_navigation_state_custom">Personalizado</string>
+    <string name="settings_customise_navigation_state_default">Predeterminada</string>
+    <plurals name="video_player_seek_seconds">
+        <item quantity="one">%1$d segundo</item>
+        <item quantity="many">%1$d de segundos</item>
+        <item quantity="other">%1$d segundos</item>
+    </plurals>
+    <string name="settings_sync_battery_usage_title">Uso da bateria</string>
+    <string name="settings_sync_battery_usage_description">As sincronizações e os backups serão pausados quando houver menos de 20% de bateria e o dispositivo não estiver carregando.</string>
+    <string name="settings_sync_battery_pause_on_battery_saver_title">Pausar quando o modo de economia de energia estiver ativo</string>
+    <string name="chat_list_search_no_results_title">Não há resultados</string>
+    <string name="chat_list_search_no_results_description">Pesquise outra(s) palavra(s)</string>
+    <string name="settings_sync_and_backup_title">Sincronização e backup</string>
+    <string name="transfers_over_quota_notification_message">Faça upgrade para retomar as transferências, ou espere até obter mais cota de transferência.</string>
+    <string name="sync_list_sync_state_paused_battery_saver">Pausado - modo de economia de energia ativo</string>
+    <string name="sync_list_sync_state_paused_low_battery">Pausado - bateria baixa</string>
+    <string name="sync_list_sync_state_paused_no_wifi">Pausado - não há Wi‑Fi</string>
+    <string name="chat_last_message_no_history">Este chat não tem histórico</string>
+    <string name="chat_last_message_sender_me">Eu</string>
+    <string name="chat_last_message_sender_unknown">Nome desconhecido</string>
+    <string name="general_mute">Silenciar</string>
+    <string name="general_unmute">Não silenciar</string>
+    <string name="general_archive">Arquivar</string>
+    <string name="general_unarchive">Deixar de arquivar</string>
+    <string name="title_properties_chat_clear">Deletar o histórico do chat</string>
+    <string name="confirmation_clear_chat_history">Você tem certeza de que quer deletar o histórico de mensagens deste chat?</string>
+    <string name="title_confirmation_leave_group_chat">Você quer sair do chat de grupo?</string>
+    <string name="confirmation_leave_group_chat">Se você sair, deixará de ter acesso para enviar ou ler mensagens.</string>
+    <string name="audio_player_continuous_playback_title">Reprodução contínua</string>
+    <string name="audio_player_continuous_playback_description">Reproduz automaticamente o próximo arquivo</string>
+    <string name="audio_player_playing_from_label">Reproduzindo de [A]%s[/A]</string>
+    <string name="video_player_zoom_fit_to_screen">Ajustar à tela</string>
+    <string name="video_player_zoom_fill_screen">Preencher a tela</string>
+    <string name="password_strength_moderate">Senha média</string>
+    <string name="share_link_updated_and_copied_snackbar">Link atualizado e copiado para a área de transferência</string>
+    <string name="share_link_key_copied_snackbar">Chave copiada para a área de transferência</string>
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="one">Link copiado para a área de transferência</item>
+        <item quantity="many">Links copiados para a área de transferência</item>
+        <item quantity="other">Links copiados para a área de transferência</item>
+    </plurals>
+    <string name="password_too_weak_error_message">Use uma senha mais segura.</string>
+    <string name="check_internet_connection_error">Não há conexão à Internet. Verifique a sua conexão e tente novamente</string>
+    <string name="media_timeline_sort_option_date_added">Data de inclusão</string>
+    <plurals name="remove_link_dialog_title">
+        <item quantity="one">Remover o link?</item>
+        <item quantity="many">Remover os links?</item>
+        <item quantity="other">Remover os links?</item>
+    </plurals>
+    <string name="media_timeline_sort_option_date_taken">Data de captura</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="one">Qualquer pessoa com este link já não poderá acessar o arquivo ou a pasta</item>
+        <item quantity="many">Qualquer pessoa com estes links já não poderá acessar os arquivos e/ou as pastas</item>
+        <item quantity="other">Qualquer pessoa com estes links já não poderá acessar os arquivos e/ou as pastas</item>
+    </plurals>
 </resources>

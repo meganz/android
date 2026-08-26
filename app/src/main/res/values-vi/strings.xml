@@ -171,7 +171,7 @@
     <!-- Label to reference a recents section -->
     <string name="section_recents">Gần&#160;Đây</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
-    <string name="section_secondary_media_uploads">Đăng tải phương&#160;tiện&#160;số</string>
+    <string name="section_secondary_media_uploads">Đăng tải phương&#160;tiện số</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Ngoại Tuyến</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -1975,7 +1975,7 @@
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]Không có [/B][A]thông báo[/A]</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Cho phép truy cập vào hình ảnh, phương tiện số và tệp tin</string>
+    <string name="allow_acces_media_title">Cho phép truy&#160;cập vào hình&#160;ảnh, phương&#160;tiện số và các tệp&#160;tin</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA cần phải có sự cấp phép của bạn để truy cập và chia sẻ tệp tin.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -2529,7 +2529,7 @@
     <!-- Title for Cookie dialog, visible for new users. -->
     <string name="dialog_cookie_alert_title">Quản&#160;lý cookies</string>
     <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Chúng&#160;tôi sử&#160;dụng cookies và các công&#160;nghệ tương&#160;tự để giúp chúng&#160;tôi cải&#160;thiện dịch&#160;vụ của mình. Tìm&#160;hiểu thêm về [A]Chính&#160;Sách Cookie[/A] của chúng&#160;tôi.</string>
+    <string name="dialog_cookie_alert_message">Chúng&#160;tôi sử&#160;dụng cookies và các công&#160;nghệ tương&#160;tự nhằm để cải&#160;thiện dịch&#160;vụ. Tìm&#160;hiểu thêm về [A]Chính&#160;Sách Cookie[/A] của chúng&#160;tôi.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Thay đổi cho Cài Đặt Cookie đã được lưu lại</string>
     <!-- Preference screen item title -->
@@ -2583,7 +2583,7 @@
     <!-- settings of the Media section -->
     <string name="settings_media">Phương&#160;tiện số</string>
     <!-- settings title of the Media section -->
-    <string name="settings_media_audio_files">Tệp tin âm thanh</string>
+    <string name="settings_media_audio_files">Tệp âm&#160;thanh</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Cho phép phát trong nền</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
@@ -2871,7 +2871,7 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">Gói đăng ký dịch vụ với %1s</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">Bạn hiện đang có một gói đăng&#160;ký MEGA được mua với %1$s. Bạn cần phải tự tiến&#160;hành hủy&#160;bỏ trong %2$s, vì MEGA không thể thực&#160;hiện cho bạn được. Trung&#160;Tâm Hướng&#160;Dẫn để có thêm thông&#160;tin.</string>
+    <string name="message_android_platform_subscription">Quý khách hiện đang có một gói đăng ký MEGA được mua với %1$s, cần phải hủy bỏ thông qua %2$s, vì MEGA không thể tự được. Xin vào Trung&#160;Tâm Hướng&#160;Dẫn để có thêm thông tin.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Bạn hiện đang có một gói đăng ký dịch vụ với MEGA. Gói dịch vụ đó sẽ tự động huỷ sau khi tài khoản bị xóa. Truy cập Thư Viện Hướng Dẫn để có thêm thông tin.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
@@ -3145,7 +3145,7 @@
     <!-- Filter page: Prompt to choose media type -->
     <string name="filter_prompt_media_type">Chọn dạng</string>
     <!-- Filter page: Button text for all media type -->
-    <string name="filter_button_all_media_type">Tất cả phương tiện số</string>
+    <string name="filter_button_all_media_type">Tất cả phương&#160;tiện số</string>
     <!-- Filter page: Prompt to choose photos source -->
     <string name="filter_prompt_media_source">Hiện các mục từ</string>
     <!-- Filter page: Radio button text for CD + CU source -->
@@ -3171,7 +3171,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Đây là thư&#160;mục chứa các tệp tin và thư mục đã được sao lưu dự phòng. Các mục lưu dự&#160;phòng là dạng “chỉ-được-xem” để phòng tránh bị chỉnh sửa trong Ổ&#160;Mây của bạn.\nBạn có thể lưu dự phòng dữ liệu của mình từ máy tính lên MEGA bằng cách sử dụng App MEGA cho Máy&#160;Tính.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;cáo.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;đối.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Tài&#160;khoản của bạn đã bị chấm&#160;dứt do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ của MEGA. \nBạn sẽ không thể lấy lại quyền truy&#160;cập vào dữ&#160;liệu đã được lưu&#160;trữ của mình hoặc được phép đăng&#160;ký tài&#160;khoản MEGA mới.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -3217,7 +3217,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">Bạn đã thêm tất cả các tên liên lạc đã có vào trong cuộc chat này rồi. Nếu bạn muốn thêm thành&#160;viên nữa, trước hết hãy mời thêm người vào sổ liên&#160;lạc của bạn.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Hình ảnh đã được lưu vào thiết bị của bạn</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Hình ảnh đã được lưu vào thiết&#160;bị của bạn</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Điền tên album</string>
     <!-- Album creation input name placeholder -->
@@ -3257,7 +3257,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Mở thư&#160;mục chỉ có chứa hình&#160;ảnh hoặc video trong giao&#160;diện khuôn lưới trực&#160;quan. Duyệt phương&#160;tiện số ở dạng hình thu nhỏ và xếp lọc theo ngày.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Bởi vì thư&#160;mục này chỉ có chứa hoàn&#160;toàn là hình&#160;ảnh và videos, chúng&#160;tôi đã tự&#160;động đặt Xem kiểu triển&#160;lãm. Giúp bạn trải&#160;nghiệm nội&#160;dung hình&#160;ảnh của mình với bố&#160;cục sống&#160;động hơn. Tính&#160;năng này có thể tắt đi trong Thiết&#160;Đặt.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Bởi vì thư&#160;mục này chỉ có chứa hoàn toàn là hình ảnh và videos, chúng tôi đã tự động đặt Xem kiểu triển&#160;lãm. Giúp bạn trải&#160;nghiệm nội&#160;dung hình&#160;ảnh của mình với bố cục sống&#160;động hơn. Tính năng này có thể tắt đi trong Thiết&#160;Đặt.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Thiết Đặt</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->

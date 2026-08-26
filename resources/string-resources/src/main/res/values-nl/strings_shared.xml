@@ -2942,4 +2942,56 @@
         <item quantity="one">%1$d contact</item>
         <item quantity="other">%1$d contacten</item>
     </plurals>
+    <string name="invite_contacts_share_link_action">Uitnodigen via link</string>
+    <string name="invite_contacts_manual_input_placeholder">Voer e-mail of telefoonnummer in</string>
+    <string name="invite_contacts_already_contact_error">Dit e-mailadres is al een contact</string>
+    <string name="invite_contacts_pending_error">Een uitnodiging is al verstuurd naar dit e-mailadres</string>
+    <string name="invite_contacts_invalid_input_error">Voer een geldig e-mailadres of telefoonnummer in</string>
+    <string name="settings_customise_navigation_tooltip_body">Kies welke items verschijnen in uw navigatie</string>
+    <string name="settings_customise_navigation_tooltip_action">Ontdekken</string>
+    <string name="settings_customise_navigation_state_custom">Aangepast</string>
+    <string name="settings_customise_navigation_state_default">Standaard</string>
+    <plurals name="video_player_seek_seconds">
+        <item quantity="one">%1$d seconde</item>
+        <item quantity="other">%1$d seconden</item>
+    </plurals>
+    <string name="settings_sync_battery_usage_title">Batterij verbruik</string>
+    <string name="settings_sync_battery_usage_description">Synchronisaties en back-ups worden gepauzeerd als het batterijniveau onder de 20% zakt en het apparaat niet wordt opgeladen.</string>
+    <string name="settings_sync_battery_pause_on_battery_saver_title">Pauzeren wanneer de batterijbesparing is ingeschakeld</string>
+    <string name="chat_list_search_no_results_title">Geen resultaten gevonden</string>
+    <string name="chat_list_search_no_results_description">Probeer een andere zoekterm</string>
+    <string name="settings_sync_and_backup_title">Synchronisatie en back-up</string>
+    <string name="transfers_over_quota_notification_message">Upgrade om overdrachten te hervatten, of wacht tot uw overdrachtslimiet wordt gereset.</string>
+    <string name="sync_list_sync_state_paused_battery_saver">Gepauzeerd, energiebesparing ingeschakeld</string>
+    <string name="sync_list_sync_state_paused_low_battery">Gepauzeerd, batterij bijna leeg</string>
+    <string name="sync_list_sync_state_paused_no_wifi">Gepauzeerd, geen wifi</string>
+    <string name="chat_last_message_no_history">Geen gespreksgeschiedenis</string>
+    <string name="chat_last_message_sender_me">Mij</string>
+    <string name="chat_last_message_sender_unknown">Onbekende naam</string>
+    <string name="general_mute">Dempen</string>
+    <string name="general_unmute">Dempen opheffen</string>
+    <string name="general_archive">Archiveren</string>
+    <string name="general_unarchive">Dearchiveren</string>
+    <string name="title_properties_chat_clear">Gespreksgeschiedenis wissen</string>
+    <string name="confirmation_clear_chat_history">Weet u zeker dat u de volledige geschiedenis van dit gesprek wilt wissen?</string>
+    <string name="title_confirmation_leave_group_chat">Groepsgesprek verlaten?</string>
+    <string name="confirmation_leave_group_chat">Als u weggaat, heeft u niet langer toegang om berichten te lezen of te versturen.</string>
+    <string name="audio_player_continuous_playback_title">Continu afspelen</string>
+    <string name="audio_player_continuous_playback_description">Speel automatisch het volgende bestand in de wachtrij af</string>
+    <string name="audio_player_playing_from_label">Afspelen vanaf [A]%s[/A]</string>
+    <string name="password_strength_moderate">Gematigd wachtwoord</string>
+    <string name="video_player_zoom_fit_to_screen">Passend maken voor scherm</string>
+    <string name="video_player_zoom_fill_screen">Scherm vullen</string>
+    <string name="share_link_updated_and_copied_snackbar">Link bijgewerkt en naar uw klembord gekopieerd</string>
+    <string name="share_link_key_copied_snackbar">Sleutel naar het klembord gekopieerd</string>
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="one">Link naar het klembord gekopieerd</item>
+        <item quantity="other">Links naar het klembord gekopieerd</item>
+    </plurals>
+    <string name="password_too_weak_error_message">Gebruik een sterker wachntwoord.</string>
+    <string name="media_timeline_sort_option_date_added">Datum toegevoegd</string>
+    <plurals name="remove_link_dialog_title">
+        <item quantity="one">Link verwijderen?</item>
+        <item quantity="other">Links verwijderen?</item>
+    </plurals>
 </resources>

@@ -679,7 +679,7 @@
     <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
     <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A][B]已將會議更新為[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A][B]已取消排定以下時間的事件[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A][B]已取消以下預定時間的事件[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
     <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A][B]已更新一個事件為[/B]</string>
     <!-- User Alert notification for scheduled meeting date change -->
@@ -687,7 +687,7 @@
     <!-- User Alert notification for scheduled meeting time change -->
     <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A][B]已將會議時間更新為[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A][B]已取消排定以下時間的會議[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A][B]已取消以下預定時間的會議[/B]</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">大容量儲存空間</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -2404,7 +2404,7 @@
     <string name="contacts_groups_create_error">建立對話時發生錯誤</string>
     <string name="home_do_more_with_mega_camera_uploads">相機上傳</string>
     <string name="home_do_more_with_mega_add_contact">新增聯絡人</string>
-    <string name="home_do_more_with_mega_schedule_meeting">安排會議</string>
+    <string name="home_do_more_with_mega_schedule_meeting">預定會議</string>
     <plurals name="general_selection_num_selected">
         <item quantity="other">已選擇%1$d個</item>
     </plurals>
@@ -2418,7 +2418,7 @@
     <string name="home_cwlo_clear_history_dialog_message">確定要清除紀錄嗎？此操作無法復原。</string>
     <string name="search_placeholder_chat">在對話中搜尋</string>
     <string name="search_landing_chat_explorer_subtitle">搜尋通訊錄、對話、會議</string>
-    <string name="home_do_more_with_mega_title">MEGA常用功能</string>
+    <string name="home_do_more_with_mega_title">MEGA更多功能</string>
     <string name="home_do_more_with_mega_add_sync">新增同步</string>
     <string name="home_do_more_with_mega_scan_document">掃描文件</string>
     <string name="home_do_more_with_mega_create_album">建立相簿</string>
@@ -2499,7 +2499,7 @@
     <string name="subscription_revamp_why_go_pro_transfer">享有高達 %1$s 的傳輸配額</string>
     <string name="subscription_revamp_why_go_pro_vpn">使用MEGA VPN，保持線上隱私</string>
     <string name="subscription_revamp_why_go_pro_pass">使用 MEGA Pass，讓密碼更安全</string>
-    <string name="subscription_revamp_current_plan_cycle_yearly">年繳訂閱</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">年付訂閱</string>
     <string name="subscription_revamp_price_per_month">%1$s/月</string>
     <string name="subscription_revamp_charged_yearly">%1$s 按年收費</string>
     <string name="subscription_revamp_get_plan_button">取得 %1$s</string>
@@ -2598,12 +2598,12 @@
     <string name="add_contacts_unverified_contact_warning">與您共享資訊的某些聯絡人尚未經過您的驗證。為了確保額外的安全性，我們建議您在聯絡人中驗證他們的憑證。點選您要驗證的聯絡人旁邊的三個小圓點，然後點選「資訊」。</string>
     <string name="contacts_qr_scan_action">掃描二維條碼</string>
     <string name="share_link_access_password_description">只有擁有密碼的人才能開啟連結</string>
-    <string name="share_link_password_copied_snackbar">密碼已複製到剪貼簿</string>
+    <string name="share_link_password_copied_snackbar">密碼已複製到您的剪貼簿</string>
     <string name="document_scanner_review_title">查看掃描</string>
     <string name="create_group_chat_link_requires_name_error">輸入群組名稱即可取得對話連結</string>
     <string name="home_do_more_with_mega_album_created_message">相簿「%1$s」已建立</string>
     <string name="home_do_more_with_mega_see_album_action">查看相簿</string>
-    <string name="campaign_name_with_discount_up_to">%1$s：最高可享 %2$d%% 折扣</string>
+    <string name="campaign_name_with_discount_up_to">%1$s：最高可享%2$d%%折扣</string>
     <string name="subscription_revamp_price_per_year">%1$s/年</string>
     <plurals name="subscription_offer_billed_yearly_months">
         <item quantity="other">前%1$d個月以%2$s計費，之後按年計費%3$s</item>
@@ -2768,11 +2768,97 @@
     <string name="contact_decline">拒絕</string>
     <string name="contact_reinvite">重新邀請</string>
     <string name="invite_contacts_my_qr_code_action">我的二維條碼</string>
-    <string name="invite_contacts_own_email_error">您無須增加個人的電子郵件</string>
-    <string name="invite_contacts_open_camera_confirmation_title">要開啟相機？</string>
-    <string name="invite_contacts_open_camera_confirmation_message">如果您開啟相機，您當前通話的視訊傳輸將被中斷。</string>
+    <string name="invite_contacts_own_email_error">無需新增您自己的電子郵件地址</string>
+    <string name="invite_contacts_open_camera_confirmation_title">要開啟相機嗎？</string>
+    <string name="invite_contacts_open_camera_confirmation_message">如果您開啟相機，您當前通話的視訊傳輸將中斷。</string>
     <string name="invite_contacts_open_camera_confirmation_confirm">開啟</string>
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d個聯絡人</item>
+    </plurals>
+    <string name="settings_customise_navigation_state_custom">自訂</string>
+    <string name="invite_contacts_invalid_input_error">輸入有效的電子郵件地址或電話號碼</string>
+    <string name="invite_contacts_manual_input_placeholder">輸入電子郵件或號碼</string>
+    <string name="invite_contacts_already_contact_error">此電子郵件地址已在通訊錄中</string>
+    <string name="invite_contacts_pending_error">已發送邀請至此電子郵件地址</string>
+    <string name="invite_contacts_share_link_action">透過連結邀請</string>
+    <string name="subscription_quota_no_connection_title">無法連線</string>
+    <string name="subscription_quota_no_connection_description">請稍後檢查您的儲存與傳輸詳細資料，或再試一次</string>
+    <string name="subscription_quota_no_connection_retry_button">重試</string>
+    <string name="subscription_offer_expired_dialog_title">優惠已結束</string>
+    <string name="subscription_offer_expired_dialog_description">此優惠已截止。請查看我們現有的方案，選擇最適合您的吧。</string>
+    <string name="subscription_offer_expired_dialog_button">查看方案</string>
+    <string name="video_editor_screen_title">編輯影片</string>
+    <string name="video_editor_save_copy_button">另存副本</string>
+    <string name="video_editor_load_failed_message">無法載入此影片</string>
+    <string name="video_editor_export_failed_message">無法儲存影片</string>
+    <string name="video_editor_tool_trim">修剪</string>
+    <string name="video_editor_tool_crop">裁切</string>
+    <string name="video_editor_tool_rotate">旋轉</string>
+    <string name="video_editor_tool_speed">速度</string>
+    <string name="video_editor_tool_volume">音量</string>
+    <string name="video_editor_rotate_left">向左旋轉</string>
+    <string name="video_editor_rotate_right">向右旋轉</string>
+    <string name="video_editor_rotate_flip">翻轉</string>
+    <string name="video_editor_volume_boost_warning">超過100%的音量增益僅在匯出時套用。</string>
+    <string name="video_editor_apply_button">套用</string>
+    <string name="video_editor_preparing_dialog_title">正在準備影片</string>
+    <string name="video_editor_saving_dialog_title">正在儲存副本</string>
+    <string name="video_editor_encoding_label">正在編碼&#8230;</string>
+    <string name="video_editor_discard_changes_description">如果現在離開，您所做的變更將會遺失。</string>
+    <string name="search_tags_show_all">顯示全部</string>
+    <string name="search_tags_show_less">顯示較少</string>
+    <string name="subscription_offer_no_connection_description">請檢查您的網路連線，然後重試</string>
+    <string name="audio_player_sleep_timer_title">睡眠定時器</string>
+    <string name="audio_player_sleep_timer_active_title">睡眠定時器 - 還剩 %s</string>
+    <string name="audio_player_sleep_timer_end_of_track">曲目結束</string>
+    <string name="audio_player_sleep_timer_turn_off">關閉定時器</string>
+    <string name="audio_player_sleep_timer_countdown_label">睡眠定時器 %s</string>
+    <plurals name="audio_player_sleep_timer_minutes">
+        <item quantity="other">%1$d分鐘</item>
+    </plurals>
+    <string name="video_editor_tooltip_title">編輯影片</string>
+    <string name="video_editor_tooltip_description">修剪、裁切、旋轉，或調整速度與音量。</string>
+    <string name="settings_customise_navigation_title">自訂導覽選單</string>
+    <string name="settings_customise_navigation_subtitle">拖曳以重新排序項目</string>
+    <string name="settings_customise_navigation_your_navigation">您的導覽選單</string>
+    <string name="settings_customise_navigation_items_counter">已選%1$d項，共%2$d項</string>
+    <string name="settings_customise_navigation_available_to_add">新增到導覽選單</string>
+    <string name="settings_customise_navigation_max_items_snackbar">最多只能選擇%1$d 個項目。請移除一個項目後再試。</string>
+    <string name="settings_customise_navigation_min_items_snackbar">最少需選%1$d項目</string>
+    <string name="video_player_large_cluster_seek_warning">跳轉影片可能反應較慢</string>
+    <string name="settings_customise_navigation_tooltip_body">選擇要顯示在導覽選單中的項目</string>
+    <string name="settings_customise_navigation_tooltip_action">探索</string>
+    <string name="settings_customise_navigation_state_default">預設</string>
+    <plurals name="video_player_seek_seconds">
+        <item quantity="other">%1$d秒</item>
+    </plurals>
+    <string name="settings_sync_battery_usage_title">電池用量</string>
+    <string name="settings_sync_battery_usage_description">電量低於20%且未連接電源時，暫停同步與備份。</string>
+    <string name="settings_sync_battery_pause_on_battery_saver_title">開啟省電模式時暫停</string>
+    <string name="chat_list_search_no_results_title">無搜尋結果</string>
+    <string name="chat_list_search_no_results_description">請嘗試其它搜尋關鍵字</string>
+    <string name="settings_sync_and_backup_title">同步與備份</string>
+    <string name="transfers_over_quota_notification_message">升級即可恢復傳輸，或等待傳輸配額重置。</string>
+    <string name="sync_list_sync_state_paused_battery_saver">已暫停，省電模式啟用中</string>
+    <string name="sync_list_sync_state_paused_low_battery">已暫停，電量過低</string>
+    <string name="sync_list_sync_state_paused_no_wifi">已暫停，無Wi-Fi</string>
+    <string name="chat_last_message_no_history">沒有對話記錄</string>
+    <string name="chat_last_message_sender_me">我</string>
+    <string name="chat_last_message_sender_unknown">未知的名稱</string>
+    <string name="general_mute">靜音</string>
+    <string name="general_unmute">取消靜音</string>
+    <string name="general_archive">封存</string>
+    <string name="general_unarchive">未封存</string>
+    <string name="title_properties_chat_clear">清除對話紀錄</string>
+    <string name="confirmation_clear_chat_history">您確定要清除此對話的全部歷史記錄嗎？</string>
+    <string name="title_confirmation_leave_group_chat">確定要離開對話群組嗎？</string>
+    <string name="confirmation_leave_group_chat">如果您離開此對話群組，您將無法再於此群組中讀取或發送訊息。</string>
+    <string name="audio_player_continuous_playback_title">連續播放</string>
+    <string name="audio_player_continuous_playback_description">自動播放佇列中的下一首</string>
+    <string name="audio_player_playing_from_label">正在播放[A]%s[/A]的歌曲</string>
+    <string name="password_strength_moderate">中強度密碼</string>
+    <string name="media_timeline_sort_option_date_added">新增日期</string>
+    <plurals name="remove_link_dialog_title">
+        <item quantity="other">移除連結？</item>
     </plurals>
 </resources>

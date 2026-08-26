@@ -699,7 +699,7 @@
     <!-- The additional security label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass và MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_description">Đặt mật khẩu và ngày hết hạn cho các đường liên kết tệp tin và thư mục</string>
+    <string name="payment_ads_free_intro_additional_security_description">Giúp cuộc&#160;sống trực&#160;tuyến của&#160;bạn an&#160;toàn hơn, nhanh&#160;hơn và dễ&#160;dàng hơn với trình&#160;quản&#160;lý mật&#160;khẩu và VPN tốc&#160;độ cao của chúng&#160;tôi</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
     <string name="payment_ads_free_intro_button_view_pro_plan">Xem các gói Pro</string>
     <!-- Label for call option on settings -->
@@ -851,7 +851,7 @@
     <!--General Request Network Failed text-->
     <string name="general_request_failed_message">Đã phát&#160;sinh lỗi, xin thử lại</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;cáo.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;đối.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Tài&#160;khoản của bạn đã bị chấm&#160;dứt do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ của MEGA. \nBạn sẽ không thể lấy lại quyền truy&#160;cập vào dữ&#160;liệu đã được lưu&#160;trữ của mình hoặc được phép đăng&#160;ký tài&#160;khoản MEGA mới.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
@@ -1175,7 +1175,7 @@
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
     <string name="transfers_storage_and_transfer_quota_banner_title">Nhận thêm không gian lưu trữ và băng thông truyền tải</string>
     <!-- Title for help centre -->
-    <string name="general_help_centre">Trung Tâm Hướng Dẫn</string>
+    <string name="general_help_centre">Trung&#160;Tâm Hướng&#160;Dẫn</string>
     <!-- Warning informing the transfers queue has been paused -->
     <string name="transfers_all_transfers_paused_warning">Các phiên truyền tải hiện tạm dừng</string>
     <!-- Button for resuming the transfers queue -->
@@ -1647,7 +1647,7 @@
     <!--Media feature title-->
     <string name="media_feature_title">Phương tiện số</string>
     <!--Media screen timeline tab title-->
-    <string name="media_timeline_tab_title">Dòng thời gian</string>
+    <string name="media_timeline_tab_title">Dòng thời&#160;gian</string>
     <!--Media screen albums tab title-->
     <string name="media_albums_tab_title">Αlbums</string>
     <!--Media screen videos tab title-->
@@ -1739,7 +1739,7 @@
     <!-- menu item -->
     <string name="timeline_tab_file_properties_shared_folder_change_permissions">Đổi quyền hạn</string>
     <!-- Timeline tab screen: Empty state no media found -->
-    <string name="timeline_tab_empty_body_no_media_found">Không tìm thấy phương tiện</string>
+    <string name="timeline_tab_empty_body_no_media_found">Không tìm thấy phương&#160;tiện</string>
     <!-- Camera uploads completed info in TimelineTab screen. -->
     <plurals name="timeline_tab_camera_uploads_completed">
         <item quantity="other">Đăng tải camêra hoàn tất, %1$d tệp tin đã được tải lên</item>
@@ -2135,7 +2135,7 @@
     <string name="pdf_viewer_dialog_text_enter_password">Nhập mật&#160;khẩu để mở tệp&#160;này</string>
     <string name="text_editor_fast_scroll_line_tooltip">Dòng %1$d</string>
     <string name="select_videos_search_empty_view_description">Tìm&#160;kiếm video trong Ổ&#160;Mây của&#160;bạn</string>
-    <string name="new_text_file_invalid_extension_error_message">Sử dụng phần mở rộng tệp hợp&#160;lệ (ví&#160;dụ .txt, .md, or .xml)</string>
+    <string name="new_text_file_invalid_extension_error_message">Sử&#160;dụng phần mở&#160;rộng tệp hợp&#160;lệ (ví&#160;dụ .txt, .md, or .xml)</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
@@ -2351,7 +2351,7 @@
     <string name="general_error_invalid_name">Tên không hợp&#160;lệ</string>
     <string name="general_file_type">Dạng tệp</string>
     <string name="campaign_name_with_discount">%1$s: giảm %2$d%%</string>
-    <string name="general_error_incorrect_name">Vui lòng sửa tên tệp&#160;tin trước khi tiếp&#160;tục</string>
+    <string name="general_error_incorrect_name">Vui&#160;lòng sửa tên tệp&#160;tin trước khi tiếp&#160;tục</string>
     <string name="general_destination">Đích đến</string>
     <string name="video_player_more_options_pip_option">Hình-trong-hình</string>
     <string name="file_link_unavaible_ToS_violation">Đường liên kết tệp tin đã bị xóa bỏ do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ.</string>
@@ -2361,15 +2361,15 @@
     <string name="contacts_action_send_message">Gửi tin&#160;nhắn</string>
     <string name="contacts_action_contact_info">Thông&#160;tin liên&#160;lạc</string>
     <string name="contacts_action_remove_contact">Xóa tên liên&#160;lạc</string>
-    <string name="cloud_drive_inactivity_banner_title">Tài&#160;khoản của bạn đã không hoạt&#160;động quá&#160;lâu</string>
+    <string name="cloud_drive_inactivity_banner_title">Tài&#160;khoản của bạn đã không hoạt&#160;động quá lâu</string>
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="other">Vì tài khoản của bạn đã không hoạt động trong hơn %1$d tháng, các tệp của bạn đã bị xóa theo chính sách không hoạt động của chúng tôi</item>
+        <item quantity="other">Vì tài&#160;khoản của bạn đã không hoạt&#160;động trong hơn %1$d tháng, các tệp của bạn đã bị xóa theo chính&#160;sách không hoạt&#160;động của chúng&#160;tôi</item>
     </plurals>
     <string name="contacts_action_audio_call">Gọi thoại</string>
     <string name="contacts_action_video_call">Gọi video</string>
     <string name="contacts_search_hint">Tìm tên liên&#160;lạc</string>
     <string name="contacts_remove_dialog_title">Xóa tên %1$s?</string>
-    <string name="contacts_remove_dialog_message">Tên liên&#160;lạc này sẽ bị xóa khỏi sổ của bạn.</string>
+    <string name="contacts_remove_dialog_message">Tên liên&#160;lạc này sẽ bị xóa khỏi sổ liên&#160;lạc của bạn.</string>
     <string name="send_contacts">Gửi tên liên&#160;lạc</string>
     <string name="contacts_groups_title">Nhóm</string>
     <string name="contacts_groups_create_error">Có lỗi phát&#160;sinh ra trong lúc tạo cuộc&#160;chat</string>
@@ -2422,9 +2422,9 @@
     <string name="add_contacts_phone_contacts_section_title">Danh bạ điện&#160;thoại</string>
     <string name="create_group_chat_settings_title">Nhóm mới</string>
     <string name="create_group_chat_name_hint">Điền tên nhóm</string>
-    <string name="create_group_chat_ekr_label">Luân phiên chìa khóa mã</string>
+    <string name="create_group_chat_ekr_label">Luân phiên chìa&#160;khóa mã</string>
     <string name="create_group_chat_get_chat_link_label">Lấy liên kết cuộc&#160;chat</string>
-    <string name="create_group_chat_allow_add_participants_label">Cho phép các thành viên không chủ trì mời thêm người</string>
+    <string name="create_group_chat_allow_add_participants_label">Cho phép các thành&#160;viên không chủ&#160;trì mời thêm người</string>
     <string name="subscription_revamp_current_plan_renews">Tự gia&#160;hạn vào %1$s</string>
     <string name="subscription_revamp_current_plan_expires">Hết hạn vào %1$s</string>
     <string name="subscription_revamp_current_plan_cycle_monthly">Hàng tháng</string>
@@ -2462,33 +2462,33 @@
     <string name="subscription_revamp_current_plan_cycle_yearly">Gói đăng&#160;ký hàng&#160;năm</string>
     <string name="document_scanner_prepare_error_permanent_message">Bạn vẫn có thể dùng bộ quét cũ.</string>
     <string name="subscription_revamp_save_label">Tiết kiệm lên tới 16%</string>
-    <string name="park_account_success_message">Tài&#160;khoản cũ của&#160;bạn đã được tạm đặt&#160;mới. Bây&#160;giờ, bạn có thể đăng&#160;nhập vào tài&#160;khoản mới của&#160;mình.</string>
-    <string name="meetings_add_participants_user_limit_warning">Cuộc gọi này giới hạn ở mức 100 người tham&#160;gia. Những người tham gia sau sẽ chỉ có thể gửi chat. Người tổ chức có thể nâng cấp lên gói Pro để gỡ bỏ giới&#160;hạn này.</string>
+    <string name="park_account_success_message">Tài&#160;khoản cũ của bạn đã&#160;được đặt mới. Bây&#160;giờ bạn có&#160;thể đăng&#160;nhập vào tài&#160;khoản mới này.</string>
+    <string name="meetings_add_participants_user_limit_warning">Cuộc&#160;gọi này giới&#160;hạn 100&#160;người tham&#160;gia. Những người vượt quá số đó chỉ&#160;có&#160;thể chat. Người tổ&#160;chức có&#160;thể nâng&#160;cấp lên Pro để xóa giới&#160;hạn này.</string>
     <string name="document_scanner_capture_button">Chụp</string>
-    <string name="share_link_set_password">Đặt mật khẩu</string>
-    <string name="document_scanner_auto_capture_label">Tự&#160;động</string>
+    <string name="share_link_set_password">Đặt mật&#160;khẩu</string>
+    <string name="document_scanner_auto_capture_label">Tự động</string>
     <string name="share_link_settings_title">Thiết đặt đường liên&#160;kết</string>
     <string name="share_link_set_expiry_date">Đặt ngày hết hạn</string>
-    <string name="share_link_expiry_subtitle">Vô&#160;hiệu đường liên&#160;kết vào một ngày cụ&#160;thể</string>
-    <string name="share_link_password_subtitle">Hạn&#160;chế truy&#160;cập bằng mật&#160;khẩu</string>
+    <string name="share_link_expiry_subtitle">Vô hiệu đường liên&#160;kết vào một ngày cụ&#160;thể</string>
+    <string name="share_link_password_subtitle">Hạn chế truy&#160;cập bằng mật&#160;khẩu</string>
     <string name="settings_sorting_and_view_mode_title">Kiểu xem và cách sắp&#160;xếp</string>
-    <string name="settings_sorting_preference_title">Tùy chỉnh việc sắp xếp</string>
-    <string name="settings_view_mode_preference_title">Tùy chỉnh chế độ xem</string>
-    <string name="settings_preference_option_per_folder">Riêng từng thư mục</string>
+    <string name="settings_sorting_preference_title">Tùy chỉnh việc sắp&#160;xếp</string>
+    <string name="settings_view_mode_preference_title">Tùy chỉnh chế&#160;độ xem</string>
+    <string name="settings_preference_option_per_folder">Riêng từng thư&#160;mục</string>
     <string name="settings_preference_option_all_folders">Giống nhau hết</string>
-    <string name="document_scanner_auto_capture_on">Tự động chụp: Bật</string>
-    <string name="document_scanner_auto_capture_off">Tự động chụp: Tắt</string>
-    <string name="settings_sorting_preference_description">Áp dụng sắp xếp theo từng thư mục, hoặc sử dụng cùng một cách sắp xếp cho tất cả các thư mục.</string>
-    <string name="settings_view_mode_preference_description">Áp dụng chế độ xem theo từng thư mục, hoặc sử dụng cùng một chế độ xem cho tất cả các thư mục.</string>
-    <string name="password_strength_very_weak">Quá đơn giản</string>
-    <string name="password_strength_weak">Mật khẩu yếu</string>
-    <string name="password_strength_medium">Thường</string>
-    <string name="password_strength_good">Được</string>
-    <string name="password_strength_strong">Mật khẩu mạnh</string>
-    <string name="password_placeholder">Nhập mật khẩu</string>
+    <string name="document_scanner_auto_capture_on">Tự&#160;động chụp: Bật</string>
+    <string name="document_scanner_auto_capture_off">Tự&#160;động chụp: Tắt</string>
+    <string name="settings_sorting_preference_description">Áp&#160;dụng kiểu sắp&#160;xếp theo từng thư&#160;mục, hoặc sử&#160;dụng một cách giống nhau hết cho tất&#160;cả thư&#160;mục.</string>
+    <string name="settings_view_mode_preference_description">Áp&#160;dụng chế độ xem theo từng thư&#160;mục, hoặc dùng một kiếu giống nhau hết cho tất&#160;cả các thư&#160;mục.</string>
+    <string name="password_strength_very_weak">Quá đơn&#160;giản</string>
+    <string name="password_strength_weak">Mật&#160;khẩu yếu</string>
+    <string name="password_strength_medium">Bình thường</string>
+    <string name="password_strength_good">Mật khẩu tốt</string>
+    <string name="password_strength_strong">Mật&#160;khẩu mạnh</string>
+    <string name="password_placeholder">Nhập mật&#160;khẩu</string>
     <string name="new_chat_title">Cuộc chat mới</string>
     <string name="contacts_qr_invitation_not_sent_dialog_title">Lời mời chưa được gửi đi</string>
-    <string name="contacts_qr_invalid_code_dialog_body">Mã QR hoặc đường liên&#160;kết tên liên&#160;lạc không hợp&#160;lệ. Xin thử quét mã khác hoặc mở đường liên&#160;kết phù&#160;hợp.</string>
+    <string name="contacts_qr_invalid_code_dialog_body">Mã&#160;QR hoặc liên&#160;kết liên&#160;lạc không hợp&#160;lệ. Hãy thử quét mã hợp&#160;lệ hoặc mở một liên&#160;kết hợp&#160;lệ.</string>
     <plurals name="subscription_revamp_current_plan_period_months">
         <item quantity="other">%1$d tháng</item>
     </plurals>
@@ -2498,26 +2498,26 @@
     <plurals name="subscription_revamp_current_plan_period_hours">
         <item quantity="other">%1$d giờ</item>
     </plurals>
-    <string name="file_info_information_owner_label">Chủ sở hữu</string>
+    <string name="file_info_information_owner_label">Chủ sở&#160;hữu</string>
     <string name="file_info_information_permissions_label">Quyền hạn</string>
-    <string name="file_info_information_no_location">Không có thông&#160;tin vị&#160;trí</string>
-    <string name="file_info_information_current_versions_label">Phiên bản hiện tại</string>
-    <string name="file_info_information_previous_versions_label">Các phiên bản trước</string>
-    <string name="file_info_information_shared_with_label">Được chia sẻ với</string>
-    <string name="subscription_quota_transfer_over_title">Vượt mức băng thông truyền tải</string>
+    <string name="file_info_information_no_location">Không có thông&#160;tin định&#160;vị</string>
+    <string name="file_info_information_current_versions_label">Phiên&#160;bản hiện&#160;tại</string>
+    <string name="file_info_information_previous_versions_label">Các phiên&#160;bản trước</string>
+    <string name="file_info_information_shared_with_label">Được chia&#160;sẻ với</string>
+    <string name="subscription_quota_transfer_over_title">Vượt mức băng&#160;thông truyền&#160;tải</string>
     <string name="file_type_name_video">Video</string>
     <string name="file_type_name_audio">Âm thanh</string>
-    <string name="contact_info_set_nickname">Đặt Tên</string>
-    <string name="contact_info_edit_nickname">Sửa biệt danh</string>
-    <string name="contact_info_verify_credentials">Xác thực chứng thực</string>
+    <string name="contact_info_set_nickname">Đặt biệt&#160;danh</string>
+    <string name="contact_info_edit_nickname">Sửa biệt&#160;danh</string>
+    <string name="contact_info_verify_credentials">Xác thực chứng&#160;thực</string>
     <string name="contact_info_credentials_verified">Đã xác thực</string>
-    <string name="contact_info_credentials_not_verified">Chưa có xác thực</string>
-    <string name="contact_info_share_contact">Chia sẻ tên liên lạc</string>
+    <string name="contact_info_credentials_not_verified">Chưa có xác&#160;thực</string>
+    <string name="contact_info_share_contact">Chia sẻ tên liên&#160;lạc</string>
     <string name="contact_info_chat_notifications">Âm báo chat</string>
     <string name="contact_info_notifications_muted">Tắt</string>
-    <string name="contact_info_shared_files">Chia sẻ tệp tin</string>
-    <string name="contact_info_manage_chat_history">Quản lý lịch sử chat</string>
-    <string name="contact_info_manage_chat_history_subtitle">Tự động xóa các tin nhắn đã có lâu hơn:</string>
+    <string name="contact_info_shared_files">Các tệp&#160;tin chia&#160;sẻ</string>
+    <string name="contact_info_manage_chat_history">Quản&#160;lý lịch&#160;sử chat</string>
+    <string name="contact_info_manage_chat_history_subtitle">Tự&#160;động xóa các tin&#160;nhắn đã có lâu hơn:</string>
     <string name="contact_info_retention_time_year">1 năm</string>
     <plurals name="contact_info_retention_time_months">
         <item quantity="other">%1$d tháng</item>
@@ -2531,18 +2531,18 @@
     <plurals name="contact_info_retention_time_hours">
         <item quantity="other">%1$d giờ</item>
     </plurals>
-    <string name="add_contacts_unverified_contact_warning">Một số tên liên lạc mà bạn đang chia sẻ thông tin chưa được bạn đã xác thực. Để đảm bảo an toàn hơn, chúng tôi khuyên bạn nên xác thực chứng chỉ đăng nhập của họ trong Sổ Liên Lạc. Nhấn vào ba dấu chấm bên cạnh tên liên lạc bạn muốn xác thực và nhấn vào Thông tin.</string>
+    <string name="add_contacts_unverified_contact_warning">Một&#160;số tên liên&#160;lạc mà bạn đang chia&#160;sẻ thông&#160;tin cùng chưa được bạn xác&#160;thực. Để đảm&#160;bảo an&#160;toàn hơn, chúng&#160;tôi khuyên bạn nên xác&#160;thực chứng&#160;chỉ đăng&#160;nhập của&#160;họ trong Sổ&#160;liên&#160;lạc. Nhấn vào ba dấu&#160;chấm bên cạnh tên liên&#160;lạc bạn muốn xác&#160;thực và nhấn vào Thông&#160;tin.</string>
     <string name="contacts_qr_scan_action">Quét mã QR</string>
-    <string name="share_link_access_password_description">Chỉ những người có mật khẩu mới có thể mở đường liên kết</string>
-    <string name="share_link_password_copied_snackbar">Mật khẩu đã được ghi vào bảng nhớ tạm</string>
+    <string name="share_link_access_password_description">Chỉ những người có mật&#160;khẩu mới có thể mở đường liên&#160;kết</string>
+    <string name="share_link_password_copied_snackbar">Mật khẩu đã được ghi vào bảng&#160;nhớ tạm</string>
     <string name="contact_info_nickname_dialog_set_button">Đặt</string>
-    <string name="contact_info_nickname_dialog_hint">Biêt danh</string>
-    <string name="contact_info_nickname_added">Đã thêm biệt danh</string>
-    <string name="contact_info_nickname_removed">Đã xóa biệt danh</string>
-    <string name="contact_info_mute_option_until_this_morning">Cho đến buổi sáng hôm nay</string>
-    <string name="contact_info_mute_option_until_tomorrow_morning">Cho đến buổi sáng ngày mai</string>
+    <string name="contact_info_nickname_dialog_hint">Biệt danh</string>
+    <string name="contact_info_nickname_added">Đã thêm biệt&#160;danh</string>
+    <string name="contact_info_nickname_removed">Đã xóa biệt&#160;danh</string>
+    <string name="contact_info_mute_option_until_this_morning">Cho đến buổi&#160;sáng hôm&#160;nay</string>
+    <string name="contact_info_mute_option_until_tomorrow_morning">Cho đến buổi&#160;sáng ngày&#160;mai</string>
     <string name="contact_info_mute_option_until_turned_back_on">Cho đến khi tôi bật lại</string>
-    <string name="contact_info_create_chat_error">Có lỗi phát&#160;sinh ra trong lúc tạo cuộc chat</string>
+    <string name="contact_info_create_chat_error">Có lỗi phát&#160;sinh trong lúc tạo cuộc chat</string>
     <plurals name="contact_info_mute_option_hours">
         <item quantity="other">%1$d giờ</item>
     </plurals>
@@ -2556,27 +2556,286 @@
     <string name="video_editor_pause_button">Tạm dừng</string>
     <string name="video_editor_muted_badge">Đã tắt tiếng</string>
     <string name="video_editor_discard_cancel_button">Tiếp tục chỉnh sửa</string>
-    <string name="share_link_upgrade_pro_dialog_title">Nâng cấp lên Pro</string>
-    <string name="share_link_upgrade_pro_dialog_message">Hạng MEGA Pro có truy cập độc quyền vào các tính năng an toàn bổ sung cho liên kết, giúp tài khoản được an toàn hơn nữa.</string>
-    <string name="share_link_upgrade_pro_dialog_see_plans">Xem các gói thuê bao</string>
+    <string name="share_link_upgrade_pro_dialog_title">Nâng&#160;cấp lên Pro</string>
+    <string name="share_link_upgrade_pro_dialog_message">Người&#160;dùng MEGA&#160;Pro có quyền truy&#160;cập độc&#160;quyền vào các tính&#160;năng an&#160;toàn đường liên&#160;kết bổ&#160;sung, giúp tài&#160;khoản càng được bảo&#160;mật hơn.</string>
+    <string name="share_link_upgrade_pro_dialog_see_plans">Xem các gói đăng&#160;ký</string>
     <string name="share_link_upgrade_pro_dialog_not_now">Không&#160;phải lúc&#160;này</string>
-    <string name="contact_info_send_file">Gửi tệp tin vào cuộc chat</string>
-    <string name="contact_info_microphone_permission_message">Cho phép ứng dụng sử dụng micrô của điện&#160;thoại để thực hiện cuộc gọi khi bạn yêu&#160;cầu.</string>
-    <string name="settings_customise_navigation_start_screen">Màn hình khởi đầu</string>
+    <string name="contact_info_send_file">Gửi tệp&#160;tin vào cuộc chat</string>
+    <string name="contact_info_microphone_permission_message">Cho phép ứng&#160;dụng sử&#160;dụng micrô của điện&#160;thoại để thực&#160;hiện cuộc gọi khi bạn cần.</string>
+    <string name="settings_customise_navigation_start_screen">Màn hình khởi&#160;đầu</string>
     <string name="tab_received_requests">Yêu cầu đã nhận</string>
-    <string name="tab_sent_requests">Yêu cầu gửi đi</string>
+    <string name="tab_sent_requests">Yêu cầu đã gửi đi</string>
     <string name="received_requests_empty">[B]Không có [/B][A]yêu cầu được nhận nào[/A]</string>
     <string name="sent_requests_empty">[B]Không có [/B][A]yêu cầu gửi đi nào[/A]</string>
     <string name="contact_accept">Chấp nhận</string>
     <string name="contact_ignore">Bỏ qua</string>
     <string name="contact_decline">Từ chối</string>
     <string name="contact_reinvite">Mời lại</string>
-    <string name="invite_contacts_my_qr_code_action">Mã QR của TK</string>
-    <string name="invite_contacts_own_email_error">Không cần phải nhập chính e-mail của mình vào sổ liên lạc</string>
-    <string name="invite_contacts_open_camera_confirmation_title">Bật máy ảnh?</string>
-    <string name="invite_contacts_open_camera_confirmation_message">Nếu bạn bật camêra, cuộc gọi video hiện tại sẽ bị gián đoạn.</string>
+    <string name="invite_contacts_my_qr_code_action">Mã QR của tôi</string>
+    <string name="invite_contacts_own_email_error">Không cần phải nhập chính email của&#160;mình vào sổ liên&#160;lạc</string>
+    <string name="invite_contacts_open_camera_confirmation_title">Bật camêra?</string>
+    <string name="invite_contacts_open_camera_confirmation_message">Nếu bạn bật camêra, cuộc gọi video hiện tại sẽ bị gián&#160;đoạn.</string>
     <string name="invite_contacts_open_camera_confirmation_confirm">Mở</string>
     <plurals name="general_selection_num_contacts">
-        <item quantity="other">%1$d tên liên lạc</item>
+        <item quantity="other">%1$d tên liên&#160;lạc</item>
+    </plurals>
+    <string name="settings_customise_navigation_state_custom">Tùy chỉnh</string>
+    <string name="chat_last_message_no_history">Không có lịch&#160;sử trò&#160;chuyện</string>
+    <string name="chat_last_message_sender_me">Tôi</string>
+    <string name="chat_last_message_sender_unknown">Tên không xác&#160;định được</string>
+    <string name="subscription_offer_no_connection_description">Kiểm tra kết&#160;nối mạng rồi thử&#160;lại</string>
+    <string name="subscription_quota_transfer_low_download_subtitle">Do đó, phiên tải&#160;xuống của&#160;bạn có&#160;thể sẽ bị gián&#160;đoạn. Nâng&#160;cấp gói để nhận được nhiều băng&#160;thông truyền&#160;tải hơn.</string>
+    <string name="subscription_quota_transfer_low_streaming_subtitle">Do đó, truyền phát phương&#160;tiện số có&#160;thể sẽ bị gián&#160;đoạn. Nâng&#160;cấp gói để có thêm nhiều băng&#160;thông truyền&#160;tải hơn.</string>
+    <string name="subscription_quota_transfer_low_download_highest_plan_subtitle">Do đó, phiên tải&#160;xuống của&#160;bạn có&#160;thể sẽ bị gián&#160;đoạn. Quản&#160;lý gói đăng&#160;ký tại [A]mega.io[/A] để có thêm nhiều băng&#160;thông hơn</string>
+    <string name="subscription_quota_transfer_low_streaming_highest_plan_subtitle">Do đó, truyền phát phương&#160;tiện số có&#160;thể sẽ bị gián&#160;đoạn. Quản&#160;lý gói đăng&#160;ký tại [A]mega.io[/A] để có thêm nhiều băng&#160;thông hơn</string>
+    <plurals name="subscription_offer_billed_monthly_years">
+        <item quantity="other">Thu phí với giá là %2$s cho %1$d năm đầu&#160;tiên, sau đó giá là %3$s</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_monthly_months">
+        <item quantity="other">Thu phí với giá là %2$s cho %1$d tháng đầu&#160;tiên, sau đó giá là %3$s</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_yearly_years">
+        <item quantity="other">Thu phí với giá là %2$s cho %1$d năm đầu&#160;tiên, sau đó sẽ&#160;thu %3$s mỗi năm</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_yearly_months">
+        <item quantity="other">Thu phí với giá là %2$s cho %1$d tháng đầu&#160;tiên, sau đó sẽ&#160;thu %3$s mỗi năm</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_minutes">
+        <item quantity="other">Phút</item>
+    </plurals>
+    <string name="general_pro_label">Mua Pro</string>
+    <string name="file_info_information_map_label">Bản đồ</string>
+    <string name="file_type_name_url">URL</string>
+    <string name="file_type_name_text">Văn bản</string>
+    <string name="file_type_name_font">Phông chữ</string>
+    <string name="video_editor_tool_trim">Cắt bớt</string>
+    <string name="video_editor_rotate_left">Trái</string>
+    <string name="file_type_name_image">Hình</string>
+    <string name="video_editor_rotate_right">Phải</string>
+    <string name="document_scanner_review_retake_page">Quét lại</string>
+    <string name="file_type_name_vector">Vectơ</string>
+    <string name="video_editor_tool_volume">Âm lượng</string>
+    <string name="file_type_name_three_d">Dạng 3D</string>
+    <string name="settings_customise_navigation_state_default">Mặc định</string>
+    <string name="subscription_revamp_current_plan_expiring_badge">Sắp hết hạn</string>
+    <string name="file_type_name_xd">Adobe XD</string>
+    <string name="file_type_name_cad">Tệp CAD</string>
+    <string name="file_type_name_web">Tệp Web</string>
+    <string name="search_tags_show_all">Hiện tất&#160;cả</string>
+    <plurals name="subscription_offer_countdown_days">
+        <item quantity="other">Ngày</item>
+    </plurals>
+    <string name="home_do_more_with_mega_see_album_action">Xem album</string>
+    <string name="subscription_revamp_price_per_year">%1$s/năm</string>
+    <string name="subscription_quota_current_plan_transfer_usage">Đã dùng %1$s</string>
+    <string name="file_type_name_mp3_audio">Âm thanh MP3</string>
+    <string name="file_type_name_png_image">Hình PNG</string>
+    <string name="file_type_name_gif_image">Hình GIF</string>
+    <string name="file_type_name_raw">Ảnh RAW</string>
+    <string name="file_type_name_generic">Tệp %1$s</string>
+    <string name="file_type_name_avi_video">AVI video</string>
+    <string name="file_type_name_mkv_video">MKV video</string>
+    <string name="file_type_name_wav_audio">Âm thanh WAV</string>
+    <string name="file_type_name_m4a_audio">Âm thanh M4U</string>
+    <string name="video_editor_save_copy_button">Lưu bản&#160;sao</string>
+    <string name="video_editor_encoding_label">Đang mã&#160;hóa&#8230;</string>
+    <string name="search_tags_show_less">Ẩn bớt</string>
+    <string name="create_group_chat_image_take_photo">Chụp ảnh</string>
+    <string name="file_type_name_compressed">Dạng nén</string>
+    <string name="file_type_name_jpeg_image">Hình JPEG</string>
+    <string name="file_type_name_heic_image">Ảnh HEIC</string>
+    <string name="file_type_name_webp_image">Hình WebP</string>
+    <string name="video_editor_screen_title">Sửa video</string>
+    <string name="document_scanner_review_title">Xem lại bản quét</string>
+    <string name="document_scanner_review_delete_page">Xóa trang</string>
+    <plurals name="subscription_offer_countdown_hours">
+        <item quantity="other">Giờ</item>
+    </plurals>
+    <string name="video_editor_saving_dialog_title">Đang lưu lại bản&#160;sao</string>
+    <string name="file_type_name_mpeg4_video">MPEG4 video</string>
+    <string name="file_type_name_pdf_document">Tài liệu PDF</string>
+    <string name="subscription_offer_special_offer_badge">Ưu&#160;đãi đặc&#160;biệt</string>
+    <string name="file_type_name_word">Tài liệu Word</string>
+    <string name="file_type_name_indesign">Adobe InDesign</string>
+    <string name="file_type_name_rar_compressed">Dạng nén RAR</string>
+    <string name="file_type_name_quicktime_video">QuickTime video</string>
+    <string name="file_type_name_7zip_compressed">Dạng nén 7-Zip</string>
+    <string name="file_type_name_zip_compressed">Dạng nén ZIP</string>
+    <string name="file_type_name_premiere">Adobe Premiere</string>
+    <string name="subscription_quota_upgrade_button">Nâng&#160;cấp lên %1$s</string>
+    <string name="file_type_name_photoshop">Adobe Photoshop</string>
+    <string name="video_editor_preparing_dialog_title">Đang chuẩn&#160;bị video</string>
+    <string name="video_editor_tooltip_title">Chỉnh sửa video</string>
+    <string name="subscription_offer_countdown_valid_until">có hiệu&#160;lực cho đến %1$s</string>
+    <string name="subscription_quota_no_connection_title">Đã không thể kết&#160;nối</string>
+    <string name="settings_customise_navigation_items_counter">%1$d trong tổng %2$d</string>
+    <string name="sync_list_sync_state_paused_no_wifi">Tạm dừng, không có Wi-Fi</string>
+    <string name="subscription_offer_get_plan_button">Nhận gói&#160;%1$s với giá %2$s</string>
+    <string name="add_contacts_manual_email_add_action">Thêm địa&#160;chỉ email</string>
+    <string name="file_type_name_illustrator">Adobe Illustrator</string>
+    <string name="add_contacts_manual_email_placeholder">Nhập địa&#160;chỉ email</string>
+    <string name="file_type_name_openoffice">Tài liệu OpenOffice</string>
+    <string name="file_type_name_aftereffects">Adobe After Effects</string>
+    <string name="home_offer_banner_subtitle">%1$s/tháng cho gói %2$s</string>
+    <string name="video_editor_export_failed_message">Đã không thể lưu lại video</string>
+    <string name="sync_list_sync_state_paused_low_battery">Tạm dừng, do pin yếu</string>
+    <string name="home_do_more_with_mega_album_created_message">Album “%1$s” đã được tạo</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_title">Máy quét QR chưa chuẩn&#160;bị xong</string>
+    <string name="settings_customise_navigation_title">Tùy chỉnh khay điều&#160;hướng</string>
+    <plurals name="general_share_link_count_title">
+        <item quantity="other">%1$d liên kết</item>
+    </plurals>
+    <string name="home_offer_banner_title">%1$s ·&#160;Nhận giảm giá %2$d%%</string>
+    <string name="campaign_name_with_discount_up_to">%1$s: Nhận giảm giá %2$d%%</string>
+    <string name="settings_customise_navigation_available_to_add">Thêm vào khay điều&#160;hướng</string>
+    <plurals name="file_info_information_num_contacts">
+        <item quantity="other">%d tên liên&#160;lạc</item>
+    </plurals>
+    <plurals name="file_info_information_num_versions">
+        <item quantity="other">%d phiên bản</item>
+    </plurals>
+    <string name="sync_list_sync_state_paused_battery_saver">Tạm dừng, do bật tiết&#160;kiệm pin</string>
+    <plurals name="subscription_revamp_current_plan_period_minutes">
+        <item quantity="other">%1$d phút</item>
+    </plurals>
+    <plurals name="video_player_seek_seconds">
+        <item quantity="other">%1$d giây</item>
+    </plurals>
+    <string name="home_offer_banner_button">Nhận ưu&#160;đãi</string>
+    <string name="audio_player_music_mode_label">Chế&#160;độ âm&#160;nhạc</string>
+    <string name="file_type_name_executable">Tệp thực thi</string>
+    <string name="file_type_name_disk_image">Ảnh tượng đĩa</string>
+    <string name="create_group_chat_image_content_description">Nhóm hình ảnh</string>
+    <string name="audio_player_podcast_mode_label">Chế độ đài tiếng&#160;nói</string>
+    <string name="share_link_expired">Đường liên&#160;kết đã hết hạn</string>
+    <string name="file_info_information_outgoing_share">Mục chia&#160;sẻ gửi đi</string>
+    <string name="file_info_information_incoming_share">Mục chia&#160;sẻ nhận được</string>
+    <string name="file_type_name_pages">Tài liệu Pages</string>
+    <string name="audio_player_playback_speed_title">Tốc&#160;độ phát</string>
+    <string name="audio_player_sleep_timer_turn_off">Hẹn giờ tắt</string>
+    <string name="audio_player_sleep_timer_countdown_label">Hẹn tắt đi ngủ %s</string>
+    <string name="contact_info_remove_contact_dialog_title">Xóa tên liên&#160;lạc?</string>
+    <string name="contact_info_notifications_muted_until">Tắt tiếng cho đến %1$s</string>
+    <string name="share_link_password_protected_label">Được bảo&#160;vệ với mật&#160;khẩu</string>
+    <string name="document_scanner_review_empty">Chưa có trang nào đã quét</string>
+    <string name="share_link_expires_on">Đường liên&#160;kết hết hạn vào %1$s</string>
+    <string name="audio_player_sleep_timer_active_title">Hẹn giờ tắt - còn %s</string>
+    <string name="contact_info_mute_notifications_dialog_title">Im&#160;lặng âm&#160;thanh thông&#160;báo chat</string>
+    <string name="invite_contacts_share_link_action">Mời bằng đường liên&#160;kết</string>
+    <string name="invite_contacts_manual_input_placeholder">Nhập email hoặc số điện&#160;thoại</string>
+    <string name="invite_contacts_already_contact_error">Địa&#160;chỉ email này đã có trong một tên liên&#160;lạc</string>
+    <string name="invite_contacts_invalid_input_error">Nhập địa&#160;chỉ email hoặc số điện&#160;thoại hợp&#160;lệ</string>
+    <string name="invite_contacts_pending_error">Một lời&#160;mời đã được gửi đến địa&#160;chỉ email này</string>
+    <plurals name="file_info_information_num_versioned_files">
+        <item quantity="other">%d tệp có phiên&#160;bản</item>
+    </plurals>
+    <string name="subscription_quota_transfer_percentage_used_title">Bạn đã dùng %1$d%% mức băng&#160;thông truyền&#160;tải</string>
+    <string name="subscription_quota_storage_over_upload_subtitle">Sắp hết không&#160;gian lưu&#160;trữ. Xin nâng&#160;cấp gói để tiếp&#160;tục tải&#160;lên</string>
+    <plurals name="subscription_offer_discount_period_year">
+        <item quantity="other">Giá ưu&#160;đãi cho %1$d năm đầu&#160;tiên</item>
+    </plurals>
+    <plurals name="subscription_offer_discount_period_month">
+        <item quantity="other">Giá ưu&#160;đãi cho tháng %1$d đầu&#160;tiên</item>
+    </plurals>
+    <string name="subscription_quota_transfer_over_streaming_subtitle">Để tiếp&#160;tục phát phương&#160;tiện, hãy nâng&#160;cấp gói để có thêm lượng truyền&#160;tải.</string>
+    <string name="subscription_quota_transfer_over_streaming_highest_plan_subtitle">Để tiếp&#160;tục phát nội&#160;dung đa phương&#160;tiện, xin hãy quản&#160;lý gói tại [A]mega.io[/A] để có thêm lượng truyền&#160;tải</string>
+    <string name="subscription_quota_transfer_over_download_subtitle">Để tiếp&#160;tục tải&#160;xuống, xin hãy nâng&#160;cấp gói để có thêm lượng truyền&#160;tải.</string>
+    <string name="subscription_quota_transfer_over_download_highest_plan_subtitle">Để tiếp&#160;tục tải&#160;xuống, xin hãy nâng&#160;cấp gói tại [A]mega.io[/A] để có thêm lượng truyền&#160;tải</string>
+    <string name="contact_info_remove_contact_dialog_message">Tất cả dữ&#160;liệu liên&#160;quan đến tên liên&#160;lạc đã chọn sẽ bị mất vĩnh&#160;viễn.</string>
+    <plurals name="share_link_access_banner_description_with_key">
+        <item quantity="other">Bất&#160;kỳ ai có đường liên&#160;kết và chìa&#160;khóa này đều có thể xem và tải&#160;xuống dữ&#160;liệu của&#160;bạn</item>
+    </plurals>
+    <string name="settings_sync_battery_usage_title">Lượng dùng pin</string>
+    <string name="subscription_quota_best_for_you">Phù&#160;hợp nhất với bạn</string>
+    <string name="video_editor_volume_boost_warning">Tỷ&#160;lệ tăng hiệu&#160;suất hơn 100% chỉ áp&#160;dụng cho xuất video.</string>
+    <string name="subscription_quota_no_connection_description">Vui lòng kiểm&#160;tra thông&#160;tin lưu&#160;trữ và truyền&#160;tải sau, hoặc thử lại</string>
+    <string name="settings_customise_navigation_tooltip_body">Chọn các mục sẽ hiển&#160;thị trong khay điều&#160;hướng</string>
+    <string name="subscription_quota_contact_support">Liên&#160;Hệ Hỗ&#160;Trợ</string>
+    <string name="settings_customise_navigation_subtitle">Kéo để sắp&#160;xếp lại các mục</string>
+    <string name="add_contacts_manual_email_already_added_error">Địa&#160;chỉ email đã được thêm</string>
+    <string name="create_group_chat_link_requires_name_error">Nhập tên nhóm để nhận đường liên&#160;kết chat</string>
+    <string name="file_type_name_excel">Bảng tính Excel</string>
+    <string name="video_editor_load_failed_message">Không tải được video</string>
+    <string name="video_editor_discard_changes_description">Nếu bạn thoát khỏi trang này ngay bây&#160;giờ, các chỉnh&#160;sửa chưa lưu sẽ bị mất.</string>
+    <string name="file_type_name_keynote">Thuyết trình Keynote</string>
+    <string name="subscription_quota_storage_highest_plan_subtitle">Giải&#160;phóng lưu&#160;trữ trên Ổ&#160;Mây hoặc quản&#160;lý gói dịch&#160;vụ tại [A]mega.io[/A] để có thêm&#160;không gian lưu&#160;trữ</string>
+    <string name="settings_customise_navigation_max_items_snackbar">Đã đạt giới&#160;hạn tối&#160;đa %1$d mục. Hãy xóa một mục để thêm mục khác.</string>
+    <string name="settings_customise_navigation_min_items_snackbar">Yêu&#160;cầu tối&#160;thiểu %1$d mục</string>
+    <string name="settings_sync_and_backup_title">Đồng&#160;bộ và sao&#160;lưu</string>
+    <string name="settings_customise_navigation_your_navigation">Khay điều&#160;hướng của bạn</string>
+    <string name="create_group_chat_image_choose_from_gallery">Chọn từ kho ảnh</string>
+    <string name="file_type_name_numbers">Trang tính Numbers</string>
+    <string name="settings_sync_battery_pause_on_battery_saver_title">Tạm dừng khi bật tiết&#160;kiệm pin</string>
+    <string name="file_type_name_powerpoint">Trình chiếu PowerPoint</string>
+    <string name="share_link_password_dialog_title">Chia&#160;sẻ mật&#160;khẩu của đường liên&#160;kết</string>
+    <string name="file_type_name_spreadsheet">Trang tính</string>
+    <string name="video_player_large_cluster_seek_warning">Việc tua nhanh trong video này có thể chậm</string>
+    <string name="share_link_separate_key_title">Đường liên&#160;kết và chìa&#160;khóa riêng&#160;biệt</string>
+    <string name="settings_sync_battery_usage_description">Quá&#160;trình đồng&#160;bộ hóa và sao&#160;lưu sẽ tạm&#160;dừng khi pin còn dưới 20% và không được sạc.</string>
+    <string name="deep_link_content_unavailable_dialog_message">Nội&#160;dung bạn đang cố gắng truy&#160;cập không còn khả&#160;dụng cho tài&#160;khoản này.</string>
+    <string name="share_link_separate_key_subtitle">Đường liên&#160;kết này sẽ không bao&#160;gồm chìa&#160;khóa giải&#160;mã. Hãy chia&#160;sẻ chìa&#160;khóa thông qua một kênh khác để tăng&#160;cường bảo&#160;mật.</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_body">Ứng&#160;dụng quét mã QR vẫn đang tải xuống. Vui lòng thử lại sau vài giây.</string>
+    <string name="subscription_offer_expired_dialog_description">Ưu&#160;đãi này hiện không còn hiệu&#160;lực. Vui lòng xem các gói hiện&#160;tại của chúng&#160;tôi để tìm gói phù&#160;hợp cho mình.</string>
+    <string name="subscription_offer_expired_dialog_title">Ưu&#160;đãi này đã kết&#160;thúc</string>
+    <string name="video_editor_tooltip_description">Cắt xén, xoay hoặc điều&#160;chỉnh tốc&#160;độ và âm&#160;lượng.</string>
+    <string name="chat_list_search_no_results_description">Hãy thử một cụm từ tìm&#160;kiếm khác</string>
+    <string name="transfers_over_quota_notification_message">Nâng cấp để tiếp&#160;tục truyền, hoặc chờ đến khi hạn mức băng&#160;thông được nạp lại.</string>
+    <string name="subscription_revamp_current_plan_upgrade_on_web">Xin nâng&#160;cấp gói đăng&#160;ký hiện&#160;tại trên trang [A]giá cả[/A] của chúng&#160;tôi</string>
+    <string name="subscription_quota_storage_almost_full_title">Không&#160;gian lưu&#160;trữ đã đầy %1$d%%</string>
+    <string name="contacts_qr_already_contact_dialog_body">Lời&#160;mời chưa được gửi. %1$s đã&#160;có trong danh&#160;sách tên liên&#160;lạc của&#160;bạn.</string>
+    <string name="add_tags_placeholder_label">#Gắn thẻ</string>
+    <string name="file_info_information_type_folder">Thư mục</string>
+    <string name="subscription_quota_current_plan_storage_usage">Đã dùng %1$s trong tổng %2$s</string>
+    <string name="subscription_quota_recommended_storage_usage">Đã dùng %1$s trong tổng %2$s</string>
+    <string name="subscription_quota_recommended_transfer_usage">Đã dùng %1$s trong tổng %2$s</string>
+    <string name="subscription_quota_charged_yearly">Thu phí %1$s hằng năm</string>
+    <string name="subscription_quota_view_all_plans">Xem tất cả các gói</string>
+    <string name="subscription_quota_current_plan_transfer_usage_with_total">Đã dùng %1$s trong tổng %2$s</string>
+    <plurals name="contact_info_mute_option_minutes">
+        <item quantity="other">%1$d phút</item>
+    </plurals>
+    <string name="subscription_offer_expired_dialog_button">Xem các gói</string>
+    <string name="subscription_quota_storage_almost_full_subtitle">Nâng&#160;cấp gói của mình trước khi hết không&#160;gian</string>
+    <string name="subscription_quota_storage_over_subtitle">Nâng cấp gói để có thêm dung lượng lưu trữ và tải lên nhiều tệp hơn</string>
+    <string name="subscription_quota_transfer_low_title">Băng&#160;thông truyền&#160;tải sắp cạn&#160;kiệt</string>
+    <string name="file_type_name_torrent">Tệp Torrent</string>
+    <string name="file_info_taken_down_file_warning">Tệp&#160;tin này đã bị gỡ bỏ theo chính&#160;sách gỡ bỏ nội&#160;dung của chúng&#160;tôi.</string>
+    <string name="file_info_taken_down_folder_warning">Tệp này đã bị gỡ bỏ theo chính&#160;sách gỡ bỏ nội&#160;dung của chúng&#160;tôi.</string>
+    <string name="file_info_taken_down_action">Chính&#160;Sách Xử&#160;Lý Gỡ&#160;Bỏ Nội&#160;Dung</string>
+    <string name="share_link_password_dialog_message">Bạn có muốn chia sẻ mật khẩu cho đường liên kết này không?</string>
+    <string name="subscription_quota_no_connection_retry_button">Thử lại</string>
+    <string name="video_editor_tool_crop">Xén</string>
+    <string name="video_editor_tool_rotate">Xoay</string>
+    <string name="video_editor_tool_speed">Tốc độ</string>
+    <string name="video_editor_rotate_flip">Lật</string>
+    <string name="video_editor_apply_button">Áp dụng</string>
+    <string name="audio_player_sleep_timer_title">Hẹn giờ tắt</string>
+    <string name="audio_player_sleep_timer_end_of_track">Cuối bài nhạc</string>
+    <plurals name="audio_player_sleep_timer_minutes">
+        <item quantity="other">%1$d phút</item>
+    </plurals>
+    <string name="settings_customise_navigation_tooltip_action">Khám phá</string>
+    <string name="chat_list_search_no_results_title">Không có kết&#160;quả</string>
+    <string name="general_mute">Tắt tiếng</string>
+    <string name="general_unmute">Bỏ tắt tiếng</string>
+    <string name="general_archive">Bảo lưu</string>
+    <string name="general_unarchive">Bỏ bảo lưu</string>
+    <string name="title_properties_chat_clear">Xóa lịch&#160;sử chat</string>
+    <string name="confirmation_clear_chat_history">Bạn có chắc muốn don toàn&#160;bộ lịch&#160;sử các tin&#160;nhắn của cuộc trò&#160;chuyện này không?</string>
+    <string name="title_confirmation_leave_group_chat">Rời khỏi nhóm chat?</string>
+    <string name="confirmation_leave_group_chat">Nếu rời khỏi cuộc chat, bạn sẽ không còn quyền truy&#160;cập vào nhóm để xem và gửi tin&#160;nhắn.</string>
+    <string name="audio_player_continuous_playback_title">Phát phương&#160;tiện liên&#160;tục</string>
+    <string name="audio_player_continuous_playback_description">Tự&#160;động phát tệp tiếp&#160;theo trong xếp hàng</string>
+    <string name="audio_player_playing_from_label">Đang phát từ [A]%s[/A]</string>
+    <string name="password_strength_moderate">Mật&#160;khẩu tạm được</string>
+    <string name="share_link_key_copied_snackbar">Chìa&#160;khóa đã ghi vào bảng&#160;nhớ tạm</string>
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="other">Đường liên&#160;kết đã được ghi vào bảng&#160;nhớ tạm</item>
+    </plurals>
+    <string name="share_link_updated_and_copied_snackbar">Đường liên&#160;kết đã&#160;được cập&#160;nhật và lưu vào bảng&#160;nhớ tạm</string>
+    <string name="video_player_zoom_fit_to_screen">Vừa khít màn&#160;hình</string>
+    <string name="media_timeline_sort_option_date_added">Ngày đã thêm</string>
+    <plurals name="remove_link_dialog_title">
+        <item quantity="other">Loại bỏ các đường liên kết?</item>
     </plurals>
 </resources>

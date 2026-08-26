@@ -47,7 +47,7 @@
     <!-- Sync dialog not now button -->
     <string name="sync_dialog_file_permission_negative_button">Şimdi değil</string>
     <!-- Sync dialog title for battery optimization -->
-    <string name="sync_dialog_battery_optimization_title">Şarj optimizasyonu</string>
+    <string name="sync_dialog_battery_optimization_title">Pil optimizasyonu</string>
     <!-- Sync dialog cancel button text -->
     <string name="sync_dialog_battery_optimization_negative_button">İzin verme</string>
     <!-- Sync dialog allow button text -->

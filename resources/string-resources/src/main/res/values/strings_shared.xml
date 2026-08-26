@@ -1621,16 +1621,6 @@
     <string name="public_link_node_removal_error_message">Link removal failed, try again later</string>
     <!-- Warning that appears prior to remove links of files-->
     <string name="remove_links_warning_message">Removing a link means its contents won’t be publicly accessible anymore</string>
-    <!-- Title of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
-    <plurals name="remove_link_dialog_title">
-        <item quantity="one">Remove link?</item>
-        <item quantity="other">Remove links?</item>
-    </plurals>
-    <!-- Explanation text of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
-    <plurals name="remove_link_dialog_description">
-        <item quantity="one">People you have shared this link with will no longer be able to access it.</item>
-        <item quantity="other">People you have shared these links with will no longer be able to access them.</item>
-    </plurals>
     <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="stop_sharing_folder_success_message">Folder sharing stopped</string>
     <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1749,12 +1739,14 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
+    is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
+    is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1791,9 +1783,11 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -3833,8 +3827,20 @@
     </plurals>
     <!-- Error shown below a password field when the password entered is too weak to be accepted, so it cannot be saved. For example, the password protecting a share link. -->
     <string name="password_too_weak_error_message">Please use a stronger password.</string>
+    <!-- Snackbar shown when an action needs the internet but the device is offline, so it was not attempted. For example, creating a share link or saving a link expiry date. -->
+    <string name="check_internet_connection_error">No internet connection. Check your connection and try again</string>
     <!-- Media timeline sort option for the bottom sheet to sort by "Date added" -->
     <string name="media_timeline_sort_option_date_added">Date added</string>
-    <!-- Media timeline sort option for the bottom sheet to sort by "Date taken" -->
-    <string name="media_timeline_sort_option_date_taken">Date taken</string>
+    <!-- Media timeline sort option for the bottom sheet to sort by "Date captured" -->
+    <string name="media_timeline_sort_option_date_taken">Date captured</string>
+    <!-- Title of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
+    <plurals name="remove_link_dialog_title">
+        <item quantity="one">Remove link?</item>
+        <item quantity="other">Remove links?</item>
+    </plurals>
+    <!-- Explanation text of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
+    <plurals name="remove_link_dialog_description">
+        <item quantity="one">Anyone with this link will no longer be able to access the file or folder</item>
+        <item quantity="other">Anyone with these links will no longer be able to access the files or folders</item>
+    </plurals>
 </resources>

@@ -3028,4 +3028,60 @@
         <item quantity="many">%1$d de contactos</item>
         <item quantity="other">%1$d contactos</item>
     </plurals>
+    <string name="settings_customise_navigation_tooltip_action">Explorar</string>
+    <string name="settings_customise_navigation_state_custom">Personalizar</string>
+    <string name="settings_customise_navigation_state_default">Predeterminado</string>
+    <string name="invite_contacts_share_link_action">Invitar mediante enlace</string>
+    <string name="invite_contacts_manual_input_placeholder">Introducir el correo electrónico o el número de teléfono</string>
+    <string name="invite_contacts_already_contact_error">Esta dirección de correo electrónico ya es un contacto</string>
+    <string name="invite_contacts_pending_error">Ya se ha enviado una invitación a esta dirección de correo electrónico</string>
+    <string name="invite_contacts_invalid_input_error">Introduce una dirección de correo electrónico válida o un número de teléfono</string>
+    <string name="settings_customise_navigation_tooltip_body">Elige qué elementos aparecen en tu menú de navegación</string>
+    <plurals name="video_player_seek_seconds">
+        <item quantity="one">%1$d segundo</item>
+        <item quantity="many">%1$d de segundos</item>
+        <item quantity="other">%1$d segundos</item>
+    </plurals>
+    <string name="settings_sync_battery_usage_title">Consumo de batería</string>
+    <string name="settings_sync_battery_usage_description">Sincronización y backup se pausan por debajo del 20% de batería si no se está cargando.</string>
+    <string name="settings_sync_battery_pause_on_battery_saver_title">Pausar cuando el ahorro de batería esté activado</string>
+    <string name="chat_list_search_no_results_title">No hay resultados</string>
+    <string name="chat_list_search_no_results_description">Prueba con otro término de búsqueda</string>
+    <string name="transfers_over_quota_notification_message">Amplía para reanudar las transferencias, o espera a que se restablezca tu cuota de transferencia.</string>
+    <string name="settings_sync_and_backup_title">Sincronizaciones y backups</string>
+    <string name="sync_list_sync_state_paused_battery_saver">En pausa, ahorro de batería activado</string>
+    <string name="sync_list_sync_state_paused_low_battery">En pausa, batería baja</string>
+    <string name="sync_list_sync_state_paused_no_wifi">En pausa, no hay Wi-Fi</string>
+    <string name="chat_last_message_sender_me">Yo</string>
+    <string name="chat_last_message_no_history">No hay historial</string>
+    <string name="chat_last_message_sender_unknown">Nombre desconocido</string>
+    <string name="general_unarchive">Restaurar</string>
+    <string name="general_archive">Archivar</string>
+    <string name="title_properties_chat_clear">Limpiar historial del chat</string>
+    <string name="general_unmute">Activar sonido</string>
+    <string name="title_confirmation_leave_group_chat">¿Abandonar el chat de grupo?</string>
+    <string name="confirmation_leave_group_chat">Si sales, ya no podrás leer o enviar mensajes.</string>
+    <string name="confirmation_clear_chat_history">¿Confirmas que quieres limpiar el historial de mensajes de esta conversación?</string>
+    <string name="general_mute">Silenciar</string>
+    <string name="audio_player_continuous_playback_title">Reproducción continua</string>
+    <string name="audio_player_continuous_playback_description">Reproduce automáticamente el siguiente archivo en la cola</string>
+    <string name="audio_player_playing_from_label">Reproduciendo desde [A]%s[/A]</string>
+    <string name="password_strength_moderate">Contraseña intermedia</string>
+    <string name="video_player_zoom_fit_to_screen">Ajustar a la pantalla</string>
+    <string name="check_internet_connection_error">No hay conexión a Internet. Comprueba la conexión y vuelve a intentarlo</string>
+    <string name="video_player_zoom_fill_screen">Rellenar pantalla</string>
+    <string name="share_link_updated_and_copied_snackbar">Enlace actualizado y copiado al portapapeles</string>
+    <string name="share_link_key_copied_snackbar">Clave copiada al portapapeles</string>
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="one">Enlace copiado al portapapeles</item>
+        <item quantity="many">Enlaces copiados al portapapeles</item>
+        <item quantity="other">Enlaces copiados al portapapeles</item>
+    </plurals>
+    <string name="password_too_weak_error_message">Usa una contraseña más segura.</string>
+    <string name="media_timeline_sort_option_date_added">Fecha de inclusión</string>
+    <plurals name="remove_link_dialog_title">
+        <item quantity="one">¿Eliminar enlace?</item>
+        <item quantity="many">¿Eliminar enlaces?</item>
+        <item quantity="other">¿Eliminar enlaces?</item>
+    </plurals>
 </resources>

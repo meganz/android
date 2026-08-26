@@ -3024,4 +3024,38 @@
         <item quantity="many">%1$d contatti</item>
         <item quantity="other">%1$d contatti</item>
     </plurals>
+    <string name="settings_customise_navigation_tooltip_action">Esplora</string>
+    <string name="settings_customise_navigation_state_custom">Personalizzato</string>
+    <string name="settings_sync_battery_usage_title">Utilizzo della batteria</string>
+    <string name="settings_sync_battery_usage_description">Le sincronizzazioni e i backup saranno messi in pausa quando la batteria è sotto il 20% e non è in carica.</string>
+    <string name="settings_sync_battery_pause_on_battery_saver_title">Metti in pausa quando il risparmio energetico è attivo</string>
+    <string name="chat_list_search_no_results_title">Nessun risultato trovato</string>
+    <string name="chat_list_search_no_results_description">Prova a cercare un altro termine</string>
+    <string name="settings_sync_and_backup_title">Sincronizzazioni e backup</string>
+    <string name="transfers_over_quota_notification_message">Effettua l\’upgrade per riprendere i trasferimenti, oppure attendi finché la tua banda di trasferimento non si resetta.</string>
+    <string name="sync_list_sync_state_paused_battery_saver">In pausa, risparmio energetico attivo</string>
+    <string name="sync_list_sync_state_paused_low_battery">In pausa, batteria scarica</string>
+    <string name="sync_list_sync_state_paused_no_wifi">In pausa, nessuna connessione Wi-Fi</string>
+    <string name="chat_last_message_sender_me">Io</string>
+    <string name="chat_last_message_no_history">Nessuna conversazione</string>
+    <string name="chat_last_message_sender_unknown">Nome sconosciuto</string>
+    <string name="general_mute">Muta</string>
+    <string name="general_unmute">Togli il muto</string>
+    <string name="general_archive">Archivia</string>
+    <string name="general_unarchive">Togli dall’archivio</string>
+    <string name="title_properties_chat_clear">Pulisci la chat</string>
+    <string name="confirmation_clear_chat_history">Sei sicuro di voler cancellare tutta la chat?</string>
+    <string name="title_confirmation_leave_group_chat">Abbandonare la chat di gruppo?</string>
+    <string name="confirmation_leave_group_chat">Se abbandoni, non potrai più leggere o inviare messaggi.</string>
+    <string name="subscription_offer_no_connection_description">Controlla la tua connessione Internet e riprova</string>
+    <string name="audio_player_sleep_timer_title">Timer di spegnimento</string>
+    <string name="audio_player_sleep_timer_end_of_track">Fine della traccia</string>
+    <string name="settings_customise_navigation_state_default">Default</string>
+    <string name="password_strength_moderate">Password moderata</string>
+    <string name="media_timeline_sort_option_date_added">Data di aggiunta</string>
+    <plurals name="remove_link_dialog_title">
+        <item quantity="one">Rimuovere il link?</item>
+        <item quantity="many">Rimuovere i link?</item>
+        <item quantity="other">Rimuovere i link?</item>
+    </plurals>
 </resources>

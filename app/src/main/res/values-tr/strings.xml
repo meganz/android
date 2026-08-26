@@ -1834,13 +1834,13 @@
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Sohbet bağlantısını al</string>
     <!-- Title of the option to make a public chat private -->
-    <string name="make_chat_private_option">Şifreleme anahtarı döndürmeyi etkinleştir</string>
+    <string name="make_chat_private_option">Şifreleme anahtarı rotasyonunu etkinleştir</string>
     <!-- Title of the view to inform that a chat is private -->
-    <string name="private_chat">Şifreleme anahtarı döndürme etkin</string>
+    <string name="private_chat">Şifreleme anahtarı rotasyonu etkin</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="make_chat_private_option_text">Şifreleme anahtarı döndürme biraz daha güvenlidir ancak bir sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar geçmiş mesajları görmez.</string>
+    <string name="make_chat_private_option_text">Şifreleme anahtarı rotasyonu biraz daha güvenlidir ancak bir sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar geçmiş mesajları görmez.</string>
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
-    <string name="make_chat_private_not_available_text">Şifreleme anahtarı döndürme, 100’den fazla katılımcısı olan konuşmalar için devre dışı bırakılır.</string>
+    <string name="make_chat_private_not_available_text">Şifreleme anahtarı rotasyonu, 100’den fazla katılımcısı olan konuşmalar için devre dışı bırakılır.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
     <string name="warning_make_chat_private">Katılımcı sayısı özel sohbetler için sınırı aştığından sohbet özel olarak dönüştürülemedi.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -1864,15 +1864,15 @@
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">Sohbet bağlantısı yüklenirken sohbet başlatılırken hata oluştu.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
-    <string name="message_set_chat_private">[A]%1$s[/A][B] şifreleme anahtarı döndürmeyi etkinleştirdi.[/B]</string>
+    <string name="message_set_chat_private">[A]%1$s[/A][B] şifreleme anahtarı rotasyonunu etkinleştirdi.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">Bu konuşma artık mevcut değil</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
-    <string name="ekr_label">Şifreleme anahtarı döndürme</string>
+    <string name="ekr_label">Şifreleme anahtarı rotasyonu</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="ekr_explanation">Şifreleme anahtarı döndürme biraz daha güvenlidir ancak bir sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar geçmiş mesajları görmez.</string>
+    <string name="ekr_explanation">Şifreleme anahtarı rotasyonu biraz daha güvenlidir ancak bir sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar geçmiş mesajları görmez.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="subtitle_chat_message_enabled_ERK">Şifreleme anahtarı döndürme biraz daha güvenlidir ancak bir sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar geçmiş mesajları görmez.</string>
+    <string name="subtitle_chat_message_enabled_ERK">Şifreleme anahtarı rotasyonu biraz daha güvenlidir ancak bir sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar geçmiş mesajları görmez.</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">%s kişisine davet daha önce gönderilmiş ve Gönderilen İstekler sekmesinden görüntülenebilir.</string>
     <!-- General label for files -->
@@ -2160,7 +2160,7 @@
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">Yeni bir grup sohbeti oluşturup bir sohbet bağlantısı almak ister misiniz?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="context_make_private_chat_warning_text">Şifreleme anahtarı döndürme biraz daha güvenlidir ancak bir sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar geçmiş mesajları görmez.</string>
+    <string name="context_make_private_chat_warning_text">Şifreleme anahtarı rotasyonu biraz daha güvenlidir ancak bir sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar geçmiş mesajları görmez.</string>
     <!-- Label that indicates the steps of a wizard -->
     <string name="wizard_steps_indicator">%1$d / %2$d</string>
     <!-- Hint of the Search view -->
@@ -2622,7 +2622,7 @@
     <!-- Option of color theme, follow the system setting. -->
     <string name="theme_system_default">Sistem varsayılanı</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
-    <string name="theme_battery_saver">Şarj Tasarrufuna Göre Ayarla</string>
+    <string name="theme_battery_saver">Pil Tasarrufuna göre ayarla</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">Değişiklikler silinsin ve düzenleyici kapatılsın mı?</string>
     <!-- Action discard -->
@@ -2710,7 +2710,7 @@
     <!-- Text of the option Backup Recovery Key in My account section -->
     <string name="backup_recovery_key_subtitle">Şifrenizi hatırlıyor musunuz?\nMEGA, unutmanız durumunda şifrenizi sıfırlayamaz.</string>
     <!-- Action to change name -->
-    <string name="change_name_action">Adınızı değiştirin</string>
+    <string name="change_name_action">Adı değiştir</string>
     <!-- Action to add photo -->
     <string name="add_photo_action">Profil fotoğrafını değiştir</string>
     <!-- Action to add phone number -->

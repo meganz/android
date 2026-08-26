@@ -648,7 +648,7 @@
     <!-- Photos search empty state title -->
     <string name="photos_search_empty_state_title">Eşleşen sonuç yok</string>
     <!-- Photos search empty state description -->
-    <string name="photos_search_empty_state_description">Farklı bir arama terimi deneyin</string>
+    <string name="photos_search_empty_state_description">Farklı bir terim aramayı deneyin</string>
     <!-- Photos search recent search -->
     <string name="photos_search_recent_search">Son arananlar</string>
     <!-- Add to album by image -->
@@ -718,7 +718,7 @@
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">Şifre yöneticimiz ve yüksek hızlı VPN’imiz ile çevrim içi hayatınızı daha güvenli, daha hızlı ve daha kolay hale getirin</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_button_view_pro_plan">Pro planlarını görüntüle</string>
+    <string name="payment_ads_free_intro_button_view_pro_plan">Pro planları görüntüle</string>
     <!-- Label for call option on settings -->
     <string name="settings_calls_title">Aramalar</string>
     <!-- Label for the sound notifications option on calls settings -->
@@ -1390,7 +1390,7 @@
     <!-- Sync message when multiple issues resolved -->
     <string name="sync_stalled_issues_resolved">Sorunlar çözüldü</string>
     <!-- Text of the empty playlist in Video Section -->
-    <string name="video_section_playlists_video_empty">Boşalt</string>
+    <string name="video_section_playlists_video_empty">Boş</string>
     <!-- Text of video count of playlist in Video Section -->
     <plurals name="video_section_playlists_video_count">
         <item quantity="one">%1$d video</item>
@@ -2123,8 +2123,8 @@
     </plurals>
     <string name="general_install_label">Yükle</string>
     <string name="general_app_update_download_success_message">Uygulama güncellemesi indirildi</string>
-    <string name="general_first_name">Adı</string>
-    <string name="general_last_name">Soyadı</string>
+    <string name="general_first_name">Ad</string>
+    <string name="general_last_name">Soyad</string>
     <string name="meetings_call_recording_consent_dialog_title">Bu arama kaydediliyor</string>
     <string name="meetings_call_recording_consent_dialog_message">Aramada kalarak kayıt altına alınmasına izin vermiş olursunuz. Kayıt yalnızca kaydeden kişinin cihazında saklanır.</string>
     <string name="meetings_call_recording_consent_dialog_positive_button">Tamam</string>
@@ -2532,7 +2532,7 @@
     </plurals>
     <string name="chat_settings_link_preview_summary">Sohbette gönderdiğiniz bağlantıların ön izlemesini oluşturur. Bu ön izlemelerin alınmasının sıfır bilgi şifrelemesi ile korunmadığını unutmayın.</string>
     <string name="sync_battery_optimisation_banner">Dosyalarınızı ve klasörlerinizi sürekli senkronize etmek için MEGA’nın arka planda çalışmasına izin verin</string>
-    <string name="sync_dialog_battery_optimization_title">Şarj optimizasyonu</string>
+    <string name="sync_dialog_battery_optimization_title">Pil optimizasyonu</string>
     <string name="general_do_not_allow_button">İzin verme</string>
     <string name="general_allow_button">İzin ver</string>
     <string name="video_player_video_not_rendered">Bu video görüntülenemiyor</string>
@@ -2550,7 +2550,7 @@
     <string name="add_contacts_phone_contacts_section_title">Telefon kişileri</string>
     <string name="create_group_chat_settings_title">Yeni grup</string>
     <string name="create_group_chat_name_hint">Grup adını girin</string>
-    <string name="create_group_chat_ekr_label">Şifreleme anahtarı döndürme</string>
+    <string name="create_group_chat_ekr_label">Şifreleme anahtarı rotasyonu</string>
     <string name="create_group_chat_get_chat_link_label">Sohbet bağlantısını al</string>
     <string name="create_group_chat_allow_add_participants_label">Yönetici olmayanların katılımcı eklemesine izin ver</string>
     <string name="subscription_revamp_current_plan_renews">%1$s tarihinde yenileniyor</string>
@@ -2699,7 +2699,7 @@
     <string name="add_contacts_unverified_contact_warning">Bilgi paylaştığınız bazı kişiler sizin tarafınızdan doğrulanmadı. Ek güvenlik sağlamak için, kimlik bilgilerini kişilerde doğrulamanızı öneririz. Doğrulamak istediğiniz kişinin yanındaki üç noktaya ve ardından Bilgi’ye dokunun.</string>
     <string name="contacts_qr_scan_action">QR kodunu tara</string>
     <string name="share_link_access_password_description">Bağlantıyı yalnızca şifreye sahip kişiler açabilir</string>
-    <string name="share_link_password_copied_snackbar">Şifre panoya kopyalandı</string>
+    <string name="share_link_password_copied_snackbar">Şifre panonuza kopyalandı</string>
     <string name="home_do_more_with_mega_album_created_message">“%1$s” albümü oluşturuldu</string>
     <string name="home_do_more_with_mega_see_album_action">Albümü gör</string>
     <string name="campaign_name_with_discount_up_to">%1$s: %%%2$d’e varan indirim</string>
@@ -2944,5 +2944,58 @@
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d kişi</item>
         <item quantity="other">%1$d kişi</item>
+    </plurals>
+    <string name="invite_contacts_share_link_action">Bağlantıyla davet et</string>
+    <string name="invite_contacts_manual_input_placeholder">E-posta veya telefon numarası girin</string>
+    <string name="invite_contacts_already_contact_error">Bu e-posta adresi zaten kişilerinizde var</string>
+    <string name="invite_contacts_pending_error">Bu e-posta adresine zaten bir davet gönderildi</string>
+    <string name="invite_contacts_invalid_input_error">Geçerli bir e-posta adresi veya telefon numarası girin</string>
+    <string name="settings_customise_navigation_tooltip_body">Navigasyonunuzda hangi öğelerin görüneceğini seçin</string>
+    <string name="settings_customise_navigation_tooltip_action">Keşfet</string>
+    <string name="settings_customise_navigation_state_custom">Özel</string>
+    <string name="settings_customise_navigation_state_default">Varsayılan</string>
+    <plurals name="video_player_seek_seconds">
+        <item quantity="one">%1$d saniye</item>
+        <item quantity="other">%1$d saniye</item>
+    </plurals>
+    <string name="settings_sync_battery_usage_title">Pil kullanımı</string>
+    <string name="settings_sync_battery_usage_description">Cihaz şarjda değilken, pil %20’nin altına düştüğünde senkronizasyon ve yedeklemeler duraklatılır.</string>
+    <string name="settings_sync_battery_pause_on_battery_saver_title">Pil tasarrufu açıkken duraklat</string>
+    <string name="chat_list_search_no_results_title">Sonuç bulunamadı</string>
+    <string name="chat_list_search_no_results_description">Farklı bir terim aramayı deneyin</string>
+    <string name="settings_sync_and_backup_title">Senkronizasyon ve yedekleme</string>
+    <string name="transfers_over_quota_notification_message">Aktarımları sürdürmek için hesabınızı yükseltin veya aktarım kotanız sıfırlanana kadar bekleyin.</string>
+    <string name="sync_list_sync_state_paused_battery_saver">Duraklatıldı, pil tasarrufu açık</string>
+    <string name="sync_list_sync_state_paused_low_battery">Duraklatıldı, düşük şarj</string>
+    <string name="sync_list_sync_state_paused_no_wifi">Duraklatıldı, Wi-Fi yok</string>
+    <string name="chat_last_message_no_history">Konuşma geçmişi yok</string>
+    <string name="chat_last_message_sender_me">Ben</string>
+    <string name="chat_last_message_sender_unknown">Bilinmeyen ad</string>
+    <string name="general_mute">Sessize al</string>
+    <string name="general_unmute">Sesi aç</string>
+    <string name="general_archive">Arşivle</string>
+    <string name="general_unarchive">Arşivden Çıkar</string>
+    <string name="title_properties_chat_clear">Sohbet geçmişini temizle</string>
+    <string name="confirmation_clear_chat_history">Bu konuşmanın tüm mesaj geçmişini temizlemek istediğinizden emin misiniz?</string>
+    <string name="title_confirmation_leave_group_chat">Grup sohbetinden ayrılmak istiyor musunuz?</string>
+    <string name="confirmation_leave_group_chat">Ayrılırsanız artık mesajları okumak veya göndermek için erişiminiz olmayacak.</string>
+    <string name="audio_player_continuous_playback_title">Kesintisiz oynatma</string>
+    <string name="audio_player_continuous_playback_description">Sıradaki bir sonraki dosyayı otomatik olarak oynat</string>
+    <string name="audio_player_playing_from_label">[A]%s[/A] klasöründen oynatılıyor</string>
+    <string name="video_player_zoom_fit_to_screen">Ekrana sığdır</string>
+    <string name="video_player_zoom_fill_screen">Ekranı doldur</string>
+    <string name="password_strength_moderate">Ortalama bir şifre</string>
+    <string name="share_link_updated_and_copied_snackbar">Bağlantı güncellendi ve panonuza kopyalandı</string>
+    <string name="share_link_key_copied_snackbar">Anahtar panonuza kopyalandı</string>
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="one">Bağlantı panonuza kopyalandı</item>
+        <item quantity="other">Bağlantılar panonuza kopyalandı</item>
+    </plurals>
+    <string name="password_too_weak_error_message">Lütfen daha güçlü bir şifre kullanın.</string>
+    <string name="check_internet_connection_error">İnternet bağlantısı yok. Bağlantınızı kontrol edin ve tekrar deneyin</string>
+    <string name="media_timeline_sort_option_date_added">Eklenme zamanı</string>
+    <plurals name="remove_link_dialog_title">
+        <item quantity="one">Bağlantı kaldırılsın mı?</item>
+        <item quantity="other">Bağlantılar kaldırılsın mı?</item>
     </plurals>
 </resources>

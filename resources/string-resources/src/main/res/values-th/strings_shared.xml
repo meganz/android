@@ -2793,4 +2793,66 @@
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d ผู้ติดต่อ</item>
     </plurals>
+    <string name="settings_customise_navigation_state_custom">กำหนดเอง</string>
+    <string name="chat_last_message_no_history">ไม่มีประวัติการสนทนา</string>
+    <string name="chat_last_message_sender_me">ฉัน</string>
+    <string name="chat_last_message_sender_unknown">ชื่อที่ไม่รู้จัก</string>
+    <string name="general_mute">ปิดเสียง</string>
+    <string name="general_unmute">เปิดเสียง</string>
+    <string name="general_archive">จัดเก็บ</string>
+    <string name="general_unarchive">ยกเลิกจัดเก็บ</string>
+    <string name="title_properties_chat_clear">ล้างประวัติการแชท</string>
+    <string name="confirmation_clear_chat_history">คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติข้อความทั้งหมดของการสนทนานี้</string>
+    <string name="title_confirmation_leave_group_chat">ออกจากกลุ่มแชทหรือไม่</string>
+    <string name="confirmation_leave_group_chat">ถ้าคุณออกจากแชทนี้ คุณจะไม่สามารถอ่านหรือส่งข้อความได้อีกต่อไป</string>
+    <string name="subscription_offer_no_connection_description">ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณแล้วลองใหม่อีกครั้ง</string>
+    <string name="audio_player_sleep_timer_title">ตัวตั้งเวลาปิด</string>
+    <string name="audio_player_sleep_timer_end_of_track">เมื่อเล่นจบเพลง</string>
+    <string name="settings_customise_navigation_tooltip_action">เปิดดู</string>
+    <string name="settings_customise_navigation_state_default">ค่าเริ่มต้น</string>
+    <string name="chat_list_search_no_results_title">ไม่พบผลลัพธ์</string>
+    <string name="chat_list_search_no_results_description">ลองใช้คำค้นหาอื่น</string>
+    <string name="audio_player_sleep_timer_active_title">ตัวตั้งเวลาปิด เหลือเวลาอีก %s</string>
+    <string name="audio_player_sleep_timer_turn_off">ปิดตัวตั้งเวลา</string>
+    <string name="audio_player_sleep_timer_countdown_label">ตัวตั้งเวลาปิด %s</string>
+    <plurals name="audio_player_sleep_timer_minutes">
+        <item quantity="other">%1$d นาที</item>
+    </plurals>
+    <string name="video_editor_tooltip_title">แก้ไขวิดีโอของคุณ</string>
+    <string name="video_editor_tooltip_description">ตัด ครอป หมุน หรือปรับความเร็วและระดับเสียงได้ตามต้องการ</string>
+    <string name="settings_customise_navigation_title">ปรับแต่งแถบนำทาง</string>
+    <string name="settings_customise_navigation_subtitle">ลากเพื่อจัดเรียงลำดับรายการใหม่</string>
+    <string name="settings_customise_navigation_your_navigation">แถบนำทางของคุณ</string>
+    <string name="settings_customise_navigation_items_counter">%1$d จากทั้งหมด %2$d รายการ</string>
+    <string name="settings_customise_navigation_available_to_add">เพิ่มไปยังแถบนำทาง</string>
+    <string name="settings_customise_navigation_max_items_snackbar">เพิ่มได้สูงสุด %1$d รายการแล้ว กรุณาลบรายการเดิมออกก่อนเพื่อเพิ่มรายการใหม่</string>
+    <string name="settings_customise_navigation_min_items_snackbar">จำเป็นต้องมีอย่างน้อย %1$d รายการ</string>
+    <string name="video_player_large_cluster_seek_warning">การเลื่อนไปยังช่วงเวลาต่างๆ ในวิดีโอนี้อาจใช้เวลาโหลดช้ากว่าปกติ</string>
+    <string name="invite_contacts_share_link_action">เชิญผ่านลิงก์</string>
+    <string name="invite_contacts_manual_input_placeholder">กรอกอีเมลหรือเบอร์โทรศัพท์</string>
+    <string name="invite_contacts_already_contact_error">ที่อยู่อีเมลนี้มีอยู่ในรายชื่อผู้ติดต่อแล้ว</string>
+    <string name="invite_contacts_pending_error">ระบบได้ส่งคำเชิญไปยังที่อยู่อีเมลนี้เรียบร้อยแล้ว</string>
+    <string name="invite_contacts_invalid_input_error">กรุณากรอกที่อยู่อีเมลหรือเบอร์โทรศัพท์ที่ถูกต้อง</string>
+    <string name="settings_customise_navigation_tooltip_body">เลือกเมนูที่ต้องการให้แสดงบนแถบนำทางของคุณ</string>
+    <plurals name="video_player_seek_seconds">
+        <item quantity="other">%1$d วินาที</item>
+    </plurals>
+    <string name="settings_sync_battery_usage_title">การใช้งานแบตเตอรี่</string>
+    <string name="settings_sync_battery_usage_description">ระบบจะหยุดซิงค์และสำรองข้อมูลชั่วคราวเมื่อแบตเตอรี่ต่ำกว่า 20% ขณะไม่ได้เสียบสายชาร์จ</string>
+    <string name="settings_sync_battery_pause_on_battery_saver_title">หยุดทำงานชั่วคราวเมื่อเปิดโหมดประหยัดแบตเตอรี่</string>
+    <string name="settings_sync_and_backup_title">ซิงค์และสำรองข้อมูล</string>
+    <string name="transfers_over_quota_notification_message">อัปเกรดแผนเพื่อถ่ายโอนข้อมูลต่อ หรือรอจนกว่าโควตาถ่ายโอนของคุณจะรีเซ็ตใหม่อีกครั้ง</string>
+    <string name="sync_list_sync_state_paused_battery_saver">หยุดชั่วคราวเนื่องจากเปิดโหมดประหยัดแบตเตอรี่</string>
+    <string name="sync_list_sync_state_paused_low_battery">หยุดชั่วคราวเนื่องจากแบตเตอรี่ต่ำ</string>
+    <string name="sync_list_sync_state_paused_no_wifi">หยุดชั่วคราวเนื่องจากไม่ได้เชื่อมต่อ Wi-Fi</string>
+    <string name="audio_player_continuous_playback_title">เล่นต่อเนื่องอัตโนมัติ</string>
+    <string name="audio_player_continuous_playback_description">เล่นไฟล์ถัดไปในคิวให้อัตโนมัติ</string>
+    <string name="audio_player_playing_from_label">กำลังเล่นจาก [A]%s[/A]</string>
+    <string name="video_player_zoom_fit_to_screen">ปรับพอดีหน้าจอ</string>
+    <string name="video_player_zoom_fill_screen">ขยายเต็มหน้าจอ</string>
+    <string name="password_strength_moderate">รหัสผ่านคาดเดาได้ในระดับปานกลาง</string>
+    <string name="media_timeline_sort_option_date_added">วันที่เพิ่ม</string>
+    <plurals name="remove_link_dialog_title">
+        <item quantity="other">ลบลิงก์หรือไม่</item>
+    </plurals>
 </resources>

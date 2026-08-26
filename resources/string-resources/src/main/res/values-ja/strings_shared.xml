@@ -2743,7 +2743,7 @@
     <string name="share_link_expires_on">リンクの有効期限は%1$s</string>
     <string name="share_link_expired">リンクの有効期限が切れました</string>
     <string name="share_link_with_password">リンク：%1$s\n\nパスワード：%2$s</string>
-    <string name="share_link_password_dialog_title">リンクパスワードの共有</string>
+    <string name="share_link_password_dialog_title">リンクパスワード</string>
     <string name="share_link_password_dialog_message">このリンクのパスワードを共有しますか？</string>
     <string name="subscription_quota_no_connection_title">接続できませんでした</string>
     <string name="subscription_quota_no_connection_description">後でストレージと転送の詳細を確認するか、もう一度お試しください。</string>
@@ -2820,5 +2820,59 @@
     <string name="invite_contacts_open_camera_confirmation_confirm">開く</string>
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d件の連絡先</item>
+    </plurals>
+    <string name="invite_contacts_share_link_action">リンクで招待</string>
+    <string name="invite_contacts_manual_input_placeholder">メールアドレスまたは電話番号を入力</string>
+    <string name="invite_contacts_already_contact_error">このメールアドレスは既に連絡先に追加されています</string>
+    <string name="invite_contacts_pending_error">このメールアドレス宛てに既に招待状が送信されています</string>
+    <string name="invite_contacts_invalid_input_error">有効なメールアドレスまたは電話番号を入力してください</string>
+    <string name="settings_customise_navigation_tooltip_body">ナビゲーションに表示する項目を選択してください。</string>
+    <string name="settings_customise_navigation_tooltip_action">試してみる</string>
+    <string name="settings_customise_navigation_state_custom">カスタム</string>
+    <string name="settings_customise_navigation_state_default">デフォルト</string>
+    <plurals name="video_player_seek_seconds">
+        <item quantity="other">%1$d秒</item>
+    </plurals>
+    <string name="settings_sync_battery_usage_title">バッテリーの使用</string>
+    <string name="settings_sync_battery_usage_description">充電中でない場合、バッテリー残量が20%未満になると同期とバックアップを一時停止します。</string>
+    <string name="settings_sync_battery_pause_on_battery_saver_title">バッテリーセーバー（低電力モード）有効時に一時停止</string>
+    <string name="chat_list_search_no_results_title">結果が見つかりません</string>
+    <string name="chat_list_search_no_results_description">別の検索用語をお試しください</string>
+    <string name="settings_sync_and_backup_title">同期とバックアップ</string>
+    <string name="transfers_over_quota_notification_message">転送を再開するにはアップグレードするか、転送容量がリセットされるまでお待ちください。</string>
+    <string name="sync_list_sync_state_paused_battery_saver">一時停止中（バッテリーセーバーON）</string>
+    <string name="sync_list_sync_state_paused_low_battery">一時停止中（バッテリー残量低下）</string>
+    <string name="sync_list_sync_state_paused_no_wifi">一時停止中（Wi-Fi未接続）</string>
+    <string name="chat_last_message_no_history">会話履歴なし</string>
+    <string name="chat_last_message_sender_me">私</string>
+    <string name="chat_last_message_sender_unknown">不明な名前</string>
+    <string name="general_mute">ミュート</string>
+    <string name="general_unmute">ミュートを解除</string>
+    <string name="general_archive">アーカイブ</string>
+    <string name="general_unarchive">アーカイブを解除</string>
+    <string name="title_properties_chat_clear">チャット履歴をクリア</string>
+    <string name="confirmation_clear_chat_history">この会話の完全なメッセージ履歴をクリアしてもよろしいですか？</string>
+    <string name="title_confirmation_leave_group_chat">グループチャットから離れますか？</string>
+    <string name="confirmation_leave_group_chat">退出すると、メッセージを読んだり送信したりできなくなります。</string>
+    <string name="audio_player_continuous_playback_title">連続再生</string>
+    <string name="audio_player_continuous_playback_description">キュー内の次のファイルを自動的に再生します</string>
+    <string name="audio_player_playing_from_label">[A]%s[/A]から再生中</string>
+    <string name="video_player_zoom_fit_to_screen">画面に合わせる</string>
+    <string name="video_player_zoom_fill_screen">画面いっぱいに表示</string>
+    <string name="password_strength_moderate">中程度の強さのパスワード</string>
+    <string name="share_link_updated_and_copied_snackbar">リンクが更新され、クリップボードにコピーされました。</string>
+    <string name="share_link_key_copied_snackbar">キーがクリップボードにコピーされました</string>
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="other">リンクがクリップボードにコピーされました</item>
+    </plurals>
+    <string name="password_too_weak_error_message">より強力なパスワードを使用してください。</string>
+    <string name="check_internet_connection_error">インターネットに接続できません。接続を確認し、再度お試しください。</string>
+    <string name="media_timeline_sort_option_date_added">追加日</string>
+    <string name="media_timeline_sort_option_date_taken">撮影日</string>
+    <plurals name="remove_link_dialog_title">
+        <item quantity="other">リンクを削除しますか？</item>
+    </plurals>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="other">このリンクを知っている人は、当該ファイルやフォルダにアクセスできなくなります。</item>
     </plurals>
 </resources>

@@ -3069,7 +3069,7 @@
     <string name="contacts_qr_scan_action">Skanowanie kodu QR</string>
     <string name="audio_player_playback_speed_title">Prędkość odtwarzania</string>
     <string name="share_link_access_password_description">Tylko osoby posiadające hasło mogą otworzyć łącze</string>
-    <string name="share_link_password_copied_snackbar">Hasło zostało skopiowane do schowka</string>
+    <string name="share_link_password_copied_snackbar">Hasło skopiowano do Twojego schowka</string>
     <string name="contact_info_notifications_muted_until">Wyciszone do %1$s</string>
     <string name="share_link_password_protected_label">Zabezpieczone hasłem</string>
     <string name="contact_info_nickname_dialog_set_button">Ustaw</string>
@@ -3186,5 +3186,64 @@
         <item quantity="few">%1$d kontakty</item>
         <item quantity="many">%1$d kontakty</item>
         <item quantity="other">%1$d kontakty</item>
+    </plurals>
+    <string name="invite_contacts_share_link_action">Zaproś za pomocą linku</string>
+    <string name="invite_contacts_manual_input_placeholder">Wprowadź adres e-mail lub numer telefonu</string>
+    <string name="invite_contacts_already_contact_error">Ten adres e-mail jest już kontaktem</string>
+    <string name="invite_contacts_pending_error">Zaproszenie zostało już wysłane na ten adres e-mail</string>
+    <string name="invite_contacts_invalid_input_error">Wprowadź poprawny adres e-mail lub numer telefonu</string>
+    <string name="settings_customise_navigation_tooltip_body">Wybierz, które elementy mają pojawić się w nawigacji</string>
+    <string name="settings_customise_navigation_tooltip_action">Eksploruj</string>
+    <string name="settings_customise_navigation_state_custom">Dowolne</string>
+    <string name="settings_customise_navigation_state_default">Domyślne</string>
+    <plurals name="video_player_seek_seconds">
+        <item quantity="one">%1$d sekunda</item>
+        <item quantity="few">%1$d sekundy</item>
+        <item quantity="many">%1$d sekund</item>
+        <item quantity="other">%1$d sekund</item>
+    </plurals>
+    <string name="settings_sync_battery_usage_title">Zużycie baterii</string>
+    <string name="settings_sync_battery_usage_description">Synchronizacje i kopie zapasowe są wstrzymywane poniżej 20% baterii, gdy urządzenie nie jest podłączone do ładowania.</string>
+    <string name="settings_sync_battery_pause_on_battery_saver_title">Pauzuj, gdy tryb oszczędzania baterii jest włączony</string>
+    <string name="chat_list_search_no_results_title">Nie znaleziono wyników</string>
+    <string name="chat_list_search_no_results_description">Spróbuj innego terminu wyszukiwania</string>
+    <string name="settings_sync_and_backup_title">Synchronizacja i kopie zapasowe</string>
+    <string name="transfers_over_quota_notification_message">Zaktualizuj plan, aby wznowić transfery, lub poczekaj, aż limit transferów zostanie zresetowany.</string>
+    <string name="sync_list_sync_state_paused_battery_saver">Pauza, oszczędzanie baterii włączone</string>
+    <string name="sync_list_sync_state_paused_low_battery">Pauza, niski poziom baterii</string>
+    <string name="sync_list_sync_state_paused_no_wifi">Pauza, brak Wi‑Fi</string>
+    <string name="chat_last_message_no_history">Brak historii rozmowy</string>
+    <string name="chat_last_message_sender_me">Ja</string>
+    <string name="chat_last_message_sender_unknown">Nieznana nazwa</string>
+    <string name="general_mute">Wycisz</string>
+    <string name="general_unmute">Wyłącz wyciszenie</string>
+    <string name="general_archive">Archiwizuj</string>
+    <string name="general_unarchive">Rozpakuj archiwum</string>
+    <string name="title_properties_chat_clear">Wyczyść historię czatu</string>
+    <string name="confirmation_clear_chat_history">Czy na pewno chcesz usunąć pełną historię tej rozmowy?</string>
+    <string name="title_confirmation_leave_group_chat">Chcesz opuścić czat?</string>
+    <string name="confirmation_leave_group_chat">Jeżeli opuścisz czat, nie będziesz miał możliwości czytania oraz wysyłania w ramach czatu.</string>
+    <string name="audio_player_continuous_playback_title">Ciągłe odtwarzanie</string>
+    <string name="audio_player_continuous_playback_description">Odtwarzaj następny plik w kolejce automatycznie</string>
+    <string name="audio_player_playing_from_label">Odtwarzanie z [A]%s[/A]</string>
+    <string name="video_player_zoom_fit_to_screen">Dopasuj do ekranu</string>
+    <string name="video_player_zoom_fill_screen">Wypełnij ekran</string>
+    <string name="password_strength_moderate">Umiarkowanie hasło</string>
+    <string name="share_link_updated_and_copied_snackbar">Link został zaktualizowany i skopiowany Twojego do schowka</string>
+    <string name="share_link_key_copied_snackbar">Klucz skopiowano Twojego do schowka</string>
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="one">Link skopiowany do Twojego schowka</item>
+        <item quantity="few">Linki skopiowane do Twojego schowka</item>
+        <item quantity="many">Linki skopiowane do Twojego schowka</item>
+        <item quantity="other">Linki skopiowane do Twojego schowka</item>
+    </plurals>
+    <string name="password_too_weak_error_message">Proszę użyć silniejszego hasła.</string>
+    <string name="check_internet_connection_error">Brak połączenia z Internetem. Sprawdź swoje połączenie i spróbuj ponownie</string>
+    <string name="media_timeline_sort_option_date_added">Data dodania</string>
+    <plurals name="remove_link_dialog_title">
+        <item quantity="one">Usunąć link?</item>
+        <item quantity="few">Usunąć linki?</item>
+        <item quantity="many">Usunąć linki?</item>
+        <item quantity="other">Usunąć linki?</item>
     </plurals>
 </resources>
