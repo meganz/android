@@ -222,6 +222,7 @@ pipeline {
             when {
                 expression { !shouldSkipBuild() }
             }
+            failFast true
             parallel {
                 stage('Build APK (GMS+QA)') {
                     when {
