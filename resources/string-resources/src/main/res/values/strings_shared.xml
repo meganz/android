@@ -3804,6 +3804,56 @@
     <string name="title_confirmation_leave_group_chat">Leave group chat?</string>
     <!-- Message of the confirmation dialog shown before leaving a group chat -->
     <string name="confirmation_leave_group_chat">If you leave, you will no longer have access to read or send messages.</string>
+    <!-- Chat list last-message preview shown when a participant is added to a group chat. %1$s is the added participant, %2$s is the person who added them -->
+    <string name="non_format_message_add_participant">%2$s added %1$s to this group chat</string>
+    <!-- Chat list last-message preview shown when a participant is removed from a group chat. %1$s is the removed participant, %2$s is the person who removed them -->
+    <string name="non_format_message_remove_participant">%2$s removed %1$s from the group chat</string>
+    <!-- Chat list last-message preview shown when a participant leaves a group chat. %1$s is the participant who left -->
+    <string name="non_format_message_participant_left_group_chat">%1$s left the group chat</string>
+    <!-- Chat list last-message preview shown when a participant is promoted to host. %1$s is the participant whose role changed, %2$s is the person who made the change -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s changed %1$s’s role to host</string>
+    <!-- Chat list last-message preview shown when a participant's role is changed to standard. %1$s is the participant whose role changed, %2$s is the person who made the change -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s changed %1$s’s role to standard</string>
+    <!-- Chat list last-message preview shown when a participant's role is changed to read-only. %1$s is the participant whose role changed, %2$s is the person who made the change -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s changed %1$s’s role to read-only</string>
+    <!-- Chat list last-message preview shown when the group chat name is changed. %1$s is the person who changed it, %2$s is the new chat name -->
+    <string name="non_format_change_title_messages">%1$s changed the group chat name to “%2$s”</string>
+    <!-- Chat list last-message preview shown when the current user clears the chat history. %1$s is the person who cleared it -->
+    <string name="history_cleared_by">%1$s cleared the chat history</string>
+    <!-- Chat list last-message preview shown when another participant clears the chat history. %1$s is the person who cleared it -->
+    <string name="non_format_history_cleared_by">%1$s cleared the chat history</string>
+    <!-- Chat list last-message preview shown when the message clearing (retention) time is changed. %1$s is the person who changed it, %2$s is the new clearing time -->
+    <string name="retention_history_changed_by">%1$s changed the message clearing time to %2$s</string>
+    <!-- Chat list last-message preview shown when message clearing (retention) is disabled. %1$s is the person who disabled it -->
+    <string name="retention_history_disabled">%1$s turned off message clearing</string>
+    <!-- Chat list last-message preview shown when a chat link is created. %1$s is the person who created it -->
+    <string name="message_created_chat_link">%1$s created a chat link</string>
+    <!-- Chat list last-message preview shown when a chat link is removed. %1$s is the person who removed it -->
+    <string name="message_deleted_chat_link">%1$s removed the chat link</string>
+    <!-- Chat list last-message preview shown when encryption key rotation is enabled for a chat. %1$s is the person who enabled it -->
+    <string name="message_set_chat_private">%1$s turned on encryption key rotation</string>
+    <!-- Message clearing (retention) duration of exactly one year, shown in the chat list last-message preview -->
+    <string name="subtitle_properties_manage_chat_label_year">1 year</string>
+    <!-- Message clearing (retention) duration in months, shown in the chat list last-message preview. %1$d is the number of months -->
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="one">%1$d month</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+    <!-- Message clearing (retention) duration in weeks, shown in the chat list last-message preview. %1$d is the number of weeks -->
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="one">%1$d week</item>
+        <item quantity="other">%1$d weeks</item>
+    </plurals>
+    <!-- Message clearing (retention) duration in days, shown in the chat list last-message preview. %d is the number of days -->
+    <plurals name="label_time_in_days_full">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <!-- Message clearing (retention) duration in hours, shown in the chat list last-message preview. %1$d is the number of hours -->
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
     <!-- Audio player: label for the continuous-playback toggle in the queue screen -->
     <string name="audio_player_continuous_playback_title">Continuous playback</string>
     <!-- Audio player: description for the continuous-playback toggle -->
