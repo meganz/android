@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
+import mega.android.core.ui.extensions.delayedTrue
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
 import org.commonmark.ext.gfm.tables.TablesExtension
 import org.commonmark.node.Node
@@ -157,11 +158,18 @@ fun MarkdownPreview(
                 },
         ) {
             when {
-                parsed == null -> Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    LargeInfiniteSpinnerIndicator()
+                parsed == null -> {
+                    // Delayed so the near-instant parse of typical documents does not flash
+                    // the spinner for a single frame.
+                    val showSpinner by delayedTrue(TextEditorLoadingUiDelay)
+                    if (showSpinner) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            LargeInfiniteSpinnerIndicator()
+                        }
+                    }
                 }
 
                 fullSelection -> FullSelectionPreview(

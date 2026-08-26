@@ -29,7 +29,6 @@ import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
-import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
@@ -60,7 +59,6 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
 import java.util.UUID
@@ -851,7 +849,7 @@ object MegaNodeUtil {
                     nodeId = NodeId(node.handle),
                     nodeSourceType = adapterType,
                     mode = textEditorModeFromValue(mode),
-                    fileName = null,
+                    fileName = node.name,
                 ),
             )
         }

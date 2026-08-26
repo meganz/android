@@ -83,6 +83,7 @@ fun HandleNodeAction(
                             nodeId = typedFileNode.id,
                             nodeSourceType = nodeSourceType,
                             mode = TextEditorMode.View,
+                            fileName = typedFileNode.name,
                         ),
                     )
                 }

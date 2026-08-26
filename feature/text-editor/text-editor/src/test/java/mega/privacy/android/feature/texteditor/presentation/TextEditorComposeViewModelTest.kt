@@ -391,6 +391,33 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
+    fun `test that a missing file name is resolved from the node before content loads`() =
+        runTest {
+            doReturn(flowOf(listOf("# Title"))).whenever(getTextContentForTextEditorUseCase)
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+            val node = mock<TypedFileNode> { on { name }.thenReturn("README.md") }
+            runBlocking {
+                whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(node)
+                whenever(getNodeAccessUseCase(any())).thenReturn(null)
+            }
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = null)
+            advanceUntilIdle()
+
+            val state = underTest.uiState.value
+            assertThat(state.fileName).isEqualTo("README.md")
+            assertThat(state.isLoading).isFalse()
+        }
+
+    @Test
+    fun `test that a file name passed in the args is not re-resolved from the node`() = runTest {
+        stubEmptyLoad()
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = "notes.md")
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.fileName).isEqualTo("notes.md")
+    }
+
+    @Test
     fun `test that applyFormatAction does nothing in Markdown source mode`() = runTest {
         val state = enterEditModeWith("hello world")
         underTest.toggleMarkdownEditMode() // switch to source mode

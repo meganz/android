@@ -260,10 +260,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     }
                     return@launch
                 }
+                _uiState.update { it.copy(isFullyLoaded = false) }
                 // Resolved before content streams so the Markdown preview routing never
                 // flips mid-stream.
                 resolveMarkdownFlags()
-                _uiState.update { it.copy(isFullyLoaded = false) }
                 val chatId = args.chatId
                 val messageId = args.messageId
                 val publicUrl = args.publicUrl
@@ -342,6 +342,16 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                         }
                         return@launch
                     }
+                }
+                // The file name drives the Markdown preview routing (isMarkdown). Openers that
+                // pass only a node handle would otherwise flash the raw source until the name
+                // arrives with the bottom-bar actions, so resolve it before any content shows.
+                if (_uiState.value.fileName.isBlank() &&
+                    resolvedNodeHandle != INVALID_NODE_HANDLE
+                ) {
+                    runCatching { getNodeByIdUseCase(NodeId(resolvedNodeHandle))?.name }
+                        .getOrNull()
+                        ?.let { name -> _uiState.update { it.copy(fileName = name) } }
                 }
                 val contentFlow = when {
                     !publicUrl.isNullOrBlank() -> getTextContentForFileLinkUseCase(

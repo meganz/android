@@ -85,11 +85,13 @@ import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.delayedTrue
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.texteditor.components.MarkdownPreview
 import mega.privacy.android.feature.texteditor.components.TextEditorContent
 import mega.privacy.android.feature.texteditor.components.TextEditorFastScrollbar
+import mega.privacy.android.feature.texteditor.components.TextEditorLoadingUiDelay
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormattingToolbar
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownLinkDialog
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownSelectionFormats
@@ -229,8 +231,18 @@ fun TextEditorScreen(
 
     // Markdown files render as a read-only preview in View mode; Edit shows the raw source.
     val showMarkdownPreview = uiState.isMarkdown && !isEditable
-    val markdownContent = remember(showMarkdownPreview, uiState.contentVersion) {
-        if (showMarkdownPreview) viewModel.getMarkdownPreviewContent() else null
+    // Gated on isFullyLoaded: nothing re-keys this remember while chunks stream in, so an
+    // earlier read would cache a partial (or empty) snapshot of the document.
+    val markdownContent = remember(
+        showMarkdownPreview,
+        uiState.isFullyLoaded,
+        uiState.contentVersion,
+    ) {
+        if (showMarkdownPreview && uiState.isFullyLoaded) {
+            viewModel.getMarkdownPreviewContent()
+        } else {
+            null
+        }
     }
     // Hoisted so the preview scroll position survives leaving/re-entering (Preview -> Edit -> Preview).
     val markdownListState = rememberLazyListState()
@@ -381,11 +393,17 @@ fun TextEditorScreen(
             ) {
                 when {
                     uiState.isLoading -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            TextEditorLoadingContent()
+                        // Delayed so fast loads (cached/local files) go straight to the
+                        // content without flashing the loading UI — same pattern as the
+                        // cloud drive skeletons.
+                        val showLoadingUi by delayedTrue(TextEditorLoadingUiDelay)
+                        if (showLoadingUi) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                TextEditorLoadingContent()
+                            }
                         }
                     }
 
@@ -407,15 +425,30 @@ fun TextEditorScreen(
                         )
                     }
 
-                    markdownContent != null -> {
-                        MarkdownPreview(
-                            content = markdownContent,
-                            lazyListState = markdownListState,
-                            modifier = Modifier.fillMaxSize(),
-                            restoreLine = uiState.restorePreviewLine,
-                            onRestoreConsumed = viewModel::consumeRestorePreviewLine,
-                            onTopLine = viewModel::updateTopLine,
-                        )
+                    // A Markdown file never falls through to the raw chunked view: while the
+                    // content is still streaming in, keep the loading indicator instead of
+                    // flashing the raw source before the preview renders.
+                    showMarkdownPreview -> {
+                        if (markdownContent != null) {
+                            MarkdownPreview(
+                                content = markdownContent,
+                                lazyListState = markdownListState,
+                                modifier = Modifier.fillMaxSize(),
+                                restoreLine = uiState.restorePreviewLine,
+                                onRestoreConsumed = viewModel::consumeRestorePreviewLine,
+                                onTopLine = viewModel::updateTopLine,
+                            )
+                        } else {
+                            val showLoadingUi by delayedTrue(TextEditorLoadingUiDelay)
+                            if (showLoadingUi) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    LargeInfiniteSpinnerIndicator()
+                                }
+                            }
+                        }
                     }
 
                     else -> {

@@ -60,6 +60,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import mega.android.core.ui.tokens.theme.DSTokens
 import timber.log.Timber
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Line height used for both line numbers and the text field so the gutter aligns with content.
@@ -67,6 +68,13 @@ import timber.log.Timber
  * — keep this the single source of truth; do not hardcode the value elsewhere.
  */
 val EditorLineHeight = 20.sp
+
+/**
+ * Grace period before any text-editor loading UI (loading content, spinners) appears, so fast
+ * loads and parses go straight to the content without flashing it — the same pattern as the
+ * cloud drive skeletons. Public so the screen and the components share the one value.
+ */
+val TextEditorLoadingUiDelay = 200.milliseconds
 
 private val LineNumberGutterWidth = 36.dp
 private val LineNumberGutterPadding = 6.dp
