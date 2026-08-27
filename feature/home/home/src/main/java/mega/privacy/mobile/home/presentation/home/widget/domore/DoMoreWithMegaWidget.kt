@@ -29,6 +29,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.sharedcomponents.button.DoMoreWithMegaItemButton
 import mega.privacy.android.core.sharedcomponents.extension.truncateMiddle
 import mega.privacy.android.domain.entity.Feature
@@ -52,6 +53,13 @@ import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.core.event.identifier.ButtonPressedEventIdentifier
+import mega.privacy.mobile.analytics.event.DoMoreWithMegaAddContactButtonPressedEvent
+import mega.privacy.mobile.analytics.event.DoMoreWithMegaAddSyncButtonPressedEvent
+import mega.privacy.mobile.analytics.event.DoMoreWithMegaCameraUploadsButtonPressedEvent
+import mega.privacy.mobile.analytics.event.DoMoreWithMegaCreateAlbumButtonPressedEvent
+import mega.privacy.mobile.analytics.event.DoMoreWithMegaScanDocumentButtonPressedEvent
+import mega.privacy.mobile.analytics.event.DoMoreWithMegaScheduleMeetingButtonPressedEvent
 import javax.inject.Inject
 
 /**
@@ -85,6 +93,7 @@ class DoMoreWithMegaWidget @Inject constructor() : HomeWidget, Flagged {
                 DoMoreWithMegaSection(
                     items = uiState.items,
                     onItemClick = { item ->
+                        Analytics.tracker.trackEvent(item.identifier.buttonPressedEvent())
                         navigationHandler.navigateForItem(
                             identifier = item.identifier,
                             isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
@@ -125,6 +134,32 @@ class DoMoreWithMegaWidget @Inject constructor() : HomeWidget, Flagged {
 
     override val feature: Feature = ApiFeatures.DoMoreWithMEGA
 }
+
+/**
+ * Resolves the analytics event for a "Do more with MEGA" shortcut. The `when` is exhaustive over
+ * [DoMoreWithMegaItem.Identifier], so a newly added shortcut fails to compile until it has been
+ * given an event rather than silently shipping untracked.
+ */
+internal fun DoMoreWithMegaItem.Identifier.buttonPressedEvent(): ButtonPressedEventIdentifier =
+    when (this) {
+        DoMoreWithMegaItem.Identifier.CameraUploads ->
+            DoMoreWithMegaCameraUploadsButtonPressedEvent
+
+        DoMoreWithMegaItem.Identifier.AddSync ->
+            DoMoreWithMegaAddSyncButtonPressedEvent
+
+        DoMoreWithMegaItem.Identifier.ScanDocument ->
+            DoMoreWithMegaScanDocumentButtonPressedEvent
+
+        DoMoreWithMegaItem.Identifier.CreateAlbum ->
+            DoMoreWithMegaCreateAlbumButtonPressedEvent
+
+        DoMoreWithMegaItem.Identifier.AddContact ->
+            DoMoreWithMegaAddContactButtonPressedEvent
+
+        DoMoreWithMegaItem.Identifier.ScheduleMeeting ->
+            DoMoreWithMegaScheduleMeetingButtonPressedEvent
+    }
 
 /**
  * Resolves the navigation for a "Do more with MEGA" shortcut. Handling the click here (rather than
