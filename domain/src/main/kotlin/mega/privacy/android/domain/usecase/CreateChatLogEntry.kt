@@ -12,7 +12,7 @@ import javax.inject.Inject
  */
 internal class CreateChatLogEntry @Inject constructor(
     private val createTraceString: CreateTraceString,
-    private val getCurrentTimeString: GetCurrentTimeString,
+    private val getCurrentTimeStringUseCase: GetCurrentTimeStringUseCase,
     private val environmentRepository: EnvironmentRepository,
 ) : CreateLogEntry {
 
@@ -43,13 +43,10 @@ internal class CreateChatLogEntry @Inject constructor(
     private fun isChatLog(tag: String?) = tag == "[chat_sdk]"
 
     private suspend fun createClientAppTag(priority: LogPriority): String =
-        "[${getFormattedTime()}][${priority.name}][clientApp ${getAppVersion()}]"
+        "[${getCurrentTimeStringUseCase()}][${priority.name}][clientApp ${getAppVersion()}]"
 
     private suspend fun getAppVersion() =
         appVersion ?: environmentRepository.getAppInfo().appVersion.also {
             appVersion = it
         }
-
-
-    private suspend fun getFormattedTime() = getCurrentTimeString("MM-dd HH:mm:ss", "UTC")
 }

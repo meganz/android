@@ -25,10 +25,8 @@ class CreateChatLogEntryTest {
         )
     }
 
-    private val getCurrentTimeString = mock<GetCurrentTimeString> {
-        on { invoke(any(), any()) }.thenReturn(
-            timeString
-        )
+    private val getCurrentTimeStringUseCase = mock<GetCurrentTimeStringUseCase> {
+        on { invoke() }.thenReturn(timeString)
     }
 
     private val appVersion = "v1"
@@ -41,7 +39,7 @@ class CreateChatLogEntryTest {
     fun setUp() {
         underTest = CreateChatLogEntry(
             createTraceString = createTraceString,
-            getCurrentTimeString = getCurrentTimeString,
+            getCurrentTimeStringUseCase = getCurrentTimeStringUseCase,
             environmentRepository = environmentRepository,
         )
     }

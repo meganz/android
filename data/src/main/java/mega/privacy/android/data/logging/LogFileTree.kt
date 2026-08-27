@@ -1,5 +1,6 @@
 package mega.privacy.android.data.logging
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -52,7 +53,16 @@ internal class LogFileTree(
     init {
         scope.launch {
             for (request in channel) {
-                createLogEntry(request)?.let(writer::writeLogEntry)
+                try {
+                    createLogEntry(request)?.let(writer::writeLogEntry)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: Throwable) {
+                    // Deliberately silent. Reporting from here would allocate on the exhausted
+                    // heap this catch exists to survive, and routing it through Timber would
+                    // re-enter log(), since this class is itself a planted tree. Dropping an
+                    // entry is already this worker's behaviour when the channel overflows.
+                }
             }
         }
     }
