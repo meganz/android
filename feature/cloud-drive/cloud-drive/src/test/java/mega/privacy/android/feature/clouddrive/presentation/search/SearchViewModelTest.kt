@@ -187,7 +187,8 @@ class SearchViewModelTest {
         whenever(
             monitorNodeUpdatesByIdUseCase(
                 NodeId(parentHandle),
-                nodeSourceType
+                nodeSourceType,
+                acceptAllUpdates = true
             )
         ).thenReturn(flowOf())
         whenever(nodeSourceTypeToSearchTargetMapper(any())).thenReturn(SearchTarget.ROOT_NODES)
@@ -1293,7 +1294,8 @@ class SearchViewModelTest {
             whenever(
                 monitorNodeUpdatesByIdUseCase(
                     NodeId(parentHandle),
-                    nodeSourceType
+                    nodeSourceType,
+                    acceptAllUpdates = true
                 )
             ).thenReturn(flowOf(NodeChanges.Remove))
 
@@ -1314,7 +1316,8 @@ class SearchViewModelTest {
             whenever(
                 monitorNodeUpdatesByIdUseCase(
                     NodeId(parentHandle),
-                    nodeSourceType
+                    nodeSourceType,
+                    acceptAllUpdates = true
                 )
             ).thenReturn(flowOf(NodeChanges.Attributes))
 
@@ -1336,7 +1339,8 @@ class SearchViewModelTest {
         whenever(
             monitorNodeUpdatesByIdUseCase(
                 NodeId(parentHandle),
-                nodeSourceType
+                nodeSourceType,
+                acceptAllUpdates = true
             )
         ).thenReturn(flowOf(NodeChanges.Attributes))
 
@@ -1356,7 +1360,8 @@ class SearchViewModelTest {
         whenever(
             monitorNodeUpdatesByIdUseCase(
                 NodeId(parentHandle),
-                nodeSourceType
+                nodeSourceType,
+                acceptAllUpdates = true
             )
         ).thenReturn(nodeChangesFlow)
 
@@ -1372,7 +1377,7 @@ class SearchViewModelTest {
     @Test
     fun `test that NavigateBackEventConsumed action consumes the navigate back event`() = runTest {
         setupTestData(emptyList())
-        whenever(monitorNodeUpdatesByIdUseCase(NodeId(parentHandle))).thenReturn(flowOf(NodeChanges.Remove))
+        whenever(monitorNodeUpdatesByIdUseCase(NodeId(parentHandle), acceptAllUpdates = true)).thenReturn(flowOf(NodeChanges.Remove))
 
         val underTest = createViewModel()
 
@@ -1428,7 +1433,8 @@ class SearchViewModelTest {
             whenever(
                 monitorNodeUpdatesByIdUseCase(
                     NodeId(parentHandle),
-                    NodeSourceType.RUBBISH_BIN
+                    NodeSourceType.RUBBISH_BIN,
+                    acceptAllUpdates = true
                 )
             ).thenReturn(flowOf())
 
@@ -1452,7 +1458,8 @@ class SearchViewModelTest {
         whenever(
             monitorNodeUpdatesByIdUseCase(
                 NodeId(-1L),
-                NodeSourceType.CLOUD_DRIVE
+                NodeSourceType.CLOUD_DRIVE,
+                acceptAllUpdates = true
             )
         ).thenReturn(flowOf())
         whenever(getAllNodeTagsUseCase(searchString = "")).thenReturn(listOf("marketing", "2026"))
@@ -1503,7 +1510,8 @@ class SearchViewModelTest {
             whenever(
                 monitorNodeUpdatesByIdUseCase(
                     NodeId(-1L),
-                    NodeSourceType.FAVOURITES
+                    NodeSourceType.FAVOURITES,
+                    acceptAllUpdates = true
                 )
             ).thenReturn(flowOf())
 
@@ -1787,7 +1795,8 @@ class SearchViewModelTest {
             whenever(
                 monitorNodeUpdatesByIdUseCase(
                     NodeId(parentHandle),
-                    NodeSourceType.INCOMING_SHARES
+                    NodeSourceType.INCOMING_SHARES,
+                    acceptAllUpdates = true
                 )
             ).thenReturn(flowOf())
             whenever(nodeSourceTypeToSearchTargetMapper(NodeSourceType.INCOMING_SHARES)).thenReturn(
@@ -1828,7 +1837,7 @@ class SearchViewModelTest {
         val expectedPlaceholder =
             LocalizedText.StringRes(sharedR.string.search_placeholder_cloud_drive)
         setupTestData(emptyList())
-        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any(), any())).thenReturn(flowOf())
         whenever(
             searchPlaceholderMapper(
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
@@ -1855,7 +1864,7 @@ class SearchViewModelTest {
                 formatArgs = listOf(nodeName)
             )
             setupTestData(emptyList())
-            whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+            whenever(monitorNodeUpdatesByIdUseCase(any(), any(), any())).thenReturn(flowOf())
             whenever(getNodeInfoByIdUseCase(NodeId(parentHandle))).thenReturn(nodeInfo)
             whenever(
                 searchPlaceholderMapper(
@@ -1878,7 +1887,7 @@ class SearchViewModelTest {
         val expectedPlaceholder =
             LocalizedText.StringRes(sharedR.string.search_bar_placeholder_text)
         setupTestData(emptyList())
-        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any(), any())).thenReturn(flowOf())
         whenever(getNodeInfoByIdUseCase(NodeId(parentHandle))).thenReturn(null)
         whenever(
             searchPlaceholderMapper(
@@ -1903,7 +1912,7 @@ class SearchViewModelTest {
             val expectedPlaceholder =
                 LocalizedText.StringRes(sharedR.string.search_bar_placeholder_text)
             setupTestData(emptyList())
-            whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+            whenever(monitorNodeUpdatesByIdUseCase(any(), any(), any())).thenReturn(flowOf())
             whenever(getNodeInfoByIdUseCase(NodeId(parentHandle))).thenReturn(nodeInfo)
             whenever(
                 searchPlaceholderMapper(

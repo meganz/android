@@ -299,7 +299,9 @@ class SearchViewModel @AssistedInject constructor(
         viewModelScope.launch {
             monitorNodeUpdatesByIdUseCase(
                 nodeId = NodeId(args.parentHandle),
-                nodeSourceType = args.nodeSourceType
+                nodeSourceType = args.nodeSourceType,
+                // Search results span nodes at any depth,  so any update is relevant
+                acceptAllUpdates = true,
             )
                 .catch { Timber.e(it) }
                 .collectLatest { change ->

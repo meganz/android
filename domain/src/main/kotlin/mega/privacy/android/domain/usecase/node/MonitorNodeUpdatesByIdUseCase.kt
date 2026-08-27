@@ -37,12 +37,14 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
      *
      * @param nodeId the id of the node to monitor updates for
      * @param nodeSourceType the source type of the node
+     * @param acceptAllUpdates when true, accepts all updates forcefully
      * @return a flow of NodeChanges
      */
     @OptIn(FlowPreview::class)
     operator fun invoke(
         nodeId: NodeId,
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        acceptAllUpdates: Boolean = false,
     ) = flow {
         val effectiveNodeId = resolveEffectiveNodeId(
             nodeId = nodeId,
@@ -52,7 +54,8 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
             merge(
                 monitorOnlineNodeUpdates(
                     effectiveNodeId = effectiveNodeId,
-                    nodeSourceType = nodeSourceType
+                    nodeSourceType = nodeSourceType,
+                    acceptAllUpdates = acceptAllUpdates,
                 ),
                 monitorOfflineNodeUpdates(),
                 monitorRefreshSessionUpdates(),
@@ -76,9 +79,10 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
     private fun monitorOnlineNodeUpdates(
         effectiveNodeId: NodeId,
         nodeSourceType: NodeSourceType,
+        acceptAllUpdates: Boolean,
     ) = nodeRepository.monitorNodeUpdates()
         .filter { update ->
-            update.changes.keys.any { node ->
+            acceptAllUpdates || update.changes.keys.any { node ->
                 node.parentId == effectiveNodeId
                         || node.id == effectiveNodeId
                         || update.isChangesInOutgoingShares(node, nodeSourceType)

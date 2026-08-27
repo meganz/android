@@ -70,7 +70,7 @@ class RecentsBucketViewModelTest {
         )
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any(), any())).thenReturn(flowOf())
     }
 
     private fun initViewModel(

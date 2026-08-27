@@ -816,7 +816,7 @@ class CloudDriveViewModelTest {
         )
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any(), any())).thenReturn(flowOf())
 
         val underTest = createViewModel(-1L)
         underTest.uiState.test {
@@ -850,7 +850,7 @@ class CloudDriveViewModelTest {
 
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any(), any())).thenReturn(flowOf())
 
         val underTest = createViewModel(-1L)
         underTest.uiState.test {
@@ -889,7 +889,7 @@ class CloudDriveViewModelTest {
         )
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any(), any())).thenReturn(flowOf())
 
         val underTest = createViewModel(-1L)
         advanceUntilIdle()
@@ -938,7 +938,7 @@ class CloudDriveViewModelTest {
             )
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-            whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+            whenever(monitorNodeUpdatesByIdUseCase(any(), any(), any())).thenReturn(flowOf())
 
             val underTest = createViewModel(-1L)
 
@@ -1454,7 +1454,7 @@ class CloudDriveViewModelTest {
             val nodeUpdates = MutableStateFlow(NodeChanges.Name)
             setupTestData(emptyList())
             monitorNodeUpdatesByIdUseCase.stub {
-                on { invoke(any(), any()) } doReturn nodeUpdates
+                on { invoke(any(), any(), any()) } doReturn nodeUpdates
             }
 
             val underTest = createViewModel()

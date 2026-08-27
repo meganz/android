@@ -97,6 +97,59 @@ class MonitorNodeUpdatesByIdUseCaseTest {
         }
 
     @Test
+    fun `test that invoke emits updates from unrelated nodes when acceptAllUpdates is true`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val unrelatedNode = mock<FolderNode> {
+                on { id } doReturn NodeId(99L)
+                on { parentId } doReturn NodeId(50L)
+                on { isInRubbishBin } doReturn false
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(unrelatedNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
+
+            underTest(nodeId, acceptAllUpdates = true).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke does not emit updates from unrelated nodes when acceptAllUpdates is false`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val unrelatedNode = mock<FolderNode> {
+                on { id } doReturn NodeId(99L)
+                on { parentId } doReturn NodeId(50L)
+                on { isInRubbishBin } doReturn false
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(unrelatedNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
+
+            underTest(nodeId).test {
+                awaitComplete()
+            }
+        }
+
+    @Test
     fun `test that invoke returns NodeChanges_Attributes when offline node is added`() = runTest {
         val nodeId = NodeId(1L)
 
