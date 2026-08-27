@@ -1,14 +1,13 @@
 package mega.privacy.android.data.gateway
 
 import ch.qos.logback.classic.AsyncAppender
-import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.core.Appender
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.logging.FlushableRollingFileAppender
+import mega.privacy.android.data.logging.LogbackContextProvider
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import org.slf4j.LoggerFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
@@ -16,6 +15,7 @@ import kotlin.coroutines.cancellation.CancellationException
 @Singleton
 internal class LogbackLogFlushGateway @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val contextProvider: LogbackContextProvider,
 ) : LogFlushGateway {
 
     /**
@@ -24,16 +24,21 @@ internal class LogbackLogFlushGateway @Inject constructor(
      * blocking. Any non-cancellation failure is swallowed — crashing the app
      * while shutting down the log pipeline would be worse than losing a few
      * buffered log lines.
+     *
+     * Does nothing until logback has been configured: a lifecycle callback can
+     * fire while [mega.privacy.android.data.logging.LogbackContextProvider] is
+     * still configuring, and asking SLF4J for the factory here would hand that
+     * configuring thread a substitute factory.
      */
     override suspend fun flush() = withContext(ioDispatcher) {
         swallow {
-            val factory = LoggerFactory.getILoggerFactory() as? LoggerContext
-                ?: return@withContext
-            factory.loggerList.forEach { logger ->
-                swallow {
-                    val iterator = logger.iteratorForAppenders()
-                    while (iterator.hasNext()) {
-                        flushAppender(iterator.next())
+            contextProvider.ifConfigured { loggerContext ->
+                loggerContext.loggerList.forEach { logger ->
+                    swallow {
+                        val iterator = logger.iteratorForAppenders()
+                        while (iterator.hasNext()) {
+                            flushAppender(iterator.next())
+                        }
                     }
                 }
             }
