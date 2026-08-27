@@ -1,22 +1,26 @@
 package mega.privacy.android.domain.usecase.meeting
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class GetScheduleMeetingDataUseCaseTest {
 
     private lateinit var underTest: GetScheduleMeetingDataUseCase
@@ -26,7 +30,7 @@ internal class GetScheduleMeetingDataUseCaseTest {
         mock<FetchScheduledMeetingOccurrencesByChatUseCase>()
     private val getChatRoomUseCase = mock<GetChatRoomUseCase>()
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = GetScheduleMeetingDataUseCase(
             getScheduledMeetingByChatUseCase,
@@ -35,25 +39,31 @@ internal class GetScheduleMeetingDataUseCaseTest {
         )
     }
 
-    @Test(expected = java.lang.IllegalStateException::class)
-    fun `test that getMeetingScheduleData return null`() =
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            getScheduledMeetingByChatUseCase,
+            fetchScheduledMeetingOccurrencesByChatUseCase,
+            getChatRoomUseCase,
+        )
+    }
+
+    @Test
+    fun `test that invoke throws IllegalStateException when scheduled meeting does not exist`() =
         runTest {
             val chatId = 123L
             whenever(getScheduledMeetingByChatUseCase(chatId)).thenReturn(null)
 
-            val result = underTest.invoke(chatId) { _, _ -> "" }
-
-            assertThat(result).isNull()
+            assertThrows<IllegalStateException> {
+                underTest.invoke(chatId) { _, _ -> "" }
+            }
         }
 
     @Test
     fun `test that getChatRoom is called accordingly`() =
         runTest {
             val chatId = 123L
-            val chat = mock<ChatRoom> {
-                on { chatId }.thenReturn(chatId)
-            }
-            whenever(getChatRoomUseCase(chatId)).thenReturn(chat)
+            whenever(getChatRoomUseCase(chatId)).thenReturn(mock())
             whenever(getScheduledMeetingByChatUseCase(chatId)).thenReturn(
                 listOf(
                     ChatScheduledMeeting(
@@ -93,7 +103,6 @@ internal class GetScheduleMeetingDataUseCaseTest {
     fun `test that getNextSchedMeetingOccurrence is called accordingly`() =
         runTest {
             val chatId = 123L
-            val now = Instant.now().minus(1L, ChronoUnit.HALF_DAYS).epochSecond
             val meetingOccurrence = ChatScheduledMeetingOccurr(
                 schedId = 456L,
                 startDateTime = Instant.now().plusSeconds(60).epochSecond,
@@ -111,13 +120,18 @@ internal class GetScheduleMeetingDataUseCaseTest {
                     )
                 )
             )
-
             whenever(
-                fetchScheduledMeetingOccurrencesByChatUseCase(chatId, now)
+                fetchScheduledMeetingOccurrencesByChatUseCase(eq(chatId), any())
             ).thenReturn(listOf(meetingOccurrence))
 
+            val lowerBound = Instant.now().minus(1L, ChronoUnit.HALF_DAYS).epochSecond
             underTest.invoke(chatId) { _, _ -> "" }
+            val upperBound = Instant.now().minus(1L, ChronoUnit.HALF_DAYS).epochSecond
 
-            verify(fetchScheduledMeetingOccurrencesByChatUseCase).invoke(chatId, now)
+            val sinceCaptor = argumentCaptor<Long>()
+            verify(fetchScheduledMeetingOccurrencesByChatUseCase)
+                .invoke(eq(chatId), sinceCaptor.capture())
+            assertThat(sinceCaptor.firstValue).isAtLeast(lowerBound)
+            assertThat(sinceCaptor.firstValue).isAtMost(upperBound)
         }
 }
