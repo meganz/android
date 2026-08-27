@@ -63,7 +63,19 @@ if ! git rev-parse --verify -q "$BASE_REF" >/dev/null; then
     exit 2
 fi
 
-NEW_NAMES=$(git diff "$BASE_REF"...HEAD -- "$STRINGS_FILE" 2>/dev/null \
+# Diff the named branch, not HEAD: the caller's checkout (e.g. the main
+# worktree during a hook-gated push of another worktree's branch) may have an
+# unrelated branch checked out. HEAD remains the fallback for detached CI
+# checkouts where no ref for the branch exists.
+if git rev-parse --verify -q "refs/heads/$BRANCH" >/dev/null; then
+    DIFF_REF="refs/heads/$BRANCH"
+elif git rev-parse --verify -q "refs/remotes/origin/$BRANCH" >/dev/null; then
+    DIFF_REF="refs/remotes/origin/$BRANCH"
+else
+    DIFF_REF="HEAD"
+fi
+
+NEW_NAMES=$(git diff "$BASE_REF"..."$DIFF_REF" -- "$STRINGS_FILE" 2>/dev/null \
     | grep -E '^\+' \
     | grep -oE '<(string|plurals) name="[^"]+"' \
     | sed -E 's/.*name="([^"]+)"/\1/' \
