@@ -19,8 +19,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * ViewModel for the subscription offer landing screen. Loads the cheapest higher-tier plan that
- * carries an active mobile offer and exposes it as a [mega.privacy.android.feature.payment.model.LocalisedSubscription]
+ * ViewModel for the subscription offer landing screen. Loads the cheapest plan that carries an
+ * active mobile offer and exposes it as a [mega.privacy.android.feature.payment.model.LocalisedSubscription]
  * on the billing period the offer applies to, flagging whether the campaign discounts other plans too.
  *
  * The offer is monitored rather than loaded once, so buying a plan elsewhere in the app clears the
