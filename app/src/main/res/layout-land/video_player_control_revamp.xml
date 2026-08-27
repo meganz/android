@@ -109,7 +109,7 @@
                     android:id="@id/exo_position"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="16dp"
                     android:textColor="@color/white"
                     android:textSize="14sp"
                     tools:text="00:30" />
@@ -137,11 +137,17 @@
                     tools:text="04:30" />
             </LinearLayout>
 
+            <!--
+                DefaultTimeBar insets the drawn bar by half the largest scrubber size
+                (scrubber_dragged_size 20dp / 2 = 10dp), so the 6dp margin lands the bar's left
+                edge on 16dp — the same content baseline as the top bar's navigation icon.
+            -->
             <mega.privacy.android.app.presentation.videoplayer.view.PulsingTimeBar
                 android:id="@id/exo_progress"
                 style="@style/Widget.Mega.TimeBar"
                 android:layout_width="0dp"
                 android:layout_height="20dp"
+                android:layout_marginStart="6dp"
                 android:layout_marginVertical="5dp"
                 app:buffered_color="@color/grey_300"
                 app:layout_constraintBottom_toBottomOf="@id/speed_playback"

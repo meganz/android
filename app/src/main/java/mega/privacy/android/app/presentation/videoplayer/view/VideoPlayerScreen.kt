@@ -26,7 +26,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -110,7 +109,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
 import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
-import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
@@ -182,7 +180,6 @@ internal fun VideoPlayerScreen(
     val view = LocalView.current
     val rootView: View = (context as? Activity)?.window?.decorView ?: view
     val navBarInsets = rememberRevampNavigationBarInsets(rootView, orientation, density)
-    val navigationBarHeight = maxOf(navBarInsets.bottom, navBarInsets.right, navBarInsets.left)
     val navigationBarBottomPx = with(density) { navBarInsets.bottom.toPx().toInt() }
     // The display cutout contributes a side inset of its own in landscape, independent of
     // where the navigation bar sits, so each side clears whichever inset is larger. Portrait
@@ -197,17 +194,6 @@ internal fun VideoPlayerScreen(
         with(density) { maxOf(navBarInsets.right, navBarInsets.cutoutRight).toPx().toInt() }
     } else {
         0
-    }
-
-    var navigationBarPosition by remember(navBarInsets) {
-        mutableStateOf(
-            when {
-                navBarInsets.bottom > 0.dp -> NavigationBarPosition.Bottom
-                navBarInsets.right > 0.dp -> NavigationBarPosition.Right
-                navBarInsets.left > 0.dp -> NavigationBarPosition.Left
-                else -> NavigationBarPosition.None
-            }
-        )
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -721,17 +707,10 @@ internal fun VideoPlayerScreen(
                         )
                     ),
                 ) {
-                    val horizontalPadding = when (orientation) {
-                        ORIENTATION_LANDSCAPE if navigationBarPosition == NavigationBarPosition.Left ->
-                            PaddingValues(start = navigationBarHeight)
-
-                        ORIENTATION_LANDSCAPE if navigationBarPosition == NavigationBarPosition.Right ->
-                            PaddingValues(end = navigationBarHeight)
-
-                        else -> PaddingValues(0.dp)
-                    }
+                    // The top app bar already insets its content by systemBars ∪ displayCutout, and
+                    // its container colour is drawn outside that inset — padding on its modifier
+                    // would shrink the background along with the content.
                     VideoPlayerTopBar(
-                        modifier = Modifier.padding(horizontalPadding),
                         title = uiState.metadata.title ?: uiState.metadata.nodeName,
                         onBackPressed = { backDispatcher?.onBackPressed() },
                         onMoreActionsClicked = onMoreActionsClicked,
