@@ -25,6 +25,8 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -43,13 +45,16 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioResumePositionUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioShuffleEnabledUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.TrackAudioPlaybackInfoUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.PersistAudioPlaybackInfoUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.TrackAndSaveAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStreamOverQuotaEventUseCase
@@ -75,7 +80,21 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     lateinit var audioPlayQueueBuilder: AudioPlayQueueBuilder
 
     @Inject
-    lateinit var trackAudioPlaybackInfoUseCase: TrackAudioPlaybackInfoUseCase
+    lateinit var trackAndSaveAudioPlaybackInfoUseCase: TrackAndSaveAudioPlaybackInfoUseCase
+
+    @Inject
+    lateinit var persistAudioPlaybackInfoUseCase: PersistAudioPlaybackInfoUseCase
+
+    @Inject
+    lateinit var getAudioResumePositionUseCase: GetAudioResumePositionUseCase
+
+    /**
+     * Forced playback-info saves run on the application scope, not [lifecycleScope]: the ones
+     * fired while the service is being torn down (stop, task removed) must outlive it.
+     */
+    @Inject
+    @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
 
     @Inject
     lateinit var monitorAudioBackgroundPlayEnabledUseCase: MonitorAudioBackgroundPlayEnabledUseCase
@@ -123,6 +142,10 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private var playQueueBuildJob: Job? = null
     private var trackPlaybackInfoJob: Job? = null
     private var lastPlayQueueParams: AudioPlayQueueParams? = null
+
+    // Latest snapshot with a resolved handle, kept because forced saves on track change fire
+    // after the player has already moved to the next item and its duration is no longer readable.
+    private var lastPlaybackInfo: MediaPlaybackInfo? = null
     private var isTransferOverQuota = false
 
     override fun onCreate() {
@@ -337,6 +360,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 // handlePlayRequestedWhileOverQuota), which does not re-show it itself.
                 MiniAudioPlayerController.notifyV2AudioPlayerPlaying(true)
             } else {
+                forceSaveCurrentPlaybackInfo()
                 // Remove the foreground lock so the notification can be swiped away when
                 // the player is paused. MediaSessionService will re-enter foreground
                 // automatically if playback resumes.
@@ -344,6 +368,31 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                     this@AudioPlayerService,
                     ServiceCompat.STOP_FOREGROUND_DETACH
                 )
+            }
+        }
+
+        override fun onPositionDiscontinuity(
+            oldPosition: Player.PositionInfo,
+            newPosition: Player.PositionInfo,
+            reason: Int,
+        ) {
+            when (reason) {
+                Player.DISCONTINUITY_REASON_SEEK,
+                Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT,
+                Player.DISCONTINUITY_REASON_AUTO_TRANSITION,
+                Player.DISCONTINUITY_REASON_SKIP,
+                Player.DISCONTINUITY_REASON_REMOVE,
+                    -> if (oldPosition.mediaItemIndex == newPosition.mediaItemIndex) {
+                    // A seek, or a repeat-one loop. A loop restarts near zero, which the persist
+                    // use case discards as below the minimum playback threshold: the user is
+                    // still listening, so the item must stay resumable rather than count as
+                    // played through.
+                    forceSaveCurrentPlaybackInfo()
+                } else {
+                    saveLeftItemPlaybackInfo(oldPosition)
+                }
+
+                else -> {}
             }
         }
 
@@ -419,35 +468,85 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         trackPlaybackInfoJob?.cancel()
         trackPlaybackInfoJob = lifecycleScope.launch {
             player?.let { exoPlayer ->
-                trackAudioPlaybackInfoUseCase {
-                    val handle = exoPlayer.currentMediaItem?.mediaId
-                        ?.let { mediaHandleStore.getHandle(it) } ?: -1L
-                    MediaPlaybackInfo(
-                        mediaHandle = handle,
-                        totalDuration = exoPlayer.duration.coerceAtLeast(0L),
-                        currentPosition = exoPlayer.currentPosition,
-                        mediaType = MediaType.Audio,
-                    )
+                runCatching {
+                    trackAndSaveAudioPlaybackInfoUseCase {
+                        buildCurrentPlaybackInfo(exoPlayer).also(::cachePlaybackInfo)
+                    }
+                }.onFailure {
+                    if (it is CancellationException) throw it
+                    Timber.e(it, "Audio playback tracking stopped unexpectedly")
                 }
             }
         }
         return START_STICKY
     }
 
+    private fun buildCurrentPlaybackInfo(exoPlayer: ExoPlayer): MediaPlaybackInfo {
+        val handle = exoPlayer.currentMediaItem?.mediaId
+            ?.let { mediaHandleStore.getHandle(it) } ?: -1L
+        return MediaPlaybackInfo(
+            mediaHandle = handle,
+            totalDuration = exoPlayer.duration.coerceAtLeast(0L),
+            currentPosition = exoPlayer.currentPosition,
+            mediaType = MediaType.Audio,
+        )
+    }
+
+    private fun cachePlaybackInfo(info: MediaPlaybackInfo) {
+        if (info.mediaHandle != -1L) lastPlaybackInfo = info
+    }
+
+    private fun snapshotAndCachePlaybackInfo(): MediaPlaybackInfo? =
+        player?.let(::buildCurrentPlaybackInfo)?.also(::cachePlaybackInfo)
+
+    /**
+     * Persists the player's current position immediately on session-ending events (pause, stop,
+     * seek, track change, app backgrounding), so the periodic save interval only bounds the
+     * position loss on a hard kill or crash.
+     */
+    private fun forceSaveCurrentPlaybackInfo() {
+        snapshotAndCachePlaybackInfo()?.let(::persistPlaybackInfo)
+    }
+
+    private fun persistPlaybackInfo(info: MediaPlaybackInfo) {
+        applicationScope.launch {
+            runCatching { persistAudioPlaybackInfoUseCase(info) }
+                .onFailure { Timber.e(it, "Failed to save audio playback info") }
+        }
+    }
+
+    /**
+     * On track change the final position of the item being left is persisted. Its duration
+     * comes from the last tracked snapshot, because the player already reports the next item's.
+     */
+    private fun saveLeftItemPlaybackInfo(oldPosition: Player.PositionInfo) {
+        val oldHandle = oldPosition.mediaItem?.mediaId
+            ?.let { mediaHandleStore.getHandle(it) } ?: return
+        val last = lastPlaybackInfo?.takeIf { it.mediaHandle == oldHandle } ?: return
+        lastPlaybackInfo = null
+        persistPlaybackInfo(last.copy(currentPosition = oldPosition.positionMs))
+    }
+
     private fun rebuildPlayQueue(params: AudioPlayQueueParams) {
         playQueueBuildJob?.cancel()
         playQueueBuildJob = lifecycleScope.launch {
+            val resumePositionMs = runCatching { getAudioResumePositionUseCase(params.handle) }
+                .onFailure {
+                    if (it is CancellationException) throw it
+                    Timber.e(it, "Failed to resolve audio resume position")
+                }
+                .getOrNull()
             audioPlayQueueBuilder(params)
                 .catch { Timber.e(it, "Failed to build audio play queue") }
                 .collect { mediaSources ->
                     needStopStreamingServer =
                         needStopStreamingServer || mediaSources.serverStarted
-                    applyMediaSources(mediaSources)
+                    applyMediaSources(mediaSources, resumePositionMs)
                 }
         }
     }
 
-    private fun applyMediaSources(mediaSources: MediaPlaySources) {
+    private fun applyMediaSources(mediaSources: MediaPlaySources, resumePositionMs: Long?) {
         val currentPlayer = player ?: return
         if (mediaSources.mediaItems.isEmpty()) return
 
@@ -475,7 +574,11 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 )
             }
         } else {
-            currentPlayer.setMediaItems(mediaSources.mediaItems, startIndex, 0L)
+            currentPlayer.setMediaItems(
+                mediaSources.mediaItems,
+                startIndex,
+                resumePositionMs ?: 0L,
+            )
             currentPlayer.prepare()
             currentPlayer.play()
         }
@@ -491,6 +594,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             }
 
             Lifecycle.Event.ON_STOP -> {
+                forceSaveCurrentPlaybackInfo()
                 if (!isBackgroundPlayEnabled) {
                     val currentPlayer = player ?: return
                     if (currentPlayer.isPlaying) {
@@ -510,6 +614,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     private fun stopPlayerAndSelf() {
+        forceSaveCurrentPlaybackInfo()
         MiniAudioPlayerController.notifyV2AudioPlayerPlaying(false)
         // Stop audio immediately so playback cannot continue even if the service is kept alive
         // by an external MediaController binding (e.g. a notification-listener app that obtained
@@ -530,6 +635,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     override fun onDestroy() {
+        forceSaveCurrentPlaybackInfo()
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         playQueueBuildJob?.cancel()
         trackPlaybackInfoJob?.cancel()

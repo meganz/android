@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.continuewhereleftoff.AUDIO_PLAYBACK_INFO_SAVE_INTERVAL_MS
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -59,10 +61,62 @@ class TrackAndSaveAudioPlaybackInfoUseCaseTest {
     @Test
     fun `test that invoke persists the playback info on every tick`() = runTest {
         whenever(getTickerUseCase.invoke(any())).thenReturn(flowOf(Unit, Unit))
+        val advanced = playbackInfo.copy(
+            currentPosition = playbackInfo.currentPosition + TimeUnit.SECONDS.toMillis(3)
+        )
+        val snapshots = ArrayDeque(listOf(playbackInfo, advanced))
 
-        underTest { playbackInfo }
+        underTest { snapshots.removeFirst() }
 
-        verify(persistAudioPlaybackInfoUseCase, times(2)).invoke(playbackInfo)
+        verify(persistAudioPlaybackInfoUseCase).invoke(playbackInfo)
+        verify(persistAudioPlaybackInfoUseCase).invoke(advanced)
+    }
+
+    @Test
+    fun `test that invoke does not persist the playback info when the snapshot is unchanged`() =
+        runTest {
+            whenever(getTickerUseCase.invoke(any())).thenReturn(flowOf(Unit, Unit, Unit))
+
+            underTest { playbackInfo }
+
+            verify(persistAudioPlaybackInfoUseCase, times(1)).invoke(playbackInfo)
+        }
+
+    @Test
+    fun `test that invoke keeps tracking when persisting a snapshot fails`() = runTest {
+        whenever(getTickerUseCase.invoke(any())).thenReturn(flowOf(Unit, Unit))
+        val advanced = playbackInfo.copy(
+            currentPosition = playbackInfo.currentPosition + TimeUnit.SECONDS.toMillis(3)
+        )
+        val snapshots = ArrayDeque(listOf(playbackInfo, advanced))
+        whenever(persistAudioPlaybackInfoUseCase.invoke(playbackInfo))
+            .thenThrow(RuntimeException("persist failed"))
+
+        underTest { snapshots.removeFirst() }
+
+        verify(persistAudioPlaybackInfoUseCase).invoke(advanced)
+    }
+
+    @Test
+    fun `test that invoke retries an unchanged snapshot when the previous persist failed`() =
+        runTest {
+            whenever(getTickerUseCase.invoke(any())).thenReturn(flowOf(Unit, Unit))
+            whenever(persistAudioPlaybackInfoUseCase.invoke(playbackInfo))
+                .thenThrow(RuntimeException("persist failed"))
+                .thenReturn(Unit)
+
+            underTest { playbackInfo }
+
+            verify(persistAudioPlaybackInfoUseCase, times(2)).invoke(playbackInfo)
+        }
+
+    @Test
+    fun `test that invoke rethrows when persisting is cancelled`() = runTest {
+        whenever(getTickerUseCase.invoke(any())).thenReturn(flowOf(Unit))
+        whenever(persistAudioPlaybackInfoUseCase.invoke(playbackInfo))
+            .thenThrow(CancellationException("cancelled"))
+
+        assertThrows<CancellationException> { underTest { playbackInfo } }
     }
 
     @Test

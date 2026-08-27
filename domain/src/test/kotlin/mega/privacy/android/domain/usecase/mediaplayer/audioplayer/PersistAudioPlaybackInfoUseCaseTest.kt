@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
@@ -9,11 +10,13 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -95,6 +98,40 @@ class PersistAudioPlaybackInfoUseCaseTest {
         }
 
     @Test
+    fun `test that invoke removes the recently used item even when deleting playback info fails`() =
+        runTest {
+            val totalDuration = TimeUnit.MINUTES.toMillis(20)
+            val info = playbackInfo(
+                currentPosition = totalDuration - TimeUnit.SECONDS.toMillis(10),
+                totalDuration = totalDuration,
+            )
+            whenever(mediaPlayerRepository.deleteMediaPlaybackInfo(mediaHandle))
+                .thenThrow(RuntimeException("delete failed"))
+
+            assertThrows<RuntimeException> { underTest(info) }
+
+            verify(removeRecentlyUsedItemUseCase).invoke(mediaHandle)
+        }
+
+    @Test
+    fun `test that invoke suppresses the second failure when both cleanups fail`() = runTest {
+        val totalDuration = TimeUnit.MINUTES.toMillis(20)
+        val info = playbackInfo(
+            currentPosition = totalDuration - TimeUnit.SECONDS.toMillis(10),
+            totalDuration = totalDuration,
+        )
+        val deleteFailure = RuntimeException("delete failed")
+        val removeFailure = RuntimeException("remove failed")
+        whenever(mediaPlayerRepository.deleteMediaPlaybackInfo(mediaHandle)).thenThrow(deleteFailure)
+        whenever(removeRecentlyUsedItemUseCase(mediaHandle)).thenThrow(removeFailure)
+
+        val thrown = assertThrows<RuntimeException> { underTest(info) }
+
+        assertThat(thrown).isEqualTo(deleteFailure)
+        assertThat(thrown.suppressed.toList()).containsExactly(removeFailure)
+    }
+
+    @Test
     fun `test that invoke persists the playback info when just over 30 seconds remain`() =
         runTest {
             val totalDuration = TimeUnit.MINUTES.toMillis(20)
@@ -110,12 +147,12 @@ class PersistAudioPlaybackInfoUseCaseTest {
         }
 
     @Test
-    fun `test that invoke persists the playback info when the duration is unknown`() = runTest {
+    fun `test that invoke does nothing when the duration is unknown`() = runTest {
         val info = playbackInfo(currentPosition = TimeUnit.MINUTES.toMillis(10), totalDuration = 0L)
 
         underTest(info)
 
-        verify(mediaPlayerRepository).updateAndPersistAudioPlaybackInfo(info)
+        verify(mediaPlayerRepository, never()).updateAndPersistAudioPlaybackInfo(any())
         verify(mediaPlayerRepository, never()).deleteMediaPlaybackInfo(any())
     }
 }

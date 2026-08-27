@@ -36,3 +36,9 @@ val AUDIO_RESUME_FINISHED_THRESHOLD_MS: Long = TimeUnit.SECONDS.toMillis(30)
  * change, app backgrounding) force an immediate save on top of the periodic one.
  */
 val AUDIO_PLAYBACK_INFO_SAVE_INTERVAL_MS: Long = TimeUnit.SECONDS.toMillis(3)
+
+/**
+ * Only audio items longer than this are silently resumed from their saved playback position
+ * when reopened; shorter items always restart from the beginning.
+ */
+val AUDIO_RESUME_MINIMUM_DURATION_MS: Long = TimeUnit.MINUTES.toMillis(6)
