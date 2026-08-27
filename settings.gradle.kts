@@ -39,6 +39,7 @@ if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     include(":sdk")
 }
 
+include(":a11y-test")
 include(":app")
 include(":baselineprofile")
 include(":core-test")

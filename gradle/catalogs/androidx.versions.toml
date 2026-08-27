@@ -52,6 +52,7 @@ camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" 
 camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 compose-material = { group = "androidx.compose.material", name = "material" }
 compose-icons = { group = "androidx.compose.material", name = "material-icons-core" }
 compose-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
