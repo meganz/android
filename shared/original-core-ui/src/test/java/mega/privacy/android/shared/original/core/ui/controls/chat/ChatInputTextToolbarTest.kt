@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat
 
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -41,13 +42,12 @@ class ChatInputTextToolbarTest {
     ) {
         composeRule.setContent {
             ChatInputTextToolbar(
-                text = text,
+                state = rememberTextFieldState(text),
                 placeholder = placeHolder,
                 showEmojiPicker = false,
                 onAttachmentClick = {},
                 onSendClick = {},
                 onEmojiClick = {},
-                onTextChange = {},
             )
         }
     }

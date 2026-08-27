@@ -6,12 +6,17 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -19,8 +24,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -57,25 +60,30 @@ internal fun ChatBottomBar(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
-    var textFieldValue by rememberSaveable(
-        inputs = arrayOf(uiState.sendingText, uiState.editingMessageContent),
-        stateSaver = TextFieldValue.Saver
-    ) {
-        mutableStateOf(
-            TextFieldValue(uiState.sendingText, TextRange(uiState.sendingText.length))
-        )
-    }
+    val textFieldState = rememberTextFieldState()
+    // The draft already written into the field. Survives configuration changes so that
+    // recreating the composition re-applies nothing and leaves unsaved typing intact.
+    var appliedSendingText by rememberSaveable { mutableStateOf<String?>(null) }
+    var appliedEditingContent by rememberSaveable { mutableStateOf<String?>(null) }
+
     LaunchedEffect(uiState.sendingText, uiState.editingMessageContent) {
+        if (appliedSendingText != uiState.sendingText
+            || appliedEditingContent != uiState.editingMessageContent
+        ) {
+            appliedSendingText = uiState.sendingText
+            appliedEditingContent = uiState.editingMessageContent
+            textFieldState.setTextAndPlaceCursorAtEnd(uiState.sendingText)
+        }
         if (uiState.sendingText.isNotEmpty()) {
             focusRequester.requestFocus()
             keyboardController?.show()
         }
     }
-    key(textFieldValue.text, uiState.editingMessageId) {
-        ComposableLifecycle {
-            if (it == Lifecycle.Event.ON_PAUSE) {
-                viewModel.saveDraftMessage(textFieldValue.text, uiState.editingMessageId)
-            }
+
+    val latestEditingMessageId by rememberUpdatedState(uiState.editingMessageId)
+    ComposableLifecycle {
+        if (it == Lifecycle.Event.ON_PAUSE) {
+            viewModel.saveDraftMessage(textFieldState.text.toString(), latestEditingMessageId)
         }
     }
 
@@ -103,7 +111,13 @@ internal fun ChatBottomBar(
 
     ChatBottomBarContent(
         uiState = uiState,
-        textFieldValue = textFieldValue,
+        textFieldState = textFieldState,
+        // Runs only for user input: a programmatic edit goes through TextFieldState.edit,
+        // which never applies the input transformation. Writing a draft into the field
+        // therefore cannot report the user as typing to the other participants.
+        inputTransformation = InputTransformation {
+            if (length > 0) viewModel.onUserTyping()
+        },
         showEmojiPicker = showEmojiPicker,
         onSendClick = {
             onSendClick(it)
@@ -115,10 +129,6 @@ internal fun ChatBottomBar(
         },
         onEmojiClick = onEmojiClick,
         interactionSourceTextInput = interactionSourceTextInput,
-        onTextChange = {
-            textFieldValue = it
-            if (it.text.isNotEmpty()) viewModel.onUserTyping()
-        },
         onCloseEditing = {
             onCloseEditing()
             viewModel.onExitTypingContext()
@@ -132,24 +142,23 @@ internal fun ChatBottomBar(
  * Chat bottom bar content
  *
  * @param uiState
- * @param textFieldValue
+ * @param textFieldState
  * @param showEmojiPicker
  * @param onSendClick
  * @param onAttachmentClick
  * @param onEmojiClick
- * @param onTextChange
  * @param interactionSourceTextInput
  */
 @Composable
 fun ChatBottomBarContent(
     uiState: ChatUiState,
-    textFieldValue: TextFieldValue,
+    textFieldState: TextFieldState,
     showEmojiPicker: Boolean,
     onSendClick: (String) -> Unit,
     onAttachmentClick: () -> Unit,
     onEmojiClick: () -> Unit,
-    onTextChange: (TextFieldValue) -> Unit,
     interactionSourceTextInput: MutableInteractionSource,
+    inputTransformation: InputTransformation? = null,
     onCloseEditing: () -> Unit = {},
     onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
     focusRequester: FocusRequester = remember { FocusRequester() },
@@ -162,7 +171,6 @@ fun ChatBottomBarContent(
         )
         ChatInputTextToolbar(
             onAttachmentClick = onAttachmentClick,
-            text = uiState.sendingText,
             placeholder = if (uiState.isNoteToSelf) stringResource(sharedR.string.chat_note_to_self_chat_message_hint) else stringResource(
                 R.string.type_message_hint_with_customized_title,
                 uiState.title.orEmpty()
@@ -170,12 +178,12 @@ fun ChatBottomBarContent(
             showEmojiPicker = showEmojiPicker,
             onSendClick = {
                 onSendClick(it)
-                onTextChange(TextFieldValue(""))
+                textFieldState.clearText()
             },
             onEmojiClick = onEmojiClick,
             interactionSource = interactionSourceTextInput,
-            textFieldValue = textFieldValue,
-            onTextChange = onTextChange,
+            state = textFieldState,
+            inputTransformation = inputTransformation,
             editingMessageId = uiState.editingMessageId,
             editMessageContent = uiState.editingMessageContent,
             onCloseEditing = onCloseEditing,
@@ -195,12 +203,11 @@ private fun ChatBottomBarPreview() {
                 sendingText = "Sending text",
                 usersTyping = listOf("User 1", "User 2"),
             ),
-            textFieldValue = TextFieldValue(""),
+            textFieldState = rememberTextFieldState(),
             showEmojiPicker = false,
             onSendClick = {},
             onAttachmentClick = {},
             onEmojiClick = {},
-            onTextChange = {},
             interactionSourceTextInput = remember { MutableInteractionSource() },
         )
     }

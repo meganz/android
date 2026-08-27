@@ -20,9 +20,13 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +44,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.tokens.theme.DSTokens
@@ -74,22 +77,22 @@ const val TEST_TAG_RECORD_VOICE_CLIP_ICON = "chat_input_text_toolbar:record_voic
 /**
  * Chat input text toolbar
  *
+ * @param state holds the text and the selection of the input field
  * @param modifier modifier
  * @param onAttachmentClick click listener for attachment icon
  * @param onSendClick click listener for send icon
  */
 @Composable
 fun ChatInputTextToolbar(
-    text: String,
+    state: TextFieldState,
     placeholder: String,
     showEmojiPicker: Boolean,
     onAttachmentClick: () -> Unit,
     onSendClick: (String) -> Unit,
     onEmojiClick: () -> Unit,
-    onTextChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    textFieldValue: TextFieldValue = TextFieldValue(text),
+    inputTransformation: InputTransformation? = null,
     editingMessageId: Long? = null,
     editMessageContent: String? = null,
     onCloseEditing: () -> Unit = {},
@@ -101,10 +104,13 @@ fun ChatInputTextToolbar(
     var showExpandButton by remember { mutableStateOf(false) }
     var isRoundedShape by remember { mutableStateOf(false) }
     val isEditing = editingMessageId != null
+    // Derived so that typing only recomposes the toolbar when the field crosses
+    // between empty and non-empty, not on every keystroke.
+    val isTextEmpty by remember(state) { derivedStateOf { state.text.isEmpty() } }
     val voiceClipRecorderState =
         remember { mutableStateOf(VoiceClipRecorderState()) }
-    LaunchedEffect(textFieldValue.text) {
-        if (textFieldValue.text.isEmpty()) {
+    LaunchedEffect(isTextEmpty) {
+        if (isTextEmpty) {
             isInputExpanded = false
         }
     }
@@ -185,9 +191,9 @@ fun ChatInputTextToolbar(
                         )
                     }
                     ChatTextField(
-                        textFieldValue = textFieldValue,
+                        state = state,
+                        inputTransformation = inputTransformation,
                         placeholder = placeholder,
-                        onTextChange = onTextChange,
                         onEmojiClick = onEmojiClick,
                         isEmojiPickerShown = showEmojiPicker,
                         isExpanded = isInputExpanded,
@@ -204,7 +210,7 @@ fun ChatInputTextToolbar(
                     modifier = Modifier
                         .align(Alignment.Bottom)
                         .padding(vertical = 6.dp),
-                    visible = textFieldValue.text.isNotEmpty() ||
+                    visible = !isTextEmpty ||
                             voiceClipRecorderState.value.event == VoiceClipRecordEvent.Lock,
                 ) {
                     Icon(
@@ -218,7 +224,7 @@ fun ChatInputTextToolbar(
                                         VoiceClipRecorderState(show = false)
                                     onVoiceClipEvent(VoiceClipRecordEvent.Finish)
                                 } else {
-                                    onSendClick(textFieldValue.text)
+                                    onSendClick(state.text.toString())
                                 }
                                 isInputExpanded = false
                             }),
@@ -231,7 +237,7 @@ fun ChatInputTextToolbar(
                     modifier = Modifier
                         .align(Alignment.Bottom)
                         .padding(vertical = 6.dp),
-                    visible = textFieldValue.text.isEmpty() &&
+                    visible = isTextEmpty &&
                             voiceClipRecorderState.value.event != VoiceClipRecordEvent.Lock,
                 ) {
                     Icon(
@@ -278,9 +284,7 @@ fun ChatInputTextToolbar(
                             .calculateBottomPadding()
                     )
                 MegaEmojiPickerView(
-                    onEmojiPicked = {
-                        onTextChange(addPickedEmojiToInput(it.emoji, textFieldValue))
-                    },
+                    onEmojiPicked = { state.insertAtSelection(it.emoji) },
                     showEmojiPicker = showEmojiPicker,
                     modifier = Modifier
                         .height(if (keyboardHeight > 0.dp) keyboardHeight else defaultHeight),
@@ -290,21 +294,18 @@ fun ChatInputTextToolbar(
     }
 }
 
-private fun addPickedEmojiToInput(
-    emoji: String,
-    textFieldValue: TextFieldValue,
-): TextFieldValue = with(textFieldValue) {
-    val start = selection.start
-    val end = selection.end
-
-    TextFieldValue(
-        text = if (start == end && end == text.length - 1) {
-            text + emoji
-        } else {
-            text.substring(0, start) + emoji + text.substring(end)
-        },
-        selection = TextRange(start + emoji.length)
-    )
+/**
+ * Replaces the current selection with [text] and leaves the cursor after it.
+ *
+ * A selection dragged right-to-left is reversed, so its offsets are normalised —
+ * [TextFieldBuffer.replace] requires `start <= end` and throws otherwise.
+ */
+internal fun TextFieldState.insertAtSelection(text: String) {
+    edit {
+        val start = selection.min
+        replace(start, selection.max, text)
+        selection = TextRange(start + text.length)
+    }
 }
 
 @CombinedThemePreviews
@@ -314,13 +315,12 @@ private fun ChatInputTextToolbarPlaceholderPreview(
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatInputTextToolbar(
-            text = "",
+            state = rememberTextFieldState(),
             placeholder = "Very long long long long long long long long long long long long long long long long long long long long long long long long long long long ",
             showEmojiPicker = showEmojiPicker,
             onAttachmentClick = {},
             onSendClick = {},
             onEmojiClick = {},
-            onTextChange = {},
         )
     }
 }
@@ -332,13 +332,12 @@ private fun ChatInputTextToolbarLongTextPreview(
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatInputTextToolbar(
-            text = "abc ".repeat(30),
+            state = rememberTextFieldState("abc ".repeat(30)),
             placeholder = "",
             showEmojiPicker = showEmojiPicker,
             onAttachmentClick = {},
             onSendClick = {},
             onEmojiClick = {},
-            onTextChange = {},
         )
     }
 }
@@ -350,13 +349,12 @@ private fun ChatInputTextToolbarEditingMessageTextPreview(
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatInputTextToolbar(
-            text = "Hello world",
+            state = rememberTextFieldState("Hello world"),
             placeholder = "",
             showEmojiPicker = false,
             onAttachmentClick = {},
             onSendClick = {},
             onEmojiClick = {},
-            onTextChange = {},
             editingMessageId = 1L,
             editMessageContent = "This is a message"
         )

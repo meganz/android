@@ -7,8 +7,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.TextFieldDecorator
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -33,7 +38,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -51,28 +55,31 @@ internal const val CHAT_TEXT_FIELD_EMOJI_ICON = "chat_text_field:emoji_icon"
 /**
  * Chat text field
  *
- * @param textFieldValue text to show
- * @param onTextChange when text changes
+ * @param state holds the text and the selection of the field
+ * @param isExpanded whether the field is expanded to full height
+ * @param onEmojiClick when the emoji icon is clicked
+ * @param isEmojiPickerShown whether the emoji picker is currently shown
  * @param modifier modifier for the text field
  * @param placeholder placeholder text
- * @param singleLine single line or not
+ * @param lineLimits how many lines the field may grow to
  * @param imeAction ime action
- * @param keyboardActions keyboard actions
+ * @param onKeyboardAction handler for the ime action
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatTextField(
-    textFieldValue: TextFieldValue,
+    state: TextFieldState,
     isExpanded: Boolean,
-    onTextChange: (TextFieldValue) -> Unit,
     onEmojiClick: () -> Unit,
     isEmojiPickerShown: Boolean,
     modifier: Modifier = Modifier,
     placeholder: String = "",
-    singleLine: Boolean = false,
+    inputTransformation: InputTransformation? = null,
+    lineLimits: TextFieldLineLimits = TextFieldLineLimits.MultiLine(
+        maxHeightInLines = if (isExpanded) Int.MAX_VALUE else 5
+    ),
     imeAction: ImeAction = ImeAction.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    maxLines: Int = if (isExpanded) Int.MAX_VALUE else 5,
+    onKeyboardAction: KeyboardActionHandler? = null,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     focusRequester: FocusRequester = remember { FocusRequester() },
@@ -88,11 +95,12 @@ fun ChatTextField(
         unfocusedIndicatorColor = Color.Transparent,
     )
     val customTextSelectionColors = customTextSelectionColors()
+    val isSingleLine = lineLimits == TextFieldLineLimits.SingleLine
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         BasicTextField(
-            value = textFieldValue,
-            onValueChange = onTextChange,
+            state = state,
+            inputTransformation = inputTransformation,
             modifier = Modifier
                 .testTag(CHAT_TEXT_FIELD_TEXT_TAG)
                 // Opt the chat input out of autofill. A large draft message can make the
@@ -115,37 +123,37 @@ fun ChatTextField(
                 keyboardType = KeyboardType.Text,
                 imeAction = imeAction
             ),
-            keyboardActions = keyboardActions,
+            onKeyboardAction = onKeyboardAction,
+            lineLimits = lineLimits,
             interactionSource = interactionSource,
-            singleLine = singleLine,
-            maxLines = maxLines,
-            onTextLayout = onTextLayout,
-        ) {
-            TextFieldDefaults.TextFieldDecorationBox(
-                value = textFieldValue.text,
-                innerTextField = it,
-                enabled = true,
-                singleLine = singleLine,
-                interactionSource = interactionSource,
-                visualTransformation = VisualTransformation.None,
-                isError = false,
-                placeholder = {
-                    Text(
-                        text = placeholder,
-                        style = MaterialTheme.typography.body1,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                },
-                colors = colors,
-                contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
-                    start = 12.dp,
-                    bottom = 10.dp,
-                    top = 10.dp,
-                    end = if (isExpanded) 12.dp else 40.dp
-                ),
-            )
-        }
+            onTextLayout = { getResult -> getResult()?.let(onTextLayout) },
+            decorator = TextFieldDecorator { innerTextField ->
+                TextFieldDefaults.TextFieldDecorationBox(
+                    value = state.text.toString(),
+                    innerTextField = innerTextField,
+                    enabled = true,
+                    singleLine = isSingleLine,
+                    interactionSource = interactionSource,
+                    visualTransformation = VisualTransformation.None,
+                    isError = false,
+                    placeholder = {
+                        Text(
+                            text = placeholder,
+                            style = MaterialTheme.typography.body1,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    colors = colors,
+                    contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
+                        start = 12.dp,
+                        bottom = 10.dp,
+                        top = 10.dp,
+                        end = if (isExpanded) 12.dp else 40.dp
+                    ),
+                )
+            },
+        )
     }
 
     Icon(
@@ -170,9 +178,8 @@ private fun ChatTextFieldPreview(
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatTextField(
-            textFieldValue = TextFieldValue("how it looks like when the text is too long"),
+            state = rememberTextFieldState("how it looks like when the text is too long"),
             placeholder = "Message",
-            onTextChange = {},
             onEmojiClick = {},
             isEmojiPickerShown = isEmojiPickerShown,
             isExpanded = false

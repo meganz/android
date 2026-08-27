@@ -1,12 +1,12 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat
 
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.ui.autofill.ContentDataType
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
@@ -21,8 +21,7 @@ class ChatTextFieldTest {
     fun `test that emoji icon show correctly`() {
         composeRule.setContent {
             ChatTextField(
-                textFieldValue = TextFieldValue("Hello world"),
-                onTextChange = {},
+                state = rememberTextFieldState("Hello world"),
                 onEmojiClick = {},
                 isEmojiPickerShown = false,
                 isExpanded = false
@@ -35,8 +34,7 @@ class ChatTextFieldTest {
     fun `test that chat text field opts out of autofill`() {
         composeRule.setContent {
             ChatTextField(
-                textFieldValue = TextFieldValue("Hello world"),
-                onTextChange = {},
+                state = rememberTextFieldState("Hello world"),
                 onEmojiClick = {},
                 isEmojiPickerShown = false,
                 isExpanded = false
