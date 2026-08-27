@@ -31,10 +31,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -50,8 +49,7 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
-import mega.privacy.android.feature.mediaplayer.components.AudioPlayerGradientBackground
-import mega.privacy.android.feature.mediaplayer.components.AudioPlayerWindowEffect
+import mega.privacy.android.feature.mediaplayer.components.MediaPlayerLoadingIndicator
 import mega.privacy.android.feature.mediaplayer.data.model.AudioQueueItem
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQueueUiState
 import mega.privacy.android.icon.pack.IconPack
@@ -63,45 +61,49 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.resources.R as sharedR
 
+/**
+ * Queue list without a top bar or background of its own.
+ *
+ * The audio player renders it either as the right-hand pane in landscape or as a full-screen
+ * overlay in portrait, and owns the background, top bar and window insets for both.
+ */
 @Composable
-internal fun AudioPlayerQueueScreen(
+internal fun AudioPlayerQueueContent(
     uiState: AudioPlayerQueueUiState,
-    onBack: () -> Unit,
     onQueueItemClick: (Int) -> Unit,
     onQueueItemMoved: (fromIndex: Int, toIndex: Int) -> Unit,
     onSetContinuousPlayback: (Boolean) -> Unit,
-    onMoreActionsClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState = rememberLazyListState()
-    AndroidTheme(isDark = true, useLegacyStatusBarColor = false) {
-        AudioPlayerWindowEffect()
-        AudioPlayerGradientBackground(
-            modifier = modifier
-                .fillMaxSize()
-                .semantics { testTagsAsResourceId = true },
-            reversed = true,
+    when (uiState) {
+        AudioPlayerQueueUiState.Loading -> Box(
+            modifier = modifier.testTag(AUDIO_PLAYER_QUEUE_LOADING_TAG),
+            contentAlignment = Alignment.Center,
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                AudioPlayerTopBar(
-                    onBackPressed = onBack,
-                    onMoreActionsClicked = onMoreActionsClicked,
-                )
-
-                if (uiState is AudioPlayerQueueUiState.Data) {
-                    QueueContent(
-                        uiState = uiState,
-                        lazyListState = lazyListState,
-                        onQueueItemClick = onQueueItemClick,
-                        onQueueItemMoved = onQueueItemMoved,
-                        onSetContinuousPlayback = onSetContinuousPlayback,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-            }
+            MediaPlayerLoadingIndicator(modifier = Modifier.size(48.dp))
         }
+
+        is AudioPlayerQueueUiState.Data -> QueueContent(
+            uiState = uiState,
+            lazyListState = lazyListState,
+            onQueueItemClick = onQueueItemClick,
+            onQueueItemMoved = onQueueItemMoved,
+            onSetContinuousPlayback = onSetContinuousPlayback,
+            modifier = modifier.testTag(AUDIO_PLAYER_QUEUE_CONTENT_TAG),
+        )
     }
 }
+
+/**
+ * Test tag for the audio player queue list content
+ */
+internal const val AUDIO_PLAYER_QUEUE_CONTENT_TAG = "audio_player:queue_content"
+
+/**
+ * Test tag for the audio player queue loading placeholder
+ */
+internal const val AUDIO_PLAYER_QUEUE_LOADING_TAG = "audio_player:queue_loading"
 
 /**
  * Rows of the queue list. The headers and the bottom inset participate in the same lazy list as
@@ -414,46 +416,50 @@ private fun QueueItemRow(
 
 @Preview
 @Composable
-private fun AudioPlayerQueueScreenPreview() {
-    AudioPlayerQueueScreen(
-        uiState = AudioPlayerQueueUiState.Data(
-            currentTitle = "Track A",
-            currentArtist = "Artist A",
-            playingFromName = "My Music",
-            isContinuousPlayback = true,
-            currentQueueIndex = 0,
-            currentArtworkUri = null,
-            currentThumbnailData = null,
-            items = listOf(
-                AudioQueueItem(mediaId = "a", title = "Track A", artist = "Artist A"),
-                AudioQueueItem(mediaId = "b", title = "Track B", artist = "Artist B"),
-                AudioQueueItem(mediaId = "c", title = "Track C", artist = null),
+private fun AudioPlayerQueueContentPreview() {
+    AndroidTheme(isDark = true) {
+        AudioPlayerQueueContent(
+            uiState = AudioPlayerQueueUiState.Data(
+                currentTitle = "Track A",
+                currentArtist = "Artist A",
+                playingFromName = "My Music",
+                isContinuousPlayback = true,
+                currentQueueIndex = 0,
+                currentArtworkUri = null,
+                currentThumbnailData = null,
+                items = listOf(
+                    AudioQueueItem(mediaId = "a", title = "Track A", artist = "Artist A"),
+                    AudioQueueItem(mediaId = "b", title = "Track B", artist = "Artist B"),
+                    AudioQueueItem(mediaId = "c", title = "Track C", artist = null),
+                ),
             ),
-        ),
-        onBack = {},
-        onQueueItemClick = {},
-        onQueueItemMoved = { _, _ -> },
-        onSetContinuousPlayback = {},
-        onMoreActionsClicked = {},
-    )
+            onQueueItemClick = {},
+            onQueueItemMoved = { _, _ -> },
+            onSetContinuousPlayback = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun QueueItemRowPlayingPreview() {
-    QueueItemRow(
-        item = AudioQueueItem(mediaId = "a", title = "Track A", artist = "Artist A"),
-        isCurrentlyPlaying = true,
-        onClick = {},
-    )
+    AndroidTheme(isDark = true) {
+        QueueItemRow(
+            item = AudioQueueItem(mediaId = "a", title = "Track A", artist = "Artist A"),
+            isCurrentlyPlaying = true,
+            onClick = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun QueueItemRowIdlePreview() {
-    QueueItemRow(
-        item = AudioQueueItem(mediaId = "b", title = "Track B", artist = null),
-        isCurrentlyPlaying = false,
-        onClick = {},
-    )
+    AndroidTheme(isDark = true) {
+        QueueItemRow(
+            item = AudioQueueItem(mediaId = "b", title = "Track B", artist = null),
+            isCurrentlyPlaying = false,
+            onClick = {},
+        )
+    }
 }

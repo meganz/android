@@ -1,16 +1,26 @@
 package mega.privacy.android.feature.mediaplayer.presentation
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.media3.common.Player
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerUiState
 import org.junit.Rule
@@ -18,6 +28,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.robolectric.annotation.Config
 
 @Config(sdk = [34])
@@ -75,28 +86,44 @@ class AudioPlayerScreenTest {
         onSeekBackward15: () -> Unit = {},
         onSpeedClicked: () -> Unit = {},
         onSleepTimerClicked: () -> Unit = {},
+        queueContent: (@Composable (Modifier) -> Unit)? = null,
+        layoutDirection: LayoutDirection = LayoutDirection.Ltr,
     ) {
         composeTestRule.setContent {
-            AudioPlayerScreen(
-                uiState = uiState,
-                isPodcastMode = isPodcastMode,
-                onPlayPauseClicked = onPlayPauseClicked,
-                onSeekTo = onSeekTo,
-                onNextClicked = onNextClicked,
-                onPreviousClicked = onPreviousClicked,
-                onShuffleClicked = onShuffleClicked,
-                onRepeatClicked = onRepeatClicked,
-                onPlaylistClicked = onPlaylistClicked,
-                onBackPressed = onBackPressed,
-                onMoreActionsClicked = onMoreActionsClicked,
-                onToggleMode = onToggleMode,
-                onSeekForward15 = onSeekForward15,
-                onSeekBackward15 = onSeekBackward15,
-                onSpeedClicked = onSpeedClicked,
-                onSleepTimerClicked = onSleepTimerClicked,
-            )
+            CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+                AudioPlayerScreen(
+                    uiState = uiState,
+                    isPodcastMode = isPodcastMode,
+                    onPlayPauseClicked = onPlayPauseClicked,
+                    onSeekTo = onSeekTo,
+                    onNextClicked = onNextClicked,
+                    onPreviousClicked = onPreviousClicked,
+                    onShuffleClicked = onShuffleClicked,
+                    onRepeatClicked = onRepeatClicked,
+                    onPlaylistClicked = onPlaylistClicked,
+                    onBackPressed = onBackPressed,
+                    onMoreActionsClicked = onMoreActionsClicked,
+                    onToggleMode = onToggleMode,
+                    onSeekForward15 = onSeekForward15,
+                    onSeekBackward15 = onSeekBackward15,
+                    onSpeedClicked = onSpeedClicked,
+                    onSleepTimerClicked = onSleepTimerClicked,
+                    queueContent = queueContent,
+                )
+            }
         }
     }
+
+    private fun setContentWithQueue(
+        onPlaylistClicked: () -> Unit = {},
+        layoutDirection: LayoutDirection = LayoutDirection.Ltr,
+    ) = setContent(
+        onPlaylistClicked = onPlaylistClicked,
+        queueContent = { queueModifier ->
+            Box(modifier = queueModifier.testTag(QUEUE_TAG))
+        },
+        layoutDirection = layoutDirection,
+    )
 
     // region Loading state
 
@@ -309,7 +336,7 @@ class AudioPlayerScreenTest {
     }
 
     @Test
-    fun `test that onPlaylistClicked is invoked when playlist button is clicked`() {
+    fun `test that onPlaylistClicked is invoked when playlist button is clicked without queue content`() {
         val onPlaylistClicked = mock<() -> Unit>()
         setContent(
             uiState = defaultData(),
@@ -454,4 +481,205 @@ class AudioPlayerScreenTest {
     }
 
     // endregion
+
+    // region Play queue
+
+    @Test
+    @Config(qualifiers = LANDSCAPE_QUALIFIERS)
+    fun `test that queue is not shown before playlist button is clicked in landscape`() {
+        setContentWithQueue()
+
+        composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    @Test
+    @Config(qualifiers = LANDSCAPE_QUALIFIERS)
+    fun `test that queue is shown when playlist button is clicked in landscape`() {
+        setContentWithQueue()
+
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+
+        composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that queue is shown when playlist button is clicked in portrait`() {
+        setContentWithQueue()
+
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+
+        composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that onPlaylistClicked is not invoked when queue content is supplied`() {
+        val onPlaylistClicked = mock<() -> Unit>()
+        setContentWithQueue(onPlaylistClicked = onPlaylistClicked)
+
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+
+        verifyNoInteractions(onPlaylistClicked)
+    }
+
+    @Test
+    @Config(qualifiers = LANDSCAPE_QUALIFIERS)
+    fun `test that queue is hidden when playlist button is clicked twice in landscape`() {
+        setContentWithQueue()
+
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+
+        composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    @Test
+    @Config(qualifiers = LANDSCAPE_QUALIFIERS)
+    fun `test that queue is hidden when back is pressed in landscape`() {
+        setContentWithQueue()
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.runOnUiThread {
+            composeTestRule.activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that queue is hidden when back is pressed in portrait`() {
+        setContentWithQueue()
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.runOnUiThread {
+            composeTestRule.activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that onMoreActionsClicked is invoked when more actions is clicked in queue overlay`() {
+        val onMoreActionsClicked = mock<() -> Unit>()
+        setContent(
+            onMoreActionsClicked = onMoreActionsClicked,
+            queueContent = { queueModifier ->
+                Box(modifier = queueModifier.testTag(QUEUE_TAG))
+            },
+        )
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+        composeTestRule.waitForIdle()
+
+        // The overlay carries its own top bar; its more-actions must reach the player's handler,
+        // which the queue's own nav entry used to own before the queue moved inline.
+        composeTestRule.onNodeWithTag(AUDIO_PLAYER_MORE_ACTIONS_BUTTON_TEST_TAG).performClick()
+
+        verify(onMoreActionsClicked).invoke()
+    }
+
+    @Test
+    fun `test that player is hidden from accessibility when queue overlay is shown in portrait`() {
+        setContentWithQueue()
+
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+
+        composeTestRule.onNodeWithContentDescription("Playlist").assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that player is reachable by accessibility again when queue overlay is dismissed`() {
+        setContentWithQueue()
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.runOnUiThread {
+            composeTestRule.activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithContentDescription("Playlist").assertIsDisplayed()
+    }
+
+    @Test
+    @Config(qualifiers = LANDSCAPE_QUALIFIERS)
+    fun `test that queue occupies the right half in landscape`() {
+        setContentWithQueue()
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+
+        val bounds = composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true)
+            .getBoundsInRoot()
+
+        assertThat(bounds.left.value).isEqualTo(LANDSCAPE_WIDTH_DP / 2)
+    }
+
+    @Test
+    @Config(qualifiers = LANDSCAPE_QUALIFIERS)
+    fun `test that queue occupies the left half in landscape when layout is RTL`() {
+        setContentWithQueue(layoutDirection = LayoutDirection.Rtl)
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+
+        // The row lays its children out along the layout direction, so under RTL the pane borders
+        // the left screen edge. The navigation-bar inset it applies must follow suit.
+        val bounds = composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true)
+            .getBoundsInRoot()
+
+        assertThat(bounds.left.value).isEqualTo(0f)
+    }
+
+    @Test
+    fun `test that queue stays visible when state is restored`() {
+        val restorationTester = StateRestorationTester(composeTestRule)
+        restorationTester.setContent {
+            AudioPlayerScreen(
+                uiState = defaultData(),
+                isPodcastMode = true,
+                onPlayPauseClicked = {},
+                onSeekTo = {},
+                onNextClicked = {},
+                onPreviousClicked = {},
+                onShuffleClicked = {},
+                onRepeatClicked = {},
+                onBackPressed = {},
+                onMoreActionsClicked = {},
+                onToggleMode = {},
+                onSeekForward15 = {},
+                onSeekBackward15 = {},
+                onSpeedClicked = {},
+                onSleepTimerClicked = {},
+                queueContent = { queueModifier ->
+                    Box(modifier = queueModifier.testTag(QUEUE_TAG))
+                },
+            )
+        }
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+        composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true).assertIsDisplayed()
+
+        // The KDoc promises the queue survives rotation; that rests on isQueueVisible being
+        // rememberSaveable, which only matters once the state is actually restored.
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        composeTestRule.onNodeWithTag(QUEUE_TAG, useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    @Config(qualifiers = LANDSCAPE_QUALIFIERS)
+    fun `test that top bar is shown when queue is visible in landscape`() {
+        setContentWithQueue()
+
+        composeTestRule.onNodeWithContentDescription("Playlist").performClick()
+
+        composeTestRule.onNodeWithTag(AUDIO_PLAYER_TOP_BAR_TEST_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    // endregion
+
+    private companion object {
+        const val LANDSCAPE_QUALIFIERS = "w800dp-h400dp-land"
+        const val LANDSCAPE_WIDTH_DP = 800f
+        const val QUEUE_TAG = "test:queue"
+    }
 }

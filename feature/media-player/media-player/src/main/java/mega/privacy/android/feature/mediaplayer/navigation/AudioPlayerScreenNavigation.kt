@@ -9,11 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.ui.NavDisplay
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -23,15 +23,13 @@ import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsA
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.mediaplayer.components.PlaybackSpeedBottomSheet
-import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerQueueScreen
+import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerQueueContent
 import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerQueueViewModel
 import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerScreen
 import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerViewModel
 import mega.privacy.android.feature.mediaplayer.presentation.SleepTimerBottomSheet
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerUiState
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.contract.transition.slideDownBackwardTransition
-import mega.privacy.android.navigation.contract.transition.slideUpForwardTransition
 
 /**
  * Navigation key for the revamped audio player Compose screen.
@@ -48,48 +46,11 @@ data class AudioPlayerScreenNavKey(val launchId: String) : NavKey, Parcelable {
     }
 }
 
-/** Navigation key for the audio player play-queue screen. */
-@Serializable
-@Parcelize
-data object AudioPlayerQueueScreenNavKey : NavKey, Parcelable
-
 internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
     navigationHandler: NavigationHandler,
     launchSourceHolder: AudioPlayerLaunchSourceHolder,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
-    entry<AudioPlayerQueueScreenNavKey>(
-        metadata = NavDisplay.transitionSpec { slideUpForwardTransition } +
-                NavDisplay.popTransitionSpec { slideDownBackwardTransition } +
-                NavDisplay.predictivePopTransitionSpec { slideDownBackwardTransition }
-    ) {
-        val activity = LocalActivity.current as? ComponentActivity
-            ?: error("AudioPlayerQueueScreen must be hosted in a ComponentActivity")
-        val playerViewModel = hiltViewModel<AudioPlayerViewModel>(activity)
-        val playerUiState by playerViewModel.uiState.collectAsStateWithLifecycle()
-
-        val viewModel = hiltViewModel<AudioPlayerQueueViewModel>()
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-        HandleAudioPlayerNodeOptions(
-            uiState = playerUiState,
-            navigationHandler = navigationHandler,
-            onTransfer = onTransfer,
-        )
-
-        AudioPlayerQueueScreen(
-            uiState = uiState,
-            onBack = navigationHandler::back,
-            onQueueItemClick = viewModel::seekToQueueItem,
-            onQueueItemMoved = viewModel::moveQueueItem,
-            onSetContinuousPlayback = viewModel::setContinuousPlayback,
-            onMoreActionsClicked = {
-                (playerUiState as? AudioPlayerUiState.Data)?.buildNodeOptionsNavKey()
-                    ?.let(navigationHandler::navigate)
-            },
-        )
-    }
-
     entry<AudioPlayerScreenNavKey> { navKey ->
         val activity = LocalActivity.current as? ComponentActivity
             ?: error("AudioPlayerScreen must be hosted in a ComponentActivity")
@@ -122,7 +83,6 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
             onPreviousClicked = viewModel::skipToPrevious,
             onShuffleClicked = viewModel::toggleShuffle,
             onRepeatClicked = viewModel::cycleRepeatMode,
-            onPlaylistClicked = { navigationHandler.navigate(AudioPlayerQueueScreenNavKey) },
             onBackPressed = navigationHandler::back,
             onMoreActionsClicked = {
                 val navKey = (uiState as? AudioPlayerUiState.Data)?.buildNodeOptionsNavKey()
@@ -135,6 +95,7 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
             onSpeedClicked = { showSpeedSheet = true },
             onSleepTimerClicked = { showSleepTimerSheet = true },
             sleepTimerState = sleepTimerState,
+            queueContent = { queueModifier -> AudioPlayerQueue(modifier = queueModifier) },
         )
 
         if (showSleepTimerSheet) {
@@ -168,10 +129,31 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
 }
 
 /**
- * Wires up the node-options bottom-sheet result handling for an audio player entry.
+ * Play queue, rendered by the player as a landscape pane or a portrait overlay.
  *
- * Shared by the player and queue entries so that a sheet opened from either screen has its
- * selected action handled by the entry beneath it.
+ * Only composed while the queue is visible, so [AudioPlayerQueueViewModel] is never created for a
+ * player entry whose queue is never opened. Once opened, the ViewModel is retained for the rest of
+ * the entry — it resolves against the entry's ViewModelStoreOwner — but its player-state
+ * subscription is not: `uiState` is shared with `WhileSubscribed`, so collection stops shortly
+ * after the queue leaves composition and resumes when it is shown again.
+ */
+@Composable
+private fun AudioPlayerQueue(modifier: Modifier = Modifier) {
+    val viewModel = hiltViewModel<AudioPlayerQueueViewModel>()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    AudioPlayerQueueContent(
+        uiState = uiState,
+        onQueueItemClick = viewModel::seekToQueueItem,
+        onQueueItemMoved = viewModel::moveQueueItem,
+        onSetContinuousPlayback = viewModel::setContinuousPlayback,
+        modifier = modifier,
+    )
+}
+
+/**
+ * Wires up the node-options bottom-sheet result handling for the audio player entry, covering
+ * sheets opened from the player and from the play queue alike.
  */
 @Composable
 private fun HandleAudioPlayerNodeOptions(

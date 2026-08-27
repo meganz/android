@@ -20,15 +20,20 @@ import timber.log.Timber
 import java.lang.ref.WeakReference
 
 /**
- * Window state shared by all active [AudioPlayerWindowEffect] instances.
+ * Original window state captured by [AudioPlayerWindowEffect] so it can be restored on exit.
  *
  * [activeCount] guards restoration: originals are restored only when the last instance leaves
- * composition. Originals are saved at most **once per Activity** ([savedActivity]): when the
- * player round-trips to another destination and back (e.g. via a node-options action), the
- * window state at re-entry may have been polluted by overlays that write to the Activity window
- * without restoring (a force-dark bottom sheet's theme SideEffect can land after this effect's
- * restore during the exit transition). Re-saving at that point would capture the polluted values
- * and later "restore" them onto the home screen, so the first-entry originals are kept instead.
+ * composition. Two player entries coexist whenever a new audio is opened while one is already
+ * playing — `AudioPlayerScreenNavKey` carries a per-launch id, and the navigation only pops the
+ * transient launcher destination — so during that transition the outgoing entry would otherwise
+ * restore the home-screen bar colors on top of the incoming one.
+ *
+ * Originals are saved at most **once per Activity** ([savedActivity]): when the player
+ * round-trips to another destination and back (e.g. via a node-options action), the window state
+ * at re-entry may have been polluted by overlays that write to the Activity window without
+ * restoring (a force-dark bottom sheet's theme SideEffect can land after this effect's restore
+ * during the exit transition). Re-saving at that point would capture the polluted values and
+ * later "restore" them onto the home screen, so the first-entry originals are kept instead.
  * All access is on the main thread (Compose applier thread); no synchronisation needed.
  */
 private object AudioPlayerWindowState {
@@ -44,8 +49,8 @@ private object AudioPlayerWindowState {
 }
 
 /**
- * Manages all system-bar window state for the audio player screens and restores it when
- * all audio player screens leave composition.
+ * Manages all system-bar window state for the audio player and restores it when the player
+ * leaves composition.
  *
  * Sets the window state required by the dark audio player UI:
  * - Status bar and navigation bar colors → transparent (gradient shows through)
@@ -60,19 +65,18 @@ private object AudioPlayerWindowState {
  * `useLegacyStatusBarColor = false`, would let AndroidTheme's SideEffect fight and override
  * these settings on every recomposition.
  *
- * **Reference-counting across multiple screens.** Both AudioPlayerScreen and
- * AudioPlayerQueueScreen call this composable. When Navigation3's slide-up transition removes
- * AudioPlayerScreen from composition while QueueScreen is active (or vice versa during the back
- * transition), a naive per-screen save/restore would momentarily flash the home-screen bar colors.
- * To prevent this, original values are shared and saved only by the **first** instance to enter
- * composition, and restored only by the **last** instance to leave. As long as any audio-player
- * screen remains in the composition tree the home-screen colors are never touched.
+ * **Reference-counted across instances.** AudioPlayerScreen is the only call site, but not the
+ * only instance: `AudioPlayerScreenNavKey` carries a per-launch id, so opening a new audio while
+ * one is already playing pushes a second player entry, and both are in composition during the
+ * transition. Restoration is therefore driven by [AudioPlayerWindowState.activeCount] rather than
+ * by a single enter/leave pair — without it the outgoing entry would restore the home-screen bar
+ * colors while the incoming one is still showing.
  *
  * **Dark colors are applied both in [DisposableEffect] setup and [SideEffect].** Applying in
  * setup means the colors are set immediately at composition time — without waiting for a
- * recomposition. This is important because Compose's smart-recomposition may skip recomposing
- * a screen whose inputs have not changed (e.g. QueueScreen when AudioPlayerScreen is removed),
- * which would prevent [SideEffect] from re-running and leave the home-screen colors visible.
+ * recomposition. This matters because Compose's smart-recomposition may skip recomposing a
+ * screen whose inputs have not changed, which would prevent [SideEffect] from re-running and
+ * leave the home-screen colors visible.
  */
 @Suppress("DEPRECATION") // statusBarColor / navigationBarColor deprecated on API 35+; all calls are guarded with SDK_INT < VANILLA_ICE_CREAM
 @Composable
@@ -130,43 +134,36 @@ fun AudioPlayerWindowEffect() {
         }
 
         onDispose {
-            // Restore original values only when the last audio-player screen leaves composition.
-            // While any audio-player screen is still active (count > 0) we must not restore,
-            // otherwise navigating between AudioPlayerScreen and QueueScreen would flash the
-            // home-screen bar colors.
             with(AudioPlayerWindowState) {
                 activeCount--
-                if (activeCount == 0) {
-                    runCatching {
-                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                            window.statusBarColor = statusBarColor
-                            window.navigationBarColor = navBarColor
-                        }
-                    }.onFailure { Timber.e(it, "Failed to restore status/nav bar colors") }
+                if (activeCount > 0) return@onDispose
 
-                    runCatching {
-                        if (bgColorValid) {
-                            window.setBackgroundDrawable(bgColor.toDrawable())
-                        } else {
-                            window.setBackgroundDrawable(null)
-                        }
-                    }.onFailure { Timber.e(it, "Failed to restore window background") }
-
-                    runCatching {
-                        insetsController.isAppearanceLightStatusBars = lightStatusBars
-                        insetsController.isAppearanceLightNavigationBars = lightNavBars
-                    }.onFailure { Timber.e(it, "Failed to restore light bar appearance") }
-
-                    runCatching {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            window.isNavigationBarContrastEnforced = contrastEnforced
-                        }
-                    }.onFailure {
-                        Timber.e(
-                            it,
-                            "Failed to restore navigation bar contrast enforcement"
-                        )
+                runCatching {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                        window.statusBarColor = statusBarColor
+                        window.navigationBarColor = navBarColor
                     }
+                }.onFailure { Timber.e(it, "Failed to restore status/nav bar colors") }
+
+                runCatching {
+                    if (bgColorValid) {
+                        window.setBackgroundDrawable(bgColor.toDrawable())
+                    } else {
+                        window.setBackgroundDrawable(null)
+                    }
+                }.onFailure { Timber.e(it, "Failed to restore window background") }
+
+                runCatching {
+                    insetsController.isAppearanceLightStatusBars = lightStatusBars
+                    insetsController.isAppearanceLightNavigationBars = lightNavBars
+                }.onFailure { Timber.e(it, "Failed to restore light bar appearance") }
+
+                runCatching {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        window.isNavigationBarContrastEnforced = contrastEnforced
+                    }
+                }.onFailure {
+                    Timber.e(it, "Failed to restore navigation bar contrast enforcement")
                 }
             }
         }
