@@ -721,7 +721,6 @@ private fun ImageContent(
         val request = ImageRequest.Builder(LocalContext.current)
             .data(imagePath)
             .memoryCacheKey(imagePath)
-            .placeholderMemoryCacheKey(errorImagePath)
             .listener(
                 onError = { _, _ ->
                     // when some image full size picture decoder throw exception, use preview/thumbnail instead
