@@ -12,7 +12,6 @@ import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.account.OfferDetail
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.repository.BillingRepository
-import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,7 +30,6 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
     private lateinit var underTest: GetRecommendedSubscriptionWithOfferUseCase
     private val getLocalPricingUseCase = mock<GetLocalPricingUseCase>()
     private val getSubscriptionOptionsUseCase = mock<GetSubscriptionOptionsUseCase>()
-    private val getCurrentSubscriptionPlanUseCase = mock<GetCurrentSubscriptionPlanUseCase>()
     private val subscriptionMapper = mock<SubscriptionMapper>()
     private val billingRepository = mock<BillingRepository>()
 
@@ -40,7 +38,6 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
         underTest = GetRecommendedSubscriptionWithOfferUseCase(
             getLocalPricingUseCase = getLocalPricingUseCase,
             getSubscriptionOptionsUseCase = getSubscriptionOptionsUseCase,
-            getCurrentSubscriptionPlanUseCase = getCurrentSubscriptionPlanUseCase,
             subscriptionMapper = subscriptionMapper,
             billingRepository = billingRepository,
         )
@@ -51,20 +48,19 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
         reset(
             getLocalPricingUseCase,
             getSubscriptionOptionsUseCase,
-            getCurrentSubscriptionPlanUseCase,
             subscriptionMapper,
             billingRepository,
         )
     }
 
     @Test
-    fun `test that returns cheapest upgrade tier that has an offer`() = runTest {
+    fun `test that returns the cheapest plan that has an offer`() = runTest {
         val lite =
             subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = false)
         val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
         val proII =
             subscriptionOption(AccountType.PRO_II, Skus.SKU_PRO_II_MONTH, 1999, offer = true)
-        stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proI, proII))
+        stub(options = listOf(lite, proI, proII))
         val expected = stubMapping(proI, Skus.SKU_PRO_I_MONTH)
 
         assertThat(underTest.invoke()?.subscription).isEqualTo(expected)
@@ -78,7 +74,7 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
             subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = false)
         val proIYearly =
             subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_YEAR, 9999, offer = true)
-        stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proIMonthly, proIYearly))
+        stub(options = listOf(lite, proIMonthly, proIYearly))
         val expected = stubMapping(proIYearly, Skus.SKU_PRO_I_YEAR)
 
         assertThat(underTest.invoke()?.subscription).isEqualTo(expected)
@@ -97,35 +93,20 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
                 subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
             val proIYearly =
                 subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_YEAR, 9999, offer = true)
-            stub(
-                currentPlan = AccountType.PRO_LITE,
-                options = listOf(lite, proIMonthly, proIYearly)
-            )
+            stub(options = listOf(lite, proIMonthly, proIYearly))
             val expected = stubMapping(proIMonthly, Skus.SKU_PRO_I_MONTH)
 
             assertThat(underTest.invoke()?.subscription).isEqualTo(expected)
         }
 
     @Test
-    fun `test that returns null when no upgrade plan has an offer`() = runTest {
+    fun `test that returns null when no plan has an offer`() = runTest {
         val lite =
             subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = false)
         val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = false)
         val proII =
             subscriptionOption(AccountType.PRO_II, Skus.SKU_PRO_II_MONTH, 1999, offer = false)
-        stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proI, proII))
-
-        assertThat(underTest.invoke()).isNull()
-    }
-
-    @Test
-    fun `test that ignores offers on plans at or below the current plan`() = runTest {
-        val lite =
-            subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = true)
-        val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
-        val proII =
-            subscriptionOption(AccountType.PRO_II, Skus.SKU_PRO_II_MONTH, 1999, offer = false)
-        stub(currentPlan = AccountType.PRO_II, options = listOf(lite, proI, proII))
+        stub(options = listOf(lite, proI, proII))
 
         assertThat(underTest.invoke()).isNull()
     }
@@ -136,45 +117,28 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
             subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = false)
         val business =
             subscriptionOption(AccountType.BUSINESS, "mega.android.business", 9999, offer = true)
-        stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, business))
+        stub(options = listOf(lite, business))
 
         assertThat(underTest.invoke()).isNull()
     }
 
     @Test
-    fun `test that returns cheapest offer plan when current plan is free`() = runTest {
+    fun `test that returns the cheapest plan when several plans have an offer`() = runTest {
         val lite =
             subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = true)
         val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
-        stub(currentPlan = AccountType.FREE, options = listOf(lite, proI))
+        stub(options = listOf(lite, proI))
         val expected = stubMapping(lite, Skus.SKU_PRO_LITE_MONTH)
 
         assertThat(underTest.invoke()?.subscription).isEqualTo(expected)
     }
 
     @Test
-    fun `test that does not recommend the current tier when only its yearly has an offer`() =
-        runTest {
-            val proIMonthly =
-                subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = false)
-            val proIYearly =
-                subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_YEAR, 9999, offer = true)
-            val proIIMonthly =
-                subscriptionOption(AccountType.PRO_II, Skus.SKU_PRO_II_MONTH, 1999, offer = false)
-            stub(
-                currentPlan = AccountType.PRO_I,
-                options = listOf(proIMonthly, proIYearly, proIIMonthly),
-            )
-
-            assertThat(underTest.invoke()).isNull()
-        }
-
-    @Test
     fun `test that ignores a plan that has the offer flag but no play billing offer`() = runTest {
         val lite =
             subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = false)
         val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
-        stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proI))
+        stub(options = listOf(lite, proI))
         val productsWithoutOffers = listOf(
             megaSku(Skus.SKU_PRO_LITE_MONTH, hasRealOffer = false),
             megaSku(Skus.SKU_PRO_I_MONTH, hasRealOffer = false),
@@ -200,7 +164,7 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
                 offer = true,
                 offerFlags = OTHER_FLAG,
             )
-            stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proI))
+            stub(options = listOf(lite, proI))
 
             assertThat(underTest.invoke()).isNull()
         }
@@ -216,7 +180,7 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
             offer = true,
             offerFlags = null,
         )
-        stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proI))
+        stub(options = listOf(lite, proI))
 
         assertThat(underTest.invoke()).isNull()
     }
@@ -232,7 +196,7 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
             offer = true,
             offerFlags = NO_FLAGS,
         )
-        stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proI))
+        stub(options = listOf(lite, proI))
 
         assertThat(underTest.invoke()).isNull()
     }
@@ -248,7 +212,7 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
             offer = true,
             offerFlags = VISIBLE_FLAG or OTHER_FLAG,
         )
-        stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proI))
+        stub(options = listOf(lite, proI))
         val expected = stubMapping(proI, Skus.SKU_PRO_I_MONTH)
 
         assertThat(underTest.invoke()?.subscription).isEqualTo(expected)
@@ -264,7 +228,7 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
             offerFlags = OTHER_FLAG,
         )
         val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
-        stub(currentPlan = AccountType.FREE, options = listOf(lite, proI))
+        stub(options = listOf(lite, proI))
         val expected = stubMapping(proI, Skus.SKU_PRO_I_MONTH)
 
         assertThat(underTest.invoke()?.subscription).isEqualTo(expected)
@@ -284,7 +248,7 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
                 offer = true,
                 offerFlags = OTHER_FLAG,
             )
-            stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proI, proII))
+            stub(options = listOf(lite, proI, proII))
             stubMapping(proI, Skus.SKU_PRO_I_MONTH)
 
             assertThat(underTest.invoke()?.hasMultipleOffers).isFalse()
@@ -297,33 +261,18 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
         val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
         val proII =
             subscriptionOption(AccountType.PRO_II, Skus.SKU_PRO_II_MONTH, 1999, offer = true)
-        stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proI, proII))
+        stub(options = listOf(lite, proI, proII))
         stubMapping(proI, Skus.SKU_PRO_I_MONTH)
 
         assertThat(underTest.invoke()?.hasMultipleOffers).isTrue()
     }
 
     @Test
-    fun `test that flags multiple offers when the other discounted plan is not an upgrade`() =
-        runTest {
-            val lite =
-                subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = true)
-            val proI =
-                subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
-            val proII =
-                subscriptionOption(AccountType.PRO_II, Skus.SKU_PRO_II_MONTH, 1999, offer = false)
-            stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proI, proII))
-            stubMapping(proI, Skus.SKU_PRO_I_MONTH)
-
-            assertThat(underTest.invoke()?.hasMultipleOffers).isTrue()
-        }
-
-    @Test
     fun `test that does not flag multiple offers when only one plan has an offer`() = runTest {
         val lite =
             subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = false)
         val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
-        stub(currentPlan = AccountType.PRO_LITE, options = listOf(lite, proI))
+        stub(options = listOf(lite, proI))
         stubMapping(proI, Skus.SKU_PRO_I_MONTH)
 
         assertThat(underTest.invoke()?.hasMultipleOffers).isFalse()
@@ -336,7 +285,7 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
                 subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
             val proIYearly =
                 subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_YEAR, 9999, offer = true)
-            stub(currentPlan = AccountType.FREE, options = listOf(proIMonthly, proIYearly))
+            stub(options = listOf(proIMonthly, proIYearly))
             stubMapping(proIMonthly, Skus.SKU_PRO_I_MONTH)
 
             assertThat(underTest.invoke()?.hasMultipleOffers).isFalse()
@@ -347,7 +296,6 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
         val lite =
             subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = false)
         val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = false)
-        whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(AccountType.FREE)
         whenever(getSubscriptionOptionsUseCase()).thenReturn(listOf(lite, proI))
 
         assertThat(underTest.invoke()).isNull()
@@ -360,7 +308,7 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
         val lite =
             subscriptionOption(AccountType.PRO_LITE, Skus.SKU_PRO_LITE_MONTH, 499, offer = false)
         val proI = subscriptionOption(AccountType.PRO_I, Skus.SKU_PRO_I_MONTH, 999, offer = true)
-        stub(currentPlan = AccountType.FREE, options = listOf(lite, proI))
+        stub(options = listOf(lite, proI))
         stubMapping(proI, Skus.SKU_PRO_I_MONTH)
 
         underTest.invoke()
@@ -382,8 +330,7 @@ class GetRecommendedSubscriptionWithOfferUseCaseTest {
         on { this.offerFlags } doReturn offerFlags
     }
 
-    private suspend fun stub(currentPlan: AccountType, options: List<SubscriptionOption>) {
-        whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(currentPlan)
+    private suspend fun stub(options: List<SubscriptionOption>) {
         whenever(getSubscriptionOptionsUseCase()).thenReturn(options)
         val products = options.map { megaSku(it.sku, hasRealOffer = it.hasOffer) }
         whenever(billingRepository.querySkus(any())).thenReturn(products)

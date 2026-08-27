@@ -8,7 +8,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Check whether the subscription offer landing screen should be shown on app launch.
  *
- * The screen is only shown when a higher-tier plan currently carries a mobile offer
+ * The screen is only shown when a plan currently carries a mobile offer
  * ([GetRecommendedSubscriptionWithOfferUseCase]). Once shown, it is not shown again until the
  * offer's reshow interval (utqa "mo.r") has elapsed; an offer without a reshow interval is only
  * ever shown once.

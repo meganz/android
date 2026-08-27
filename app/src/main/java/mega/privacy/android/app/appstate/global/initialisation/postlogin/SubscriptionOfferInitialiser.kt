@@ -10,8 +10,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Opens the subscription offer landing screen after login when a higher-tier plan carries a mobile
- * offer, then records the launch so the screen is not shown again until the offer's reshow interval
+ * Opens the subscription offer landing screen after login when a plan carries a mobile offer, then
+ * records the launch so the screen is not shown again until the offer's reshow interval
  * has elapsed.
  */
 class SubscriptionOfferInitialiser @Inject constructor(

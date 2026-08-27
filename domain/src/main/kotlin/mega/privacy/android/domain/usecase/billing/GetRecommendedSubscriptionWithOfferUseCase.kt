@@ -5,55 +5,47 @@ import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.account.subscriptionSkuLevel
 import mega.privacy.android.domain.entity.billing.RecommendedSubscriptionOffer
 import mega.privacy.android.domain.repository.BillingRepository
-import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import javax.inject.Inject
 
 /**
- * Get the cheapest upgrade plan that currently carries a mobile offer, used to promote a discount in
- * the landing dialog (DSN-3130).
+ * Get the cheapest plan that currently carries a mobile offer, used to promote a discount in the
+ * landing dialog (DSN-3130).
  *
- * Plans are ordered by tier ([subscriptionSkuLevel], then price, so the monthly option comes before
- * the yearly one of the same tier). Only plans at a strictly higher tier than the current plan are
- * considered, so the dialog never promotes the current tier (any billing period) or a downgrade; the
- * cheapest such plan that has an offer is returned. All billing periods are considered, so a
- * yearly-only offer is still found. Returns null when no higher-tier plan has an offer.
+ * The account's own plan is deliberately not taken into account: campaigns pick their audience
+ * server side, so whichever plan is discounted is promoted to paid and free accounts alike, even
+ * when the account already sits on a higher tier. Plans are ordered by tier
+ * ([subscriptionSkuLevel], then price, so the monthly option comes before the yearly one of the
+ * same tier) and the cheapest one carrying an offer is returned. All billing periods are
+ * considered, so a yearly-only offer is still found. Returns null when no plan has an offer.
  *
- * An offer is only promoted when its flags bitmask opts in via [MOBILE_OFFER_VISIBLE_FLAG]; offers
+ * An offer is only promoted when its flags bitmask opts in via the mobile-offer visible bit; offers
  * without that bit, and offers carrying no flags at all, are discounted silently. They still apply
  * their discount on the upgrade screen, they are just never advertised on the Home banner, the menu
  * banner, or the offer landing screen.
  *
  * [RecommendedSubscriptionOffer.hasMultipleOffers] reports whether the campaign discounts more than
- * one plan, regardless of tier, so the dialog can link to the full list of plans.
+ * one plan, so the dialog can link to the full list of plans.
  *
  * @property getLocalPricingUseCase             [GetLocalPricingUseCase]
  * @property getSubscriptionOptionsUseCase      [GetSubscriptionOptionsUseCase]
- * @property getCurrentSubscriptionPlanUseCase  [GetCurrentSubscriptionPlanUseCase]
  * @property subscriptionMapper                 [SubscriptionMapper]
  */
 class GetRecommendedSubscriptionWithOfferUseCase @Inject constructor(
     private val getLocalPricingUseCase: GetLocalPricingUseCase,
     private val getSubscriptionOptionsUseCase: GetSubscriptionOptionsUseCase,
-    private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
     private val subscriptionMapper: SubscriptionMapper,
     private val billingRepository: BillingRepository,
 ) {
     /**
      * Invoke
      *
-     * @return the cheapest upgrade plan with an active offer, or null if none
+     * @return the cheapest plan with an active offer, or null if none
      */
     suspend operator fun invoke(): RecommendedSubscriptionOffer? {
-        val currentPlan = getCurrentSubscriptionPlanUseCase()
-        val availablePlans = getSubscriptionOptionsUseCase()
+        val advertisedPlans = getSubscriptionOptionsUseCase()
             .filter { it.sku.subscriptionSkuLevel != Skus.NO_LEVEL }
+            .filter { it.hasOffer && it.isOfferVisible }
             .sortedWith(compareBy({ it.sku.subscriptionSkuLevel }, { it.amount.value }))
-
-        val currentLevel = availablePlans
-            .firstOrNull { it.accountType == currentPlan }
-            ?.sku.subscriptionSkuLevel
-
-        val advertisedPlans = availablePlans.filter { it.hasOffer && it.isOfferVisible }
         if (advertisedPlans.isEmpty()) return null
 
         val skus = advertisedPlans.map { it.sku }.distinct()
@@ -62,9 +54,7 @@ class GetRecommendedSubscriptionWithOfferUseCase @Inject constructor(
         val plansWithOffer = advertisedPlans
             .filter { products[it.sku]?.offers.orEmpty().isNotEmpty() }
 
-        val offerPlan = plansWithOffer
-            .firstOrNull { it.sku.subscriptionSkuLevel > currentLevel }
-            ?: return null
+        val offerPlan = plansWithOffer.firstOrNull() ?: return null
 
         val localPricing = getLocalPricingUseCase(offerPlan.sku)
         return RecommendedSubscriptionOffer(

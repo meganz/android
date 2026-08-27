@@ -31,11 +31,9 @@ import javax.inject.Singleton
  * leaves so a tab switch does not restart it at all, and it re-runs on the next subscription to
  * pick up a campaign that started meanwhile.
  *
- * The lookup deliberately runs before the account plan is known rather than waiting for the account
- * details, which is what keeps the banner quick. Until they arrive the current tier reads as
- * [mega.privacy.android.domain.entity.AccountType.UNKNOWN], so the promoted plan is whichever is
- * cheapest; the null plan passes through `distinctUntilChanged`, so the offer is re-evaluated
- * against the real tier as soon as the details land, and again on the next account.
+ * The lookup runs on the first emission rather than waiting for the account details to arrive,
+ * which is what keeps the banner quick; the promoted plan does not depend on the account plan
+ * anyway, only on which plans the campaign discounts.
  *
  * A failed lookup is emitted as a failed [Result] instead of terminating the flow, so a transient
  * billing error still leaves the offer monitored; consumers with nowhere to surface an error treat
