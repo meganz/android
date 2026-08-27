@@ -680,12 +680,25 @@ def fetchSlackChannelIdsByReleaseVersion(String version) {
 
 
 /**
+ * Gradle command prefix for the two module-list queries below.
+ *
+ * Both run at the very start of a pipeline stage. In the MR pipeline that stage goes on
+ * to run more Gradle, so keeping the daemon alive lets the query pay the cold
+ * configuration once and the task that follows reuse it. The flags must stay identical
+ * to GRADLE_CI in android_build_status.groovy - Gradle only reuses a daemon whose
+ * parameters match. Every other pipeline keeps --no-daemon, so CD behaviour is unchanged.
+ */
+String gradleQueryCmd() {
+    return env.IS_CI_BUILD == 'true' ? "./gradlew --no-watch-fs -Dorg.gradle.daemon.idletimeout=180000" : "./gradlew --no-daemon"
+}
+
+/**
  * Gets list of all module paths in the project by parsing output from printSubprojectPaths task.
  * @return List of module paths like ["app", "domain", "feature/chat"]
  */
 ArrayList<String> getModuleList() {
     def moduleListRaw = sh(
-        script: "./gradlew printSubprojectPaths --no-daemon -q",
+        script: "${gradleQueryCmd()} printSubprojectPaths -q",
         returnStdout: true
     ).trim()
 
@@ -726,7 +739,7 @@ ArrayList<String> getModuleList() {
  */
 ArrayList<String> getUnitTestModuleList() {
     def unitTestModuleListRaw = sh(
-        script: "./gradlew printModulesWithUnitTest --no-daemon -q",
+        script: "${gradleQueryCmd()} printModulesWithUnitTest -q",
         returnStdout: true
     ).trim()
 

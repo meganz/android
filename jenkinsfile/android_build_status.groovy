@@ -6,7 +6,6 @@ BUILD_START_TIME = System.currentTimeMillis()
 BUILD_STEP = ""
 
 GMS_APK_BUILD_LOG = "gms_build.log"
-QA_APK_BUILD_LOG = "qa_build.log"
 
 LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
@@ -32,6 +31,10 @@ UNIT_TEST_RESULT_LINK_MAP = [:]
 JSON_LINT_REPORT_LINK = ""
 
 NODE_LABELS = 'mac-jenkins-slave-android'
+
+// Daemon is reused across a stage's Gradle invocations and bounded by the idle timeout below,
+// since agents run multiple executors and an explicit stop would hit a sibling stage's daemon.
+GRADLE_CI = "./gradlew --no-watch-fs -Dorg.gradle.daemon.idletimeout=180000"
 
 /**
  * Folder to contain build outputs, including APK, AAG and symbol files
@@ -59,6 +62,8 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '1'))
         timeout(time: 1, unit: 'HOURS')
         gitLabConnection('GitLabConnection')
+        // A newer push makes the running build's result irrelevant; free its three agents.
+        disableConcurrentBuilds(abortPrevious: true)
     }
     environment {
 
@@ -78,6 +83,30 @@ pipeline {
         IS_CI_BUILD = 'true'
     }
     post {
+        always {
+            script {
+                // Declarative runs `always` for every completion status, including the
+                // NOT_BUILT of a build superseded by `abortPrevious` and the UNSTABLE of a
+                // build with failing tests. A build superseded while still queueing has no
+                // workspace, so common.groovy cannot be loaded there; losing those stats
+                // must not change the build result.
+                try {
+                    common = load('jenkinsfile/common.groovy')
+                    common.recordBuildStats(
+                            common.collectBuildStats(
+                                    AGENT_ACQUIRED_TIME ?: BUILD_START_TIME,
+                                    STAGE_DURATIONS_MS,
+                                    STAGE_NODE_NAMES,
+                                    currentBuild.currentResult,
+                                    shouldSkipBuild(),
+                                    isCodeReviewOnly()
+                            )
+                    )
+                } catch (Exception e) {
+                    println("[build-stats] skipped: ${e}")
+                }
+            }
+        }
         failure {
             script {
                 common = load('jenkinsfile/common.groovy')
@@ -125,17 +154,6 @@ pipeline {
                         unitTestResult +
                         lintSummaryMessage
                 common.sendToMR(failureMessage)
-
-                common.recordBuildStats(
-                        common.collectBuildStats(
-                                AGENT_ACQUIRED_TIME ?: BUILD_START_TIME,
-                                STAGE_DURATIONS_MS,
-                                STAGE_NODE_NAMES,
-                                currentBuild.currentResult,
-                                shouldSkipBuild(),
-                                isCodeReviewOnly()
-                        )
-                )
             }
         }
         success {
@@ -170,17 +188,6 @@ pipeline {
                         common.sendToMR(mergeRequestMessage)
                     }
                 }
-
-                common.recordBuildStats(
-                        common.collectBuildStats(
-                                AGENT_ACQUIRED_TIME ?: BUILD_START_TIME,
-                                STAGE_DURATIONS_MS,
-                                STAGE_NODE_NAMES,
-                                currentBuild.currentResult,
-                                shouldSkipBuild(),
-                                isCodeReviewOnly()
-                        )
-                )
             }
         }
         cleanup {
@@ -235,25 +242,13 @@ pipeline {
                                 STAGE_START_MS['build_apk_ms'] = System.currentTimeMillis()
                                 STAGE_NODE_NAMES['build_apk'] = env.NODE_NAME
                                 util.useArtifactory() {
-                                    sh "./gradlew app:assembleGmsDebug --no-daemon 2>&1  | tee ${GMS_APK_BUILD_LOG}"
-                                    sh "./gradlew app:assembleGmsQa --no-daemon 2>&1  | tee ${QA_APK_BUILD_LOG}"
+                                    sh "set -o pipefail && ${GRADLE_CI} app:assembleGmsDebug app:assembleGmsQa 2>&1 | tee ${GMS_APK_BUILD_LOG}"
                                 }
-
-                                sh """
-                                if grep -q -m 1 \"^FAILURE: \" ${GMS_APK_BUILD_LOG}; then
-                                    echo GMS APK build failed. Exitting....
-                                    exit 1
-                                fi
-                                if grep -q -m 1 \"^FAILURE: \" ${QA_APK_BUILD_LOG}; then
-                                    echo QA APK build failed. Exitting....
-                                    exit 1
-                                fi
-                            """
 
                                 util.useGitLab() {
                                     String htmlOutput = "mr-file-changes.html"
                                     try {
-                                        sh "./gradlew --no-daemon checkMergeRequestFileChanges --html-output $htmlOutput --current-branch=\"${env.GIT_BRANCH}\" --target-branch=\"${env.GITLAB_OA_TARGET_BRANCH}\""
+                                        sh "${GRADLE_CI} checkMergeRequestFileChanges --html-output $htmlOutput --current-branch=\"${env.GIT_BRANCH}\" --target-branch=\"${env.GITLAB_OA_TARGET_BRANCH}\""
                                     } finally {
                                         MERGE_REQUEST_FILE_CHANGES_MESSAGE = getHtmlReport(htmlOutput, "")
                                     }
@@ -295,7 +290,7 @@ pipeline {
                                     def failedModules = []
 
                                     try {
-                                        sh "./gradlew --no-daemon runAllUnitTestsWithCoverage"
+                                        sh "${GRADLE_CI} runAllUnitTestsWithCoverage"
                                     } finally {
 
                                         failedModules = detectFailedTestModules(moduleList)
@@ -312,7 +307,7 @@ pipeline {
                                     }
 
                                     String htmlOutput = "coverage.html"
-                                    sh "./gradlew --no-daemon collectCoverage --modules \"${common.getCoverageModuleList(moduleList).join(",")}\" --html-output ${htmlOutput}"
+                                    sh "${GRADLE_CI} collectCoverage --modules \"${common.getCoverageModuleList(moduleList).join(",")}\" --html-output ${htmlOutput}"
                                     COVERAGE_SUMMARY = getHtmlReport(htmlOutput, "No coverage report found")
                                 }
                             }
@@ -350,7 +345,7 @@ pipeline {
                                 STAGE_NODE_NAMES['lint'] = env.NODE_NAME
                                 util.useArtifactory() {
                                     sh "mv custom_lint.xml lint.xml"
-                                    sh "./gradlew --no-daemon lint"
+                                    sh "${GRADLE_CI} lint"
                                 }
 
                                 def lintModuleList = common.getModuleList()
@@ -459,7 +454,7 @@ pipeline {
                                 util.useGitLab() {
                                     withCredentials([string(credentialsId: 'ANTHROPIC_API_KEY', variable: 'ANTHROPIC_API_KEY')]) {
                                         try {
-                                            sh "./gradlew --no-daemon codeReview --skill '${skillFile}' --output '${CODE_REVIEW_OUTPUT_FILE}' --target-branch '${targetBranch}' --summary '${CODE_REVIEW_SUMMARY_FILE}' --error-report '${CODE_REVIEW_ERROR_REPORT_FILE}'"
+                                            sh "${GRADLE_CI} codeReview --skill '${skillFile}' --output '${CODE_REVIEW_OUTPUT_FILE}' --target-branch '${targetBranch}' --summary '${CODE_REVIEW_SUMMARY_FILE}' --error-report '${CODE_REVIEW_ERROR_REPORT_FILE}'"
                                             def summary = "Code Review Report"
                                             if (fileExists(CODE_REVIEW_SUMMARY_FILE)) {
                                                 summary = readFile(CODE_REVIEW_SUMMARY_FILE).trim()
@@ -567,18 +562,10 @@ String getBuildWarnings() {
     println("Entering getBuildWarnings()")
     String result = ""
     if (fileExists(GMS_APK_BUILD_LOG)) {
-        String gmsBuildWarnings = sh(script: "cat ${GMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
+        String gmsBuildWarnings = sh(script: "grep -a '^w:' ${GMS_APK_BUILD_LOG} | sort -u || true", returnStdout: true).trim()
         println("gmsBuildWarnings = $gmsBuildWarnings")
         if (!gmsBuildWarnings.isEmpty()) {
             result = "<details><summary>:warning: GMS Build Warnings :warning:</summary>" + wrapBuildWarnings(gmsBuildWarnings) + "</details>"
-        }
-    }
-
-    if (fileExists(QA_APK_BUILD_LOG)) {
-        String qaBuildWarnings = sh(script: "cat ${QA_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
-        println("qaGmsBuildWarnings = $qaBuildWarnings")
-        if (!qaBuildWarnings.isEmpty()) {
-            result += "<details><summary>:warning: QA GMS Build Warnings :warning:</summary>" + wrapBuildWarnings(qaBuildWarnings) + "</details>"
         }
     }
 
@@ -604,7 +591,7 @@ static String wrapBuildWarnings(String rawWarning) {
  */
 def generateLintSummary(List<String> moduleList) {
     String aggregatedJson = "lint_summary.json"
-    sh "./gradlew --no-daemon generateLintReport " +
+    sh "${GRADLE_CI} generateLintReport " +
             "--modules \"${moduleList.join(",")}\" " +
             "--target-file ${aggregatedJson}"
 

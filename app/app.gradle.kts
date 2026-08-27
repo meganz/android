@@ -148,7 +148,9 @@ android {
             initWith(getByName("debug"))
             isDebuggable = true
             matchingFallbacks += listOf("debug", "release")
-            if (isServerBuild()) {
+            // CD jobs (deliver_qa, release) still ship a minified QA build; MR builds only need to
+            // prove the variant compiles, and R8 is the single longest task of the APK stage.
+            if (isServerBuild() && !isCiBuild()) {
                 isMinifyEnabled = true
                 isShrinkResources = true
                 proguardFiles(
