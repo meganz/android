@@ -65,9 +65,79 @@ class RichDocumentState(document: RichDocument) {
 
     var pendingSplit: RichSplitRequest? by mutableStateOf(null)
 
+    // Document-level undo: per-field text undo cannot cover structural operations
+    // (split/merge/retype) or span changes, and would desync spans from text, so the whole
+    // document is checkpointed instead. Snapshots are the immutable model — cheap to hold
+    // and compare for the single-chunk documents rich mode is gated to.
+    private val undoStack = ArrayDeque<RichDocument>().apply { addLast(document) }
+    private val redoStack = ArrayDeque<RichDocument>()
+
     /** The focused text-bearing block, or null (no focus, or a non-text block). */
     val focusedTextBlock: RichTextBlockEditState?
         get() = focusedIndex?.let { blocks.getOrNull(it) } as? RichTextBlockEditState
+
+    /**
+     * Checkpoints the current document for undo. Called before every mutating operation (the
+     * structural operations checkpoint themselves) and after typing bursts settle. An
+     * unchanged document is not stacked twice; any new checkpoint invalidates redo.
+     */
+    fun recordUndo() {
+        val current = toDocument()
+        if (undoStack.lastOrNull() == current) return
+        undoStack.addLast(current)
+        while (undoStack.size > UndoCapacity) undoStack.removeFirst()
+        redoStack.clear()
+    }
+
+    /**
+     * Restores the newest checkpoint older than the current document.
+     *
+     * Non-destructive by invariant: the restored checkpoint STAYS on the stack as the current
+     * state's own checkpoint. That keeps a no-op undo from draining the baseline, and it makes
+     * the debounced typing collector harmless after a restore — its [recordUndo] finds the
+     * current document already on top and dedups instead of clearing the redo history.
+     */
+    fun undo(): Boolean {
+        val current = toDocument()
+        while (undoStack.size > 1 && undoStack.last() == current) {
+            undoStack.removeLast()
+        }
+        val snapshot = undoStack.lastOrNull() ?: run {
+            undoStack.addLast(current)
+            return false
+        }
+        if (snapshot == current) return false
+        redoStack.addLast(current)
+        restore(snapshot)
+        return true
+    }
+
+    fun redo(): Boolean {
+        val snapshot = redoStack.removeLastOrNull() ?: return false
+        val current = toDocument()
+        // Capture drift typed since the undo (normally none: a checkpointed edit clears redo).
+        if (undoStack.lastOrNull() != current) undoStack.addLast(current)
+        undoStack.addLast(snapshot)
+        while (undoStack.size > UndoCapacity) undoStack.removeFirst()
+        restore(snapshot)
+        return true
+    }
+
+    private fun restore(document: RichDocument) {
+        blocks.clear()
+        document.blocks.forEach { blocks.add(it.toEditState()) }
+        focusedIndex = focusedIndex?.coerceIn(0, (blocks.size - 1).coerceAtLeast(0))
+        pendingFocus = null
+        pendingSplit = null
+    }
+
+    /** Checkbox tap on a task item; checkpointed for undo. */
+    fun setTaskChecked(index: Int, checked: Boolean) {
+        val block = blocks.getOrNull(index) as? RichTextBlockEditState ?: return
+        val kind = block.kind as? RichBlockKind.Item ?: return
+        recordUndo()
+        block.kind = kind.copy(checked = checked)
+    }
 
     /**
      * Records a split request from the field's input transformation. Only a snapshot-state
@@ -91,6 +161,7 @@ class RichDocumentState(document: RichDocument) {
      */
     fun splitBlock(index: Int, start: Int, end: Int = start) {
         val block = blocks.getOrNull(index) as? RichTextBlockEditState ?: return
+        recordUndo()
         val kind = block.kind
         val text = block.text.textFieldState.text.toString()
         if (text.isEmpty()) {
@@ -128,6 +199,7 @@ class RichDocumentState(document: RichDocument) {
      */
     fun mergeBlockBackward(index: Int): Boolean {
         val block = blocks.getOrNull(index) as? RichTextBlockEditState ?: return false
+        recordUndo()
         demote(block.kind)?.let {
             block.kind = it
             return true
@@ -161,6 +233,7 @@ class RichDocumentState(document: RichDocument) {
     /** Toolbar heading action on the focused block: body -> H1 -> H2 -> H3 -> body. */
     fun cycleFocusedHeading() {
         val block = focusedTextBlock ?: return
+        recordUndo()
         block.kind = when (val kind = block.kind) {
             is RichBlockKind.Heading ->
                 if (kind.level < MaxCycledHeadingLevel) {
@@ -176,6 +249,7 @@ class RichDocumentState(document: RichDocument) {
     /** Toolbar list action: toggles the focused block's list marker, or flips its list type. */
     fun toggleFocusedListItem(ordered: Boolean) {
         val block = focusedTextBlock ?: return
+        recordUndo()
         val kind = block.kind
         block.kind = when {
             kind is RichBlockKind.Item && kind.ordered == ordered -> RichBlockKind.Paragraph
@@ -187,6 +261,7 @@ class RichDocumentState(document: RichDocument) {
     /** Toolbar quote action: toggles the focused block between quote and paragraph. */
     fun toggleFocusedQuote() {
         val block = focusedTextBlock ?: return
+        recordUndo()
         block.kind = when (block.kind) {
             is RichBlockKind.Quote -> RichBlockKind.Paragraph
             else -> RichBlockKind.Quote(1)
@@ -251,6 +326,9 @@ class RichDocumentState(document: RichDocument) {
     private companion object {
         /** The heading toolbar cycles H1..H3; deeper levels are kept but not produced. */
         const val MaxCycledHeadingLevel = 3
+
+        /** Undo checkpoints kept; bounds memory for the largest rich-capable documents. */
+        const val UndoCapacity = 50
     }
 }
 

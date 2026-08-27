@@ -32,7 +32,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
@@ -41,6 +44,9 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
 import mega.privacy.android.feature.texteditor.components.MarkdownBlockSpacing
 import mega.privacy.android.feature.texteditor.components.MarkdownCodeFrame
 import mega.privacy.android.feature.texteditor.components.MarkdownColors
@@ -50,6 +56,7 @@ import mega.privacy.android.feature.texteditor.components.MarkdownQuoteFrame
 import mega.privacy.android.feature.texteditor.components.markdownHeadingStyle
 import mega.privacy.android.feature.texteditor.components.rememberMarkdownColors
 import timber.log.Timber
+import kotlin.time.Duration.Companion.seconds
 
 const val RICH_DOCUMENT_EDITOR_TAG = "rich_document_editor"
 
@@ -59,11 +66,15 @@ const val RICH_DOCUMENT_TAIL_TAP_TAG = "rich_document_editor:tail_tap_area"
 
 private val TailTapAreaHeight = 160.dp
 
+/** Idle time after which a typing burst is checkpointed for undo. */
+private val UndoCheckpointDebounce = 1.seconds
+
 /**
  * The rich editor surface: every block is always directly editable — no Markdown syntax, no
  * tap-to-reveal. Block structure (bullets, numbers, checkboxes, quote bars, code boxes) is
  * chrome drawn outside the text fields; inline formatting is applied by the span engine.
  */
+@OptIn(FlowPreview::class)
 @Composable
 fun RichDocumentEditor(
     state: RichDocumentState,
@@ -82,6 +93,24 @@ fun RichDocumentEditor(
             state.pendingSplit = null
             state.splitBlock(request.index, request.start, request.end)
         }
+    }
+
+    // Checkpoint typing bursts for undo once input settles, so undo steps back through typing
+    // instead of jumping to the previous structural operation. Code blocks have no input
+    // transformation, so their text length stands in for an edit counter.
+    LaunchedEffect(state) {
+        snapshotFlow {
+            state.blocks.sumOf { block ->
+                when (block) {
+                    is RichTextBlockEditState -> block.text.editCount
+                    is CodeBlockEditState -> block.code.text.length
+                    else -> 0
+                }
+            }
+        }
+            .drop(1)
+            .debounce(UndoCheckpointDebounce)
+            .collect { state.recordUndo() }
     }
 
     LaunchedEffect(state) {
@@ -187,13 +216,15 @@ private fun RichTextBlockRow(
                 .focusRequester(focusRequester)
                 .onFocusChanged { if (it.isFocused) state.focusedIndex = index }
                 .onPreviewKeyEvent { event ->
-                    if (event.type == KeyEventType.KeyDown &&
-                        event.key == Key.Backspace &&
-                        block.text.textFieldState.selection == TextRange.Zero
-                    ) {
-                        state.mergeBlockBackward(index)
-                    } else {
-                        false
+                    when {
+                        handleUndoRedoKey(event, state) -> true
+
+                        event.type == KeyEventType.KeyDown &&
+                                event.key == Key.Backspace &&
+                                block.text.textFieldState.selection == TextRange.Zero ->
+                            state.mergeBlockBackward(index)
+
+                        else -> false
                     }
                 }
                 .testTag(richBlockFieldTag(index)),
@@ -204,7 +235,7 @@ private fun RichTextBlockRow(
             marker = when {
                 kind.checked != null -> MarkdownListMarker.TaskCheckbox(
                     checked = kind.checked,
-                    onCheckedChange = { block.kind = kind.copy(checked = it) },
+                    onCheckedChange = { state.setTaskChecked(index, it) },
                 )
 
                 kind.ordered -> MarkdownListMarker.Number(orderedNumber(state.blocks, index))
@@ -257,6 +288,7 @@ private fun CodeBlockRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged { if (it.isFocused) state.focusedIndex = index }
+                .onPreviewKeyEvent { handleUndoRedoKey(it, state) }
                 .testTag(richBlockFieldTag(index)),
         )
     }
@@ -286,6 +318,28 @@ private fun RawSourceRow(block: RawSourceEditState, colors: MarkdownColors) {
 private fun blockTextStyle(kind: RichBlockKind, colors: MarkdownColors): TextStyle = when (kind) {
     is RichBlockKind.Heading -> markdownHeadingStyle(kind.level).copy(color = colors.text)
     else -> MaterialTheme.typography.bodyMedium.copy(color = colors.text)
+}
+
+/**
+ * Routes Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y (hardware keyboards) to document-level undo/redo.
+ * Always consumed, even when there is nothing to undo: the field's built-in text undo bypasses
+ * the span engine and would desync spans from text.
+ */
+private fun handleUndoRedoKey(event: KeyEvent, state: RichDocumentState): Boolean {
+    if (event.type != KeyEventType.KeyDown || !event.isCtrlPressed) return false
+    return when (event.key) {
+        Key.Z -> {
+            if (event.isShiftPressed) state.redo() else state.undo()
+            true
+        }
+
+        Key.Y -> {
+            state.redo()
+            true
+        }
+
+        else -> false
+    }
 }
 
 /** 1-based number of an ordered item: counts ordered predecessors at the same indent. */

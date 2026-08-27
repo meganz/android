@@ -288,6 +288,170 @@ internal class RichDocumentStateTest {
             .isEqualTo(RichBlockKind.Paragraph)
     }
 
+    @Test
+    fun `test that undo restores the document before a split and redo reapplies it`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("hello world")))
+
+        state.splitBlock(0, 6)
+        assertThat(state.blocks).hasSize(2)
+
+        assertThat(state.undo()).isTrue()
+        assertThat(state.blocks).hasSize(1)
+        assertThat((state.blocks[0] as RichTextBlockEditState).text.textFieldState.text.toString())
+            .isEqualTo("hello world")
+
+        assertThat(state.redo()).isTrue()
+        assertThat(state.blocks).hasSize(2)
+    }
+
+    @Test
+    fun `test that undo reverts a structural retype`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("text")))
+        state.focusedIndex = 0
+
+        state.toggleFocusedQuote()
+        assertThat((state.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Quote(1))
+
+        assertThat(state.undo()).isTrue()
+        assertThat((state.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Paragraph)
+    }
+
+    @Test
+    fun `test that undo steps back through typing checkpoints`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("a")))
+        val block = state.blocks[0] as RichTextBlockEditState
+
+        block.text.textFieldState.edit { append("b") }
+        state.recordUndo()
+        block.text.textFieldState.edit { append("c") }
+        state.recordUndo()
+
+        assertThat(state.undo()).isTrue()
+        assertThat(block(state).text.textFieldState.text.toString()).isEqualTo("ab")
+        assertThat(state.undo()).isTrue()
+        assertThat(block(state).text.textFieldState.text.toString()).isEqualTo("a")
+        assertThat(state.undo()).isFalse()
+    }
+
+    @Test
+    fun `test that recordUndo does not stack an unchanged document`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("a")))
+
+        state.recordUndo()
+        state.recordUndo()
+
+        assertThat(state.undo()).isFalse()
+    }
+
+    @Test
+    fun `test that a new checkpoint clears the redo history`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("a")))
+        val edit: (String) -> Unit = { text ->
+            (state.blocks[0] as RichTextBlockEditState).text.textFieldState.edit {
+                append(text)
+            }
+        }
+
+        edit("b")
+        state.recordUndo()
+        state.undo()
+        edit("x")
+        state.recordUndo()
+
+        assertThat(state.redo()).isFalse()
+    }
+
+    @Test
+    fun `test that setTaskChecked updates the kind and is undoable`() {
+        val state = stateOf(
+            RichBlock.ListItem(ordered = false, indent = 0, checked = false, RichText("t")),
+        )
+
+        state.setTaskChecked(0, true)
+        assertThat((state.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Item(ordered = false, indent = 0, checked = true))
+
+        assertThat(state.undo()).isTrue()
+        assertThat((state.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Item(ordered = false, indent = 0, checked = false))
+    }
+
+    @Test
+    fun `test that the undo stack is capped and never crashes when exhausted`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("")))
+        repeat(60) { index ->
+            (state.blocks[0] as RichTextBlockEditState).text.textFieldState.edit {
+                append("$index,")
+            }
+            state.recordUndo()
+        }
+
+        var undoCount = 0
+        while (state.undo()) undoCount++
+
+        assertThat(undoCount).isAtMost(50)
+        assertThat(undoCount).isGreaterThan(0)
+    }
+
+    @Test
+    fun `test that a no-op undo keeps the baseline snapshot undoable`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("original")))
+
+        assertThat(state.undo()).isFalse()
+
+        block(state).text.textFieldState.edit { append("!") }
+        state.recordUndo()
+
+        assertThat(state.undo()).isTrue()
+        assertThat(block(state).text.textFieldState.text.toString()).isEqualTo("original")
+    }
+
+    @Test
+    fun `test that a checkpoint fired after undo does not wipe the redo history`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("hello world")))
+        state.splitBlock(0, 6)
+        assertThat(state.undo()).isTrue()
+
+        // The debounced typing collector fires after every restore (rebuilding the blocks
+        // resets the edit counters it watches); it must dedup, not clear redo.
+        state.recordUndo()
+
+        assertThat(state.redo()).isTrue()
+        assertThat(state.blocks).hasSize(2)
+    }
+
+    @Test
+    fun `test that typing after undo invalidates redo once checkpointed`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("hello world")))
+        state.splitBlock(0, 6)
+        state.undo()
+
+        block(state).text.textFieldState.edit { append("!") }
+        state.recordUndo()
+
+        assertThat(state.redo()).isFalse()
+    }
+
+    @Test
+    fun `test that undo redo cycles are stable across repeated presses`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("hello world")))
+        state.splitBlock(0, 6)
+
+        repeat(3) {
+            assertThat(state.undo()).isTrue()
+            assertThat(state.blocks).hasSize(1)
+            assertThat(state.undo()).isFalse()
+            assertThat(state.redo()).isTrue()
+            assertThat(state.blocks).hasSize(2)
+            assertThat(state.redo()).isFalse()
+        }
+    }
+
+    private fun block(state: RichDocumentState): RichTextBlockEditState =
+        state.blocks[0] as RichTextBlockEditState
+
     private fun stateOf(vararg blocks: RichBlock): RichDocumentState =
         RichDocumentState(RichDocument(blocks.toList()))
 

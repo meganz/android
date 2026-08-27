@@ -605,6 +605,21 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
+    fun `test that a toolbar style toggle can be undone at the document level`() = runTest {
+        enterEditModeWith("hello world")
+        underTest.ensureRichDocumentState()
+        val rich = underTest.richDocumentState.value!!
+        rich.focusedIndex = 0
+        rich.focusedTextBlock!!.text.textFieldState.edit { selection = TextRange(0, 5) }
+
+        underTest.applyFormatAction(MarkdownFormatAction.Bold)
+        assertThat(rich.focusedTextBlock!!.text.spans).isNotEmpty()
+
+        assertThat(rich.undo()).isTrue()
+        assertThat((rich.blocks[0] as RichTextBlockEditState).text.spans).isEmpty()
+    }
+
+    @Test
     fun `test that getMarkdownPreviewContent returns joined content for normal lines`() = runTest {
         doReturn(flowOf(listOf("# Title", "body"))).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())

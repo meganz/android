@@ -26,6 +26,10 @@ class RichTextBlockState(
     var typingStyles: Set<RichSpanStyle> by mutableStateOf(emptySet())
         private set
 
+    /** Bumped on every user edit; the editor watches it to checkpoint typing bursts for undo. */
+    var editCount: Int by mutableStateOf(0)
+        internal set
+
     /** Styles covering [offset] — a caret directly after styled text counts as inside it. */
     fun stylesAt(offset: Int): Set<RichSpanStyle> =
         spans.filter { offset > it.start && offset <= it.end }.map { it.style }.toSet()

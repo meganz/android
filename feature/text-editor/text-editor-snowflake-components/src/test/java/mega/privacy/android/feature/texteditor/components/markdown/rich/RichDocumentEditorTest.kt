@@ -13,6 +13,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
+import androidx.compose.ui.test.withKeyDown
 import androidx.compose.ui.text.TextRange
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -202,6 +203,59 @@ class RichDocumentEditorTest {
         val block = state.blocks[0] as RichTextBlockEditState
         assertThat(block.kind).isEqualTo(RichBlockKind.Paragraph)
         assertThat(block.text.textFieldState.text.toString()).isEqualTo("item")
+    }
+
+    @Test
+    fun `test that ctrl z undoes the last split and ctrl shift z redoes it`() {
+        setEditor(RichDocument(listOf(RichBlock.Paragraph(RichText("hello world")))))
+        composeRule.onNodeWithTag(richBlockFieldTag(0))
+            .performTextInputSelection(TextRange(6))
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performTextInput("\n")
+        composeRule.waitForIdle()
+        assertThat(state.blocks).hasSize(2)
+
+        composeRule.onNodeWithTag(richBlockFieldTag(1)).performKeyInput {
+            withKeyDown(Key.CtrlLeft) { pressKey(Key.Z) }
+        }
+        composeRule.waitForIdle()
+
+        assertThat(state.blocks).hasSize(1)
+        assertThat((state.blocks[0] as RichTextBlockEditState).text.textFieldState.text.toString())
+            .isEqualTo("hello world")
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performKeyInput {
+            withKeyDown(Key.CtrlLeft) { withKeyDown(Key.ShiftLeft) { pressKey(Key.Z) } }
+        }
+        composeRule.waitForIdle()
+
+        assertThat(state.blocks).hasSize(2)
+    }
+
+    @Test
+    fun `test that redo still works after the typing checkpoint debounce elapses`() {
+        setEditor(RichDocument(listOf(RichBlock.Paragraph(RichText("hello world")))))
+        composeRule.onNodeWithTag(richBlockFieldTag(0))
+            .performTextInputSelection(TextRange(6))
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performTextInput("\n")
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag(richBlockFieldTag(1)).performKeyInput {
+            withKeyDown(Key.CtrlLeft) { pressKey(Key.Z) }
+        }
+        composeRule.waitForIdle()
+        assertThat(state.blocks).hasSize(1)
+
+        // Let the debounced typing-checkpoint collector fire (restore resets the edit
+        // counters it watches); it must not wipe the redo history.
+        composeRule.mainClock.advanceTimeBy(2_000)
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performKeyInput {
+            withKeyDown(Key.CtrlLeft) { pressKey(Key.Y) }
+        }
+        composeRule.waitForIdle()
+
+        assertThat(state.blocks).hasSize(2)
     }
 
     @Test

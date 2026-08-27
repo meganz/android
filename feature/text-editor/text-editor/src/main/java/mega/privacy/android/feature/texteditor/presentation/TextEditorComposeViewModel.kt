@@ -517,17 +517,12 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private fun applyRichFormatAction(action: MarkdownFormatAction) {
         val rich = richDocumentState.value ?: return
         when (action) {
-            MarkdownFormatAction.Bold ->
-                rich.focusedTextBlock?.text?.toggleStyle(RichSpanStyle.Bold)
-
-            MarkdownFormatAction.Italic ->
-                rich.focusedTextBlock?.text?.toggleStyle(RichSpanStyle.Italic)
-
+            MarkdownFormatAction.Bold -> toggleFocusedStyle(rich, RichSpanStyle.Bold)
+            MarkdownFormatAction.Italic -> toggleFocusedStyle(rich, RichSpanStyle.Italic)
             MarkdownFormatAction.Strikethrough ->
-                rich.focusedTextBlock?.text?.toggleStyle(RichSpanStyle.Strikethrough)
+                toggleFocusedStyle(rich, RichSpanStyle.Strikethrough)
 
-            MarkdownFormatAction.InlineCode ->
-                rich.focusedTextBlock?.text?.toggleStyle(RichSpanStyle.Code)
+            MarkdownFormatAction.InlineCode -> toggleFocusedStyle(rich, RichSpanStyle.Code)
 
             MarkdownFormatAction.HeadingCycle -> rich.cycleFocusedHeading()
             MarkdownFormatAction.BulletList -> rich.toggleFocusedListItem(ordered = false)
@@ -535,6 +530,12 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             MarkdownFormatAction.Quote -> rich.toggleFocusedQuote()
             MarkdownFormatAction.Link -> requestRichLinkDialog(rich)
         }
+    }
+
+    private fun toggleFocusedStyle(rich: RichDocumentState, style: RichSpanStyle) {
+        val block = rich.focusedTextBlock ?: return
+        rich.recordUndo()
+        block.text.toggleStyle(style)
     }
 
     private fun requestRichLinkDialog(rich: RichDocumentState) {
@@ -562,12 +563,18 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     fun confirmLink(linkText: String, url: String) {
-        richTextBlockForLink()?.text?.applyLink(linkText, url)
+        richTextBlockForLink()?.let { block ->
+            richDocumentState.value?.recordUndo()
+            block.text.applyLink(linkText, url)
+        }
         dismissLinkDialog()
     }
 
     fun removeLink() {
-        richTextBlockForLink()?.text?.removeLink()
+        richTextBlockForLink()?.let { block ->
+            richDocumentState.value?.recordUndo()
+            block.text.removeLink()
+        }
         dismissLinkDialog()
     }
 

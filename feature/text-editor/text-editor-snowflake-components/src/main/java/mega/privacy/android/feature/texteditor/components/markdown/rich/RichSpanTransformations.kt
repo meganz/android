@@ -52,6 +52,7 @@ class RichSpanInputTransformation(
             )
         }
         state.spans = RichSpanAdjuster.adjust(state.spans, edits, state.typingStyles)
+        state.editCount++
     }
 }
 
