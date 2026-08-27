@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -91,12 +92,30 @@ internal class TimelineRevampViewModelTest {
         mock<MonitorMediaNodeContentChangesUseCase>()
     private val gridSizePreference = MutableStateFlow<Int?>(null)
 
+    /**
+     * Awaits the Data emission carrying [expected], skipping any earlier ones. The grid size reaches
+     * [TimelineRevampUiState.Data] through its own flow, so it can trail the emission that first
+     * exposes Data by a tick.
+     */
+    private suspend fun ReceiveTurbine<TimelineRevampUiState.Data>.awaitGridSize(
+        expected: TimelineGridSize,
+    ) {
+        var size = awaitItem().gridSize
+        while (size != expected) {
+            size = awaitItem().gridSize
+        }
+        assertThat(size).isEqualTo(expected)
+    }
+
     private suspend fun initUnderTest(
         filterUiState: TimelineFilterUiState = TimelineFilterUiState(),
         isHiddenNodesEnabled: Boolean = false,
         showHiddenItems: Boolean = false,
         mediaChanges: Flow<Unit> = emptyFlow(),
         contentChanges: Flow<Set<Long>> = emptyFlow(),
+        // False leaves the persisted preference silent, the way it is for the frames between a
+        // pinch's steps and the DataStore write landing.
+        persistedGridSizeEchoes: Boolean = true,
     ) {
         whenever(timelineFilterUiStateMapper(anyOrNull<Map<String, String?>>(), any()))
             .thenReturn(filterUiState)
@@ -109,7 +128,7 @@ internal class TimelineRevampViewModelTest {
         whenever(monitorMediaNodeContentChangesUseCase()).thenReturn(contentChanges)
         whenever(monitorTimelineGridSizeUseCase()).thenReturn(gridSizePreference)
         whenever(setTimelineGridSizeUseCase(any())) doSuspendableAnswer {
-            gridSizePreference.value = it.getArgument(0)
+            if (persistedGridSizeEchoes) gridSizePreference.value = it.getArgument(0)
         }
         underTest = TimelineRevampViewModel(
             getMediaTimelineSectionsUseCase = getMediaTimelineSectionsUseCase,
@@ -500,6 +519,46 @@ internal class TimelineRevampViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that onZoomIn steps twice when the grid size preference has not emitted yet`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any(), any()))
+                .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+            gridSizePreference.value = TimelineGridSize.Compact.ordinal
+            initUnderTest(persistedGridSizeEchoes = false)
+
+            underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+                awaitGridSize(TimelineGridSize.Compact)
+                // A pinch fires its steps a frame or two apart, before the write lands, so the
+                // second step has to build on the first rather than re-read Compact.
+                underTest.onZoomIn()
+                awaitGridSize(TimelineGridSize.Default)
+                underTest.onZoomIn()
+                awaitGridSize(TimelineGridSize.Large)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(setTimelineGridSizeUseCase)(TimelineGridSize.Default.ordinal)
+            verify(setTimelineGridSizeUseCase)(TimelineGridSize.Large.ordinal)
+        }
+
+    @Test
+    fun `test that a later grid size preference emission overrides the optimistic value`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any(), any()))
+                .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+            initUnderTest(persistedGridSizeEchoes = false)
+
+            underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+                awaitGridSize(TimelineGridSize.Default)
+                underTest.onGridSizeChange(TimelineGridSize.Large)
+                awaitGridSize(TimelineGridSize.Large)
+                gridSizePreference.value = TimelineGridSize.Compact.ordinal
+                awaitGridSize(TimelineGridSize.Compact)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that onZoomOut is a no-op when already at the smallest size`() = runTest {

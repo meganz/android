@@ -121,6 +121,7 @@ class TimelineRevampViewModel @Inject constructor(
     private val mediaLoaderStarted = AtomicBoolean(false)
     private val sectionsMonitorStarted = AtomicBoolean(false)
     private val contentMonitorStarted = AtomicBoolean(false)
+    private val gridSizeMonitorStarted = AtomicBoolean(false)
 
     /**
      * Backs [TimelineRevampUiState.Data.takenDownDialogEvent]; folded into [uiState] so the screen
@@ -129,19 +130,15 @@ class TimelineRevampViewModel @Inject constructor(
     private val _takenDownDialogEvent = MutableStateFlow<StateEvent>(consumed)
 
     /**
-     * The grid size (Compact / Default / Large), sourced from the persisted preference. Drives only
-     * the grid column count, so it lives in [uiState] (not [currentFilter]) — changing it must not
-     * reload the timeline. Eagerly shared so [onZoomIn] / [onZoomOut] can read the current value.
+     * The grid size (Compact / Default / Large). Drives only the grid column count, so it lives in
+     * [uiState] (not [currentFilter]) — changing it must not reload the timeline.
+     *
+     * [onGridSizeChange] writes it optimistically instead of waiting for the persisted preference to
+     * round trip, so the successive steps of a single pinch compose rather than each reading the
+     * same pre-pinch size and collapsing into one. Seeded from the preference by
+     * [monitorTimelineGridSize].
      */
-    private val gridSizeFlow: StateFlow<TimelineGridSize> = monitorTimelineGridSizeUseCase()
-        .map { ordinal ->
-            ordinal?.let { TimelineGridSize.entries.getOrNull(it) } ?: TimelineGridSize.Default
-        }
-        .catch {
-            Timber.e(it, "Unable to monitor timeline grid size")
-            emit(TimelineGridSize.Default)
-        }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, TimelineGridSize.Default)
+    private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
 
     /**
      * The selected timestamp column and direction. Drives the section order and the per-section page
@@ -287,7 +284,7 @@ class TimelineRevampViewModel @Inject constructor(
             sectionsState.onStart { monitorTimelineSections() },
             loadedNodes,
             isHiddenNodesEnabled,
-            gridSizeFlow,
+            gridSizeFlow.onStart { monitorTimelineGridSize() },
             sortOptionsFlow,
         ) { sectionsState, loaded, hiddenNodesEnabled, gridSize, currentSort ->
             GridBundle(sectionsState, loaded, hiddenNodesEnabled, gridSize, currentSort)
@@ -483,6 +480,27 @@ class TimelineRevampViewModel @Inject constructor(
      * publishing the new sections. A [monitorMediaChanges] emission instead refreshes silently — no loading
      * state, held until the grid stops scrolling ([awaitScrollIdle]) so the layout never reflows mid-scroll.
      */
+    /**
+     * Seeds [gridSizeFlow] from the persisted preference and keeps it in sync with changes made
+     * elsewhere (e.g. the legacy Timeline tab). Started from [uiState] rather than eagerly, so the
+     * preference is only read once something observes the grid.
+     */
+    private fun monitorTimelineGridSize() {
+        if (!gridSizeMonitorStarted.compareAndSet(false, true)) return
+        viewModelScope.launch {
+            monitorTimelineGridSizeUseCase()
+                .map { ordinal ->
+                    ordinal?.let { TimelineGridSize.entries.getOrNull(it) }
+                        ?: TimelineGridSize.Default
+                }
+                .catch {
+                    Timber.e(it, "Unable to monitor timeline grid size")
+                    emit(TimelineGridSize.Default)
+                }
+                .collect { gridSizeFlow.value = it }
+        }
+    }
+
     private fun monitorTimelineSections() {
         if (!sectionsMonitorStarted.compareAndSet(false, true)) return
         viewModelScope.launch {
@@ -890,6 +908,7 @@ class TimelineRevampViewModel @Inject constructor(
      * not reload the timeline.
      */
     fun onGridSizeChange(size: TimelineGridSize) {
+        gridSizeFlow.value = size
         persistGridSize(size)
         trackGridSizeSelection(size)
     }

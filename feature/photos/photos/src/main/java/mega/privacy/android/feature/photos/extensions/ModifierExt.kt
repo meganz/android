@@ -2,6 +2,8 @@ package mega.privacy.android.feature.photos.extensions
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateCentroidSize
+import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -22,31 +24,63 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 fun Modifier.photosZoomGestureDetector(
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
+    onPinchActiveChanged: (Boolean) -> Unit = {},
 ) = this.pointerInput(Unit) {
     awaitEachGesture {
-        awaitFirstDown(requireUnconsumed = false)
-        do {
-            val event = awaitPointerEvent(
-                pass = PointerEventPass.Initial
-            )
-            if (event.changes.any { it.isConsumed })
-                break
-            val zoomChange = event.calculateZoom()
-            if (zoomChange != 1.0f) {
-                if (zoomChange > 1.0f) {
-                    onZoomIn()
-                } else {
-                    onZoomOut()
+        var claimed = false
+        var pinchReported = false
+        // Zoom accumulated since the gesture started, reset to 1f each time a step fires.
+        var accumulatedZoom = 1f
+        var accumulatedPan = Offset.Zero
+
+        try {
+            awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+            do {
+                val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                // Only meaningful before claiming; past that every change is consumed by us.
+                if (!claimed && event.changes.any { it.isConsumed }) return@awaitEachGesture
+
+                if (!pinchReported && event.changes.count { it.pressed } > 1) {
+                    pinchReported = true
+                    onPinchActiveChanged(true)
                 }
-                // Consume event in case to trigger scroll
-                event.changes.map { it.consume() }
-                break
-            }
-        } while (event.changes.any { it.pressed })
+
+                // 1f while fewer than two pointers are down, so a single finger never accumulates.
+                accumulatedZoom *= event.calculateZoom()
+
+                if (!claimed) {
+                    accumulatedPan += event.calculatePan()
+                    val zoomMotion =
+                        abs(1f - accumulatedZoom) * event.calculateCentroidSize(useCurrent = false)
+                    // Two fingers panning in parallel hold their separation, so requiring the zoom
+                    // motion to dominate the pan leaves two-finger scrolling to the grid.
+                    claimed = zoomMotion > viewConfiguration.touchSlop &&
+                            zoomMotion > accumulatedPan.getDistance()
+                }
+
+                if (claimed) {
+                    event.changes.forEach { it.consume() }
+                    when {
+                        accumulatedZoom >= ZOOM_STEP_RATIO -> {
+                            onZoomIn()
+                            accumulatedZoom = 1f
+                        }
+
+                        accumulatedZoom <= 1f / ZOOM_STEP_RATIO -> {
+                            onZoomOut()
+                            accumulatedZoom = 1f
+                        }
+                    }
+                }
+            } while (event.changes.any { it.pressed })
+        } finally {
+            if (pinchReported) onPinchActiveChanged(false)
+        }
     }
 }
 
@@ -244,6 +278,14 @@ private suspend fun AwaitPointerEventScope.awaitLongPressOnInitialPass(
 } catch (_: PointerEventTimeoutCancellationException) {
     true
 }
+
+/**
+ * Ratio the finger separation must change by, since the gesture started or since the last step, to
+ * move the grid one size. Stepping by the actual tile-size ratios instead would make the last step
+ * need the fingers to triple their separation; a uniform ratio keeps every step reachable within one
+ * comfortable motion.
+ */
+private const val ZOOM_STEP_RATIO = 1.4f
 
 /** Distance from the top/bottom edge within which dragging starts to auto-scroll the grid. */
 private val DRAG_TO_SELECT_AUTO_SCROLL_THRESHOLD = 100.dp
