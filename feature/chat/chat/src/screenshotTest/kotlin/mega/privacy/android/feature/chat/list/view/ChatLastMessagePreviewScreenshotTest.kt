@@ -127,6 +127,85 @@ class ChatLastMessagePreviewScreenshotTest {
         )
     }
 
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ChatRoomItemsOngoingCalls() {
+        Rows(
+            stringResource(sharedR.string.ongoing_call_messages),
+            stringResource(sharedR.string.meetings_list_ongoing_call_message),
+        )
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ChatRoomItemsEndedCalls() {
+        val oneToOne = (
+            stringResource(sharedR.string.call_ended_message) +
+                pluralStringResource(sharedR.plurals.plural_call_ended_messages_minutes, 5, 5) +
+                ", " +
+                pluralStringResource(sharedR.plurals.plural_call_ended_messages_seconds, 3, 3)
+            ).stripMarkers()
+        val group = (
+            stringResource(sharedR.string.group_call_ended_message) +
+                pluralStringResource(sharedR.plurals.plural_call_ended_messages_hours, 1, 1) +
+                ", " +
+                pluralStringResource(sharedR.plurals.plural_call_ended_messages_minutes, 2, 2) +
+                ", " +
+                pluralStringResource(sharedR.plurals.plural_call_ended_messages_seconds, 3, 3)
+            ).stripMarkers()
+        Rows(
+            "Alice: $oneToOne",
+            "Alice: $group",
+            "Alice: " + stringResource(sharedR.string.group_call_ended_no_duration_message).stripMarkers(),
+            "Alice: " + stringResource(sharedR.string.call_rejected_messages).stripMarkers(),
+            "Alice: " + stringResource(sharedR.string.call_missed_messages).stripMarkers(),
+            "Alice: " + stringResource(sharedR.string.call_not_answered_messages).stripMarkers(),
+            "Alice: " + stringResource(sharedR.string.call_failed_messages).stripMarkers(),
+            "Alice: " + stringResource(sharedR.string.call_cancelled_messages).stripMarkers(),
+        )
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ChatRoomItemsScheduledMeeting() {
+        Rows(
+            stringResource(
+                sharedR.string.chat_chat_room_message_updated_scheduled_meeting, "Alice",
+            ).stripMarkers(),
+        )
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ChatRoomItemsAttachmentsAndVoiceClips() {
+        Rows(
+            "Alice: holiday.jpg",
+            "Alice: " + stringResource(sharedR.string.contacts_sent, "3"),
+            "Alice: 01:03",
+        )
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ChatRoomItemsMetaAndUnrecognizable() {
+        Rows(
+            "Alice: https://mega.io",
+            "Alice: " + stringResource(sharedR.string.title_geolocation_message),
+            "Alice: Happy Friday",
+            stringResource(sharedR.string.error_message_unrecognizable),
+        )
+    }
+
+    private fun String.stripMarkers(): String =
+        replace("[A]", "").replace("[/A]", "")
+            .replace("[B]", "").replace("[/B]", "")
+            .replace("[C]", "").replace("[/C]", "")
+
     @Composable
     private fun Row(
         title: String,
