@@ -11,6 +11,7 @@ import mega.privacy.android.data.test.engine.FakeGatewayEngine
 import mega.privacy.android.data.test.engine.FakeGatewayStubbing
 import mega.privacy.android.data.test.state.FakeAccountState
 import mega.privacy.android.data.test.state.FakeNodeTree
+import mega.privacy.android.data.test.state.FakeShareState
 import mega.privacy.android.data.test.stub.StubMegaAccountDetails
 import mega.privacy.android.data.test.stub.StubMegaCancelToken
 import mega.privacy.android.data.test.stub.StubMegaError
@@ -86,7 +87,8 @@ private const val DETAILS_FLAG_SESSIONS = 0x20
  *
  * Default behaviour: the fake represents a logged-in account (see [FakeAccountState]) with a node
  * tree seeded with Cloud Drive / Rubbish Bin / Vault roots (see [FakeNodeTree]). Node reads resolve
- * through [nodeTree], account reads through [account]; other queries return empty/neutral values
+ * through [nodeTree], account reads through [account], share and public-link reads through
+ * [shares] (see [FakeShareState]); other queries return empty/neutral values
  * and listener-based commands complete successfully with API_OK. No deep SDK behaviour is
  * simulated: commands such as copy/move/delete never mutate [nodeTree]; tests needing tree changes
  * mutate it directly or stub the relevant reads.
@@ -110,6 +112,7 @@ class FakeMegaApiGateway(
     private val engine: FakeGatewayEngine = FakeGatewayEngine(),
     val account: FakeAccountState = FakeAccountState(),
     val nodeTree: FakeNodeTree = FakeNodeTree(),
+    val shares: FakeShareState = FakeShareState(nodeTree),
 ) : MegaApiGateway, FakeGatewayStubbing by engine {
 
     private val globalUpdatesFlow = MutableSharedFlow<GlobalUpdate>(extraBufferCapacity = 64)
@@ -187,10 +190,11 @@ class FakeMegaApiGateway(
         MegaTransferScriptOutcome(steps, finalTransfer, error, stepDelayMs),
     )
 
-    /** Clears stubs, recorded invocations, account state and the node tree back to defaults. */
+    /** Clears stubs, recorded invocations, account state, shares and the node tree to defaults. */
     fun resetToDefaults() {
         engine.reset()
         nodeTree.clear()
+        shares.clear()
         account.isLoggedIn = true
         account.email = "test@mega.nz"
         account.myUserHandle = 111L
@@ -639,16 +643,22 @@ class FakeMegaApiGateway(
     }
 
     override suspend fun getIncomingSharesNode(order: Int?): List<MegaNode> =
-        engine.dispatch(MegaApiGateway::getIncomingSharesNode, listOf(order)) { emptyList() }
+        engine.dispatch(MegaApiGateway::getIncomingSharesNode, listOf(order)) {
+            shares.incomingShareNodes()
+        }
 
     override suspend fun getOutgoingSharesNode(order: Int?): List<MegaShare> =
-        engine.dispatch(MegaApiGateway::getOutgoingSharesNode, listOf(order)) { emptyList() }
+        engine.dispatch(MegaApiGateway::getOutgoingSharesNode, listOf(order)) {
+            shares.outgoingMegaShares()
+        }
 
     override suspend fun isPendingShare(node: MegaNode): Boolean =
         engine.dispatch(MegaApiGateway::isPendingShare, listOf(node)) { false }
 
     override suspend fun getPublicLinks(order: Int?): List<MegaNode> =
-        engine.dispatch(getPublicLinksNullableOrderRef, listOf(order)) { emptyList() }
+        engine.dispatch(getPublicLinksNullableOrderRef, listOf(order)) {
+            shares.publicLinkNodes()
+        }
 
     override suspend fun getNumChildFolders(node: MegaNode): Int =
         engine.dispatch(MegaApiGateway::getNumChildFolders, listOf(node)) {
@@ -868,8 +878,13 @@ class FakeMegaApiGateway(
         )
     }
 
+    /** Resolves the simulated peers of seeded shares, by email or base64 handle. */
     override suspend fun getContact(emailOrBase64Handle: String): MegaUser? =
-        engine.dispatch(MegaApiGateway::getContact, listOf(emailOrBase64Handle)) { null }
+        engine.dispatch(MegaApiGateway::getContact, listOf(emailOrBase64Handle)) {
+            shares.shareUsers().firstOrNull { (email, handle) ->
+                email == emailOrBase64Handle || encodeHandle(handle) == emailOrBase64Handle
+            }?.let { (email, handle) -> StubMegaUser(email = email, handle = handle) }
+        }
 
     override suspend fun getUserAlerts(): List<MegaUserAlert> =
         engine.dispatch(MegaApiGateway::getUserAlerts, emptyList()) { emptyList() }
@@ -951,7 +966,7 @@ class FakeMegaApiGateway(
     }
 
     override suspend fun getPublicLinks(): List<MegaNode> =
-        engine.dispatch(getPublicLinksRef, emptyList()) { emptyList() }
+        engine.dispatch(getPublicLinksRef, emptyList()) { shares.publicLinkNodes() }
 
     override fun getPreview(
         node: MegaNode,
@@ -1324,28 +1339,42 @@ class FakeMegaApiGateway(
     }
 
     override suspend fun getPublicLinks(order: Int): List<MegaNode> =
-        engine.dispatch(getPublicLinksOrderRef, listOf(order)) { emptyList() }
+        engine.dispatch(getPublicLinksOrderRef, listOf(order)) { shares.publicLinkNodes() }
 
     override suspend fun getInShares(order: Int): List<MegaNode> =
-        engine.dispatch(getInSharesByOrderRef, listOf(order)) { emptyList() }
+        engine.dispatch(getInSharesByOrderRef, listOf(order)) { shares.incomingShareNodes() }
 
     override suspend fun getInShares(user: MegaUser): List<MegaNode> =
-        engine.dispatch(getInSharesByUserRef, listOf(user)) { emptyList() }
+        engine.dispatch(getInSharesByUserRef, listOf(user)) {
+            shares.incomingShares
+                .filter { it.ownerEmail == user.email }
+                .mapNotNull { nodeTree.nodeByHandle(it.nodeHandle) }
+        }
 
     override suspend fun getUserFromInShare(node: MegaNode, recursive: Boolean): MegaUser? =
-        engine.dispatch(MegaApiGateway::getUserFromInShare, listOf(node, recursive)) { null }
+        engine.dispatch(MegaApiGateway::getUserFromInShare, listOf(node, recursive)) {
+            shares.incomingShareFor(node, recursive)?.let {
+                StubMegaUser(email = it.ownerEmail, handle = it.ownerHandle)
+            }
+        }
 
     override suspend fun getOutShares(order: Int): List<MegaShare> =
-        engine.dispatch(getOutSharesByOrderRef, listOf(order)) { emptyList() }
+        engine.dispatch(getOutSharesByOrderRef, listOf(order)) { shares.outgoingMegaShares() }
 
     override suspend fun getOutShares(megaNode: MegaNode): List<MegaShare> =
-        engine.dispatch(getOutSharesByNodeRef, listOf(megaNode)) { emptyList() }
+        engine.dispatch(getOutSharesByNodeRef, listOf(megaNode)) {
+            shares.outgoingMegaShares(megaNode.handle)
+        }
 
     override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
-        engine.dispatch(MegaApiGateway::getUnverifiedIncomingShares, listOf(order)) { emptyList() }
+        engine.dispatch(MegaApiGateway::getUnverifiedIncomingShares, listOf(order)) {
+            shares.incomingMegaShares(verified = false)
+        }
 
     override suspend fun getVerifiedIncomingShares(order: Int?): List<MegaShare> =
-        engine.dispatch(MegaApiGateway::getVerifiedIncomingShares, listOf(order)) { emptyList() }
+        engine.dispatch(MegaApiGateway::getVerifiedIncomingShares, listOf(order)) {
+            shares.incomingMegaShares(verified = true)
+        }
 
     override fun createSet(name: String, type: Int, listener: MegaRequestListenerInterface) {
         completeRequest(
@@ -2039,10 +2068,13 @@ class FakeMegaApiGateway(
             nodeTree.nodeByHandle(handle)?.name?.let { nodeName -> "/" + nodeName }
         }
 
-    /** The fake account owns every node by default. */
+    /**
+     * The fake account owns every node by default; nodes covered by a seeded incoming share (the
+     * share root or one of its descendants) report the share's access level instead.
+     */
     override fun getAccess(megaNode: MegaNode): Int =
         engine.dispatchBlocking(MegaApiGateway::getAccess, listOf(megaNode)) {
-            MegaShare.ACCESS_OWNER
+            shares.incomingShareFor(megaNode)?.access ?: MegaShare.ACCESS_OWNER
         }
 
     override fun stopSharingNode(megaNode: MegaNode) {

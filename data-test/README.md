@@ -98,6 +98,46 @@ fresh generated id (used as both `msgId` and `tempId`), authored by the logged-i
 appends it to the room's history, so a sent message renders through the app's real send-and-store
 path. `getMessage` resolves through the seeded history.
 
+## Share topology
+
+`FakeShareState` (`gateway.shares`) seeds incoming shares, outgoing shares and public links so
+the Shared Items screens (Incoming/Outgoing/Links tabs) and the folder-info sharing sections
+render from seeded state. Seeding helpers register the share record and place its node in the
+node tree in one call; the gateway's share reads (`get{Unverified,Verified}IncomingShares`,
+`getIncomingSharesNode`/`getInShares`, `getOutgoingSharesNode`/`getOutShares`, `getPublicLinks`,
+`getUserFromInShare`, `getAccess`, `getContact`) resolve from it. Defaults stay empty success.
+
+```kotlin
+// A folder shared TO the logged-in user by a simulated second account
+gateway.shares.addIncomingShare(
+    node = StubMegaNode(handle = 10L, name = "shared-in", isFolder = true, isInShare = true),
+    ownerEmail = "owner@mega.nz", ownerHandle = 222L, access = MegaShare.ACCESS_READ,
+)
+
+// A folder of the logged-in user shared to another user
+gateway.shares.addOutgoingShare(
+    node = StubMegaNode(handle = 20L, name = "shared-out", parentHandle = 1L, isFolder = true, isOutShare = true),
+    userEmail = "peer@mega.nz", access = MegaShare.ACCESS_READ,
+)
+
+// A publicly linked node
+gateway.shares.addPublicLink(
+    node = StubMegaNode(handle = 30L, name = "linked.txt", parentHandle = 1L, isExported = true, publicLink = "https://mega.nz/..."),
+)
+```
+
+As with the node tree, listener-based share commands (`setShareAccess`, `deleteNode`,
+`disableExport`) never mutate the share state themselves. The mutating helpers apply the
+SDK-side effect and broadcast the matching `OnNodesUpdate` (with the real `CHANGE_TYPE_*` flag)
+in one call, so the app's node monitoring refreshes the share surfaces:
+
+```kotlin
+gateway.shares.removeIncomingShare(10L)                                  // CHANGE_TYPE_REMOVED
+gateway.shares.removeOutgoingShare(20L, "peer@mega.nz")                  // CHANGE_TYPE_OUTSHARE
+gateway.shares.setOutgoingShareAccess(20L, "peer@mega.nz", ACCESS_FULL)  // CHANGE_TYPE_OUTSHARE
+gateway.shares.removePublicLink(30L)                                     // CHANGE_TYPE_PUBLIC_LINK
+```
+
 ## Stubbing semantics
 
 Stubs are keyed by method name (`KFunction.name`), so overloads share stubs — use the
@@ -111,7 +151,7 @@ are persistent (not one-shot). `clearStubs()`, `clearInvocations()` and `reset()
 |---|---|
 | `engine` | `FakeGatewayEngine` — stub registry, invocation recording, `FakeGatewayStubbing` surface |
 | `stub` | `Stub*` subclasses of the SWIG SDK wrapper classes, constructible without native code |
-| `state` | `FakeAccountState`, `FakeNodeTree`, `FakeChatState` — mutable default state |
+| `state` | `FakeAccountState`, `FakeNodeTree`, `FakeShareState`, `FakeChatState` — mutable default state |
 | `gateway` | `FakeMegaApiGateway`, `FakeMegaChatApiGateway` and outcome types |
 
 The `Stub*` classes subclass the SDK wrappers via the protected `(cPtr, cMemoryOwn)` constructor
