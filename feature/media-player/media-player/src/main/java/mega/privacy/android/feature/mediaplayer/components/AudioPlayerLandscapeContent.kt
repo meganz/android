@@ -51,6 +51,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 fun AudioPlayerLandscapeContent(
     isPlaying: Boolean,
     isLoading: Boolean,
+    controlsEnabled: Boolean,
     currentPosition: Long,
     duration: Long,
     artworkUri: String?,
@@ -161,6 +162,7 @@ fun AudioPlayerLandscapeContent(
                     PodcastPlaybackControls(
                         isPlaying = isPlaying,
                         isLoading = isLoading,
+                        controlsEnabled = controlsEnabled,
                         currentPlaybackSpeed = currentPlaybackSpeed,
                         sleepTimerActive = sleepTimerActive,
                         sleepTimerContentDescription = sleepTimerContentDescription,
@@ -174,6 +176,7 @@ fun AudioPlayerLandscapeContent(
                     MusicPlaybackControls(
                         isPlaying = isPlaying,
                         isLoading = isLoading,
+                        controlsEnabled = controlsEnabled,
                         shuffleEnabled = shuffleEnabled,
                         repeatMode = repeatMode,
                         onShuffleClicked = onShuffleClicked,
@@ -210,6 +213,7 @@ private fun PreviewAudioPlayerLandscapeContent() {
         AudioPlayerLandscapeContent(
             isPlaying = false,
             isLoading = false,
+            controlsEnabled = true,
             currentPosition = 45_000L,
             duration = 240_000L,
             artworkUri = null,

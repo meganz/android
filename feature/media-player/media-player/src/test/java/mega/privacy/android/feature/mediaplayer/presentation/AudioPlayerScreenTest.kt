@@ -2,6 +2,7 @@ package mega.privacy.android.feature.mediaplayer.presentation
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -133,6 +134,27 @@ class AudioPlayerScreenTest {
         setContent(uiState = AudioPlayerUiState.Loading, isPodcastMode = false)
 
         composeTestRule.onNodeWithContentDescription("Next").assertIsNotEnabled()
+    }
+
+    @Test
+    fun `test that next button is enabled when uiState is Data with isLoading true`() {
+        setContent(uiState = defaultData(isLoading = true), isPodcastMode = false)
+
+        composeTestRule.onNodeWithContentDescription("Next").assertIsEnabled()
+    }
+
+    @Test
+    fun `test that previous button is enabled when uiState is Data with isLoading true`() {
+        setContent(uiState = defaultData(isLoading = true), isPodcastMode = false)
+
+        composeTestRule.onNodeWithContentDescription("Previous").assertIsEnabled()
+    }
+
+    @Test
+    fun `test that seek forward button is enabled when uiState is Data with isLoading true`() {
+        setContent(uiState = defaultData(isLoading = true), isPodcastMode = true)
+
+        composeTestRule.onNodeWithContentDescription("Seek forward 15 seconds").assertIsEnabled()
     }
 
     // endregion
@@ -332,11 +354,11 @@ class AudioPlayerScreenTest {
     }
 
     @Test
-    fun `test that seek backward 15 button is disabled when isLoading is true in podcast mode`() {
+    fun `test that seek backward 15 button is enabled when isLoading is true in podcast mode`() {
         setContent(uiState = defaultData(isLoading = true), isPodcastMode = true)
 
         composeTestRule.onNodeWithContentDescription("Seek backward 15 seconds")
-            .assertIsNotEnabled()
+            .assertIsEnabled()
     }
 
     // endregion

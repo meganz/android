@@ -25,6 +25,7 @@ import mega.privacy.android.icon.pack.IconPack
 internal fun PodcastPlaybackControls(
     isPlaying: Boolean,
     isLoading: Boolean,
+    controlsEnabled: Boolean,
     currentPlaybackSpeed: Float,
     sleepTimerActive: Boolean,
     sleepTimerContentDescription: String,
@@ -62,7 +63,7 @@ internal fun PodcastPlaybackControls(
 
         IconButton(
             onClick = onSeekBackward15,
-            enabled = !isLoading,
+            enabled = controlsEnabled,
         ) {
             MegaIcon(
                 imageVector = IconPack.Medium.Regular.Outline.FifteenBackward,
@@ -80,7 +81,7 @@ internal fun PodcastPlaybackControls(
 
         IconButton(
             onClick = onSeekForward15,
-            enabled = !isLoading,
+            enabled = controlsEnabled,
         ) {
             MegaIcon(
                 imageVector = IconPack.Medium.Regular.Outline.FifteenForward,

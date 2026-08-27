@@ -28,6 +28,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 fun AudioPlayerPortraitContent(
     isPlaying: Boolean,
     isLoading: Boolean,
+    controlsEnabled: Boolean,
     currentPosition: Long,
     duration: Long,
     title: String,
@@ -88,6 +89,7 @@ fun AudioPlayerPortraitContent(
                 duration = duration,
                 isPlaying = isPlaying,
                 isLoading = isLoading,
+                controlsEnabled = controlsEnabled,
                 isPodcastMode = isPodcastMode,
                 shuffleEnabled = shuffleEnabled,
                 repeatMode = repeatMode,
@@ -119,6 +121,7 @@ private fun PreviewAudioPlayerPortraitContent() {
         AudioPlayerPortraitContent(
             isPlaying = false,
             isLoading = false,
+            controlsEnabled = true,
             currentPosition = 45_000L,
             duration = 240_000L,
             title = "Song Title",

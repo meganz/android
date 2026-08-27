@@ -129,6 +129,7 @@ fun AudioPlayerScreen(
             ) { innerPadding ->
                 val contentIsPlaying: Boolean
                 val contentIsLoading: Boolean
+                val contentControlsEnabled: Boolean
                 val contentPosition: Long
                 val contentDuration: Long
                 val contentTitle: String
@@ -143,6 +144,7 @@ fun AudioPlayerScreen(
                     is AudioPlayerUiState.Loading -> {
                         contentIsPlaying = false
                         contentIsLoading = true
+                        contentControlsEnabled = false
                         contentPosition = 0L
                         contentDuration = 0L
                         contentTitle = ""
@@ -157,6 +159,7 @@ fun AudioPlayerScreen(
                     is AudioPlayerUiState.Data -> {
                         contentIsPlaying = uiState.isPlaying
                         contentIsLoading = uiState.isLoading
+                        contentControlsEnabled = true
                         contentPosition = uiState.currentPosition
                         contentDuration = uiState.duration
                         contentTitle = uiState.title ?: uiState.currentPlayingItemName ?: ""
@@ -173,6 +176,7 @@ fun AudioPlayerScreen(
                     isLandscape = isLandscape,
                     isPlaying = contentIsPlaying,
                     isLoading = contentIsLoading,
+                    controlsEnabled = contentControlsEnabled,
                     currentPosition = contentPosition,
                     duration = contentDuration,
                     title = contentTitle,
@@ -208,6 +212,7 @@ private fun AudioPlayerContent(
     isLandscape: Boolean,
     isPlaying: Boolean,
     isLoading: Boolean,
+    controlsEnabled: Boolean,
     currentPosition: Long,
     duration: Long,
     title: String,
@@ -250,6 +255,7 @@ private fun AudioPlayerContent(
         AudioPlayerLandscapeContent(
             isPlaying = isPlaying,
             isLoading = isLoading,
+            controlsEnabled = controlsEnabled,
             currentPosition = currentPosition,
             duration = duration,
             artworkUri = artworkUri,
@@ -280,6 +286,7 @@ private fun AudioPlayerContent(
         AudioPlayerPortraitContent(
             isPlaying = isPlaying,
             isLoading = isLoading,
+            controlsEnabled = controlsEnabled,
             currentPosition = currentPosition,
             duration = duration,
             title = title,

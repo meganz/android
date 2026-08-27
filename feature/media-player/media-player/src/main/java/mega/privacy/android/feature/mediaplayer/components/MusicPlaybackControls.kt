@@ -19,6 +19,7 @@ import mega.privacy.android.icon.pack.IconPack
 internal fun MusicPlaybackControls(
     isPlaying: Boolean,
     isLoading: Boolean,
+    controlsEnabled: Boolean,
     shuffleEnabled: Boolean,
     repeatMode: Int,
     onShuffleClicked: () -> Unit,
@@ -50,7 +51,7 @@ internal fun MusicPlaybackControls(
 
         IconButton(
             onClick = onPreviousClicked,
-            enabled = !isLoading,
+            enabled = controlsEnabled,
         ) {
             MegaIcon(
                 imageVector = IconPack.Medium.Regular.Solid.SkipBack,
@@ -68,7 +69,7 @@ internal fun MusicPlaybackControls(
 
         IconButton(
             onClick = onNextClicked,
-            enabled = !isLoading,
+            enabled = controlsEnabled,
         ) {
             MegaIcon(
                 imageVector = IconPack.Medium.Regular.Solid.SkipForward,
