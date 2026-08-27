@@ -43,6 +43,7 @@ internal class ChatRoomUiItemMapper @Inject constructor() {
         status = (item as? ChatRoomItem.IndividualChatRoomItem)
             ?.userChatStatus
             .toContactItemStatus(),
+        hasOngoingCall = item.hasOngoingCall() && item !is ChatRoomItem.NoteToSelfChatRoomItem,
     )
 
     private fun UserChatStatus?.toContactItemStatus(): ContactItemStatus = when (this) {

@@ -3774,6 +3774,8 @@
     <string name="chat_list_search_no_results_title">No results found</string>
     <!-- Description shown on the chat list when a search returns no matching chats or meetings -->
     <string name="chat_list_search_no_results_description">Try a different search term</string>
+    <!-- Accessibility content description for the icon shown on a chat list row when that chat has a call in progress -->
+    <string name="chat_list_ongoing_call_content_description">Ongoing call</string>
     <!-- Title of the sync and backup settings screen -->
     <string name="settings_sync_and_backup_title">Sync and backup</string>
     <!-- Body of the system notification shown when transfers are interrupted because the transfer quota has been exceeded -->

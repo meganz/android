@@ -53,6 +53,7 @@ dependencies {
     testRuntimeOnly(testlib.junit.jupiter.engine)
 
     // screenshot tests
+    screenshotTestImplementation(project(":core-test"))
     screenshotTestImplementation(platform(androidx.compose.bom))
     screenshotTestImplementation(androidx.compose.ui.tooling)
     screenshotTestImplementation(testlib.compose.screenshot)

@@ -40,8 +40,15 @@ class ChatRoomItemViewScreenshotTest {
         RowWithStatus(ContactItemStatus.Offline)
     }
 
+    @PreviewTest
+    @CombinedThemePreviews
     @Composable
-    private fun RowWithStatus(status: ContactItemStatus) {
+    fun ChatRoomItemOngoingCall() {
+        RowWithStatus(ContactItemStatus.Online, hasOngoingCall = true)
+    }
+
+    @Composable
+    private fun RowWithStatus(status: ContactItemStatus, hasOngoingCall: Boolean = false) {
         AndroidThemeForPreviews {
             ChatRoomItemView(
                 item = ChatRoomUiItem(
@@ -60,6 +67,7 @@ class ChatRoomItemViewScreenshotTest {
                         color = 0xFFFEBC00.toInt(),
                     ),
                     status = status,
+                    hasOngoingCall = hasOngoingCall,
                 ),
                 onItemClick = {},
             )

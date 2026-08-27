@@ -85,6 +85,19 @@ internal fun ChatRoomItemView(
                             .testTag(CHAT_ROOM_ITEM_MUTE_TAG),
                     )
                 }
+                if (item.hasOngoingCall) {
+                    MegaIcon(
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Solid.Phone01),
+                        tint = IconColor.Brand,
+                        contentDescription = stringResource(
+                            sharedR.string.chat_list_ongoing_call_content_description
+                        ),
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .size(16.dp)
+                            .testTag(CHAT_ROOM_ITEM_CALL_TAG),
+                    )
+                }
             }
         },
         subtitle = {
@@ -206,6 +219,7 @@ internal const val CHAT_ROOM_ITEM_AVATAR_TAG = "chat_room_item:avatar"
 internal const val CHAT_ROOM_ITEM_STATUS_TAG = "chat_room_item:status_dot"
 internal const val CHAT_ROOM_ITEM_TITLE_TAG = "chat_room_item:title"
 internal const val CHAT_ROOM_ITEM_MUTE_TAG = "chat_room_item:mute_icon"
+internal const val CHAT_ROOM_ITEM_CALL_TAG = "chat_room_item:call_indicator"
 internal const val CHAT_ROOM_ITEM_MESSAGE_TAG = "chat_room_item:last_message"
 internal const val CHAT_ROOM_ITEM_TIMESTAMP_TAG = "chat_room_item:timestamp"
 internal const val CHAT_ROOM_ITEM_UNREAD_TAG = "chat_room_item:unread_badge"
@@ -241,6 +255,7 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
                 color = 0xFFFEBC00.toInt(),
             ),
             status = ContactItemStatus.Online,
+            hasOngoingCall = false,
         ),
         ChatRoomUiItem(
             chatId = 2L,
@@ -254,6 +269,7 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
             isNoteToSelf = false,
             avatar = ChatRoomUiItem.ChatRoomUiAvatar.Group,
             status = ContactItemStatus.Unknown,
+            hasOngoingCall = true,
         ),
         ChatRoomUiItem(
             chatId = 3L,
@@ -267,6 +283,7 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
             isNoteToSelf = false,
             avatar = ChatRoomUiItem.ChatRoomUiAvatar.Meeting,
             status = ContactItemStatus.Unknown,
+            hasOngoingCall = false,
         ),
         ChatRoomUiItem(
             chatId = 4L,
@@ -280,6 +297,7 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
             isNoteToSelf = true,
             avatar = ChatRoomUiItem.ChatRoomUiAvatar.NoteToSelf,
             status = ContactItemStatus.Unknown,
+            hasOngoingCall = false,
         ),
     )
 }

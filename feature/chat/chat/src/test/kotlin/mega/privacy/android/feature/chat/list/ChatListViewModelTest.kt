@@ -374,6 +374,7 @@ class ChatListViewModelTest {
             color = null,
         ),
         status = ContactItemStatus.Unknown,
+        hasOngoingCall = false,
     )
 
     private fun ChatListTabState.items(): List<ChatRoomUiItem> =

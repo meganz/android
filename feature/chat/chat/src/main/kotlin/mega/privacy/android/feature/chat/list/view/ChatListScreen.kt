@@ -284,6 +284,7 @@ private val previewChats = persistentListOf(
             color = null,
         ),
         status = ContactItemStatus.Online,
+        hasOngoingCall = false,
     ),
     ChatRoomUiItem(
         chatId = 2L,
@@ -297,6 +298,7 @@ private val previewChats = persistentListOf(
         isNoteToSelf = false,
         avatar = ChatRoomUiItem.ChatRoomUiAvatar.Group,
         status = ContactItemStatus.Unknown,
+        hasOngoingCall = false,
     ),
 )
 

@@ -17,6 +17,7 @@ import mega.android.core.ui.components.contact.state.ContactItemStatus
  * @property isNoteToSelf Whether the chat room is the note-to-self chat.
  * @property avatar Leading avatar to render for the row.
  * @property status Online-status indicator for the peer; [ContactItemStatus.Unknown] hides it.
+ * @property hasOngoingCall Whether the chat room currently has a call in progress.
  */
 @Immutable
 data class ChatRoomUiItem(
@@ -31,6 +32,7 @@ data class ChatRoomUiItem(
     val isNoteToSelf: Boolean,
     val avatar: ChatRoomUiAvatar,
     val status: ContactItemStatus,
+    val hasOngoingCall: Boolean,
 ) {
 
     /**

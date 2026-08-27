@@ -5,6 +5,7 @@ import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem.ChatRoomUiAvatar
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -198,11 +199,47 @@ class ChatRoomUiItemMapperTest {
         assertThat(actual.status).isEqualTo(ContactItemStatus.Unknown)
     }
 
+    @ParameterizedTest
+    @MethodSource("provideCallStatuses")
+    fun `test that invoke maps hasOngoingCall from the current call status`(
+        callStatus: ChatRoomItemStatus,
+        expected: Boolean,
+    ) {
+        val item = ChatRoomItem.IndividualChatRoomItem(
+            chatId = 1L,
+            title = "Mieko Kawakami",
+            currentCallStatus = callStatus,
+        )
+
+        val actual = underTest(item)
+
+        assertThat(actual.hasOngoingCall).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that invoke never marks a note to self chat room item as having an ongoing call`() {
+        val item = ChatRoomItem.NoteToSelfChatRoomItem(
+            chatId = 3L,
+            title = "Note to self",
+            currentCallStatus = ChatRoomItemStatus.Joined,
+        )
+
+        val actual = underTest(item)
+
+        assertThat(actual.hasOngoingCall).isFalse()
+    }
+
     private fun provideUserChatStatuses(): Stream<Arguments> = Stream.of(
         Arguments.of(UserChatStatus.Online, ContactItemStatus.Online),
         Arguments.of(UserChatStatus.Away, ContactItemStatus.Away),
         Arguments.of(UserChatStatus.Busy, ContactItemStatus.Busy),
         Arguments.of(UserChatStatus.Offline, ContactItemStatus.Offline),
         Arguments.of(UserChatStatus.Invalid, ContactItemStatus.Unknown),
+    )
+
+    private fun provideCallStatuses(): Stream<Arguments> = Stream.of(
+        Arguments.of(ChatRoomItemStatus.NotStarted, false),
+        Arguments.of(ChatRoomItemStatus.NotJoined, true),
+        Arguments.of(ChatRoomItemStatus.Joined, true),
     )
 }

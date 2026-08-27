@@ -155,6 +155,7 @@ class ChatListScreenScreenshotTest {
                         color = 0xFFFEBC00.toInt(),
                     ),
                     status = ContactItemStatus.Online,
+                    hasOngoingCall = false,
                 ),
                 ChatRoomUiItem(
                     chatId = 2L,
@@ -168,6 +169,7 @@ class ChatListScreenScreenshotTest {
                     isNoteToSelf = false,
                     avatar = ChatRoomUiItem.ChatRoomUiAvatar.Group,
                     status = ContactItemStatus.Unknown,
+                    hasOngoingCall = false,
                 ),
             ),
         ),
@@ -185,6 +187,7 @@ class ChatListScreenScreenshotTest {
                     isNoteToSelf = false,
                     avatar = ChatRoomUiItem.ChatRoomUiAvatar.Meeting,
                     status = ContactItemStatus.Unknown,
+                    hasOngoingCall = false,
                 ),
                 ChatRoomUiItem(
                     chatId = 4L,
@@ -198,6 +201,7 @@ class ChatListScreenScreenshotTest {
                     isNoteToSelf = false,
                     avatar = ChatRoomUiItem.ChatRoomUiAvatar.Meeting,
                     status = ContactItemStatus.Unknown,
+                    hasOngoingCall = false,
                 ),
             ),
         ),

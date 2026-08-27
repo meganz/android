@@ -254,5 +254,6 @@ class ChatLastMessagePreviewScreenshotTest {
         isNoteToSelf = false,
         avatar = avatar,
         status = ContactItemStatus.Unknown,
+        hasOngoingCall = false,
     )
 }
