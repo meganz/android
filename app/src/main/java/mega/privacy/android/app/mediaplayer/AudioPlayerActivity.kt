@@ -32,12 +32,14 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaWarningViewModel
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
@@ -634,12 +636,19 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     /**
      * The player hosts its fragments in a legacy navigation graph, so it cannot render the
      * quota-warning screen itself: the warning is opened in the single activity shell instead.
-     * Only collected while resumed, so whichever activity is in front takes the event.
+     * Only download warnings are claimed here, and only while resumed, so the activity in
+     * front takes the event.
+     *
+     * Streaming warnings are left to the host underneath: they close the player (see
+     * [observeTransferOverQuota]), and opening the shell from here would clear the activities
+     * between it and the player, so dismissing the warning would land on the shell instead of
+     * where the audio was opened from.
      */
     private fun observeTransferOverQuotaWarning() {
         lifecycleScope.launch {
             if (isQuotaWarningUpsellEnabled()) {
                 transferOverQuotaWarningViewModel.transferOverQuotaEvents
+                    .filter { it == TransferOverQuotaSource.Download }
                     .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                     .collect {
                         transferOverQuotaWarningViewModel.consumeTransferOverQuotaEvent()
