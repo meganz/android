@@ -53,6 +53,7 @@ class StubMegaRequest(
     private val link: String? = null,
     private val file: String? = null,
     private val text: String? = null,
+    private val password: String? = null,
     private val paramType: Int = 0,
     private val number: Long = 0L,
     private val flag: Boolean = false,
@@ -68,6 +69,7 @@ class StubMegaRequest(
     private val megaAccountDetails: MegaAccountDetails? = null,
     private val recentActions: MegaRecentActionBucketList? = null,
     private val megaFolderInfo: MegaFolderInfo? = null,
+    private val megaPushNotificationSettings: MegaPushNotificationSettings? = null,
 ) : MegaRequest(0, false) {
 
     override fun delete() = Unit
@@ -81,7 +83,7 @@ class StubMegaRequest(
     override fun getSessionKey(): String? = null
     override fun getName(): String? = name
     override fun getEmail(): String? = email
-    override fun getPassword(): String? = null
+    override fun getPassword(): String? = password
     override fun getNewPassword(): String? = null
     override fun getPrivateKey(): String? = null
     override fun getAccess(): Int = access
@@ -108,7 +110,8 @@ class StubMegaRequest(
     override fun getMegaStringListMap(): MegaStringListMap? = null
     override fun getMegaStringTable(): MegaStringTable? = null
     override fun getMegaFolderInfo(): MegaFolderInfo? = megaFolderInfo
-    override fun getMegaPushNotificationSettings(): MegaPushNotificationSettings? = null
+    override fun getMegaPushNotificationSettings(): MegaPushNotificationSettings? =
+        megaPushNotificationSettings
     override fun getMegaBackgroundMediaUploadPtr(): MegaBackgroundMediaUpload? = null
     override fun getMegaBannerList(): MegaBannerList? = null
     override fun getMegaStringList(): MegaStringList? = megaStringList

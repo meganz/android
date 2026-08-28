@@ -41,6 +41,7 @@ class StubMegaChatMessage(
     private val megaNodeList: MegaNodeList? = null,
     private val megaHandleList: MegaHandleList? = null,
     private val containsMeta: MegaChatContainsMeta? = null,
+    private val users: List<StubMegaChatMessageUser> = emptyList(),
 ) : MegaChatMessage(0, false) {
 
     override fun delete() = Unit
@@ -63,10 +64,11 @@ class StubMegaChatMessage(
     override fun getHandleOfAction(): Long = handleOfAction
     override fun getPrivilege(): Int = privilege
     override fun getCode(): Int = code
-    override fun getUsersCount(): Long = usersCount
-    override fun getUserHandle(p0: Long): Long = -1L
-    override fun getUserName(p0: Long): String? = null
-    override fun getUserEmail(p0: Long): String? = null
+    override fun getUsersCount(): Long =
+        if (users.isEmpty()) usersCount else users.size.toLong()
+    override fun getUserHandle(p0: Long): Long = users.getOrNull(p0.toInt())?.handle ?: -1L
+    override fun getUserName(p0: Long): String? = users.getOrNull(p0.toInt())?.name
+    override fun getUserEmail(p0: Long): String? = users.getOrNull(p0.toInt())?.email
     override fun getMegaNodeList(): MegaNodeList? = megaNodeList
     override fun getMegaHandleList(): MegaHandleList? = megaHandleList
     override fun getDuration(): Int = duration
@@ -82,3 +84,17 @@ class StubMegaChatMessage(
     override fun hasChanged(p0: Int): Boolean = (changes and p0) != 0
     override fun getContainsMeta(): MegaChatContainsMeta? = containsMeta
 }
+
+/**
+ * A user referenced by a message (e.g. a contact attachment), served through the message's
+ * per-index user getters.
+ *
+ * @property handle Handle of the referenced user.
+ * @property name Name of the referenced user.
+ * @property email Email of the referenced user.
+ */
+data class StubMegaChatMessageUser(
+    val handle: Long,
+    val name: String?,
+    val email: String?,
+)

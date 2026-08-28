@@ -79,6 +79,18 @@ class StubConstructorBackedValuesTest {
     }
 
     @Test
+    fun `test that StubMegaRequest returns the password and push notification settings when set`() {
+        val settings = StubMegaPushNotificationSettings()
+        val underTest = StubMegaRequest(
+            password = "credentials",
+            megaPushNotificationSettings = settings,
+        )
+
+        assertThat(underTest.password).isEqualTo("credentials")
+        assertThat(underTest.megaPushNotificationSettings).isSameInstanceAs(settings)
+    }
+
+    @Test
     fun `test that StubMegaNode returns the constructor values when queried`() {
         val underTest = StubMegaNode(
             handle = 10L,
@@ -563,6 +575,23 @@ class StubConstructorBackedValuesTest {
         assertThat(underTest.content).isEqualTo("hello")
         assertThat(underTest.isEdited).isTrue()
         assertThat(underTest.isDeleted).isTrue()
+    }
+
+    @Test
+    fun `test that StubMegaChatMessage serves the referenced users through the per-index getters`() {
+        val underTest = StubMegaChatMessage(
+            users = listOf(
+                StubMegaChatMessageUser(handle = 222L, name = "Alice", email = "alice@mega.nz"),
+            ),
+        )
+
+        assertThat(underTest.usersCount).isEqualTo(1L)
+        assertThat(underTest.getUserHandle(0)).isEqualTo(222L)
+        assertThat(underTest.getUserName(0)).isEqualTo("Alice")
+        assertThat(underTest.getUserEmail(0)).isEqualTo("alice@mega.nz")
+        assertThat(underTest.getUserHandle(1)).isEqualTo(-1L)
+        assertThat(underTest.getUserName(1)).isNull()
+        assertThat(underTest.getUserEmail(1)).isNull()
     }
 
     @Test

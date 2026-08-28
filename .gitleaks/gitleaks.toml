@@ -24,5 +24,6 @@ paths = [
     '''pnpm-lock.yaml''',
     '''Database.refactorlog''',
     '''vendor''',
-    '''data/src/test/java/mega/privacy/android/data/repository/DefaultAccountRepositoryTest.kt'''
+    '''data/src/test/java/mega/privacy/android/data/repository/DefaultAccountRepositoryTest.kt''',
+    '''app/src/androidTest/java/test/mega/privacy/android/app/ContactInfoTest.kt'''
 ]

@@ -1316,11 +1316,13 @@ class FakeMegaChatApiGateway(
             listOf(chatId, srcMp4, srcWebp, sizeMp4, sizeWebp, width, height, title),
         ) { StubMegaChatMessage() }
 
+    // Like sendMessage, the SDK echoes the outgoing attachment as part of the chat history, so
+    // the returned message must survive a later history reload.
     override fun attachContacts(chatId: Long, contactHandles: MegaHandleList): MegaChatMessage =
         engine.dispatchBlocking(
             MegaChatApiGateway::attachContacts,
             listOf(chatId, contactHandles),
-        ) { StubMegaChatMessage() }
+        ) { StubMegaChatMessage() }.also { chatState.addChatMessage(chatId, it) }
 
     override suspend fun forwardContact(
         sourceChatId: Long,
