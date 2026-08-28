@@ -41,6 +41,7 @@ import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import mega.android.core.ui.extensions.delayedTrue
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
 import org.commonmark.ext.gfm.tables.TablesExtension
+import org.commonmark.ext.task.list.items.TaskListItemsExtension
 import org.commonmark.node.Node
 import org.commonmark.parser.IncludeSourceSpans
 import org.commonmark.parser.Parser
@@ -288,7 +289,13 @@ private fun FullSelectionPreview(
 
 private val markdownParser: Parser by lazy {
     Parser.builder()
-        .extensions(listOf(TablesExtension.create(), StrikethroughExtension.create()))
+        .extensions(
+            listOf(
+                TablesExtension.create(),
+                StrikethroughExtension.create(),
+                TaskListItemsExtension.create(),
+            ),
+        )
         .includeSourceSpans(IncludeSourceSpans.BLOCKS)
         .build()
 }

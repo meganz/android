@@ -1,10 +1,12 @@
 package mega.privacy.android.feature.texteditor.components
 
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isToggleable
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
@@ -44,6 +46,16 @@ class MarkdownPreviewTest {
         }
         // onFirst: a repeated fragment such as a list marker legitimately matches several nodes.
         composeRule.onAllNodes(matcher).onFirst().assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that task list items render disabled checkboxes instead of literal markers`() {
+        setContent("- [x] done\n- [ ] todo")
+
+        assertTextDisplayed("done")
+        composeRule.onAllNodes(isToggleable()).assertCountEquals(2)
+        composeRule.onAllNodes(isToggleable()).onFirst().assertIsNotEnabled()
+        composeRule.onAllNodes(hasText("[x]", substring = true)).assertCountEquals(0)
     }
 
     @Test

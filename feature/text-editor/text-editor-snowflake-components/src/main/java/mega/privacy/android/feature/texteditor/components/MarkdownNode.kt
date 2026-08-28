@@ -38,6 +38,7 @@ import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
 import org.commonmark.ext.gfm.tables.TableHead
 import org.commonmark.ext.gfm.tables.TableRow
+import org.commonmark.ext.task.list.items.TaskListItemMarker
 import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
 import org.commonmark.node.Code
@@ -88,7 +89,7 @@ private fun rememberBlockScrollState(node: Node): ScrollState {
 /** Resolved colors for Markdown rendering, mapped from design tokens. */
 internal data class MarkdownColors(
     val text: Color,
-    val accent: Color,
+    val link: Color,
     val codeBackground: Color,
     val divider: Color,
     val quoteBar: Color,
@@ -97,7 +98,7 @@ internal data class MarkdownColors(
 @Composable
 internal fun rememberMarkdownColors(): MarkdownColors = MarkdownColors(
     text = DSTokens.colors.text.primary,
-    accent = DSTokens.colors.text.accent,
+    link = DSTokens.colors.link.primary,
     codeBackground = DSTokens.colors.background.surface1,
     divider = DSTokens.colors.border.subtle,
     quoteBar = DSTokens.colors.border.strong,
@@ -188,7 +189,7 @@ internal object MarkdownInlineStyles {
     )
 
     fun link(colors: MarkdownColors): SpanStyle = SpanStyle(
-        color = colors.accent,
+        color = colors.link,
         textDecoration = TextDecoration.Underline,
     )
 }
@@ -206,18 +207,27 @@ private fun MarkdownList(
         var index = start
         while (item != null) {
             if (item is ListItem) {
+                // A task item carries a TaskListItemMarker child; render it as a checkbox —
+                // disabled, because toggling from the read-only preview must not edit the file.
+                val taskMarker = item.firstChildOfType<TaskListItemMarker>()
                 MarkdownListItemFrame(
-                    marker = if (ordered) {
-                        MarkdownListMarker.Number(index)
-                    } else {
-                        MarkdownListMarker.Bullet
+                    marker = when {
+                        taskMarker != null -> MarkdownListMarker.TaskCheckbox(
+                            checked = taskMarker.isChecked,
+                            enabled = false,
+                        )
+
+                        ordered -> MarkdownListMarker.Number(index)
+                        else -> MarkdownListMarker.Bullet
                     },
                     colors = colors,
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         var child = item.firstChild
                         while (child != null) {
-                            MarkdownBlock(child, colors, nested = true)
+                            if (child !is TaskListItemMarker) {
+                                MarkdownBlock(child, colors, nested = true)
+                            }
                             child = child.next
                         }
                     }
@@ -227,6 +237,15 @@ private fun MarkdownList(
             item = item.next
         }
     }
+}
+
+private inline fun <reified T : Node> Node.firstChildOfType(): T? {
+    var child = firstChild
+    while (child != null) {
+        if (child is T) return child
+        child = child.next
+    }
+    return null
 }
 
 @Composable

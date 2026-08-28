@@ -1,10 +1,8 @@
 package mega.privacy.android.feature.texteditor.components.markdown.rich
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,9 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
+import mega.privacy.android.feature.texteditor.components.MarkdownBlock
 import mega.privacy.android.feature.texteditor.components.MarkdownBlockSpacing
 import mega.privacy.android.feature.texteditor.components.MarkdownCodeFrame
 import mega.privacy.android.feature.texteditor.components.MarkdownColors
@@ -54,6 +50,7 @@ import mega.privacy.android.feature.texteditor.components.MarkdownListItemChrome
 import mega.privacy.android.feature.texteditor.components.MarkdownListMarker
 import mega.privacy.android.feature.texteditor.components.MarkdownQuoteChrome
 import mega.privacy.android.feature.texteditor.components.markdownHeadingStyle
+import mega.privacy.android.feature.texteditor.components.parseTopLevelBlocks
 import mega.privacy.android.feature.texteditor.components.rememberMarkdownColors
 import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
@@ -297,21 +294,14 @@ private fun CodeBlockRow(
 
 @Composable
 private fun RawSourceRow(block: RawSourceEditState, colors: MarkdownColors) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 12.dp)
-            .background(colors.codeBackground, RoundedCornerShape(4.dp))
-            .horizontalScroll(rememberScrollState())
-            .padding(8.dp),
-    ) {
-        BasicText(
-            text = block.source,
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontFamily = FontFamily.Monospace,
-                color = colors.text,
-            ),
-        )
+    // Rendered through the preview's block components so unsupported constructs (tables,
+    // HTML, images) look exactly like View mode. Not editable — the verbatim source slice
+    // still serializes untouched, which is what keeps them lossless.
+    val nodes = remember(block.source) { parseTopLevelBlocks(block.source) }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        nodes.forEach { node ->
+            MarkdownBlock(node = node, colors = colors)
+        }
     }
 }
 

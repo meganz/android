@@ -295,10 +295,12 @@ class RichDocumentEditorTest {
     }
 
     @Test
-    fun `test that raw source blocks render their markdown verbatim`() {
-        val table = "| a | b |"
+    fun `test that raw source blocks render like the preview instead of showing syntax`() {
+        val table = "| City | Nights |\n|------|--------|\n| Rome | 3 |"
         setEditor(RichDocument(listOf(RichBlock.RawSource(table))))
 
-        composeRule.onNodeWithText(table).assertExists()
+        composeRule.onNodeWithText("City").assertExists()
+        composeRule.onNodeWithText("Rome").assertExists()
+        composeRule.onNodeWithText("|------|", substring = true).assertDoesNotExist()
     }
 }

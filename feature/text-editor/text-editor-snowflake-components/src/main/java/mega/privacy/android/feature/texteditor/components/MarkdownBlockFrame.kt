@@ -35,6 +35,10 @@ import androidx.compose.ui.unit.dp
  */
 
 internal val MarkdownListIndentStep = 24.dp
+
+/** Base inset of every list row from the body-text margin, as markdown renderers convention. */
+internal val MarkdownListStartPadding = 16.dp
+
 private val QuoteBarWidth = 3.dp
 
 /** Vertical rhythm shared by the preview's block spacing and the rich editor's row padding. */
@@ -52,9 +56,12 @@ internal object MarkdownBlockSpacing {
 internal sealed interface MarkdownListMarker {
     data object Bullet : MarkdownListMarker
     data class Number(val number: Int) : MarkdownListMarker
+
+    /** [enabled] is false in the read-only preview: viewing must never edit the file. */
     data class TaskCheckbox(
         val checked: Boolean,
-        val onCheckedChange: (Boolean) -> Unit,
+        val enabled: Boolean = true,
+        val onCheckedChange: (Boolean) -> Unit = {},
     ) : MarkdownListMarker
 }
 
@@ -89,14 +96,15 @@ internal fun MarkdownListItemChrome(
     colors: MarkdownColors,
     indent: Int = 0,
 ) {
-    if (indent > 0) {
-        Spacer(modifier = Modifier.width(MarkdownListIndentStep * indent))
-    }
+    Spacer(
+        modifier = Modifier.width(MarkdownListStartPadding + MarkdownListIndentStep * indent),
+    )
     DisableSelection {
         when (marker) {
             is MarkdownListMarker.TaskCheckbox -> Checkbox(
                 checked = marker.checked,
                 onCheckedChange = marker.onCheckedChange,
+                enabled = marker.enabled,
                 modifier = Modifier
                     .padding(end = 4.dp)
                     .height(24.dp),
