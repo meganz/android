@@ -73,33 +73,47 @@ internal fun MarkdownListItemFrame(
             .padding(MarkdownBlockSpacing.listOrQuoteRow),
         verticalAlignment = Alignment.Top,
     ) {
-        if (indent > 0) {
-            Spacer(modifier = Modifier.width(MarkdownListIndentStep * indent))
-        }
-        DisableSelection {
-            when (marker) {
-                is MarkdownListMarker.TaskCheckbox -> Checkbox(
-                    checked = marker.checked,
-                    onCheckedChange = marker.onCheckedChange,
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .height(24.dp),
-                )
-
-                is MarkdownListMarker.Number -> Text(
-                    text = "${marker.number}. ",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colors.text,
-                )
-
-                MarkdownListMarker.Bullet -> Text(
-                    text = "•  ",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colors.text,
-                )
-            }
-        }
+        MarkdownListItemChrome(marker = marker, colors = colors, indent = indent)
         content()
+    }
+}
+
+/**
+ * The leading chrome of a list item row — indent plus marker — for callers that own the row
+ * (the rich editor keeps its text field a stable sibling so retyping a block does not recreate
+ * the field and drop focus/keyboard).
+ */
+@Composable
+internal fun MarkdownListItemChrome(
+    marker: MarkdownListMarker,
+    colors: MarkdownColors,
+    indent: Int = 0,
+) {
+    if (indent > 0) {
+        Spacer(modifier = Modifier.width(MarkdownListIndentStep * indent))
+    }
+    DisableSelection {
+        when (marker) {
+            is MarkdownListMarker.TaskCheckbox -> Checkbox(
+                checked = marker.checked,
+                onCheckedChange = marker.onCheckedChange,
+                modifier = Modifier
+                    .padding(end = 4.dp)
+                    .height(24.dp),
+            )
+
+            is MarkdownListMarker.Number -> Text(
+                text = "${marker.number}. ",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.text,
+            )
+
+            MarkdownListMarker.Bullet -> Text(
+                text = "•  ",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.text,
+            )
+        }
     }
 }
 
@@ -118,16 +132,28 @@ internal fun MarkdownQuoteFrame(
             .padding(MarkdownBlockSpacing.listOrQuoteRow),
         verticalAlignment = Alignment.Top,
     ) {
-        repeat(depth.coerceAtLeast(1)) {
-            Box(
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .width(QuoteBarWidth)
-                    .fillMaxHeight()
-                    .background(colors.quoteBar),
-            )
-        }
+        MarkdownQuoteChrome(depth = depth, colors = colors)
         content()
+    }
+}
+
+/**
+ * The leading chrome of a quote row — [depth] full-height bars. The parent row must constrain
+ * its height (e.g. `IntrinsicSize.Min`) for the bars to fill it.
+ */
+@Composable
+internal fun MarkdownQuoteChrome(
+    depth: Int,
+    colors: MarkdownColors,
+) {
+    repeat(depth.coerceAtLeast(1)) {
+        Box(
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .width(QuoteBarWidth)
+                .fillMaxHeight()
+                .background(colors.quoteBar),
+        )
     }
 }
 

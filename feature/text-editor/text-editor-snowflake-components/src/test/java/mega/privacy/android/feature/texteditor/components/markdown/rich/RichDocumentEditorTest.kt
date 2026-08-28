@@ -2,6 +2,7 @@ package mega.privacy.android.feature.texteditor.components.markdown.rich
 
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsToggleable
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -256,6 +257,41 @@ class RichDocumentEditorTest {
         composeRule.waitForIdle()
 
         assertThat(state.blocks).hasSize(2)
+    }
+
+    @Test
+    fun `test that retyping the focused block to a list keeps focus and the keyboard`() {
+        setEditor(RichDocument(listOf(RichBlock.Paragraph(RichText("item")))))
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).requestFocus()
+        composeRule.waitForIdle()
+
+        composeRule.runOnIdle { state.toggleFocusedListItem(ordered = false) }
+        composeRule.waitForIdle()
+
+        assertThat((state.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Item(ordered = false, indent = 0, checked = null))
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).assertIsFocused()
+    }
+
+    @Test
+    fun `test that Enter on an empty list item exits the list without losing focus`() {
+        setEditor(
+            RichDocument(
+                listOf(
+                    RichBlock.ListItem(ordered = false, indent = 0, checked = null, RichText("")),
+                ),
+            ),
+        )
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).requestFocus()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).performTextInput("\n")
+        composeRule.waitForIdle()
+
+        assertThat(state.blocks).hasSize(1)
+        assertThat((state.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Paragraph)
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).assertIsFocused()
     }
 
     @Test

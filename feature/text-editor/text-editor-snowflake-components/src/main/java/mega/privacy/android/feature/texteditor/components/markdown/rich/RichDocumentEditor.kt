@@ -5,9 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -50,9 +50,9 @@ import kotlinx.coroutines.flow.drop
 import mega.privacy.android.feature.texteditor.components.MarkdownBlockSpacing
 import mega.privacy.android.feature.texteditor.components.MarkdownCodeFrame
 import mega.privacy.android.feature.texteditor.components.MarkdownColors
-import mega.privacy.android.feature.texteditor.components.MarkdownListItemFrame
+import mega.privacy.android.feature.texteditor.components.MarkdownListItemChrome
 import mega.privacy.android.feature.texteditor.components.MarkdownListMarker
-import mega.privacy.android.feature.texteditor.components.MarkdownQuoteFrame
+import mega.privacy.android.feature.texteditor.components.MarkdownQuoteChrome
 import mega.privacy.android.feature.texteditor.components.markdownHeadingStyle
 import mega.privacy.android.feature.texteditor.components.rememberMarkdownColors
 import timber.log.Timber
@@ -198,7 +198,43 @@ private fun RichTextBlockRow(
         snapshotFlow { block.text.textFieldState.selection }
             .collect { block.text.syncTypingStylesToCaret() }
     }
-    val field: @Composable RowScope.() -> Unit = {
+    // One stable Row for every kind: retyping a block (toolbar toggles, Enter on an empty
+    // item, backspace demotion) only swaps the chrome sibling. Putting the field inside
+    // per-kind wrappers would recreate it on a kind change, dropping focus and the keyboard.
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .padding(
+                when (kind) {
+                    is RichBlockKind.Heading -> MarkdownBlockSpacing.heading(kind.level)
+                    is RichBlockKind.Item, is RichBlockKind.Quote ->
+                        MarkdownBlockSpacing.listOrQuoteRow
+
+                    RichBlockKind.Paragraph -> MarkdownBlockSpacing.block
+                },
+            ),
+        verticalAlignment = Alignment.Top,
+    ) {
+        when (kind) {
+            is RichBlockKind.Item -> MarkdownListItemChrome(
+                marker = when {
+                    kind.checked != null -> MarkdownListMarker.TaskCheckbox(
+                        checked = kind.checked,
+                        onCheckedChange = { state.setTaskChecked(index, it) },
+                    )
+
+                    kind.ordered -> MarkdownListMarker.Number(orderedNumber(state.blocks, index))
+                    else -> MarkdownListMarker.Bullet
+                },
+                colors = colors,
+                indent = kind.indent,
+            )
+
+            is RichBlockKind.Quote -> MarkdownQuoteChrome(depth = kind.depth, colors = colors)
+
+            RichBlockKind.Paragraph, is RichBlockKind.Heading -> Unit
+        }
         BasicTextField(
             state = block.text.textFieldState,
             textStyle = blockTextStyle(kind, colors),
@@ -228,41 +264,6 @@ private fun RichTextBlockRow(
                     }
                 }
                 .testTag(richBlockFieldTag(index)),
-        )
-    }
-    when (kind) {
-        is RichBlockKind.Item -> MarkdownListItemFrame(
-            marker = when {
-                kind.checked != null -> MarkdownListMarker.TaskCheckbox(
-                    checked = kind.checked,
-                    onCheckedChange = { state.setTaskChecked(index, it) },
-                )
-
-                kind.ordered -> MarkdownListMarker.Number(orderedNumber(state.blocks, index))
-                else -> MarkdownListMarker.Bullet
-            },
-            colors = colors,
-            indent = kind.indent,
-            content = field,
-        )
-
-        is RichBlockKind.Quote -> MarkdownQuoteFrame(
-            depth = kind.depth,
-            colors = colors,
-            content = field,
-        )
-
-        RichBlockKind.Paragraph, is RichBlockKind.Heading -> Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    when (kind) {
-                        is RichBlockKind.Heading -> MarkdownBlockSpacing.heading(kind.level)
-                        else -> MarkdownBlockSpacing.block
-                    },
-                ),
-            verticalAlignment = Alignment.Top,
-            content = { field() },
         )
     }
 }
