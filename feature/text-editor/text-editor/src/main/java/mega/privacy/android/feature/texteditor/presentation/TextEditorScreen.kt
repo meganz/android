@@ -92,6 +92,7 @@ import mega.privacy.android.feature.texteditor.components.MarkdownPreview
 import mega.privacy.android.feature.texteditor.components.TextEditorContent
 import mega.privacy.android.feature.texteditor.components.TextEditorFastScrollbar
 import mega.privacy.android.feature.texteditor.components.TextEditorLoadingUiDelay
+import mega.privacy.android.feature.texteditor.components.markdown.MarkdownEditInputTransformation
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormattingToolbar
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownLinkDialog
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownSelectionFormats
@@ -501,6 +502,13 @@ fun TextEditorScreen(
                                         onTopLineChanged = viewModel::updateTopLine,
                                         restoreFocusChunkIndex = uiState.restoreFocusChunkIndex,
                                         onRestoreFocusConsumed = viewModel::consumeRestoreFocusChunkIndex,
+                                        // Typing assist for raw Markdown editing — source mode
+                                        // and documents too large for rich mode alike, so gated
+                                        // on the flag rather than isWysiwygCapable.
+                                        inputTransformation = MarkdownEditInputTransformation
+                                            .takeIf {
+                                                uiState.isMarkdown && uiState.isWysiwygEnabled
+                                            },
                                     )
                                     TextEditorFastScrollbar(
                                         state = lazyListState,

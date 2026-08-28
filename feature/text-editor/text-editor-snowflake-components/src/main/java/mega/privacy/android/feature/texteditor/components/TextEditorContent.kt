@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -126,6 +127,8 @@ fun TextEditorContent(
     /** When non-null, restores focus to this chunk index and shows the keyboard (e.g. after rotation). */
     restoreFocusChunkIndex: Int? = null,
     onRestoreFocusConsumed: () -> Unit = {},
+    /** Applied to every editable chunk's text field (Markdown typing behaviors). */
+    inputTransformation: InputTransformation? = null,
 ) {
     val textColor = DSTokens.colors.text.primary
     val textStyle = remember(textColor) { editorTextStyle(textColor) }
@@ -259,6 +262,7 @@ fun TextEditorContent(
                     restoreFocusChunkIndex = restoreFocusChunkIndex,
                     onRestoreFocusConsumed = onRestoreFocusConsumed,
                     onChunkLayout = onChunkLayout,
+                    inputTransformation = inputTransformation,
                 )
             }
         }
@@ -325,6 +329,7 @@ private fun EditModeLazyColumn(
     restoreFocusChunkIndex: Int? = null,
     onRestoreFocusConsumed: () -> Unit = {},
     onChunkLayout: (Int, TextLayoutResult?) -> Unit,
+    inputTransformation: InputTransformation? = null,
 ) {
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -378,6 +383,7 @@ private fun EditModeLazyColumn(
                 showLineNumbers = showLineNumbers,
                 textStyle = textStyle,
                 onLayout = { onChunkLayout(idx, it) },
+                inputTransformation = inputTransformation,
                 focusRequester = if (
                     (idx == 0 && requestInitialFocusOnFirstChunk) ||
                     idx == restoreFocusChunkIndex
@@ -443,6 +449,7 @@ private fun EditableChunkItem(
     textStyle: TextStyle,
     onLayout: (TextLayoutResult) -> Unit = {},
     focusRequester: FocusRequester? = null,
+    inputTransformation: InputTransformation? = null,
 ) {
     val layoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
     EditorChunkLayout(
@@ -461,8 +468,12 @@ private fun EditableChunkItem(
             state = textFieldState,
             readOnly = readOnly,
             textStyle = textStyle,
+            inputTransformation = inputTransformation,
             cursorBrush = SolidColor(cursorColor),
             modifier = Modifier
+                // Span the full row so a tap anywhere on a line — not just on its text —
+                // focuses the field and places the caret.
+                .fillMaxWidth()
                 .then(
                     if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier,
                 )
