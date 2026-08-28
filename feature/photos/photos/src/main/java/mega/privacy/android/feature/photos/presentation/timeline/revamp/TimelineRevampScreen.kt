@@ -3,6 +3,8 @@ package mega.privacy.android.feature.photos.presentation.timeline.revamp
 import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -19,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -64,6 +67,8 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.R
+import mega.privacy.android.feature.photos.components.HeaderHorizontalInset
+import mega.privacy.android.feature.photos.components.HeaderVerticalInset
 import mega.privacy.android.feature.photos.components.StickySectionHeader
 import mega.privacy.android.feature.photos.components.TimelineGridSizeSettingsMenu
 import mega.privacy.android.feature.photos.extensions.isScrolledToEnd
@@ -865,9 +870,23 @@ private fun TimelineRevampGridSizeMenu(
             TimelineGridSize.Default -> IconPack.Small.Thin.Outline.Grid4
             TimelineGridSize.Compact -> IconPack.Small.Thin.Outline.Grid9
         }
+        val interactionSource = remember { MutableInteractionSource() }
         MegaIcon(
             modifier = Modifier
-                .clickable { expanded = !expanded }
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                ) { expanded = !expanded }
+                .padding(
+                    start = GRID_SIZE_ICON_LEADING_TOUCH_PADDING,
+                    end = HeaderHorizontalInset,
+                    top = HeaderVerticalInset,
+                    bottom = HeaderVerticalInset,
+                )
+                .indication(
+                    interactionSource = interactionSource,
+                    indication = ripple(bounded = false, radius = GRID_SIZE_ICON_RIPPLE_RADIUS),
+                )
                 .testTag(TIMELINE_REVAMP_GRID_SIZE_ICON_TAG),
             imageVector = gridSizeIcon,
             tint = IconColor.Secondary,
@@ -985,6 +1004,11 @@ private val TIMELINE_REVAMP_SELECTOR_CLEARANCE = 90.dp
 
 /** Grace period before hiding the selector, so a short accidental scroll-down doesn't flicker it away. */
 private const val SELECTOR_HIDE_DEBOUNCE_MS = 200L
+
+/** Extra touch area on the leading side of the grid size action, where the header has room. */
+private val GRID_SIZE_ICON_LEADING_TOUCH_PADDING = 32.dp
+
+private val GRID_SIZE_ICON_RIPPLE_RADIUS = 20.dp
 
 internal const val TIMELINE_REVAMP_CONTENT_GRID_TAG = "timeline_revamp_content:grid"
 internal const val TIMELINE_REVAMP_STICKY_HEADER_TAG = "timeline_revamp_content:sticky_header"
