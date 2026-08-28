@@ -8,6 +8,8 @@ import mega.privacy.android.domain.repository.VideoSectionRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import javax.inject.Inject
 
+private val byTitle = compareBy(playlistTitleComparator, UserVideoPlaylist::title)
+
 /**
  * The use case for getting all video playlists.
  */
@@ -41,34 +43,34 @@ class GetVideoPlaylistsUseCase @Inject constructor(
             SortOrder.ORDER_SIZE_DESC,
             SortOrder.ORDER_SIZE_ASC,
                 -> {
-                playlists.filterIsInstance<UserVideoPlaylist>().sortedBy { it.title }
+                playlists.filterIsInstance<UserVideoPlaylist>().sortedWith(byTitle)
             }
 
             SortOrder.ORDER_DEFAULT_DESC -> {
-                playlists.filterIsInstance<UserVideoPlaylist>().sortedByDescending { it.title }
+                playlists.filterIsInstance<UserVideoPlaylist>().sortedWith(byTitle.reversed())
             }
 
             SortOrder.ORDER_CREATION_ASC -> {
                 playlists.filterIsInstance<UserVideoPlaylist>()
-                    .sortedBy { it.title }
+                    .sortedWith(byTitle)
                     .sortedBy { it.creationTime }
             }
 
             SortOrder.ORDER_CREATION_DESC -> {
                 playlists.filterIsInstance<UserVideoPlaylist>()
-                    .sortedBy { it.title }
+                    .sortedWith(byTitle)
                     .sortedByDescending { it.creationTime }
             }
 
             SortOrder.ORDER_MODIFICATION_ASC -> {
                 playlists.filterIsInstance<UserVideoPlaylist>()
-                    .sortedBy { it.title }
+                    .sortedWith(byTitle)
                     .sortedBy { it.modificationTime }
             }
 
             SortOrder.ORDER_MODIFICATION_DESC -> {
                 playlists.filterIsInstance<UserVideoPlaylist>()
-                    .sortedBy { it.title }
+                    .sortedWith(byTitle)
                     .sortedByDescending { it.modificationTime }
             }
 

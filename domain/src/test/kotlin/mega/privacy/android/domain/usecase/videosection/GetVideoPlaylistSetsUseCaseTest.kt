@@ -44,7 +44,37 @@ class GetVideoPlaylistSetsUseCaseTest {
 
     @Test
     fun `test that the function is invoked as expected`() = runTest {
+        whenever(videoSectionRepository.getVideoPlaylistSets()).thenReturn(emptyList())
+
         underTest()
         verify(videoSectionRepository).getVideoPlaylistSets()
+    }
+
+    @Test
+    fun `test that the sets are ordered by name`() = runTest {
+        val sets = listOf(initUserSet(name = "c"), initUserSet(name = "a"), initUserSet(name = "b"))
+        whenever(videoSectionRepository.getVideoPlaylistSets()).thenReturn(sets)
+
+        assertThat(underTest().map { it.name }).containsExactly("a", "b", "c").inOrder()
+    }
+
+    @Test
+    fun `test that a trailing counter in the name is ordered by value`() = runTest {
+        val sets = listOf(
+            initUserSet(name = "New playlist (10)"),
+            initUserSet(name = "New playlist (2)"),
+            initUserSet(name = "New playlist"),
+        )
+        whenever(videoSectionRepository.getVideoPlaylistSets()).thenReturn(sets)
+
+        assertThat(underTest().map { it.name }).containsExactly(
+            "New playlist",
+            "New playlist (2)",
+            "New playlist (10)",
+        ).inOrder()
+    }
+
+    private fun initUserSet(name: String) = mock<UserSet> {
+        on { this.name }.thenReturn(name)
     }
 }

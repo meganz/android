@@ -183,6 +183,71 @@ class GetVideoPlaylistsUseCaseTest {
             }
         }
 
+    @ParameterizedTest(name = "when SortOrder is {0}")
+    @EnumSource(
+        value = SortOrder::class,
+        names = ["ORDER_DEFAULT_ASC", "ORDER_DEFAULT_DESC"]
+    )
+    fun `test that a trailing counter in the title is ordered by value`(
+        sortOrder: SortOrder,
+    ) = runTest {
+        val playlist1 = initUserVideoPlaylist(title = "New playlist (10)")
+        val playlist2 = initUserVideoPlaylist(title = "New playlist (2)")
+        val playlist3 = initUserVideoPlaylist(title = "New playlist")
+
+        initOrder(sortOrder)
+        val list = listOf(favouritesVideoPlaylist, playlist1, playlist2, playlist3)
+        whenever(videoSectionRepository.getVideoPlaylists(any())).thenReturn(list)
+
+        val result = underTest()
+        assertThat(result[0] is FavouritesVideoPlaylist).isTrue()
+        val actual = result.drop(1).mapNotNull { (it as? UserVideoPlaylist)?.title }
+        val ascending = listOf("New playlist", "New playlist (2)", "New playlist (10)")
+        if (sortOrder == SortOrder.ORDER_DEFAULT_ASC) {
+            assertThat(actual).containsExactlyElementsIn(ascending).inOrder()
+        } else {
+            assertThat(actual).containsExactlyElementsIn(ascending.reversed()).inOrder()
+        }
+    }
+
+    @ParameterizedTest(name = "when SortOrder is {0}")
+    @EnumSource(
+        value = SortOrder::class,
+        names = ["ORDER_CREATION_ASC", "ORDER_CREATION_DESC", "ORDER_MODIFICATION_ASC", "ORDER_MODIFICATION_DESC"]
+    )
+    fun `test that titles sharing a timestamp are ordered by counter value`(
+        sortOrder: SortOrder,
+    ) = runTest {
+        val playlist1 = initUserVideoPlaylist(
+            title = "New playlist (10)",
+            creationTime = 1L,
+            modificationTime = 1L,
+        )
+        val playlist2 = initUserVideoPlaylist(
+            title = "New playlist (2)",
+            creationTime = 1L,
+            modificationTime = 1L,
+        )
+        val playlist3 = initUserVideoPlaylist(
+            title = "New playlist",
+            creationTime = 1L,
+            modificationTime = 1L,
+        )
+
+        initOrder(sortOrder)
+        val list = listOf(favouritesVideoPlaylist, playlist1, playlist2, playlist3)
+        whenever(videoSectionRepository.getVideoPlaylists(any())).thenReturn(list)
+
+        val result = underTest()
+        assertThat(result[0] is FavouritesVideoPlaylist).isTrue()
+        val actual = result.drop(1).mapNotNull { (it as? UserVideoPlaylist)?.title }
+        assertThat(actual).containsExactly(
+            "New playlist",
+            "New playlist (2)",
+            "New playlist (10)",
+        ).inOrder()
+    }
+
     @Test
     fun `test that videoPlaylists is empty`() =
         runTest {
