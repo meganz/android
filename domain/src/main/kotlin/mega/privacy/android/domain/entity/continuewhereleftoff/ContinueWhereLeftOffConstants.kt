@@ -40,5 +40,9 @@ val AUDIO_PLAYBACK_INFO_SAVE_INTERVAL_MS: Long = TimeUnit.SECONDS.toMillis(3)
 /**
  * Only audio items longer than this are silently resumed from their saved playback position
  * when reopened; shorter items always restart from the beginning.
+ *
+ * The six-minute floor is a product requirement, not a tuning heuristic: silent resume is meant
+ * for long-form audio such as podcasts and audiobooks, not for music. Change it only with
+ * product sign-off.
  */
 val AUDIO_RESUME_MINIMUM_DURATION_MS: Long = TimeUnit.MINUTES.toMillis(6)

@@ -1261,6 +1261,8 @@
     <string name="audio_playback_position_dialog_resume_button">Resume</string>
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Restart</string>
+    <!-- Audio player: snackbar shown when playback silently resumes from a saved position (%1$s = position, e.g. 15:45) -->
+    <string name="audio_player_resumed_snackbar_message">Resumed from %1$s</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
     <string name="general_save_to_device">Download</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->

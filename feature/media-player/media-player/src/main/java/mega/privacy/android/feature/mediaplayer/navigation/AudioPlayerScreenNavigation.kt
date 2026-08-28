@@ -10,12 +10,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
+import mega.android.core.ui.model.SnackbarAttributes
+import mega.android.core.ui.model.SnackbarDuration
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.sheet.options.DarkNodeOptionsBottomSheetNavKey
@@ -30,6 +33,8 @@ import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerViewMode
 import mega.privacy.android.feature.mediaplayer.presentation.SleepTimerBottomSheet
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerUiState
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Navigation key for the revamped audio player Compose screen.
@@ -71,6 +76,28 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
 
         val isPodcastMode by viewModel.isPodcastMode.collectAsStateWithLifecycle()
         val sleepTimerState by viewModel.sleepTimerState.collectAsStateWithLifecycle()
+
+        val resumedFromPosition by viewModel.resumedFromPosition.collectAsStateWithLifecycle()
+        val snackBarQueue = rememberSnackBarQueue()
+        val context = LocalContext.current
+        LaunchedEffect(resumedFromPosition) {
+            val position = resumedFromPosition ?: return@LaunchedEffect
+            snackBarQueue.queueMessage(
+                SnackbarAttributes(
+                    message = context.getString(
+                        sharedR.string.audio_player_resumed_snackbar_message,
+                        position,
+                    ),
+                    // Short is ~4s; the default for an action snackbar would be ~10s.
+                    duration = SnackbarDuration.Short,
+                    action = context.getString(
+                        sharedR.string.audio_playback_position_dialog_restart_button
+                    ),
+                    actionClick = viewModel::restartFromBeginning,
+                )
+            )
+            viewModel.onResumeEventConsumed()
+        }
         var showSpeedSheet by remember { mutableStateOf(false) }
         var showSleepTimerSheet by remember { mutableStateOf(false) }
 

@@ -58,6 +58,8 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.TrackAndSaveA
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStreamOverQuotaEventUseCase
+import mega.privacy.android.feature.mediaplayer.data.AudioResumeEvent
+import mega.privacy.android.feature.mediaplayer.data.AudioResumeEventQueue
 import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
 import mega.privacy.android.feature.mediaplayer.data.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.feature.mediaplayer.navigation.AudioPlayerScreenNavKey
@@ -124,6 +126,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     lateinit var mediaHandleStore: MediaHandleStore
 
     @Inject
+    lateinit var audioResumeEventQueue: AudioResumeEventQueue
+
+    @Inject
     lateinit var monitorStreamOverQuotaEventUseCase: MonitorStreamOverQuotaEventUseCase
 
     @Inject
@@ -142,6 +147,10 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private var playQueueBuildJob: Job? = null
     private var trackPlaybackInfoJob: Job? = null
     private var lastPlayQueueParams: AudioPlayQueueParams? = null
+
+    // Announce the applied resume only when the rebuild opens a different item; rebuilds of
+    // the queue around the already-playing item are not a resume from the user's point of view.
+    private var shouldAnnounceResume = false
 
     // Latest snapshot with a resolved handle, kept because forced saves on track change fire
     // after the player has already moved to the next item and its duration is no longer readable.
@@ -530,12 +539,19 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private fun rebuildPlayQueue(params: AudioPlayQueueParams) {
         playQueueBuildJob?.cancel()
         playQueueBuildJob = lifecycleScope.launch {
+            val isOpeningDifferentItem = player?.currentMediaItem?.mediaId
+                ?.let { mediaHandleStore.getHandle(it) } != params.handle
+            // Switching items invalidates an announcement the player screen never showed —
+            // the queue outlives the screen's ViewModel, and a leftover event would otherwise
+            // be announced against this item and let Restart discard its saved position.
+            if (isOpeningDifferentItem) audioResumeEventQueue.consume()
             val resumePositionMs = runCatching { getAudioResumePositionUseCase(params.handle) }
                 .onFailure {
                     if (it is CancellationException) throw it
                     Timber.e(it, "Failed to resolve audio resume position")
                 }
                 .getOrNull()
+            shouldAnnounceResume = isOpeningDifferentItem && resumePositionMs != null
             audioPlayQueueBuilder(params)
                 .catch { Timber.e(it, "Failed to build audio play queue") }
                 .collect { mediaSources ->
@@ -574,6 +590,14 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 )
             }
         } else {
+            // The start position is applied on every emission that reaches this branch, and that
+            // is deliberate. The queue builder emits twice -- a single item for a fast start, then
+            // the full queue -- and the second emission normally takes the addMediaItems branch
+            // above, so the position is set once. When it does reach setMediaItems again the
+            // player has been reset (STATE_IDLE), and starting from zero there would lose the
+            // resume the user was just told about. A rebuild around the item already playing
+            // keeps the position for the same reason but is not announced: the user has seen
+            // that resume already, and re-announcing it on every rebuild would be noise.
             currentPlayer.setMediaItems(
                 mediaSources.mediaItems,
                 startIndex,
@@ -581,6 +605,12 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             )
             currentPlayer.prepare()
             currentPlayer.play()
+            if (shouldAnnounceResume && resumePositionMs != null) {
+                shouldAnnounceResume = false
+                targetMediaId?.let { mediaHandleStore.getHandle(it) }?.let { handle ->
+                    audioResumeEventQueue.emit(AudioResumeEvent(handle, resumePositionMs))
+                }
+            }
         }
     }
 

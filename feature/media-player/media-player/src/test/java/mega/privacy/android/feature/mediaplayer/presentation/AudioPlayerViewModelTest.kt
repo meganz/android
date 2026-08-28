@@ -4,19 +4,25 @@ import android.content.Intent
 import androidx.media3.common.Player
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.feature.mediaplayer.data.AudioResumeEvent
+import mega.privacy.android.feature.mediaplayer.data.AudioResumeEventQueue
 import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.data.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState
@@ -52,6 +58,14 @@ class AudioPlayerViewModelTest {
     private val setAudioShuffleEnabledUseCase = mock<SetAudioShuffleEnabledUseCase>()
     private val setAudioRepeatModeUseCase = mock<SetAudioRepeatModeUseCase>()
     private val repeatToggleModeByExoPlayerMapper = mock<RepeatToggleModeByExoPlayerMapper>()
+    private val deleteAudioPlaybackInfoUseCase = mock<DeleteAudioPlaybackInfoUseCase>()
+
+    // Real instance: a plain in-memory holder, recreated per test so a pending event never
+    // leaks into the next ViewModel.
+    private lateinit var audioResumeEventQueue: AudioResumeEventQueue
+
+    // Real instance: a stateless formatter, so the tests assert the string the user actually sees.
+    private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
 
     @BeforeEach
     fun setUp() {
@@ -64,12 +78,17 @@ class AudioPlayerViewModelTest {
         // cache ensures the value is delivered once the coroutine does subscribe.
         gatewayPlayerState = MutableSharedFlow(replay = 1)
         whenever(gateway.playerState).thenReturn(gatewayPlayerState)
+        audioResumeEventQueue = AudioResumeEventQueue()
         underTest = AudioPlayerViewModel(
             gateway = gateway,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
             setAudioShuffleEnabledUseCase = setAudioShuffleEnabledUseCase,
             setAudioRepeatModeUseCase = setAudioRepeatModeUseCase,
+            deleteAudioPlaybackInfoUseCase = deleteAudioPlaybackInfoUseCase,
             repeatToggleModeByExoPlayerMapper = repeatToggleModeByExoPlayerMapper,
+            audioResumeEventQueue = audioResumeEventQueue,
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
+            applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
         )
     }
 
@@ -82,6 +101,7 @@ class AudioPlayerViewModelTest {
             setAudioShuffleEnabledUseCase,
             setAudioRepeatModeUseCase,
             repeatToggleModeByExoPlayerMapper,
+            deleteAudioPlaybackInfoUseCase,
         )
     }
 
@@ -824,6 +844,125 @@ class AudioPlayerViewModelTest {
             assertThat(underTest.sleepTimerState.value).isEqualTo(SleepTimerState.Inactive)
         }
 
+
+    @Test
+    fun `test that resumedFromPosition emits the formatted position when the service queues a resume event`() =
+        runTest {
+            gatewayPlayerState.emit(AudioControllerState(currentMediaItemHandle = 123L))
+            val event = AudioResumeEvent(mediaHandle = 123L, resumePositionMs = 945_000L)
+
+            underTest.resumedFromPosition.test {
+                assertThat(awaitItem()).isNull()
+
+                audioResumeEventQueue.emit(event)
+
+                assertThat(awaitItem()).isEqualTo("15:45")
+            }
+        }
+
+    @Test
+    fun `test that resumedFromPosition includes hours when the resume position is past an hour`() =
+        runTest {
+            gatewayPlayerState.emit(AudioControllerState(currentMediaItemHandle = 123L))
+            val event = AudioResumeEvent(mediaHandle = 123L, resumePositionMs = 3_945_000L)
+
+            underTest.resumedFromPosition.test {
+                assertThat(awaitItem()).isNull()
+
+                audioResumeEventQueue.emit(event)
+
+                assertThat(awaitItem()).isEqualTo("1:05:45")
+            }
+        }
+
+    @Test
+    fun `test that resumedFromPosition stays null when the resume event is for another item`() =
+        runTest {
+            gatewayPlayerState.emit(AudioControllerState(currentMediaItemHandle = 456L))
+            val event = AudioResumeEvent(mediaHandle = 123L, resumePositionMs = 945_000L)
+
+            underTest.resumedFromPosition.test {
+                assertThat(awaitItem()).isNull()
+
+                audioResumeEventQueue.emit(event)
+
+                expectNoEvents()
+            }
+        }
+
+    @Test
+    fun `test that resumedFromPosition emits once the player reports the item the event belongs to`() =
+        runTest {
+            val event = AudioResumeEvent(mediaHandle = 123L, resumePositionMs = 945_000L)
+
+            underTest.resumedFromPosition.test {
+                assertThat(awaitItem()).isNull()
+
+                // The service emits at play(), which can land before Media3 reports the new item.
+                gatewayPlayerState.emit(AudioControllerState(currentMediaItemHandle = 456L))
+                audioResumeEventQueue.emit(event)
+                expectNoEvents()
+
+                gatewayPlayerState.emit(AudioControllerState(currentMediaItemHandle = 123L))
+
+                assertThat(awaitItem()).isEqualTo("15:45")
+            }
+        }
+
+    @Test
+    fun `test that onResumeEventConsumed clears the pending resume event`() = runTest {
+        gatewayPlayerState.emit(AudioControllerState(currentMediaItemHandle = 123L))
+        val event = AudioResumeEvent(mediaHandle = 123L, resumePositionMs = 945_000L)
+
+        underTest.resumedFromPosition.test {
+            assertThat(awaitItem()).isNull()
+            audioResumeEventQueue.emit(event)
+            assertThat(awaitItem()).isEqualTo("15:45")
+
+            underTest.onResumeEventConsumed()
+
+            assertThat(awaitItem()).isNull()
+        }
+    }
+
+    @Test
+    fun `test that restartFromBeginning seeks to the start of the current item`() = runTest {
+        underTest.restartFromBeginning()
+
+        verify(gateway).seekTo(0L)
+    }
+
+    @Test
+    fun `test that restartFromBeginning discards the saved playback position of the current item`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState(currentMediaItemHandle = 123456L))
+                awaitItem() // Data
+
+                underTest.restartFromBeginning()
+
+                verify(gateway).seekTo(0L)
+                verify(deleteAudioPlaybackInfoUseCase).invoke(123456L)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that restartFromBeginning does not discard playback info when no item is playing`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState(currentMediaItemHandle = null))
+                awaitItem() // Data
+
+                underTest.restartFromBeginning()
+
+                verify(gateway).seekTo(0L)
+                verify(deleteAudioPlaybackInfoUseCase, never()).invoke(any())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     companion object {
         // Intent extra keys — must match values in AudioPlayerViewModel

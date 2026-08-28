@@ -18,6 +18,7 @@ dependencies {
     lintChecks(project(":lint"))
 
     implementation(project(":feature:media-player:media-player-snowflake-components"))
+    implementation(project(":core:formatter"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:coroutine"))
     implementation(project(":core:ui-components:node-components"))

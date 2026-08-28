@@ -6,25 +6,32 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.feature.mediaplayer.data.AudioResumeEventQueue
 import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.data.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState
@@ -59,7 +66,11 @@ class AudioPlayerViewModel @Inject constructor(
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val setAudioShuffleEnabledUseCase: SetAudioShuffleEnabledUseCase,
     private val setAudioRepeatModeUseCase: SetAudioRepeatModeUseCase,
+    private val deleteAudioPlaybackInfoUseCase: DeleteAudioPlaybackInfoUseCase,
     private val repeatToggleModeByExoPlayerMapper: RepeatToggleModeByExoPlayerMapper,
+    private val audioResumeEventQueue: AudioResumeEventQueue,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
     private val playerState = MutableStateFlow<AudioPlayerUiState>(AudioPlayerUiState.Loading)
@@ -72,6 +83,12 @@ class AudioPlayerViewModel @Inject constructor(
     /** Whether the player is currently in podcast mode. Available from the moment the launch
      * intent is processed, before Media3 finishes connecting. */
     val isPodcastMode: StateFlow<Boolean> = _isPodcastMode.asStateFlow()
+
+    private val _resumedFromPosition = MutableStateFlow<String?>(null)
+
+    /** Formatted position a silent resume started from, set while the resume snackbar is still
+     * to be shown and cleared via [onResumeEventConsumed]. */
+    val resumedFromPosition: StateFlow<String?> = _resumedFromPosition.asStateFlow()
 
     private val _sleepTimerState = MutableStateFlow<SleepTimerState>(SleepTimerState.Inactive)
 
@@ -98,6 +115,37 @@ class AudioPlayerViewModel @Inject constructor(
 
     init {
         observePlayerState()
+        observeResumeEvents()
+    }
+
+    private fun observeResumeEvents() {
+        viewModelScope.launch {
+            combine(audioResumeEventQueue.events, playerState) { event, state ->
+                event to (state as? AudioPlayerUiState.Data)?.currentPlayingHandle
+            }.collect { (event, currentPlayingHandle) ->
+                // A track change that does not rebuild the play queue -- an auto-advance to the
+                // next item -- leaves the service-side invalidation untouched, so the event must
+                // be matched against what is actually playing before it is announced. The event
+                // is left pending rather than dropped on a mismatch: the service emits at play(),
+                // which can land before Media3 reports the new item, so a mismatch is not yet
+                // proof the event is stale.
+                if (event.mediaHandle != currentPlayingHandle) return@collect
+                // Announce what was actually claimed rather than the combined value: a newer
+                // event queued while combine still held the previous one would otherwise be
+                // taken here and the older position announced in its place.
+                val claimed = audioResumeEventQueue.consume() ?: return@collect
+                if (claimed.mediaHandle != currentPlayingHandle) {
+                    // Put it back rather than dropping it, for the same reason the check above
+                    // leaves a mismatch pending: the player may simply not have reported this
+                    // event's item yet. Claiming it here without re-queueing would lose it for
+                    // good, since the queue no longer holds anything to re-emit.
+                    audioResumeEventQueue.emit(claimed)
+                    return@collect
+                }
+                _resumedFromPosition.value =
+                    durationInSecondsTextMapper(claimed.resumePositionMs.milliseconds)
+            }
+        }
     }
 
     private fun observePlayerState() {
@@ -384,6 +432,32 @@ class AudioPlayerViewModel @Inject constructor(
         sleepTimerJob = null
         endOfTrackSourceItemId = null
         _sleepTimerState.value = SleepTimerState.Inactive
+    }
+
+    /** Marks the pending resume event as shown so the snackbar is not repeated. */
+    fun onResumeEventConsumed() {
+        _resumedFromPosition.value = null
+    }
+
+    /**
+     * Restarts the current item from the beginning, undoing a silent resume.
+     *
+     * The saved position is discarded as well as sought past: a snapshot at the start is below
+     * the minimum playback threshold and is never persisted, so seeking alone would leave the
+     * old record intact and silently resume from it again if the player is closed before
+     * playback passes that threshold.
+     */
+    fun restartFromBeginning() {
+        val handle = (playerState.value as? AudioPlayerUiState.Data)?.currentPlayingHandle
+        gateway.seekTo(0L)
+        if (handle == null) return
+        // The snackbar sits where the user dismisses the screen from, so leaving right after
+        // tapping Restart is a natural gesture; on viewModelScope the delete would be cancelled
+        // and the discarded position would silently resume on the next open.
+        applicationScope.launch {
+            runCatching { deleteAudioPlaybackInfoUseCase(handle) }
+                .onFailure { Timber.e(it, "Failed to discard audio playback info on restart") }
+        }
     }
 
     fun setPlaybackSpeed(speed: Float) {
