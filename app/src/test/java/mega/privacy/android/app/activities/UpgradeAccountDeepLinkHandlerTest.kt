@@ -3,6 +3,7 @@ package mega.privacy.android.app.activities
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.billing.RecommendedSubscriptionOffer
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionWithOfferUseCase
@@ -11,10 +12,12 @@ import mega.privacy.android.navigation.destination.SubscriptionOfferNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.payment.SubscriptionOfferSource
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.SubscriptionOfferNotificationTappedEvent
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
@@ -31,6 +34,12 @@ class UpgradeAccountDeepLinkHandlerTest {
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val getRecommendedSubscriptionWithOfferUseCase =
         mock<GetRecommendedSubscriptionWithOfferUseCase>()
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
+    }
 
     @BeforeAll
     fun setup() {
@@ -104,6 +113,8 @@ class UpgradeAccountDeepLinkHandlerTest {
 
             assertThat(actual)
                 .containsExactly(SubscriptionOfferNavKey(SubscriptionOfferSource.Notification))
+            assertThat(analyticsExtension.events)
+                .contains(SubscriptionOfferNotificationTappedEvent)
         }
 
     @Test
@@ -133,6 +144,31 @@ class UpgradeAccountDeepLinkHandlerTest {
         assertThat(actual).containsExactly(UpgradeAccountNavKey())
         verifyNoInteractions(getRecommendedSubscriptionWithOfferUseCase)
     }
+
+    @Test
+    fun `test that the tapped event is tracked when the offer is no longer available`() = runTest {
+        whenever(getRecommendedSubscriptionWithOfferUseCase()).thenReturn(null)
+
+        underTest.getNavKeysInternal(megaUpgradeUri(offer = "1"), null, true)
+
+        assertThat(analyticsExtension.events).contains(SubscriptionOfferNotificationTappedEvent)
+    }
+
+    @Test
+    fun `test that the tapped event is tracked when the user is not logged in`() = runTest {
+        underTest.getNavKeysInternal(megaUpgradeUri(offer = "1"), null, false)
+
+        assertThat(analyticsExtension.events).contains(SubscriptionOfferNotificationTappedEvent)
+    }
+
+    @Test
+    fun `test that the tapped event is not tracked when the upgrade link carries no offer`() =
+        runTest {
+            underTest.getNavKeysInternal(megaUpgradeUri(), null, true)
+
+            assertThat(analyticsExtension.events)
+                .doesNotContain(SubscriptionOfferNotificationTappedEvent)
+        }
 
     @Test
     fun `test that the offer link shows a message and does not look up the offer when the user is not logged in`() =
