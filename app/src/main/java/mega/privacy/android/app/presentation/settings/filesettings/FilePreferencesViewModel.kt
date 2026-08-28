@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.filenode.RemoveAllVersionsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
 import mega.privacy.android.domain.usecase.offline.ClearOfflineUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFolderSizeUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
@@ -53,9 +54,10 @@ class FilePreferencesViewModel @Inject constructor(
     private val getRubbishBinAutopurgePeriodUseCase: GetRubbishBinAutopurgePeriodUseCase,
     private val setRubbishBinAutopurgePeriodUseCase: SetRubbishBinAutopurgePeriodUseCase,
     private val isRubbishBinAutopurgePeriodValidUseCase: IsRubbishBinAutopurgePeriodValidUseCase,
+    private val cleanRubbishBinUseCase: CleanRubbishBinUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(FilePreferencesState())
+    private val _state = MutableStateFlow(FilePreferencesState(emptyRubbishBinEvent = consumed()))
 
     /**
      * State
@@ -229,6 +231,28 @@ class FilePreferencesViewModel @Inject constructor(
      */
     fun resetDeleteAllVersionsEvent() {
         _state.update { it.copy(deleteAllVersionsEvent = consumed()) }
+    }
+
+    /**
+     * Clear the Rubbish Bin
+     */
+    fun clearRubbishBin() {
+        viewModelScope.launch {
+            runCatching {
+                cleanRubbishBinUseCase()
+            }.onSuccess {
+                _state.update { it.copy(emptyRubbishBinEvent = triggered<Throwable?>(null)) }
+            }.onFailure { e ->
+                _state.update { it.copy(emptyRubbishBinEvent = triggered<Throwable?>(e)) }
+            }
+        }
+    }
+
+    /**
+     * Reset empty rubbish bin event
+     */
+    fun resetEmptyRubbishBinEvent() {
+        _state.update { it.copy(emptyRubbishBinEvent = consumed()) }
     }
 
     /**

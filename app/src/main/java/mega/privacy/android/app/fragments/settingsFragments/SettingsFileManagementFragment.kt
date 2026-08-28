@@ -190,6 +190,23 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             viewModel.resetDeleteAllVersionsEvent()
         }
 
+        if (filePreferencesState.emptyRubbishBinEvent is StateEventWithContentTriggered) {
+            val exception = filePreferencesState.emptyRubbishBinEvent.content
+            if (exception == null) {
+                Util.showSnackbar(
+                    requireActivity(),
+                    getString(sharedR.string.empty_rubbish_bin_success_message)
+                )
+                resetRubbishInfo()
+            } else {
+                Util.showSnackbar(
+                    requireActivity(),
+                    getString(sharedR.string.empty_rubbish_bin_error_message)
+                )
+            }
+            viewModel.resetEmptyRubbishBinEvent()
+        }
+
         enableRbSchedulerSwitch?.isVisible = filePreferencesState.isRubbishBinAutopurgeEnabled
         daysRbSchedulerPreference?.isVisible = filePreferencesState.isRubbishBinAutopurgeEnabled
         updateRBScheduler(filePreferencesState.rubbishBinAutopurgePeriod)

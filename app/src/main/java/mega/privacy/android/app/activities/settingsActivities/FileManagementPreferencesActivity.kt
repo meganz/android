@@ -11,7 +11,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.DialogTwoVerticalButtonsBinding
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment
-import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -86,8 +85,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
         builder.setPositiveButton(
             getFormattedStringOrDefault(sharedR.string.general_clear)
         ) { _: DialogInterface?, _: Int ->
-            val nC = NodeController(this)
-            nC.cleanRubbishBin()
+            viewModel.clearRubbishBin()
         }
         builder.setNegativeButton(
             getFormattedStringOrDefault(sharedR.string.general_dialog_cancel_button),

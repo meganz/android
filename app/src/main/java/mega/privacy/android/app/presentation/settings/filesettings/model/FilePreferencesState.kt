@@ -11,6 +11,7 @@ import de.palm.composestateevents.consumed
  * @property updateCacheSizeSetting Update cache size setting.
  * @property updateOfflineSize Update offline size.
  * @property deleteAllVersionsEvent Event triggered when all versions are deleted.
+ * @property emptyRubbishBinEvent Event triggered when the rubbish bin is emptied.
  * @property isRubbishBinAutopurgeEnabled Whether the rubbish bin autopurge is enabled.
  * @property rubbishBinAutopurgePeriod Period of the rubbish bin autopurge in days.
  * @property errorMessageId Id of the error message.
@@ -22,6 +23,7 @@ data class FilePreferencesState(
     val updateCacheSizeSetting: Long? = null,
     val updateOfflineSize: Long? = null,
     val deleteAllVersionsEvent: StateEventWithContent<Throwable?> = consumed(),
+    val emptyRubbishBinEvent: StateEventWithContent<Throwable?>,
     val isRubbishBinAutopurgeEnabled: Boolean = false,
     val rubbishBinAutopurgePeriod: Int = 0,
     val errorMessageId: Int = 0

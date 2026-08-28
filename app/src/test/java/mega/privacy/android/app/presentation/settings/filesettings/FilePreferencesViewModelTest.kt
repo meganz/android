@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.filenode.RemoveAllVersionsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
 import mega.privacy.android.domain.usecase.offline.ClearOfflineUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFolderSizeUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
@@ -69,6 +70,7 @@ internal class FilePreferencesViewModelTest {
     private val setRubbishBinAutopurgePeriodUseCase: SetRubbishBinAutopurgePeriodUseCase = mock()
     private val isRubbishBinAutopurgePeriodValidUseCase: IsRubbishBinAutopurgePeriodValidUseCase =
         mock()
+    private val cleanRubbishBinUseCase: CleanRubbishBinUseCase = mock()
     private val myAccountUpdateFlow = MutableStateFlow(
         MyAccountUpdate(
             MyAccountUpdate.Action.STORAGE_STATE_CHANGED,
@@ -100,7 +102,8 @@ internal class FilePreferencesViewModelTest {
             isRubbishBinAutopurgeEnabledUseCase,
             getRubbishBinAutopurgePeriodUseCase,
             setRubbishBinAutopurgePeriodUseCase,
-            isRubbishBinAutopurgePeriodValidUseCase
+            isRubbishBinAutopurgePeriodValidUseCase,
+            cleanRubbishBinUseCase
         )
     }
 
@@ -121,6 +124,7 @@ internal class FilePreferencesViewModelTest {
             getRubbishBinAutopurgePeriodUseCase,
             setRubbishBinAutopurgePeriodUseCase,
             isRubbishBinAutopurgePeriodValidUseCase,
+            cleanRubbishBinUseCase,
             monitorMyAccountUpdateUseCase
         )
     }
@@ -268,6 +272,46 @@ internal class FilePreferencesViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.deleteAllVersionsEvent).isEqualTo(consumed())
+            }
+        }
+
+    @Test
+    fun `test that clearRubbishBin triggers emptyRubbishBinEvent with null when the use case succeeds`() =
+        runTest {
+            whenever(cleanRubbishBinUseCase()).thenReturn(Unit)
+            underTest.clearRubbishBin()
+            advanceUntilIdle()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.emptyRubbishBinEvent).isNotNull()
+                assertThat((state.emptyRubbishBinEvent as StateEventWithContentTriggered<Throwable?>).content).isNull()
+            }
+        }
+
+    @Test
+    fun `test that clearRubbishBin triggers emptyRubbishBinEvent with the error when the use case fails`() =
+        runTest {
+            val exception = RuntimeException()
+            whenever(cleanRubbishBinUseCase()).thenThrow(exception)
+
+            underTest.clearRubbishBin()
+            advanceUntilIdle()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.emptyRubbishBinEvent).isNotNull()
+                assertThat((state.emptyRubbishBinEvent as StateEventWithContentTriggered<Throwable?>).content).isEqualTo(
+                    exception
+                )
+            }
+        }
+
+    @Test
+    fun `test that resetEmptyRubbishBinEvent sets emptyRubbishBinEvent to consumed when invoked`() =
+        runTest {
+            underTest.resetEmptyRubbishBinEvent()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.emptyRubbishBinEvent).isEqualTo(consumed())
             }
         }
 

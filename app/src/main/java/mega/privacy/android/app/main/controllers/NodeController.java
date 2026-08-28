@@ -25,7 +25,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileExplorerActivity;
@@ -303,10 +302,5 @@ public class NodeController {
             megaApi.share(node, email, ACCESS_READ, shareListener);
         }
 
-    }
-
-    public void cleanRubbishBin() {
-        Timber.d("cleanRubbishBin");
-        megaApi.cleanRubbishBin(new CleanRubbishBinListener(context));
     }
 }
