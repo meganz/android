@@ -232,6 +232,9 @@ internal class ImportFilesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
                         (context as FileExplorerActivity).setNameFiles(names)
                         updateNameLayout(holder.nameLayout, holder.name)
                         Util.hideKeyboardView(context, v1, 0)
+                        if (positionWithFocus == holder.getBindingAdapterPosition()) {
+                            positionWithFocus = Constants.INVALID_POSITION
+                        }
                     } else {
                         positionWithFocus = holder.getBindingAdapterPosition()
                     }
@@ -275,13 +278,16 @@ internal class ImportFilesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
      * @param areItemsVisible True if showing whole list, false otherwise.
      */
     private fun setDataList(areItemsVisible: Boolean) {
+        val previousSize = files.size
         files.clear()
+        positionWithFocus = Constants.INVALID_POSITION
+
         if (areItemsVisible) {
             files.addAll(filesAll)
-            notifyItemRangeInserted(filesPartial.size, files.size - filesPartial.size)
+            notifyItemRangeInserted(previousSize, files.size - previousSize)
         } else {
             files.addAll(filesPartial)
-            notifyItemRangeRemoved(filesPartial.size, files.size - filesPartial.size)
+            notifyItemRangeRemoved(files.size, previousSize - files.size)
         }
     }
 
@@ -396,9 +402,10 @@ internal class ImportFilesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         val holder =
-            list.findViewHolderForLayoutPosition(positionWithFocus) as ViewHolderImportFiles?
+            list.findViewHolderForLayoutPosition(positionWithFocus) as? ViewHolderImportFiles
 
-        if (holder?.name == null) {
+        if (holder == null) {
+            positionWithFocus = Constants.INVALID_POSITION
             return
         }
 
