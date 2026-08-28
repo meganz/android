@@ -122,6 +122,7 @@ internal fun TimelineRevampScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     onSelectorVisibleChanged: (Boolean) -> Unit = {},
+    onPinchActiveChanged: (Boolean) -> Unit = {},
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val takenDownDialogEvent =
@@ -178,6 +179,7 @@ internal fun TimelineRevampScreen(
                 onGridSizeChange = onGridSizeChange,
                 onZoomIn = onZoomIn,
                 onZoomOut = onZoomOut,
+                onPinchActiveChanged = onPinchActiveChanged,
                 onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
@@ -229,6 +231,7 @@ private fun TimelineRevampContent(
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
+    onPinchActiveChanged: (Boolean) -> Unit,
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?, Int) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
@@ -354,6 +357,7 @@ private fun TimelineRevampContent(
                 onGridSizeChange = onGridSizeChange,
                 onZoomIn = onZoomIn,
                 onZoomOut = onZoomOut,
+                onPinchActiveChanged = onPinchActiveChanged,
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
                 onScrollingChanged = onScrollingChanged,
@@ -381,6 +385,7 @@ private fun TimelineRevampGrid(
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
+    onPinchActiveChanged: (Boolean) -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?, Int) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
     onScrollingChanged: (Boolean) -> Unit,
@@ -567,10 +572,6 @@ private fun TimelineRevampGrid(
             columns = GridCells.Fixed(columns),
             modifier = Modifier
                 .fillMaxSize()
-                .photosZoomGestureDetector(
-                    onZoomIn = onZoomIn,
-                    onZoomOut = onZoomOut,
-                )
                 .photosGridDragToSelectGesture(
                     lazyGridState = lazyGridState,
                     mediaIndexOfKey = { key ->
@@ -598,6 +599,11 @@ private fun TimelineRevampGrid(
                                 ?.let { currentOnNodeSelected(it) }
                         }
                     },
+                )
+                .photosZoomGestureDetector(
+                    onZoomIn = onZoomIn,
+                    onZoomOut = onZoomOut,
+                    onPinchActiveChanged = onPinchActiveChanged,
                 )
                 .testTag(TIMELINE_REVAMP_CONTENT_GRID_TAG),
             state = lazyGridState,

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
@@ -257,6 +258,75 @@ class TimelineRevampScreenTest {
             }
 
         assertThat(selectedIds).containsExactly(1L, 2L, 3L)
+    }
+
+    @Test
+    fun `test that a pinch on the grid zooms in`() {
+        var zoomIns = 0
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = (0..2).associateWith { index -> photoNode(id = index + 1L) },
+            ),
+            onZoomIn = { zoomIns++ },
+        )
+
+        // 1.55x the starting spread: past one step's ratio, short of two.
+        composeRule.onNodeWithTag(TIMELINE_REVAMP_CONTENT_GRID_TAG).performTouchInput {
+            spreadFingers(from = 40f, to = 62f)
+        }
+
+        assertThat(zoomIns).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that a pinch does not zoom when a drag selection is already active`() {
+        val selectedIds = mutableStateSetOf<Long>()
+        var zoomIns = 0
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 30,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = (0..29).associateWith { index -> photoNode(id = index + 1L) },
+            ),
+            selectedPhotoIds = selectedIds,
+            onNodeSelected = { node -> selectedIds.toggle(node.id) },
+            onZoomIn = { zoomIns++ },
+        )
+
+        composeRule.onNodeWithTag(TIMELINE_REVAMP_CONTENT_GRID_TAG).performTouchInput {
+            val anchor = Offset(width * 0.2f, height * 0.5f)
+            down(0, anchor)
+            advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+            updatePointerTo(0, anchor + Offset(0f, 40f))
+            move()
+            // Second finger joins mid-drag-select and spreads far enough to have stepped the grid
+            // twice; drag-to-select owns the gesture, so the pinch must stay out of it.
+            down(1, anchor + Offset(40f, 0f))
+            repeat(10) { step ->
+                updatePointerTo(1, anchor + Offset(40f + 18f * (step + 1), 0f))
+                move()
+            }
+            up(0)
+            up(1)
+        }
+
+        assertThat(zoomIns).isEqualTo(0)
     }
 
     @Test
@@ -586,13 +656,36 @@ class TimelineRevampScreenTest {
         if (id in this) remove(id) else add(id)
     }
 
+    /** Spreads two horizontally-opposed pointers from [from] to [to] pixels either side of centre. */
+    private fun TouchInjectionScope.spreadFingers(from: Float, to: Float) {
+        down(0, center + Offset(-from, 0f))
+        down(1, center + Offset(from, 0f))
+        repeat(10) { step ->
+            val spread = from + (to - from) * (step + 1) / 10
+            updatePointerTo(0, center + Offset(-spread, 0f))
+            updatePointerTo(1, center + Offset(spread, 0f))
+            move()
+        }
+        up(0)
+        up(1)
+    }
+
     private fun ComposeContentTestRule.setScreen(
         uiState: TimelineRevampUiState,
         selectedPhotoIds: Set<Long> = emptySet(),
         onNodeSelected: (PhotosNodeContentItemV2) -> Unit = {},
         loadMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2> =
             { _, _ -> emptyMap() },
-    ) = setScreenContent({ uiState }, selectedPhotoIds, onNodeSelected, loadMediaRange)
+        onZoomIn: () -> Unit = {},
+        onPinchActiveChanged: (Boolean) -> Unit = {},
+    ) = setScreenContent(
+        { uiState },
+        selectedPhotoIds,
+        onNodeSelected,
+        loadMediaRange,
+        onZoomIn,
+        onPinchActiveChanged,
+    )
 
     private fun ComposeContentTestRule.setScreenContent(
         uiState: () -> TimelineRevampUiState,
@@ -600,6 +693,8 @@ class TimelineRevampScreenTest {
         onNodeSelected: (PhotosNodeContentItemV2) -> Unit = {},
         loadMediaRange: suspend (firstIndex: Int, lastIndex: Int) -> Map<Int, PhotosNodeContentItemV2> =
             { _, _ -> emptyMap() },
+        onZoomIn: () -> Unit = {},
+        onPinchActiveChanged: (Boolean) -> Unit = {},
     ) {
         setContent {
             TimelineRevampScreen(
@@ -609,8 +704,9 @@ class TimelineRevampScreenTest {
                 onVisibleRangeChanged = { _, _ -> },
                 loadMediaRange = loadMediaRange,
                 onGridSizeChange = {},
-                onZoomIn = {},
+                onZoomIn = onZoomIn,
                 onZoomOut = {},
+                onPinchActiveChanged = onPinchActiveChanged,
                 onMediaTimePeriodSelected = {},
                 onNodeClicked = { _, _ -> },
                 onNodeSelected = onNodeSelected,

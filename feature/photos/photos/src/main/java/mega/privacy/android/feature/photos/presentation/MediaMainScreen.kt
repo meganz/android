@@ -524,6 +524,8 @@ fun MediaMainScreen(
 
     var isSearchModeForVideosOrPlaylists by rememberSaveable { mutableStateOf(false) }
 
+    var isTimelinePinchActive by remember { mutableStateOf(false) }
+
     // Handling back handler for timeline filter
     BackHandler(enabled = showTimelineFilter) {
         if (showTimelineFilter) {
@@ -678,7 +680,9 @@ fun MediaMainScreen(
             hideTabs =
                 selectionModeType.isAnActiveSelection() || isSearchModeForVideosOrPlaylists,
             pagerScrollEnabled =
-                selectionModeType == MediaSelectionModeType.None && !isSearchModeForVideosOrPlaylists,
+                selectionModeType == MediaSelectionModeType.None &&
+                        !isSearchModeForVideosOrPlaylists &&
+                        !isTimelinePinchActive,
             initialSelectedIndex = currentTabIndex.coerceAtMost(tabEntries.lastIndex),
             onTabSelected = { index ->
                 currentTabIndex = index
@@ -707,6 +711,9 @@ fun MediaMainScreen(
                                     onTimelineRevampGridSizeChange = onTimelineRevampGridSizeChange,
                                     onTimelineRevampZoomIn = onTimelineRevampZoomIn,
                                     onTimelineRevampZoomOut = onTimelineRevampZoomOut,
+                                    onTimelineRevampPinchActiveChanged = {
+                                        isTimelinePinchActive = it
+                                    },
                                     onTimelineRevampNodeClicked = onTimelineRevampNodeClicked,
                                     onTimelineRevampTakenDownDialogConsumed = onTimelineRevampTakenDownDialogConsumed,
                                     showEnableCameraUploadsPage = showEnableCameraUploadsPageForRevamp,
@@ -831,6 +838,7 @@ private fun MediaScreen.MediaContent(
     onTimelineRevampGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineRevampZoomIn: () -> Unit,
     onTimelineRevampZoomOut: () -> Unit,
+    onTimelineRevampPinchActiveChanged: (Boolean) -> Unit,
     onTimelineRevampNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
     onTimelineRevampTakenDownDialogConsumed: () -> Unit,
     showEnableCameraUploadsPage: Boolean,
@@ -881,6 +889,7 @@ private fun MediaScreen.MediaContent(
                             onGridSizeChange = onTimelineRevampGridSizeChange,
                             onZoomIn = onTimelineRevampZoomIn,
                             onZoomOut = onTimelineRevampZoomOut,
+                            onPinchActiveChanged = onTimelineRevampPinchActiveChanged,
                             onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                             onNodeClicked = { node, anchorIndex ->
                                 when {
