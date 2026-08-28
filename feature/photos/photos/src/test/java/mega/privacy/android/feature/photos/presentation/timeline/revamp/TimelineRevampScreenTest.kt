@@ -11,6 +11,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -19,6 +20,9 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
@@ -106,6 +110,34 @@ class TimelineRevampScreenTest {
         )
 
         composeRule.onNodeWithTag(TIMELINE_REVAMP_GRID_SIZE_ICON_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the grid size selector tap area spans the header without growing it`() {
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "May 2026",
+                        startDate = 0L,
+                        endDate = 0L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = emptyMap(),
+            )
+        )
+
+        val icon = composeRule.onNodeWithTag(TIMELINE_REVAMP_GRID_SIZE_ICON_TAG)
+            .getUnclippedBoundsInRoot()
+        val header = composeRule.onNodeWithTag(TIMELINE_REVAMP_NON_STICKY_HEADER_TAG)
+            .getUnclippedBoundsInRoot()
+
+        // The action grows its touch target into the header insets, so the header keeps its height.
+        assertThat(header.height).isEqualTo(60.dp)
+        assertThat(icon.width).isEqualTo(64.dp)
+        assertThat(icon.height).isEqualTo(40.dp)
     }
 
     @Test
