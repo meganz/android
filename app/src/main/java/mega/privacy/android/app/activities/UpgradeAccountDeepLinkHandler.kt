@@ -2,6 +2,9 @@ package mega.privacy.android.app.activities
 
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.deeplinks.isMegaUpgradeLink
+import mega.privacy.android.app.deeplinks.isSubscriptionOfferLink
 import mega.privacy.android.core.coroutine.logAndSwallowExceptions
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionWithOfferUseCase
@@ -10,6 +13,7 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.navigation.destination.SubscriptionOfferNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.payment.SubscriptionOfferSource
+import mega.privacy.mobile.analytics.event.SubscriptionOfferNotificationTappedEvent
 import javax.inject.Inject
 
 /**
@@ -43,11 +47,15 @@ class UpgradeAccountDeepLinkHandler @Inject constructor(
      * the upgrade screen instead, as does plain `mega://upgrade`.
      *
      * A logged out user is told to log in rather than taken to either screen, so the offer is not
-     * looked up at all in that case.
+     * looked up at all in that case. The tap on the notification is reported either way, as it
+     * happened whatever the app then decides to show.
      */
     private suspend fun megaUpgradeLinkNavKey(uri: Uri, isLoggedIn: Boolean): NavKey {
-        val hasOffer = isLoggedIn
-                && uri.getQueryParameter(OFFER_QUERY_PARAMETER) == OFFER_QUERY_VALUE
+        val isOfferLink = uri.isSubscriptionOfferLink
+        if (isOfferLink) {
+            Analytics.tracker.trackEvent(SubscriptionOfferNotificationTappedEvent)
+        }
+        val hasOffer = isLoggedIn && isOfferLink
         return if (hasOffer && getRecommendedSubscriptionOffer() != null) {
             SubscriptionOfferNavKey(SubscriptionOfferSource.Notification)
         } else {
@@ -59,14 +67,4 @@ class UpgradeAccountDeepLinkHandler @Inject constructor(
         runCatching { getRecommendedSubscriptionWithOfferUseCase() }
             .logAndSwallowExceptions()
             .getOrNull()
-
-    private val Uri.isMegaUpgradeLink: Boolean
-        get() = scheme == MEGA_SCHEME && host == UPGRADE_HOST
-
-    private companion object {
-        const val MEGA_SCHEME = "mega"
-        const val UPGRADE_HOST = "upgrade"
-        const val OFFER_QUERY_PARAMETER = "offer"
-        const val OFFER_QUERY_VALUE = "1"
-    }
 }

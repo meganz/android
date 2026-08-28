@@ -29,7 +29,9 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.deeplinks.isSubscriptionOfferLink
 import mega.privacy.android.app.notifications.ChatMessageNotificationManager
 import mega.privacy.android.app.notifications.PromoPushNotificationManager
 import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotificationManager
@@ -65,6 +67,7 @@ import mega.privacy.android.domain.usecase.meeting.SetFakeIncomingCallStateUseCa
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
 import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.mobile.analytics.event.SubscriptionOfferNotificationReceivedEvent
 import timber.log.Timber
 
 /**
@@ -124,6 +127,7 @@ class PushMessageWorker @AssistedInject constructor(
         Timber.d("Push message worker - do work")
         // legacy support, other places need to know logging in happen
         val pushMessage = getPushMessageFromWorkerData(inputData)
+        trackSubscriptionOfferNotificationReceived(pushMessage)
         val isRequiredLogin = isRequiredLogin(pushMessage)
 
         pushMessage?.let {
@@ -292,6 +296,18 @@ class PushMessageWorker @AssistedInject constructor(
         }
 
         return@withContext Result.success()
+    }
+
+    /**
+     * Reported as soon as the push is decoded rather than once the notification is posted, so that
+     * a campaign push that arrives while the session cannot be restored still counts as received.
+     */
+    private fun trackSubscriptionOfferNotificationReceived(pushMessage: PushMessage?) {
+        val isSubscriptionOffer = (pushMessage as? PromoPushMessage)
+            ?.let { isSubscriptionOfferLink(it.redirectLink) } == true
+        if (isSubscriptionOffer) {
+            Analytics.tracker.trackEvent(SubscriptionOfferNotificationReceivedEvent)
+        }
     }
 
     private fun isRequiredLogin(pushMessage: PushMessage?): Boolean {

@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.app.notifications.ChatMessageNotificationManager
 import mega.privacy.android.app.notifications.PromoPushNotificationManager
 import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotificationManager
@@ -47,11 +49,14 @@ import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.SetFakeIncomingCallStateUseCase
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
 import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
+import mega.privacy.mobile.analytics.event.SubscriptionOfferNotificationReceivedEvent
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -97,9 +102,11 @@ class PushMessageWorkerTest {
     private val ioDispatcher = UnconfinedTestDispatcher()
     private val getUrlRegexPatternTypeUseCase: GetUrlRegexPatternTypeUseCase = mock()
     private val decodeLinkUseCase: DecodeLinkUseCase = mock()
+    private val analyticsTracker = mock<AnalyticsTracker>()
 
     @Before
     fun setUp() {
+        Analytics.initialise(analyticsTracker)
         context = ApplicationProvider.getApplicationContext()
         executor = Executors.newSingleThreadExecutor()
         workExecutor = WorkManagerTaskExecutor(executor)
@@ -158,6 +165,11 @@ class PushMessageWorkerTest {
             .thenReturn(flowOf(CallsMeetingReminders.Disabled))
         monitorChatCallUpdatesUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
         whenever(monitorChatConnectionStateUseCase()).thenReturn(emptyFlow())
+    }
+
+    @After
+    fun tearDown() {
+        Analytics.initialise(null as AnalyticsTracker?)
     }
 
     @Test
@@ -275,6 +287,50 @@ class PushMessageWorkerTest {
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
     }
+
+    @Test
+    fun `test that the subscription offer received event is tracked when the offer promo push arrives`() =
+        runTest {
+            val pushMessage = PushMessage.PromoPushMessage(
+                id = 1,
+                title = "Offer",
+                subtitle = null,
+                description = "Offer description",
+                redirectLink = "mega://upgrade?offer=1",
+                imagePath = null,
+                sound = null,
+            )
+            whenever(pushMessageMapper(any())).thenReturn(pushMessage)
+            whenever(decodeLinkUseCase(pushMessage.redirectLink)).thenReturn(pushMessage.redirectLink)
+            whenever(getUrlRegexPatternTypeUseCase(pushMessage.redirectLink)).thenReturn(null)
+            whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
+
+            underTest.doWork()
+
+            verify(analyticsTracker).trackEvent(SubscriptionOfferNotificationReceivedEvent)
+        }
+
+    @Test
+    fun `test that the subscription offer received event is not tracked when the promo push is not an offer`() =
+        runTest {
+            val pushMessage = PushMessage.PromoPushMessage(
+                id = 1,
+                title = "Promo",
+                subtitle = null,
+                description = "Promo description",
+                redirectLink = "mega://upgrade",
+                imagePath = null,
+                sound = null,
+            )
+            whenever(pushMessageMapper(any())).thenReturn(pushMessage)
+            whenever(decodeLinkUseCase(pushMessage.redirectLink)).thenReturn(pushMessage.redirectLink)
+            whenever(getUrlRegexPatternTypeUseCase(pushMessage.redirectLink)).thenReturn(null)
+            whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
+
+            underTest.doWork()
+
+            verify(analyticsTracker, never()).trackEvent(SubscriptionOfferNotificationReceivedEvent)
+        }
 
     @Test
     fun `test that PromoPushMessage with UPGRADE_LINK redirect does not require login and skips fast login`() =
