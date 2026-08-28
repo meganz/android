@@ -515,6 +515,22 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun signalPresenceActivity(listener: MegaChatRequestListenerInterface) =
         chatApi.signalPresenceActivity(listener)
 
+    override fun setPresenceAutoaway(
+        enabled: Boolean,
+        timeout: Int,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.setPresenceAutoaway(enabled, timeout, listener)
+
+    override fun setPresencePersist(
+        enabled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.setPresencePersist(enabled, listener)
+
+    override fun setLastGreenVisible(
+        enabled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.setLastGreenVisible(enabled, listener)
+
     override fun clearChatHistory(
         chatId: Long,
         listener: MegaChatRequestListenerInterface,

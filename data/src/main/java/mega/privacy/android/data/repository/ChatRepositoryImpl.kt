@@ -763,6 +763,61 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
+    override suspend fun setPresenceAutoAway(enabled: Boolean, timeoutSeconds: Int) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                megaChatApiGateway.setPresenceAutoaway(
+                    enabled = enabled,
+                    timeout = timeoutSeconds,
+                    listener = OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
+                            if (error.errorCode == MegaChatError.ERROR_OK) {
+                                continuation.resume(Unit)
+                            } else {
+                                continuation.failWithError(error, "setPresenceAutoAway")
+                            }
+                        }
+                    )
+                )
+            }
+        }
+
+    override suspend fun setPresencePersist(enabled: Boolean) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                megaChatApiGateway.setPresencePersist(
+                    enabled = enabled,
+                    listener = OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
+                            if (error.errorCode == MegaChatError.ERROR_OK) {
+                                continuation.resume(Unit)
+                            } else {
+                                continuation.failWithError(error, "setPresencePersist")
+                            }
+                        }
+                    )
+                )
+            }
+        }
+
+    override suspend fun setLastGreenVisible(enabled: Boolean) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                megaChatApiGateway.setLastGreenVisible(
+                    enabled = enabled,
+                    listener = OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
+                            if (error.errorCode == MegaChatError.ERROR_OK) {
+                                continuation.resume(Unit)
+                            } else {
+                                continuation.failWithError(error, "setLastGreenVisible")
+                            }
+                        }
+                    )
+                )
+            }
+        }
+
     override suspend fun clearChatHistory(chatId: Long) =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->

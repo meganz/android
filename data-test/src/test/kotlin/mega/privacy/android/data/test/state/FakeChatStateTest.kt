@@ -16,6 +16,11 @@ class FakeChatStateTest {
 
         assertThat(underTest.initState).isEqualTo(MegaChatApi.INIT_ONLINE_SESSION)
         assertThat(underTest.onlineStatus).isEqualTo(MegaChatApi.STATUS_ONLINE)
+        assertThat(underTest.presenceAutoAwayEnabled).isFalse()
+        assertThat(underTest.presenceAutoAwayTimeout).isEqualTo(0L)
+        assertThat(underTest.presencePersist).isFalse()
+        assertThat(underTest.presencePending).isFalse()
+        assertThat(underTest.lastGreenVisible).isFalse()
         assertThat(underTest.myUserHandle).isEqualTo(111L)
         assertThat(underTest.myFullname).isEqualTo("Test User")
         assertThat(underTest.myEmail).isEqualTo("test@mega.nz")
@@ -51,6 +56,11 @@ class FakeChatStateTest {
         val underTest = FakeChatState().apply {
             initState = MegaChatApi.INIT_OFFLINE_SESSION
             onlineStatus = MegaChatApi.STATUS_OFFLINE
+            presenceAutoAwayEnabled = true
+            presenceAutoAwayTimeout = 300L
+            presencePersist = true
+            presencePending = true
+            lastGreenVisible = true
             myUserHandle = 999L
             myFullname = "Other User"
             myEmail = "other@mega.nz"
@@ -62,6 +72,11 @@ class FakeChatStateTest {
 
         assertThat(underTest.initState).isEqualTo(MegaChatApi.INIT_ONLINE_SESSION)
         assertThat(underTest.onlineStatus).isEqualTo(MegaChatApi.STATUS_ONLINE)
+        assertThat(underTest.presenceAutoAwayEnabled).isFalse()
+        assertThat(underTest.presenceAutoAwayTimeout).isEqualTo(0L)
+        assertThat(underTest.presencePersist).isFalse()
+        assertThat(underTest.presencePending).isFalse()
+        assertThat(underTest.lastGreenVisible).isFalse()
         assertThat(underTest.myUserHandle).isEqualTo(111L)
         assertThat(underTest.myFullname).isEqualTo("Test User")
         assertThat(underTest.myEmail).isEqualTo("test@mega.nz")

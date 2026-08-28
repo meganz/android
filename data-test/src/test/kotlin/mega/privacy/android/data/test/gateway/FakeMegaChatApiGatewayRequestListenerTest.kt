@@ -156,6 +156,18 @@ class FakeMegaChatApiGatewayRequestListenerTest {
         listenerCase("signalPresenceActivity", MegaChatRequest.TYPE_SIGNAL_ACTIVITY) { g, l ->
             g.signalPresenceActivity(l)
         },
+        listenerCase(
+            "setPresenceAutoaway",
+            MegaChatRequest.TYPE_SET_PRESENCE_AUTOAWAY,
+        ) { g, l -> g.setPresenceAutoaway(true, 300, l) },
+        listenerCase(
+            "setPresencePersist",
+            MegaChatRequest.TYPE_SET_PRESENCE_PERSIST,
+        ) { g, l -> g.setPresencePersist(true, l) },
+        listenerCase(
+            "setLastGreenVisible",
+            MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE,
+        ) { g, l -> g.setLastGreenVisible(true, l) },
         listenerCase("clearChatHistory", MegaChatRequest.TYPE_TRUNCATE_HISTORY) { g, l ->
             g.clearChatHistory(1L, l)
         },

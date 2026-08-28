@@ -47,7 +47,6 @@ class FakeMegaChatApiGatewayDefaultsTest {
         case("getChatCall") { it.getChatCall(1L) },
         case("getChatCallByCallId") { it.getChatCallByCallId(1L) },
         case("getScheduledMeeting") { it.getScheduledMeeting(1L, 2L) },
-        case("getChatPresenceConfig") { it.getChatPresenceConfig() },
     )
 
     @ParameterizedTest(name = "{0}")

@@ -539,6 +539,64 @@ class ChatRepositoryImplTest {
         }
 
     @Test
+    fun `test that setPresenceAutoAway invokes the right methods`() =
+        runTest {
+            val enabled = Random.nextBoolean()
+            val timeoutSeconds = Random.nextInt(0, 1000)
+            whenever(
+                megaChatApiGateway.setPresenceAutoaway(
+                    eq(enabled),
+                    eq(timeoutSeconds),
+                    any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    megaChatErrorSuccess,
+                )
+            }
+
+            underTest.setPresenceAutoAway(enabled, timeoutSeconds)
+
+            verify(megaChatApiGateway).setPresenceAutoaway(eq(enabled), eq(timeoutSeconds), any())
+        }
+
+    @Test
+    fun `test that setPresencePersist invokes the right methods`() =
+        runTest {
+            val enabled = Random.nextBoolean()
+            whenever(megaChatApiGateway.setPresencePersist(eq(enabled), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    megaChatErrorSuccess,
+                )
+            }
+
+            underTest.setPresencePersist(enabled)
+
+            verify(megaChatApiGateway).setPresencePersist(eq(enabled), any())
+        }
+
+    @Test
+    fun `test that setLastGreenVisible invokes the right methods`() =
+        runTest {
+            val enabled = Random.nextBoolean()
+            whenever(megaChatApiGateway.setLastGreenVisible(eq(enabled), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    megaChatErrorSuccess,
+                )
+            }
+
+            underTest.setLastGreenVisible(enabled)
+
+            verify(megaChatApiGateway).setLastGreenVisible(eq(enabled), any())
+        }
+
+    @Test
     fun `test that archiveChat invokes the right methods`() =
         runTest {
             val archive = Random.nextBoolean()

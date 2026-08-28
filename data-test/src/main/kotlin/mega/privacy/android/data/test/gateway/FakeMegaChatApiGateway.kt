@@ -18,6 +18,7 @@ import mega.privacy.android.data.test.engine.FakeGatewayStubbing
 import mega.privacy.android.data.test.state.FakeChatState
 import mega.privacy.android.data.test.stub.StubMegaChatError
 import mega.privacy.android.data.test.stub.StubMegaChatMessage
+import mega.privacy.android.data.test.stub.StubMegaChatPresenceConfig
 import mega.privacy.android.data.test.stub.StubMegaChatRequest
 import mega.privacy.android.data.test.stub.StubMegaHandleList
 import mega.privacy.android.data.test.stub.StubMegaStringList
@@ -825,6 +826,47 @@ class FakeMegaChatApiGateway(
             MegaChatRequest.TYPE_SIGNAL_ACTIVITY,
         )
 
+    override fun setPresenceAutoaway(
+        enabled: Boolean,
+        timeout: Int,
+        listener: MegaChatRequestListenerInterface,
+    ) {
+        chatState.presenceAutoAwayEnabled = enabled
+        chatState.presenceAutoAwayTimeout = timeout.toLong()
+        completeChatRequest(
+            MegaChatApiGateway::setPresenceAutoaway,
+            listOf(enabled, timeout, listener),
+            listener,
+            MegaChatRequest.TYPE_SET_PRESENCE_AUTOAWAY,
+        )
+    }
+
+    override fun setPresencePersist(
+        enabled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) {
+        chatState.presencePersist = enabled
+        completeChatRequest(
+            MegaChatApiGateway::setPresencePersist,
+            listOf(enabled, listener),
+            listener,
+            MegaChatRequest.TYPE_SET_PRESENCE_PERSIST,
+        )
+    }
+
+    override fun setLastGreenVisible(
+        enabled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) {
+        chatState.lastGreenVisible = enabled
+        completeChatRequest(
+            MegaChatApiGateway::setLastGreenVisible,
+            listOf(enabled, listener),
+            listener,
+            MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE,
+        )
+    }
+
     override fun clearChatHistory(chatId: Long, listener: MegaChatRequestListenerInterface) =
         completeChatRequest(
             MegaChatApiGateway::clearChatHistory,
@@ -1392,7 +1434,16 @@ class FakeMegaChatApiGateway(
     )
 
     override suspend fun getChatPresenceConfig(): MegaChatPresenceConfig? =
-        engine.dispatch(MegaChatApiGateway::getChatPresenceConfig, emptyList()) { null }
+        engine.dispatch(MegaChatApiGateway::getChatPresenceConfig, emptyList()) {
+            StubMegaChatPresenceConfig(
+                onlineStatus = chatState.onlineStatus,
+                isAutoawayEnabled = chatState.presenceAutoAwayEnabled,
+                autoawayTimeout = chatState.presenceAutoAwayTimeout,
+                isPersist = chatState.presencePersist,
+                isPending = chatState.presencePending,
+                isLastGreenVisible = chatState.lastGreenVisible,
+            )
+        }
 
     override suspend fun setIgnoredCall(chatId: Long): Boolean =
         engine.dispatch(MegaChatApiGateway::setIgnoredCall, listOf(chatId)) { true }

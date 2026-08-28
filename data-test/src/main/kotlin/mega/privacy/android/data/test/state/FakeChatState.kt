@@ -19,6 +19,21 @@ class FakeChatState {
     /** Own online status. */
     var onlineStatus: Int = MegaChatApi.STATUS_ONLINE
 
+    /** Whether the presence auto-away option is enabled. */
+    var presenceAutoAwayEnabled: Boolean = false
+
+    /** Auto-away timeout in seconds. */
+    var presenceAutoAwayTimeout: Long = 0L
+
+    /** Whether the online status persists after going offline. */
+    var presencePersist: Boolean = false
+
+    /** Whether the presence configuration is pending server confirmation. */
+    var presencePending: Boolean = false
+
+    /** Whether the last time online is visible to other users. */
+    var lastGreenVisible: Boolean = false
+
     /** Handle of the logged-in user. */
     var myUserHandle: Long = 111L
 
@@ -47,6 +62,11 @@ class FakeChatState {
     fun reset() {
         initState = MegaChatApi.INIT_ONLINE_SESSION
         onlineStatus = MegaChatApi.STATUS_ONLINE
+        presenceAutoAwayEnabled = false
+        presenceAutoAwayTimeout = 0L
+        presencePersist = false
+        presencePending = false
+        lastGreenVisible = false
         myUserHandle = 111L
         myFullname = "Test User"
         myEmail = "test@mega.nz"

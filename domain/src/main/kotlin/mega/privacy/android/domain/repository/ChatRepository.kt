@@ -435,6 +435,31 @@ interface ChatRepository {
     suspend fun signalPresenceActivity()
 
     /**
+     * Enable or disable the auto-away option, with one specific timeout
+     *
+     * @param enabled           True to enable the auto-away feature
+     * @param timeoutSeconds    Seconds to wait before turning away (if no activity has been signalled)
+     */
+    suspend fun setPresenceAutoAway(enabled: Boolean, timeoutSeconds: Int)
+
+    /**
+     * Enable or disable the persist option
+     *
+     * When this option is enabled, the online status specified by the user will be
+     * shown to other users even when disconnected.
+     *
+     * @param enabled True to enable the persist feature
+     */
+    suspend fun setPresencePersist(enabled: Boolean)
+
+    /**
+     * Enable or disable the visibility of when the logged in user was online (green)
+     *
+     * @param enabled True to enable the visibility of the last time was online
+     */
+    suspend fun setLastGreenVisible(enabled: Boolean)
+
+    /**
      * Clear chat history
      *
      * @param chatId    Chat id

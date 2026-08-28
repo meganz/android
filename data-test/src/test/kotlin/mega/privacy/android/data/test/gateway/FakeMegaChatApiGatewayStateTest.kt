@@ -1,6 +1,8 @@
 package mega.privacy.android.data.test.gateway
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.test.state.FakeChatState
 import mega.privacy.android.data.test.stub.StubMegaChatRoom
 import nz.mega.sdk.MegaChatApi
@@ -86,6 +88,50 @@ class FakeMegaChatApiGatewayStateTest {
         underTest.chatState.myFullname = "Jane Doe"
 
         assertThat(underTest.getUserFullNameFromCache(4242L)).isEqualTo("Jane Doe")
+    }
+
+    @Test
+    fun `test that getChatPresenceConfig returns a config backed by chat state when mutated`() = runTest {
+        underTest.chatState.onlineStatus = MegaChatApi.STATUS_AWAY
+        underTest.chatState.presenceAutoAwayEnabled = true
+        underTest.chatState.presenceAutoAwayTimeout = 300L
+        underTest.chatState.presencePersist = true
+        underTest.chatState.presencePending = true
+        underTest.chatState.lastGreenVisible = true
+
+        val config = requireNotNull(underTest.getChatPresenceConfig())
+
+        assertThat(config.onlineStatus).isEqualTo(MegaChatApi.STATUS_AWAY)
+        assertThat(config.isAutoawayEnabled).isTrue()
+        assertThat(config.autoawayTimeout).isEqualTo(300L)
+        assertThat(config.isPersist).isTrue()
+        assertThat(config.isPending).isTrue()
+        assertThat(config.isLastGreenVisible).isTrue()
+    }
+
+    @Test
+    fun `test that setPresenceAutoaway updates chat state when invoked`() = runTest {
+        underTest.setPresenceAutoaway(true, 300, OptionalMegaChatRequestListenerInterface())
+
+        assertThat(underTest.chatState.presenceAutoAwayEnabled).isTrue()
+        assertThat(underTest.chatState.presenceAutoAwayTimeout).isEqualTo(300L)
+        assertThat(requireNotNull(underTest.getChatPresenceConfig()).isAutoawayEnabled).isTrue()
+    }
+
+    @Test
+    fun `test that setPresencePersist updates chat state when invoked`() = runTest {
+        underTest.setPresencePersist(true, OptionalMegaChatRequestListenerInterface())
+
+        assertThat(underTest.chatState.presencePersist).isTrue()
+        assertThat(requireNotNull(underTest.getChatPresenceConfig()).isPersist).isTrue()
+    }
+
+    @Test
+    fun `test that setLastGreenVisible updates chat state when invoked`() = runTest {
+        underTest.setLastGreenVisible(true, OptionalMegaChatRequestListenerInterface())
+
+        assertThat(underTest.chatState.lastGreenVisible).isTrue()
+        assertThat(requireNotNull(underTest.getChatPresenceConfig()).isLastGreenVisible).isTrue()
     }
 
     @Test

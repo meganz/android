@@ -807,6 +807,53 @@ interface MegaChatApiGateway {
     fun signalPresenceActivity(listener: MegaChatRequestListenerInterface)
 
     /**
+     * Enable or disable the auto-away option, with one specific timeout
+     *
+     * When autoaway is enabled and persist is false, the app should call
+     * [signalPresenceActivity] from time to time.
+     *
+     * The associated request type with this request is [TYPE_SET_PRESENCE_AUTOAWAY].
+     *
+     * @param enabled   True to enable the auto-away feature
+     * @param timeout   Seconds to wait before turning away (if no activity has been signalled)
+     * @param listener  [MegaChatRequestListenerInterface] to track this request
+     */
+    fun setPresenceAutoaway(
+        enabled: Boolean,
+        timeout: Int,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Enable or disable the persist option
+     *
+     * When this option is enabled, the online status shown to other users will be the
+     * one specified by the user, even when you are disconnected.
+     *
+     * The associated request type with this request is [TYPE_SET_PRESENCE_PERSIST].
+     *
+     * @param enabled   True to enable the persist feature
+     * @param listener  [MegaChatRequestListenerInterface] to track this request
+     */
+    fun setPresencePersist(
+        enabled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Enable or disable the visibility of when the logged in user was online (green)
+     *
+     * The associated request type with this request is [TYPE_SET_LAST_GREEN_VISIBLE].
+     *
+     * @param enabled   True to enable the visibility of the last time was online
+     * @param listener  [MegaChatRequestListenerInterface] to track this request
+     */
+    fun setLastGreenVisible(
+        enabled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
      * Allows a logged in operator/moderator to clear the entire history of a chat
      *
      * The latest message gets overridden with a management message.
