@@ -11,6 +11,10 @@ internal data class VideoZoomViewport(
     val videoHeight: Int,
     val screenWidth: Int,
     val screenHeight: Int,
+    // Minimum overflow before an axis counts as pannable. Deliberately has no default: a
+    // call site that forgets it would silently fall back to plain geometry, which is the
+    // 1px-overflow pan that claims the brightness/volume swipe.
+    val panThresholdPx: Float,
 ) {
     /** The zoom level at which the FIT-displayed video exactly fills the screen. */
     val fillZoom: Float
@@ -139,11 +143,11 @@ internal class VideoPlayerZoomState {
 
     /** True when the zoomed video overflows the screen horizontally, so horizontal panning applies. */
     fun canPanHorizontally(viewport: VideoZoomViewport): Boolean =
-        viewport.videoWidth * zoomLevel > viewport.screenWidth + PAN_OVERFLOW_SLACK_PX
+        viewport.videoWidth * zoomLevel > viewport.screenWidth + viewport.panThresholdPx
 
     /** True when the zoomed video overflows the screen vertically, so vertical panning applies. */
     fun canPanVertically(viewport: VideoZoomViewport): Boolean =
-        viewport.videoHeight * zoomLevel > viewport.screenHeight + PAN_OVERFLOW_SLACK_PX
+        viewport.videoHeight * zoomLevel > viewport.screenHeight + viewport.panThresholdPx
 
     private fun snapToBoundaries(zoom: Float, viewport: VideoZoomViewport): Float {
         val fill = viewport.fillZoom
@@ -192,7 +196,9 @@ internal class VideoPlayerZoomState {
         // pinch locks onto a boundary while within ±5% of it.
         private const val ZOOM_SNAP_RATIO = 0.05f
 
-        // 1px slack absorbs FIT layout rounding so panning is not enabled at the fit level.
-        private const val PAN_OVERFLOW_SLACK_PX = 1f
+        // Lower bound for [VideoZoomViewport.panThresholdPx]: 1px absorbs FIT layout rounding
+        // so panning is not enabled at the fit level. It is not a gesture threshold — see
+        // VideoPlayerController.MIN_PAN_OVERFLOW_DP for the value production passes.
+        const val PAN_OVERFLOW_SLACK_PX = 1f
     }
 }
