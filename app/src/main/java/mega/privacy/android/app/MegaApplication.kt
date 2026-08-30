@@ -5,8 +5,6 @@ import android.app.Application
 import android.content.Intent
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
-import android.os.Handler
-import android.os.Looper
 import android.os.StrictMode
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -29,7 +27,6 @@ import mega.privacy.android.app.globalmanagement.ChatApiListenerCoordinator
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.SmsVerificationState
 import mega.privacy.android.app.meeting.CallService
-import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.workmanager.WorkManagerConfigurationProvider
 import mega.privacy.android.data.gateway.LogFlushGateway
 import mega.privacy.android.data.qualifier.MegaApi
@@ -57,7 +54,6 @@ import javax.inject.Inject
  * @property activityLifecycleHandler
  * @property pushNotificationSettingManagement
  * @property chatManagement
- * @property rtcAudioManagerGateway
  * @property callChangesObserver
  * @property applicationScope
  */
@@ -117,9 +113,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
     @Inject
     @get:JvmName("chatManagement")
     lateinit var chatManagement: ChatManagement
-
-    @Inject
-    lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
 
     @Inject
     lateinit var callChangesObserver: CallChangesObserver
@@ -218,18 +211,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
     }
 
     /**
-     * Disable mega chat api
-     *
-     */
-    fun disableMegaChatApi() = chatApiListenerCoordinator.unregister()
-
-    /**
-     * Setup mega chat api
-     *
-     */
-    fun setupMegaChatApi() = chatApiListenerCoordinator.register()
-
-    /**
      * Check current enabled cookies and set the corresponding flags to true/false
      */
     fun checkEnabledCookies() {
@@ -268,32 +249,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
      */
     fun showOneCallNotification(incomingCall: MegaChatCall) =
         callChangesObserver.showOneCallNotification(incomingCall)
-
-    /**
-     * Create or update audio manager
-     *
-     * @param isSpeakerOn
-     * @param type
-     */
-    fun createOrUpdateAudioManager(isSpeakerOn: Boolean, type: Int) {
-        Timber.d("Create or update audio manager, type is %s", type)
-        chatManagement.registerScreenReceiver()
-        Handler(Looper.getMainLooper()).post {
-            rtcAudioManagerGateway.createOrUpdateAudioManager(isSpeakerOn, type)
-        }
-    }
-
-    /**
-     * Remove the incoming call AppRTCAudioManager.
-     */
-    fun removeRTCAudioManagerRingIn() = rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-
-    /**
-     * Activate the proximity sensor.
-     */
-    fun startProximitySensor() = rtcAudioManagerGateway.startProximitySensor { isNear: Boolean ->
-        chatManagement.controlProximitySensor(isNear)
-    }
 
     /**
      * Open call service

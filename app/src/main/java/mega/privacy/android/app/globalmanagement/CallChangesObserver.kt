@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
 import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
+import mega.privacy.android.app.meeting.RtcAudioManagerController
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.notifications.CallPushMessageNotificationManager
 import mega.privacy.android.app.utils.CallUtil
@@ -67,6 +67,7 @@ class CallChangesObserver @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val application: Application,
     private val chatManagement: ChatManagement,
+    private val rtcAudioManagerController: RtcAudioManagerController,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
@@ -494,8 +495,10 @@ class CallChangesObserver @Inject constructor(
             showOneCallNotification(callToLaunch)
         } else {
             Timber.d("The call screen should be displayed. Chat ID of incoming call ${callToLaunch.chatid}")
-            MegaApplication.getInstance()
-                .createOrUpdateAudioManager(false, Constants.AUDIO_MANAGER_CALL_RINGING)
+            rtcAudioManagerController.createOrUpdateAudioManager(
+                false,
+                Constants.AUDIO_MANAGER_CALL_RINGING,
+            )
             launchCallActivity(callToLaunch)
         }
     }
@@ -513,8 +516,10 @@ class CallChangesObserver @Inject constructor(
     fun showOneCallNotification(incomingCall: MegaChatCall) {
         Timber.d("Show incoming call notification and start to sound. Chat ID is ${incomingCall.chatid}")
         LegacyAudioPlayerService.pauseAudioPlayer(application)
-        MegaApplication.getInstance()
-            .createOrUpdateAudioManager(false, Constants.AUDIO_MANAGER_CALL_RINGING)
+        rtcAudioManagerController.createOrUpdateAudioManager(
+            false,
+            Constants.AUDIO_MANAGER_CALL_RINGING,
+        )
         chatManagement.addNotificationShown(incomingCall.chatid)
         ChatAdvancedNotificationBuilder.newInstance(application)
             .showOneCallNotification(incomingCall)

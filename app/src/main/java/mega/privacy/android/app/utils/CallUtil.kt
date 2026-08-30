@@ -23,7 +23,6 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.di.MegaApiEntryPoint
@@ -31,6 +30,7 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.meeting.CallServiceStarterEntryPoint
+import mega.privacy.android.app.meeting.RtcAudioManagerControllerEntryPoint
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
@@ -94,6 +94,11 @@ object CallUtil {
         applicationContext,
         CallServiceStarterEntryPoint::class.java,
     ).callServiceStarter().invoke(chatId)
+
+    private fun rtcAudioManagerController() = EntryPointAccessors.fromApplication(
+        applicationContext,
+        RtcAudioManagerControllerEntryPoint::class.java,
+    ).rtcAudioManagerController()
 
     /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
@@ -755,7 +760,7 @@ object CallUtil {
             enableOrDisableLocalVideo(
                 false,
                 call.chatid,
-                DisableAudioVideoCallListener(MegaApplication.getInstance()),
+                DisableAudioVideoCallListener(applicationContext),
             )
         }
     }
@@ -1114,8 +1119,8 @@ object CallUtil {
         if (callIdIncomingCall == MEGACHAT_INVALID_HANDLE) return
 
         try {
-            val notificationManager = MegaApplication.getInstance()
-                .baseContext.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            val notificationManager = applicationContext
+                .getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             notificationManager?.cancel(getCallNotificationId(callIdIncomingCall))
         } catch (e: Exception) {
             Timber.e(e)
@@ -1267,7 +1272,7 @@ object CallUtil {
             resolvedTypeAudioManager = Constants.AUDIO_MANAGER_CALL_IN_PROGRESS
         }
 
-        MegaApplication.getInstance().createOrUpdateAudioManager(
+        rtcAudioManagerController().createOrUpdateAudioManager(
             chatManagement().getSpeakerStatus(chatId),
             resolvedTypeAudioManager,
         )

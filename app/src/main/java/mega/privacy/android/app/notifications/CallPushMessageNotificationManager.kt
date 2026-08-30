@@ -13,10 +13,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.PendingIntentCompat
 import androidx.core.app.Person
 import androidx.core.content.ContextCompat
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import mega.privacy.android.app.meeting.CallNotificationIntentService
+import mega.privacy.android.app.meeting.RtcAudioManagerController
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -37,6 +37,7 @@ import javax.inject.Inject
 class CallPushMessageNotificationManager @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
+    private val rtcAudioManagerController: RtcAudioManagerController,
 ) {
     private val channelId = NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2
     private var callPushMessageChatId: Long? = null
@@ -58,11 +59,10 @@ class CallPushMessageNotificationManager @Inject constructor(
                 Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            MegaApplication.getInstance()
-                .createOrUpdateAudioManager(
-                    false,
-                    Constants.AUDIO_MANAGER_CALL_RINGING
-                )
+            rtcAudioManagerController.createOrUpdateAudioManager(
+                false,
+                Constants.AUDIO_MANAGER_CALL_RINGING
+            )
             notify(context = context, chatId = chatId, title = title, hasInfo = false, notifId = id)
         }
     }
@@ -76,7 +76,7 @@ class CallPushMessageNotificationManager @Inject constructor(
         Timber.d("Remove call push message notification")
         hide(chatId)
         rtcAudioManagerGateway.stopIncomingCallSounds()
-        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+        rtcAudioManagerController.removeRTCAudioManagerRingIn()
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)

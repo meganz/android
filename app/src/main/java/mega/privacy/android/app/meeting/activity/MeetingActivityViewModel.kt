@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.extensions.updateItemAt
@@ -32,6 +31,7 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
+import mega.privacy.android.app.meeting.RtcAudioManagerController
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.adapter.Participant
@@ -177,6 +177,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val getChatCallUseCase: GetChatCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
+    private val rtcAudioManagerController: RtcAudioManagerController,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val checkChatLink: CheckChatLinkUseCase,
     private val monitorChatParticipantsUseCase: MonitorChatParticipantsUseCase,
@@ -1574,8 +1575,10 @@ class MeetingActivityViewModel @Inject constructor(
      * init RTC Audio Manager
      */
     fun initRTCAudioManager() {
-        MegaApplication.getInstance()
-            .createOrUpdateAudioManager(true, AUDIO_MANAGER_CREATING_JOINING_MEETING)
+        rtcAudioManagerController.createOrUpdateAudioManager(
+            true,
+            AUDIO_MANAGER_CREATING_JOINING_MEETING,
+        )
     }
 
     /**
@@ -1818,7 +1821,7 @@ class MeetingActivityViewModel @Inject constructor(
                         )
                     }.onSuccess { chatCall ->
                         chatManagement.removeJoiningCallChatId(chatId)
-                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                        rtcAudioManagerController.removeRTCAudioManagerRingIn()
                         if (chatCall == null) {
                             finishMeetingActivity()
                         } else {

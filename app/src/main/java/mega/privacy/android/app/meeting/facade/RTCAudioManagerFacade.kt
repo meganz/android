@@ -7,10 +7,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.interfaces.OnProximitySensorListener
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.RtcAudioManagerController
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -28,7 +29,8 @@ class RTCAudioManagerFacade @Inject constructor(
     private val application: Application,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val broadcastAudioOutputUseCase: BroadcastAudioOutputUseCase,
-    ) : RTCAudioManagerGateway {
+    private val rtcAudioManagerController: Lazy<RtcAudioManagerController>,
+) : RTCAudioManagerGateway {
     private var rtcAudioManager: AppRTCAudioManager? = null
     private var rtcAudioManagerRingInCall: AppRTCAudioManager? = null
 
@@ -87,7 +89,8 @@ class RTCAudioManagerFacade @Inject constructor(
                     false,
                     Constants.AUDIO_MANAGER_CALL_RINGING,
                     applicationScope,
-                    broadcastAudioOutputUseCase
+                    broadcastAudioOutputUseCase,
+                    ::removeRTCAudioManagerRingIn,
                 )
         } else {
             rtcAudioManager?.apply {
@@ -101,10 +104,11 @@ class RTCAudioManagerFacade @Inject constructor(
                 isSpeakerOn,
                 type,
                 applicationScope,
-                broadcastAudioOutputUseCase
+                broadcastAudioOutputUseCase,
+                ::removeRTCAudioManagerRingIn,
             )
             if (type != Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING && type != Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP) {
-                MegaApplication.getInstance().startProximitySensor()
+                rtcAudioManagerController.get().startProximitySensor()
             }
         }
     }

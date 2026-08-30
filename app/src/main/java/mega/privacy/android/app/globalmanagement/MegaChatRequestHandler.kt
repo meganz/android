@@ -1,8 +1,8 @@
 package mega.privacy.android.app.globalmanagement
 
 import android.app.Application
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
@@ -24,6 +24,7 @@ import javax.inject.Singleton
  * @property autoJoinPublicChatHandler
  * @property chatLogoutHandler
  * @property myAccountInfo
+ * @property chatApiListenerCoordinator
  */
 @Singleton
 class MegaChatRequestHandler @Inject constructor(
@@ -36,6 +37,7 @@ class MegaChatRequestHandler @Inject constructor(
     private val autoJoinPublicChatHandler: AutoJoinPublicChatHandler,
     private val chatLogoutHandler: ChatLogoutHandler,
     private val myAccountInfo: MyAccountInfo,
+    private val chatApiListenerCoordinator: Lazy<ChatApiListenerCoordinator>,
 ) : MegaChatRequestListenerInterface {
     private var isLoginRunning = false
 
@@ -90,7 +92,7 @@ class MegaChatRequestHandler @Inject constructor(
     private fun onChatLogout(e: MegaChatError) {
         Timber.d("CHAT_TYPE_LOGOUT: %d__%s", e.errorCode, e.errorString)
         resetDefaults()
-        MegaApplication.getInstance().disableMegaChatApi()
+        chatApiListenerCoordinator.get().unregister()
         val loggedState: Int = megaApi.isLoggedIn
         Timber.d("Login status on %s", loggedState)
         if (loggedState == 0) {

@@ -231,6 +231,7 @@ class MeetingActivityViewModelTest {
             getChatCallUseCase = getChatCallUseCase,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             chatManagement = chatManagement,
+            rtcAudioManagerController = mock(),
             setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
             checkChatLink = checkChatLink,
             context = context,

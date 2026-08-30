@@ -2,22 +2,26 @@ package mega.privacy.android.app.listeners;
 
 import java.lang.ref.WeakReference;
 
-import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.globalmanagement.ChatApiListenerCoordinator;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 
 public class ChatLogoutListener implements MegaChatRequestListenerInterface {
+    private final ChatApiListenerCoordinator chatApiListenerCoordinator;
     private WeakReference<ChatLogoutCallback> chatLogoutCallback;
 
     public interface ChatLogoutCallback {
         void chatLogoutFinish();
     }
 
-    public ChatLogoutListener() {}
+    public ChatLogoutListener(ChatApiListenerCoordinator chatApiListenerCoordinator) {
+        this.chatApiListenerCoordinator = chatApiListenerCoordinator;
+    }
 
-    public ChatLogoutListener(ChatLogoutCallback chatLogoutCallback) {
+    public ChatLogoutListener(ChatApiListenerCoordinator chatApiListenerCoordinator, ChatLogoutCallback chatLogoutCallback) {
+        this(chatApiListenerCoordinator);
         this.chatLogoutCallback = new WeakReference<>(chatLogoutCallback);
     }
 
@@ -33,9 +37,9 @@ public class ChatLogoutListener implements MegaChatRequestListenerInterface {
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         if (request.getType() != MegaChatRequest.TYPE_LOGOUT) return;
 
-        MegaApplication.getInstance().disableMegaChatApi();
+        chatApiListenerCoordinator.unregister();
 
-        ChatLogoutCallback callback = chatLogoutCallback.get();
+        ChatLogoutCallback callback = chatLogoutCallback != null ? chatLogoutCallback.get() : null;
         if (callback != null) {
             callback.chatLogoutFinish();
         }

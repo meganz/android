@@ -28,7 +28,6 @@ import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.OnProximitySensorListener
 import mega.privacy.android.app.utils.CallUtil
@@ -43,17 +42,17 @@ import mega.privacy.android.domain.usecase.meeting.BroadcastAudioOutputUseCase
 import org.webrtc.ThreadUtils
 import timber.log.Timber
 import java.io.IOException
-import javax.inject.Inject
 
 /**
  * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
  */
-class AppRTCAudioManager @Inject constructor(
+class AppRTCAudioManager(
     private val apprtcContext: Context,
     private var isSpeakerOn: Boolean,
     type: Int,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val broadcastAudioOutputUseCase: BroadcastAudioOutputUseCase,
+    private val removeRingInAudioManager: () -> Unit,
 ) {
 
 
@@ -395,7 +394,7 @@ class AppRTCAudioManager @Inject constructor(
             audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_MUTE, 0)
             stopVibration()
             if (CallUtil.participatingInACall()) {
-                getInstance().removeRTCAudioManagerRingIn()
+                removeRingInAudioManager()
             }
         } else if (!isNecessaryMute && audioManager.isStreamMute(AudioManager.STREAM_RING)) {
             adjustStreamVolume()
@@ -1026,13 +1025,15 @@ class AppRTCAudioManager @Inject constructor(
             type: Int,
             applicationScope: CoroutineScope,
             outputAudioUseCase: BroadcastAudioOutputUseCase,
+            removeRingInAudioManager: () -> Unit,
         ): AppRTCAudioManager {
             return AppRTCAudioManager(
                 context,
                 isSpeakerOn,
                 type,
                 applicationScope,
-                outputAudioUseCase
+                outputAudioUseCase,
+                removeRingInAudioManager
             )
         }
     }

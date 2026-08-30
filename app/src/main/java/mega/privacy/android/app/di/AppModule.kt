@@ -1,6 +1,7 @@
 package mega.privacy.android.app.di
 
 import android.content.Context
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +19,7 @@ import mega.privacy.android.app.appstate.global.event.CombinedEventQueueImpl
 import mega.privacy.android.app.appstate.global.event.NavigationEventQueueReceiver
 import mega.privacy.android.app.consent.ConsentDialogDestinations
 import mega.privacy.android.app.deeplinks.DeepLinksDialogDestinations
+import mega.privacy.android.app.globalmanagement.ChatApiListenerCoordinator
 import mega.privacy.android.app.main.dialog.link.OpenLinkDialogDestinations
 import mega.privacy.android.app.main.dialog.newfile.NewTextFileDialogDestinations
 import mega.privacy.android.app.main.dialog.newfolder.NewFolderDialogDestinations
@@ -172,8 +174,10 @@ internal class AppModule {
         )
 
     @Provides
-    fun provideDisableChatApiUseCase(): DisableChatApiUseCase =
-        DisableChatApiUseCase { MegaApplication.getInstance().disableMegaChatApi() }
+    fun provideDisableChatApiUseCase(
+        chatApiListenerCoordinator: Lazy<ChatApiListenerCoordinator>,
+    ): DisableChatApiUseCase =
+        DisableChatApiUseCase { chatApiListenerCoordinator.get().unregister() }
 
     @Provides
     fun provideNavigationEventQueueReceiver(queue: CombinedEventQueueImpl): NavigationEventQueueReceiver =

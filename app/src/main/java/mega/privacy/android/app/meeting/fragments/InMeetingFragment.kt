@@ -43,7 +43,6 @@ import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
@@ -58,6 +57,7 @@ import mega.privacy.android.app.meeting.AnimationTool.moveX
 import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.CallServiceStarter
 import mega.privacy.android.app.meeting.OnDragTouchListener
+import mega.privacy.android.app.meeting.RtcAudioManagerController
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_GUEST
@@ -141,6 +141,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     @Inject
     lateinit var callServiceStarter: CallServiceStarter
+
+    @Inject
+    lateinit var rtcAudioManagerController: RtcAudioManagerController
 
     @Inject
     lateinit var megaNavigator: MegaNavigator
@@ -447,7 +450,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         blink = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
 
         initViewModel()
-        MegaApplication.getInstance().startProximitySensor()
+        rtcAudioManagerController.startProximitySensor()
         initToolbar()
         initFloatingWindowContainerDragListener(view)
         initFloatingPanel()
@@ -2876,7 +2879,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onResume() {
         super.onResume()
-        MegaApplication.getInstance().startProximitySensor()
+        rtcAudioManagerController.startProximitySensor()
         checkChildFragments()
         inMeetingViewModel.checkParticipantsList()
     }
