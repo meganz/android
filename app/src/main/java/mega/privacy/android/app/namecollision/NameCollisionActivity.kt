@@ -28,6 +28,7 @@ import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.namecollision.data.FileVersioningInfo
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
@@ -481,62 +482,63 @@ class NameCollisionActivity : PasscodeActivity() {
     /**
      * Updates the UI related to file versioning.
      *
-     * @param fileVersioningInfo Triple with the following info:
-     *                              - First:    True if file versioning is enabled, false otherwise.
-     *                              - Second:   Collision type: upload, movement of copy.
-     *                              - Third:    True if the collision is related to a file, false if is to a folder.
+     * @param fileVersioningInfo [FileVersioningInfo] of the current collision.
      */
-    private fun updateFileVersioningData(fileVersioningInfo: Triple<Boolean, NameCollisionType, Boolean>) {
+    private fun updateFileVersioningData(fileVersioningInfo: FileVersioningInfo) {
         if (viewModel.isCopyToOrigin)
             return
 
-        val isFileVersioningEnabled = fileVersioningInfo.first
-        val nameCollisionType = fileVersioningInfo.second
-        val isFile = fileVersioningInfo.third
+        with(fileVersioningInfo) {
+            binding.replaceUpdateMergeInfo.isVisible = canReplaceOrUpdate
+            binding.replaceUpdateMergeView.root.isVisible = canReplaceOrUpdate
+            binding.replaceUpdateMergeButton.isVisible = canReplaceOrUpdate
+            binding.replaceUpdateMergeSeparator.isVisible = canReplaceOrUpdate
 
-        binding.learnMore.isVisible =
-            isFileVersioningEnabled && nameCollisionType == NameCollisionType.UPLOAD
+            binding.learnMore.isVisible = canReplaceOrUpdate
+                    && isFileVersioningEnabled
+                    && nameCollisionType == NameCollisionType.UPLOAD
 
-        val replaceUpdateMergeInfoId: Int
-        val replaceUpdateMergeButtonId: Int
+            val replaceUpdateMergeInfoId: Int
+            val replaceUpdateMergeButtonId: Int
 
-        when (nameCollisionType) {
-            NameCollisionType.UPLOAD -> {
-                replaceUpdateMergeInfoId = when {
-                    !isFile -> R.string.warning_upload_and_merge
-                    isFileVersioningEnabled -> R.string.warning_versioning_upload_and_update
-                    else -> R.string.warning_upload_and_replace
+            when (nameCollisionType) {
+                NameCollisionType.UPLOAD -> {
+                    replaceUpdateMergeInfoId = when {
+                        !isFile -> R.string.warning_upload_and_merge
+                        isFileVersioningEnabled -> R.string.warning_versioning_upload_and_update
+                        else -> R.string.warning_upload_and_replace
+                    }
+                    replaceUpdateMergeButtonId = when {
+                        !isFile -> R.string.upload_and_merge
+                        isFileVersioningEnabled -> R.string.upload_and_update
+                        else -> R.string.upload_and_replace
+                    }
                 }
-                replaceUpdateMergeButtonId = when {
-                    !isFile -> R.string.upload_and_merge
-                    isFileVersioningEnabled -> R.string.upload_and_update
-                    else -> R.string.upload_and_replace
+
+                NameCollisionType.COPY -> {
+                    replaceUpdateMergeInfoId =
+                        if (isFile) R.string.warning_copy_and_replace
+                        else R.string.warning_copy_and_merge
+                    replaceUpdateMergeButtonId =
+                        if (isFile) R.string.copy_and_replace
+                        else R.string.copy_and_merge
+                }
+
+                NameCollisionType.MOVE -> {
+                    replaceUpdateMergeInfoId =
+                        if (isFile) R.string.warning_move_and_replace
+                        else R.string.warning_move_and_merge
+                    replaceUpdateMergeButtonId =
+                        if (isFile) R.string.move_and_replace
+                        else R.string.move_and_merge
                 }
             }
 
-            NameCollisionType.COPY -> {
-                replaceUpdateMergeInfoId =
-                    if (isFile) R.string.warning_copy_and_replace
-                    else R.string.warning_copy_and_merge
-                replaceUpdateMergeButtonId =
-                    if (isFile) R.string.copy_and_replace
-                    else R.string.copy_and_merge
-            }
-
-            NameCollisionType.MOVE -> {
-                replaceUpdateMergeInfoId =
-                    if (isFile) R.string.warning_move_and_replace
-                    else R.string.warning_move_and_merge
-                replaceUpdateMergeButtonId =
-                    if (isFile) R.string.move_and_replace
-                    else R.string.move_and_merge
-            }
+            binding.replaceUpdateMergeInfo.text =
+                getString(replaceUpdateMergeInfoId)
+            binding.replaceUpdateMergeButton.text =
+                getString(replaceUpdateMergeButtonId)
         }
-
-        binding.replaceUpdateMergeInfo.text =
-            getString(replaceUpdateMergeInfoId)
-        binding.replaceUpdateMergeButton.text =
-            getString(replaceUpdateMergeButtonId)
     }
 
     private fun manageCollisionsResolution(collisionsResolution: ArrayList<NodeNameCollisionResult>) {

@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.namecollision.data.FileVersioningInfo
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
@@ -35,6 +37,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
+import mega.privacy.android.domain.entity.shares.hasFullAccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -51,6 +54,7 @@ import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisi
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionsResultUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.ReorderNodeNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.UpdateNodeNameCollisionsResultUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -78,6 +82,7 @@ class NameCollisionViewModel @Inject constructor(
     private val moveCollidedNodeUseCase: MoveCollidedNodeUseCase,
     private val moveCollidedNodesUseCase: MoveCollidedNodesUseCase,
     private val deleteCacheFilesUseCase: DeleteCacheFilesUseCase,
+    private val getNodeAccessPermission: GetNodeAccessPermission,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(NameCollisionUiState())
 
@@ -87,8 +92,8 @@ class NameCollisionViewModel @Inject constructor(
     val uiState: StateFlow<NameCollisionUiState> = _uiState
 
     private val currentCollision: MutableLiveData<NodeNameCollisionResult?> = MutableLiveData()
-    private val fileVersioningInfo: MutableLiveData<Triple<Boolean, NameCollisionType, Boolean>> =
-        MutableLiveData()
+    private val fileVersioningInfo: MutableLiveData<FileVersioningInfo> = MutableLiveData()
+    private var fileVersioningInfoJob: Job? = null
     private val actionResult: MutableLiveData<NameCollisionActionResult> = MutableLiveData()
     private val collisionsResolution: MutableLiveData<ArrayList<NodeNameCollisionResult>> =
         MutableLiveData()
@@ -263,27 +268,54 @@ class NameCollisionViewModel @Inject constructor(
      * Updates file versioning info.
      */
     private fun updateFileVersioningInfo() {
-        val currentCollision = currentCollision.value ?: return
-        viewModelScope.launch {
-            runCatching { getFileVersionsOption(false) }
-                .onSuccess { isFileDisable ->
-                    fileVersioningInfo.value =
-                        Triple(
-                            isFileDisable.not(),
-                            getCollisionType(),
-                            currentCollision.nameCollision.isFile
-                        )
-                }
+        val collision = currentCollision.value?.nameCollision ?: return
+        val collisionType = getCollisionType(collision)
+        fileVersioningInfoJob?.cancel()
+        fileVersioningInfoJob = viewModelScope.launch {
+            val isFileVersioningDisabled = runCatching { getFileVersionsOption(false) }
+                .onFailure { Timber.e(it, "Error getting the file versions option") }
+                .getOrNull() ?: true
+
+            fileVersioningInfo.value = FileVersioningInfo(
+                isFileVersioningEnabled = isFileVersioningDisabled.not(),
+                nameCollisionType = collisionType,
+                isFile = collision.isFile,
+                canReplaceOrUpdate = canReplaceOrUpdate(collision, collisionType),
+            )
         }
     }
 
     /**
-     * Gets the [NameCollisionType] of the current collision.
+     * Checks whether the existing node can be replaced or updated. Uploading a file with an existing
+     * name only replaces or versions the existing node if the user has full access to it, otherwise
+     * the SDK silently creates a duplicated node with the same name.
      *
-     * @return The type of the current collision.
+     * @param collision     [NameCollision] to resolve.
+     * @param collisionType [NameCollisionType] of the collision.
+     * @return True if the existing node can be replaced or updated, false otherwise.
      */
-    private fun getCollisionType(): NameCollisionType =
-        when (val collision = currentCollision.value?.nameCollision) {
+    private suspend fun canReplaceOrUpdate(
+        collision: NameCollision,
+        collisionType: NameCollisionType,
+    ): Boolean {
+        if (collisionType != NameCollisionType.UPLOAD || !collision.isFile) return true
+
+        return runCatching { getNodeAccessPermission(NodeId(collision.collisionHandle)) }
+            .onFailure { Timber.e(it, "Error getting the access permission") }
+            .getOrNull()
+            ?.hasFullAccessPermission() ?: true
+    }
+
+    /**
+     * Gets the [NameCollisionType] of a collision.
+     *
+     * @param collision [NameCollision] to check, the current one by default.
+     * @return The type of the collision.
+     */
+    private fun getCollisionType(
+        collision: NameCollision? = currentCollision.value?.nameCollision,
+    ): NameCollisionType =
+        when (collision) {
             is NodeNameCollision.Chat -> {
                 NameCollisionType.COPY
             }
@@ -818,8 +850,7 @@ class NameCollisionViewModel @Inject constructor(
     /**
      * Gets the file versioning info.
      */
-    fun getFileVersioningInfo(): LiveData<Triple<Boolean, NameCollisionType, Boolean>> =
-        fileVersioningInfo
+    fun getFileVersioningInfo(): LiveData<FileVersioningInfo> = fileVersioningInfo
 
     /**
      * Gets the action result.

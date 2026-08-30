@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisi
 import mega.privacy.android.domain.usecase.node.namecollision.NodeCollisionsWithSize
 import mega.privacy.android.domain.usecase.node.namecollision.ReorderNodeNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.UpdateNodeNameCollisionsResultUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -46,10 +48,12 @@ import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -69,6 +73,7 @@ internal class NameCollisionViewModelTest {
     private val updateNodeNameCollisionsResultUseCase: UpdateNodeNameCollisionsResultUseCase =
         mock()
     private val deleteCacheFilesUseCase = mock<DeleteCacheFilesUseCase>()
+    private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
 
     private fun initUnderTest() {
         underTest = NameCollisionViewModel(
@@ -89,6 +94,7 @@ internal class NameCollisionViewModelTest {
             moveCollidedNodeUseCase = mock(),
             moveCollidedNodesUseCase = mock(),
             deleteCacheFilesUseCase = deleteCacheFilesUseCase,
+            getNodeAccessPermission = getNodeAccessPermission,
         )
     }
 
@@ -101,6 +107,7 @@ internal class NameCollisionViewModelTest {
             getFileVersionsOption,
             monitorUserUpdates,
             deleteCacheFilesUseCase,
+            getNodeAccessPermission,
         )
     }
 
@@ -459,7 +466,133 @@ internal class NameCollisionViewModelTest {
             assertThat(underTest.shouldFinish()).isTrue()
         }
 
+    private suspend fun stubUploadCollision(isFile: Boolean = true): FileNameCollision {
+        val nameCollision = mock<FileNameCollision> {
+            on { this.collisionHandle } doReturn COLLISION_HANDLE
+            on { this.isFile } doReturn isFile
+        }
+        val collisionResult = mock<NodeNameCollisionResult> {
+            on { this.nameCollision } doReturn nameCollision
+        }
+        whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn collisionResult
+        whenever(getFileVersionsOption(any())) doReturn false
+        return nameCollision
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = AccessPermission::class,
+        names = ["FULL", "OWNER"],
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    fun `test that canReplaceOrUpdate is false when the colliding file has no full access`(
+        accessPermission: AccessPermission,
+    ) = runTest {
+        val nameCollision = stubUploadCollision()
+        whenever(getNodeAccessPermission(NodeId(COLLISION_HANDLE))) doReturn accessPermission
+
+        initUnderTest()
+        underTest.setSingleData(nameCollision)
+        advanceUntilIdle()
+
+        assertThat(underTest.getFileVersioningInfo().value?.canReplaceOrUpdate).isFalse()
+    }
+
+    @Test
+    fun `test that canReplaceOrUpdate is false when getFileVersionsOption throws and the colliding file has no full access`() =
+        runTest {
+            val nameCollision = stubUploadCollision()
+            whenever(getFileVersionsOption(any())) doThrow RuntimeException()
+            whenever(getNodeAccessPermission(NodeId(COLLISION_HANDLE))) doReturn
+                    AccessPermission.READWRITE
+
+            initUnderTest()
+            underTest.setSingleData(nameCollision)
+            advanceUntilIdle()
+
+            val info = underTest.getFileVersioningInfo().value
+            assertThat(info?.canReplaceOrUpdate).isFalse()
+            assertThat(info?.isFileVersioningEnabled).isFalse()
+        }
+
+    @ParameterizedTest
+    @EnumSource(value = AccessPermission::class, names = ["FULL", "OWNER"])
+    fun `test that canReplaceOrUpdate is true when the colliding file has full access`(
+        accessPermission: AccessPermission,
+    ) = runTest {
+        val nameCollision = stubUploadCollision()
+        whenever(getNodeAccessPermission(NodeId(COLLISION_HANDLE))) doReturn accessPermission
+
+        initUnderTest()
+        underTest.setSingleData(nameCollision)
+        advanceUntilIdle()
+
+        assertThat(underTest.getFileVersioningInfo().value?.canReplaceOrUpdate).isTrue()
+    }
+
+    @Test
+    fun `test that canReplaceOrUpdate is true when the access permission cannot be obtained`() =
+        runTest {
+            val nameCollision = stubUploadCollision()
+            whenever(getNodeAccessPermission(NodeId(COLLISION_HANDLE))) doReturn null
+
+            initUnderTest()
+            underTest.setSingleData(nameCollision)
+            advanceUntilIdle()
+
+            assertThat(underTest.getFileVersioningInfo().value?.canReplaceOrUpdate).isTrue()
+        }
+
+    @Test
+    fun `test that canReplaceOrUpdate is true when getting the access permission throws`() =
+        runTest {
+            val nameCollision = stubUploadCollision()
+            whenever(getNodeAccessPermission(NodeId(COLLISION_HANDLE))) doThrow RuntimeException()
+
+            initUnderTest()
+            underTest.setSingleData(nameCollision)
+            advanceUntilIdle()
+
+            assertThat(underTest.getFileVersioningInfo().value?.canReplaceOrUpdate).isTrue()
+        }
+
+    @Test
+    fun `test that the access permission is not checked when the collision is a folder`() =
+        runTest {
+            val nameCollision = stubUploadCollision(isFile = false)
+
+            initUnderTest()
+            underTest.setSingleData(nameCollision)
+            advanceUntilIdle()
+
+            verifyNoInteractions(getNodeAccessPermission)
+            assertThat(underTest.getFileVersioningInfo().value?.canReplaceOrUpdate).isTrue()
+        }
+
+    @Test
+    fun `test that the access permission is not checked when the collision is not an upload`() =
+        runTest {
+            val nameCollision = mock<NodeNameCollision.Chat> {
+                on { this.collisionHandle } doReturn COLLISION_HANDLE
+                on { this.isFile } doReturn true
+            }
+            val collisionResult = mock<NodeNameCollisionResult> {
+                on { this.nameCollision } doReturn nameCollision
+            }
+            whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn collisionResult
+            whenever(getFileVersionsOption(any())) doReturn false
+
+            initUnderTest()
+            underTest.setSingleData(nameCollision)
+            advanceUntilIdle()
+
+            verifyNoInteractions(getNodeAccessPermission)
+            assertThat(underTest.getFileVersioningInfo().value?.canReplaceOrUpdate).isTrue()
+        }
+
     companion object {
+        private const val COLLISION_HANDLE = 123L
+
         @JvmField
         @RegisterExtension
         val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
