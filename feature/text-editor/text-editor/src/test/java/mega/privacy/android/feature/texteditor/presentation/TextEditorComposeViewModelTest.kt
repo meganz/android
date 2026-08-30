@@ -39,6 +39,9 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.PublicNodeException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
@@ -66,6 +69,7 @@ import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFolderLin
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SetShowLineNumbersPreferenceUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormatAction
 import mega.privacy.android.feature.texteditor.components.markdown.rich.MarkdownToRichDocumentConverter
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichBlockKind
@@ -82,6 +86,7 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.IOException
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
@@ -135,6 +140,7 @@ internal class TextEditorComposeViewModelTest {
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase = mock()
     private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper =
         TextEditorBottomBarActionsMapper()
     private val fileLinkPublicNode: TypedFileNode = mock {
@@ -184,6 +190,7 @@ internal class TextEditorComposeViewModelTest {
             isConnectedToInternetUseCase,
             snackbarEventQueue,
             getFeatureFlagValueUseCase,
+            isInTransferOverQuotaUseCase,
         )
         runBlocking {
             whenever(getNodeByIdUseCase(any())).thenReturn(null)
@@ -191,6 +198,7 @@ internal class TextEditorComposeViewModelTest {
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getNodeVersionsByHandleUseCase(any())).thenReturn(emptyList())
+            whenever(isInTransferOverQuotaUseCase()).thenReturn(false)
         }
         whenever(monitorNodeUpdatesUseCase()).thenReturn(flowOf())
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
@@ -260,6 +268,7 @@ internal class TextEditorComposeViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             richToModelConverter = MarkdownToRichDocumentConverter(),
             richToMarkdownConverter = RichDocumentToMarkdownConverter(),
+            isInTransferOverQuotaUseCase = isInTransferOverQuotaUseCase,
         )
     }
 
@@ -1026,8 +1035,139 @@ internal class TextEditorComposeViewModelTest {
         advanceUntilIdle()
         assertThat(underTest.uiState.value.errorEvent).isEqualTo(triggered)
         assertThat(underTest.uiState.value.isLoading).isFalse()
-        assertThat(underTest.uiState.value.errorMessage).isEqualTo("load failed")
+        assertThat(underTest.uiState.value.errorMessageRes).isNull()
         assertThat(underTest.uiState.value.isNoInternetError).isFalse()
+    }
+
+    @Test
+    fun `test that getText failure flags over quota when the download hits transfer over quota`() =
+        runTest {
+            doReturn(flow<List<String>> {
+                throw QuotaExceededMegaException(-17, "Transfer quota exceeded")
+            }).whenever(getTextContentForTextEditorUseCase)
+                .invoke(any<Long>(), anyOrNull(), any())
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+            advanceUntilIdle()
+            assertThat(underTest.uiState.value.errorEvent).isEqualTo(triggered)
+            assertThat(underTest.uiState.value.isLoading).isFalse()
+            assertThat(underTest.uiState.value.isOverQuotaError).isTrue()
+        }
+
+    @Test
+    fun `test that getText failure does not show the message of an IOException`() = runTest {
+        doReturn(flow<List<String>> { throw IOException("Streaming server did not serve http://127.0.0.1:4443/x") })
+            .whenever(getTextContentForTextEditorUseCase).invoke(any<Long>(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.errorEvent).isEqualTo(triggered)
+        assertThat(underTest.uiState.value.errorMessageRes).isNull()
+    }
+
+    @Test
+    fun `test that getText failure does not query the quota for a cloud drive load`() = runTest {
+        whenever(isInTransferOverQuotaUseCase()).thenReturn(true)
+        doReturn(flow<List<String>> { throw MegaException(-1, "Read failed") })
+            .whenever(getTextContentForTextEditorUseCase)
+            .invoke(any<Long>(), anyOrNull(), any())
+
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        // The download fallback reports the quota as a QuotaExceededMegaException, so a failure
+        // that is not one is not a quota problem however the account looks.
+        assertThat(underTest.uiState.value.isOverQuotaError).isFalse()
+        verify(isInTransferOverQuotaUseCase, never()).invoke()
+    }
+
+    @Test
+    fun `test that getText failure flags over quota for a file link inside a quota window`() =
+        runTest {
+            stubFileLinkInit()
+            whenever(isInTransferOverQuotaUseCase()).thenReturn(true)
+            doReturn(flow<List<String>> { throw IOException("unexpected end of stream") })
+                .whenever(getTextContentForFileLinkUseCase)
+                .invoke(urlFileLink = any<String>(), chunkSizeLines = any())
+
+            initUnderTest(publicUrl = FILE_LINK_URL)
+            advanceUntilIdle()
+
+            // The file link loader has no download fallback, so the quota only surfaces as an IO
+            // error and has to be recognised by asking for the quota state.
+            assertThat(underTest.uiState.value.isOverQuotaError).isTrue()
+        }
+
+    @Test
+    fun `test that getText failure flags over quota for a folder link inside a quota window`() =
+        runTest {
+            stubFolderLinkInit()
+            whenever(isInTransferOverQuotaUseCase()).thenReturn(true)
+            doReturn(flow<List<String>> { throw IOException("unexpected end of stream") })
+                .whenever(getTextContentForFolderLinkUseCase)
+                .invoke(node = any(), chunkSizeLines = any())
+
+            initUnderTest(nodeHandle = FOLDER_LINK_HANDLE, isFolderLink = true)
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.isOverQuotaError).isTrue()
+        }
+
+    @Test
+    fun `test that getText failure does not flag over quota for a link outside a quota window`() =
+        runTest {
+            stubFileLinkInit()
+            whenever(isInTransferOverQuotaUseCase()).thenReturn(false)
+            doReturn(flow<List<String>> { throw IOException("unexpected end of stream") })
+                .whenever(getTextContentForFileLinkUseCase)
+                .invoke(urlFileLink = any<String>(), chunkSizeLines = any())
+
+            initUnderTest(publicUrl = FILE_LINK_URL)
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.isOverQuotaError).isFalse()
+        }
+
+    @Test
+    fun `test that getText failure does not flag over quota when loading a local path`() = runTest {
+        whenever(isInTransferOverQuotaUseCase()).thenReturn(true)
+        doReturn(flow<List<String>> { throw MegaException(-1, "Read failed") })
+            .whenever(getTextContentForTextEditorUseCase)
+            .invoke(any<Long>(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, localPath = "/local/file.txt")
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.isOverQuotaError).isFalse()
+    }
+
+    @Test
+    fun `test that getText failure does not flag over quota for other errors`() = runTest {
+        doReturn(flow<List<String>> { throw MegaException(-12, "Already exists") })
+            .whenever(getTextContentForTextEditorUseCase).invoke(any<Long>(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.isOverQuotaError).isFalse()
+    }
+
+    @Test
+    fun `test that consumeErrorEvent clears the over quota flag`() = runTest {
+        doReturn(flow<List<String>> {
+            throw QuotaExceededMegaException(-17, "Transfer quota exceeded")
+        }).whenever(getTextContentForTextEditorUseCase).invoke(any<Long>(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        underTest.consumeErrorEvent()
+
+        assertThat(underTest.uiState.value.isOverQuotaError).isFalse()
+    }
+
+    @Test
+    fun `test that getText failure does not show the message of a MegaException`() = runTest {
+        doReturn(flow<List<String>> { throw MegaException(-12, "Already exists") })
+            .whenever(getTextContentForTextEditorUseCase).invoke(any<Long>(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.errorEvent).isEqualTo(triggered)
+        assertThat(underTest.uiState.value.isLoading).isFalse()
+        assertThat(underTest.uiState.value.errorMessageRes).isNull()
     }
 
     @Test
@@ -1661,7 +1801,7 @@ internal class TextEditorComposeViewModelTest {
         }
 
     @Test
-    fun `test that saveFile failure triggers errorEvent and sets errorMessage`() = runTest {
+    fun `test that saveFile failure triggers errorEvent`() = runTest {
         doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
@@ -1675,7 +1815,7 @@ internal class TextEditorComposeViewModelTest {
 
         val state = underTest.uiState.value
         assertThat(state.errorEvent).isEqualTo(triggered)
-        assertThat(state.errorMessage).isEqualTo("disk full")
+        assertThat(state.errorMessageRes).isNull()
     }
 
     @Test
@@ -2509,7 +2649,7 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
-    fun `test that init shows error with message when getChatFileUseCase throws`() = runTest {
+    fun `test that init shows error when getChatFileUseCase throws`() = runTest {
         val chatId = 100L
         val messageId = 200L
         whenever(getChatFileUseCase(chatId, messageId))
@@ -2528,7 +2668,7 @@ internal class TextEditorComposeViewModelTest {
         val state = underTest.uiState.value
         assertThat(state.isLoading).isFalse()
         assertThat(state.errorEvent).isEqualTo(triggered)
-        assertThat(state.errorMessage).isEqualTo("SDK error")
+        assertThat(state.errorMessageRes).isNull()
     }
 
     private suspend fun stubFileLinkInit() {
@@ -2577,7 +2717,34 @@ internal class TextEditorComposeViewModelTest {
         val state = underTest.uiState.value
         assertThat(state.isLoading).isFalse()
         assertThat(state.errorEvent).isEqualTo(triggered)
-        assertThat(state.errorMessage).isEqualTo("Public node error")
+        assertThat(state.errorMessageRes).isNull()
+    }
+
+    @Test
+    fun `test that init names the failure when getPublicNodeUseCase reports an expired link`() =
+        runTest {
+            whenever(getPublicNodeUseCase(FILE_LINK_URL))
+                .thenAnswer { throw PublicNodeException.Expired() }
+
+            initUnderTest(publicUrl = FILE_LINK_URL)
+            advanceUntilIdle()
+
+            val state = underTest.uiState.value
+            assertThat(state.errorEvent).isEqualTo(triggered)
+            assertThat(state.errorMessageRes).isEqualTo(sharedR.string.file_link_expired_title)
+        }
+
+    @Test
+    fun `test that init does not show the message of an unnamed PublicNodeException`() = runTest {
+        whenever(getPublicNodeUseCase(FILE_LINK_URL))
+            .thenAnswer { throw PublicNodeException.GenericError() }
+
+        initUnderTest(publicUrl = FILE_LINK_URL)
+        advanceUntilIdle()
+
+        val state = underTest.uiState.value
+        assertThat(state.errorEvent).isEqualTo(triggered)
+        assertThat(state.errorMessageRes).isNull()
     }
 
     @Test

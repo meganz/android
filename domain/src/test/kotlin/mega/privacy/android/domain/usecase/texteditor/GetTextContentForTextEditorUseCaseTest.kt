@@ -2,8 +2,13 @@ package mega.privacy.android.domain.usecase.texteditor
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.flow.toList
 import mega.privacy.android.domain.entity.node.NodeId
@@ -11,13 +16,16 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.domain.usecase.streaming.StartStreamingServer
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,6 +40,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class GetTextContentForTextEditorUseCaseTest {
@@ -45,6 +54,7 @@ internal class GetTextContentForTextEditorUseCaseTest {
     private val downloadNodeUseCase: DownloadNodeUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
     private val readStreamingContentUseCase: ReadStreamingContentUseCase = mock()
+    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase = mock()
 
     private val underTest = GetTextContentForTextEditorUseCase(
         ioDispatcher = ioDispatcher,
@@ -56,6 +66,7 @@ internal class GetTextContentForTextEditorUseCaseTest {
         downloadNodeUseCase = downloadNodeUseCase,
         fileSystemRepository = fileSystemRepository,
         readStreamingContentUseCase = readStreamingContentUseCase,
+        cancelTransferByTagUseCase = cancelTransferByTagUseCase,
     )
 
     @TempDir
@@ -72,6 +83,7 @@ internal class GetTextContentForTextEditorUseCaseTest {
             downloadNodeUseCase,
             fileSystemRepository,
             readStreamingContentUseCase,
+            cancelTransferByTagUseCase,
         )
     }
 
@@ -223,18 +235,14 @@ internal class GetTextContentForTextEditorUseCaseTest {
     @Test
     fun `test that getText returns content via download when streaming unavailable`() = runTest {
         val nodeHandle = 30L
-        val destFile = File(tempDir, "downloaded.txt").apply { writeText("") }
+        val destFile = File(tempDir, "downloaded.txt")
         val downloadedPath = destFile.absolutePath
-        val node = mock<TypedFileNode> {
-            on { id } doReturn NodeId(nodeHandle)
-            on { name } doReturn "remote.txt"
-        }
+        val node = stubRemoteNode(nodeHandle, "remote.txt")
         val transfer = mock<Transfer> {
+            on { tag } doReturn 1
             on { localPath } doReturn downloadedPath
         }
         whenever(startStreamingServer()).thenReturn(Unit)
-        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
-        whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
         whenever(getStreamingUriStringForNode(node)).thenReturn(null)
         whenever(getCacheFileUseCase(any(), any())).thenReturn(destFile)
         whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(
@@ -245,27 +253,23 @@ internal class GetTextContentForTextEditorUseCaseTest {
             .thenReturn(flowOf(listOf("downloaded")))
 
         val chunks = underTest(nodeHandle = nodeHandle, localPath = null).toList()
-        val content = chunks.flatten().joinToString("\n")
 
-        assertThat(content).isEqualTo("downloaded")
+        assertThat(chunks.flatten().joinToString("\n")).isEqualTo("downloaded")
+        verify(cancelTransferByTagUseCase, never()).invoke(any())
     }
 
     @Test
     fun `test that getText returns content via download when startStreamingServer throws`() =
         runTest {
             val nodeHandle = 35L
-            val destFile = File(tempDir, "fallback.txt").apply { writeText("") }
+            val destFile = File(tempDir, "fallback.txt")
             val downloadedPath = destFile.absolutePath
-            val node = mock<TypedFileNode> {
-                on { id } doReturn NodeId(nodeHandle)
-                on { name } doReturn "remote.txt"
-            }
+            val node = stubRemoteNode(nodeHandle, "remote.txt")
             val transfer = mock<Transfer> {
+                on { tag } doReturn 2
                 on { localPath } doReturn downloadedPath
             }
             whenever(startStreamingServer()).thenThrow(RuntimeException("Streaming unavailable"))
-            whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
-            whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
             whenever(getCacheFileUseCase(any(), any())).thenReturn(destFile)
             whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(
                 flowOf(TransferEvent.TransferFinishEvent(transfer, null))
@@ -275,49 +279,61 @@ internal class GetTextContentForTextEditorUseCaseTest {
                 .thenReturn(flowOf(listOf("fallback content")))
 
             val chunks = underTest(nodeHandle = nodeHandle, localPath = null).toList()
-            val content = chunks.flatten().joinToString("\n")
 
-            assertThat(content).isEqualTo("fallback content")
+            assertThat(chunks.flatten().joinToString("\n")).isEqualTo("fallback content")
         }
+
+    @Test
+    fun `test that getText returns content via download when the streaming read fails`() = runTest {
+        val nodeHandle = 36L
+        val destFile = File(tempDir, "after_streaming_failure.txt")
+        val downloadedPath = destFile.absolutePath
+        val node = stubRemoteNode(nodeHandle, "remote.txt")
+        val transfer = mock<Transfer> {
+            on { tag } doReturn 3
+            on { localPath } doReturn downloadedPath
+        }
+        whenever(startStreamingServer()).thenReturn(Unit)
+        whenever(getStreamingUriStringForNode(node)).thenReturn("https://stream.example/file")
+        whenever(readStreamingContentUseCase(any())).thenAnswer { throw IOException("not served") }
+        whenever(getCacheFileUseCase(any(), any())).thenReturn(destFile)
+        whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(
+            flowOf(TransferEvent.TransferFinishEvent(transfer, null))
+        )
+        whenever(fileSystemRepository.doesFileExist(downloadedPath)).thenReturn(true)
+        whenever(fileSystemRepository.readLinesFromPathInChunks(downloadedPath, 500))
+            .thenReturn(flowOf(listOf("downloaded after streaming failed")))
+
+        val chunks = underTest(nodeHandle = nodeHandle, localPath = null).toList()
+
+        assertThat(chunks.flatten().joinToString("\n"))
+            .isEqualTo("downloaded after streaming failed")
+    }
 
     @Test
     fun `test that getText throws when cache file for download is null`() = runTest {
         val nodeHandle = 40L
-        val node = mock<TypedFileNode> {
-            on { id } doReturn NodeId(nodeHandle)
-            on { name } doReturn "x.txt"
-        }
+        stubRemoteNode(nodeHandle, "x.txt")
         whenever(startStreamingServer()).thenReturn(Unit)
-        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
-        whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
-        whenever(getStreamingUriStringForNode(node)).thenReturn(null)
+        whenever(getStreamingUriStringForNode(any())).thenReturn(null)
         whenever(getCacheFileUseCase(any(), any())).thenReturn(null)
 
         val result = runCatching {
             underTest(nodeHandle = nodeHandle, localPath = null).toList()
         }
 
-        assertThat(result.isFailure).isTrue()
-        val exception = result.exceptionOrNull()
-        assertThat(exception).isInstanceOf(IllegalStateException::class.java)
-        assertThat(exception?.message).contains("Cannot get cache file for download")
+        assertThat(result.exceptionOrNull()).isInstanceOf(IllegalStateException::class.java)
     }
 
     @Test
     fun `test that getText throws when download finishes with error`() = runTest {
         val nodeHandle = 50L
-        val destFile = File(tempDir, "fail.txt")
-        val node = mock<TypedFileNode> {
-            on { id } doReturn NodeId(nodeHandle)
-            on { name } doReturn "y.txt"
-        }
-        val transfer = mock<Transfer>()
         val downloadError = MegaException(-1, "Download failed")
+        val node = stubRemoteNode(nodeHandle, "failed.txt")
+        val transfer = mock<Transfer> { on { tag } doReturn 4 }
         whenever(startStreamingServer()).thenReturn(Unit)
-        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
-        whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
         whenever(getStreamingUriStringForNode(node)).thenReturn(null)
-        whenever(getCacheFileUseCase(any(), any())).thenReturn(destFile)
+        whenever(getCacheFileUseCase(any(), any())).thenReturn(File(tempDir, "failed.txt"))
         whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(
             flowOf(TransferEvent.TransferFinishEvent(transfer, downloadError))
         )
@@ -326,26 +342,20 @@ internal class GetTextContentForTextEditorUseCaseTest {
             underTest(nodeHandle = nodeHandle, localPath = null).toList()
         }
 
-        assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isSameInstanceAs(downloadError)
     }
 
     @Test
     fun `test that getText throws when download succeeds but file does not exist`() = runTest {
         val nodeHandle = 60L
-        val destFile = File(tempDir, "missing.txt")
-        val downloadedPath = "/some/path/missing.txt"
-        val node = mock<TypedFileNode> {
-            on { id } doReturn NodeId(nodeHandle)
-            on { name } doReturn "missing.txt"
-        }
+        val downloadedPath = File(tempDir, "missing.txt").absolutePath
+        val node = stubRemoteNode(nodeHandle, "missing.txt")
         val transfer = mock<Transfer> {
+            on { tag } doReturn 5
             on { localPath } doReturn downloadedPath
         }
         whenever(startStreamingServer()).thenThrow(RuntimeException("unavailable"))
-        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
-        whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
-        whenever(getCacheFileUseCase(any(), any())).thenReturn(destFile)
+        whenever(getCacheFileUseCase(any(), any())).thenReturn(File(tempDir, "missing.txt"))
         whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(
             flowOf(TransferEvent.TransferFinishEvent(transfer, null))
         )
@@ -355,8 +365,76 @@ internal class GetTextContentForTextEditorUseCaseTest {
             underTest(nodeHandle = nodeHandle, localPath = null).toList()
         }
 
-        assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isInstanceOf(FileNotFoundException::class.java)
+    }
+
+    @Test
+    fun `test that getText throws and cancels the transfer when the download hits transfer over quota`() =
+        runTest {
+            val nodeHandle = 70L
+            val overQuotaError = QuotaExceededMegaException(-17, "Transfer quota exceeded", 60L)
+            val node = stubRemoteNode(nodeHandle, "quota.txt")
+            val transfer = mock<Transfer> { on { tag } doReturn 7 }
+            whenever(startStreamingServer()).thenThrow(RuntimeException("unavailable"))
+            whenever(getCacheFileUseCase(any(), any())).thenReturn(File(tempDir, "quota.txt"))
+            whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(
+                flowOf(TransferEvent.TransferTemporaryErrorEvent(transfer, overQuotaError))
+            )
+
+            val result = runCatching {
+                underTest(nodeHandle = nodeHandle, localPath = null).toList()
+            }
+
+            assertThat(result.exceptionOrNull()).isSameInstanceAs(overQuotaError)
+            verify(cancelTransferByTagUseCase).invoke(7)
+        }
+
+    @Test
+    fun `test that getText throws and cancels the transfer when the node is blocked`() = runTest {
+        val nodeHandle = 71L
+        val blockedError = BlockedMegaException(-16, "Blocked")
+        val node = stubRemoteNode(nodeHandle, "blocked.txt")
+        val transfer = mock<Transfer> { on { tag } doReturn 8 }
+        whenever(startStreamingServer()).thenThrow(RuntimeException("unavailable"))
+        whenever(getCacheFileUseCase(any(), any())).thenReturn(File(tempDir, "blocked.txt"))
+        whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(
+            flowOf(TransferEvent.TransferTemporaryErrorEvent(transfer, blockedError))
+        )
+
+        val result = runCatching {
+            underTest(nodeHandle = nodeHandle, localPath = null).toList()
+        }
+
+        assertThat(result.exceptionOrNull()).isSameInstanceAs(blockedError)
+        verify(cancelTransferByTagUseCase).invoke(8)
+    }
+
+    @Test
+    fun `test that getText ignores other temporary errors during the download`() = runTest {
+        val nodeHandle = 72L
+        val destFile = File(tempDir, "recovered.txt")
+        val downloadedPath = destFile.absolutePath
+        val node = stubRemoteNode(nodeHandle, "recovered.txt")
+        val transfer = mock<Transfer> {
+            on { tag } doReturn 9
+            on { localPath } doReturn downloadedPath
+        }
+        whenever(startStreamingServer()).thenThrow(RuntimeException("unavailable"))
+        whenever(getCacheFileUseCase(any(), any())).thenReturn(destFile)
+        whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(
+            flowOf(
+                TransferEvent.TransferTemporaryErrorEvent(transfer, MegaException(-3, "Try again")),
+                TransferEvent.TransferFinishEvent(transfer, null),
+            )
+        )
+        whenever(fileSystemRepository.doesFileExist(downloadedPath)).thenReturn(true)
+        whenever(fileSystemRepository.readLinesFromPathInChunks(downloadedPath, 500))
+            .thenReturn(flowOf(listOf("recovered")))
+
+        val chunks = underTest(nodeHandle = nodeHandle, localPath = null).toList()
+
+        assertThat(chunks.flatten().joinToString("\n")).isEqualTo("recovered")
+        verify(cancelTransferByTagUseCase, never()).invoke(any())
     }
 
     @Test
@@ -378,5 +456,15 @@ internal class GetTextContentForTextEditorUseCaseTest {
 
         assertThat(content).isEqualTo("chat content")
         verify(getNodeByIdUseCase, never()).invoke(any())
+    }
+
+    private suspend fun stubRemoteNode(nodeHandle: Long, name: String): TypedFileNode {
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(nodeHandle)
+            on { this.name } doReturn name
+        }
+        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
+        whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
+        return node
     }
 }

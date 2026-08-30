@@ -31,12 +31,11 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.material3.Button
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -78,6 +77,7 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
 import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
@@ -333,10 +333,14 @@ fun TextEditorScreen(
         onBack()
     }
 
+    // The error content replaces the document, so every action that would operate on it -- the
+    // toolbar actions, the node options menu, the bottom bar -- has nothing to act on.
+    val hasError = uiState.errorEvent == triggered
     val showBottomBar = uiState.mode != TextEditorMode.Edit
             && uiState.mode != TextEditorMode.Create
             && uiState.bottomBarActions.isNotEmpty()
             && !uiState.isLoading
+            && !hasError
     CompositionLocalProvider(LocalSnackBarHostState provides snackbarHostState) {
         MegaScaffold(
             modifier = Modifier.fillMaxSize(),
@@ -369,6 +373,7 @@ fun TextEditorScreen(
                     isMarkdown = uiState.isMarkdown,
                     showEditModeSwitch = uiState.isWysiwygCapable,
                     isRichTextMode = uiState.markdownEditMode == MarkdownEditMode.RichText,
+                    showActions = !hasError,
                 )
             },
         ) { paddingValues ->
@@ -408,13 +413,16 @@ fun TextEditorScreen(
                         }
                     }
 
-                    uiState.errorEvent == triggered -> {
-                        val message = uiState.errorMessage?.takeIf { it.isNotBlank() }
+                    hasError -> {
+                        val messageRes = uiState.errorMessageRes
                         val errorMessage = when {
                             uiState.isNoInternetError ->
                                 stringResource(sharedR.string.error_no_internet_message)
 
-                            message != null -> message
+                            uiState.isOverQuotaError ->
+                                stringResource(sharedR.string.subscription_quota_transfer_over_title)
+
+                            messageRes != null -> stringResource(messageRes)
                             else -> stringResource(sharedR.string.general_request_failed_message)
                         }
                         TextEditorErrorContent(
@@ -623,6 +631,7 @@ private fun CollapsingTopBar(
     isMarkdown: Boolean,
     showEditModeSwitch: Boolean,
     isRichTextMode: Boolean,
+    showActions: Boolean,
 ) {
     Column {
         // Reserve the status-bar height permanently via a window-insets modifier so the content and
@@ -663,6 +672,7 @@ private fun CollapsingTopBar(
                             isMarkdown = isMarkdown,
                             showEditModeSwitch = showEditModeSwitch,
                             isRichTextMode = isRichTextMode,
+                            showActions = showActions,
                         )
 
                         else -> TextEditorViewModeTopAppBar(
@@ -672,6 +682,7 @@ private fun CollapsingTopBar(
                             onOpenNodeOptions = onOpenNodeOptions,
                             onTitleClick = onTitleClick,
                             isMarkdownPreview = isMarkdownPreview,
+                            showActions = showActions,
                         )
                     }
                 }
@@ -846,9 +857,11 @@ private fun TextEditorErrorContent(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             MegaText(text = message, modifier = Modifier.padding(16.dp))
-            Button(onClick = onDismiss) {
-                Text(text = stringResource(sharedR.string.general_ok))
-            }
+            PrimaryFilledButton(
+                modifier = Modifier.wrapContentWidth(),
+                text = stringResource(sharedR.string.general_ok),
+                onClick = onDismiss,
+            )
         }
     }
 }
@@ -905,11 +918,13 @@ private fun TextEditorEditModeTopAppBar(
     isMarkdown: Boolean,
     showEditModeSwitch: Boolean,
     isRichTextMode: Boolean,
+    showActions: Boolean = true,
 ) {
     MegaTopAppBar(
         title = title,
         navigationType = AppBarNavigationType.Close(onClose),
         actions = buildList {
+            if (!showActions) return@buildList
             if (!isMarkdown) add(TextEditorTopBarAction.LineNumbers)
             if (showEditModeSwitch) {
                 add(TextEditorTopBarAction.SwitchEditMode(isRichTextMode))
@@ -943,8 +958,10 @@ private fun TextEditorViewModeTopAppBar(
     onOpenNodeOptions: (() -> Unit)?,
     onTitleClick: () -> Unit,
     isMarkdownPreview: Boolean = false,
+    showActions: Boolean = true,
 ) {
     val actions = buildList {
+        if (!showActions) return@buildList
         // Line numbers are meaningless in the rendered Markdown preview.
         if (!isMarkdownPreview) add(TextEditorTopBarAction.LineNumbers)
         if (onOpenNodeOptions != null) add(TextEditorTopBarAction.More)

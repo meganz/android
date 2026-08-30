@@ -9,7 +9,9 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -17,6 +19,7 @@ import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.domain.usecase.streaming.StartStreamingServer
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import java.io.FileNotFoundException
 import javax.inject.Inject
@@ -46,6 +49,7 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
     private val downloadNodeUseCase: DownloadNodeUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val readStreamingContentUseCase: ReadStreamingContentUseCase,
+    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
 ) {
 
     /**
@@ -138,7 +142,7 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
     }
 
     private suspend fun downloadThenReadPath(node: TypedFileNode): String {
-        val nodeFileName = node.name.ifEmpty { "file.txt" }
+        val nodeFileName = node.name.ifEmpty { FALLBACK_FILE_NAME }
         val destFile = getCacheFileUseCase(TEXT_EDITOR_TEMP_FOLDER, nodeFileName)
             ?: throw IllegalStateException("Cannot get cache file for download")
         val destDir = destFile.parentFile?.absolutePath
@@ -154,12 +158,26 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
             appData = listOf(TransferAppData.BackgroundTransfer),
             isHighPriority = true,
         ).collect { event ->
-            if (event is TransferEvent.TransferFinishEvent) {
-                if (event.error != null) {
-                    finishError = event.error
-                } else {
-                    downloadedPath = event.transfer.localPath
+            when (event) {
+                is TransferEvent.TransferFinishEvent -> {
+                    if (event.error != null) {
+                        finishError = event.error
+                    } else {
+                        downloadedPath = event.transfer.localPath
+                    }
                 }
+
+                // The SDK holds these until the quota window expires, so a finish event never
+                // comes; and a transfer left queued is rejected as a duplicate on the next request.
+                is TransferEvent.TransferTemporaryErrorEvent -> {
+                    val error = event.error
+                    if (error is QuotaExceededMegaException || error is BlockedMegaException) {
+                        cancelTransferByTagUseCase(event.transfer.tag)
+                        throw error
+                    }
+                }
+
+                else -> Unit
             }
         }
         finishError?.let { throw it }
@@ -174,5 +192,9 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
     private sealed interface ContentSource {
         data class LocalPath(val path: String) : ContentSource
         data class StreamingContent(val content: String) : ContentSource
+    }
+
+    private companion object {
+        const val FALLBACK_FILE_NAME = "file.txt"
     }
 }

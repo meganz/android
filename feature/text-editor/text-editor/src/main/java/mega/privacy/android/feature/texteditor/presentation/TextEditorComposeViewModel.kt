@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.texteditor.presentation
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
@@ -36,6 +37,8 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartDownloadNode
+import mega.privacy.android.domain.exception.PublicNodeException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -64,6 +67,7 @@ import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFolderLin
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SetShowLineNumbersPreferenceUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormatAction
 import mega.privacy.android.feature.texteditor.components.markdown.rich.MarkdownToRichDocumentConverter
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentState
@@ -110,6 +114,28 @@ private enum class OneShotAction { GetLink, Share, SendToChat }
 private val DOWNLOAD_COOLDOWN = 800.milliseconds
 
 /**
+ * Localized message for a failure worth naming, or null to fall back to the generic error copy.
+ *
+ * A whitelist, so a failure nobody anticipated falls back to the generic copy rather than leaking
+ * a message written for the log -- [PublicNodeException]'s is its own class name.
+ */
+@StringRes
+private fun Throwable.presentableMessageRes(): Int? = when (this) {
+    is PublicNodeException.Expired -> sharedR.string.file_link_expired_title
+    is PublicNodeException.LinkRemoved -> sharedR.string.file_link_unavailable_disabled
+    is PublicNodeException.AccountTerminated -> sharedR.string.file_link_unavailable_title
+    else -> null
+}
+
+/**
+ * True when the failure is bandwidth over quota, which the UI names rather than reporting as a
+ * generic failure. The cause is checked as well, for the failures that reach the collector wrapped
+ * in another exception.
+ */
+private val Throwable.isTransferOverQuota: Boolean
+    get() = this is QuotaExceededMegaException || cause is QuotaExceededMegaException
+
+/**
  * ViewModel for the Compose text editor screen.
  *
  * The full document is stored as [fullContentLines] during loading and view mode.
@@ -152,6 +178,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val richToModelConverter: MarkdownToRichDocumentConverter,
     private val richToMarkdownConverter: RichDocumentToMarkdownConverter,
+    private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -286,7 +313,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                             it.copy(
                                 isLoading = false,
                                 errorEvent = triggered,
-                                errorMessage = exception?.message?.ifBlank { null },
+                                errorMessageRes = exception?.presentableMessageRes(),
                             )
                         }
                         return@launch
@@ -310,7 +337,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                             it.copy(
                                 isLoading = false,
                                 errorEvent = triggered,
-                                errorMessage = exception?.message?.ifBlank { null },
+                                errorMessageRes = exception?.presentableMessageRes(),
                             )
                         }
                         return@launch
@@ -337,7 +364,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                             it.copy(
                                 isLoading = false,
                                 errorEvent = triggered,
-                                errorMessage = exception?.message?.ifBlank { null },
+                                errorMessageRes = exception?.presentableMessageRes(),
                             )
                         }
                         return@launch
@@ -379,11 +406,18 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 contentFlow
                     .catch { e ->
                         Timber.e(e, "Text editor: failed to load content gradually")
+                        // Link loaders only do an HTTP read with no download fallback, so a quota
+                        // failure arrives as a plain IO error, not as a quota exception.
+                        val streamingOnlyLoad =
+                            !args.publicUrl.isNullOrBlank() || args.isFolderLink
+                        val isOverQuota = e.isTransferOverQuota ||
+                                (streamingOnlyLoad && isInTransferOverQuota())
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
                                 errorEvent = triggered,
-                                errorMessage = e.message.orEmpty().ifBlank { null },
+                                errorMessageRes = e.presentableMessageRes(),
+                                isOverQuotaError = isOverQuota,
                             )
                         }
                     }
@@ -1004,7 +1038,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     _uiState.update {
                         it.copy(
                             errorEvent = triggered,
-                            errorMessage = e.message?.ifBlank { null },
+                            errorMessageRes = e.presentableMessageRes(),
                         )
                     }
                 },
@@ -1016,8 +1050,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         _uiState.update {
             it.copy(
                 errorEvent = consumed,
-                errorMessage = null,
+                errorMessageRes = null,
                 isNoInternetError = false,
+                isOverQuotaError = false,
             )
         }
     }
@@ -1464,6 +1499,18 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     /**
+     * Whether the account is inside a bandwidth over quota window.
+     *
+     * The load reads the file by streaming it first, and a quota failure there is only ever a
+     * failed HTTP read -- the local server closes the stream rather than reporting a reason -- so
+     * the quota is queried directly instead of inferred from the failure.
+     */
+    private suspend fun isInTransferOverQuota(): Boolean =
+        runCatching { isInTransferOverQuotaUseCase() }
+            .onFailure { Timber.e(it, "Text editor: failed to read the transfer quota state") }
+            .getOrDefault(false)
+
+    /**
      * Cancels the content load and surfaces a no-internet error if connectivity drops
      * while the editor is still loading. Only started for network-backed loads (no
      * local path). The initial offline case is handled by the synchronous
@@ -1488,8 +1535,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                         it.copy(
                             isLoading = false,
                             errorEvent = triggered,
-                            errorMessage = null,
+                            errorMessageRes = null,
                             isNoInternetError = true,
+                            isOverQuotaError = false,
                         )
                     }
                 }

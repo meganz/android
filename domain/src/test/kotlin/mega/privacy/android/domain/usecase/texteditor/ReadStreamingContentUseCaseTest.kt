@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.texteditor
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import java.io.IOException
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,12 +27,12 @@ internal class ReadStreamingContentUseCaseTest {
     }
 
     @Test
-    fun `test that invoke returns empty string when bytes are null`() = runTest {
+    fun `test that invoke throws when bytes are null`() = runTest {
         whenever(getDataBytesFromUrlUseCase(any())).thenReturn(null)
 
-        val result = underTest("http://127.0.0.1:4443/file")
+        val result = runCatching { underTest("http://127.0.0.1:4443/file") }
 
-        assertThat(result).isEmpty()
+        assertThat(result.exceptionOrNull()).isInstanceOf(IOException::class.java)
     }
 
     @Test
