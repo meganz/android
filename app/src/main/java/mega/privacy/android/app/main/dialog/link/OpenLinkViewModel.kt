@@ -100,9 +100,6 @@ internal class OpenLinkViewModel @AssistedInject constructor(
 
     /**
      * Resolves a successful [ChatLinkContent] and emits the matching navigation event.
-     *
-     * Only called from the Compose dialog. The legacy [OpenLinkDialogFragment]
-     * performs the chat-room lookup itself, so it must not invoke this method.
      */
     fun handleChatLinkContent(content: ChatLinkContent) {
         if (content.link.isEmpty()) return

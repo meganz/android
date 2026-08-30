@@ -38,7 +38,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Compose replacement for `OpenLinkDialogFragment`.
+ * Dialog for opening a MEGA link typed by the user.
  *
  * Wraps [InputDialog] with [OpenLinkViewModel]. Resolves typed-link results to the
  * appropriate destination (file/folder/password activity, chat / meeting navigation,
