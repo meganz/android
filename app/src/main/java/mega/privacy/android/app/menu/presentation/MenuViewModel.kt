@@ -189,7 +189,7 @@ class MenuViewModel @Inject constructor(
             ) { isAchievementsEnabled, accountType, navigationBarSections ->
                 buildAccountItems(
                     isAchievementsEnabled = isAchievementsEnabled,
-                    accountType = accountType ?: AccountType.FREE,
+                    accountType = accountType,
                     navigationBarSections = navigationBarSections,
                 )
             }.collect { myAccountItems ->
@@ -265,7 +265,7 @@ class MenuViewModel @Inject constructor(
      */
     private fun buildAccountItems(
         isAchievementsEnabled: Boolean,
-        accountType: AccountType,
+        accountType: AccountType?,
         navigationBarSections: NavigationBarSections,
     ): ImmutableList<NavDrawerItem.Account> {
         val staticRows = filterMyAccountItems(isAchievementsEnabled, accountType)
@@ -449,21 +449,29 @@ class MenuViewModel @Inject constructor(
             monitorAccountDetailUseCase()
                 .catch { Timber.e(it) }
                 .collectLatest { accountDetail ->
-                    val usedStorage = accountDetail.storageDetail?.usedStorage ?: 0
-                    val totalStorage = accountDetail.storageDetail?.totalStorage ?: 0
-                    val usedRubbish = accountDetail.storageDetail?.usedRubbish ?: 0
-                    val accountType = accountDetail.levelDetail?.accountType ?: AccountType.FREE
-                    val accountTypeName = accountTypeNameMapper(accountType)
-                    storageSubtitleFlow.value = if (accountType.isBusinessAccount) {
-                        getStringFromStringResMapper(
-                            SharedR.string.navigation_drawer_used_space_only,
-                            fileSizeStringMapper(usedStorage)
-                        ).stripLinkAnnotations()
-                    } else {
-                        "${fileSizeStringMapper(usedStorage)}/${fileSizeStringMapper(totalStorage)}"
-                    }
-                    currentPlanSubtitleFlow.value = getStringFromStringResMapper(accountTypeName)
-                    rubbishBinSubtitleFlow.value = fileSizeStringMapper(usedRubbish)
+                    val storageDetail = accountDetail.storageDetail
+                    val accountType = accountDetail.levelDetail?.accountType
+
+                    // A null subtitle leaves the row shimmering. The details arrive in separate
+                    // pieces, so treating a missing one as Free / 0 B would report a plan the
+                    // account may not be on rather than admitting the value is not known yet.
+                    currentPlanSubtitleFlow.value = accountType
+                        ?.let { getStringFromStringResMapper(accountTypeNameMapper(it)) }
+                    storageSubtitleFlow.value =
+                        if (storageDetail == null || accountType == null) {
+                            null
+                        } else if (accountType.isBusinessAccount) {
+                            getStringFromStringResMapper(
+                                SharedR.string.navigation_drawer_used_space_only,
+                                fileSizeStringMapper(storageDetail.usedStorage)
+                            ).stripLinkAnnotations()
+                        } else {
+                            "${fileSizeStringMapper(storageDetail.usedStorage)}/${
+                                fileSizeStringMapper(storageDetail.totalStorage)
+                            }"
+                        }
+                    rubbishBinSubtitleFlow.value = storageDetail
+                        ?.let { fileSizeStringMapper(it.usedRubbish) }
                 }
         }
     }

@@ -7,14 +7,17 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -22,11 +25,13 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.parcelize.Parcelize
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM
+import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM_SUBTITLE_SHIMMER
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.AVATAR
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.LOGOUT_BUTTON
@@ -143,6 +148,75 @@ class MenuHomeScreeUiTest {
         validUntil = System.currentTimeMillis() / 1000L + 28L * 24L * 3600L,
         campaignId = 90210L,
     )
+
+    private fun accountItem(subTitle: MutableStateFlow<String?>?) = NavDrawerItem.Account(
+        destination = TestDestination,
+        icon = Icons.Default.Settings,
+        title = android.R.string.ok,
+        subTitle = subTitle,
+    )
+
+    private fun setupRuleWithAccountItems(
+        vararg items: NavDrawerItem.Account,
+        navigateToFeature: (NavKey) -> Unit = {},
+    ) = setupRule(
+        uiState = createDefaultMenuUiState().copy(
+            myAccountItems = items.toList().toImmutableList()
+        ),
+        navigateToFeature = navigateToFeature,
+    )
+
+    @Test
+    fun `test that the account row subtitle shimmers while it has no value yet`() {
+        setupRuleWithAccountItems(accountItem(MutableStateFlow(null)))
+
+        composeRule.onNodeWithTag(ACCOUNT_ITEM_SUBTITLE_SHIMMER, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the account row subtitle replaces the shimmer once the value arrives`() {
+        setupRuleWithAccountItems(accountItem(MutableStateFlow("2 MB")))
+
+        composeRule.onNodeWithTag(ACCOUNT_ITEM_SUBTITLE_SHIMMER, useUnmergedTree = true)
+            .assertDoesNotExist()
+        composeRule.onNodeWithText("2 MB").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that an account row without a subtitle flow does not shimmer`() {
+        setupRuleWithAccountItems(accountItem(subTitle = null))
+
+        composeRule.onNodeWithTag(ACCOUNT_ITEM_SUBTITLE_SHIMMER, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that a shimmering account row is exactly as tall as a loaded row with no action button`() {
+        setupRuleWithAccountItems(
+            accountItem(MutableStateFlow(null)),
+            accountItem(MutableStateFlow("2 MB")),
+        )
+
+        val rows = composeRule.onAllNodesWithTag(ACCOUNT_ITEM, useUnmergedTree = true)
+
+        assertThat(rows[0].getBoundsInRoot().height).isEqualTo(rows[1].getBoundsInRoot().height)
+    }
+
+    @Test
+    fun `test that a shimmering account row without an action button still navigates when clicked`() {
+        val destinations = mutableListOf<NavKey>()
+        setupRuleWithAccountItems(
+            accountItem(MutableStateFlow(null)),
+            navigateToFeature = { destinations.add(it) },
+        )
+
+        composeRule.onNodeWithTag(ACCOUNT_ITEM, useUnmergedTree = true)
+            .assertIsEnabled()
+            .performClick()
+
+        assertThat(destinations).containsExactly(TestDestination)
+    }
 
     @Test
     fun `test that toolbar is displayed`() {

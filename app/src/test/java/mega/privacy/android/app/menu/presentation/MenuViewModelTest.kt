@@ -102,6 +102,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
@@ -802,7 +803,7 @@ class MenuViewModelTest {
         }
 
     @Test
-    fun `test that account details with null level detail default to FREE account type`() =
+    fun `test that current plan and storage subtitles are null when level detail is null`() =
         runTest {
             stubDefaultDependencies()
 
@@ -817,23 +818,8 @@ class MenuViewModelTest {
                 on { invoke() }.thenReturn(flowOf(accountDetail))
             }
 
-            val mockStorageString = "100B"
-            val mockTotalStorageString = "200B"
-            val mockRubbishString = "50B"
-            val mockAccountTypeName = R.string.copy
-
             fileSizeStringMapper.stub {
-                on { invoke(100L) }.thenReturn(mockStorageString)
-                on { invoke(200L) }.thenReturn(mockTotalStorageString)
-                on { invoke(50L) }.thenReturn(mockRubbishString)
-            }
-
-            accountTypeNameMapper.stub {
-                on { invoke(AccountType.FREE) }.thenReturn(mockAccountTypeName)
-            }
-
-            getStringFromStringResMapper.stub {
-                on { invoke(mockAccountTypeName) }.thenReturn("Free")
+                on { invoke(50L) }.thenReturn("50B")
             }
 
             val menuItems = mapOf(
@@ -847,21 +833,79 @@ class MenuViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
 
-                verify(fileSizeStringMapper).invoke(100L)
-                verify(fileSizeStringMapper).invoke(200L)
-                verify(fileSizeStringMapper).invoke(50L)
-                verify(accountTypeNameMapper).invoke(AccountType.FREE)
-                verify(getStringFromStringResMapper).invoke(mockAccountTypeName)
+                verify(accountTypeNameMapper, never()).invoke(AccountType.FREE)
 
                 assertThat(state.myAccountItems).hasSize(3)
 
                 state.myAccountItems.itemFor(CurrentPlanItem)?.subTitle?.test {
-                    assertThat(awaitItem()).isEqualTo("Free")
+                    assertThat(awaitItem()).isNull()
+                }
+
+                state.myAccountItems.itemFor(StorageItem)?.subTitle?.test {
+                    assertThat(awaitItem()).isNull()
+                }
+
+                state.myAccountItems.itemFor(RubbishBinItem)?.subTitle?.test {
+                    assertThat(awaitItem()).isEqualTo("50B")
                 }
 
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that current plan row hides the upgrade action when level detail is null`() = runTest {
+        stubDefaultDependencies()
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(createAccountDetail(levelDetail = null)))
+        }
+
+        initUnderTest(menuItems = mapOf(10 to CurrentPlanItem))
+
+        underTest.uiState.test {
+            val state = awaitItem()
+
+            assertThat(state.myAccountItems.itemFor(CurrentPlanItem)?.actionLabel).isEqualTo(0)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that all subtitles are null when storage and level details are null`() = runTest {
+        stubDefaultDependencies()
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(AccountDetail()))
+        }
+
+        val menuItems = mapOf(
+            10 to CurrentPlanItem,
+            20 to StorageItem,
+            90 to RubbishBinItem
+        )
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+
+            state.myAccountItems.itemFor(CurrentPlanItem)?.subTitle?.test {
+                assertThat(awaitItem()).isNull()
+            }
+
+            state.myAccountItems.itemFor(StorageItem)?.subTitle?.test {
+                assertThat(awaitItem()).isNull()
+            }
+
+            state.myAccountItems.itemFor(RubbishBinItem)?.subTitle?.test {
+                assertThat(awaitItem()).isNull()
+            }
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     @Test
     fun `test that account details with zero storage values are handled correctly`() = runTest {
@@ -1829,7 +1873,6 @@ class MenuViewModelTest {
                 transfer = false,
                 pro = false
             )
-
         }
 
     @Test

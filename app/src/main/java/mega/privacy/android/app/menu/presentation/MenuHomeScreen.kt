@@ -8,14 +8,18 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,30 +42,42 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.badge.NotificationBadge
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.SecondaryFilledButton
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
+import mega.android.core.ui.components.list.GenericListItem
 import mega.android.core.ui.components.list.SecondaryHeaderListItem
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.LaunchedOncePerAppEffect
+import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.extensions.launchUrl
+import mega.privacy.android.app.menu.navigation.CurrentPlanItem
+import mega.privacy.android.app.menu.navigation.RubbishBinItem
+import mega.privacy.android.app.menu.navigation.StorageItem
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM
+import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM_SUBTITLE_SHIMMER
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.AVATAR
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.LOGOUT_BUTTON
@@ -365,46 +381,129 @@ private fun AccountItem(
     val hasActionLabel = item.actionLabel != null
     val subtitle by item.subTitle?.collectAsState(null) ?: remember { mutableStateOf(null) }
     val badge by item.badge?.collectAsState(null) ?: remember { mutableStateOf(null) }
-    FlexibleLineListItem(
-        enable = enable,
+    // A subtitle flow with no value yet, as opposed to a row that has no subtitle at all.
+    val isSubtitleLoading = item.subTitle != null && subtitle == null
+
+    val leadingElement: @Composable () -> Unit = {
+        MegaIcon(
+            painter = rememberVectorPainter(item.icon),
+            tint = if (enable) IconColor.Primary else IconColor.Disabled,
+            contentDescription = null
+        )
+    }
+    val trailingElement: @Composable () -> Unit = {
+        item.actionLabel?.let { actionLabelResId ->
+            if (actionLabelResId > 0) {
+                PrimaryFilledButton(
+                    modifier = Modifier
+                        .wrapContentSize(),
+                    text = stringResource(id = actionLabelResId),
+                    isLoading = false,
+                    enabled = enable,
+                    onClick = onNavigate,
+                )
+            }
+        } ?: MegaIcon(
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
+            tint = if (enable) IconColor.Secondary else IconColor.Disabled,
+            contentDescription = "arrow right",
+        )
+    }
+    val titleTrailingElement = badge?.composeLet { count ->
+        NavigationBadge(
+            navigationBadge = count,
+            small = false,
+            modifier = Modifier.testTag(BADGE)
+        )
+    }
+
+    if (isSubtitleLoading) {
+        AccountItemSubtitleLoading(
+            title = stringResource(id = item.title),
+            enable = enable,
+            enableClick = hasActionLabel.not() && enable,
+            onClickListener = onNavigate,
+            leadingElement = leadingElement,
+            trailingElement = trailingElement,
+            titleTrailingElement = titleTrailingElement,
+        )
+    } else {
+        FlexibleLineListItem(
+            enable = enable,
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(ACCOUNT_ITEM),
+            title = stringResource(id = item.title),
+            subtitle = subtitle,
+            leadingElement = { leadingElement() },
+            trailingElement = trailingElement,
+            enableClick = hasActionLabel.not() && enable,
+            onClickListener = onNavigate,
+            titleTrailingElement = titleTrailingElement,
+        )
+    }
+}
+
+/** The loaded row's twin, with a placeholder in place of its subtitle. */
+@Composable
+private fun AccountItemSubtitleLoading(
+    title: String,
+    enable: Boolean,
+    enableClick: Boolean,
+    onClickListener: () -> Unit,
+    leadingElement: @Composable () -> Unit,
+    trailingElement: @Composable () -> Unit,
+    titleTrailingElement: (@Composable () -> Unit)?,
+) {
+    GenericListItem(
         modifier = Modifier
             .fillMaxWidth()
+            .defaultMinSize(minHeight = LIST_ITEM_MIN_HEIGHT)
             .testTag(ACCOUNT_ITEM),
-        title = stringResource(id = item.title),
-        subtitle = subtitle,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        enableClick = enableClick,
+        onClickListener = onClickListener,
+        title = {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                MegaText(
+                    text = title,
+                    textColor = if (enable) TextColor.Primary else TextColor.Disabled,
+                    style = AppTheme.typography.bodyLarge,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                titleTrailingElement?.invoke()
+            }
+        },
+        subtitle = {
+            Box(contentAlignment = Alignment.CenterStart) {
+                // Holds the row at its loaded height so the list does not shift.
+                MegaText(
+                    text = " ",
+                    textColor = TextColor.Secondary,
+                    style = AppTheme.typography.bodyMedium,
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(SUBTITLE_SHIMMER_WIDTH)
+                        .height(16.dp)
+                        .shimmerEffect()
+                        .testTag(ACCOUNT_ITEM_SUBTITLE_SHIMMER)
+                )
+            }
+        },
         leadingElement = {
-            MegaIcon(
-                painter = rememberVectorPainter(item.icon),
-                contentDescription = null
-            )
+            Box(
+                modifier = Modifier
+                    .size(LEADING_ELEMENT_SIZE)
+                    .align(Alignment.CenterVertically),
+            ) {
+                leadingElement()
+            }
         },
-        trailingElement = {
-            item.actionLabel?.let { actionLabelResId ->
-                if (actionLabelResId > 0) {
-                    PrimaryFilledButton(
-                        modifier = Modifier
-                            .wrapContentSize(),
-                        text = stringResource(id = actionLabelResId),
-                        isLoading = false,
-                        enabled = enable,
-                        onClick = onNavigate,
-                    )
-                }
-            } ?: MegaIcon(
-                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
-                tint = if (enable) IconColor.Secondary else IconColor.Disabled,
-                contentDescription = "arrow right",
-            )
-        },
-        enableClick = hasActionLabel.not() && enable,
-        onClickListener = onNavigate,
-        titleTrailingElement = badge?.composeLet { count ->
-            NavigationBadge(
-                navigationBadge = count,
-                small = false,
-                modifier = Modifier.testTag(BADGE)
-            )
-        },
+        trailingElement = trailingElement,
     )
 }
 
@@ -469,6 +568,38 @@ private fun LogoutButton(
 
 @CombinedThemePreviews
 @Composable
+private fun MenuHomeScreenUiAccountRowsLoadingPreview() {
+    fun loadingRow(item: NavDrawerItem.Account, actionLabel: Int? = null) =
+        NavDrawerItem.Account(
+            destination = item.destination,
+            icon = item.icon,
+            title = item.title,
+            subTitle = MutableStateFlow(null),
+            actionLabel = actionLabel,
+        )
+
+    AndroidThemeForPreviews {
+        MenuHomeScreenUi(
+            uiState = MenuUiState(
+                name = "John Doe",
+                email = "john.doe@example.com",
+                myAccountItems = persistentListOf(
+                    loadingRow(CurrentPlanItem, actionLabel = 0),
+                    loadingRow(StorageItem),
+                    loadingRow(RubbishBinItem),
+                ),
+                analyticsEventIdentifier = null,
+            ),
+            navigateToFeature = {},
+            onLogoutClicked = {},
+            onResetTestPasswordScreenEvent = {},
+            onResetLogoutConfirmationEvent = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
 private fun MenuHomeScreenUiPreview(
     @PreviewParameter(BooleanProvider::class) showBadge: Boolean,
 ) {
@@ -526,6 +657,12 @@ internal object MenuHomeScreenUiTestTags {
     const val BADGE = "$MENU_HOME_SCREEN:badge"
     const val AVATAR = "$MENU_HOME_SCREEN:avatar"
     const val OFFER_BANNER = "$MENU_HOME_SCREEN:offer_banner"
+    const val ACCOUNT_ITEM_SUBTITLE_SHIMMER = "$ACCOUNT_ITEM:subtitle_shimmer"
 }
 
 private const val MENU_OFFER_BANNER_IMPRESSION_KEY = "menu_subscription_offer_banner_impression"
+
+private val LIST_ITEM_MIN_HEIGHT = 60.dp
+private val LEADING_ELEMENT_SIZE = 32.dp
+
+private val SUBTITLE_SHIMMER_WIDTH = 100.dp
