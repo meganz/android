@@ -688,10 +688,14 @@ class VideoPlayerController(
                 override fun onDoubleTap(e: MotionEvent): Boolean {
                     if (isLocked.value || !isGesturesEnabled) return false
                     val viewport = currentViewport()
-                    if (zoomState.isZoomedBeyondFill(viewport)) {
-                        zoomState.zoomToFill(viewport)
+                    // A zoom sitting between the fit and fill levels, or beyond fill, is not a
+                    // display mode the user committed to: the double tap cancels it instead of
+                    // seeking, so the playback position never moves while a transient zoom is
+                    // on screen. Both fit and fill still seek on a double tap.
+                    if (zoomState.currentBoundary(viewport) == null) {
+                        zoomState.reset()
                         performBoundaryHapticFeedback()
-                        Analytics.tracker.trackEvent(VideoPlayerZoomToFillEvent)
+                        Analytics.tracker.trackEvent(VideoPlayerZoomToFitEvent)
                         updateTransformations()
                         // The trailing ACTION_UP of the double tap schedules the chip hide.
                         showZoomChip(viewport)
@@ -961,6 +965,11 @@ class VideoPlayerController(
             videoHeight = videoView?.height ?: 0,
             screenWidth = playerComposeView.width,
             screenHeight = playerComposeView.height,
+            panThresholdPx = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                MIN_PAN_OVERFLOW_DP,
+                context.resources.displayMetrics,
+            ),
         )
     }
 
@@ -1053,5 +1062,11 @@ class VideoPlayerController(
 
         // Used when AudioManager is unavailable; starts the volume gesture at 50%.
         private const val DEFAULT_VOLUME_FALLBACK = 0.5f
+
+        // Below this overflow, panning could only move the video by a few pixels, while the
+        // vertical swipe is far more valuable as the brightness/volume gesture the pan would
+        // otherwise claim as soon as an axis overflows by a single pixel. 48dp is Android's
+        // minimum touch target, used here as the lower bound of a meaningful displacement.
+        private const val MIN_PAN_OVERFLOW_DP = 48f
     }
 }

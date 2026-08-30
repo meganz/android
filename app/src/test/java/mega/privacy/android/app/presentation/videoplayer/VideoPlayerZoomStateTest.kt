@@ -17,6 +17,7 @@ class VideoPlayerZoomStateTest {
         videoHeight = 500,
         screenWidth = 1000,
         screenHeight = 2000,
+        panThresholdPx = VideoPlayerZoomState.PAN_OVERFLOW_SLACK_PX,
     )
 
     // Video aspect ratio matches the screen exactly, so fillZoom = 1.
@@ -25,6 +26,7 @@ class VideoPlayerZoomStateTest {
         videoHeight = 2000,
         screenWidth = 1000,
         screenHeight = 2000,
+        panThresholdPx = VideoPlayerZoomState.PAN_OVERFLOW_SLACK_PX,
     )
 
     private val unknownViewport = VideoZoomViewport(
@@ -32,6 +34,7 @@ class VideoPlayerZoomStateTest {
         videoHeight = 0,
         screenWidth = 1000,
         screenHeight = 2000,
+        panThresholdPx = VideoPlayerZoomState.PAN_OVERFLOW_SLACK_PX,
     )
 
     // Panoramic video whose fill level (2000 / 250 = 8) exceeds MAX_ZOOM.
@@ -40,6 +43,18 @@ class VideoPlayerZoomStateTest {
         videoHeight = 250,
         screenWidth = 1000,
         screenHeight = 2000,
+        panThresholdPx = VideoPlayerZoomState.PAN_OVERFLOW_SLACK_PX,
+    )
+
+    // Landscape-shaped geometry: the height nearly fills the screen while fillZoom is set by
+    // the width (max(1000 / 400, 1000 / 990) = 2.5), so the vertical axis starts overflowing
+    // well below fill. Each test supplies its own threshold.
+    private val landscapeLikeViewport = VideoZoomViewport(
+        videoWidth = 400,
+        videoHeight = 990,
+        screenWidth = 1000,
+        screenHeight = 1000,
+        panThresholdPx = VideoPlayerZoomState.PAN_OVERFLOW_SLACK_PX,
     )
 
     @BeforeEach
@@ -302,5 +317,37 @@ class VideoPlayerZoomStateTest {
         underTest.onPan(-300f, -100f, viewport)
         assertThat(underTest.translationX).isEqualTo(-300f)
         assertThat(underTest.translationY).isEqualTo(0f)
+    }
+
+    @Test
+    fun `test that canPanHorizontally returns false when the overflow is below the pan threshold`() {
+        val thresholdViewport = viewport.copy(panThresholdPx = 100f)
+        // 1.06 rather than 1.05: the latter sits on the fit snap boundary and is pulled back to 1.
+        underTest.onPinchScale(1.06f, thresholdViewport)
+        assertThat(underTest.canPanHorizontally(thresholdViewport)).isFalse()
+    }
+
+    @Test
+    fun `test that canPanHorizontally returns true when the overflow exceeds the pan threshold`() {
+        val thresholdViewport = viewport.copy(panThresholdPx = 100f)
+        underTest.onPinchScale(1.5f, thresholdViewport)
+        assertThat(underTest.canPanHorizontally(thresholdViewport)).isTrue()
+    }
+
+    // Zoom 1.1 overflows the vertical axis by 89px (990 * 1.1 - 1000) and is clear of both
+    // snap zones ([0.95, 1.05] for fit, [2.375, 2.625] for fill), so the two tests below
+    // differ only in where the threshold sits relative to that 89px.
+    @Test
+    fun `test that canPanVertically returns false when the overflow is below the pan threshold`() {
+        val strictViewport = landscapeLikeViewport.copy(panThresholdPx = 300f)
+        underTest.onPinchScale(1.1f, strictViewport)
+        assertThat(underTest.canPanVertically(strictViewport)).isFalse()
+    }
+
+    @Test
+    fun `test that canPanVertically returns true when the overflow exceeds the pan threshold`() {
+        val looseViewport = landscapeLikeViewport.copy(panThresholdPx = 50f)
+        underTest.onPinchScale(1.1f, looseViewport)
+        assertThat(underTest.canPanVertically(looseViewport)).isTrue()
     }
 }

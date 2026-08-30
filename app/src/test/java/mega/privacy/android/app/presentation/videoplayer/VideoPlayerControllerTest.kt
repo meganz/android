@@ -49,11 +49,15 @@ import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(UnstableApi::class)
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [Build.VERSION_CODES.Q])
 class VideoPlayerControllerTest {
+
+    // Mirrors VideoPlayerController.SEEK_STEP.
+    private val seekStep = 15.seconds
 
     private val mockPlayerView = mock<PlayerView>()
     private val mockPlayer = mock<Player>()
@@ -431,6 +435,33 @@ class VideoPlayerControllerTest {
         assertThat(controller.getTranslationX()).isEqualTo(0f)
     }
 
+    // The two pan-threshold tests below share a landscape-shaped surface: video 400x990 in
+    // the 1000x1000 player view, so fillZoom = max(2.5, 1.01) = 2.5 and any zoom well below
+    // it keeps canStartPan out of its beyond-fill branch. Robolectric density is 1, so the
+    // 48dp threshold is 48px.
+    @Test
+    fun `test that onScroll adjusts brightness when the vertical overflow is below the pan threshold`() {
+        stubVideoSurfaceView(videoWidth = 400, videoHeight = 990)
+        val controller = createController()
+        // Overflows by 9.8px (990 * 1.02 - 1000), below the 48px threshold.
+        controller.setZoomLevel(1.02f)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        verify(onBrightnessChange).invoke(any())
+        assertThat(controller.getTranslationY()).isEqualTo(0f)
+    }
+
+    @Test
+    fun `test that onScroll pans vertically when the vertical overflow exceeds the pan threshold`() {
+        stubVideoSurfaceView(videoWidth = 400, videoHeight = 990)
+        val controller = createController()
+        // 1.3 rather than a zoom just past the 48px threshold: the 287px overflow leaves a
+        // ±143px pan range, so the 50px swipe is not cut short by the translation clamp.
+        controller.setZoomLevel(1.3f)
+        controller.callOnScroll(distanceX = 0f, distanceY = 50f, startX = 400f)
+        assertThat(controller.getTranslationY()).isEqualTo(-50f)
+        verify(onBrightnessChange, never()).invoke(any())
+    }
+
     @Test
     fun `test that onSingleTapConfirmed calls playerViewClicked`() {
         val controller = createController()
@@ -663,16 +694,61 @@ class VideoPlayerControllerTest {
     }
 
     @Test
-    fun `test that double tap when zoomed beyond fill returns to fill and shows the fill screen chip`() {
+    fun `test that double tap when zoomed beyond fill returns to fit and shows the fit to screen chip`() {
         stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
         val controller = createController()
         controller.setZoomLevel(3f)
         val handled = controller.callOnDoubleTap()
         assertThat(handled).isTrue()
-        assertThat(controller.getZoomLevel()).isEqualTo(2f)
+        assertThat(controller.getZoomLevel()).isEqualTo(1f)
         assertThat(controller.getZoomChipState())
-            .isEqualTo(VideoPlayerOverlayChipState.Zoom.FillScreen)
+            .isEqualTo(VideoPlayerOverlayChipState.Zoom.FitToScreen)
         verify(mockPlayerView).performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+    }
+
+    @Test
+    fun `test that double tap when zoomed beyond fill exits the fullscreen state`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController(isFullscreen = true)
+        controller.setZoomLevel(3f)
+        controller.callOnDoubleTap()
+        verify(fullscreenClickedCallback).invoke(false)
+        verify(mockFullscreen).setImageResource(R.drawable.ic_full_screen)
+    }
+
+    @Test
+    fun `test that double tap between fit and fill returns to fit instead of seeking`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.setZoomLevel(1.5f)
+        val handled = controller.callOnDoubleTap()
+        assertThat(handled).isTrue()
+        assertThat(controller.getZoomLevel()).isEqualTo(1f)
+        assertThat(controller.getZoomChipState())
+            .isEqualTo(VideoPlayerOverlayChipState.Zoom.FitToScreen)
+        verify(mockPlayer, never()).seekTo(any())
+    }
+
+    @Test
+    fun `test that double tap at the fill level seeks forward without returning to fit`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.setZoomLevel(2f)
+        controller.callOnDoubleTap(x = 900f)
+        verify(mockPlayer).seekTo(seekStep.inWholeMilliseconds)
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerDoubleTapSeekForwardEvent)
+        assertThat(controller.getZoomLevel()).isEqualTo(2f)
+    }
+
+    @Test
+    fun `test that a second double tap after returning to fit seeks forward`() {
+        stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
+        val controller = createController()
+        controller.setZoomLevel(1.5f)
+        controller.callOnDoubleTap(x = 900f)
+        controller.callOnDoubleTap(x = 900f)
+        verify(mockPlayer).seekTo(seekStep.inWholeMilliseconds)
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerDoubleTapSeekForwardEvent)
     }
 
     @Test
@@ -929,12 +1005,12 @@ class VideoPlayerControllerTest {
     }
 
     @Test
-    fun `test that double tap when zoomed beyond fill tracks the zoom to fill event instead of seek events`() {
+    fun `test that double tap when zoomed beyond fill tracks the zoom to fit event instead of seek events`() {
         stubVideoSurfaceView(videoWidth = 500, videoHeight = 1000)
         val controller = createController()
         controller.setZoomLevel(3f)
         controller.callOnDoubleTap()
-        verify(mockAnalyticsTracker).trackEvent(VideoPlayerZoomToFillEvent)
+        verify(mockAnalyticsTracker).trackEvent(VideoPlayerZoomToFitEvent)
         verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerDoubleTapSeekForwardEvent)
         verify(mockAnalyticsTracker, never()).trackEvent(VideoPlayerDoubleTapSeekBackwardEvent)
     }
