@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
+import mega.privacy.android.domain.usecase.chat.SetLastGreenVisibleUseCase
+import mega.privacy.android.domain.usecase.chat.SetPresenceAutoAwayUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -19,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatPreferencesViewModel @Inject constructor(
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
-    monitorChatSignalPresenceUseCase: MonitorChatSignalPresenceUseCase,
+    private val setPresenceAutoAwayUseCase: SetPresenceAutoAwayUseCase,
+    private val setLastGreenVisibleUseCase: SetLastGreenVisibleUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatPreferencesState())
@@ -32,23 +33,10 @@ class ChatPreferencesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            merge(
-                monitorUpdatePushNotificationSettingsUseCase().map {
-                    { state: ChatPreferencesState ->
-                        state.copy(
-                            isPushNotificationSettingsUpdatedEvent = true
-                        )
-                    }
-                },
-                monitorChatSignalPresenceUseCase().map {
-                    { state: ChatPreferencesState ->
-                        state.copy(
-                            signalPresenceUpdate = true
-                        )
-                    }
+            monitorUpdatePushNotificationSettingsUseCase().collect {
+                _state.update { state ->
+                    state.copy(isPushNotificationSettingsUpdatedEvent = true)
                 }
-            ).collect {
-                _state.update(it)
             }
         }
     }
@@ -63,11 +51,26 @@ class ChatPreferencesViewModel @Inject constructor(
     }
 
     /**
-     * Signal presence update consumed.
+     * Enables the auto-away presence option with the given timeout.
+     *
+     * @param timeoutSeconds Seconds to wait before turning away.
      */
-    fun onSignalPresenceUpdateConsumed() {
+    fun setAutoAwayPresence(timeoutSeconds: Int) {
         viewModelScope.launch {
-            _state.update { it.copy(signalPresenceUpdate = false) }
+            runCatching { setPresenceAutoAwayUseCase(true, timeoutSeconds) }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Enables or disables the visibility of the last time the user was online.
+     *
+     * @param enabled True to enable. False to disable.
+     */
+    fun setLastGreenVisible(enabled: Boolean) {
+        viewModelScope.launch {
+            runCatching { setLastGreenVisibleUseCase(enabled) }
+                .onFailure { Timber.e(it) }
         }
     }
 }

@@ -2,9 +2,7 @@ package mega.privacy.android.app.presentation.settings.chat
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,18 +19,14 @@ import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesAct
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.settings.MegaSwitchPreference
 import mega.privacy.android.app.presentation.settings.chat.imagequality.SettingsChatImageQualityActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.qualifier.MegaApi
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApi
-import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatPresenceConfig
+import mega.privacy.android.domain.entity.chat.ChatPresenceConfig
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,19 +34,11 @@ import javax.inject.Inject
 class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreferenceClickListener,
     Preference.OnPreferenceChangeListener {
 
-    @MegaApi
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var megaChatApi: MegaChatApiAndroid
-
     @Inject
     lateinit var pushNotificationSettingManagement: PushNotificationSettingManagement
 
     private val viewModel: SettingsChatViewModel by viewModels()
 
-    private var statusConfig: MegaChatPresenceConfig? = null
     private var chatNotificationsPreference: Preference? = null
     private var statusChatListPreference: ListPreference? = null
     private var autoAwaySwitch: SwitchPreferenceCompat? = null
@@ -64,16 +50,6 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
 
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
         addPreferencesFromResource(R.xml.preferences_chat)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        val v = super.onCreateView(inflater, container, savedInstanceState)
-        setOnlineOptions(viewModel.isConnected && megaApi.rootNode != null)
-        return v
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -144,24 +120,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                 isChecked = viewModel.state.value.isRichLinkEnabled
             }
 
-        megaChatApi.signalPresenceActivity()
-
-        //Get chat status
-        statusConfig = megaChatApi.presenceConfig
-        if (statusConfig != null) {
-            Timber.d("ChatStatus pending: ${statusConfig!!.isPending}, status: ${statusConfig!!.onlineStatus}")
-            statusChatListPreference?.apply {
-                value = statusConfig!!.onlineStatus.toString()
-                summary =
-                    if (statusConfig?.onlineStatus == MegaChatApi.STATUS_INVALID) getString(R.string.recovering_info)
-                    else statusChatListPreference?.entry
-            }
-
-            showPresenceChatConfig()
-            megaChatApi.signalPresenceActivity()
-        } else {
-            waitPresenceConfig()
-        }
+        viewModel.signalChatPresence()
 
         setupObservers()
     }
@@ -170,6 +129,8 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect { state ->
+                    setOnlineOptions(viewModel.isConnected && state.rootNodeExists)
+
                     findPreference<Preference?>(KEY_CHAT_IMAGE_QUALITY)?.summary =
                         state.imageQuality?.title?.let { getString(it) }
 
@@ -185,17 +146,25 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                             summary = entry
                         }
                     }
+
+                    val statusConfig = state.chatPresenceConfig
+                    if (statusConfig != null) {
+                        Timber.d("ChatStatus pending: ${statusConfig.isPending}, status: ${statusConfig.onlineStatus}")
+                        showPresenceChatConfig(statusConfig)
+                    } else {
+                        waitPresenceConfig()
+                    }
                 }
             }
         }
 
         viewLifecycleOwner.collectFlow(viewModel.monitorConnectivityEvent) { isConnected ->
-            setOnlineOptions(isConnected)
+            setOnlineOptions(isConnected && viewModel.state.value.rootNodeExists)
         }
     }
 
     override fun onPreferenceClick(preference: Preference): Boolean {
-        megaChatApi.signalPresenceActivity()
+        viewModel.signalChatPresence()
 
         if (Util.isOffline(context)) return false
 
@@ -211,16 +180,16 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
             }
 
             SettingsConstants.KEY_CHAT_AUTOAWAY_SWITCH -> {
-                statusConfig = megaChatApi.presenceConfig
+                val statusConfig = viewModel.state.value.chatPresenceConfig
 
                 if (statusConfig != null) {
-                    if (statusConfig!!.isAutoawayEnabled) {
+                    if (statusConfig.isAutoAwayEnabled) {
                         Timber.d("Change AUTOAWAY chat to false")
-                        megaChatApi.setPresenceAutoaway(false, 0)
+                        viewModel.setAutoAwayEnabled(false)
                         chatAutoAwayPreference?.let { preferenceScreen.removePreference(it) }
                     } else {
                         Timber.d("Change AUTOAWAY chat to true")
-                        megaChatApi.setPresenceAutoaway(true, 300)
+                        viewModel.setAutoAwayEnabled(true)
                         chatAutoAwayPreference?.let { preferenceScreen.addPreference(it) }
                         chatAutoAwayPreference?.summary =
                             getString(R.string.settings_autoaway_value, 5)
@@ -235,7 +204,9 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
             }
 
             SettingsConstants.KEY_CHAT_PERSISTENCE -> {
-                megaChatApi.setPresencePersist(!statusConfig!!.isPersist)
+                viewModel.state.value.chatPresenceConfig?.let { statusConfig ->
+                    viewModel.setPresencePersist(!statusConfig.isPersist)
+                }
                 return true
             }
 
@@ -247,10 +218,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
             }
 
             SettingsConstants.KEY_CHAT_RICH_LINK -> {
-                megaApi.enableRichPreviews(
-                    richLinksSwitch!!.isChecked,
-                    SetAttrUserListener(requireContext())
-                )
+                viewModel.enableRichLinkPreview(richLinksSwitch!!.isChecked)
                 return true
             }
 
@@ -279,7 +247,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
 
             SettingsConstants.KEY_CHAT_STATUS -> {
                 statusChatListPreference?.summary = statusChatListPreference?.entry
-                megaChatApi.onlineStatus = (newValue as String).toInt()
+                viewModel.setUserStatus((newValue as String).toInt())
                 return true
             }
 
@@ -322,18 +290,6 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
     }
 
     /**
-     * Method for updating the presence configuration.
-     *
-     * @param cancelled If it is cancelled
-     */
-    fun updatePresenceConfigChat(cancelled: Boolean) {
-        if (!cancelled) {
-            statusConfig = megaChatApi.presenceConfig
-        }
-        showPresenceChatConfig()
-    }
-
-    /**
      * Method for showing and hiding what is needed while waiting for presence config.
      */
     private fun waitPresenceConfig() {
@@ -344,40 +300,40 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         }
 
         statusChatListPreference?.apply {
-            value = MegaChatApi.STATUS_OFFLINE.toString()
+            value = UserChatStatus.Offline.toChatStatusPreferenceValue()?.toString()
             summary = statusChatListPreference?.entry
         }
 
         enableLastGreenChatSwitch?.isEnabled = false
     }
 
-    private fun showPresenceChatConfig() {
+    private fun showPresenceChatConfig(statusConfig: ChatPresenceConfig) {
         statusChatListPreference?.apply {
-            value = statusConfig?.onlineStatus.toString()
-            summary = statusChatListPreference?.entry
+            value = statusConfig.onlineStatus.toChatStatusPreferenceValue()?.toString()
+            summary =
+                if (statusConfig.onlineStatus == UserChatStatus.Invalid) getString(R.string.recovering_info)
+                else entry
         }
 
-        if (statusConfig?.onlineStatus == MegaChatApi.STATUS_ONLINE ||
-            statusConfig?.onlineStatus != MegaChatApi.STATUS_OFFLINE
-        ) {
+        if (statusConfig.onlineStatus != UserChatStatus.Offline) {
             chatPersistenceCheck?.let { preferenceScreen.addPreference(it) }
-            chatPersistenceCheck?.isChecked = statusConfig!!.isPersist
+            chatPersistenceCheck?.isChecked = statusConfig.isPersist
         }
 
-        if (statusConfig?.onlineStatus != MegaChatApi.STATUS_ONLINE) {
+        if (statusConfig.onlineStatus != UserChatStatus.Online) {
             autoAwaySwitch?.let { preferenceScreen.removePreference(it) }
             chatAutoAwayPreference?.let { preferenceScreen.removePreference(it) }
-            if (statusConfig?.onlineStatus == MegaChatApi.STATUS_OFFLINE) {
+            if (statusConfig.onlineStatus == UserChatStatus.Offline) {
                 chatPersistenceCheck?.let { preferenceScreen.removePreference(it) }
             }
-        } else if (statusConfig!!.isPersist) {
+        } else if (statusConfig.isPersist) {
             autoAwaySwitch?.let { preferenceScreen.removePreference(it) }
             chatAutoAwayPreference?.let { preferenceScreen.removePreference(it) }
         } else {
             autoAwaySwitch?.let { preferenceScreen.addPreference(it) }
 
-            if (statusConfig!!.isAutoawayEnabled) {
-                val timeout = statusConfig!!.autoawayTimeout.toInt() / 60
+            if (statusConfig.isAutoAwayEnabled) {
+                val timeout = statusConfig.autoAwayTimeout.toInt() / 60
                 autoAwaySwitch?.isChecked = true
                 chatAutoAwayPreference?.let { preferenceScreen.addPreference(it) }
                 chatAutoAwayPreference?.summary =
@@ -393,7 +349,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
 
             if (!isChecked) {
                 onPreferenceClickListener = null
-                isChecked = statusConfig!!.isLastGreenVisible
+                isChecked = statusConfig.isLastGreenVisible
             }
 
             onPreferenceClickListener = this@SettingsChatFragment

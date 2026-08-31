@@ -44,17 +44,9 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
 
     private fun collectFlows() {
         collectFlow(viewModel.state) { chatPreferencesState ->
-            with(chatPreferencesState) {
-                if (isPushNotificationSettingsUpdatedEvent) {
-                    sttChat?.updateNotifChat()
-                    viewModel.onConsumePushNotificationSettingsUpdateEvent()
-                }
-                if (signalPresenceUpdate) {
-                    if (sttChat != null) {
-                        sttChat?.updatePresenceConfigChat(false)
-                    }
-                    viewModel.onSignalPresenceUpdateConsumed()
-                }
+            if (chatPreferencesState.isPushNotificationSettingsUpdatedEvent) {
+                sttChat?.updateNotifChat()
+                viewModel.onConsumePushNotificationSettingsUpdateEvent()
             }
         }
     }
@@ -72,7 +64,7 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 val value = validateAutoAway(v1.text)
                 if (value != null) {
-                    setAutoAwayValue(value, false)
+                    setAutoAwayValue(value)
                 }
                 newFolderDialog?.dismiss()
                 return@setOnEditorActionListener true
@@ -89,13 +81,12 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
         set.setOnClickListener {
             val value = validateAutoAway(input.text)
             if (value != null) {
-                setAutoAwayValue(value, false)
+                setAutoAwayValue(value)
             }
             newFolderDialog?.dismiss()
         }
         val cancel = v.findViewById<Button>(R.id.autoaway_cancel_button)
         cancel.setOnClickListener {
-            setAutoAwayValue(Constants.INVALID_OPTION, true)
             newFolderDialog?.dismiss()
         }
         newFolderDialog = builder.create()
@@ -127,17 +118,11 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
     /**
      * Establishing the value of Auto Away.
      *
-     * @param value     The value.
-     * @param cancelled If it is cancelled.
+     * @param value The value, in minutes.
      */
-    private fun setAutoAwayValue(value: String, cancelled: Boolean) {
+    private fun setAutoAwayValue(value: String) {
         Timber.d("Value: $value")
-        if (cancelled) {
-            sttChat?.updatePresenceConfigChat(true)
-        } else {
-            val timeout = value.toInt()
-            megaChatApi.setPresenceAutoaway(true, timeout * 60)
-        }
+        viewModel.setAutoAwayPresence(value.toInt() * 60)
     }
 
     /**
@@ -147,6 +132,6 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
      */
     fun enableLastGreen(enable: Boolean) {
         Timber.d("Enable Last Green: $enable")
-        megaChatApi.setLastGreenVisible(enable, null)
+        viewModel.setLastGreenVisible(enable)
     }
 }

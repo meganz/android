@@ -8,7 +8,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
+import mega.privacy.android.domain.usecase.chat.SetLastGreenVisibleUseCase
+import mega.privacy.android.domain.usecase.chat.SetPresenceAutoAwayUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,16 +28,16 @@ class ChatPreferencesViewModelTest {
             on { invoke() }.thenReturn(flowOf(true))
         }
 
-    private val monitorChatSignalPresenceUseCase =
-        mock<MonitorChatSignalPresenceUseCase> {
-            on { invoke() }.thenReturn(flowOf(Unit))
-        }
+    private val setPresenceAutoAwayUseCase = mock<SetPresenceAutoAwayUseCase>()
+
+    private val setLastGreenVisibleUseCase = mock<SetLastGreenVisibleUseCase>()
 
     @BeforeEach
     fun setUp() {
         underTest = ChatPreferencesViewModel(
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
-            monitorChatSignalPresenceUseCase = monitorChatSignalPresenceUseCase,
+            setPresenceAutoAwayUseCase = setPresenceAutoAwayUseCase,
+            setLastGreenVisibleUseCase = setLastGreenVisibleUseCase,
         )
     }
 
@@ -66,28 +67,21 @@ class ChatPreferencesViewModelTest {
         }
 
     @Test
-    fun `test that when chat signal presence is updated state is also updated`() =
+    fun `test that setAutoAwayPresence enables auto away with the given timeout`() =
         runTest {
+            underTest.setAutoAwayPresence(300)
             testScheduler.advanceUntilIdle()
-            verify(monitorChatSignalPresenceUseCase).invoke()
-            underTest.state.test {
-                val state = awaitItem()
-                Truth.assertThat(state.signalPresenceUpdate).isTrue()
-            }
+
+            verify(setPresenceAutoAwayUseCase).invoke(true, 300)
         }
 
     @Test
-    fun `test that when onSignalPresenceUpdateConsumed is called then state is also updated`() =
+    fun `test that setLastGreenVisible invokes its use case`() =
         runTest {
+            underTest.setLastGreenVisible(true)
             testScheduler.advanceUntilIdle()
-            verify(monitorChatSignalPresenceUseCase).invoke()
-            underTest.state.test {
-                val state = awaitItem()
-                Truth.assertThat(state.signalPresenceUpdate).isTrue()
-                underTest.onSignalPresenceUpdateConsumed()
-                val updatedState = awaitItem()
-                Truth.assertThat(updatedState.signalPresenceUpdate).isFalse()
-            }
+
+            verify(setLastGreenVisibleUseCase).invoke(true)
         }
 
     companion object {
