@@ -41,21 +41,37 @@ internal class AudioQueueItemFactoryTest {
 
     @Test
     fun `test that resolveTitle returns tag title when present`() {
-        val result = underTest.resolveTitle(metadata(title = "Song", displayTitle = "file.mp3"))
+        val result = AudioQueueItemFactory.resolveTitle(
+            metadata(title = "Song", displayTitle = "file.mp3")
+        )
 
         assertThat(result).isEqualTo("Song")
     }
 
     @Test
     fun `test that resolveTitle falls back to display title when tag title is absent`() {
-        val result = underTest.resolveTitle(metadata(displayTitle = "file.mp3"))
+        val result = AudioQueueItemFactory.resolveTitle(metadata(displayTitle = "file.mp3"))
 
         assertThat(result).isEqualTo("file.mp3")
     }
 
     @Test
     fun `test that resolveTitle returns null when no title is present`() {
-        assertThat(underTest.resolveTitle(metadata())).isNull()
+        assertThat(AudioQueueItemFactory.resolveTitle(metadata())).isNull()
+    }
+
+    @Test
+    fun `test that resolveTitle falls back to display title when tag title is blank`() {
+        val result = AudioQueueItemFactory.resolveTitle(
+            metadata(title = "   ", displayTitle = "file.mp3")
+        )
+
+        assertThat(result).isEqualTo("file.mp3")
+    }
+
+    @Test
+    fun `test that resolveTitle returns null when tag title is blank and no display title`() {
+        assertThat(AudioQueueItemFactory.resolveTitle(metadata(title = "   "))).isNull()
     }
 
     @Test
@@ -107,6 +123,30 @@ internal class AudioQueueItemFactoryTest {
         val result = underTest.buildQueueItems(
             listOf(mediaItem(mediaId = "id-1", displayTitle = "file.mp3"))
         )
+        assertThat(result[0].title).isEqualTo("file.mp3")
+    }
+
+    @Test
+    fun `test that cacheParsedMetadata returns false when tag title is blank`() {
+        val cached = underTest.cacheParsedMetadata(
+            "id-1",
+            metadata(title = "   ", displayTitle = "file.mp3", artist = "Artist"),
+        )
+
+        assertThat(cached).isFalse()
+
+        val result = underTest.buildQueueItems(
+            listOf(mediaItem(mediaId = "id-1", displayTitle = "file.mp3"))
+        )
+        assertThat(result[0].title).isEqualTo("file.mp3")
+    }
+
+    @Test
+    fun `test that buildQueueItems falls back to display title when tag title is blank`() {
+        val result = underTest.buildQueueItems(
+            listOf(mediaItem(mediaId = "id-1", title = "  ", displayTitle = "file.mp3"))
+        )
+
         assertThat(result[0].title).isEqualTo("file.mp3")
     }
 

@@ -46,6 +46,7 @@ import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.feature.mediaplayer.data.AudioQueueItemFactory
 import mega.privacy.android.feature.mediaplayer.navigation.AudioPlayerScreenNavKey
 import timber.log.Timber
 
@@ -96,10 +97,7 @@ class MiniAudioPlayerController(
 
         override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
             if (v2MediaController != null) {
-                trackName.text = mediaMetadata.title ?: ""
-                val artist = mediaMetadata.artist?.toString()
-                artistName.text = artist ?: ""
-                artistName.isVisible = artist != null
+                applyV2Metadata(mediaMetadata)
             }
         }
 
@@ -384,13 +382,22 @@ class MiniAudioPlayerController(
         playerView.controllerHideOnTouch = false
         updatePlayerViewVisibility()
         updateUIRegardingPlayback(controller.playbackState)
-        val metadata = controller.mediaMetadata
-        trackName.text = metadata.title ?: ""
-        val artist = metadata.artist?.toString()
-        artistName.text = artist ?: ""
-        artistName.isVisible = artist != null
+        applyV2Metadata(controller.mediaMetadata)
         applyTintToPlayPauseButton()
         playerView.showController()
+    }
+
+    /**
+     * Media3 exposes the tag-derived song title only after the item has been prepared, so until
+     * then [AudioQueueItemFactory.resolveTitle] yields the file name the mapper kept in
+     * `displayTitle`. The full-screen player adds its own `currentPlayingItemName` fallback on
+     * top of that; the mini player has no equivalent and shows nothing if both are absent.
+     */
+    private fun applyV2Metadata(metadata: MediaMetadata) {
+        trackName.text = AudioQueueItemFactory.resolveTitle(metadata).orEmpty()
+        val artist = metadata.artist?.toString()
+        artistName.text = artist.orEmpty()
+        artistName.isVisible = !artist.isNullOrBlank()
     }
 
     private fun disconnectV2Service() {

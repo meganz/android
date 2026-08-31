@@ -405,6 +405,8 @@ private fun QueueItemRow(
             }
         }
 
+        Spacer(modifier = Modifier.width(12.dp))
+
         MegaIcon(
             painter = rememberVectorPainter(IconPack.Small.Thin.Outline.QueueLine),
             tint = IconColor.Secondary,

@@ -140,7 +140,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
             mediaItemCount = c.mediaItemCount,
             isBuffering = c.playbackState == Player.STATE_BUFFERING,
             isIdle = !suppressIdle && c.playbackState == Player.STATE_IDLE,
-            title = audioQueueItemFactory.resolveTitle(c.mediaMetadata),
+            title = AudioQueueItemFactory.resolveTitle(c.mediaMetadata),
             artist = c.mediaMetadata.artist?.toString(),
             artworkUri = c.mediaMetadata.artworkUri?.toString(),
             currentMediaItemId = c.currentMediaItem?.mediaId,
@@ -191,7 +191,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
             }
             updateState {
                 copy(
-                    title = audioQueueItemFactory.resolveTitle(mediaMetadata),
+                    title = AudioQueueItemFactory.resolveTitle(mediaMetadata),
                     artist = mediaMetadata.artist?.toString(),
                     artworkUri = mediaMetadata.artworkUri?.toString(),
                     queueItems = newQueueItems ?: queueItems,

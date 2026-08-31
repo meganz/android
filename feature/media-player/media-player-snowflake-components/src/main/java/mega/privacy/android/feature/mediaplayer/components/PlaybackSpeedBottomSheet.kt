@@ -29,17 +29,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,6 +61,11 @@ private const val PLAYBACK_SPEED_STEP = 0.05f
 private const val PLAYBACK_TOTAL_STEPS = 30 // (2.0 - 0.5) / 0.05
 
 private val PLAYBACK_PRESET_SPEEDS = listOf(1.0f, 1.25f, 1.5f, 1.75f, 2.0f)
+
+// Sets the floor width of the speed label: the longest shape a value can take, two decimals plus
+// the "x" suffix. The enclosing Box still grows to the live value if a glyph combination happens
+// to measure wider, so this reserves space without ever clipping.
+private const val WIDEST_SPEED_LABEL = "0.00x"
 
 /**
  * Bottom sheet for selecting playback speed, shown when the speed indicator is tapped
@@ -108,11 +114,8 @@ fun PlaybackSpeedBottomSheet(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                MegaText(
-                    text = formatPlaybackSpeed(snappedDisplaySpeed),
-                    textColor = if (snappedDisplaySpeed == 1f) TextColor.Primary else TextColor.Brand,
-                    style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
-                    textAlign = TextAlign.Center,
+                SpeedValueLabel(
+                    speed = snappedDisplaySpeed,
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -141,6 +144,39 @@ fun PlaybackSpeedBottomSheet(
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Centred speed value whose left edge stays put while dragging.
+ *
+ * The value swings between 2 and 5 characters ("1x" … "1.75x"), so centring the text itself makes
+ * both edges move on every tick. An invisible widest-value placeholder reserves the maximum width
+ * and the live value is start-aligned inside it, leaving only the right edge to change.
+ */
+@Composable
+private fun SpeedValueLabel(
+    speed: Float,
+    modifier: Modifier = Modifier,
+) {
+    val style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold)
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        Box {
+            MegaText(
+                text = WIDEST_SPEED_LABEL,
+                textColor = TextColor.Primary,
+                style = style,
+                modifier = Modifier
+                    .alpha(0f)
+                    .clearAndSetSemantics { },
+            )
+            MegaText(
+                text = formatPlaybackSpeed(speed),
+                textColor = if (speed == 1f) TextColor.Primary else TextColor.Brand,
+                style = style,
+                modifier = Modifier.align(Alignment.CenterStart),
+            )
         }
     }
 }

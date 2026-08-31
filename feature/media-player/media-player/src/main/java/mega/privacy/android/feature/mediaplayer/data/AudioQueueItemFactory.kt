@@ -25,10 +25,6 @@ class AudioQueueItemFactory @Inject constructor(
 
     private data class ParsedTagMetadata(val title: String, val artist: String?)
 
-    /** Tag-derived title when available, otherwise the file name stored as displayTitle. */
-    fun resolveTitle(metadata: MediaMetadata): String? =
-        metadata.title?.toString() ?: metadata.displayTitle?.toString()
-
     /**
      * Remembers the tag-derived title/artist for [mediaId] so later [buildQueueItems] calls keep
      * showing them once playback moves on.
@@ -36,7 +32,7 @@ class AudioQueueItemFactory @Inject constructor(
      * @return true when tag metadata was cached, false when [metadata] carries no tag title
      */
     fun cacheParsedMetadata(mediaId: String, metadata: MediaMetadata): Boolean {
-        val tagTitle = metadata.title?.toString() ?: return false
+        val tagTitle = metadata.tagTitle() ?: return false
         parsedTagMetadata[mediaId] = ParsedTagMetadata(tagTitle, metadata.artist?.toString())
         return true
     }
@@ -59,5 +55,20 @@ class AudioQueueItemFactory @Inject constructor(
 
     fun clearCache() {
         parsedTagMetadata.clear()
+    }
+
+    companion object {
+
+        /** Tag-derived title when available, otherwise the file name stored as displayTitle. */
+        fun resolveTitle(metadata: MediaMetadata): String? =
+            metadata.tagTitle() ?: metadata.displayTitle?.toString()
+
+        /**
+         * A blank tag title counts as no tag title: some encoders write empty ID3 frames, and
+         * showing them would leave the player and the queue with an empty label rather than
+         * falling back to the file name.
+         */
+        private fun MediaMetadata.tagTitle(): String? =
+            title?.toString()?.takeIf { it.isNotBlank() }
     }
 }
