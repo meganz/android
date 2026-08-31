@@ -526,6 +526,10 @@ fun MediaMainScreen(
 
     var isTimelinePinchActive by remember { mutableStateOf(false) }
 
+    // Timeline cells drag-selected before their nodes load; counted into the top bar's selection
+    // count so drag-selecting placeholders reflects in the count immediately.
+    var timelinePendingSelectionCount by remember { mutableIntStateOf(0) }
+
     // Handling back handler for timeline filter
     BackHandler(enabled = showTimelineFilter) {
         if (showTimelineFilter) {
@@ -581,7 +585,7 @@ fun MediaMainScreen(
                 videosSelectionUiState = videosSelectionUiState,
                 playlistsTabUiState = playlistsTabUiState,
                 timelineItemCount = effectiveTimelineItemCount,
-                timelineSelectedCount = selectedPhotoIds.size,
+                timelineSelectedCount = selectedPhotoIds.size + timelinePendingSelectionCount,
                 selectedTimePeriod = effectiveSelectedTimePeriod,
                 videosTabQuery = videosTabQuery,
                 playlistsTabQuery = playlistsTabQuery,
@@ -716,6 +720,9 @@ fun MediaMainScreen(
                                     },
                                     onTimelineRevampNodeClicked = onTimelineRevampNodeClicked,
                                     onTimelineRevampTakenDownDialogConsumed = onTimelineRevampTakenDownDialogConsumed,
+                                    onTimelineRevampPendingSelectionCountChanged = {
+                                        timelinePendingSelectionCount = it
+                                    },
                                     showEnableCameraUploadsPage = showEnableCameraUploadsPageForRevamp,
                                     timelineFilterUiState = timelineFilterUiState,
                                     mediaCameraUploadUiState = mediaCameraUploadUiState,
@@ -841,6 +848,7 @@ private fun MediaScreen.MediaContent(
     onTimelineRevampPinchActiveChanged: (Boolean) -> Unit,
     onTimelineRevampNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
     onTimelineRevampTakenDownDialogConsumed: () -> Unit,
+    onTimelineRevampPendingSelectionCountChanged: (Int) -> Unit,
     showEnableCameraUploadsPage: Boolean,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
@@ -910,6 +918,7 @@ private fun MediaScreen.MediaContent(
                             },
                             onNodeSelected = { node -> onTimelinePhotoSelected(node.id) },
                             selectedPhotoIds = selectedPhotoIds,
+                            onPendingSelectionCountChanged = onTimelineRevampPendingSelectionCountChanged,
                             onTakenDownDialogEventConsumed = onTimelineRevampTakenDownDialogConsumed,
                             clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
                             onNavigateToCameraUploadsSettings = {

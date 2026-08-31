@@ -448,6 +448,253 @@ class TimelineRevampScreenTest {
     }
 
     @Test
+    fun `test that drag-swept unloaded cells are loaded and selected when the drag ends`() {
+        val selectedIds = mutableStateSetOf<Long>()
+        val loadRequests = mutableListOf<IntRange>()
+        composeRule.setScreen(
+            uiState = TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = mapOf(0 to photoNode(id = 1L)),
+            ),
+            selectedPhotoIds = selectedIds,
+            onNodeSelected = { selectedIds.toggle(it.id) },
+            loadMediaRange = { first, last ->
+                loadRequests.add(first..last)
+                (first..last).associateWith { index -> photoNode(id = index + 1L) }
+            },
+        )
+
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+            .onFirst()
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(width.toFloat() * 2, 0f))
+                up()
+            }
+
+        composeRule.runOnIdle {
+            assertThat(loadRequests).containsExactly(1..2)
+            assertThat(selectedIds).containsExactly(1L, 2L, 3L)
+        }
+    }
+
+    @Test
+    fun `test that the pending selection count is reported while swept cells are unresolved`() {
+        val selectedIds = mutableStateSetOf<Long>()
+        var pendingCount = 0
+        val loadGate = CompletableDeferred<Unit>()
+        composeRule.setScreen(
+            uiState = TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = mapOf(0 to photoNode(id = 1L)),
+            ),
+            selectedPhotoIds = selectedIds,
+            onNodeSelected = { selectedIds.toggle(it.id) },
+            loadMediaRange = { first, last ->
+                loadGate.await()
+                (first..last).associateWith { index -> photoNode(id = index + 1L) }
+            },
+            onPendingSelectionCountChanged = { pendingCount = it },
+        )
+
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+            .onFirst()
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(width.toFloat() * 2, 0f))
+                up()
+            }
+
+        // Until the drag-end fetch resolves, the two swept placeholders count as pending.
+        composeRule.runOnIdle {
+            assertThat(selectedIds).containsExactly(1L)
+            assertThat(pendingCount).isEqualTo(2)
+        }
+
+        loadGate.complete(Unit)
+
+        // Once resolved they join the real selection and stop counting as pending.
+        composeRule.runOnIdle {
+            assertThat(selectedIds).containsExactly(1L, 2L, 3L)
+            assertThat(pendingCount).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `test that a drag anchored on a checked placeholder deselects the swept pending cells`() {
+        val selectedIds = mutableStateSetOf<Long>()
+        var pendingCount = 0
+        composeRule.setScreen(
+            uiState = TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = mapOf(0 to photoNode(id = 1L)),
+            ),
+            selectedPhotoIds = selectedIds,
+            onNodeSelected = { selectedIds.toggle(it.id) },
+            // Never resolves, so the swept cells stay checked, unresolved placeholders.
+            loadMediaRange = { _, _ -> CompletableDeferred<Unit>().await(); emptyMap() },
+            onPendingSelectionCountChanged = { pendingCount = it },
+        )
+
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+            .onFirst()
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(width.toFloat() * 2, 0f))
+                up()
+            }
+
+        composeRule.runOnIdle {
+            assertThat(selectedIds).containsExactly(1L)
+            assertThat(pendingCount).isEqualTo(2)
+        }
+
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_SHIMMER_TAG)
+            .onFirst()
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(width.toFloat(), 0f))
+                up()
+            }
+
+        composeRule.runOnIdle {
+            assertThat(selectedIds).containsExactly(1L)
+            assertThat(pendingCount).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `test that header deselect removes resolved drag-selected ids even when the refetch is partial`() {
+        val selectedIds = mutableStateSetOf<Long>()
+        var loadCalls = 0
+        composeRule.setScreen(
+            uiState = TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = mapOf(0 to photoNode(id = 1L)),
+            ),
+            selectedPhotoIds = selectedIds,
+            onNodeSelected = { selectedIds.toggle(it.id) },
+            loadMediaRange = { first, last ->
+                loadCalls++
+                // The drag-end fetch resolves; the header-deselect refetch fails silently.
+                if (loadCalls == 1) {
+                    (first..last).associateWith { index -> photoNode(id = index + 1L) }
+                } else {
+                    emptyMap()
+                }
+            },
+        )
+
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+            .onFirst()
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(width.toFloat() * 2, 0f))
+                up()
+            }
+
+        composeRule.runOnIdle {
+            assertThat(selectedIds).containsExactly(1L, 2L, 3L)
+        }
+
+        topHeaderCheckbox().performClick()
+
+        composeRule.runOnIdle {
+            assertThat(selectedIds).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that the drag-end fetch spans only unresolved cells`() {
+        val selectedIds = mutableStateSetOf<Long>()
+        val loadRequests = mutableListOf<IntRange>()
+        composeRule.setScreen(
+            uiState = TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 9,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = mapOf(0 to photoNode(id = 1L)),
+            ),
+            selectedPhotoIds = selectedIds,
+            onNodeSelected = { selectedIds.toggle(it.id) },
+            loadMediaRange = { first, last ->
+                loadRequests.add(first..last)
+                (first..last).associateWith { index -> photoNode(id = index + 1L) }
+            },
+        )
+
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+            .onFirst()
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(width.toFloat() * 2, 0f))
+                up()
+            }
+
+        composeRule.runOnIdle {
+            assertThat(loadRequests).containsExactly(1..2)
+        }
+
+        // The resolved cells (1..2) linger as pending marks; a second drag further down must not
+        // stretch its fetch back across them.
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_SHIMMER_TAG)[3]
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(width.toFloat(), 0f))
+                up()
+            }
+
+        composeRule.runOnIdle {
+            assertThat(loadRequests).containsExactly(1..2, 4..5).inOrder()
+        }
+    }
+
+    @Test
     fun `test that the month header shows a select-all checkbox only in selection mode`() {
         val selectedIds = mutableStateSetOf<Long>()
         composeRule.setScreen(
@@ -710,6 +957,7 @@ class TimelineRevampScreenTest {
             { _, _ -> emptyMap() },
         onZoomIn: () -> Unit = {},
         onPinchActiveChanged: (Boolean) -> Unit = {},
+        onPendingSelectionCountChanged: (Int) -> Unit = {},
     ) = setScreenContent(
         { uiState },
         selectedPhotoIds,
@@ -717,6 +965,7 @@ class TimelineRevampScreenTest {
         loadMediaRange,
         onZoomIn,
         onPinchActiveChanged,
+        onPendingSelectionCountChanged,
     )
 
     private fun ComposeContentTestRule.setScreenContent(
@@ -727,6 +976,7 @@ class TimelineRevampScreenTest {
             { _, _ -> emptyMap() },
         onZoomIn: () -> Unit = {},
         onPinchActiveChanged: (Boolean) -> Unit = {},
+        onPendingSelectionCountChanged: (Int) -> Unit = {},
     ) {
         setContent {
             TimelineRevampScreen(
@@ -739,6 +989,7 @@ class TimelineRevampScreenTest {
                 onZoomIn = onZoomIn,
                 onZoomOut = {},
                 onPinchActiveChanged = onPinchActiveChanged,
+                onPendingSelectionCountChanged = onPendingSelectionCountChanged,
                 onMediaTimePeriodSelected = {},
                 onNodeClicked = { _, _ -> },
                 onNodeSelected = onNodeSelected,

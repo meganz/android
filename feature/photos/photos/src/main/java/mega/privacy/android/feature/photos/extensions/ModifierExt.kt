@@ -109,6 +109,8 @@ fun Modifier.photosZoomGestureDetector(
  * (a long-press released without dragging never triggers it)
  * @param onDragSelectionChange called with the ordinal media index and the selection state it
  * should take; the caller applies it idempotently through the same event a tap or long-press fires
+ * @param onDragSelectEnded called when a drag that fired [onDragSelectStarted] ends, however the
+ * gesture finishes
  */
 internal fun Modifier.photosGridDragToSelectGesture(
     lazyGridState: LazyGridState,
@@ -116,6 +118,7 @@ internal fun Modifier.photosGridDragToSelectGesture(
     isMediaSelected: (mediaIndex: Int) -> Boolean,
     onDragSelectStarted: () -> Unit,
     onDragSelectionChange: (mediaIndex: Int, selected: Boolean) -> Unit,
+    onDragSelectEnded: () -> Unit = {},
 ) = this.pointerInput(lazyGridState) {
     val autoScrollThreshold = DRAG_TO_SELECT_AUTO_SCROLL_THRESHOLD.toPx()
     val maxAutoScrollVelocity = DRAG_TO_SELECT_MAX_AUTO_SCROLL_VELOCITY.toPx()
@@ -246,6 +249,7 @@ internal fun Modifier.photosGridDragToSelectGesture(
                     extendSelectionTo(change.position)
                 }
             } finally {
+                if (anchorReported) onDragSelectEnded()
                 endDrag()
             }
         }
