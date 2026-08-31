@@ -1,9 +1,12 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.android.tools.screenshot.PreviewTest
 import kotlinx.collections.immutable.persistentListOf
+import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.node.NodeId
@@ -21,7 +24,8 @@ import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 /**
  * Covers the assembled sync list — warning banners, chip row and chip content laid out together
  * with the FAB. The individual pieces have their own goldens; this pins how the shell composes
- * them.
+ * them. Rendered the way a host screen composes it: the scaffold holds the FAB, the tab holds
+ * the content.
  */
 class SyncListContentScreenshotTest {
 
@@ -30,19 +34,9 @@ class SyncListContentScreenshotTest {
     @Composable
     fun SyncListTabWithSyncs() {
         AndroidThemeForPreviews {
-            SyncListTabContent(
+            SyncListTabHost(
                 syncFoldersUiState = SyncFoldersUiState(syncUiItems = syncItems),
-                syncStalledIssuesState = SyncStalledIssuesState(stalledIssues = emptyList()),
-                syncSolvedIssuesState = SyncSolvedIssuesState(),
-                syncNotificationState = SyncMonitorState(),
-                stalledIssuesCount = 0,
-                onSyncFolderClicked = {},
-                onBackupFolderClicked = {},
-                syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
-                onOpenUpgradeAccountClicked = {},
-                onDismissNotification = {},
-                onSyncRefresh = {},
-                chipContent = { _, _ -> SyncFoldersChipContent() },
+                chipContent = { SyncFoldersChipContent() },
             )
         }
     }
@@ -52,22 +46,12 @@ class SyncListContentScreenshotTest {
     @Composable
     fun SyncListTabOverQuota() {
         AndroidThemeForPreviews {
-            SyncListTabContent(
+            SyncListTabHost(
                 syncFoldersUiState = SyncFoldersUiState(
                     syncUiItems = syncItems,
                     isStorageOverQuota = true,
                 ),
-                syncStalledIssuesState = SyncStalledIssuesState(stalledIssues = emptyList()),
-                syncSolvedIssuesState = SyncSolvedIssuesState(),
-                syncNotificationState = SyncMonitorState(),
-                stalledIssuesCount = 0,
-                onSyncFolderClicked = {},
-                onBackupFolderClicked = {},
-                syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
-                onOpenUpgradeAccountClicked = {},
-                onDismissNotification = {},
-                onSyncRefresh = {},
-                chipContent = { _, _ -> SyncFoldersChipContent(isStorageOverQuota = true) },
+                chipContent = { SyncFoldersChipContent(isStorageOverQuota = true) },
             )
         }
     }
@@ -77,22 +61,45 @@ class SyncListContentScreenshotTest {
     @Composable
     fun SyncListTabLowBattery() {
         AndroidThemeForPreviews {
-            SyncListTabContent(
+            SyncListTabHost(
                 syncFoldersUiState = SyncFoldersUiState(
                     syncUiItems = syncItems,
                     isLowBatteryLevel = true,
                 ),
+                chipContent = { SyncFoldersChipContent(isLowBatteryLevel = true) },
+            )
+        }
+    }
+
+    @Composable
+    private fun SyncListTabHost(
+        syncFoldersUiState: SyncFoldersUiState,
+        chipContent: @Composable () -> Unit,
+    ) {
+        val fabState = rememberSyncListFabState()
+        MegaScaffold(
+            floatingActionButton = {
+                SyncListTabFab(
+                    fabState = fabState,
+                    syncFoldersUiState = syncFoldersUiState,
+                    onSyncFolderClicked = {},
+                    onBackupFolderClicked = {},
+                )
+            },
+        ) { paddingValues ->
+            SyncListTabContent(
+                modifier = Modifier.padding(paddingValues),
+                syncFoldersUiState = syncFoldersUiState,
                 syncStalledIssuesState = SyncStalledIssuesState(stalledIssues = emptyList()),
                 syncSolvedIssuesState = SyncSolvedIssuesState(),
                 syncNotificationState = SyncMonitorState(),
                 stalledIssuesCount = 0,
-                onSyncFolderClicked = {},
-                onBackupFolderClicked = {},
                 syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
                 onOpenUpgradeAccountClicked = {},
                 onDismissNotification = {},
                 onSyncRefresh = {},
-                chipContent = { _, _ -> SyncFoldersChipContent(isLowBatteryLevel = true) },
+                fabState = fabState,
+                chipContent = { _, _ -> chipContent() },
             )
         }
     }

@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
@@ -47,6 +48,7 @@ import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
  * @param selectedChip The currently selected chip in the sync list UI. Defaults to [SyncChip.SYNC_FOLDERS].
  * @param onOpenMegaFolderClicked Callback invoked when the user clicks to open a specific Mega folder.
  * @param onStalledIssueMoreClicked Callback invoked with the id of the stalled issue whose resolution options were requested.
+ * @param fabState Shared with the [SyncListTabFab] the host places in its scaffold when [isInCloudDrive] is true.
  */
 @Composable
 fun SyncListRoute(
@@ -61,11 +63,10 @@ fun SyncListRoute(
     isInCloudDrive: Boolean = false,
     onSyncSettingsClicked: (() -> Unit)? = null,
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
+    fabState: SyncListFabState = rememberSyncListFabState(),
     onFabExpanded: (Boolean) -> Unit = {},
 ) {
-    val fragmentActivity = LocalContext.current.findFragmentActivity()
-    val viewModelStoreOwner =
-        fragmentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
+    val viewModelStoreOwner = syncListViewModelStoreOwner()
 
     SyncListRoute(
         syncPermissionsManager = syncPermissionsManager,
@@ -83,10 +84,20 @@ fun SyncListRoute(
         selectedChip = selectedChip,
         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
         onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
+        fabState = fabState,
         onFabExpanded = onFabExpanded,
         onStalledIssueMoreClicked = onStalledIssueMoreClicked,
     )
 }
+
+/**
+ * Owner the sync list view models are scoped to. [SyncListTabFab] resolves the same owner, so the
+ * FAB a host places in its scaffold reads the [SyncFoldersViewModel] of the route beside it.
+ */
+@Composable
+internal fun syncListViewModelStoreOwner(): ViewModelStoreOwner =
+    LocalContext.current.findFragmentActivity()
+        ?: checkNotNull(LocalViewModelStoreOwner.current)
 
 @Composable
 internal fun SyncListRoute(
@@ -106,6 +117,7 @@ internal fun SyncListRoute(
     isInCloudDrive: Boolean = false,
     viewModel: SyncListViewModel = hiltViewModel(),
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
+    fabState: SyncListFabState = rememberSyncListFabState(),
     onFabExpanded: (Boolean) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -139,15 +151,13 @@ internal fun SyncListRoute(
             syncSolvedIssuesState = solvedIssuesState,
             syncNotificationState = notificationState,
             stalledIssuesCount = state.stalledIssuesCount,
-            onSyncFolderClicked = { onSyncFolderClicked() },
-            onBackupFolderClicked = { onBackupFolderClicked() },
             syncPermissionsManager = syncPermissionsManager,
             onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
             onDismissNotification = syncIssueNotificationViewModel::dismissNotification,
             onSyncRefresh = syncFoldersViewModel::onSyncRefresh,
             chipContent = chipContent,
+            fabState = fabState,
             selectedChip = selectedChip,
-            onFabExpanded = onFabExpanded,
         )
     } else {
         SyncListScreen(

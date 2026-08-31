@@ -47,6 +47,8 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.getSelectedItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
+import mega.privacy.android.feature.sync.ui.synclist.SyncListTabFab
+import mega.privacy.android.feature.sync.ui.synclist.rememberSyncListFabState
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
@@ -137,6 +139,13 @@ internal fun DriveSyncScreen(
     val megaNavigator = viewModel.megaNavigator
     var showUploadOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(initialTabIndex) }
+    val syncFabState = rememberSyncListFabState()
+    val onSyncFolderClicked: () -> Unit = {
+        navigationHandler.navigate(SyncNewFolderNavKey(syncType = SyncType.TYPE_TWOWAY))
+    }
+    val onBackupFolderClicked: () -> Unit = {
+        navigationHandler.navigate(SyncNewFolderNavKey(syncType = SyncType.TYPE_BACKUP))
+    }
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
         navigationHandler = navigationHandler,
@@ -241,21 +250,29 @@ internal fun DriveSyncScreen(
             )
         },
         floatingActionButton = {
-            val showFab = selectedTabIndex == 0
-                    && with(cloudDriveUiState as? CloudDriveUiState.Data) {
-                this?.items?.isEmpty() != true && selectionState.isInSelectionMode.not()
-            }
-
-            AddContentFab(
-                modifier = Modifier
-                    .testTag(DRIVE_SYNCS_FAB_TAG)
-                    .applyScrollToHideFabBehavior(),
-                visible = showFab,
-                onClick = {
-                    Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
-                    showUploadOptionsBottomSheet = true
+            if (selectedTabIndex == 1) {
+                // The scaffold only lays its snackbars out above a FAB that occupies this slot.
+                SyncListTabFab(
+                    fabState = syncFabState,
+                    onSyncFolderClicked = onSyncFolderClicked,
+                    onBackupFolderClicked = onBackupFolderClicked,
+                )
+            } else {
+                val showFab = with(cloudDriveUiState as? CloudDriveUiState.Data) {
+                    this?.items?.isEmpty() != true && selectionState.isInSelectionMode.not()
                 }
-            )
+
+                AddContentFab(
+                    modifier = Modifier
+                        .testTag(DRIVE_SYNCS_FAB_TAG)
+                        .applyScrollToHideFabBehavior(),
+                    visible = showFab,
+                    onClick = {
+                        Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
+                        showUploadOptionsBottomSheet = true
+                    }
+                )
+            }
         },
     ) { paddingValues ->
         MegaCollapsibleTabRow(
@@ -310,20 +327,8 @@ internal fun DriveSyncScreen(
                             )
                         },
                         syncPermissionsManager = viewModel.syncPermissionsManager,
-                        onSyncFolderClicked = {
-                            navigationHandler.navigate(
-                                SyncNewFolderNavKey(
-                                    syncType = SyncType.TYPE_TWOWAY,
-                                )
-                            )
-                        },
-                        onBackupFolderClicked = {
-                            navigationHandler.navigate(
-                                SyncNewFolderNavKey(
-                                    syncType = SyncType.TYPE_BACKUP,
-                                )
-                            )
-                        },
+                        onSyncFolderClicked = onSyncFolderClicked,
+                        onBackupFolderClicked = onBackupFolderClicked,
                         onSelectStopBackupDestinationClicked = {
                             navigationHandler.navigate(
                                 if (useCloudExplorerPicker) {
@@ -342,7 +347,7 @@ internal fun DriveSyncScreen(
                         onCameraUploadsSettingsClicked = {
                             navigationHandler.navigate(SettingsCameraUploadsNavKey)
                         },
-                        onFabExpanded = { isExpanded -> }
+                        fabState = syncFabState,
                     )
                 }
             },
