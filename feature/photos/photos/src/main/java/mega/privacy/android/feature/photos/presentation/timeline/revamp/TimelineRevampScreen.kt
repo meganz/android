@@ -23,12 +23,13 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -128,6 +129,7 @@ internal fun TimelineRevampScreen(
     contentPadding: PaddingValues = PaddingValues(),
     onSelectorVisibleChanged: (Boolean) -> Unit = {},
     onPinchActiveChanged: (Boolean) -> Unit = {},
+    onPendingSelectionCountChanged: (Int) -> Unit = {},
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val takenDownDialogEvent =
@@ -190,6 +192,7 @@ internal fun TimelineRevampScreen(
                 onNodeSelected = onNodeSelected,
                 onScrollingChanged = onScrollingChanged,
                 onSelectorVisibleChanged = onSelectorVisibleChanged,
+                onPendingSelectionCountChanged = onPendingSelectionCountChanged,
                 selectedPhotoIds = selectedPhotoIds,
                 bannerContent = if (selectedPhotoIds.isEmpty()) {
                     {
@@ -242,6 +245,7 @@ private fun TimelineRevampContent(
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
     onScrollingChanged: (Boolean) -> Unit,
     onSelectorVisibleChanged: (Boolean) -> Unit,
+    onPendingSelectionCountChanged: (Int) -> Unit,
     selectedPhotoIds: Set<Long>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
@@ -366,6 +370,7 @@ private fun TimelineRevampContent(
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
                 onScrollingChanged = onScrollingChanged,
+                onPendingSelectionCountChanged = onPendingSelectionCountChanged,
                 selectedPhotoIds = selectedPhotoIds,
                 contentPadding = contentPaddingWithSelector,
                 bannerContent = bannerContent,
@@ -394,6 +399,7 @@ private fun TimelineRevampGrid(
     onNodeClicked: (PhotosNodeContentItemV2?, Int) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
     onScrollingChanged: (Boolean) -> Unit,
+    onPendingSelectionCountChanged: (Int) -> Unit,
     selectedPhotoIds: Set<Long>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
@@ -415,16 +421,27 @@ private fun TimelineRevampGrid(
     val currentLoadedNodes by rememberUpdatedState(loadedNodes)
     val currentSelectedPhotoIds by rememberUpdatedState(selectedPhotoIds)
     val currentOnNodeSelected by rememberUpdatedState(onNodeSelected)
+    val currentLoadMediaRange by rememberUpdatedState(loadMediaRange)
 
     // Cells marked for selection while their node is still loading; their shimmer placeholders
-    // render as selected and they join the selection once the node arrives.
-    val pendingSelection = remember { mutableStateSetOf<Int>() }
+    // render as selected and they join the selection once the node arrives. The value is the node
+    // once a range fetch resolves the cell (its id is then in selectedPhotoIds), null while the
+    // cell is selected but unresolved — so unresolved entries are exactly what the selection count
+    // must add on top of selectedPhotoIds without double counting.
+    val pendingSelection = remember { mutableStateMapOf<Int, PhotosNodeContentItemV2?>() }
+
+    // Removes a cell's pending mark when it is deselected. An entry a range fetch resolved holds
+    // its node and its id is already in the real selection, so toggle it back out too.
+    fun unmarkPendingSelection(index: Int) {
+        pendingSelection.remove(index)?.let { resolved ->
+            if (resolved.id in currentSelectedPhotoIds) currentOnNodeSelected(resolved)
+        }
+    }
 
     LaunchedEffect(loadedNodes) {
-        val iterator = pendingSelection.iterator()
-        while (iterator.hasNext()) {
-            val node = loadedNodes[iterator.next()] ?: continue
-            iterator.remove()
+        pendingSelection.keys.toList().forEach { index ->
+            val node = loadedNodes[index] ?: return@forEach
+            pendingSelection.remove(index)
             node.takeUnless { it.isTakenDown }
                 ?.takeIf { it.id !in selectedPhotoIds }
                 ?.let(onNodeSelected)
@@ -433,6 +450,15 @@ private fun TimelineRevampGrid(
 
     LaunchedEffect(selectedPhotoIds.isEmpty()) {
         if (selectedPhotoIds.isEmpty()) pendingSelection.clear()
+    }
+
+    val currentOnPendingSelectionCountChanged by rememberUpdatedState(onPendingSelectionCountChanged)
+    LaunchedEffect(Unit) {
+        snapshotFlow { pendingSelection.count { it.value == null } }
+            .collect { currentOnPendingSelectionCountChanged(it) }
+    }
+    DisposableEffect(Unit) {
+        onDispose { currentOnPendingSelectionCountChanged(0) }
     }
 
     NotifyVisibleMediaRange(
@@ -503,7 +529,11 @@ private fun TimelineRevampGrid(
             val node = loadedNodes[index]
             if (node == null) {
                 hasUnloadedCells = true
-                if (selectAll) pendingSelection.add(index) else pendingSelection.remove(index)
+                if (selectAll) {
+                    if (index !in pendingSelection) pendingSelection[index] = null
+                } else {
+                    unmarkPendingSelection(index)
+                }
             } else {
                 if (!selectAll) pendingSelection.remove(index)
                 node.takeUnless { it.isTakenDown }
@@ -517,6 +547,7 @@ private fun TimelineRevampGrid(
                     loadMediaRange(range.first, range.last).forEach { (index, node) ->
                         // Leaving selection mode clears the pending marks; don't revive the selection.
                         if (!selectAll || index in pendingSelection) {
+                            if (selectAll) pendingSelection[index] = node
                             node.takeUnless { it.isTakenDown }
                                 ?.takeIf { (it.id in currentSelectedPhotoIds) != selectAll }
                                 ?.let { currentOnNodeSelected(it) }
@@ -527,6 +558,34 @@ private fun TimelineRevampGrid(
                 } catch (e: Exception) {
                     Timber.e(e, "Failed to resolve the section selection")
                 }
+            }
+        }
+    }
+
+    // Cells drag-swept while unloaded only sit in pendingSelection, invisible to the selection
+    // count and any action taken on the selection. Resolve them the way toggleRangeSelection does
+    // as soon as the drag ends, instead of waiting for them to scroll into the loading window.
+    fun resolvePendingDragSelection() {
+        // Span only the unresolved cells: resolved entries linger (their nodes never reach
+        // loadedNodes) and would otherwise stretch the fetch across every past drag/select-all.
+        val unresolved = pendingSelection.filterValues { it == null }.keys
+        val first = unresolved.minOrNull() ?: return
+        val last = unresolved.max()
+        scope.launch {
+            try {
+                currentLoadMediaRange(first, last).forEach { (index, node) ->
+                    // Leaving selection mode clears the pending marks; don't revive the selection.
+                    if (index in pendingSelection) {
+                        pendingSelection[index] = node
+                        node.takeUnless { it.isTakenDown }
+                            ?.takeIf { it.id !in currentSelectedPhotoIds }
+                            ?.let(currentOnNodeSelected)
+                    }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to resolve the drag selection")
             }
         }
     }
@@ -583,8 +642,11 @@ private fun TimelineRevampGrid(
                         globalMediaIndexOf(key, currentOffsetByGroupId)
                     },
                     isMediaSelected = { index ->
+                        // An unloaded cell renders as checked through its pending mark, so treat
+                        // it as selected too — anchoring a drag on it must deselect, not reselect.
                         currentLoadedNodes[index]
-                            ?.let { it.id in currentSelectedPhotoIds } == true
+                            ?.let { it.id in currentSelectedPhotoIds }
+                            ?: (index in pendingSelection)
                     },
                     onDragSelectStarted = {
                         Analytics.tracker.trackEvent(MediaScreenDragToSelectStartedEvent)
@@ -593,9 +655,9 @@ private fun TimelineRevampGrid(
                         val node = currentLoadedNodes[index]
                         if (node == null) {
                             if (selected) {
-                                pendingSelection.add(index)
+                                if (index !in pendingSelection) pendingSelection[index] = null
                             } else {
-                                pendingSelection.remove(index)
+                                unmarkPendingSelection(index)
                             }
                         } else {
                             if (!selected) pendingSelection.remove(index)
@@ -604,6 +666,7 @@ private fun TimelineRevampGrid(
                                 ?.let { currentOnNodeSelected(it) }
                         }
                     },
+                    onDragSelectEnded = { resolvePendingDragSelection() },
                 )
                 .photosZoomGestureDetector(
                     onZoomIn = onZoomIn,
