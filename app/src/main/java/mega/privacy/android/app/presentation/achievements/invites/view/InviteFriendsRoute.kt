@@ -49,6 +49,7 @@ import mega.privacy.android.app.presentation.achievements.invites.model.InviteFr
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel.Companion.KEY_FROM
 import mega.privacy.android.app.presentation.contact.invite.navigation.InviteContactScreenResult.Companion.KEY_SENT_NUMBER
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -145,7 +146,7 @@ internal fun InviteFriendsView(
                         .testTag(InviteFriendsViewTestTags.IMAGE_MAIN)
                         .padding(top = 20.dp)
                         .align(Alignment.CenterHorizontally),
-                    painter = painterResource(id = R.drawable.ic_invite_friends_big),
+                    painter = painterResource(id = iconPackR.drawable.ic_invite_friends_big),
                     contentDescription = "Invite Friends Image"
                 )
                 Text(
@@ -257,7 +258,7 @@ internal fun InviteConfirmationDialog(
                             .testTag(InviteFriendsViewTestTags.DIALOG_IMAGE_ICON)
                             .padding(top = 40.dp)
                             .align(Alignment.CenterHorizontally),
-                        painter = painterResource(id = R.drawable.ic_success_invite),
+                        painter = painterResource(id = iconPackR.drawable.ic_success_invite),
                         contentDescription = "Invite Friends Check Icon"
                     )
                     Text(
