@@ -16,6 +16,7 @@ import mega.privacy.android.navigation.destination.MediaMainNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.PhotosBottomNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuMediaNavigationItemEvent
 
 class MediaNavItem : MainNavItem {
     override val id: String = "media"
@@ -36,4 +37,6 @@ class MediaNavItem : MainNavItem {
     override val availableOffline: Boolean = false
     override val analyticsEventIdentifier: NavigationEventIdentifier =
         PhotosBottomNavigationItemEvent
+    override val drawerAnalyticsEventIdentifier: NavigationEventIdentifier =
+        MyMenuMediaNavigationItemEvent
 }

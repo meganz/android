@@ -57,6 +57,11 @@ import mega.privacy.android.app.presentation.settings.customisenavigation.model.
 import mega.privacy.android.app.presentation.settings.customisenavigation.model.removeNavigationItem
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.CustomiseNavigationItemAddedEvent
+import mega.privacy.mobile.analytics.event.CustomiseNavigationItemRemovedEvent
+import mega.privacy.mobile.analytics.event.CustomiseNavigationItemsReorderedEvent
+import mega.privacy.mobile.analytics.event.CustomiseNavigationMaxItemsSnackbarDisplayedEvent
+import mega.privacy.mobile.analytics.event.CustomiseNavigationMinItemsSnackbarDisplayedEvent
 import mega.privacy.mobile.analytics.event.CustomiseNavigationResetButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CustomiseNavigationSaveButtonPressedEvent
 
@@ -142,12 +147,18 @@ private fun CustomiseNavigationContent(
     fun onSaveClicked() {
         Analytics.tracker.trackEvent(CustomiseNavigationSaveButtonPressedEvent)
         when (pendingIds.navigationSelectionError()) {
-            NavigationSelectionError.TooFewItems -> coroutineScope.launch {
-                snackbarHostState?.showAutoDurationSnackbar(minItemsMessage)
+            NavigationSelectionError.TooFewItems -> {
+                Analytics.tracker.trackEvent(CustomiseNavigationMinItemsSnackbarDisplayedEvent)
+                coroutineScope.launch {
+                    snackbarHostState?.showAutoDurationSnackbar(minItemsMessage)
+                }
             }
 
-            NavigationSelectionError.TooManyItems -> coroutineScope.launch {
-                snackbarHostState?.showAutoDurationSnackbar(maxItemsMessage)
+            NavigationSelectionError.TooManyItems -> {
+                Analytics.tracker.trackEvent(CustomiseNavigationMaxItemsSnackbarDisplayedEvent)
+                coroutineScope.launch {
+                    snackbarHostState?.showAutoDurationSnackbar(maxItemsMessage)
+                }
             }
 
             null -> onSave(pendingIds)
@@ -167,11 +178,22 @@ private fun CustomiseNavigationContent(
                 .weight(1f)
                 .verticalScroll(rememberScrollState()),
         ) {
+            var arrangementBeforeDrag by remember { mutableStateOf<List<String>?>(null) }
             YourNavigationCard(
                 items = pendingItems,
                 menuItem = data.menuItem,
                 onMove = { from, to -> pendingIds = pendingIds.moveNavigationItem(from, to) },
-                onItemDisabled = { id -> pendingIds = pendingIds.removeNavigationItem(id) },
+                onDragStarted = { arrangementBeforeDrag = pendingIds },
+                onDragStopped = {
+                    if (arrangementBeforeDrag != null && arrangementBeforeDrag != pendingIds) {
+                        Analytics.tracker.trackEvent(CustomiseNavigationItemsReorderedEvent)
+                    }
+                    arrangementBeforeDrag = null
+                },
+                onItemDisabled = { id ->
+                    pendingIds = pendingIds.removeNavigationItem(id)
+                    trackItemToggled(id = id, isAdded = false)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -179,7 +201,10 @@ private fun CustomiseNavigationContent(
             if (availableItems.isNotEmpty()) {
                 AvailableToAddCard(
                     items = availableItems,
-                    onItemEnabled = { id -> pendingIds = pendingIds.addNavigationItem(id) },
+                    onItemEnabled = { id ->
+                        pendingIds = pendingIds.addNavigationItem(id)
+                        trackItemToggled(id = id, isAdded = true)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -267,6 +292,8 @@ private fun YourNavigationCard(
     items: List<NavigationItemUiModel>,
     menuItem: NavigationItemUiModel,
     onMove: (fromIndex: Int, toIndex: Int) -> Unit,
+    onDragStarted: () -> Unit,
+    onDragStopped: () -> Unit,
     onItemDisabled: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -299,6 +326,8 @@ private fun YourNavigationCard(
                 items = items,
                 key = { it.id },
                 onMove = { from, to -> onMove(from.index, to.index) },
+                onDragStarted = { _, _ -> onDragStarted() },
+                onDragStopped = { onDragStopped() },
                 modifier = Modifier.height(NavigationItemRowHeight * items.size),
             ) { item ->
                 NavigationItemRow(
@@ -412,6 +441,17 @@ private fun NavigationItemRow(
         enable = isEnabled,
     )
 }
+
+private fun trackItemToggled(id: String, isAdded: Boolean) {
+    Analytics.tracker.trackEvent(
+        if (isAdded) {
+            CustomiseNavigationItemAddedEvent(id)
+        } else {
+            CustomiseNavigationItemRemovedEvent(id)
+        }
+    )
+}
+
 
 private val NavigationItemRowHeight = 68.dp
 

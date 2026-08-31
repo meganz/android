@@ -2232,7 +2232,8 @@ class MenuViewModelTest {
                 .thenReturn(true)
             val menuItems = mapOf(56 to MenuItemPlaceholder, 60 to DeviceCentreItem)
 
-            initUnderTest(menuItems = menuItems, mainNavItems = createMainNavItems())
+            val mainNavItems = createMainNavItems()
+            initUnderTest(menuItems = menuItems, mainNavItems = mainNavItems)
 
             underTest.uiState.test {
                 val state = awaitItem()
@@ -2242,6 +2243,10 @@ class MenuViewModelTest {
                 val favouritesRow = state.myAccountItems.first()
                 assertThat(favouritesRow.destination).isEqualTo(FavouritesTestNavKey)
                 assertThat(favouritesRow.title).isEqualTo(R.string.paste)
+                assertThat(favouritesRow.analyticsEventIdentifier)
+                    .isSameInstanceAs(
+                        mainNavItems.single { it.id == "favourites" }.drawerAnalyticsEventIdentifier
+                    )
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -2382,6 +2387,102 @@ class MenuViewModelTest {
             }
         }
 
+    @Test
+    fun `test that hidden section rows use the item's drawer analytics event identifier`() = runTest {
+        stubDefaultDependencies()
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+            .thenReturn(true)
+        monitorNavigationItemsPreferenceUseCase.stub {
+            on { invoke() }.thenReturn(
+                flowOf(NavigationItemsPreference(orderedVisibleItemIds = listOf("favourites")))
+            )
+        }
+        val homeDrawerIdentifier = mock<NavigationEventIdentifier>()
+        val driveDrawerIdentifier = mock<NavigationEventIdentifier>()
+        val mediaDrawerIdentifier = mock<NavigationEventIdentifier>()
+        val mainNavItems = setOf(
+            createMainNavItem(
+                id = "home",
+                destination = HomeTestNavKey,
+                preferredSlot = PreferredSlot.Ordered(0),
+                label = R.string.ok,
+                drawerIdentifier = homeDrawerIdentifier,
+            ),
+            createMainNavItem(
+                id = "drive",
+                destination = DriveTestNavKey,
+                preferredSlot = PreferredSlot.Ordered(1),
+                label = R.string.cancel,
+                drawerIdentifier = driveDrawerIdentifier,
+            ),
+            createMainNavItem(
+                id = "media",
+                destination = MediaTestNavKey,
+                preferredSlot = PreferredSlot.Ordered(2),
+                label = R.string.copy,
+                drawerIdentifier = mediaDrawerIdentifier,
+            ),
+            createMainNavItem(
+                id = "favourites",
+                destination = FavouritesTestNavKey,
+                preferredSlot = PreferredSlot.None,
+                label = R.string.paste,
+            ),
+        )
+        val menuItems = mapOf(56 to MenuItemPlaceholder)
+
+        initUnderTest(menuItems = menuItems, mainNavItems = mainNavItems)
+
+        underTest.uiState.test {
+            val identifiersByDestination = awaitItem().myAccountItems
+                .associate { it.destination to it.analyticsEventIdentifier }
+            assertThat(identifiersByDestination).containsExactly(
+                HomeTestNavKey, homeDrawerIdentifier,
+                DriveTestNavKey, driveDrawerIdentifier,
+                MediaTestNavKey, mediaDrawerIdentifier,
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that hidden section rows keep the item's own event when no drawer identifier is defined`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CustomisableBottomNavigation))
+                .thenReturn(true)
+            monitorNavigationItemsPreferenceUseCase.stub {
+                on { invoke() }.thenReturn(
+                    flowOf(
+                        NavigationItemsPreference(
+                            orderedVisibleItemIds = listOf("home", "drive", "media", "favourites")
+                        )
+                    )
+                )
+            }
+            val extraDestination = object : MainNavItemNavKey {}
+            val extraItem = createMainNavItem(
+                id = "extra",
+                destination = extraDestination,
+                preferredSlot = PreferredSlot.None,
+                label = R.string.ok,
+            )
+            val menuItems = mapOf(56 to MenuItemPlaceholder)
+
+            initUnderTest(
+                menuItems = menuItems,
+                mainNavItems = createMainNavItems() + extraItem,
+            )
+
+            underTest.uiState.test {
+                val extraRow = awaitItem().myAccountItems
+                    .single { it.destination == extraDestination }
+                assertThat(extraRow.analyticsEventIdentifier)
+                    .isSameInstanceAs(extraItem.analyticsEventIdentifier)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     private fun createMainNavItems(): Set<MainNavItem> = setOf(
         createMainNavItem(
             id = "home",
@@ -2420,6 +2521,7 @@ class MenuViewModelTest {
         destination: MainNavItemNavKey,
         preferredSlot: PreferredSlot,
         @StringRes label: Int,
+        drawerIdentifier: NavigationEventIdentifier? = null,
     ): MainNavItem = object : MainNavItem {
         override val id: String = id
         override val destination: MainNavItemNavKey = destination
@@ -2432,6 +2534,8 @@ class MenuViewModelTest {
         override val preferredSlot: PreferredSlot = preferredSlot
         override val availableOffline: Boolean = false
         override val analyticsEventIdentifier: NavigationEventIdentifier = mock()
+        override val drawerAnalyticsEventIdentifier: NavigationEventIdentifier
+            get() = drawerIdentifier ?: analyticsEventIdentifier
     }
 
     private companion object {

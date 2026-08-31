@@ -31,11 +31,23 @@ import mega.privacy.android.app.presentation.settings.customisenavigation.model.
 import mega.privacy.android.app.presentation.settings.customisenavigation.model.NavigationItemUiModel
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
+import mega.privacy.mobile.analytics.event.CustomiseNavigationItemAddedEvent
+import mega.privacy.mobile.analytics.event.CustomiseNavigationItemRemovedEvent
+import mega.privacy.mobile.analytics.event.CustomiseNavigationItemsReorderedEvent
+import mega.privacy.mobile.analytics.event.CustomiseNavigationMaxItemsSnackbarDisplayedEvent
+import mega.privacy.mobile.analytics.event.CustomiseNavigationMinItemsSnackbarDisplayedEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
@@ -76,9 +88,12 @@ class CustomiseNavigationScreenTest {
         icon = IconPack.Medium.Thin.Outline.Menu01,
     )
 
+    private lateinit var analyticsTracker: AnalyticsTracker
+
     @Before
     fun setUp() {
-        Analytics.initialise(mock<AnalyticsTracker>())
+        analyticsTracker = mock<AnalyticsTracker>()
+        Analytics.initialise(analyticsTracker)
     }
 
     @Test
@@ -170,6 +185,7 @@ class CustomiseNavigationScreenTest {
             )
         ).assertIsDisplayed()
         assertThat(savedIds).isEmpty()
+        verify(analyticsTracker).trackEvent(CustomiseNavigationMaxItemsSnackbarDisplayedEvent)
     }
 
     @Test
@@ -188,6 +204,7 @@ class CustomiseNavigationScreenTest {
             )
         ).assertIsDisplayed()
         assertThat(savedIds).isEmpty()
+        verify(analyticsTracker).trackEvent(CustomiseNavigationMinItemsSnackbarDisplayedEvent)
     }
 
     @Test
@@ -358,6 +375,68 @@ class CustomiseNavigationScreenTest {
         )
         composeTestRule.onNodeWithTag(CustomiseNavigationScreenTestTags.SAVE_BUTTON)
             .assertIsEnabled()
+    }
+
+    @Test
+    fun `test that an item added event with the mapped section is tracked when a toggle is switched on`() {
+        setScreenContent()
+
+        toggleFor(chatItem.id).performScrollTo().performClick()
+
+        val event = trackedEvents().filterIsInstance<CustomiseNavigationItemAddedEvent>().single()
+        assertThat(event.info["section"]).isEqualTo("chat")
+    }
+
+    @Test
+    fun `test that an item removed event with the mapped section is tracked when a toggle is switched off`() {
+        setScreenContent()
+
+        toggleFor(mediaItem.id).performScrollTo().performClick()
+
+        val event = trackedEvents().filterIsInstance<CustomiseNavigationItemRemovedEvent>().single()
+        assertThat(event.info["section"]).isEqualTo("media")
+    }
+
+    @Test
+    fun `test that a toggled item is tracked with its id even when the id is not a known section`() {
+        val unknownItem = NavigationItemUiModel(
+            id = "unknown",
+            label = sharedR.string.general_menu,
+            icon = IconPack.Medium.Thin.Outline.Menu01,
+        )
+        setScreenContent(available = listOf(chatItem, unknownItem))
+
+        toggleFor(unknownItem.id).performScrollTo().performClick()
+
+        val event = trackedEvents().filterIsInstance<CustomiseNavigationItemAddedEvent>().single()
+        assertThat(event.info["section"]).isEqualTo("unknown")
+    }
+
+    @Test
+    fun `test that a reordered event is tracked once when a drag changes the order`() {
+        setScreenContent()
+
+        rowFor(homeItem.id).performScrollTo().performDragDownByRows(1f)
+
+        verify(analyticsTracker, times(1)).trackEvent(CustomiseNavigationItemsReorderedEvent)
+    }
+
+    @Test
+    fun `test that no reordered event is tracked when a drag does not change the order`() {
+        setScreenContent()
+
+        rowFor(homeItem.id).performScrollTo().performTouchInput {
+            down(center)
+            advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+            up()
+        }
+
+        verify(analyticsTracker, never()).trackEvent(CustomiseNavigationItemsReorderedEvent)
+    }
+
+    private fun trackedEvents(): List<EventIdentifier> = argumentCaptor<EventIdentifier>().run {
+        verify(analyticsTracker, atLeastOnce()).trackEvent(capture())
+        allValues
     }
 
     private fun dataState(

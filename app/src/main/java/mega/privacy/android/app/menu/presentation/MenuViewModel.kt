@@ -241,7 +241,7 @@ class MenuViewModel @Inject constructor(
                     title = item.label,
                     badge = item.badge,
                     availableOffline = item.availableOffline,
-                    analyticsEventIdentifier = item.analyticsEventIdentifier,
+                    analyticsEventIdentifier = item.drawerAnalyticsEventIdentifier,
                 )
             }
     }

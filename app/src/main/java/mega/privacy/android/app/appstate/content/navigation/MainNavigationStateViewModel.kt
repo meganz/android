@@ -74,7 +74,8 @@ class MainNavigationStateViewModel @Inject constructor(
                 mainNavItems = navigationItems,
                 mainNavScreens = mainScreens,
                 initialDestination = barStartDestination ?: startScreenPreferenceDestination,
-                isConnected = isConnected
+                isConnected = isConnected,
+                isCustomisedArrangement = barStartDestination != null,
             )
         }.catch { Timber.e(it, "Error in NavigationItemStateViewModel") }
             .asUiStateFlow(

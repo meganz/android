@@ -46,4 +46,10 @@ class OfflineNavItemTest {
     fun `test that label is the offline files section string`() {
         assertThat(underTest.label).isEqualTo(sharedR.string.general_section_offline_files)
     }
+
+    @Test
+    fun `test that drawer analytics event identifier defaults to the bottom navigation event`() {
+        assertThat(underTest.drawerAnalyticsEventIdentifier)
+            .isEqualTo(underTest.analyticsEventIdentifier)
+    }
 }

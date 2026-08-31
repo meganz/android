@@ -15,6 +15,7 @@ import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.HomeBottomNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuHomeNavigationItemEvent
 import mega.privacy.mobile.home.presentation.home.Home
 import mega.privacy.mobile.home.presentation.home.homeScreen
 
@@ -35,4 +36,5 @@ class HomeNavItem : MainNavItem {
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(0)
     override val availableOffline: Boolean = true
     override val analyticsEventIdentifier: NavigationEventIdentifier = HomeBottomNavigationItemEvent
+    override val drawerAnalyticsEventIdentifier: NavigationEventIdentifier = MyMenuHomeNavigationItemEvent
 }

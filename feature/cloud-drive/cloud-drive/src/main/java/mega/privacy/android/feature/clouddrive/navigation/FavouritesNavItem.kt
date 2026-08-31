@@ -21,6 +21,7 @@ import mega.privacy.android.navigation.destination.FavouritesNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.FavouritesBottomNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuFavouritesNavigationItemEvent
 
 /**
  * Main navigation item for the Favourites section.
@@ -50,5 +51,7 @@ class FavouritesNavItem : MainNavItem, Flagged {
     override val availableOffline: Boolean = false
     override val analyticsEventIdentifier: NavigationEventIdentifier =
         FavouritesBottomNavigationItemEvent
+    override val drawerAnalyticsEventIdentifier: NavigationEventIdentifier =
+        MyMenuFavouritesNavigationItemEvent
 }
 

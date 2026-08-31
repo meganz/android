@@ -31,6 +31,9 @@ import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.LaunchedOnceEffect
+import mega.privacy.android.analytics.Analytics
+import mega.android.core.ui.extensions.LaunchedOncePerAppEffect
+import mega.privacy.mobile.analytics.event.CustomNavigationActiveEvent
 import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
 import mega.privacy.android.app.appstate.content.navigation.TopLevelBackStackNavigationHandler
@@ -76,6 +79,11 @@ fun HomeScreens(
         }
 
         is MainNavState.Data -> {
+            if (currentState.isCustomisedArrangement) {
+                LaunchedOncePerAppEffect(CUSTOM_NAVIGATION_ACTIVE_EFFECT_KEY) {
+                    Analytics.tracker.trackEvent(CustomNavigationActiveEvent)
+                }
+            }
             var hasSetStackFromKey by rememberSaveable(key) { mutableStateOf(false) }
             val homeScreenStacks =
                 rememberTopLevelBackStack(currentState.initialDestination)
@@ -245,3 +253,5 @@ private fun fallback(
         innerNavigationHandler.back()
     }
 }
+
+private const val CUSTOM_NAVIGATION_ACTIVE_EFFECT_KEY = "custom_navigation_active"

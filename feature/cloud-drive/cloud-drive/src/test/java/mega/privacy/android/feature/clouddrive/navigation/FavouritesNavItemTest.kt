@@ -5,6 +5,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.destination.FavouritesNavKey
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.MyMenuFavouritesNavigationItemEvent
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
@@ -46,5 +47,11 @@ class FavouritesNavItemTest {
     fun `test that label is the favourites string`() {
         assertThat(underTest.label)
             .isEqualTo(sharedR.string.video_section_title_favourite_playlist)
+    }
+
+    @Test
+    fun `test that drawer analytics event identifier is the favourites drawer event`() {
+        assertThat(underTest.drawerAnalyticsEventIdentifier)
+            .isEqualTo(MyMenuFavouritesNavigationItemEvent)
     }
 }

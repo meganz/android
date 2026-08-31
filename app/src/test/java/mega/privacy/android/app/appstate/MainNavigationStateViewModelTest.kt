@@ -80,7 +80,7 @@ class MainNavigationStateViewModelTest {
             monitorConnectivityUseCase,
             monitorStartScreenPreferenceDestinationUseCase,
             screenPreferenceDestinationMapper,
-            navigationResultManager
+            navigationResultManager,
         )
         stubNavigationItemsPreference(preference = null)
         stubCustomisableNavigationFlag(enabled = false)
@@ -552,6 +552,82 @@ class MainNavigationStateViewModelTest {
                         android.R.string.paste,
                     ).inOrder()
                     assertThat(item.initialDestination).isEqualTo(defaultStartScreen)
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that state reports a customised arrangement when the bar uses a saved preference`() =
+        runTest {
+            stubConnectivity()
+            stubAllEnabledFlaggedItems()
+            stubEmptyStartScreenPreference()
+            stubNavigationItemsPreference(NavigationItemsPreference(listOf("media", "home")))
+            stubCustomisableNavigationFlag(enabled = true)
+
+            initUnderTest(setOf(mediaItem(), menuItem(), homeItem(), driveItem()))
+
+            underTest.state
+                .filterIsInstance<MainNavState.Data>()
+                .test {
+                    assertThat(awaitItem().isCustomisedArrangement).isTrue()
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that state reports a default arrangement when the customisation flag is disabled`() =
+        runTest {
+            stubConnectivity()
+            stubAllEnabledFlaggedItems()
+            stubEmptyStartScreenPreference()
+            stubNavigationItemsPreference(NavigationItemsPreference(listOf("media", "home")))
+            stubCustomisableNavigationFlag(enabled = false)
+
+            initUnderTest(setOf(mediaItem(), menuItem(), homeItem(), driveItem()))
+
+            underTest.state
+                .filterIsInstance<MainNavState.Data>()
+                .test {
+                    assertThat(awaitItem().isCustomisedArrangement).isFalse()
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that state reports a default arrangement when no preference is saved`() =
+        runTest {
+            stubConnectivity()
+            stubAllEnabledFlaggedItems()
+            stubEmptyStartScreenPreference()
+            stubNavigationItemsPreference(preference = null)
+            stubCustomisableNavigationFlag(enabled = true)
+
+            initUnderTest(setOf(mediaItem(), menuItem(), homeItem(), driveItem()))
+
+            underTest.state
+                .filterIsInstance<MainNavState.Data>()
+                .test {
+                    assertThat(awaitItem().isCustomisedArrangement).isFalse()
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that state reports a default arrangement when no preferred id matches an enabled item`() =
+        runTest {
+            stubConnectivity()
+            stubAllEnabledFlaggedItems()
+            stubEmptyStartScreenPreference()
+            stubNavigationItemsPreference(NavigationItemsPreference(listOf("unknown")))
+            stubCustomisableNavigationFlag(enabled = true)
+
+            initUnderTest(setOf(mediaItem(), menuItem(), homeItem(), driveItem()))
+
+            underTest.state
+                .filterIsInstance<MainNavState.Data>()
+                .test {
+                    assertThat(awaitItem().isCustomisedArrangement).isFalse()
                     cancelAndIgnoreRemainingEvents()
                 }
         }

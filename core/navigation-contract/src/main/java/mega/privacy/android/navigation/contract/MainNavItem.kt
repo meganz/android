@@ -24,6 +24,14 @@ interface MainNavItem {
     val preferredSlot: PreferredSlot
     val availableOffline: Boolean
     val analyticsEventIdentifier: NavigationEventIdentifier
+
+    /**
+     * Analytics identifier tracked when this section is opened from a Menu drawer row rather
+     * than the navigation bar. Defaults to [analyticsEventIdentifier] for items without a
+     * dedicated drawer event.
+     */
+    val drawerAnalyticsEventIdentifier: NavigationEventIdentifier
+        get() = analyticsEventIdentifier
 }
 
 sealed interface MainNavItemBadge {

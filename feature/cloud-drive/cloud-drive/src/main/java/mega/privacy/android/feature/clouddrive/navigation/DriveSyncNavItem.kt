@@ -19,6 +19,7 @@ import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuCloudDriveNavigationItemEvent
 
 class DriveSyncNavItem : MainNavItem {
     override val id: String = "drive"
@@ -49,4 +50,6 @@ class DriveSyncNavItem : MainNavItem {
     override val availableOffline: Boolean = false
     override val analyticsEventIdentifier: NavigationEventIdentifier =
         CloudDriveBottomNavigationItemEvent
+    override val drawerAnalyticsEventIdentifier: NavigationEventIdentifier =
+        MyMenuCloudDriveNavigationItemEvent
 }
