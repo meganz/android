@@ -1,0 +1,44 @@
+{
+  "screenshotPath": "/sdcard/googletest/test_outputfiles/a11y/HomeScreenTest-screenshot-1.png",
+  "results": [
+    {
+      "check": "TextContrastCheck",
+      "type": "SUPPRESSED",
+      "element": "android.widget.TextView mega.privacy.android.app:id/home_banner_title Rect(48, 120 - 480, 168)",
+      "message": "The item's text contrast ratio is 2.34. This ratio is based on an estimated foreground color of #999999 and an estimated background color of #FFFFFF. Consider increasing this item's text contrast ratio to 4.50 or greater.",
+      "metadata": {
+        "KEY_CONTRAST_RATIO": 2.34,
+        "KEY_REQUIRED_CONTRAST_RATIO": 4.5,
+        "KEY_TEXT_COLOR": -6710887,
+        "KEY_BACKGROUND_COLOR": -1,
+        "KEY_IS_LARGE_TEXT": false,
+        "KEY_VIEW_BOUNDS_STRING": "Rect(48, 120 - 480, 168)"
+      }
+    },
+    {
+      "check": "TextSizeCheck",
+      "type": "SUPPRESSED",
+      "element": "android.widget.TextView mega.privacy.android.app:id/home_storage_label Rect(48, 200 - 320, 232)",
+      "message": "The text size of this item is fixed and does not scale with the system font size setting.",
+      "metadata": {
+        "KEY_ESTIMATED_TEXT_SIZE_DP": 11.0,
+        "KEY_TEXT_SIZE_UNIT": 1,
+        "KEY_TEXT": "Storage"
+      }
+    },
+    {
+      "check": "TextContrastCheck",
+      "type": "NOT_RUN",
+      "element": null,
+      "message": null,
+      "metadata": {}
+    },
+    {
+      "check": "SpeakableTextPresentCheck",
+      "type": "SUPPRESSED",
+      "element": "android.view.View Rect(0, 0 - 1080, 2400)",
+      "message": null,
+      "metadata": {}
+    }
+  ]
+}

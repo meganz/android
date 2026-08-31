@@ -1,0 +1,43 @@
+{
+  "screenshotPath": null,
+  "results": [
+    {
+      "check": "TouchTargetSizeCheck",
+      "type": "ERROR",
+      "element": "android.widget.ImageButton mega.privacy.android.app:id/settings_toggle Rect(996, 350 - 1028, 382)",
+      "message": "This item's height is 32dp and width is 32dp. Consider making this touch target 48dp wide and 48dp high or larger.",
+      "metadata": {
+        "KEY_WIDTH": 32,
+        "KEY_HEIGHT": 32,
+        "KEY_REQUIRED_WIDTH": 48,
+        "KEY_REQUIRED_HEIGHT": 48
+      }
+    },
+    {
+      "check": "ImageContrastCheck",
+      "type": "SUPPRESSED",
+      "element": "android.widget.ImageView mega.privacy.android.app:id/settings_section_icon Rect(48, 350 - 96, 398)",
+      "message": "The image's contrast ratio is 1.86. This ratio is based on an estimated foreground color of #D6D6D6 and an estimated background color of #FFFFFF. Consider increasing this image's contrast ratio to 3.00 or greater.",
+      "metadata": {
+        "KEY_CONTRAST_RATIO": 1.86,
+        "KEY_FOREGROUND_COLOR": -2697514,
+        "KEY_BACKGROUND_COLOR": -1,
+        "KEY_SCREENSHOT_BOUNDS_STRING": "Rect(48, 350 - 96, 398)"
+      }
+    },
+    {
+      "check": "ClickableSpanCheck",
+      "type": "WARNING",
+      "element": "android.widget.TextView mega.privacy.android.app:id/settings_legal_links Rect(48, 2100 - 1032, 2148)",
+      "message": "Using ClickableSpan is not accessible to all users because it may not be visible or actionable via accessibility services.",
+      "metadata": {}
+    },
+    {
+      "check": "EditableContentDescCheck",
+      "type": "NOT_RUN",
+      "element": null,
+      "message": null,
+      "metadata": {}
+    }
+  ]
+}
