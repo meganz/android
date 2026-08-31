@@ -59,6 +59,17 @@ internal class RichDocumentConversionTest {
     }
 
     @Test
+    fun `test that a list item with extra block content falls back to raw source whole`() {
+        val markdown = "- item\n\n    second paragraph\n- plain"
+        val document = toModel.convert(markdown)
+
+        assertThat(document.blocks).hasSize(1)
+        assertThat(document.blocks.single()).isInstanceOf(RichBlock.RawSource::class.java)
+        assertThat(roundTrip(markdown)).isEqualTo(markdown)
+        assertStable(markdown)
+    }
+
+    @Test
     fun `test that convert maps task boxes to checked state`() {
         val document = toModel.convert("- [ ] todo\n- [x] done")
 

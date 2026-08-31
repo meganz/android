@@ -124,6 +124,14 @@ class MarkdownToRichDocumentConverter @Inject constructor() {
         listIndent: Int,
         out: MutableList<RichBlock>,
     ) {
+        // An item carrying block content the flat model cannot indent (a second paragraph,
+        // code, a quote...) makes the WHOLE list raw source: rendered through the preview
+        // components (parity) and re-emitted verbatim (fidelity), instead of flattening the
+        // extra content to top level without its indentation.
+        if (hasUnsupportedItemContent(list)) {
+            out += rawSource(list, source)
+            return
+        }
         // Only a run starting away from 1 needs its start recorded (on its first item).
         var startNumber = (list as? OrderedList)?.markerStartNumber?.takeIf { it != 1 }
         var item = list.firstChild
@@ -168,6 +176,30 @@ class MarkdownToRichDocumentConverter @Inject constructor() {
             }
             item = item.next
         }
+    }
+
+    /** True when any item (recursively) holds block content beyond its text and sublists. */
+    private fun hasUnsupportedItemContent(list: Node): Boolean {
+        var item = list.firstChild
+        while (item != null) {
+            if (item is ListItem) {
+                var textTaken = false
+                var child = item.firstChild
+                while (child != null) {
+                    when {
+                        child is TaskListItemMarker -> Unit
+                        child is Paragraph && !textTaken -> textTaken = true
+                        child is BulletList || child is OrderedList ->
+                            if (hasUnsupportedItemContent(child)) return true
+
+                        else -> return true
+                    }
+                    child = child.next
+                }
+            }
+            item = item.next
+        }
+        return false
     }
 
     private inline fun convertSupportedOrRaw(

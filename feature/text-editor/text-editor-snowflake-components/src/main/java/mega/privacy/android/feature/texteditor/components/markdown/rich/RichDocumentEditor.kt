@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
@@ -130,6 +133,27 @@ fun RichDocumentEditor(
         }
     }
 
+    // Same selection palette as the preview and the chunked source editor, instead of the
+    // Material default, so selecting text looks the same on every editor surface.
+    val selectionColors = remember(colors.text) {
+        TextSelectionColors(
+            handleColor = colors.text,
+            backgroundColor = colors.text.copy(alpha = 0.3f),
+        )
+    }
+    CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
+        RichDocumentBlocks(state, visualStyles, colors, focusRequesters, modifier)
+    }
+}
+
+@Composable
+private fun RichDocumentBlocks(
+    state: RichDocumentState,
+    visualStyles: RichSpanVisualStyles,
+    colors: MarkdownColors,
+    focusRequesters: MutableMap<Int, FocusRequester>,
+    modifier: Modifier = Modifier,
+) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
