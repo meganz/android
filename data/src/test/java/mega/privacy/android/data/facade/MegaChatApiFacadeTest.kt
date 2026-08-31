@@ -2,7 +2,10 @@ package mega.privacy.android.data.facade
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import nz.mega.sdk.MegaChatApi
@@ -16,16 +19,21 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  * Test class for [MegaChatApiFacade], focused on the call getters being gated on the chat
- * init state to avoid the native crash in AND-19389.
+ * init state to avoid the native crash in AND-19389, and on chat room open/close being
+ * serialised.
  */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -146,4 +154,72 @@ internal class MegaChatApiFacadeTest {
             assertThat(result).isNull()
             verify(chatApi, never()).chatCallsIds
         }
+
+    @Test
+    fun `test that openChatRoom does not close another chat room while a chat room is being opened`() {
+        val firstChatId = 1L
+        val secondChatId = 2L
+        val openEntered = CountDownLatch(1)
+        val releaseOpen = CountDownLatch(1)
+        val secondCloseEntered = CountDownLatch(1)
+
+        whenever(chatApi.openChatRoom(eq(firstChatId), any())) doAnswer {
+            openEntered.countDown()
+            releaseOpen.await()
+            true
+        }
+        doAnswer { secondCloseEntered.countDown() }
+            .whenever(chatApi).closeChatRoom(eq(secondChatId), any())
+
+        val scope = CoroutineScope(Dispatchers.IO)
+        val facade = MegaChatApiFacade(chatApi = chatApi, sharingScope = scope)
+
+        try {
+            scope.launch { facade.openChatRoom(firstChatId).collect {} }
+            assertThat(openEntered.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue()
+
+            scope.launch { facade.openChatRoom(secondChatId).collect {} }
+
+            assertThat(secondCloseEntered.await(BLOCKED_MILLIS, TimeUnit.MILLISECONDS)).isFalse()
+
+            releaseOpen.countDown()
+            assertThat(secondCloseEntered.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue()
+        } finally {
+            releaseOpen.countDown()
+            scope.cancel()
+        }
+    }
+
+    @Test
+    fun `test that openChatRoom closes the chat room when the last subscriber goes away`() {
+        val chatId = 3L
+        val openEntered = CountDownLatch(1)
+        val closeAfterOpen = CountDownLatch(1)
+
+        whenever(chatApi.openChatRoom(eq(chatId), any())) doAnswer {
+            openEntered.countDown()
+            true
+        }
+        doAnswer { if (openEntered.count == 0L) closeAfterOpen.countDown() }
+            .whenever(chatApi).closeChatRoom(eq(chatId), any())
+
+        val scope = CoroutineScope(Dispatchers.IO)
+        val facade = MegaChatApiFacade(chatApi = chatApi, sharingScope = scope)
+
+        try {
+            val collectJob = scope.launch { facade.openChatRoom(chatId).collect {} }
+            assertThat(openEntered.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue()
+
+            collectJob.cancel()
+
+            assertThat(closeAfterOpen.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue()
+        } finally {
+            scope.cancel()
+        }
+    }
+
+    private companion object {
+        const val TIMEOUT_SECONDS = 5L
+        const val BLOCKED_MILLIS = 300L
+    }
 }

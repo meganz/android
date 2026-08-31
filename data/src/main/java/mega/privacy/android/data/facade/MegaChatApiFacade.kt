@@ -1,11 +1,15 @@
 package mega.privacy.android.data.facade
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.IgnoredChatRequestListener
 import mega.privacy.android.data.model.ChatRoomUpdate
@@ -208,13 +212,20 @@ internal class MegaChatApiFacade @Inject constructor(
             }
         }
 
-        chatApi.closeChatRoom(chatId, listener)
-        val opened = chatApi.openChatRoom(chatId, listener)
-        Timber.d("Open chat room $chatId: $opened")
-
-        awaitClose {
+        try {
+            chatRoomListenerMutex.withLock {
+                chatApi.closeChatRoom(chatId, listener)
+                val opened = chatApi.openChatRoom(chatId, listener)
+                Timber.d("Open chat room $chatId: $opened")
+            }
+            awaitClose()
+        } finally {
             Timber.d("Close chat room $chatId")
-            chatApi.closeChatRoom(chatId, listener)
+            withContext(NonCancellable) {
+                chatRoomListenerMutex.withLock {
+                    chatApi.closeChatRoom(chatId, listener)
+                }
+            }
         }
     }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
@@ -966,5 +977,20 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override suspend fun setUserStoppedTyping(chatId: Long) {
         chatApi.sendStopTypingNotification(chatId)
+    }
+
+    companion object {
+        /**
+         * Guards [MegaChatApiJava.openChatRoom] and [MegaChatApiJava.closeChatRoom], which mutate
+         * and iterate the same static listener set without holding its lock, so opening one chat
+         * room while another is being closed throws ConcurrentModificationException. This facade is
+         * the only place the app opens or closes chat rooms, so serialising here is enough.
+         *
+         * The close runs in a `finally` rather than in the `awaitClose` block so that it keeps the
+         * flow alive until it completes: [SharingStarted.WhileSubscribed] restarts the upstream as
+         * soon as the previous one is done, and a close landing after that restart would unregister
+         * the new listener.
+         */
+        private val chatRoomListenerMutex = Mutex()
     }
 }
