@@ -14,6 +14,7 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.lifecycle.awaitInstance
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -63,6 +64,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import kotlin.coroutines.resume
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.feature.documentscanner.components.BoundaryOverlay
 import mega.privacy.android.feature.documentscanner.components.CapturedPagesDeck
@@ -407,61 +409,59 @@ private fun CameraPreview(
     val analysisExecutor = remember { Executors.newSingleThreadExecutor() }
     val scanFrameAnalyzer = remember { ScanFrameAnalyzer(ANALYSIS_INTERVAL_MS) }
 
-    DisposableEffect(lifecycleOwner) {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-        cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
-            val preview = Preview.Builder().build().also {
-                it.surfaceProvider = previewView.surfaceProvider
-            }
-            val imageAnalysis = ImageAnalysis.Builder()
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
-                .also { analysis ->
-                    analysis.setAnalyzer(analysisExecutor) { imageProxy ->
-                        try {
-                            val plane = imageProxy.planes[0]
-                            val frame = scanFrameAnalyzer.analyze(
-                                width = imageProxy.width,
-                                height = imageProxy.height,
-                                rowStride = plane.rowStride,
-                                pixelStride = plane.pixelStride,
-                                rotationDegrees = imageProxy.imageInfo.rotationDegrees,
-                                timestampMs = imageProxy.imageInfo.timestamp / 1_000_000,
-                            ) {
-                                val buffer = plane.buffer
-                                ByteArray(buffer.remaining()).also { buffer.get(it) }
-                            }
-                            frame?.let {
-                                onFrame(it.bytes, it.width, it.height, it.rotationDegrees, it.timestampMs)
-                            }
-                        } catch (e: Exception) {
-                            Timber.e(e, "[DocScanner] Analysis frame failed")
-                        } finally {
-                            imageProxy.close()
+    DisposableEffect(Unit) {
+        onDispose { analysisExecutor.shutdown() }
+    }
+
+    LaunchedEffect(lifecycleOwner) {
+        val cameraProvider = ProcessCameraProvider.awaitInstance(context)
+        val preview = Preview.Builder().build().also {
+            it.surfaceProvider = previewView.surfaceProvider
+        }
+        val imageAnalysis = ImageAnalysis.Builder()
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .build()
+            .also { analysis ->
+                analysis.setAnalyzer(analysisExecutor) { imageProxy ->
+                    try {
+                        val plane = imageProxy.planes[0]
+                        val frame = scanFrameAnalyzer.analyze(
+                            width = imageProxy.width,
+                            height = imageProxy.height,
+                            rowStride = plane.rowStride,
+                            pixelStride = plane.pixelStride,
+                            rotationDegrees = imageProxy.imageInfo.rotationDegrees,
+                            timestampMs = imageProxy.imageInfo.timestamp / 1_000_000,
+                        ) {
+                            val buffer = plane.buffer
+                            ByteArray(buffer.remaining()).also { buffer.get(it) }
                         }
+                        frame?.let {
+                            onFrame(it.bytes, it.width, it.height, it.rotationDegrees, it.timestampMs)
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "[DocScanner] Analysis frame failed")
+                    } finally {
+                        imageProxy.close()
                     }
                 }
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-            try {
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    lifecycleOwner,
-                    cameraSelector,
-                    preview,
-                    imageAnalysis,
-                    imageCapture,
-                )
-            } catch (e: Exception) {
-                Timber.e(e, "CameraX bind failed")
             }
-        }, ContextCompat.getMainExecutor(context))
-
-        onDispose {
-            if (cameraProviderFuture.isDone) {
-                cameraProviderFuture.get().unbindAll()
-            }
-            analysisExecutor.shutdown()
+        try {
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(
+                lifecycleOwner,
+                CameraSelector.DEFAULT_BACK_CAMERA,
+                preview,
+                imageAnalysis,
+                imageCapture,
+            )
+        } catch (e: Exception) {
+            Timber.e(e, "CameraX bind failed")
+        }
+        try {
+            awaitCancellation()
+        } finally {
+            cameraProvider.unbindAll()
         }
     }
 

@@ -48,8 +48,10 @@ concurrent-futures = { module = "androidx.concurrent:concurrent-futures-ktx", ve
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
 constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayout-compose" }
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
-camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
+camera-compose = { module = "androidx.camera:camera-compose", version.ref = "camerax" }
 camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
+camera-video = { module = "androidx.camera:camera-video", version.ref = "camerax" }
+camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }

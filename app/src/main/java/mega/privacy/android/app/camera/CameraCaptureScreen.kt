@@ -39,7 +39,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -80,7 +80,6 @@ internal fun CameraCaptureScreen(
     viewModel: CameraViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
     val cameraState = rememberCameraState()
     var flashMode by rememberSaveable { mutableStateOf(cameraState.flashMode) }
     var camSelector by rememberSaveableCamSelector(CamSelector.Back)
@@ -102,18 +101,38 @@ internal fun CameraCaptureScreen(
     val animatedRotation = rememberAnimationRotation(rotation.toFloat())
 
     var availableZoomRange by remember { mutableStateOf(1.0f..5.0f) }
-    LaunchedEffect(cameraState.isInitialized) {
+    val cameraInfo = cameraState.cameraInfo
+    LaunchedEffect(cameraInfo) {
+        cameraInfo?.zoomState?.asFlow()?.collect { zoomState ->
+            cameraState.zoomRatio = zoomState.zoomRatio
+            availableZoomRange = zoomState.minZoomRatio..zoomState.maxZoomRatio
+        }
+    }
+
+    // Update camera state when parameters change
+    LaunchedEffect(cameraState.isInitialized, camSelector, cameraOption, flashMode) {
         if (cameraState.isInitialized) {
-            cameraState.controller.cameraInfo?.zoomState?.observe(lifecycleOwner) { zoomState ->
-                cameraState.zoomRatio = zoomState.zoomRatio
-                availableZoomRange = zoomState.minZoomRatio..zoomState.maxZoomRatio
-            }
+            cameraState.update(
+                camSelector = camSelector,
+                captureMode = cameraOption.mode,
+                flashMode = flashMode,
+                enableTorch = false,
+                videoQualitySelector = cameraState.videoQualitySelector,
+            )
         }
     }
 
     // Focus ring state management
     var focusRingKey by remember { mutableIntStateOf(0) }
     var tapOffset by remember { mutableStateOf(Offset(0f, 0f)) }
+
+    // Dismiss focus ring after a delay
+    LaunchedEffect(focusRingKey) {
+        if (cameraState.isFocusActive) {
+            delay(1000)
+            cameraState.isFocusActive = false
+        }
+    }
 
     val flashOptions = remember {
         hashMapOf(
@@ -261,9 +280,6 @@ internal fun CameraCaptureScreen(
             ) {
                 CameraPreview(
                     cameraState = cameraState,
-                    camSelector = camSelector,
-                    captureMode = cameraOption.mode,
-                    flashMode = flashMode,
                     onTapFocus = { x, y ->
                         tapOffset = Offset(x, y)
                         focusRingKey++
@@ -295,7 +311,7 @@ internal fun CameraCaptureScreen(
                             interpolator = AccelerateDecelerateInterpolator()
                             addUpdateListener { animation ->
                                 val zoomValue = animation.animatedValue as Float
-                                cameraState.controller.setZoomRatio(zoomValue)
+                                cameraState.applyZoomRatio(zoomValue)
                             }
                             start()
                         }

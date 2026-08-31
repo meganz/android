@@ -5,7 +5,6 @@ import android.app.Application
 import android.net.Uri
 import androidx.camera.core.ImageCapture
 import androidx.camera.video.FileDescriptorOutputOptions
-import androidx.camera.view.video.AudioConfig
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
@@ -108,7 +107,7 @@ internal class CameraViewModel @Inject constructor(
                     cameraState.startRecording(
                         FileDescriptorOutputOptions.Builder(fileDescriptor)
                             .setLocation(location).build(),
-                        AudioConfig.create(hasRecordAudioPermission),
+                        hasRecordAudioPermission,
                     ) {
                         when (it) {
                             is CaptureResult.Success -> {
