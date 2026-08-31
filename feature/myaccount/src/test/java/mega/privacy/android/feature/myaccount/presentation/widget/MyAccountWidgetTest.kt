@@ -13,7 +13,7 @@ import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.stripLinkAnnotations
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
-import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
 import mega.privacy.android.shared.resources.R
 import org.junit.Assert.assertTrue
 import org.junit.Rule

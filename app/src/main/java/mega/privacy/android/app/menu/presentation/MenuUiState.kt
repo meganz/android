@@ -4,7 +4,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
+import mega.privacy.android.shared.account.presentation.model.AvatarContent
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.home.presentation.home.widget.banner.model.SubscriptionOfferBannerUiModel

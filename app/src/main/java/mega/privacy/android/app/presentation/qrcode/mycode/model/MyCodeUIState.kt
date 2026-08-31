@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.qrcode.mycode.model
 
 import androidx.annotation.ColorInt
-import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
+import mega.privacy.android.shared.account.presentation.model.AvatarContent
 
 /**
  * UI state class for MyCodeFragment

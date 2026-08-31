@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.myaccount.presentation.mapper
+package mega.privacy.android.shared.account.presentation.mapper
 
 import android.content.Context
 import androidx.compose.ui.unit.TextUnit
@@ -7,10 +7,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
-import mega.privacy.android.feature.myaccount.presentation.model.EmojiAvatarContent
-import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
-import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.shared.account.presentation.model.AvatarContent
+import mega.privacy.android.shared.account.presentation.model.EmojiAvatarContent
+import mega.privacy.android.shared.account.presentation.model.PhotoAvatarContent
+import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.thirdpartylib.twemoji.wrapper.EmojiManagerWrapper
 import java.io.File

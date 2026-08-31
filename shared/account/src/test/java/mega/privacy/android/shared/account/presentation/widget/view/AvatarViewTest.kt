@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.myaccount.presentation.widget.view
+package mega.privacy.android.shared.account.presentation.widget.view
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -8,9 +8,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.feature.myaccount.presentation.model.EmojiAvatarContent
-import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
-import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.shared.account.presentation.model.EmojiAvatarContent
+import mega.privacy.android.shared.account.presentation.model.PhotoAvatarContent
+import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
 import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.Ignore
 import org.junit.Rule

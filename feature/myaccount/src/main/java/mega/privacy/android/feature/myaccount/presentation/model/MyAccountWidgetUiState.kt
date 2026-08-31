@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.myaccount.presentation.model
 
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.shared.account.presentation.model.AvatarContent
 
 /**
  * UI state for MyAccount widget

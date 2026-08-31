@@ -37,9 +37,9 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
-import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
-import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
-import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
+import mega.privacy.android.shared.account.presentation.model.PhotoAvatarContent
+import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
+import mega.privacy.android.shared.account.presentation.widget.view.Avatar
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme

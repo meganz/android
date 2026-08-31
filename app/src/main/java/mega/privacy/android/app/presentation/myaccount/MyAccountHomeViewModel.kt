@@ -45,7 +45,7 @@ import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
-import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.shared.account.presentation.mapper.AvatarContentMapper
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -23,12 +23,17 @@ dependencies {
     lintChecks(project(":lint"))
 
     implementation(project(":domain"))
+    implementation(project(":data"))
     implementation(project(":resources:string-resources"))
     implementation(project(":resources:icon-pack"))
+    implementation(project(":shared:original-core-ui"))
+    implementation(project(":third-party-lib:twemoji"))
 
     //core components
     implementation(lib.mega.core.ui)
     implementation(lib.mega.core.ui.tokens)
+    implementation(lib.coil3)
+    implementation(lib.coil.compose)
 
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))

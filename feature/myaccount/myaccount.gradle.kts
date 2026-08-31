@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":shared:original-core-ui"))
+    implementation(project(":shared:account"))
     implementation(project(":legacy-core-ui"))
     implementation(project(":core:ui-components:shared-components"))
     implementation(project(":core:formatter"))

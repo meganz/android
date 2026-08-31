@@ -1,7 +1,7 @@
-package mega.privacy.android.feature.myaccount.presentation.mapper
+package mega.privacy.android.shared.account.presentation.mapper
 
 import androidx.compose.ui.unit.TextUnit
-import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
+import mega.privacy.android.shared.account.presentation.model.AvatarContent
 import java.io.File
 
 /**

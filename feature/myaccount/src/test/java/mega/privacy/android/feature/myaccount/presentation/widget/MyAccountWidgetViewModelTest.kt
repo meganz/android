@@ -23,11 +23,11 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
-import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.feature.myaccount.presentation.mapper.QuotaLevelMapper
-import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
-import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.shared.account.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.shared.account.presentation.model.AvatarContent
+import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

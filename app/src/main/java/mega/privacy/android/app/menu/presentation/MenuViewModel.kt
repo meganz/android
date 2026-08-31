@@ -61,7 +61,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
 import mega.privacy.android.domain.usecase.preference.MonitorNavigationItemsPreferenceUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
-import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.shared.account.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.contract.PreferredSlot

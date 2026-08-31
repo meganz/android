@@ -73,10 +73,10 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVA
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLBAR
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialogM3NavKey
-import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
 import mega.privacy.android.feature.payment.components.OfferBanner
 import mega.privacy.android.feature.payment.components.rememberOfferExpired
-import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
+import mega.privacy.android.shared.account.presentation.widget.view.Avatar
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem

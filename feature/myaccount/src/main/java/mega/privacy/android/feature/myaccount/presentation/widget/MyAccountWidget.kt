@@ -41,8 +41,8 @@ import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.stripLinkAnnotations
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
-import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
-import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
+import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
+import mega.privacy.android.shared.account.presentation.widget.view.Avatar
 import mega.privacy.android.feature.myaccount.presentation.widget.view.MyAccountHorizontalProgressBar
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R

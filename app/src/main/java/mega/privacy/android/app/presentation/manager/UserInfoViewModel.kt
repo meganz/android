@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
-import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.shared.account.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject

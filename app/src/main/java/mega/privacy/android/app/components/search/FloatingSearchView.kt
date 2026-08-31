@@ -26,9 +26,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.SearchQuerySectionBinding
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
-import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
-import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
-import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
+import mega.privacy.android.shared.account.presentation.model.AvatarContent
+import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
+import mega.privacy.android.shared.account.presentation.widget.view.Avatar
 import mega.privacy.android.app.utils.Util
 
 /**

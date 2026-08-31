@@ -18,7 +18,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
-import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.shared.account.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.feature.myaccount.presentation.mapper.QuotaLevelMapper
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
 import mega.privacy.android.core.coroutine.asUiStateFlow

@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.myaccount.presentation.mapper
+package mega.privacy.android.shared.account.presentation.mapper
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
@@ -9,9 +9,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.wrapper.AvatarWrapper
-import mega.privacy.android.feature.myaccount.presentation.model.EmojiAvatarContent
-import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
-import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.shared.account.presentation.model.EmojiAvatarContent
+import mega.privacy.android.shared.account.presentation.model.PhotoAvatarContent
+import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.thirdpartylib.twemoji.wrapper.EmojiManagerWrapper

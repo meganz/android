@@ -37,7 +37,7 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.OFFER
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_HEADER
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLBAR
-import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.shared.account.presentation.model.TextAvatarContent
 import mega.privacy.android.feature.payment.components.TEST_TAG_OFFER_BANNER_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_OFFER_BANNER_DISMISS
 import mega.privacy.android.navigation.contract.DefaultNumberBadge

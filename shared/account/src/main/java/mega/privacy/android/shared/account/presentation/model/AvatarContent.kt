@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.myaccount.presentation.model
+package mega.privacy.android.shared.account.presentation.model
 
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
