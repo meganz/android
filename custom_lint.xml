@@ -5,6 +5,17 @@
         <ignore path="res/values-ru/strings.xml" />
     </issue>
     <issue id="NewApi" severity="error" />
+    <!-- Accessibility checks are pinned to warning severity repo-wide: legacy modules carry
+         many findings that are remediated by migration to feature modules, so these checks
+         must surface in reports without turning builds red. -->
+    <issue id="AccessibilityFocus" severity="warning" />
+    <issue id="AccessibilityScrollActions" severity="warning" />
+    <issue id="AccessibilityWindowStateChangedEvent" severity="warning" />
+    <issue id="ClickableViewAccessibility" severity="warning" />
+    <issue id="ContentDescription" severity="warning" />
+    <issue id="GetContentDescriptionOverride" severity="warning" />
+    <issue id="KeyboardInaccessibleWidget" severity="warning" />
+    <issue id="LabelFor" severity="warning" />
     <!-- We can define which issue will ignore when run lint in CI/CD here />-
     <!--    <issue id="QueryPermissionsNeeded" severity="ignore" />-->
 </lint>
