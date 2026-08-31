@@ -378,6 +378,19 @@ pipeline {
                     BUILD_STEP = "Upload Code Coverage"
 
                     util.useArtifactory() {
+                        // Temporary diagnostics: same task chain as the MR pipeline logs,
+                        // so cache key inputs of both jobs can be diffed for one tree.
+                        String cacheKeyDebugLog = "cache_key_debug.txt"
+                        sh "./gradlew --no-daemon -Dorg.gradle.caching.debug=true " +
+                                ":core:formatter:testDebugUnitTestCoverage 2>&1 " +
+                                "| tee ${cacheKeyDebugLog}"
+                        try {
+                            println("cache key debug log: " +
+                                    common.uploadFileToArtifactory("android_upload", cacheKeyDebugLog))
+                        } catch (Exception e) {
+                            println("cache key debug log upload skipped: ${e}")
+                        }
+
                         sh "./gradlew --no-daemon runAllUnitTestsWithCoverage"
                         String artifactoryTargetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
                         String coverageSummaryFile = "coverage_summary.csv"

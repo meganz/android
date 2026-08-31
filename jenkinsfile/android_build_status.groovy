@@ -7,6 +7,8 @@ BUILD_STEP = ""
 
 GMS_APK_BUILD_LOG = "gms_build.log"
 
+CACHE_KEY_DEBUG_LOG = "cache_key_debug.txt"
+
 LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
 LINT_REPORT_SUMMARY_MAP = [:]
@@ -288,6 +290,20 @@ pipeline {
                                 util.useArtifactory() {
                                     def moduleList = common.getUnitTestModuleList()
                                     def failedModules = []
+
+                                    // Temporary diagnostics: log the build cache key inputs of one
+                                    // small, representative task chain so runs of this job and the
+                                    // CD job on the same source tree can be diffed. The pipe through
+                                    // tee keeps a failure here from failing the stage.
+                                    sh "${GRADLE_CI} -Dorg.gradle.caching.debug=true " +
+                                            ":core:formatter:testDebugUnitTestCoverage 2>&1 " +
+                                            "| tee ${CACHE_KEY_DEBUG_LOG}"
+                                    try {
+                                        println("cache key debug log: " +
+                                                common.uploadFileToArtifactory(CACHE_KEY_DEBUG_LOG))
+                                    } catch (Exception e) {
+                                        println("cache key debug log upload skipped: ${e}")
+                                    }
 
                                     try {
                                         sh "${GRADLE_CI} runAllUnitTestsWithCoverage"
