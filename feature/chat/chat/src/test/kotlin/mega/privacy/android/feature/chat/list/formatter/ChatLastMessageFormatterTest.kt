@@ -14,6 +14,8 @@ import mega.privacy.android.domain.entity.chat.ChatMessageCode
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
+import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatListItemUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
@@ -21,6 +23,9 @@ import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,6 +45,7 @@ class ChatLastMessageFormatterTest {
     private val getMessageSenderNameUseCase = mock<GetMessageSenderNameUseCase>()
     private val getMyUserHandleUseCase = mock<GetMyUserHandleUseCase>()
     private val getMyFullNameUseCase = mock<GetMyFullNameUseCase>()
+    private val getChatRoomUseCase = mock<GetChatRoomUseCase>()
     private val emojiShortcodeConverter = mock<EmojiShortcodeConverter>()
 
     private lateinit var underTest: ChatLastMessageFormatter
@@ -52,6 +58,7 @@ class ChatLastMessageFormatterTest {
             getMessageSenderNameUseCase,
             getMyUserHandleUseCase,
             getMyFullNameUseCase,
+            getChatRoomUseCase,
             emojiShortcodeConverter,
         )
         whenever(emojiShortcodeConverter.convert(any())) doAnswer { it.getArgument(0) }
@@ -62,6 +69,7 @@ class ChatLastMessageFormatterTest {
             getMessageSenderNameUseCase = getMessageSenderNameUseCase,
             getMyUserHandleUseCase = getMyUserHandleUseCase,
             getMyFullNameUseCase = getMyFullNameUseCase,
+            getChatRoomUseCase = getChatRoomUseCase,
             emojiShortcodeConverter = emojiShortcodeConverter,
         )
     }
@@ -488,6 +496,236 @@ class ChatLastMessageFormatterTest {
             context.getString(sharedR.string.message_set_chat_private, "Alice")
         )
     }
+
+    @Test
+    fun `test that invoke formats an ongoing call for a call started message`() = runTest {
+        whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+            chatId = CHAT_ID,
+            lastMessageType = ChatRoomLastMessage.CallStarted,
+        )
+        val room = chatRoom(isGroup = false, isMeeting = false)
+        whenever(getChatRoomUseCase(CHAT_ID)) doReturn room
+
+        assertThat(underTest(CHAT_ID)).isEqualTo(
+            context.getString(sharedR.string.ongoing_call_messages)
+        )
+    }
+
+    @Test
+    fun `test that invoke formats a meeting in progress for a call started message in a meeting`() =
+        runTest {
+            whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+                chatId = CHAT_ID,
+                lastMessageType = ChatRoomLastMessage.CallStarted,
+            )
+            val room = chatRoom(isGroup = true, isMeeting = true)
+            whenever(getChatRoomUseCase(CHAT_ID)) doReturn room
+
+            assertThat(underTest(CHAT_ID)).isEqualTo(
+                context.getString(sharedR.string.meetings_list_ongoing_call_message)
+            )
+        }
+
+    @Test
+    fun `test that invoke formats a one to one ended call with its duration`() = runTest {
+        stubEndedCall(
+            termCode = ChatMessageTermCode.ENDED,
+            duration = 5.minutes + 3.seconds,
+            isGroup = false,
+            isMeeting = false,
+        )
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(ACTOR_HANDLE, CHAT_ID)) doReturn "Alice"
+
+        val expected = "Alice: " + strip(
+            context.getString(sharedR.string.call_ended_message) +
+                context.resources.getQuantityString(
+                    sharedR.plurals.plural_call_ended_messages_minutes, 5, 5,
+                ) + ", " +
+                context.resources.getQuantityString(
+                    sharedR.plurals.plural_call_ended_messages_seconds, 3, 3,
+                )
+        )
+        assertThat(underTest(CHAT_ID)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that invoke formats a group ended call with hours minutes and seconds`() = runTest {
+        stubEndedCall(
+            termCode = ChatMessageTermCode.BY_MODERATOR,
+            duration = 1.hours + 2.minutes + 3.seconds,
+            isGroup = true,
+            isMeeting = false,
+        )
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(ACTOR_HANDLE, CHAT_ID)) doReturn "Alice"
+
+        val expected = "Alice: " + strip(
+            context.getString(sharedR.string.group_call_ended_message) +
+                context.resources.getQuantityString(
+                    sharedR.plurals.plural_call_ended_messages_hours, 1, 1,
+                ) + ", " +
+                context.resources.getQuantityString(
+                    sharedR.plurals.plural_call_ended_messages_minutes, 2, 2,
+                ) + ", " +
+                context.resources.getQuantityString(
+                    sharedR.plurals.plural_call_ended_messages_seconds, 3, 3,
+                )
+        )
+        assertThat(underTest(CHAT_ID)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that invoke formats a group ended call without a duration`() = runTest {
+        stubEndedCall(
+            termCode = ChatMessageTermCode.ENDED,
+            duration = Duration.ZERO,
+            isGroup = true,
+            isMeeting = true,
+        )
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(ACTOR_HANDLE, CHAT_ID)) doReturn "Alice"
+
+        val expected = "Alice: " +
+            strip(context.getString(sharedR.string.group_call_ended_no_duration_message))
+        assertThat(underTest(CHAT_ID)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that invoke formats a rejected call`() = runTest {
+        stubEndedCall(termCode = ChatMessageTermCode.REJECTED)
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(ACTOR_HANDLE, CHAT_ID)) doReturn "Alice"
+
+        assertThat(underTest(CHAT_ID)).isEqualTo(
+            "Alice: " + strip(context.getString(sharedR.string.call_rejected_messages))
+        )
+    }
+
+    @Test
+    fun `test that invoke formats a failed call`() = runTest {
+        stubEndedCall(termCode = ChatMessageTermCode.FAILED)
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(ACTOR_HANDLE, CHAT_ID)) doReturn "Alice"
+
+        assertThat(underTest(CHAT_ID)).isEqualTo(
+            "Alice: " + strip(context.getString(sharedR.string.call_failed_messages))
+        )
+    }
+
+    @Test
+    fun `test that invoke formats a missed call for the callee when the call was not answered`() =
+        runTest {
+            stubEndedCall(termCode = ChatMessageTermCode.NO_ANSWER, senderHandle = ACTOR_HANDLE)
+            whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+            whenever(getMessageSenderNameUseCase(ACTOR_HANDLE, CHAT_ID)) doReturn "Alice"
+
+            assertThat(underTest(CHAT_ID)).isEqualTo(
+                "Alice: " + strip(context.getString(sharedR.string.call_missed_messages))
+            )
+        }
+
+    @Test
+    fun `test that invoke formats an unanswered call for the caller`() = runTest {
+        stubEndedCall(termCode = ChatMessageTermCode.NO_ANSWER, senderHandle = MY_HANDLE)
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMyFullNameUseCase()) doReturn "My Name"
+
+        assertThat(underTest(CHAT_ID)).isEqualTo(
+            "My Name: " + strip(context.getString(sharedR.string.call_not_answered_messages))
+        )
+    }
+
+    @Test
+    fun `test that invoke formats a cancelled call for the caller`() = runTest {
+        stubEndedCall(termCode = ChatMessageTermCode.CANCELLED, senderHandle = MY_HANDLE)
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMyFullNameUseCase()) doReturn "My Name"
+
+        assertThat(underTest(CHAT_ID)).isEqualTo(
+            "My Name: " + strip(context.getString(sharedR.string.call_cancelled_messages))
+        )
+    }
+
+    @Test
+    fun `test that invoke formats a missed call for the callee when the call was cancelled`() =
+        runTest {
+            stubEndedCall(termCode = ChatMessageTermCode.CANCELLED, senderHandle = ACTOR_HANDLE)
+            whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+            whenever(getMessageSenderNameUseCase(ACTOR_HANDLE, CHAT_ID)) doReturn "Alice"
+
+            assertThat(underTest(CHAT_ID)).isEqualTo(
+                "Alice: " + strip(context.getString(sharedR.string.call_missed_messages))
+            )
+        }
+
+    @Test
+    fun `test that invoke falls back to the raw message when the ended call cannot be resolved`() =
+        runTest {
+            whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+                chatId = CHAT_ID,
+                lastMessage = "raw text",
+                lastMessageId = MESSAGE_ID,
+                lastMessageType = ChatRoomLastMessage.CallEnded,
+            )
+            whenever(getChatMessageUseCase(CHAT_ID, MESSAGE_ID)) doReturn null
+
+            assertThat(underTest(CHAT_ID)).isEqualTo("raw text")
+        }
+
+    @Test
+    fun `test that invoke formats an updated scheduled meeting message`() = runTest {
+        whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+            chatId = CHAT_ID,
+            lastMessageId = MESSAGE_ID,
+            lastMessageType = ChatRoomLastMessage.SchedMeeting,
+            lastMessageSender = ACTOR_HANDLE,
+            isGroup = true,
+        )
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(ACTOR_HANDLE, CHAT_ID)) doReturn "Alice"
+
+        assertThat(underTest(CHAT_ID)).isEqualTo(
+            strip(
+                context.getString(
+                    sharedR.string.chat_chat_room_message_updated_scheduled_meeting, "Alice",
+                )
+            )
+        )
+    }
+
+    private suspend fun stubEndedCall(
+        termCode: ChatMessageTermCode,
+        duration: Duration = Duration.ZERO,
+        isGroup: Boolean = false,
+        isMeeting: Boolean = false,
+        senderHandle: Long = ACTOR_HANDLE,
+    ) {
+        whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+            chatId = CHAT_ID,
+            lastMessage = "raw text",
+            lastMessageId = MESSAGE_ID,
+            lastMessageType = ChatRoomLastMessage.CallEnded,
+            isGroup = isGroup,
+        )
+        whenever(getChatMessageUseCase(CHAT_ID, MESSAGE_ID)) doReturn managementMessage(
+            userHandle = senderHandle,
+        ).copy(termCode = termCode, duration = duration)
+        val room = chatRoom(isGroup, isMeeting)
+        whenever(getChatRoomUseCase(CHAT_ID)) doReturn room
+    }
+
+    private fun chatRoom(isGroup: Boolean, isMeeting: Boolean): ChatRoom {
+        val room = mock<ChatRoom>()
+        whenever(room.isGroup) doReturn isGroup
+        whenever(room.isMeeting) doReturn isMeeting
+        return room
+    }
+
+    private fun strip(text: String): String =
+        text.replace("[A]", "").replace("[/A]", "")
+            .replace("[B]", "").replace("[/B]", "")
+            .replace("[C]", "").replace("[/C]", "")
 
     private suspend fun stubManagementMessage(type: ChatRoomLastMessage, message: ChatMessage) {
         whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(

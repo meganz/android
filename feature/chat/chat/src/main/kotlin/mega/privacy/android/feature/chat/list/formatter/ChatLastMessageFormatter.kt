@@ -7,12 +7,15 @@ import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatListItemUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.shared.resources.R as sharedR
+import kotlin.time.Duration
 import javax.inject.Inject
 
 /**
@@ -31,6 +34,12 @@ import javax.inject.Inject
  * changes) resolve their actor and target names from the underlying
  * [ChatMessage], mirroring the legacy chat-list preview wording.
  *
+ * Call and meeting families (started/ongoing calls, ended calls with their
+ * duration or termination reason, and scheduled-meeting updates) reproduce the
+ * legacy call-preview wording. Call duration is decomposed from the message's
+ * [ChatMessage.duration] and rendered with the hour/minute/second plurals; the
+ * one-to-one versus group/meeting wording is chosen from the chat room.
+ *
  * Emoji short-codes embedded in normal-text message content are converted to
  * their glyphs via [EmojiShortcodeConverter], matching the legacy preview.
  */
@@ -41,6 +50,7 @@ internal class ChatLastMessageFormatter @Inject constructor(
     private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val getMyFullNameUseCase: GetMyFullNameUseCase,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val emojiShortcodeConverter: EmojiShortcodeConverter,
 ) {
 
@@ -64,6 +74,10 @@ internal class ChatLastMessageFormatter @Inject constructor(
             ChatRoomLastMessage.PublicHandleDelete,
             ChatRoomLastMessage.SetPrivateMode,
                 -> managementPreview(item)
+
+            ChatRoomLastMessage.CallStarted -> callStartedPreview(item.chatId)
+            ChatRoomLastMessage.CallEnded -> callEndedPreview(item)
+            ChatRoomLastMessage.SchedMeeting -> scheduledMeetingPreview(item)
 
             else -> item.lastMessage
         }
@@ -177,6 +191,103 @@ internal class ChatLastMessageFormatter @Inject constructor(
             sharedR.string.message_set_chat_private,
             resolveName(message.userHandle, chatId),
         )
+
+    private suspend fun callStartedPreview(chatId: Long): String =
+        if (isMeeting(chatId)) {
+            context.getString(sharedR.string.meetings_list_ongoing_call_message)
+        } else {
+            context.getString(sharedR.string.ongoing_call_messages)
+        }
+
+    private suspend fun callEndedPreview(item: ChatListItem): String {
+        val message = getChatMessageUseCase(item.chatId, item.lastMessageId) ?: return item.lastMessage
+        val chatRoom = runCatching { getChatRoomUseCase(item.chatId) }.getOrNull()
+        val isGroup = chatRoom?.isGroup ?: item.isGroup
+        val isMeeting = chatRoom?.isMeeting == true
+        val body = when (message.termCode) {
+            ChatMessageTermCode.ENDED,
+            ChatMessageTermCode.BY_MODERATOR,
+                -> callEndedDuration(message.duration, isGroup, isMeeting)
+
+            ChatMessageTermCode.REJECTED ->
+                stripFormatMarkers(context.getString(sharedR.string.call_rejected_messages))
+
+            ChatMessageTermCode.NO_ANSWER ->
+                callUnansweredOrMissed(message.userHandle, sharedR.string.call_not_answered_messages)
+
+            ChatMessageTermCode.CANCELLED ->
+                callUnansweredOrMissed(message.userHandle, sharedR.string.call_cancelled_messages)
+
+            ChatMessageTermCode.FAILED ->
+                stripFormatMarkers(context.getString(sharedR.string.call_failed_messages))
+        }
+        return "${resolveName(message.userHandle, item.chatId)}: $body"
+    }
+
+    private suspend fun scheduledMeetingPreview(item: ChatListItem): String =
+        stripFormatMarkers(
+            context.getString(
+                sharedR.string.chat_chat_room_message_updated_scheduled_meeting,
+                resolveName(item.lastMessageSender, item.chatId),
+            )
+        )
+
+    private suspend fun callUnansweredOrMissed(senderHandle: Long, selfString: Int): String {
+        val resId = if (senderHandle == myHandle()) {
+            selfString
+        } else {
+            sharedR.string.call_missed_messages
+        }
+        return stripFormatMarkers(context.getString(resId))
+    }
+
+    private fun callEndedDuration(duration: Duration, isGroup: Boolean, isMeeting: Boolean): String {
+        val isOneToOne = !isGroup && !isMeeting
+        if (!isOneToOne && duration <= Duration.ZERO) {
+            return stripFormatMarkers(
+                context.getString(sharedR.string.group_call_ended_no_duration_message)
+            )
+        }
+        val builder = StringBuilder(
+            if (isOneToOne) {
+                context.getString(sharedR.string.call_ended_message)
+            } else {
+                context.getString(sharedR.string.group_call_ended_message)
+            }
+        )
+        duration.toComponents { hours, minutes, seconds, _ ->
+            if (hours > 0) {
+                builder.append(
+                    context.resources.getQuantityString(
+                        sharedR.plurals.plural_call_ended_messages_hours, hours.toInt(), hours,
+                    )
+                )
+                if (minutes > 0 || seconds > 0) builder.append(", ")
+            }
+            if (minutes > 0) {
+                builder.append(
+                    context.resources.getQuantityString(
+                        sharedR.plurals.plural_call_ended_messages_minutes, minutes, minutes,
+                    )
+                )
+                if (seconds > 0) builder.append(", ")
+            }
+            builder.append(
+                context.resources.getQuantityString(
+                    sharedR.plurals.plural_call_ended_messages_seconds, seconds, seconds,
+                )
+            )
+        }
+        return stripFormatMarkers(builder.toString())
+    }
+
+    private suspend fun isMeeting(chatId: Long): Boolean =
+        runCatching { getChatRoomUseCase(chatId)?.isMeeting }.getOrNull() == true
+
+    private fun stripFormatMarkers(text: String): String =
+        text.replace("[A]", "").replace("[/A]", "")
+            .replace("[B]", "").replace("[/B]", "")
+            .replace("[C]", "").replace("[/C]", "")
 
     private fun retentionDuration(retentionTimeInSeconds: Long): String? = when {
         retentionTimeInSeconds <= 0L -> null
