@@ -248,7 +248,7 @@ class ChatListViewModelTest {
     }
 
     @Test
-    fun `test that getChatRoomActions returns the eligible actions ordered for the chat`() =
+    fun `test that getBulkChatRoomActions returns the eligible actions ordered for a single selected chat`() =
         runTest {
             stubChatRooms(
                 chats = listOf(
@@ -262,7 +262,7 @@ class ChatListViewModelTest {
                 meetings = emptyList(),
             )
 
-            val actual = underTest.getChatRoomActions(1L).map { it.testTag }
+            val actual = underTest.getBulkChatRoomActions(setOf(1L)).map { it.testTag }
 
             assertThat(actual).containsExactly(
                 CHAT_ROOM_ACTIONS_CLEAR_HISTORY_TAG,
@@ -273,39 +273,85 @@ class ChatListViewModelTest {
         }
 
     @Test
-    fun `test that getChatRoomActions returns empty for an unknown chat`() = runTest {
+    fun `test that getBulkChatRoomActions returns only actions eligible for every selected chat`() =
+        runTest {
+            stubChatRooms(
+                chats = listOf(
+                    ChatRoomItem.GroupChatRoomItem(
+                        chatId = 1L,
+                        title = "Group",
+                        hasPermissions = true,
+                        isActive = true,
+                    ),
+                    ChatRoomItem.IndividualChatRoomItem(
+                        chatId = 2L,
+                        title = "Chat",
+                        hasPermissions = true,
+                    ),
+                ),
+                meetings = emptyList(),
+            )
+
+            val actual = underTest.getBulkChatRoomActions(setOf(1L, 2L)).map { it.testTag }
+
+            assertThat(actual).containsExactly(
+                CHAT_ROOM_ACTIONS_CLEAR_HISTORY_TAG,
+                CHAT_ROOM_ACTIONS_MUTE_TAG,
+                CHAT_ROOM_ACTIONS_ARCHIVE_TAG,
+            ).inOrder()
+        }
+
+    @Test
+    fun `test that getBulkChatRoomActions returns empty for an empty selection`() = runTest {
         stubChatRooms()
 
-        assertThat(underTest.getChatRoomActions(999L)).isEmpty()
+        assertThat(underTest.getBulkChatRoomActions(emptySet())).isEmpty()
     }
 
     @Test
-    fun `test that onChatRoomActionSelected runs the picked action on the chat`() = runTest {
-        stubChatRooms(
-            chats = listOf(
-                ChatRoomItem.IndividualChatRoomItem(
-                    chatId = 1L,
-                    title = "Chat",
-                    hasPermissions = true,
-                )
-            ),
-            meetings = emptyList(),
-        )
+    fun `test that getBulkChatRoomActions returns empty for unknown chats`() = runTest {
+        stubChatRooms()
 
-        underTest.onChatRoomActionSelected(1L, CHAT_ROOM_ACTIONS_MUTE_TAG)
-        advanceUntilIdle()
-
-        verify(muteChatNotificationForChatRoomsUseCase)(
-            chatIdList = listOf(1L),
-            muteOption = ChatPushNotificationMuteOption.MuteUntilTurnBackOn,
-        )
+        assertThat(underTest.getBulkChatRoomActions(setOf(999L))).isEmpty()
     }
 
     @Test
-    fun `test that onChatRoomActionSelected does nothing for an unknown chat`() = runTest {
+    fun `test that onBulkChatRoomActionSelected runs the picked action on every selected chat`() =
+        runTest {
+            stubChatRooms(
+                chats = listOf(
+                    ChatRoomItem.IndividualChatRoomItem(
+                        chatId = 1L,
+                        title = "Chat",
+                        hasPermissions = true,
+                    ),
+                    ChatRoomItem.IndividualChatRoomItem(
+                        chatId = 2L,
+                        title = "Chat 2",
+                        hasPermissions = true,
+                    ),
+                ),
+                meetings = emptyList(),
+            )
+
+            underTest.onBulkChatRoomActionSelected(setOf(1L, 2L), CHAT_ROOM_ACTIONS_MUTE_TAG)
+            advanceUntilIdle()
+
+            verify(muteChatNotificationForChatRoomsUseCase)(
+                chatIdList = listOf(1L),
+                muteOption = ChatPushNotificationMuteOption.MuteUntilTurnBackOn,
+            )
+            verify(muteChatNotificationForChatRoomsUseCase)(
+                chatIdList = listOf(2L),
+                muteOption = ChatPushNotificationMuteOption.MuteUntilTurnBackOn,
+            )
+        }
+
+    @Test
+    fun `test that onBulkChatRoomActionSelected does nothing for unknown chats`() = runTest {
         stubChatRooms()
 
-        underTest.onChatRoomActionSelected(999L, CHAT_ROOM_ACTIONS_MUTE_TAG)
+        underTest.onBulkChatRoomActionSelected(setOf(999L), CHAT_ROOM_ACTIONS_MUTE_TAG)
         advanceUntilIdle()
 
         verifyNoInteractions(muteChatNotificationForChatRoomsUseCase)

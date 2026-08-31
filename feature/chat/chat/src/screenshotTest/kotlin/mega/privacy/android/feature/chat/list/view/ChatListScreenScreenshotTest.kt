@@ -124,6 +124,28 @@ class ChatListScreenScreenshotTest {
     @PreviewTest
     @CombinedThemePreviews
     @Composable
+    fun ChatListScreenSelectionMode() {
+        AndroidThemeForPreviews {
+            ChatListScreenContent(
+                uiState = populatedState(),
+                showMeetingTab = false,
+                searchMode = false,
+                searchQuery = "",
+                onBackClick = {},
+                onItemClick = {},
+                onSearchModeChange = {},
+                onQueryChange = {},
+                selectionMode = true,
+                selectedChatIds = setOf(1L),
+                selectedCount = 1,
+                isAllSelected = false,
+            )
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
     fun ChatListScreenLoading() {
         AndroidThemeForPreviews {
             ChatListScreen(

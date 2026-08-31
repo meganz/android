@@ -4,64 +4,67 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 
 /**
- * Mutually-exclusive overlay state driving the chat list item actions bottom sheet and its
- * destructive-action confirmation dialog. Only one overlay can be shown at a time.
+ * Mutually-exclusive overlay state driving the chat list bulk actions bottom sheet and its
+ * destructive-action confirmation dialog while in selection mode. Only one overlay can be shown
+ * at a time, for the set of currently selected chats.
  */
-sealed interface ChatRoomActionsUiState {
+sealed interface ChatListBulkActionsUiState {
 
     /**
      * No overlay is shown.
      */
-    data object Hidden : ChatRoomActionsUiState
+    data object Hidden : ChatListBulkActionsUiState
 
     /**
-     * The actions bottom sheet is shown for the chat with [chatId].
+     * The bulk actions bottom sheet is shown for the chats in [chatIds].
      */
-    data class ShowingActions(val chatId: Long) : ChatRoomActionsUiState
+    data class ShowingActions(val chatIds: Set<Long>) : ChatListBulkActionsUiState
 
     /**
-     * The confirmation dialog for the action [actionId] is shown for the chat with [chatId],
+     * The confirmation dialog for the action [actionId] is shown for the chats in [chatIds],
      * driven by [confirmation]. A new destructive action needs no new state variant.
      */
     data class Confirming(
-        val chatId: Long,
+        val chatIds: Set<Long>,
         val actionId: String,
         val confirmation: ChatRoomMenuItemConfirmation,
-    ) : ChatRoomActionsUiState
+    ) : ChatListBulkActionsUiState
 
     companion object {
 
         /**
          * [Saver] persisting the overlay across configuration changes and process death.
          */
-        val Saver: Saver<ChatRoomActionsUiState, *> = listSaver(
+        val Saver: Saver<ChatListBulkActionsUiState, *> = listSaver(
             save = { state ->
                 when (state) {
                     Hidden -> listOf(HIDDEN_TAG)
-                    is ShowingActions -> listOf(SHOWING_TAG, state.chatId)
+                    is ShowingActions -> listOf(SHOWING_TAG) + state.chatIds.toList()
                     is Confirming -> listOf(
                         CONFIRMING_TAG,
-                        state.chatId,
                         state.actionId,
                         state.confirmation.title,
                         state.confirmation.message,
                         state.confirmation.confirmButtonText,
                         state.confirmation.testTag,
-                    )
+                    ) + state.chatIds.toList()
                 }
             },
             restore = { saved ->
                 when (saved.first()) {
-                    SHOWING_TAG -> ShowingActions(saved[1] as Long)
+                    SHOWING_TAG -> ShowingActions(
+                        chatIds = saved.drop(1).map { it as Long }.toSet(),
+                    )
+
                     CONFIRMING_TAG -> Confirming(
-                        chatId = saved[1] as Long,
-                        actionId = saved[2] as String,
+                        actionId = saved[1] as String,
                         confirmation = ChatRoomMenuItemConfirmation(
-                            title = saved[3] as Int,
-                            message = saved[4] as Int,
-                            confirmButtonText = saved[5] as Int,
-                            testTag = saved[6] as String,
+                            title = saved[2] as Int,
+                            message = saved[3] as Int,
+                            confirmButtonText = saved[4] as Int,
+                            testTag = saved[5] as String,
                         ),
+                        chatIds = saved.drop(6).map { it as Long }.toSet(),
                     )
 
                     else -> Hidden

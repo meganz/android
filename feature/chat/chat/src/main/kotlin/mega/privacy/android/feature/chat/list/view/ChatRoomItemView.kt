@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.badge.NotificationBadge
+import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.contact.component.ContactStatusDot
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.image.MegaIcon
@@ -45,6 +46,10 @@ import java.io.File
  * @param modifier [Modifier]
  * @param onItemLongClick Optional callback when the row is long-pressed, with the chat id;
  * when null the row has no long-press affordance.
+ * @param selectionMode Whether the list is in multi-select mode; a tap then toggles selection
+ * and the row shows a selection checkbox instead of the unread badge.
+ * @param isSelected Whether this row is currently selected.
+ * @param onSelectionToggle Optional callback when the row's selection is toggled, with the chat id.
  */
 @Composable
 internal fun ChatRoomItemView(
@@ -52,9 +57,13 @@ internal fun ChatRoomItemView(
     onItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     onItemLongClick: ((Long) -> Unit)? = null,
+    selectionMode: Boolean = false,
+    isSelected: Boolean = false,
+    onSelectionToggle: ((Long) -> Unit)? = null,
 ) {
     GenericListItem(
         modifier = modifier.testTag(CHAT_ROOM_ITEM_TAG),
+        selected = isSelected,
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
         leadingElement = { ChatRoomAvatarView(item) },
         title = {
@@ -124,14 +133,28 @@ internal fun ChatRoomItemView(
             }
         },
         trailingElement = {
-            if (item.unreadCount > 0) {
+            if (selectionMode) {
+                Checkbox(
+                    checked = isSelected,
+                    onCheckStateChanged = { onSelectionToggle?.invoke(item.chatId) },
+                    clickable = false,
+                    tapTargetArea = false,
+                    modifier = Modifier.testTag(CHAT_ROOM_ITEM_CHECKBOX_TAG),
+                )
+            } else if (item.unreadCount > 0) {
                 NotificationBadge(
                     count = item.unreadCount,
                     modifier = Modifier.testTag(CHAT_ROOM_ITEM_UNREAD_TAG),
                 )
             }
         },
-        onClickListener = { onItemClick(item.chatId) },
+        onClickListener = {
+            if (selectionMode) {
+                onSelectionToggle?.invoke(item.chatId)
+            } else {
+                onItemClick(item.chatId)
+            }
+        },
         onLongClickListener = onItemLongClick?.let { { it(item.chatId) } },
     )
 }
@@ -223,6 +246,7 @@ internal const val CHAT_ROOM_ITEM_CALL_TAG = "chat_room_item:call_indicator"
 internal const val CHAT_ROOM_ITEM_MESSAGE_TAG = "chat_room_item:last_message"
 internal const val CHAT_ROOM_ITEM_TIMESTAMP_TAG = "chat_room_item:timestamp"
 internal const val CHAT_ROOM_ITEM_UNREAD_TAG = "chat_room_item:unread_badge"
+internal const val CHAT_ROOM_ITEM_CHECKBOX_TAG = "chat_room_item:selection_checkbox"
 
 @CombinedThemePreviews
 @Composable
@@ -233,6 +257,22 @@ private fun ChatRoomItemViewPreview(
         ChatRoomItemView(
             item = item,
             onItemClick = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ChatRoomItemViewSelectedPreview(
+    @PreviewParameter(ChatRoomUiItemPreviewProvider::class) item: ChatRoomUiItem,
+) {
+    AndroidThemeForPreviews {
+        ChatRoomItemView(
+            item = item,
+            onItemClick = {},
+            selectionMode = true,
+            isSelected = item.chatId % 2L == 1L,
+            onSelectionToggle = {},
         )
     }
 }

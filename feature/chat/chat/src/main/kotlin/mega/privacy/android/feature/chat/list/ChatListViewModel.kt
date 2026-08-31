@@ -76,34 +76,43 @@ internal class ChatListViewModel @Inject constructor(
     }
 
     /**
-     * Resolve the ordered actions available for the chat with [chatId] when its actions bottom
-     * sheet is opened, by filtering the contributed [ChatRoomMenuItem]s by their own eligibility.
+     * Resolve the ordered actions available for the selected chats in [chatIds] when the bulk
+     * actions bottom sheet is opened, by filtering the contributed [ChatRoomMenuItem]s to those
+     * eligible for every selected chat. A single-chat selection therefore yields exactly that
+     * chat's actions.
      *
-     * @param chatId Chat id whose actions are requested.
-     * @return Ordered, renderable actions, or empty when the chat is unknown.
+     * @param chatIds Ids of the currently selected chats.
+     * @return Ordered, renderable actions common to all selected chats, or empty when none apply.
      */
-    suspend fun getChatRoomActions(chatId: Long): List<ChatRoomActionUiItem> {
-        val room = currentChatRooms()[chatId] ?: return emptyList()
+    suspend fun getBulkChatRoomActions(chatIds: Set<Long>): List<ChatRoomActionUiItem> {
+        if (chatIds.isEmpty()) return emptyList()
+        val rooms = currentChatRooms()
+        val selectedRooms = chatIds.mapNotNull { rooms[it] }
+        if (selectedRooms.isEmpty()) return emptyList()
         return chatRoomMenuItems.entries
             .sortedBy { it.key }
             .map { it.value }
-            .filter { it.shouldDisplay(room) }
-            .map { it.toUiItem(room) }
+            .filter { menuItem -> selectedRooms.all { menuItem.shouldDisplay(it) } }
+            .map { it.toUiItem(selectedRooms.first()) }
     }
 
     /**
-     * Run the action identified by [actionId] on the chat with [chatId].
+     * Run the action identified by [actionId] on every selected chat in [chatIds].
      *
-     * @param chatId Chat id the action was picked for.
+     * @param chatIds Ids of the chats the action was picked for.
      * @param actionId Test-tag identity of the picked action.
      */
-    fun onChatRoomActionSelected(chatId: Long, actionId: String) {
+    fun onBulkChatRoomActionSelected(chatIds: Set<Long>, actionId: String) {
         viewModelScope.launch {
-            val room = currentChatRooms()[chatId] ?: return@launch
+            val rooms = currentChatRooms()
             val menuItem =
                 chatRoomMenuItems.values.firstOrNull { it.testTag == actionId } ?: return@launch
-            runCatching { menuItem.onClick(room) }
-                .onFailure { Timber.e(it, "Failed to run action $actionId on chat $chatId") }
+            chatIds.mapNotNull { rooms[it] }.forEach { room ->
+                runCatching { menuItem.onClick(room) }
+                    .onFailure {
+                        Timber.e(it, "Failed to run action $actionId on chat ${room.chatId}")
+                    }
+            }
         }
     }
 
