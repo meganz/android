@@ -1,4 +1,4 @@
-package mega.privacy.android.app.myAccount.view
+package mega.privacy.android.feature.myaccount.presentation.usage.view
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,10 +13,10 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.divider.StrongDivider
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.core.formatter.formatSubscriptionDate
 import mega.privacy.android.feature.myaccount.presentation.usage.MyAccountUsageUiState
 import mega.privacy.android.feature.myaccount.presentation.usage.PaymentAlertType
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Payment alert section
@@ -32,11 +32,11 @@ internal fun PaymentAlertSection(
     // Get text and color based on payment alert type
     val (text, textColor) = when (uiState.paymentAlertType) {
         PaymentAlertType.BusinessExpired -> {
-            stringResource(R.string.payment_overdue_label) to TextColor.Error
+            stringResource(sharedR.string.account_usage_payment_overdue_label) to TextColor.Error
         }
 
         PaymentAlertType.BusinessGracePeriod -> {
-            stringResource(R.string.payment_required_label) to TextColor.Warning
+            stringResource(sharedR.string.account_usage_payment_required_label) to TextColor.Warning
         }
 
         PaymentAlertType.AccountRenewsOn -> {

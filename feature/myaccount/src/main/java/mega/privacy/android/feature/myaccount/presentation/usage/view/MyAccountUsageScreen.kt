@@ -1,4 +1,4 @@
-package mega.privacy.android.app.myAccount.view
+package mega.privacy.android.feature.myaccount.presentation.usage.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,7 +28,6 @@ import mega.android.core.ui.extensions.delayedTrue
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
@@ -37,6 +36,8 @@ import mega.privacy.android.feature.myaccount.presentation.usage.MyAccountUsageU
 import mega.privacy.android.feature.myaccount.presentation.usage.PaymentAlertType
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.resources.R as sharedR
+import java.time.LocalDate
+import java.time.ZoneId
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -48,7 +49,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * @param onUsageLoadErrorDismiss After user acknowledges load failure; typically pop back stack (new entry gets a new ViewModel).
  */
 @Composable
-fun MyAccountUsageScreen(
+internal fun MyAccountUsageScreen(
     uiState: MyAccountUsageUiState,
     modifier: Modifier = Modifier,
     onUpgradeClick: () -> Unit = {},
@@ -92,7 +93,7 @@ fun MyAccountUsageScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 // Storage Details Section
                 MegaText(
-                    text = stringResource(id = R.string.usage_storage_details_label),
+                    text = stringResource(id = sharedR.string.account_usage_storage_breakdown_title),
                     style = AppTheme.typography.titleMedium,
                     textColor = TextColor.Primary,
                     modifier = Modifier.fillMaxWidth()
@@ -100,21 +101,21 @@ fun MyAccountUsageScreen(
                 Spacer(modifier = Modifier.height(5.dp))
                 // Storage Details Items
                 StorageDetailItem(
-                    title = stringResource(id = R.string.section_cloud_drive),
+                    title = stringResource(id = sharedR.string.general_section_cloud_drive),
                     value = uiState.cloudStorage?.let { formatFileSize(it, context) }.orEmpty(),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 if (uiState.backupStorageSize > 0) {
                     StorageDetailItem(
-                        title = stringResource(id = R.string.home_side_menu_backups_title),
+                        title = stringResource(id = sharedR.string.account_usage_backups_label),
                         value = formatFileSize(uiState.backupStorageSize, context),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
 
                 StorageDetailItem(
-                    title = stringResource(id = R.string.title_incoming_shares_explorer),
+                    title = stringResource(id = sharedR.string.general_title_incoming_shares),
                     value = uiState.incomingStorage?.let { formatFileSize(it, context) }.orEmpty(),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -127,7 +128,7 @@ fun MyAccountUsageScreen(
 
                 if (uiState.isFileVersioningEnabled) {
                     StorageDetailItem(
-                        title = stringResource(id = R.string.file_properties_folder_previous_versions),
+                        title = stringResource(id = sharedR.string.file_info_information_previous_versions_label),
                         value = uiState.versionsSize?.let { formatFileSize(it, context) }.orEmpty(),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -137,7 +138,7 @@ fun MyAccountUsageScreen(
                 if (uiState.showUpgradeButton) {
                     Spacer(modifier = Modifier.height(20.dp))
                     PrimaryFilledButton(
-                        text = stringResource(id = R.string.account_my_account_usage_get_more_storage_button),
+                        text = stringResource(id = sharedR.string.account_usage_get_more_storage_button),
                         onClick = onUpgradeClick,
                         modifier = Modifier
                             .widthIn(max = 310.dp)
@@ -153,7 +154,7 @@ fun MyAccountUsageScreen(
 
     if (uiState.usageLoadFailed && !errorDialogDismissed) {
         BasicDialog(
-            title = stringResource(R.string.general_error_word),
+            title = stringResource(sharedR.string.general_error_word),
             description = stringResource(sharedR.string.general_request_failed_message),
             positiveButtonText = stringResource(sharedR.string.general_ok),
             onPositiveButtonClicked = {
@@ -236,6 +237,10 @@ private class MyAccountUsageStateProvider : PreviewParameterProvider<MyAccountUs
             rubbishStorage = 20 * gb,
             backupStorageSize = 0L,
         ),
+        // Pro - renews today
+        baseProState.copy(paymentAlertDate = daysFromNow(0)),
+        // Pro - renews tomorrow
+        baseProState.copy(paymentAlertDate = daysFromNow(1)),
         // Business
         MyAccountUsageUiState(
             isUsageContentReady = true,
@@ -248,6 +253,14 @@ private class MyAccountUsageStateProvider : PreviewParameterProvider<MyAccountUs
         // Loading
         MyAccountUsageUiState(isUsageContentReady = false),
     )
+
+    /** Midday [days] from now, so the alert lands on that calendar day in any time zone. */
+    private fun daysFromNow(days: Long): Long =
+        LocalDate.now(ZoneId.systemDefault())
+            .plusDays(days)
+            .atTime(12, 0)
+            .atZone(ZoneId.systemDefault())
+            .toEpochSecond()
 }
 
 @CombinedThemePreviews

@@ -3954,4 +3954,22 @@
     <string name="account_info_expired_yesterday">Expired yesterday</string>
     <!-- My Account: subscription notice for any other expiry date. Placeholder is that date, e.g. "22 Jul 2026" or "Sunday, 22 Jul 2026" -->
     <string name="account_info_expires_on_date">Expires on %1$s</string>
+    <!-- Account usage screen: label under the storage quota meter -->
+    <string name="account_usage_storage_label">Storage</string>
+    <!-- Account usage screen: label under the transfer quota meter -->
+    <string name="account_usage_transfer_label">Transfer</string>
+    <!-- Account usage screen: used amount out of the total quota, e.g. "18 GB / 400 GB". First placeholder is the used amount, second is the total. The [A] tags mark the used amount, which turns red when the quota is exceeded. -->
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <!-- Account usage screen: alert shown to a business admin when the account has expired and payment is late -->
+    <string name="account_usage_payment_overdue_label">Payment overdue</string>
+    <!-- Account usage screen: alert shown to a business admin when the account is in its grace period and payment is needed -->
+    <string name="account_usage_payment_required_label">Payment required</string>
+    <!-- Account usage screen: heading of the section listing how much storage each area uses -->
+    <string name="account_usage_storage_breakdown_title">Storage usage breakdown</string>
+    <!-- Account usage screen: storage breakdown row for the Backups folder -->
+    <string name="account_usage_backups_label">Backups</string>
+    <!-- Account usage screen: button that takes the user to the upgrade plans screen -->
+    <string name="account_usage_get_more_storage_button">Get more storage</string>
+    <!-- The word "Error" on its own, used as a title or a prefix that the error message follows -->
+    <string name="general_error_word">Error</string>
 </resources>

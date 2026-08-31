@@ -44,7 +44,7 @@ import javax.inject.Inject
  * is set; the UI shows a message and navigates back (no retry).
  */
 @HiltViewModel
-class MyAccountUsageComposeViewModel @Inject constructor(
+internal class MyAccountUsageComposeViewModel @Inject constructor(
     private val getFileVersionsOption: GetFileVersionsOption,
     private val checkVersionsUseCase: CheckVersionsUseCase,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,

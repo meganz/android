@@ -1,4 +1,4 @@
-package mega.privacy.android.app.myAccount.view
+package mega.privacy.android.feature.myaccount.presentation.usage.view
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
@@ -8,7 +8,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.feature.myaccount.presentation.usage.MyAccountUsageUiState
@@ -105,35 +104,35 @@ class MyAccountUsageScreenTest {
     @Test
     fun `test that storage details label is shown when content is ready`() {
         setContent(readyFreeState())
-        val label = composeTestRule.activity.getString(R.string.usage_storage_details_label)
+        val label = composeTestRule.activity.getString(sharedR.string.account_usage_storage_breakdown_title)
         composeTestRule.onNodeWithText(label).assertIsDisplayed()
     }
 
     @Test
     fun `test that backup storage item is shown when backupStorageSize is positive`() {
         setContent(readyFreeState().copy(backupStorageSize = GIGABYTE))
-        val label = composeTestRule.activity.getString(R.string.home_side_menu_backups_title)
+        val label = composeTestRule.activity.getString(sharedR.string.account_usage_backups_label)
         composeTestRule.onNodeWithText(label).assertIsDisplayed()
     }
 
     @Test
     fun `test that backup storage item is not shown when backupStorageSize is zero`() {
         setContent(readyFreeState().copy(backupStorageSize = 0L))
-        val label = composeTestRule.activity.getString(R.string.home_side_menu_backups_title)
+        val label = composeTestRule.activity.getString(sharedR.string.account_usage_backups_label)
         composeTestRule.onNodeWithText(label).assertDoesNotExist()
     }
 
     @Test
     fun `test that previous versions item is shown when file versioning is enabled`() {
         setContent(readyFreeState().copy(isFileVersioningEnabled = true))
-        val label = composeTestRule.activity.getString(R.string.file_properties_folder_previous_versions)
+        val label = composeTestRule.activity.getString(sharedR.string.file_info_information_previous_versions_label)
         composeTestRule.onNodeWithText(label).assertIsDisplayed()
     }
 
     @Test
     fun `test that previous versions item is not shown when file versioning is disabled`() {
         setContent(readyFreeState().copy(isFileVersioningEnabled = false))
-        val label = composeTestRule.activity.getString(R.string.file_properties_folder_previous_versions)
+        val label = composeTestRule.activity.getString(sharedR.string.file_info_information_previous_versions_label)
         composeTestRule.onNodeWithText(label).assertDoesNotExist()
     }
 
@@ -158,7 +157,7 @@ class MyAccountUsageScreenTest {
                 paymentAlertType = PaymentAlertType.BusinessExpired,
             )
         )
-        val alertText = composeTestRule.activity.getString(R.string.payment_overdue_label)
+        val alertText = composeTestRule.activity.getString(sharedR.string.account_usage_payment_overdue_label)
         composeTestRule.onNodeWithText(alertText).assertIsDisplayed()
     }
 
@@ -171,7 +170,7 @@ class MyAccountUsageScreenTest {
                 paymentAlertType = PaymentAlertType.None,
             )
         )
-        val alertText = composeTestRule.activity.getString(R.string.payment_overdue_label)
+        val alertText = composeTestRule.activity.getString(sharedR.string.account_usage_payment_overdue_label)
         composeTestRule.onNodeWithText(alertText).assertDoesNotExist()
     }
 
@@ -212,7 +211,7 @@ class MyAccountUsageScreenTest {
     )
 
     private fun upgradeButtonText() =
-        composeTestRule.activity.getString(R.string.account_my_account_usage_get_more_storage_button)
+        composeTestRule.activity.getString(sharedR.string.account_usage_get_more_storage_button)
 
     private companion object {
         const val MEGABYTE = 1024L * 1024

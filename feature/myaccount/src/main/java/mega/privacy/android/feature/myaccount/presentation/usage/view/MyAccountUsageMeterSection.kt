@@ -1,4 +1,4 @@
-package mega.privacy.android.app.myAccount.view
+package mega.privacy.android.feature.myaccount.presentation.usage.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +26,6 @@ import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.stripLinkAnnotations
 import mega.privacy.android.domain.entity.StorageState
@@ -34,6 +33,7 @@ import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
 import mega.privacy.android.feature.myaccount.presentation.usage.MyAccountUsageUiState
 import mega.privacy.android.feature.myaccount.presentation.view.MyAccountQuotaProgressBar
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun UsageMeterSection(
@@ -101,7 +101,7 @@ private fun BusinessUsageLayout(
                 .weight(1f),
         ) {
             MegaText(
-                text = stringResource(id = R.string.account_storage_label),
+                text = stringResource(id = sharedR.string.account_usage_storage_label),
                 style = AppTheme.typography.labelLarge,
                 textColor = TextColor.Info,
                 textAlign = TextAlign.Center
@@ -124,7 +124,7 @@ private fun BusinessUsageLayout(
                 .weight(1f),
         ) {
             MegaText(
-                text = stringResource(id = R.string.transfer_label),
+                text = stringResource(id = sharedR.string.account_usage_transfer_label),
                 style = AppTheme.typography.labelLarge,
                 textColor = TextColor.Success,
                 textAlign = TextAlign.Center
@@ -181,7 +181,7 @@ private fun RegularUsageLayout(
 
             Column {
                 val storageText = stringResource(
-                    R.string.used_storage_transfer,
+                    sharedR.string.account_usage_used_of_total,
                     uiState.usedStorage?.let { formatFileSize(it, context) }.orEmpty(),
                     uiState.totalStorage?.let { formatFileSize(it, context) }.orEmpty()
                 ).let { if (isStorageOverQuota) it else it.stripLinkAnnotations() }
@@ -205,7 +205,7 @@ private fun RegularUsageLayout(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 MegaText(
-                    text = stringResource(id = R.string.account_storage_label),
+                    text = stringResource(id = sharedR.string.account_usage_storage_label),
                     style = AppTheme.typography.labelLarge,
                     textColor = TextColor.Primary,
                 )
@@ -232,7 +232,7 @@ private fun RegularUsageLayout(
 
                 Column {
                     val transferText = stringResource(
-                        R.string.used_storage_transfer,
+                        sharedR.string.account_usage_used_of_total,
                         uiState.usedTransfer?.let { formatFileSize(it, context) }.orEmpty(),
                         uiState.totalTransfer?.let { formatFileSize(it, context) }.orEmpty()
                     ).stripLinkAnnotations()
@@ -245,7 +245,7 @@ private fun RegularUsageLayout(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     MegaText(
-                        text = stringResource(id = R.string.transfer_label),
+                        text = stringResource(id = sharedR.string.account_usage_transfer_label),
                         style = AppTheme.typography.labelLarge,
                         textColor = TextColor.Primary
                     )

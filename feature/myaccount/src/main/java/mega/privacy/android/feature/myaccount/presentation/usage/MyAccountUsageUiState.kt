@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 /**
  * Payment alert type for account subscription
  */
-enum class PaymentAlertType {
+internal enum class PaymentAlertType {
     None,                    // No alert to display
     BusinessExpired,         // Business account expired - red color
     BusinessGracePeriod,     // Business account grace period - amber color
@@ -49,7 +49,7 @@ enum class PaymentAlertType {
  * @property usageLoadFailed True when any required load path failed (bootstrap or live account detail); show error and navigate back.
  */
 @Stable
-data class MyAccountUsageUiState(
+internal data class MyAccountUsageUiState(
     val usageLoadFailed: Boolean = false,
     val isUsageContentReady: Boolean = false,
     val isFileVersioningEnabled: Boolean = true,

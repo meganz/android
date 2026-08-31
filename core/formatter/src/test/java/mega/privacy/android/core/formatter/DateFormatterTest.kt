@@ -2,8 +2,12 @@ package mega.privacy.android.core.formatter
 
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.model.LocalizedText
+import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.Description
 import org.junit.runner.RunWith
+import org.junit.runners.model.Statement
+import org.junit.rules.TestRule
 import org.robolectric.RobolectricTestRunner
 import java.time.LocalDate
 import java.time.ZoneId
@@ -14,9 +18,15 @@ import mega.privacy.android.shared.resources.R as SharedR
 /**
  * Runs under Robolectric because [formatSubscriptionDate] resolves its patterns through
  * `DateFormat.getBestDateTimePattern`, which returns null on a plain JVM.
+ *
+ * Every case is expressed relative to the current day rather than a fixed date, because the
+ * function reads the clock itself and takes no date parameter.
  */
 @RunWith(RobolectricTestRunner::class)
 class DateFormatterTest {
+
+    @get:Rule
+    val midnightRollover = MidnightRolloverRule()
 
     @Test
     fun `test that formatSubscriptionDate returns the today sentence for the current day`() {
@@ -69,7 +79,10 @@ class DateFormatterTest {
         val actual = formatSubscriptionDate(middayIn(30), renewing = false) as LocalizedText.StringRes
 
         assertThat(actual.resId).isEqualTo(SharedR.string.account_info_expires_on_date)
-        assertThat(actual.formatArgs.single().toString()).matches("[A-Z][a-z]{2} \\d{1,2}, \\d{4}")
+        with(actual.formatArgs.single().toString()) {
+            assertThat(this).doesNotContain(weekdayNameIn(30))
+            assertThat(this).contains(today().plusDays(30).year.toString())
+        }
     }
 
     private fun stringResOf(text: LocalizedText): Int =
@@ -87,4 +100,26 @@ class DateFormatterTest {
             .atTime(12, 0)
             .atZone(ZoneId.systemDefault())
             .toEpochSecond()
+}
+
+/**
+ * Reruns a test once if the calendar day rolled over while it was running. [formatSubscriptionDate]
+ * reads the clock itself, so a rollover between a test building its timestamps and the function
+ * resolving "today" shifts every case by a day. A failure with the day unchanged is a real failure
+ * and is rethrown untouched.
+ */
+class MidnightRolloverRule : TestRule {
+
+    override fun apply(base: Statement, description: Description): Statement =
+        object : Statement() {
+            override fun evaluate() {
+                val startedOn = LocalDate.now(ZoneId.systemDefault())
+                try {
+                    base.evaluate()
+                } catch (error: AssertionError) {
+                    if (LocalDate.now(ZoneId.systemDefault()) == startedOn) throw error
+                    base.evaluate()
+                }
+            }
+        }
 }

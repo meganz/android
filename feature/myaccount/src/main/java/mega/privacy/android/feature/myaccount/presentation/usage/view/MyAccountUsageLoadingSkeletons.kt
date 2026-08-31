@@ -1,4 +1,4 @@
-package mega.privacy.android.app.myAccount.view
+package mega.privacy.android.feature.myaccount.presentation.usage.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
