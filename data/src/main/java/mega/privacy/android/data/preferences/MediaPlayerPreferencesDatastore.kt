@@ -18,6 +18,10 @@ import javax.inject.Inject
 private const val MEDIA_PLAYER_PREFERENCES = "MEDIA_PLAYER_PREFERENCES"
 private const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED = "settings_audio_background_play_enabled"
 private const val KEY_AUDIO_SHUFFLE_ENABLED = "settings_audio_shuffle_enabled"
+private const val KEY_AUDIO_CONTINUOUS_PLAYBACK_ENABLED =
+    "settings_audio_continuous_playback_enabled"
+private const val KEY_AUDIO_CONTINUOUS_PLAYBACK_AUTO_ENABLED =
+    "settings_audio_continuous_playback_auto_enabled"
 private const val KEY_AUDIO_REPEAT_MODE = "settings_audio_repeat_mode"
 private const val KEY_VIDEO_REPEAT_MODE = "settings_video_repeat_mode"
 private const val mediaPlayerPreferenceFileName = MEDIA_PLAYER_PREFERENCES
@@ -46,6 +50,10 @@ internal class MediaPlayerPreferencesDatastore @Inject constructor(
     private val audioBackgroundPlayEnabledKey =
         booleanPreferencesKey(KEY_AUDIO_BACKGROUND_PLAY_ENABLED)
     private val audioShuffleEnabledKey = booleanPreferencesKey(KEY_AUDIO_SHUFFLE_ENABLED)
+    private val audioContinuousPlaybackEnabledKey =
+        booleanPreferencesKey(KEY_AUDIO_CONTINUOUS_PLAYBACK_ENABLED)
+    private val audioContinuousPlaybackAutoEnabledKey =
+        booleanPreferencesKey(KEY_AUDIO_CONTINUOUS_PLAYBACK_AUTO_ENABLED)
     private val audioRepeatModeKey = intPreferencesKey(KEY_AUDIO_REPEAT_MODE)
     private val videoRepeatModeKey = intPreferencesKey(KEY_VIDEO_REPEAT_MODE)
 
@@ -64,6 +72,24 @@ internal class MediaPlayerPreferencesDatastore @Inject constructor(
     override suspend fun setAudioShuffleEnabled(value: Boolean) {
         context.mediaPlayerPreferenceDataStore.edit {
             it[audioShuffleEnabledKey] = value
+        }
+    }
+
+    override fun monitorAudioContinuousPlaybackEnabled() =
+        context.mediaPlayerPreferenceDataStore.monitor(audioContinuousPlaybackEnabledKey)
+
+    override suspend fun setAudioContinuousPlaybackEnabled(value: Boolean) {
+        context.mediaPlayerPreferenceDataStore.edit {
+            it[audioContinuousPlaybackEnabledKey] = value
+        }
+    }
+
+    override fun monitorAudioContinuousPlaybackAutoEnabled() =
+        context.mediaPlayerPreferenceDataStore.monitor(audioContinuousPlaybackAutoEnabledKey)
+
+    override suspend fun setAudioContinuousPlaybackAutoEnabled(value: Boolean) {
+        context.mediaPlayerPreferenceDataStore.edit {
+            it[audioContinuousPlaybackAutoEnabledKey] = value
         }
     }
 

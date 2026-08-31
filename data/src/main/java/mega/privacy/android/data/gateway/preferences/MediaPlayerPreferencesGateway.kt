@@ -36,6 +36,36 @@ interface MediaPlayerPreferencesGateway {
     suspend fun setAudioShuffleEnabled(value: Boolean)
 
     /**
+     * Monitor the value of AudioContinuousPlaybackEnabled
+     *
+     * @return Flow of Boolean
+     */
+    fun monitorAudioContinuousPlaybackEnabled(): Flow<Boolean?>
+
+    /**
+     * Set the value of AudioContinuousPlaybackEnabled
+     *
+     * @param value true is playing the next item automatically, otherwise is false.
+     */
+    suspend fun setAudioContinuousPlaybackEnabled(value: Boolean)
+
+    /**
+     * Monitor whether AudioContinuousPlaybackEnabled was turned on to satisfy a repeat-queue mode
+     * rather than by the user
+     *
+     * @return Flow of Boolean
+     */
+    fun monitorAudioContinuousPlaybackAutoEnabled(): Flow<Boolean?>
+
+    /**
+     * Set whether AudioContinuousPlaybackEnabled was turned on to satisfy a repeat-queue mode
+     * rather than by the user
+     *
+     * @param value true if continuous playback was turned on automatically, otherwise is false.
+     */
+    suspend fun setAudioContinuousPlaybackAutoEnabled(value: Boolean)
+
+    /**
      * Monitor the value of AudioRepeatMode
      *
      * @return Flow of Int

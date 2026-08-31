@@ -492,6 +492,18 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     override suspend fun setAudioShuffleEnabled(value: Boolean) =
         mediaPlayerPreferencesGateway.setAudioShuffleEnabled(value)
 
+    override fun monitorAudioContinuousPlaybackEnabled() =
+        mediaPlayerPreferencesGateway.monitorAudioContinuousPlaybackEnabled()
+
+    override suspend fun setAudioContinuousPlaybackEnabled(value: Boolean) =
+        mediaPlayerPreferencesGateway.setAudioContinuousPlaybackEnabled(value)
+
+    override fun monitorAudioContinuousPlaybackAutoEnabled() =
+        mediaPlayerPreferencesGateway.monitorAudioContinuousPlaybackAutoEnabled()
+
+    override suspend fun setAudioContinuousPlaybackAutoEnabled(value: Boolean) =
+        mediaPlayerPreferencesGateway.setAudioContinuousPlaybackAutoEnabled(value)
+
     override fun monitorAudioRepeatMode() =
         mediaPlayerPreferencesGateway.monitorAudioRepeatMode().map {
             repeatToggleModeMapper(it)
