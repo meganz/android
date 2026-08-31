@@ -37,7 +37,9 @@ import mega.privacy.android.feature.sync.ui.synclist.SYNC_FOLDERS_CHIP_TEST_TAG
 import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.feature.sync.ui.synclist.SyncListState
+import mega.privacy.android.feature.sync.ui.synclist.SyncListTabFab
 import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
+import mega.privacy.android.feature.sync.ui.synclist.rememberSyncListFabState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
@@ -314,13 +316,24 @@ internal class SyncListRouteTest {
 
     /**
      * Mirrors how Cloud Drive hosts the Syncs tab: the host owns the scaffold, and so the only
-     * snackbar host, while the tab supplies content only.
+     * snackbar host and the FAB, while the tab supplies content only.
      */
     @OptIn(ExperimentalMaterial3Api::class)
     private fun setComposeContentInHostScaffold(hostState: SnackbarHostState) {
+        val foldersState = syncFoldersViewModel.uiState.value
         composeTestRule.setContent {
             CompositionLocalProvider(LocalSnackBarHostState provides hostState) {
-                MegaScaffoldWithTopAppBarScrollBehavior { paddingValues ->
+                val fabState = rememberSyncListFabState()
+                MegaScaffoldWithTopAppBarScrollBehavior(
+                    floatingActionButton = {
+                        SyncListTabFab(
+                            fabState = fabState,
+                            syncFoldersUiState = foldersState,
+                            onSyncFolderClicked = {},
+                            onBackupFolderClicked = {},
+                        )
+                    },
+                ) { paddingValues ->
                     SyncListRoute(
                         isInCloudDrive = true,
                         viewModel = viewModel,
@@ -337,6 +350,7 @@ internal class SyncListRouteTest {
                         onOpenMegaFolderClicked = {},
                         onCameraUploadsSettingsClicked = {},
                         onStalledIssueMoreClicked = {},
+                        fabState = fabState,
                     )
                 }
             }
@@ -419,7 +433,7 @@ internal class SyncListRouteTest {
     }
 
     @Test
-    fun `test that the tab FAB sits at the bottom end of the tab area`() {
+    fun `test that the tab FAB sits at the bottom end of the host scaffold`() {
         whenever(syncFoldersUiState.value).thenReturn(
             SyncFoldersUiState(syncUiItems = manySyncUiItems.toImmutableList())
         )
@@ -432,6 +446,30 @@ internal class SyncListRouteTest {
 
         assertThat((root.bottom - fab.bottom).value).isWithin(0.5f).of(16f)
         assertThat((root.right - fab.right).value).isWithin(0.5f).of(16f)
+    }
+
+    @Test
+    fun `test that the tab snackbar is laid out above the FAB`() {
+        whenever(syncFoldersUiState.value).thenReturn(
+            SyncFoldersUiState(syncUiItems = manySyncUiItems.toImmutableList())
+        )
+        whenever(syncStalledIssuesState.value).thenReturn(
+            SyncStalledIssuesState(
+                stalledIssues = emptyList(),
+                snackbarMessageContent = triggered(sharedR.string.sync_stalled_issue_resolved),
+            )
+        )
+
+        setComposeContentInHostScaffold(SnackbarHostState())
+
+        val message =
+            composeTestRule.activity.getString(sharedR.string.sync_stalled_issue_resolved)
+        val snackbar = composeTestRule.onNodeWithText(message).getUnclippedBoundsInRoot()
+        val fab = composeTestRule
+            .onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
+            .getUnclippedBoundsInRoot()
+
+        assertThat(snackbar.bottom.value).isAtMost(fab.top.value)
     }
 
     private fun setComposeContentWithDisposeSwitch() = mutableStateOf(true).also { switch ->

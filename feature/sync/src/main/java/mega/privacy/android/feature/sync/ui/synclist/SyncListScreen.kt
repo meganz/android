@@ -24,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -157,8 +156,10 @@ internal fun SyncListScreen(
 }
 
 /**
- * Sync list as a tab of another screen. The host screen owns the scaffold, top app bar and
- * snackbar host; adding a second scaffold here would render every snackbar twice.
+ * Sync list as a tab of another screen. The host screen owns the scaffold, top app bar,
+ * snackbar host and FAB; adding a second scaffold here would render every snackbar twice, and
+ * a FAB outside the host scaffold would be covered by those snackbars. The host places the FAB
+ * with [SyncListTabFab] and shares [fabState] so a tap on this content still collapses it.
  */
 @Composable
 internal fun SyncListTabContent(
@@ -167,53 +168,35 @@ internal fun SyncListTabContent(
     syncSolvedIssuesState: SyncSolvedIssuesState,
     syncNotificationState: SyncMonitorState,
     stalledIssuesCount: Int,
-    onSyncFolderClicked: () -> Unit,
-    onBackupFolderClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
     onOpenUpgradeAccountClicked: () -> Unit,
     onDismissNotification: () -> Unit,
     onSyncRefresh: () -> Unit,
     chipContent: @Composable (chip: SyncChip, onIssuesInfoClicked: () -> Unit) -> Unit,
     modifier: Modifier = Modifier,
+    fabState: SyncListFabState = rememberSyncListFabState(),
     selectedChip: SyncChip = SYNC_FOLDERS,
-    onFabExpanded: (Boolean) -> Unit = {},
 ) {
-    val multiFabState = rememberMultiFloatingActionButtonState()
-    FabExpandedEffect(multiFabState, onFabExpanded)
-
-    Box(modifier = modifier.fillMaxSize()) {
-        SyncListContent(
-            modifier = Modifier
-                .fillMaxSize()
-                .collapseFabOnTap(multiFabState),
-            syncFoldersUiState = syncFoldersUiState,
-            syncStalledIssuesState = syncStalledIssuesState,
-            syncSolvedIssuesState = syncSolvedIssuesState,
-            syncNotificationState = syncNotificationState,
-            stalledIssuesCount = stalledIssuesCount,
-            syncPermissionsManager = syncPermissionsManager,
-            onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
-            onDismissNotification = onDismissNotification,
-            onSyncRefresh = onSyncRefresh,
-            selectedChip = selectedChip,
-            chipContent = chipContent,
-        )
-        SyncListFab(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .navigationBarsPadding()
-                .padding(16.dp),
-            syncFoldersUiState = syncFoldersUiState,
-            multiFabState = multiFabState,
-            onSyncFolderClicked = onSyncFolderClicked,
-            onBackupFolderClicked = onBackupFolderClicked,
-            onFabExpanded = onFabExpanded,
-        )
-    }
+    SyncListContent(
+        modifier = modifier
+            .fillMaxSize()
+            .collapseFabOnTap(fabState.multiFabState),
+        syncFoldersUiState = syncFoldersUiState,
+        syncStalledIssuesState = syncStalledIssuesState,
+        syncSolvedIssuesState = syncSolvedIssuesState,
+        syncNotificationState = syncNotificationState,
+        stalledIssuesCount = stalledIssuesCount,
+        syncPermissionsManager = syncPermissionsManager,
+        onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
+        onDismissNotification = onDismissNotification,
+        onSyncRefresh = onSyncRefresh,
+        selectedChip = selectedChip,
+        chipContent = chipContent,
+    )
 }
 
 @Composable
-private fun SyncListFab(
+internal fun SyncListFab(
     syncFoldersUiState: SyncFoldersUiState,
     multiFabState: MutableState<MultiFloatingActionButtonState>,
     onSyncFolderClicked: () -> Unit,
@@ -263,7 +246,7 @@ private fun SyncListFab(
 }
 
 @Composable
-private fun FabExpandedEffect(
+internal fun FabExpandedEffect(
     multiFabState: MutableState<MultiFloatingActionButtonState>,
     onFabExpanded: (Boolean) -> Unit,
 ) {
@@ -406,8 +389,6 @@ private fun SyncListTabContentPreview() {
             syncSolvedIssuesState = SyncSolvedIssuesState(),
             syncNotificationState = SyncMonitorState(),
             stalledIssuesCount = 0,
-            onSyncFolderClicked = {},
-            onBackupFolderClicked = {},
             syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
             onOpenUpgradeAccountClicked = {},
             onDismissNotification = {},
