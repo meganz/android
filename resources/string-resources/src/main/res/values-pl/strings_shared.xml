@@ -3112,7 +3112,7 @@
     <string name="video_editor_pause_button">Wstrzymaj</string>
     <string name="video_editor_muted_badge">Wyciszony</string>
     <string name="video_editor_discard_cancel_button">Kontynuuj edycję</string>
-    <string name="share_link_password_dialog_title">Hasło do linku udostępniania</string>
+    <string name="share_link_password_dialog_title">Hasło do linku</string>
     <string name="subscription_quota_no_connection_title">Nie udało się nawiązać połączenia</string>
     <string name="subscription_quota_no_connection_description">Sprawdź później szczegóły dotyczące przechowywania i transferu, albo spróbuj ponownie</string>
     <string name="subscription_quota_no_connection_retry_button">Spróbuj ponownie</string>
@@ -3246,4 +3246,71 @@
         <item quantity="many">Usunąć linki?</item>
         <item quantity="other">Usunąć linki?</item>
     </plurals>
+    <string name="media_timeline_sort_option_date_taken">Data wykonania</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="one">Ktokolwiek ma ten link, nie będzie już mógł uzyskać dostępu do pliku ani folderu</item>
+        <item quantity="few">Ktokolwiek ma te linki, nie będzie już mógł uzyskać dostępu do plików ani folderów</item>
+        <item quantity="many">Ktokolwiek ma te linki, nie będzie już mógł uzyskać dostępu do plików ani folderów</item>
+        <item quantity="other">Ktokolwiek ma te linki, nie będzie już mógł uzyskać dostępu do plików ani folderów</item>
+    </plurals>
+    <string name="account_info_renews_on_date">Odnawia na w %1$s</string>
+    <string name="account_info_expires_on_date">Wygasa dnia %1$s</string>
+    <string name="account_info_renews_today">Odnawia się dzisiaj</string>
+    <string name="account_info_renews_tomorrow_date">Odnowi się jutro, %1$s</string>
+    <string name="account_info_expires_today">Wygasa dzisiaj</string>
+    <string name="account_info_expires_tomorrow_date">Wygasa jutro, %1$s</string>
+    <string name="account_info_expired_yesterday">Wygasł wczoraj</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s opuścił czat</string>
+    <string name="non_format_change_title_messages">%1$s zmienił nazwę czatu grupowego na „%2$s”</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 rok</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="one">%1$d miesiąc</item>
+        <item quantity="few">%1$d miesiące</item>
+        <item quantity="many">%1$d miesiące</item>
+        <item quantity="other">%1$d miesiące</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="one">%1$d tydzień</item>
+        <item quantity="few">%1$d tygodni</item>
+        <item quantity="many">%1$d tygodni</item>
+        <item quantity="other">%1$d tygodni</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="one">%d dzień</item>
+        <item quantity="few">%d dni</item>
+        <item quantity="many">%d dni</item>
+        <item quantity="other">%d dni</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="one">%1$d godzina</item>
+        <item quantity="few">%1$d godzin</item>
+        <item quantity="many">%1$d godzin</item>
+        <item quantity="other">%1$d godzin</item>
+    </plurals>
+    <string name="non_format_message_add_participant">%2$s dodał %1$s do tego czatu grupowego</string>
+    <string name="non_format_message_remove_participant">%2$s usunął %1$s z czatu grupowego</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s zmienił rolę %1$s na hosta</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s zmienił rolę %1$s na standardową</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s zmienił rolę %1$s na tylko do odczytu</string>
+    <string name="history_cleared_by">%1$s wyczyścił historię czatu</string>
+    <string name="non_format_history_cleared_by">%1$s wyczyścił historię czatu</string>
+    <string name="retention_history_changed_by">%1$s zmienił czas usuwania wiadomości na %2$s</string>
+    <string name="retention_history_disabled">%1$s wyłączył kasowanie wiadomości</string>
+    <string name="message_created_chat_link">%1$s utworzył link do czatu</string>
+    <string name="message_deleted_chat_link">%1$s usunął link do czatu</string>
+    <string name="message_set_chat_private">%1$s włączył rotację klucza szyfrowania</string>
+    <string name="title_geolocation_message">Przypięta lokalizacja</string>
+    <string name="chat_list_ongoing_call_content_description">Trwające połączenie</string>
+    <string name="contacts_sent">Wysłano %s kontaktów</string>
+    <string name="error_message_unrecognizable">Wiadomość nieczytelna</string>
+    <string name="audio_player_resumed_snackbar_message">Wznowiono od %1$s</string>
+    <string name="account_usage_storage_label">Powierzchnia</string>
+    <string name="account_usage_transfer_label">Przesyłanie</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_payment_overdue_label">Opłata zaległa</string>
+    <string name="account_usage_payment_required_label">Płatność wymagana</string>
+    <string name="account_usage_storage_breakdown_title">Podział wykorzystania pamięci</string>
+    <string name="account_usage_backups_label">Kopie zapasowe</string>
+    <string name="account_usage_get_more_storage_button">Uzyskaj więcej pamięci</string>
+    <string name="general_error_word">Błąd</string>
 </resources>

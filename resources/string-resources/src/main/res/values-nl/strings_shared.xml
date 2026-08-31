@@ -2862,7 +2862,7 @@
     <string name="deep_link_content_unavailable_dialog_message">De inhoud die u probeert te openen, is niet beschikbaar voor dit account.</string>
     <string name="share_link_expires_on">De link verloopt op %1$s</string>
     <string name="share_link_expired">Link verlopen</string>
-    <string name="share_link_password_dialog_title">Deel link wachtwoord</string>
+    <string name="share_link_password_dialog_title">Link wachtwoord</string>
     <string name="share_link_password_dialog_message">Wilt u het wachtwoord voor deze link delen?</string>
     <string name="subscription_quota_no_connection_title">Kon geen verbinding maken</string>
     <string name="subscription_quota_no_connection_description">Bekijk later uw opslag- en overdrachtsgegevens, of probeer het opnieuw</string>
@@ -2994,4 +2994,62 @@
         <item quantity="one">Link verwijderen?</item>
         <item quantity="other">Links verwijderen?</item>
     </plurals>
+    <string name="account_info_renews_on_date">Wordt verlengd op %1$s</string>
+    <string name="account_info_expires_on_date">Vervalt op %1$s</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s heeft de groep chat verlaten</string>
+    <string name="non_format_change_title_messages">%1$s wijzigt de groepsgesprek naam naar “%2$s”</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 jaar</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="one">%1$d maand</item>
+        <item quantity="other">%1$d maanden</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="one">%1$d week</item>
+        <item quantity="other">%1$d weken</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dagen</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="one">%1$d uur</item>
+        <item quantity="other">%1$d uren</item>
+    </plurals>
+    <string name="title_geolocation_message">Vastgezette locatie</string>
+    <string name="chat_list_ongoing_call_content_description">Lopende oproep</string>
+    <string name="check_internet_connection_error">Geen internetverbinding. Controleer uw verbinding en probeer het opnieuw</string>
+    <string name="media_timeline_sort_option_date_taken">Datum van opname</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="one">Iedereen met deze link heeft geen toegang meer tot het bestand of de map</item>
+        <item quantity="other">Iedereen met deze links heeft geen toegang meer tot de bestanden of mappen</item>
+    </plurals>
+    <string name="account_info_renews_today">Wordt vandaag verlengd</string>
+    <string name="account_info_renews_tomorrow_date">Wordt morgen verlengd, %1$s</string>
+    <string name="account_info_expires_today">Verloopt vandaag</string>
+    <string name="account_info_expires_tomorrow_date">Verloopt morgen, %1$s</string>
+    <string name="account_info_expired_yesterday">Gisteren verlopen</string>
+    <string name="non_format_message_add_participant">%2$s heeft %1$s aan deze groepschat toegevoegd</string>
+    <string name="non_format_message_remove_participant">%2$s heeft %1$s uit de groepschat verwijderd</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s heeft de rol van %1$s gewijzigd naar gastheer</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s heeft de rol van %1$s gewijzigd naar standaard</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s heeft de rol van %1$s gewijzigd naar alleen-lezen</string>
+    <string name="history_cleared_by">%1$s heeft de chatgeschiedenis gewist</string>
+    <string name="non_format_history_cleared_by">%1$s heeft de chatgeschiedenis gewist</string>
+    <string name="retention_history_changed_by">%1$s heeft de tijd voor het wissen van berichten gewijzigd naar %2$s</string>
+    <string name="retention_history_disabled">%1$s heeft het wissen van berichten uitgeschakeld</string>
+    <string name="message_created_chat_link">%1$s heeft een chatlink aangemaakt</string>
+    <string name="message_deleted_chat_link">%1$s heeft de chatlink verwijderd</string>
+    <string name="message_set_chat_private">%1$s heeft rotatie van encryptiesleutels ingeschakeld</string>
+    <string name="contacts_sent">%s contacten verzonden</string>
+    <string name="error_message_unrecognizable">Bericht onherkenbaar</string>
+    <string name="audio_player_resumed_snackbar_message">Hervat vanaf %1$s</string>
+    <string name="account_usage_storage_label">Opslag</string>
+    <string name="account_usage_transfer_label">Overdracht</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A]/%2$s</string>
+    <string name="account_usage_payment_overdue_label">Betaling over tijd</string>
+    <string name="account_usage_payment_required_label">Betaling verplicht</string>
+    <string name="account_usage_storage_breakdown_title">Uitsplitsing van opslaggebruik</string>
+    <string name="account_usage_backups_label">Back-ups</string>
+    <string name="account_usage_get_more_storage_button">Krijg meer opslag</string>
+    <string name="general_error_word">Fout</string>
 </resources>

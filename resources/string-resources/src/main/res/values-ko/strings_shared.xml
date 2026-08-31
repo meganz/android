@@ -1681,7 +1681,7 @@
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">이 사진첩 이름은 허용되지 않습니다. 다른 이름을 입력하세요.</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="album_name_exists_error_message">이 이름을 가진 앨범이 이미 존재합니다. 다른 이름을 입력하세요.</string>
+    <string name="album_name_exists_error_message">이 이름을 가진 사진첩이 이미 존재합니다. 다른 이름을 입력하세요.</string>
     <!-- sentence to detail the permanent awarded text related to VPN achievement -->
     <string name="mega_vpn_achievement_awarded_storage_text_permanent">MEGA&#160;VPN 무료 체험을 시작하면 영구적으로 유효한 %1$s의 무료 저장소를 받습니다</string>
     <!-- sentence to detail the permanent awarded text related to PWM achievement -->
@@ -2084,7 +2084,7 @@
     <string name="photos_loading_indicator_text">불러오는 중</string>
     <string name="photos_network_error_message">네트워크 연결 없음</string>
     <string name="photos_save_to_cloud_drive_button_text">클라우드 드라이브에 저장</string>
-    <string name="photos_create_album_duplicate_name_error">이 이름을 가진 앨범이 이미 존재합니다. 다른 이름을 입력하세요.</string>
+    <string name="photos_create_album_duplicate_name_error">이 이름을 가진 사진첩이 이미 존재합니다. 다른 이름을 입력하세요.</string>
     <string name="photos_create_album_proscribed_name_error">이 사진첩 이름은 허용되지 않습니다. 다른 이름을 입력하세요.</string>
     <string name="home_recents_clear_dialog_message">최근 활동을 모두 지우시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
     <string name="choose_account_screen_plan_available_yearly_billing">%1$s 요금제는 연간 결제로 이용 가능합니다</string>
@@ -2732,7 +2732,7 @@
     <string name="deep_link_content_unavailable_dialog_message">접근하려는 콘텐츠는 이 계정에서 이용 불가합니다.</string>
     <string name="share_link_expires_on">링크가 %1$s에 만료됩니다</string>
     <string name="share_link_expired">링크가 만료되었습니다</string>
-    <string name="share_link_password_dialog_title">링크 암호 공유</string>
+    <string name="share_link_password_dialog_title">링크 암호</string>
     <string name="share_link_password_dialog_message">이 링크의 암호를 공유하시겠습니까?</string>
     <string name="subscription_quota_no_connection_title">연결할 수 없습니다</string>
     <string name="subscription_quota_no_connection_description">나중에 저장소와 전송 세부 정보를 확인하거나, 다시 시도하세요</string>
@@ -2858,4 +2858,58 @@
     <plurals name="remove_link_dialog_title">
         <item quantity="other">링크를 제거할까요?</item>
     </plurals>
+    <string name="account_info_renews_on_date">%1$s에 갱신</string>
+    <string name="account_info_expires_on_date">%1$s에 만료</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s님이 단체 대화를 떠났습니다</string>
+    <string name="non_format_change_title_messages">%1$s님이 단체 대화 이름을 “%2$s”로 변경하였습니다</string>
+    <string name="subtitle_properties_manage_chat_label_year">1년</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="other">%1$d개월</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="other">%1$d주</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="other">%d일</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="other">%1$d시간</item>
+    </plurals>
+    <string name="title_geolocation_message">고정된 위치</string>
+    <string name="chat_list_ongoing_call_content_description">진행중인 통화</string>
+    <string name="password_too_weak_error_message">더 강한 암호를 쓰세요.</string>
+    <string name="check_internet_connection_error">인터넷 연결이 없습니다. 연결을 확인하고 다시 시도하세요</string>
+    <string name="media_timeline_sort_option_date_taken">촬영 날짜</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="other">이 링크를 가진 사람들이 더 이상 파일 또는 폴더에 접근할 수 없게 됩니다</item>
+    </plurals>
+    <string name="account_info_renews_today">오늘 갱신</string>
+    <string name="account_info_renews_tomorrow_date">내일, %1$s 갱신</string>
+    <string name="account_info_expires_today">오늘 만료</string>
+    <string name="account_info_expires_tomorrow_date">내일, %1$s 만료</string>
+    <string name="account_info_expired_yesterday">어제 만료됨</string>
+    <string name="non_format_message_add_participant">%2$s 님이 %1$s 님을 이 단체 대화에 추가하였습니다</string>
+    <string name="non_format_message_remove_participant">%2$s 님이 %1$s 님을 단체 대화에서 제거했습니다</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s 님이 %1$s님의 역할을 주최자로 변경하였습니다</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s 님이 %1$s 님의 역할을 일반으로 변경하였습니다</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s 님이 %1$s 님의 역할을 읽기 전용으로 변경했습니다</string>
+    <string name="history_cleared_by">%1$s 님이 대화 기록을 비웠습니다</string>
+    <string name="non_format_history_cleared_by">%1$s 님이 대화 기록을 비웠습니다</string>
+    <string name="retention_history_changed_by">%1$s 님이 메시지 삭제 시간을 %2$s(으)로 설정하였습니다</string>
+    <string name="retention_history_disabled">%1$s 님이 메시지 삭제를 껐습니다</string>
+    <string name="message_created_chat_link">%1$s 님이 대화 링크를 만들었습니다</string>
+    <string name="message_deleted_chat_link">%1$s 님이 대화 링크를 제거했습니다</string>
+    <string name="message_set_chat_private">%1$s 님이 암호화 키 순환을 켰습니다</string>
+    <string name="contacts_sent">연락처 %s개를 보냈습니다</string>
+    <string name="error_message_unrecognizable">알아볼 수 없는 메시지</string>
+    <string name="audio_player_resumed_snackbar_message">%1$s부터 재개</string>
+    <string name="account_usage_storage_label">저장소</string>
+    <string name="account_usage_transfer_label">전송</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_payment_overdue_label">결제 기한 초과</string>
+    <string name="account_usage_payment_required_label">결제 필요</string>
+    <string name="account_usage_storage_breakdown_title">저장소 사용량 명세서</string>
+    <string name="account_usage_backups_label">백업</string>
+    <string name="account_usage_get_more_storage_button">더 많은 저장소 받기</string>
+    <string name="general_error_word">오류</string>
 </resources>

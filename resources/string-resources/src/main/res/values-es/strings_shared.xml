@@ -2959,7 +2959,7 @@
     <string name="deep_link_content_unavailable_dialog_message">El contenido al que intentas acceder no está disponible para esta cuenta.</string>
     <string name="share_link_expires_on">El enlace caduca el %1$s</string>
     <string name="share_link_expired">Enlace caducado</string>
-    <string name="share_link_password_dialog_title">Compartir contraseña del enlace</string>
+    <string name="share_link_password_dialog_title">Contraseña del enlace</string>
     <string name="share_link_password_dialog_message">¿Quieres compartir la contraseña de este enlace?</string>
     <string name="subscription_quota_no_connection_title">No se ha podido conectar</string>
     <string name="subscription_quota_no_connection_description">Comprueba tu almacenamiento y transferencia más tarde, o inténtalo de nuevo</string>
@@ -3084,4 +3084,66 @@
         <item quantity="many">¿Eliminar enlaces?</item>
         <item quantity="other">¿Eliminar enlaces?</item>
     </plurals>
+    <string name="account_info_expires_on_date">Caduca el %1$s</string>
+    <string name="account_info_renews_on_date">Se renueva el %1$s</string>
+    <string name="account_info_expires_tomorrow_date">Caduca mañana, %1$s</string>
+    <string name="account_info_renews_tomorrow_date">Se renueva mañana, %1$s</string>
+    <string name="account_info_expires_today">Caduca hoy</string>
+    <string name="account_info_expired_yesterday">Caducó ayer</string>
+    <string name="account_info_renews_today">Se renueva hoy</string>
+    <string name="non_format_message_add_participant">%2$s ha añadido %1$s a este chat de grupo</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s ha abandonado el chat de grupo</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s ha cambiado el rol de %1$s a solo lectura</string>
+    <string name="non_format_message_remove_participant">%2$s ha eliminado a %1$s del chat de grupo</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s ha cambiado el rol de %1$s a anfitrión</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s ha cambiado el rol de %1$s a estándar</string>
+    <string name="non_format_change_title_messages">%1$s ha cambiado el nombre del grupo a “%2$s”</string>
+    <string name="history_cleared_by">%1$s ha borrado el historial de chat</string>
+    <string name="non_format_history_cleared_by">%1$s ha borrado el historial de chat</string>
+    <string name="message_created_chat_link">%1$s ha creado un enlace de chat</string>
+    <string name="message_deleted_chat_link">%1$s ha eliminado el enlace de chat</string>
+    <string name="message_set_chat_private">%1$s ha activado la rotación de la clave de cifrado</string>
+    <string name="retention_history_changed_by">%1$s ha cambiado el tiempo de borrado de mensajes a %2$s</string>
+    <string name="retention_history_disabled">%1$s desactivado el borrado de mensajes</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 año</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="one">%1$d mes</item>
+        <item quantity="many">%1$d meses</item>
+        <item quantity="other">%1$d meses</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="one">%1$d semana</item>
+        <item quantity="many">%1$d de semanas</item>
+        <item quantity="other">%1$d semanas</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="one">%d día</item>
+        <item quantity="many">%d de días</item>
+        <item quantity="other">%d días</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="one">%1$d hora</item>
+        <item quantity="many">%1$d horas</item>
+        <item quantity="other">%1$d horas</item>
+    </plurals>
+    <string name="media_timeline_sort_option_date_taken">Fecha de captura</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="one">Cualquiera que tenga este enlace ya no podrá acceder al archivo o a la carpeta</item>
+        <item quantity="many">Cualquiera que tenga estos enlaces ya no podrá acceder a los archivos o a las carpetas</item>
+        <item quantity="other">Cualquiera que tenga estos enlaces ya no podrá acceder a los archivos o a las carpetas</item>
+    </plurals>
+    <string name="contacts_sent">%s contactos enviados</string>
+    <string name="title_geolocation_message">Ubicación fijada</string>
+    <string name="error_message_unrecognizable">Mensaje irreconocible</string>
+    <string name="chat_list_ongoing_call_content_description">Llamada en curso</string>
+    <string name="audio_player_resumed_snackbar_message">Reanudado desde %1$s</string>
+    <string name="account_usage_storage_label">Almacenamiento</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_storage_breakdown_title">Desglose del almacenamiento</string>
+    <string name="account_usage_get_more_storage_button">Consigue más almacenamiento</string>
+    <string name="account_usage_backups_label">Backups</string>
+    <string name="account_usage_transfer_label">Transferencia</string>
+    <string name="account_usage_payment_overdue_label">Pago vencido</string>
+    <string name="account_usage_payment_required_label">Pago requerido</string>
+    <string name="general_error_word">Error</string>
 </resources>

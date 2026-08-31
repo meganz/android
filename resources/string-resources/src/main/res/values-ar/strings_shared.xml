@@ -3472,4 +3472,66 @@
         <item quantity="many">إزالة الروابط؟</item>
         <item quantity="other">إزالة الروابط؟</item>
     </plurals>
+    <string name="account_info_expires_on_date">تنتهي الصلاحية في %1$s</string>
+    <string name="account_info_renews_on_date">يتجدد بتاريخ %1$s</string>
+    <string name="non_format_message_add_participant">%2$s أضاف %1$s إلى هذه المحادثة الجماعية</string>
+    <string name="non_format_message_participant_left_group_chat">غادر %1$s مجموعة المحادثة</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s غيّر دور %1$s إلى وضع القراءة فقط</string>
+    <string name="non_format_message_remove_participant">قام %2$s بإزالة %1$s من المحادثة الجماعية</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">غيّر %2$s دور %1$s ليصبح المضيف</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s غيّر دور %1$s إلى عادي</string>
+    <string name="non_format_change_title_messages">%1$s غير اسم المجموعة إلى “%2$s”</string>
+    <string name="history_cleared_by">قام %1$s بمسح سجل المحادثة</string>
+    <string name="non_format_history_cleared_by">قام %1$s بمسح سجل المحادثة</string>
+    <string name="message_created_chat_link">أنشأ %1$s رابط محادثة</string>
+    <string name="message_deleted_chat_link">قام %1$s بإزالة رابط المحادثة</string>
+    <string name="message_set_chat_private">قام %1$s بتشغيل تدوير مفاتيح التشفير</string>
+    <string name="retention_history_changed_by">%1$s غيّر وقت مسح الرسالة إلى %2$s</string>
+    <string name="retention_history_disabled">قام %1$s بتعطيل مسح الرسائل</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 سنة</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="zero">%1$d شهر</item>
+        <item quantity="one">%1$d شهر</item>
+        <item quantity="two">%1$d شهران</item>
+        <item quantity="few">%1$d أشهر</item>
+        <item quantity="many">%1$d شهراً</item>
+        <item quantity="other">%1$d شهر</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="zero">%1$d أسبوع</item>
+        <item quantity="one">%1$d أسبوع</item>
+        <item quantity="two">%1$d أسبوعان</item>
+        <item quantity="few">%1$d أسابيع</item>
+        <item quantity="many">%1$d أسبوعاً</item>
+        <item quantity="other">%1$d أسبوع</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="zero">%d يوم</item>
+        <item quantity="one">%d يوم</item>
+        <item quantity="two">%d يومان</item>
+        <item quantity="few">%d أيام</item>
+        <item quantity="many">%d يوماً</item>
+        <item quantity="other">%d يوم</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="zero">%1$d ساعة</item>
+        <item quantity="one">%1$d ساعة</item>
+        <item quantity="two">%1$d ساعتان</item>
+        <item quantity="few">%1$d ساعات</item>
+        <item quantity="many">%1$d ساعة</item>
+        <item quantity="other">%1$d ساعة</item>
+    </plurals>
+    <string name="contacts_sent">أرسل %s جهة اتصال</string>
+    <string name="title_geolocation_message">موقع مثبت</string>
+    <string name="error_message_unrecognizable">رسالة غير معروفة</string>
+    <string name="chat_list_ongoing_call_content_description">مكالمة جارية</string>
+    <string name="account_usage_storage_label">مساحة التخزين</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A]/%2$s</string>
+    <string name="account_usage_storage_breakdown_title">تفاصيل توزيع استخدام مساحة التخزين</string>
+    <string name="account_usage_get_more_storage_button">احصل على المزيد من مساحة التخزين</string>
+    <string name="account_usage_backups_label">النسخ الاحتياطية</string>
+    <string name="account_usage_transfer_label">تراسل المعطيات</string>
+    <string name="account_usage_payment_overdue_label">متأخر بالدفع</string>
+    <string name="account_usage_payment_required_label">الدفعة المالية مستحقة</string>
+    <string name="general_error_word">خطأ</string>
 </resources>

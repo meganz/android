@@ -2865,7 +2865,7 @@
     <string name="share_link_expires_on">Bağlantı %1$s tarihinde sona erecek</string>
     <string name="share_link_expired">Bağlantının süresi doldu</string>
     <string name="share_link_with_password">Bağlantı: %1$s\n\nŞifre: %2$s</string>
-    <string name="share_link_password_dialog_title">Bağlantı şifresini paylaş</string>
+    <string name="share_link_password_dialog_title">Bağlantı şifresi</string>
     <string name="share_link_password_dialog_message">Bu bağlantının şifresini paylaşmak ister misiniz?</string>
     <string name="subscription_quota_no_connection_title">Bağlanılamadı</string>
     <string name="subscription_quota_no_connection_description">Depolama ve aktarım ayrıntılarınızı daha sonra kontrol edin veya tekrar deneyin</string>
@@ -2998,4 +2998,61 @@
         <item quantity="one">Bağlantı kaldırılsın mı?</item>
         <item quantity="other">Bağlantılar kaldırılsın mı?</item>
     </plurals>
+    <string name="account_info_renews_on_date">%1$s tarihinde yenileniyor</string>
+    <string name="account_info_expires_on_date">%1$s tarihinde süresi doluyor</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s grup sohbetinden ayrıldı</string>
+    <string name="non_format_change_title_messages">%1$s, grup sohbeti adını “%2$s” olarak değiştirdi.</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 yıl</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="one">%1$d ay</item>
+        <item quantity="other">%1$d ay</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="one">%1$d hafta</item>
+        <item quantity="other">%1$d hafta</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="one">%d gün</item>
+        <item quantity="other">%d gün</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="one">%1$d saat</item>
+        <item quantity="other">%1$d saat</item>
+    </plurals>
+    <string name="media_timeline_sort_option_date_taken">Çekim tarihi</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="one">Bu bağlantıya sahip olan herkes artık dosyaya veya klasöre erişemeyecek</item>
+        <item quantity="other">Bu bağlantılara sahip olan herkes artık dosyalara veya klasörlere erişemeyecek</item>
+    </plurals>
+    <string name="account_info_renews_today">Bugün yenileniyor</string>
+    <string name="account_info_renews_tomorrow_date">Yarın yenileniyor, %1$s</string>
+    <string name="account_info_expires_today">Bugün sona eriyor</string>
+    <string name="account_info_expires_tomorrow_date">Yarın sona eriyor, %1$s</string>
+    <string name="account_info_expired_yesterday">Dün sona erdi</string>
+    <string name="non_format_message_add_participant">%2$s, %1$s kişisini bu grup sohbetine ekledi</string>
+    <string name="non_format_message_remove_participant">%2$s, %1$s kişisini grup sohbetinden çıkardı</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s, %1$s kişisinin rolünü moderatör olarak değiştirdi</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s, %1$s kişisinin rolünü standart olarak değiştirdi</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s, %1$s kişisinin rolünü salt okunur olarak değiştirdi</string>
+    <string name="history_cleared_by">%1$s sohbet geçmişini temizledi</string>
+    <string name="non_format_history_cleared_by">%1$s sohbet geçmişini temizledi</string>
+    <string name="retention_history_changed_by">%1$s, mesaj temizleme süresini %2$s olarak değiştirdi</string>
+    <string name="retention_history_disabled">%1$s mesaj temizleme özelliğini kapattı</string>
+    <string name="message_created_chat_link">%1$s bir sohbet bağlantısı oluşturdu</string>
+    <string name="message_deleted_chat_link">%1$s sohbet bağlantısını kaldırdı</string>
+    <string name="message_set_chat_private">%1$s, şifreleme anahtarı rotasyonunu etkinleştirdi</string>
+    <string name="title_geolocation_message">Sabitlenmiş konum</string>
+    <string name="chat_list_ongoing_call_content_description">Devam eden arama</string>
+    <string name="contacts_sent">%s kişi gönderildi</string>
+    <string name="error_message_unrecognizable">Mesaj tanınamıyor</string>
+    <string name="audio_player_resumed_snackbar_message">%1$s’den devam edildi</string>
+    <string name="account_usage_storage_label">Depolama alanı</string>
+    <string name="account_usage_transfer_label">Aktarım</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_payment_overdue_label">Gecikmiş ödeme</string>
+    <string name="account_usage_payment_required_label">Ödeme gerekli</string>
+    <string name="account_usage_storage_breakdown_title">Depolama kullanımı dökümü</string>
+    <string name="account_usage_backups_label">Yedekler</string>
+    <string name="account_usage_get_more_storage_button">Daha fazla depolama edin</string>
+    <string name="general_error_word">Hata</string>
 </resources>

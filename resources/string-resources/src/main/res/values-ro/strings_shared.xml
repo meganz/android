@@ -3085,4 +3085,40 @@
         <item quantity="few">Elimini linkurile?</item>
         <item quantity="other">Elimini linkurile?</item>
     </plurals>
+    <string name="account_info_renews_on_date">Se reînnoiește pe %1$s</string>
+    <string name="account_info_expires_on_date">Expiră pe %1$s</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s a părăsit chatul de grup</string>
+    <string name="non_format_change_title_messages">%1$s a schimbat numele chatului de grup în „%2$s”</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 an</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="one">%1$d lună</item>
+        <item quantity="few">%1$d luni</item>
+        <item quantity="other">%1$d de luni</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="one">%1$d săptămână</item>
+        <item quantity="few">%1$d săptămâni</item>
+        <item quantity="other">%1$d de săptămâni</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="one">%d zi</item>
+        <item quantity="few">%d zile</item>
+        <item quantity="other">%d de zile</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="one">%1$d oră</item>
+        <item quantity="few">%1$d ore</item>
+        <item quantity="other">%1$d de ore</item>
+    </plurals>
+    <string name="title_geolocation_message">Locație fixată</string>
+    <string name="chat_list_ongoing_call_content_description">Apel în desfășurare</string>
+    <string name="account_usage_storage_label">Spațiu de stocare</string>
+    <string name="account_usage_transfer_label">Transfer</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_payment_overdue_label">Plata este scadentă</string>
+    <string name="account_usage_payment_required_label">Plată necesară</string>
+    <string name="account_usage_storage_breakdown_title">Defalcarea utilizării spațiului de stocare</string>
+    <string name="account_usage_backups_label">Backupuri</string>
+    <string name="account_usage_get_more_storage_button">Obțineți mai mult spațiu de stocare</string>
+    <string name="general_error_word">Eroare</string>
 </resources>

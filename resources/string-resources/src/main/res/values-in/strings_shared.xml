@@ -2813,4 +2813,32 @@
     <plurals name="remove_link_dialog_title">
         <item quantity="other">Hapus tautan?</item>
     </plurals>
+    <string name="account_info_expires_on_date">Kedaluwarsa pada %1$s</string>
+    <string name="account_info_renews_on_date">Memperbarui pada %1$s</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 tahun</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="other">%1$d bulan</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="other">%1$d minggu</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="other">%d hari</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="other">%1$d jam</item>
+    </plurals>
+    <string name="non_format_message_participant_left_group_chat">%1$s meninggalkan obrolan grup</string>
+    <string name="non_format_change_title_messages">%1$s mengubah nama obrolan grup menjadi “%2$s”</string>
+    <string name="title_geolocation_message">Lokasi yang disematkan</string>
+    <string name="chat_list_ongoing_call_content_description">Panggilan berlangsung</string>
+    <string name="account_usage_storage_label">Penyimpanan</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_storage_breakdown_title">Kerusakan penggunaan penyimpanan</string>
+    <string name="account_usage_get_more_storage_button">Dapatkan lebih banyak penyimpanan</string>
+    <string name="account_usage_backups_label">Cadangan</string>
+    <string name="account_usage_transfer_label">Pemindahan</string>
+    <string name="account_usage_payment_overdue_label">Pembayaran lewat jatuh tempo</string>
+    <string name="account_usage_payment_required_label">Pembayaran diperlukan</string>
+    <string name="general_error_word">Kesalahan</string>
 </resources>

@@ -1261,8 +1261,6 @@
     <string name="audio_playback_position_dialog_resume_button">Resume</string>
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Restart</string>
-    <!-- Audio player: snackbar shown when playback silently resumes from a saved position (%1$s = position, e.g. 15:45) -->
-    <string name="audio_player_resumed_snackbar_message">Resumed from %1$s</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
     <string name="general_save_to_device">Download</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
@@ -3774,8 +3772,6 @@
     <string name="chat_list_search_no_results_title">No results found</string>
     <!-- Description shown on the chat list when a search returns no matching chats or meetings -->
     <string name="chat_list_search_no_results_description">Try a different search term</string>
-    <!-- Accessibility content description for the icon shown on a chat list row when that chat has a call in progress -->
-    <string name="chat_list_ongoing_call_content_description">Ongoing call</string>
     <!-- Title of the sync and backup settings screen -->
     <string name="settings_sync_and_backup_title">Sync and backup</string>
     <!-- Body of the system notification shown when transfers are interrupted because the transfer quota has been exceeded -->
@@ -3792,49 +3788,6 @@
     <string name="chat_last_message_sender_me">Me</string>
     <!-- Chat list last-message preview sender prefix used when a group-chat message sender's name cannot be resolved -->
     <string name="chat_last_message_sender_unknown">Unknown name</string>
-    <!-- Chat list last-message preview shown when a call is currently ongoing in a one-to-one or group chat -->
-    <string name="ongoing_call_messages">Ongoing call</string>
-    <!-- Chat list last-message preview shown when a meeting call is currently in progress -->
-    <string name="meetings_list_ongoing_call_message">Meeting in progress</string>
-    <!-- Chat list last-message preview shown when a one-to-one call has ended; followed by the call duration -->
-    <string name="call_ended_message">[A]Call ended[/A][C]. Duration: [/C]</string>
-    <!-- Chat list last-message preview shown when a group or meeting call has ended; followed by the call duration -->
-    <string name="group_call_ended_message">[A]Group call ended[/A][C]. Duration: [/C]</string>
-    <!-- Chat list last-message preview shown when a group or meeting call has ended without any duration -->
-    <string name="group_call_ended_no_duration_message">[A]Group call ended[/A]</string>
-    <!-- Chat list last-message preview shown when a call was rejected by the callee -->
-    <string name="call_rejected_messages">[A]Call was rejected[/A]</string>
-    <!-- Chat list last-message preview shown to the caller when their call was not answered -->
-    <string name="call_not_answered_messages">[A]Call was not answered[/A]</string>
-    <!-- Chat list last-message preview shown to the callee for a call they missed -->
-    <string name="call_missed_messages">[A]Missed call[/A]</string>
-    <!-- Chat list last-message preview shown when a call failed due to an error -->
-    <string name="call_failed_messages">[A]Call failed[/A]</string>
-    <!-- Chat list last-message preview shown to the caller when they cancelled the call -->
-    <string name="call_cancelled_messages">[A]Call was cancelled[/A]</string>
-    <!-- Chat list last-message preview shown when a scheduled meeting was updated; %1$s is the name of the person who updated it -->
-    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
-    <!-- Chat list last-message preview shown when one or more contacts were shared in the chat; %s is the number of contacts sent -->
-    <string name="contacts_sent">Sent %s contacts.</string>
-    <!-- Chat list last-message preview shown when a location was shared in the chat -->
-    <string name="title_geolocation_message">Pinned location</string>
-    <!-- Chat list last-message preview shown when the last message type cannot be recognised -->
-    <string name="error_message_unrecognizable">Message unrecognizable</string>
-    <!-- Hours component of an ended-call duration in the chat list last-message preview; %1$s is the number of hours -->
-    <plurals name="plural_call_ended_messages_hours">
-        <item quantity="one">[B]%1$s hour[/B]</item>
-        <item quantity="other">[B]%1$s hours[/B]</item>
-    </plurals>
-    <!-- Minutes component of an ended-call duration in the chat list last-message preview; %1$s is the number of minutes -->
-    <plurals name="plural_call_ended_messages_minutes">
-        <item quantity="one">[B]%1$s minute[/B]</item>
-        <item quantity="other">[B]%1$s minutes[/B]</item>
-    </plurals>
-    <!-- Seconds component of an ended-call duration in the chat list last-message preview; %1$d is the number of seconds -->
-    <plurals name="plural_call_ended_messages_seconds">
-        <item quantity="one">[B]%1$d second[/B]</item>
-        <item quantity="other">[B]%1$d seconds[/B]</item>
-    </plurals>
     <!-- Chat list item action that mutes notifications for the chat -->
     <string name="general_mute">Mute</string>
     <!-- Chat list item action that unmutes notifications for the chat -->
@@ -3851,6 +3804,59 @@
     <string name="title_confirmation_leave_group_chat">Leave group chat?</string>
     <!-- Message of the confirmation dialog shown before leaving a group chat -->
     <string name="confirmation_leave_group_chat">If you leave, you will no longer have access to read or send messages.</string>
+    <!-- Audio player: label for the continuous-playback toggle in the queue screen -->
+    <string name="audio_player_continuous_playback_title">Continuous playback</string>
+    <!-- Audio player: description for the continuous-playback toggle -->
+    <string name="audio_player_continuous_playback_description">Play the next file in the queue automatically</string>
+    <!-- Audio player: queue screen header showing the source folder; [A] marks the folder name rendered in Primary colour -->
+    <string name="audio_player_playing_from_label">Playing from [A]%s[/A]</string>
+    <!-- Zoom overlay shown in the video player while pinch-zooming when the video is displayed at its original size, fitted inside the screen -->
+    <string name="video_player_zoom_fit_to_screen">Fit to screen</string>
+    <!-- Zoom overlay shown in the video player while pinch-zooming when the video is zoomed exactly to fill the whole screen -->
+    <string name="video_player_zoom_fill_screen">Fill screen</string>
+    <!-- Password strength label shown below a password field when the password is of moderate strength, between weak and strong -->
+    <string name="password_strength_moderate">Moderate password</string>
+    <!-- Share link revamp: snackbar shown after the link settings are saved and the updated link is copied to the clipboard -->
+    <string name="share_link_updated_and_copied_snackbar">Link updated and copied to your clipboard</string>
+    <!-- Share link revamp: snackbar shown after the link decryption key is copied to the clipboard -->
+    <string name="share_link_key_copied_snackbar">Key copied to your clipboard</string>
+    <!-- Share link revamp: snackbar shown after an existing share link is copied to the clipboard, without creating it. The quantity is the number of links copied. -->
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="one">Link copied to your clipboard</item>
+        <item quantity="other">Links copied to your clipboard</item>
+    </plurals>
+    <!-- Error shown below a password field when the password entered is too weak to be accepted, so it cannot be saved. For example, the password protecting a share link. -->
+    <string name="password_too_weak_error_message">Please use a stronger password.</string>
+    <!-- Snackbar shown when an action needs the internet but the device is offline, so it was not attempted. For example, creating a share link or saving a link expiry date. -->
+    <string name="check_internet_connection_error">No internet connection. Check your connection and try again</string>
+    <!-- Media timeline sort option for the bottom sheet to sort by "Date added" -->
+    <string name="media_timeline_sort_option_date_added">Date added</string>
+    <!-- Media timeline sort option for the bottom sheet to sort by "Date captured" -->
+    <string name="media_timeline_sort_option_date_taken">Date taken</string>
+    <!-- Title of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
+    <plurals name="remove_link_dialog_title">
+        <item quantity="one">Remove link?</item>
+        <item quantity="other">Remove links?</item>
+    </plurals>
+    <!-- Explanation text of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
+    <plurals name="remove_link_dialog_description">
+        <item quantity="one">Anyone with this link will no longer be able to access the file or folder</item>
+        <item quantity="other">Anyone with these links will no longer be able to access the files or folders</item>
+    </plurals>
+    <!-- My Account: subscription notice when the plan renews later today -->
+    <string name="account_info_renews_today">Renews today</string>
+    <!-- My Account: subscription notice when the plan renews the next day. Placeholder is that date, e.g. "22 Jul 2026" -->
+    <string name="account_info_renews_tomorrow_date">Renews tomorrow, %1$s</string>
+    <!-- My Account: subscription notice for any other renewal date. Placeholder is that date, e.g. "22 Jul 2026" or "Sunday, 22 Jul 2026" -->
+    <string name="account_info_renews_on_date">Renews on %1$s</string>
+    <!-- My Account: subscription notice when the plan expires later today -->
+    <string name="account_info_expires_today">Expires today</string>
+    <!-- My Account: subscription notice when the plan expires the next day. Placeholder is that date, e.g. "22 Jul 2026" -->
+    <string name="account_info_expires_tomorrow_date">Expires tomorrow, %1$s</string>
+    <!-- My Account: subscription notice when the plan expired the previous day -->
+    <string name="account_info_expired_yesterday">Expired yesterday</string>
+    <!-- My Account: subscription notice for any other expiry date. Placeholder is that date, e.g. "22 Jul 2026" or "Sunday, 22 Jul 2026" -->
+    <string name="account_info_expires_on_date">Expires on %1$s</string>
     <!-- Chat list last-message preview shown when a participant is added to a group chat. %1$s is the added participant, %2$s is the person who added them -->
     <string name="non_format_message_add_participant">%2$s added %1$s to this group chat</string>
     <!-- Chat list last-message preview shown when a participant is removed from a group chat. %1$s is the removed participant, %2$s is the person who removed them -->
@@ -3901,59 +3907,16 @@
         <item quantity="one">%1$d hour</item>
         <item quantity="other">%1$d hours</item>
     </plurals>
-    <!-- Audio player: label for the continuous-playback toggle in the queue screen -->
-    <string name="audio_player_continuous_playback_title">Continuous playback</string>
-    <!-- Audio player: description for the continuous-playback toggle -->
-    <string name="audio_player_continuous_playback_description">Play the next file in the queue automatically</string>
-    <!-- Audio player: queue screen header showing the source folder; [A] marks the folder name rendered in Primary colour -->
-    <string name="audio_player_playing_from_label">Playing from [A]%s[/A]</string>
-    <!-- Zoom overlay shown in the video player while pinch-zooming when the video is displayed at its original size, fitted inside the screen -->
-    <string name="video_player_zoom_fit_to_screen">Fit to screen</string>
-    <!-- Zoom overlay shown in the video player while pinch-zooming when the video is zoomed exactly to fill the whole screen -->
-    <string name="video_player_zoom_fill_screen">Fill screen</string>
-    <!-- Password strength label shown below a password field when the password is of moderate strength, between weak and strong -->
-    <string name="password_strength_moderate">Moderate password</string>
-    <!-- Share link revamp: snackbar shown after the link settings are saved and the updated link is copied to the clipboard -->
-    <string name="share_link_updated_and_copied_snackbar">Link updated and copied to your clipboard</string>
-    <!-- Share link revamp: snackbar shown after the link decryption key is copied to the clipboard -->
-    <string name="share_link_key_copied_snackbar">Key copied to your clipboard</string>
-    <!-- Share link revamp: snackbar shown after an existing share link is copied to the clipboard, without creating it. The quantity is the number of links copied. -->
-    <plurals name="share_link_copied_snackbar">
-        <item quantity="one">Link copied to your clipboard</item>
-        <item quantity="other">Links copied to your clipboard</item>
-    </plurals>
-    <!-- Error shown below a password field when the password entered is too weak to be accepted, so it cannot be saved. For example, the password protecting a share link. -->
-    <string name="password_too_weak_error_message">Please use a stronger password.</string>
-    <!-- Snackbar shown when an action needs the internet but the device is offline, so it was not attempted. For example, creating a share link or saving a link expiry date. -->
-    <string name="check_internet_connection_error">No internet connection. Check your connection and try again</string>
-    <!-- Media timeline sort option for the bottom sheet to sort by "Date added" -->
-    <string name="media_timeline_sort_option_date_added">Date added</string>
-    <!-- Media timeline sort option for the bottom sheet to sort by "Date captured" -->
-    <string name="media_timeline_sort_option_date_taken">Date captured</string>
-    <!-- Title of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
-    <plurals name="remove_link_dialog_title">
-        <item quantity="one">Remove link?</item>
-        <item quantity="other">Remove links?</item>
-    </plurals>
-    <!-- Explanation text of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
-    <plurals name="remove_link_dialog_description">
-        <item quantity="one">Anyone with this link will no longer be able to access the file or folder</item>
-        <item quantity="other">Anyone with these links will no longer be able to access the files or folders</item>
-    </plurals>
-    <!-- My Account: subscription notice when the plan renews later today -->
-    <string name="account_info_renews_today">Renews today</string>
-    <!-- My Account: subscription notice when the plan renews the next day. Placeholder is that date, e.g. "22 Jul 2026" -->
-    <string name="account_info_renews_tomorrow_date">Renews tomorrow, %1$s</string>
-    <!-- My Account: subscription notice for any other renewal date. Placeholder is that date, e.g. "22 Jul 2026" or "Sunday, 22 Jul 2026" -->
-    <string name="account_info_renews_on_date">Renews on %1$s</string>
-    <!-- My Account: subscription notice when the plan expires later today -->
-    <string name="account_info_expires_today">Expires today</string>
-    <!-- My Account: subscription notice when the plan expires the next day. Placeholder is that date, e.g. "22 Jul 2026" -->
-    <string name="account_info_expires_tomorrow_date">Expires tomorrow, %1$s</string>
-    <!-- My Account: subscription notice when the plan expired the previous day -->
-    <string name="account_info_expired_yesterday">Expired yesterday</string>
-    <!-- My Account: subscription notice for any other expiry date. Placeholder is that date, e.g. "22 Jul 2026" or "Sunday, 22 Jul 2026" -->
-    <string name="account_info_expires_on_date">Expires on %1$s</string>
+    <!-- Chat list last-message preview shown when one or more contacts were shared in the chat; %s is the number of contacts sent -->
+    <string name="contacts_sent">Sent %s contacts</string>
+    <!-- Chat list last-message preview shown when a location was shared in the chat -->
+    <string name="title_geolocation_message">Pinned location</string>
+    <!-- Chat list last-message preview shown when the last message type cannot be recognised -->
+    <string name="error_message_unrecognizable">Message unrecognisable</string>
+    <!-- Audio player: snackbar shown when playback silently resumes from a saved position (%1$s = position, e.g. 15:45) -->
+    <string name="audio_player_resumed_snackbar_message">Resumed from %1$s</string>
+    <!-- Accessibility content description for the icon shown on a chat list row when that chat has a call in progress -->
+    <string name="chat_list_ongoing_call_content_description">Ongoing call</string>
     <!-- Account usage screen: label under the storage quota meter -->
     <string name="account_usage_storage_label">Storage</string>
     <!-- Account usage screen: label under the transfer quota meter -->

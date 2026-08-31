@@ -2875,4 +2875,52 @@
     <plurals name="remove_link_dialog_description">
         <item quantity="other">このリンクを知っている人は、当該ファイルやフォルダにアクセスできなくなります。</item>
     </plurals>
+    <string name="account_info_renews_on_date">更新日%1$s</string>
+    <string name="account_info_expires_on_date">有効期限%1$s</string>
+    <string name="account_info_renews_today">本日更新されます</string>
+    <string name="account_info_renews_tomorrow_date">明日、%1$sに更新されます</string>
+    <string name="account_info_expires_today">本日、有効期限が切れます</string>
+    <string name="account_info_expires_tomorrow_date">明日、%1$sに有効期限が切れます</string>
+    <string name="account_info_expired_yesterday">昨日、有効期限が切れました</string>
+    <string name="non_format_message_participant_left_group_chat">%1$sさんはグループチャットから離れました</string>
+    <string name="non_format_change_title_messages">%1$sさんはグループチャット名を「%2$s」に変更しました</string>
+    <string name="subtitle_properties_manage_chat_label_year">1年</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="other">%1$dか月</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="other">%1$d週</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="other">%d日</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="other">%1$d時間</item>
+    </plurals>
+    <string name="non_format_message_add_participant">%2$sさんが%1$sさんをこのグループチャットに追加しました</string>
+    <string name="non_format_message_remove_participant">%2$sさんが%1$sさんをグループチャットから削除しました</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$sさんが%1$sさんの役割を「ホスト」に変更しました</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$sさんが%1$sさんの役割を「標準」に変更しました</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$sさんが%1$sさんの権限を「閲覧専用」に変更しました</string>
+    <string name="history_cleared_by">%1$sさんがチャット履歴を消去しました</string>
+    <string name="non_format_history_cleared_by">%1$sさんがチャット履歴を消去しました</string>
+    <string name="retention_history_changed_by">%1$sさんがメッセージの消去時間を%2$sに変更しました</string>
+    <string name="retention_history_disabled">%1$sさんがメッセージの消去を無効にしました</string>
+    <string name="message_created_chat_link">%1$sさんがチャットリンクを作成しました</string>
+    <string name="message_deleted_chat_link">%1$sさんがチャットリンクを削除しました</string>
+    <string name="message_set_chat_private">%1$sさんが暗号化キーのローテーションを有効にしました</string>
+    <string name="title_geolocation_message">ピン留めされた場所</string>
+    <string name="contacts_sent">%s件の連絡先を送信しました</string>
+    <string name="error_message_unrecognizable">内容を表示できません</string>
+    <string name="audio_player_resumed_snackbar_message">%1$sから再開</string>
+    <string name="chat_list_ongoing_call_content_description">継続中の通話</string>
+    <string name="account_usage_storage_label">ストレージ</string>
+    <string name="account_usage_transfer_label">転送</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_payment_overdue_label">お支払い期日超過</string>
+    <string name="account_usage_payment_required_label">お支払いが必要です</string>
+    <string name="account_usage_storage_breakdown_title">ストレージ使用量の内訳</string>
+    <string name="account_usage_backups_label">バックアップ</string>
+    <string name="account_usage_get_more_storage_button">ストレージをさらに増やす</string>
+    <string name="general_error_word">エラー</string>
 </resources>

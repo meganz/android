@@ -2838,4 +2838,41 @@
     <plurals name="remove_link_dialog_title">
         <item quantity="other">Loại bỏ các đường liên kết?</item>
     </plurals>
+    <string name="account_info_renews_on_date">Tự gia&#160;hạn vào %1$s</string>
+    <string name="account_info_expires_on_date">Hết hạn vào %1$s</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s đã rời khỏi cuộc chat</string>
+    <string name="non_format_change_title_messages">%1$s đã đổi tên nhóm chat thành ”%2$s”</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 năm</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="other">%1$d tháng</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="other">%1$d tuần</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="other">%d ngày</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="other">%1$d giờ</item>
+    </plurals>
+    <string name="title_geolocation_message">Vị trí được đánh dấu</string>
+    <string name="chat_list_ongoing_call_content_description">Cuộc gọi đang diễn ra</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s đã đổi chức của %1$s thành thông&#160;thường</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s đã đổi quyền của %1$s thành chỉ-được-xem</string>
+    <string name="history_cleared_by">%1$s đã dọn lịch&#160;sử của cuộc chat</string>
+    <string name="non_format_history_cleared_by">%1$s đã dọn lịch&#160;sử của cuộc chat</string>
+    <string name="retention_history_changed_by">%1$s đã đặt lịch dọn&#160;dẹp lịch&#160;sử tin&#160;nhắn là %2$s</string>
+    <string name="retention_history_disabled">%1$s đã tắt tính&#160;năng tự&#160;động xóa tin&#160;nhắn</string>
+    <string name="message_created_chat_link">%1$s đã tạo liên&#160;kết vào chat</string>
+    <string name="message_deleted_chat_link">%1$s đã xóa đường liên&#160;kết vào cuộc chat</string>
+    <string name="message_set_chat_private">%1$s đã bật luân&#160;phiên chìa&#160;khóa mã</string>
+    <string name="account_usage_storage_label">Lưu Trữ</string>
+    <string name="account_usage_transfer_label">Truyền tải</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_payment_overdue_label">Thánh toán bị quá hạn</string>
+    <string name="account_usage_payment_required_label">Yêu cầu giải quyết thanh toán</string>
+    <string name="account_usage_storage_breakdown_title">Liệt kê lượng dùng</string>
+    <string name="account_usage_backups_label">Sao lưu dự phòng</string>
+    <string name="account_usage_get_more_storage_button">Lấy thêm không gian</string>
+    <string name="general_error_word">Lỗi</string>
 </resources>
