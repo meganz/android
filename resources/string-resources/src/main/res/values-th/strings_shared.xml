@@ -2579,7 +2579,7 @@
     <string name="add_contacts_unverified_contact_warning">ผู้ติดต่อบางรายที่คุณแชร์ข้อมูลด้วยยังไม่ได้รับการตรวจสอบจากคุณ เพื่อความปลอดภัยมากยิ่งขึ้น เราขอแนะนำให้คุณตรวจสอบข้อมูลประจำตัวของพวกเขาในรายชื่อติดต่อ โดยแตะที่จุดสามจุดถัดจากรายชื่อติดต่อที่คุณต้องการตรวจสอบและแตะที่ข้อมูล</string>
     <string name="contacts_qr_scan_action">สแกนคิวอาร์โค้ด</string>
     <string name="share_link_access_password_description">เฉพาะผู้ที่มีรหัสผ่านเท่านั้นที่สามารถเปิดลิงก์ได้</string>
-    <string name="share_link_password_copied_snackbar">คัดลอกรหัสผ่านไปไว้ที่คลิปบอร์ดแล้ว</string>
+    <string name="share_link_password_copied_snackbar">คัดลอกรหัสผ่านไปยังคลิปบอร์ดแล้ว</string>
     <string name="create_group_chat_link_requires_name_error">กรุณาระบุชื่อกลุ่มเพื่อรับลิงก์แชท</string>
     <string name="contact_info_nickname_dialog_set_button">ตั้งค่า</string>
     <string name="contact_info_nickname_dialog_hint">ชื่อเล่น</string>
@@ -2746,7 +2746,7 @@
     <string name="deep_link_content_unavailable_dialog_message">คอนเทนต์ที่คุณต้องการเข้าถึงไม่สามารถใช้งานได้สำหรับบัญชีนี้</string>
     <string name="share_link_expires_on">ลิงก์หมดอายุ %1$s</string>
     <string name="share_link_expired">ลิงก์หมดอายุ</string>
-    <string name="share_link_password_dialog_title">รหัสผ่านสำหรับลิงก์แชร์</string>
+    <string name="share_link_password_dialog_title">รหัสผ่านของลิงก์</string>
     <string name="share_link_password_dialog_message">คุณต้องการแชร์รหัสผ่านของลิงก์นี้หรือไม่</string>
     <string name="subscription_quota_no_connection_title">เชื่อมต่อไม่สำเร็จ</string>
     <string name="subscription_quota_no_connection_description">ตรวจสอบรายละเอียดพื้นที่จัดเก็บและการถ่ายโอนในภายหลัง หรือลองใหม่อีกครั้ง</string>
@@ -2855,4 +2855,63 @@
     <plurals name="remove_link_dialog_title">
         <item quantity="other">ลบลิงก์หรือไม่</item>
     </plurals>
+    <string name="account_info_renews_on_date">ต่ออายุเมื่อวันที่ %1$s</string>
+    <string name="account_info_expires_on_date">หมดอายุใน %1$s</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s ออกจากแชทกลุ่ม</string>
+    <string name="non_format_change_title_messages">%1$s เปลี่ยนชื่อแชทกลุ่มเป็น “%2$s”</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 ปี</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="other">%1$d เดือน</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="other">%1$d สัปดาห์</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="other">%d วัน</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="other">%1$d ชั่วโมง</item>
+    </plurals>
+    <string name="share_link_updated_and_copied_snackbar">อัปเดตลิงก์และคัดลอกไปยังคลิปบอร์ดเรียบร้อยแล้ว</string>
+    <string name="share_link_key_copied_snackbar">คัดลอกคีย์ไปยังคลิปบอร์ดแล้ว</string>
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="other">คัดลอกลิงก์ทั้งหมดไปยังคลิปบอร์ดแล้ว</item>
+    </plurals>
+    <string name="password_too_weak_error_message">กรุณาใช้รหัสผ่านที่มีความปลอดภัยสูงกว่านี้</string>
+    <string name="check_internet_connection_error">ไม่มีการเชื่อมต่ออินเทอร์เน็ต กรุณาตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง</string>
+    <string name="media_timeline_sort_option_date_taken">วันที่ถ่ายภาพ</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="other">ทุกคนที่มีลิงก์เหล่านี้จะไม่สามารถเข้าถึงไฟล์หรือโฟลเดอร์เหล่านี้ได้อีกต่อไป</item>
+    </plurals>
+    <string name="account_info_renews_today">ต่ออายุวันนี้</string>
+    <string name="account_info_renews_tomorrow_date">ต่ออายุพรุ่งนี้ %1$s</string>
+    <string name="account_info_expires_today">หมดอายุวันนี้</string>
+    <string name="account_info_expires_tomorrow_date">หมดอายุพรุ่งนี้ %1$s</string>
+    <string name="account_info_expired_yesterday">หมดอายุเมื่อวานนี้</string>
+    <string name="non_format_message_add_participant">%2$s เพิ่ม %1$s เข้าร่วมแชทกลุ่มนี้</string>
+    <string name="non_format_message_remove_participant">%2$s นำ %1$s ออกจากแชทกลุ่ม</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s เปลี่ยนบทบาทของ %1$s เป็นผู้จัด</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s เปลี่ยนบทบาทของ %1$s เป็นสมาชิกทั่วไป</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s เปลี่ยนบทบาทของ %1$s เป็นแบบอ่านอย่างเดียว</string>
+    <string name="history_cleared_by">%1$s ล้างประวัติการแชทแล้ว</string>
+    <string name="non_format_history_cleared_by">%1$s ล้างประวัติการแชทแล้ว</string>
+    <string name="retention_history_changed_by">%1$s เปลี่ยนเวลาล้างข้อความเป็น %2$s</string>
+    <string name="retention_history_disabled">%1$s ปิดการล้างข้อความแล้ว</string>
+    <string name="message_created_chat_link">%1$s สร้างลิงก์แชทแล้ว</string>
+    <string name="message_deleted_chat_link">%1$s ลบลิงก์แชทออกแล้ว</string>
+    <string name="message_set_chat_private">%1$s เปิดใช้งานการหมุนเวียนคีย์เข้ารหัสแล้ว</string>
+    <string name="title_geolocation_message">ตำแหน่งที่ปักหมุด</string>
+    <string name="chat_list_ongoing_call_content_description">สายที่กำลังโทร</string>
+    <string name="contacts_sent">ส่งรายชื่อติดต่อแล้ว %s รายการ</string>
+    <string name="error_message_unrecognizable">ไม่สามารถระบุข้อความได้</string>
+    <string name="audio_player_resumed_snackbar_message">เล่นต่อจาก %1$s</string>
+    <string name="account_usage_storage_label">ที่เก็บข้อมูล</string>
+    <string name="account_usage_transfer_label">ถ่ายโอน</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_payment_overdue_label">การชำระเงินล่าช้า</string>
+    <string name="account_usage_payment_required_label">ต้องชำระเงิน</string>
+    <string name="account_usage_storage_breakdown_title">รายละเอียดการใช้พื้นที่เก็บข้อมูล</string>
+    <string name="account_usage_backups_label">สำรองข้อมูล</string>
+    <string name="account_usage_get_more_storage_button">รับพื้นที่เก็บข้อมูลมากกว่านี้</string>
+    <string name="general_error_word">ผิดพลาด</string>
 </resources>

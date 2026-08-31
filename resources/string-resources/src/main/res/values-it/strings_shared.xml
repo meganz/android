@@ -2750,7 +2750,7 @@
     <string name="add_contacts_unverified_contact_warning">Alcuni dei contatti con cui stai condividendo informazioni non sono stati verificati da te. Per aumentare la sicurezza, ti raccomandiamo di verificare le loro credenziali in Contatti. Tocca sui tre pallini affianco il contatto che vuoi verificare e poi tocca su Info.</string>
     <string name="contacts_qr_scan_action">Scansiona il codice QR</string>
     <string name="share_link_access_password_description">Solo le persone con la password possono aprire il link</string>
-    <string name="share_link_password_copied_snackbar">Password copiata negli appunti</string>
+    <string name="share_link_password_copied_snackbar">Password copiata nei tuoi appunti</string>
     <string name="document_scanner_review_title">Controlla la scansione</string>
     <string name="document_scanner_review_empty">Nessuna pagina scansionata</string>
     <string name="document_scanner_review_delete_page">Elimina pagina</string>
@@ -2975,7 +2975,7 @@
     <string name="deep_link_content_unavailable_dialog_message">Il contenuto a cui stai cercando di accedere non è disponibile per questo account.</string>
     <string name="share_link_expires_on">Il link scade il giorno %1$s</string>
     <string name="share_link_expired">Link scaduto</string>
-    <string name="share_link_password_dialog_title">Condividi la password del link</string>
+    <string name="share_link_password_dialog_title">Password del link</string>
     <string name="share_link_password_dialog_message">Vuoi condividere la password di questo link?</string>
     <string name="subscription_quota_no_connection_title">Impossibile connettersi</string>
     <string name="subscription_quota_no_connection_description">Controlla i dettagli del tuo spazio di archiviazione e della tua banda di trasferimento più tardi, oppure riprova</string>
@@ -3058,4 +3058,109 @@
         <item quantity="many">Rimuovere i link?</item>
         <item quantity="other">Rimuovere i link?</item>
     </plurals>
+    <string name="account_info_renews_on_date">Si rinnova il %1$s</string>
+    <string name="account_info_expires_on_date">Scade il %1$s</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s ha abbandonato la chat di gruppo</string>
+    <string name="non_format_change_title_messages">%1$s ha cambiato il nome di questa chat di gruppo in “%2$s”</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 anno</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="one">%1$d mese</item>
+        <item quantity="many">%1$d mesi</item>
+        <item quantity="other">%1$d mesi</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="one">%1$d settimana</item>
+        <item quantity="many">%1$d settimane</item>
+        <item quantity="other">%1$d settimane</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="one">%d giorno</item>
+        <item quantity="many">%d giorni</item>
+        <item quantity="other">%d giorni</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="one">%1$d ora</item>
+        <item quantity="many">%1$d ore</item>
+        <item quantity="other">%1$d ore</item>
+    </plurals>
+    <string name="title_geolocation_message">Posizione fissata</string>
+    <string name="chat_list_ongoing_call_content_description">Chiamata in corso</string>
+    <string name="audio_player_sleep_timer_active_title">Timer di spegnimento - %s rimanenti</string>
+    <string name="audio_player_sleep_timer_turn_off">Spegni timer</string>
+    <string name="audio_player_sleep_timer_countdown_label">Timer di spegnimento %s</string>
+    <plurals name="audio_player_sleep_timer_minutes">
+        <item quantity="one">%1$d minuto</item>
+        <item quantity="many">%1$d di minuti</item>
+        <item quantity="other">%1$d minuti</item>
+    </plurals>
+    <string name="video_editor_tooltip_title">Modifica il tuo video</string>
+    <string name="video_editor_tooltip_description">Taglia, ritaglia, ruota, o modifica la velocità e il volume.</string>
+    <string name="settings_customise_navigation_title">Personalizza la navigazione</string>
+    <string name="settings_customise_navigation_subtitle">Trascina per riordinare gli oggetti</string>
+    <string name="settings_customise_navigation_your_navigation">La tua navigazione</string>
+    <string name="settings_customise_navigation_items_counter">%1$d su %2$d</string>
+    <string name="settings_customise_navigation_available_to_add">Aggiungi alla tua navigazione</string>
+    <string name="settings_customise_navigation_max_items_snackbar">%1$d oggetti massimi raggiunti. Rimuovi un oggetto per aggiungerne un altro.</string>
+    <string name="settings_customise_navigation_min_items_snackbar">Minimo %1$d oggetti</string>
+    <string name="video_player_large_cluster_seek_warning">Lo scorrimento in questo video potrebbe essere lento</string>
+    <string name="invite_contacts_share_link_action">Invita tramite link</string>
+    <string name="invite_contacts_manual_input_placeholder">Inserisci email o numero di telefono</string>
+    <string name="invite_contacts_already_contact_error">Questo indirizzo email è già un contatto</string>
+    <string name="invite_contacts_pending_error">Un invito è già stato spedito a questo indirizzo email</string>
+    <string name="invite_contacts_invalid_input_error">Inserisci un indirizzo email o un numero di telefono valido</string>
+    <string name="settings_customise_navigation_tooltip_body">Scegli quali oggetti far apparire nella tua navigazione</string>
+    <plurals name="video_player_seek_seconds">
+        <item quantity="one">%1$d secondo</item>
+        <item quantity="many">%1$d di secondi</item>
+        <item quantity="other">%1$d secondi</item>
+    </plurals>
+    <string name="audio_player_continuous_playback_title">Riproduzione continua</string>
+    <string name="audio_player_continuous_playback_description">Riproduci il prossimo file nella coda automaticamente</string>
+    <string name="audio_player_playing_from_label">Riproduzione da [A]%s[/A]</string>
+    <string name="video_player_zoom_fit_to_screen">Adatta allo schermo</string>
+    <string name="video_player_zoom_fill_screen">Riempi lo schermo</string>
+    <string name="share_link_updated_and_copied_snackbar">Link aggiornato e copiato negli appunti</string>
+    <string name="share_link_key_copied_snackbar">Chiave copiata negli appunti</string>
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="one">Link copiato negli appunti</item>
+        <item quantity="many">Link copiati negli appunti</item>
+        <item quantity="other">Link copiati negli appunti</item>
+    </plurals>
+    <string name="password_too_weak_error_message">Per favore, utilizza una password più resistente.</string>
+    <string name="check_internet_connection_error">Nessuna connessione internet. Controlla la tua connessione e riprova</string>
+    <string name="media_timeline_sort_option_date_taken">Data di scatto</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="one">Chiunque con questo link non potrà più accedere al file o alla cartella</item>
+        <item quantity="many">Chiunque con questi link non potrà più accedere ai file o alle cartelle</item>
+        <item quantity="other">Chiunque con questi link non potrà più accedere ai file o alle cartelle</item>
+    </plurals>
+    <string name="account_info_renews_today">Si rinnova oggi</string>
+    <string name="account_info_renews_tomorrow_date">Si rinnova domani, %1$s</string>
+    <string name="account_info_expires_today">Scade oggi</string>
+    <string name="account_info_expires_tomorrow_date">Scade domani, %1$s</string>
+    <string name="account_info_expired_yesterday">Scaduto ieri</string>
+    <string name="non_format_message_add_participant">%2$s ha aggiunto %1$s a questa chat di gruppo</string>
+    <string name="non_format_message_remove_participant">%2$s ha rimosso %1$s da questa chat di gruppo</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s ha cambiato il ruolo di %1$s come host</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s ha cambiato il ruolo di %1$s come standard</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s ha cambiato il ruolo di %1$s come sola lettura</string>
+    <string name="history_cleared_by">%1$s ha pulito la cronologia della chat</string>
+    <string name="non_format_history_cleared_by">%1$s ha pulito la cronologia della chat</string>
+    <string name="retention_history_changed_by">%1$s ha cambiato il tempo di pulizia dei messaggi a %2$s</string>
+    <string name="retention_history_disabled">%1$s ha disattivato la pulizia dei messaggi</string>
+    <string name="message_created_chat_link">%1$s ha creato un link della chat</string>
+    <string name="message_deleted_chat_link">%1$s ha rimosso il link della chat</string>
+    <string name="message_set_chat_private">%1$s ha attivato la rotazione della chiave di criptazione</string>
+    <string name="contacts_sent">%s contatti inviati</string>
+    <string name="error_message_unrecognizable">Messaggio non leggibile</string>
+    <string name="audio_player_resumed_snackbar_message">Ripreso da %1$s</string>
+    <string name="general_error_word">Errore</string>
+    <string name="account_usage_storage_label">Archivio</string>
+    <string name="account_usage_transfer_label">Trasferisci</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_payment_overdue_label">Pagamento in ritardo</string>
+    <string name="account_usage_payment_required_label">Pagamento necessario</string>
+    <string name="account_usage_storage_breakdown_title">Scomposizione dell\’utilizzo dell\’archivio</string>
+    <string name="account_usage_backups_label">Backup</string>
+    <string name="account_usage_get_more_storage_button">Ottieni più spazio</string>
 </resources>

@@ -3039,7 +3039,7 @@
     <string name="deep_link_content_unavailable_dialog_message">Le contenu que vous essayez d\’accéder n\’est pas disponible pour ce compte.</string>
     <string name="share_link_expires_on">Le lien expire le %1$s</string>
     <string name="share_link_expired">Lien expiré</string>
-    <string name="share_link_password_dialog_title">Partager le mot de passe du lien</string>
+    <string name="share_link_password_dialog_title">Mot de passe du lien</string>
     <string name="subscription_quota_no_connection_description">Vérifiez vos informations de stockage et de transfert plus tard, ou réessayez</string>
     <string name="subscription_offer_expired_dialog_description">Cette offre n\’est plus disponible. Consultez nos abonnements actuels pour en trouver un qui vous convient.</string>
     <string name="video_editor_screen_title">Modifier la vidéo</string>
@@ -3110,4 +3110,62 @@
         <item quantity="many">Supprimer les liens ?</item>
         <item quantity="other">Supprimer les liens ?</item>
     </plurals>
+    <string name="account_info_expires_on_date">Expire le %1$s</string>
+    <string name="account_info_renews_on_date">Se renouvelle le %1$s</string>
+    <string name="password_too_weak_error_message">Veuillez utiliser un mot de passe plus robuste.</string>
+    <string name="check_internet_connection_error">Pas de connexion Internet. Vérifiez votre connexion et réessayez</string>
+    <string name="media_timeline_sort_option_date_taken">Date de capture</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="one">Toute personne disposant de ce lien ne pourra plus accéder au fichier ou au dossier</item>
+        <item quantity="many">Toute personne disposant de ces liens ne pourra plus accéder aux fichiers ou aux dossiers</item>
+        <item quantity="other">Toute personne disposant de ces liens ne pourra plus accéder aux fichiers ou aux dossiers</item>
+    </plurals>
+    <string name="account_info_renews_today">Renouvellement aujourd\’hui</string>
+    <string name="account_info_renews_tomorrow_date">Renouvellement demain, le %1$s</string>
+    <string name="account_info_expires_today">Expire aujourd\’hui</string>
+    <string name="account_info_expires_tomorrow_date">Expire demain, le %1$s</string>
+    <string name="account_info_expired_yesterday">Expiré hier</string>
+    <string name="non_format_change_title_messages">%1$s a changé le nom de la conversation de groupe en « %2$s »</string>
+    <string name="history_cleared_by">%1$s a effacé l\’historique de conversation</string>
+    <string name="non_format_history_cleared_by">%1$s a effacé l\’historique de conversation</string>
+    <string name="message_created_chat_link">%1$s a créé un lien de conversation</string>
+    <string name="message_deleted_chat_link">%1$s a supprimé le lien de conversation</string>
+    <string name="message_set_chat_private">%1$s a activé la rotation des clés de chiffrement</string>
+    <string name="retention_history_changed_by">%1$s a changé le délai d\’effacement des messages à %2$s</string>
+    <string name="retention_history_disabled">%1$s a désactivé l\’effacement des messages</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 an</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="one">%1$d&#160;mois</item>
+        <item quantity="many">%1$d de mois</item>
+        <item quantity="other">%1$d&#160;mois</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="one">%1$d&#160;semaine</item>
+        <item quantity="many">%1$d de semaines</item>
+        <item quantity="other">%1$d&#160;semaines</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="one">%d jour</item>
+        <item quantity="many">%d jours</item>
+        <item quantity="other">%d jours</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="one">%1$d&#160;heure</item>
+        <item quantity="many">%1$d d’heures</item>
+        <item quantity="other">%1$d&#160;heures</item>
+    </plurals>
+    <string name="non_format_message_participant_left_group_chat">%1$s a quitté la conversation de groupe</string>
+    <string name="contacts_sent">%s contacts envoyés</string>
+    <string name="title_geolocation_message">Position épinglée</string>
+    <string name="error_message_unrecognizable">Message non reconnaissable</string>
+    <string name="chat_list_ongoing_call_content_description">Appel en cours</string>
+    <string name="account_usage_storage_label">Espace de stockage</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_storage_breakdown_title">Répartition de l’espace de stockage utilisé</string>
+    <string name="account_usage_get_more_storage_button">Obtenir plus d’espace de stockage</string>
+    <string name="account_usage_backups_label">Sauvegardes</string>
+    <string name="account_usage_transfer_label">Transfert</string>
+    <string name="account_usage_payment_overdue_label">Le paiement est en retard</string>
+    <string name="account_usage_payment_required_label">Le paiement est exigé</string>
+    <string name="general_error_word">Erreur</string>
 </resources>

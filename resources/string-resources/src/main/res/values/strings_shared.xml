@@ -3832,7 +3832,7 @@
     <!-- Media timeline sort option for the bottom sheet to sort by "Date added" -->
     <string name="media_timeline_sort_option_date_added">Date added</string>
     <!-- Media timeline sort option for the bottom sheet to sort by "Date captured" -->
-    <string name="media_timeline_sort_option_date_taken">Date captured</string>
+    <string name="media_timeline_sort_option_date_taken">Date taken</string>
     <!-- Title of the confirmation dialog shown before removing the link(s) of one or more files or folders. Plural. -->
     <plurals name="remove_link_dialog_title">
         <item quantity="one">Remove link?</item>
@@ -3843,4 +3843,96 @@
         <item quantity="one">Anyone with this link will no longer be able to access the file or folder</item>
         <item quantity="other">Anyone with these links will no longer be able to access the files or folders</item>
     </plurals>
+    <!-- My Account: subscription notice when the plan renews later today -->
+    <string name="account_info_renews_today">Renews today</string>
+    <!-- My Account: subscription notice when the plan renews the next day. Placeholder is that date, e.g. "22 Jul 2026" -->
+    <string name="account_info_renews_tomorrow_date">Renews tomorrow, %1$s</string>
+    <!-- My Account: subscription notice for any other renewal date. Placeholder is that date, e.g. "22 Jul 2026" or "Sunday, 22 Jul 2026" -->
+    <string name="account_info_renews_on_date">Renews on %1$s</string>
+    <!-- My Account: subscription notice when the plan expires later today -->
+    <string name="account_info_expires_today">Expires today</string>
+    <!-- My Account: subscription notice when the plan expires the next day. Placeholder is that date, e.g. "22 Jul 2026" -->
+    <string name="account_info_expires_tomorrow_date">Expires tomorrow, %1$s</string>
+    <!-- My Account: subscription notice when the plan expired the previous day -->
+    <string name="account_info_expired_yesterday">Expired yesterday</string>
+    <!-- My Account: subscription notice for any other expiry date. Placeholder is that date, e.g. "22 Jul 2026" or "Sunday, 22 Jul 2026" -->
+    <string name="account_info_expires_on_date">Expires on %1$s</string>
+    <!-- Chat list last-message preview shown when a participant is added to a group chat. %1$s is the added participant, %2$s is the person who added them -->
+    <string name="non_format_message_add_participant">%2$s added %1$s to this group chat</string>
+    <!-- Chat list last-message preview shown when a participant is removed from a group chat. %1$s is the removed participant, %2$s is the person who removed them -->
+    <string name="non_format_message_remove_participant">%2$s removed %1$s from the group chat</string>
+    <!-- Chat list last-message preview shown when a participant leaves a group chat. %1$s is the participant who left -->
+    <string name="non_format_message_participant_left_group_chat">%1$s left the group chat</string>
+    <!-- Chat list last-message preview shown when a participant is promoted to host. %1$s is the participant whose role changed, %2$s is the person who made the change -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s changed %1$s’s role to host</string>
+    <!-- Chat list last-message preview shown when a participant's role is changed to standard. %1$s is the participant whose role changed, %2$s is the person who made the change -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s changed %1$s’s role to standard</string>
+    <!-- Chat list last-message preview shown when a participant's role is changed to read-only. %1$s is the participant whose role changed, %2$s is the person who made the change -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s changed %1$s’s role to read-only</string>
+    <!-- Chat list last-message preview shown when the group chat name is changed. %1$s is the person who changed it, %2$s is the new chat name -->
+    <string name="non_format_change_title_messages">%1$s changed the group chat name to “%2$s”</string>
+    <!-- Chat list last-message preview shown when the current user clears the chat history. %1$s is the person who cleared it -->
+    <string name="history_cleared_by">%1$s cleared the chat history</string>
+    <!-- Chat list last-message preview shown when another participant clears the chat history. %1$s is the person who cleared it -->
+    <string name="non_format_history_cleared_by">%1$s cleared the chat history</string>
+    <!-- Chat list last-message preview shown when the message clearing (retention) time is changed. %1$s is the person who changed it, %2$s is the new clearing time -->
+    <string name="retention_history_changed_by">%1$s changed the message clearing time to %2$s</string>
+    <!-- Chat list last-message preview shown when message clearing (retention) is disabled. %1$s is the person who disabled it -->
+    <string name="retention_history_disabled">%1$s turned off message clearing</string>
+    <!-- Chat list last-message preview shown when a chat link is created. %1$s is the person who created it -->
+    <string name="message_created_chat_link">%1$s created a chat link</string>
+    <!-- Chat list last-message preview shown when a chat link is removed. %1$s is the person who removed it -->
+    <string name="message_deleted_chat_link">%1$s removed the chat link</string>
+    <!-- Chat list last-message preview shown when encryption key rotation is enabled for a chat. %1$s is the person who enabled it -->
+    <string name="message_set_chat_private">%1$s turned on encryption key rotation</string>
+    <!-- Message clearing (retention) duration of exactly one year, shown in the chat list last-message preview -->
+    <string name="subtitle_properties_manage_chat_label_year">1 year</string>
+    <!-- Message clearing (retention) duration in months, shown in the chat list last-message preview. %1$d is the number of months -->
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="one">%1$d month</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+    <!-- Message clearing (retention) duration in weeks, shown in the chat list last-message preview. %1$d is the number of weeks -->
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="one">%1$d week</item>
+        <item quantity="other">%1$d weeks</item>
+    </plurals>
+    <!-- Message clearing (retention) duration in days, shown in the chat list last-message preview. %d is the number of days -->
+    <plurals name="label_time_in_days_full">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <!-- Message clearing (retention) duration in hours, shown in the chat list last-message preview. %1$d is the number of hours -->
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+    <!-- Chat list last-message preview shown when one or more contacts were shared in the chat; %s is the number of contacts sent -->
+    <string name="contacts_sent">Sent %s contacts</string>
+    <!-- Chat list last-message preview shown when a location was shared in the chat -->
+    <string name="title_geolocation_message">Pinned location</string>
+    <!-- Chat list last-message preview shown when the last message type cannot be recognised -->
+    <string name="error_message_unrecognizable">Message unrecognisable</string>
+    <!-- Audio player: snackbar shown when playback silently resumes from a saved position (%1$s = position, e.g. 15:45) -->
+    <string name="audio_player_resumed_snackbar_message">Resumed from %1$s</string>
+    <!-- Accessibility content description for the icon shown on a chat list row when that chat has a call in progress -->
+    <string name="chat_list_ongoing_call_content_description">Ongoing call</string>
+    <!-- Account usage screen: label under the storage quota meter -->
+    <string name="account_usage_storage_label">Storage</string>
+    <!-- Account usage screen: label under the transfer quota meter -->
+    <string name="account_usage_transfer_label">Transfer</string>
+    <!-- Account usage screen: used amount out of the total quota, e.g. "18 GB / 400 GB". First placeholder is the used amount, second is the total. The [A] tags mark the used amount, which turns red when the quota is exceeded. -->
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <!-- Account usage screen: alert shown to a business admin when the account has expired and payment is late -->
+    <string name="account_usage_payment_overdue_label">Payment overdue</string>
+    <!-- Account usage screen: alert shown to a business admin when the account is in its grace period and payment is needed -->
+    <string name="account_usage_payment_required_label">Payment required</string>
+    <!-- Account usage screen: heading of the section listing how much storage each area uses -->
+    <string name="account_usage_storage_breakdown_title">Storage usage breakdown</string>
+    <!-- Account usage screen: storage breakdown row for the Backups folder -->
+    <string name="account_usage_backups_label">Backups</string>
+    <!-- Account usage screen: button that takes the user to the upgrade plans screen -->
+    <string name="account_usage_get_more_storage_button">Get more storage</string>
+    <!-- The word "Error" on its own, used as a title or a prefix that the error message follows -->
+    <string name="general_error_word">Error</string>
 </resources>

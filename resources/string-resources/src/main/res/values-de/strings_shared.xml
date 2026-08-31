@@ -2862,7 +2862,7 @@
     <string name="deep_link_content_unavailable_dialog_message">Der Inhalt, auf den Sie zugreifen möchten, ist mit diesem Account nicht zugänglich.</string>
     <string name="share_link_expires_on">Der Link läuft am %1$s ab</string>
     <string name="share_link_expired">Link abgelaufen</string>
-    <string name="share_link_password_dialog_title">Linkpasswort teilen</string>
+    <string name="share_link_password_dialog_title">Linkpasswort</string>
     <string name="share_link_password_dialog_message">Möchten Sie das Passwort für diesen Link teilen?</string>
     <string name="subscription_quota_no_connection_title">Keine Verbindung möglich</string>
     <string name="subscription_quota_no_connection_description">Prüfen Sie Ihre Speicher- und Transferdetails später oder versuchen Sie es erneut</string>
@@ -2980,4 +2980,62 @@
         <item quantity="one">Link entfernen?</item>
         <item quantity="other">Links entfernen?</item>
     </plurals>
+    <string name="account_info_expires_on_date">Läuft am %1$s ab</string>
+    <string name="account_info_renews_on_date">Verlängerung am %1$s</string>
+    <string name="non_format_message_add_participant">%2$s hat %1$s zu diesem Gruppenchat hinzugefügt</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s hat den Gruppenchat verlassen</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s hat die Rolle von %1$s zu Nur-Lesen geändert</string>
+    <string name="non_format_message_remove_participant">%2$s hat %1$s aus dem Gruppenchat entfernt</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s hat die Rolle von %1$s zu Gastgeber geändert</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s hat die Rolle von %1$s zu Standard geändert</string>
+    <string name="non_format_change_title_messages">%1$s hat den Gruppenchat in „%2$s“ umbenannt</string>
+    <string name="history_cleared_by">%1$s hat den Chatverlauf gelöscht</string>
+    <string name="non_format_history_cleared_by">%1$s hat den Chatverlauf gelöscht</string>
+    <string name="message_created_chat_link">%1$s hat einen Chatlink erstellt</string>
+    <string name="message_deleted_chat_link">%1$s hat den Chatlink gelöscht</string>
+    <string name="message_set_chat_private">%1$s hat die Schlüsselrotation aktiviert</string>
+    <string name="retention_history_changed_by">%1$s hat die Lebensdauer von Chatnachrichten auf %2$s geändert</string>
+    <string name="retention_history_disabled">%1$s hat das automatische Löschen von Nachrichten deaktiviert</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 Jahr</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="one">%1$d Monat</item>
+        <item quantity="other">%1$d Monate</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="one">%1$d Woche</item>
+        <item quantity="other">%1$d Wochen</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="one">%d Tag</item>
+        <item quantity="other">%d Tage</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="one">%1$d Stunde</item>
+        <item quantity="other">%1$d Stunden</item>
+    </plurals>
+    <string name="password_too_weak_error_message">Bitte wählen Sie ein stärkeres Passwort.</string>
+    <string name="check_internet_connection_error">Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut</string>
+    <string name="media_timeline_sort_option_date_taken">Aufnahmedatum</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="one">Andere können über diesen Link nicht mehr auf die Datei bzw. den Ordner zugreifen</item>
+        <item quantity="other">Andere können über diese Links nicht mehr auf die Dateien bzw. Ordner zugreifen</item>
+    </plurals>
+    <string name="account_info_renews_today">Verlängerung heute</string>
+    <string name="account_info_renews_tomorrow_date">Verlängerung morgen, %1$s</string>
+    <string name="account_info_expires_today">Läuft heute ab</string>
+    <string name="account_info_expires_tomorrow_date">Läuft morgen ab, den %1$s</string>
+    <string name="account_info_expired_yesterday">Gestern abgelaufen</string>
+    <string name="contacts_sent">%s Kontakte gesendet</string>
+    <string name="title_geolocation_message">Standort</string>
+    <string name="error_message_unrecognizable">Unbekanntes Nachrichtenformat</string>
+    <string name="chat_list_ongoing_call_content_description">Laufendes Gespräch</string>
+    <string name="account_usage_storage_label">Speicher</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_storage_breakdown_title">Belegter Speicherplatz</string>
+    <string name="account_usage_get_more_storage_button">Erhalten Sie mehr Speicherplatz</string>
+    <string name="account_usage_backups_label">Backups</string>
+    <string name="account_usage_transfer_label">Transfer</string>
+    <string name="account_usage_payment_overdue_label">Zahlung überfällig</string>
+    <string name="account_usage_payment_required_label">Zahlung erforderlich</string>
+    <string name="general_error_word">Fehler</string>
 </resources>

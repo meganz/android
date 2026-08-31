@@ -3225,4 +3225,44 @@
         <item quantity="many">Удалить ссылки?</item>
         <item quantity="other">Удалить ссылки?</item>
     </plurals>
+    <string name="account_info_renews_on_date">Продлевается %1$s</string>
+    <string name="account_info_expires_on_date">Истекает %1$s</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s покинул чат</string>
+    <string name="non_format_change_title_messages">%1$s изменил название группового чата на «%2$s»</string>
+    <string name="subtitle_properties_manage_chat_label_year">1 год</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="one">%1$d месяц</item>
+        <item quantity="few">%1$d месяца</item>
+        <item quantity="many">%1$d месяцев</item>
+        <item quantity="other">%1$d месяцев</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="one">%1$d неделя</item>
+        <item quantity="few">%1$d недели</item>
+        <item quantity="many">%1$d недель</item>
+        <item quantity="other">%1$d недель</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d дня</item>
+        <item quantity="many">%d дней</item>
+        <item quantity="other">%d дней</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="one">%1$d час</item>
+        <item quantity="few">%1$d часа</item>
+        <item quantity="many">%1$d часов</item>
+        <item quantity="other">%1$d часов</item>
+    </plurals>
+    <string name="title_geolocation_message">Закреплённое местоположение</string>
+    <string name="chat_list_ongoing_call_content_description">Текущий звонок</string>
+    <string name="account_usage_storage_label">Хранилище</string>
+    <string name="account_usage_transfer_label">Передача данных</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_payment_overdue_label">Платёж просрочен</string>
+    <string name="account_usage_payment_required_label">Требуется оплата</string>
+    <string name="account_usage_storage_breakdown_title">Распределение использования хранилища</string>
+    <string name="account_usage_backups_label">Резервные копии</string>
+    <string name="account_usage_get_more_storage_button">Получить больше места</string>
+    <string name="general_error_word">Ошибка</string>
 </resources>

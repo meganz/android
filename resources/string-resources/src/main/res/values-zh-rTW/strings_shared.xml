@@ -2861,4 +2861,32 @@
     <plurals name="remove_link_dialog_title">
         <item quantity="other">移除連結？</item>
     </plurals>
+    <string name="account_info_renews_on_date">續訂日期%1$s</string>
+    <string name="account_info_expires_on_date">%1$s到期</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s離開了對話群組</string>
+    <string name="non_format_change_title_messages">%1$s已將此對話群組更名為“%2$s”</string>
+    <string name="subtitle_properties_manage_chat_label_year">1年</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="other">%1$d個月</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="other">%1$d週</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="other">%d天</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="other">%1$d小時</item>
+    </plurals>
+    <string name="title_geolocation_message">固定位置</string>
+    <string name="chat_list_ongoing_call_content_description">正在進行中的通話</string>
+    <string name="account_usage_storage_label">儲存空間</string>
+    <string name="account_usage_transfer_label">傳輸</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A] / %2$s</string>
+    <string name="account_usage_payment_overdue_label">付款逾期</string>
+    <string name="account_usage_payment_required_label">應付款</string>
+    <string name="account_usage_storage_breakdown_title">儲存空間使用分析</string>
+    <string name="account_usage_backups_label">備份</string>
+    <string name="account_usage_get_more_storage_button">獲得更多儲存空間</string>
+    <string name="general_error_word">錯誤</string>
 </resources>

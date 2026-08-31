@@ -2773,7 +2773,7 @@
     <string name="deep_link_content_unavailable_dialog_message">您尝试访问的内容对该账户不可用。</string>
     <string name="share_link_expires_on">链接将于 %1$s 过期</string>
     <string name="share_link_expired">链接已过期</string>
-    <string name="share_link_password_dialog_title">分享链接密码</string>
+    <string name="share_link_password_dialog_title">链接密码</string>
     <string name="share_link_password_dialog_message">您是否要共享此链接的密码？</string>
     <string name="subscription_quota_no_connection_title">无法连接</string>
     <string name="subscription_quota_no_connection_description">请稍后查看您的存储和传输详情，或再次尝试</string>
@@ -2868,4 +2868,58 @@
     <plurals name="remove_link_dialog_title">
         <item quantity="other">移除链接?</item>
     </plurals>
+    <string name="account_info_renews_on_date">续订日期%1$s</string>
+    <string name="account_info_expires_on_date">%1$s到期</string>
+    <string name="password_too_weak_error_message">请使用一个更强的密码。</string>
+    <string name="check_internet_connection_error">无网络连接。请检查您的连接后重试</string>
+    <string name="media_timeline_sort_option_date_taken">拍摄日期</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="other">拥有这些链接的任何人将无法再访问这些文件或文件夹</item>
+    </plurals>
+    <string name="account_info_renews_today">今天续订</string>
+    <string name="account_info_renews_tomorrow_date">明天续订，%1$s</string>
+    <string name="account_info_expires_today">今天到期</string>
+    <string name="account_info_expires_tomorrow_date">明天到期， %1$s</string>
+    <string name="account_info_expired_yesterday">昨天过期</string>
+    <string name="non_format_message_participant_left_group_chat">%1$s已离开群聊</string>
+    <string name="non_format_change_title_messages">%1$s已将群聊名称更改为“%2$s”</string>
+    <string name="subtitle_properties_manage_chat_label_year">1年</string>
+    <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="other">%1$d个月</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="other">%1$d周</item>
+    </plurals>
+    <plurals name="label_time_in_days_full">
+        <item quantity="other">%d天</item>
+    </plurals>
+    <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="other">%1$d小时</item>
+    </plurals>
+    <string name="non_format_message_add_participant">%2$s 已将 %1$s 添加到这个群聊中</string>
+    <string name="non_format_message_remove_participant">%2$s 已将 %1$s 从群聊中移除</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s 将 %1$s 的角色改为主持人</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s 将 %1$s 的角色改为标准成员</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s 将 %1$s 的角色改为只读成员</string>
+    <string name="history_cleared_by">%1$s 已清除聊天记录</string>
+    <string name="non_format_history_cleared_by">%1$s 已清除聊天记录</string>
+    <string name="retention_history_changed_by">%1$s 已将消息清除时间改为 %2$s</string>
+    <string name="retention_history_disabled">%1$s 已关闭消息清除</string>
+    <string name="message_created_chat_link">%1$s 创建了一个聊天链接</string>
+    <string name="message_deleted_chat_link">%1$s 已移除聊天链接</string>
+    <string name="message_set_chat_private">%1$s 已启用加密密钥轮换</string>
+    <string name="title_geolocation_message">固定位置</string>
+    <string name="chat_list_ongoing_call_content_description">正在进行通话</string>
+    <string name="contacts_sent">已发送%s位联系人</string>
+    <string name="error_message_unrecognizable">消息无法识别</string>
+    <string name="audio_player_resumed_snackbar_message">已从 %1$s 继续</string>
+    <string name="account_usage_storage_label">存储空间</string>
+    <string name="account_usage_transfer_label">传输</string>
+    <string name="account_usage_used_of_total">[A]%1$s[/A]/%2$s</string>
+    <string name="account_usage_payment_overdue_label">逾期付款</string>
+    <string name="account_usage_payment_required_label">需要付款</string>
+    <string name="account_usage_storage_breakdown_title">存储空间使用详情</string>
+    <string name="account_usage_backups_label">备份</string>
+    <string name="account_usage_get_more_storage_button">获取更多存储空间</string>
+    <string name="general_error_word">错误</string>
 </resources>

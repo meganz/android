@@ -2799,7 +2799,7 @@
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]近期[/B]活動已隱藏</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
-    <string name="setting_fingerprint">指紋辨識</string>
+    <string name="setting_fingerprint">指紋識別</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
     <string name="title_enable_fingerprint">確認指紋解鎖</string>
     <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
