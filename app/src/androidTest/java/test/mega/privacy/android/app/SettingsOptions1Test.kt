@@ -17,11 +17,14 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.boot.TestAppBoot
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.test.gateway.FakeMegaApiGateway
+import mega.privacy.android.data.test.gateway.FakeMegaChatApiGateway
 import mega.privacy.android.data.test.stub.StubMegaRequest
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
+import nz.mega.sdk.MegaChatApi
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -38,13 +41,12 @@ import javax.inject.Inject
  * rule), and Compose test tags are matched as resource ids where the screen sets
  * `testTagsAsResourceId = true`.
  *
- * Two constraints shape which sm20 scenarios are ported here:
+ * Two constraints shape how the sm20 scenarios are ported here:
  *
  * 1. **Only screens that reach the SDK through `MegaApiGateway` / `MegaChatApiGateway` are
- *    fake-backed.** The legacy Chat settings screen and the legacy rubbish-bin "empty" action call
- *    `MegaChatApiAndroid` / `MegaApiAndroid` (and legacy `NodeController`) directly, so the fake
- *    cannot intercept them; per `TEST-PLACEMENT-POLICY.md` those stay in AAT until refactored behind
- *    the gateway. See the class-level deferral list in the MR description.
+ *    fake-backed.** The chat settings presence flows (AND-24539) and the rubbish-bin "empty" action
+ *    (AND-24540) are gateway-backed since those refactors landed, which unblocked tc05–tc12 and
+ *    tc17 in this suite.
  * 2. **Legacy `PreferenceFragment` screens carry no Compose test tags**, so their rows are driven by
  *    visible title text (`By.text`, resolved from the app's string resources). The Compose Camera
  *    Uploads screen and its radio dialogs are fully tagged, so those are driven by `By.res` — the
@@ -52,8 +54,9 @@ import javax.inject.Inject
  *    on its own window.
  *
  * Ported: tc01 (theme), tc03 (CU how-to/file-upload options), tc04 (CU keep-file-names + secondary
- * media), tc13 (calls sound notifications), tc15 (clear offline files), tc20 (file-versioning
- * toggle). The remaining sm20 scenarios are deferred with reasons in the MR description.
+ * media), tc05–tc08 (chat online status), tc09 (auto-away with timeout), tc10 (persist status),
+ * tc11 (last-green visibility), tc12 (rich URL previews), tc13 (calls sound notifications),
+ * tc15 (clear offline files), tc17 (empty rubbish bin), tc20 (file-versioning toggle).
  */
 @HiltAndroidTest
 class SettingsOptions1Test {
@@ -63,6 +66,9 @@ class SettingsOptions1Test {
 
     @Inject
     lateinit var fakeMegaApi: FakeMegaApiGateway
+
+    @Inject
+    lateinit var fakeMegaChat: FakeMegaChatApiGateway
 
     @Inject
     lateinit var saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase
@@ -122,6 +128,7 @@ class SettingsOptions1Test {
         )
 
         fakeMegaApi.clearInvocations()
+        fakeMegaChat.clearInvocations()
 
         // Persist a logged-in session through the app's real credentials path and seed Camera
         // Uploads as enabled so the CU option tiles (tc03/tc04) render without the enable flow's
@@ -200,6 +207,127 @@ class SettingsOptions1Test {
         )
     }
 
+    /**
+     * tc05–tc08 — changing the chat online status through the status dialog requests the SDK with
+     * the matching status value and updates the shown selection (away, busy, offline, then online).
+     *
+     * Carries the demo-clip camera holds: short pauses on each state, ending on a 2s hold.
+     */
+    @Test
+    fun chatOnlineStatusChangesUpdateSummaryAndRequestGateway() {
+        openChatSettings()
+
+        val statusRow = str("set_status_option_label")
+        val dialogCancel = targetContext.getString(android.R.string.cancel)
+        Thread.sleep(1_000)
+
+        listOf(
+            str("settings_chat_status_away") to MegaChatApi.STATUS_AWAY,
+            str("settings_chat_status_busy") to MegaChatApi.STATUS_BUSY,
+            str("settings_chat_status_offline") to MegaChatApi.STATUS_OFFLINE,
+            str("settings_chat_status_online") to MegaChatApi.STATUS_ONLINE,
+        ).forEach { (statusLabel, sdkStatus) ->
+            clickText(statusRow, "status-row")
+            // The status dialog renders in its own window; its Cancel button is the only element
+            // not also present on the screen behind it.
+            awaitObject(By.text(dialogCancel), LOAD_TIMEOUT, "status-dialog")
+            Thread.sleep(1_000)
+            clickText(statusLabel, "status-option-$sdkStatus")
+            awaitGone(By.text(dialogCancel), "status-dialog-dismissed")
+
+            awaitObject(By.text(statusLabel), LOAD_TIMEOUT, "status-summary-$sdkStatus")
+            awaitInvocations("setOnlineStatus($sdkStatus)") {
+                fakeMegaChat.invocationsOf(MegaChatApiGateway::setOnlineStatus)
+                    .filter { it.arguments.firstOrNull() == sdkStatus }
+            }
+            Thread.sleep(1_000)
+        }
+
+        Thread.sleep(2_000)
+    }
+
+    /** tc09 — enabling auto-away requests the default timeout, and its dialog sets a custom one. */
+    @Test
+    fun chatAutoAwayEnableAndTimeoutDialogRequestGateway() {
+        openChatSettings()
+
+        clickChatPreference(str("settings_autoaway_title"), "auto-away-switch")
+        awaitInvocations("setPresenceAutoaway(true, 300)") {
+            fakeMegaChat.invocationsOf(MegaChatApiGateway::setPresenceAutoaway)
+                .filter { it.arguments[0] == true && it.arguments[1] == 300 }
+        }
+        // The timeout row appears with the default 5-minute summary once auto-away is on.
+        awaitObject(
+            By.text(str("settings_autoaway_value", 5)),
+            LOAD_TIMEOUT,
+            "auto-away-default-summary",
+        )
+
+        clickChatPreference(str("settings_autoaway_subtitle"), "auto-away-timeout-row")
+        awaitObject(
+            By.text(str("title_dialog_set_autoaway_value")),
+            LOAD_TIMEOUT,
+            "auto-away-dialog",
+        )
+        val input = By.res(viewId("autoaway_edittext"))
+        awaitObject(input, LOAD_TIMEOUT, "auto-away-input")
+        device.findObject(input).text = "10"
+        click(By.res(viewId("autoaway_set_button")), LOAD_TIMEOUT, "auto-away-set-button")
+
+        awaitInvocations("setPresenceAutoaway(true, 600)") {
+            fakeMegaChat.invocationsOf(MegaChatApiGateway::setPresenceAutoaway)
+                .filter { it.arguments[0] == true && it.arguments[1] == 600 }
+        }
+    }
+
+    /** tc10 — toggling status persistence requests the SDK to persist the status. */
+    @Test
+    fun chatPersistStatusToggleRequestsGateway() {
+        openChatSettings()
+
+        clickChatPreference(str("settings_persistence_title"), "persistence-row")
+
+        awaitInvocations("setPresencePersist(true)") {
+            fakeMegaChat.invocationsOf(MegaChatApiGateway::setPresencePersist)
+                .filter { it.arguments.firstOrNull() == true }
+        }
+    }
+
+    /**
+     * tc11 — toggling last-seen visibility requests the SDK. The row is interactable because the
+     * fake's default presence config (Online status) has landed by the time [openChatSettings]
+     * returns — the fragment disables it while the config is missing.
+     */
+    @Test
+    fun chatLastGreenVisibilityToggleRequestsGateway() {
+        openChatSettings()
+
+        val lastGreen = str("option_enable_last_green_chat")
+        scrollToText(lastGreen)
+        clickChatPreference(lastGreen, "last-green-row")
+
+        awaitInvocations("setLastGreenVisible(true)") {
+            fakeMegaChat.invocationsOf(MegaChatApiGateway::setLastGreenVisible)
+                .filter { it.arguments.firstOrNull() == true }
+        }
+    }
+
+    /** tc12 — toggling rich URL previews requests the SDK to enable them. */
+    @Test
+    fun chatRichUrlPreviewsToggleRequestsGateway() {
+        openChatSettings()
+
+        val richPreviews = str("option_enable_chat_rich_preview")
+        scrollToText(richPreviews)
+        clickChatPreference(richPreviews, "rich-previews-row")
+
+        awaitInvocations("enableRichPreviews(true)") {
+            fakeMegaApi.invocations.filter {
+                it.methodName == "enableRichPreviews" && it.arguments.firstOrNull() == true
+            }
+        }
+    }
+
     /** tc13 — the Calls settings screen shows the sound-notifications option. */
     @Test
     fun callsSettingsShowsSoundNotifications() {
@@ -229,6 +357,32 @@ class SettingsOptions1Test {
         awaitObject(By.text(confirmation), LOAD_TIMEOUT, "clear-offline-dialog")
         clickText(str("general_clear"), "clear-offline-confirm")
         awaitGone(By.text(confirmation), "clear-offline-dialog-dismissed")
+    }
+
+    /** tc17 — emptying the rubbish bin confirms, requests the SDK and shows the success snackbar. */
+    @Test
+    fun emptyRubbishBinConfirmationRequestsGatewayAndShowsSnackbar() {
+        openFileManagementSettings()
+
+        val emptyRubbishBin = str("empty_rubbish_bin_menu")
+        scrollToText(emptyRubbishBin)
+        clickText(emptyRubbishBin, "empty-rubbish-bin-row")
+
+        awaitObject(
+            By.text(str("remove_all_rubbish_bin_confirmation")),
+            LOAD_TIMEOUT,
+            "empty-rubbish-bin-dialog",
+        )
+        clickText(str("general_clear"), "empty-rubbish-bin-confirm")
+
+        awaitInvocations("cleanRubbishBin") {
+            fakeMegaApi.invocations.filter { it.methodName == "cleanRubbishBin" }
+        }
+        awaitObject(
+            By.text(str("empty_rubbish_bin_success_message")),
+            LOAD_TIMEOUT,
+            "empty-rubbish-bin-snackbar",
+        )
     }
 
     /** tc20 — disabling file versioning confirms and requests the SDK to disable it. */
@@ -274,6 +428,21 @@ class SettingsOptions1Test {
         clickText(fileManagement, "file-management-row")
     }
 
+    private fun openChatSettings() {
+        openSettings()
+        val chat = str("section_chat")
+        scrollToText(chat)
+        // The Chat row enables asynchronously once the chat session and connectivity land.
+        awaitObject(By.text(chat).enabled(true), LOAD_TIMEOUT, "chat-row-enabled")
+        clickText(chat, "chat-row")
+        // The status row enables once the presence config, connectivity and root node all land.
+        awaitObject(
+            By.text(str("set_status_option_label")).enabled(true),
+            LOAD_TIMEOUT,
+            "chat-settings-screen",
+        )
+    }
+
     private fun openCameraUploadsSettings() {
         openSettings()
         val cameraUploads = str("section_photo_sync")
@@ -305,7 +474,8 @@ class SettingsOptions1Test {
         }
         throw AssertionError(
             "Timed out after ${timeoutMs}ms waiting for an invocation of $name; " +
-                    "recorded methods=${fakeMegaApi.invocations.map { it.methodName }}",
+                    "recorded api methods=${fakeMegaApi.invocations.map { it.methodName }}, " +
+                    "recorded chat methods=${fakeMegaChat.invocations.map { it.methodName }}",
         )
     }
 
@@ -319,12 +489,29 @@ class SettingsOptions1Test {
         return targetContext.getString(id)
     }
 
+    private fun str(name: String, vararg args: Any): String {
+        val id = targetContext.resources.getIdentifier(name, "string", targetContext.packageName)
+        require(id != 0) { "string resource not found: $name" }
+        return targetContext.getString(id, *args)
+    }
+
+    /** Fully-qualified resource id for a legacy view id in the app package. */
+    private fun viewId(name: String): String = "${targetContext.packageName}:id/$name"
+
     private fun click(selector: BySelector, timeout: Long, name: String) {
         awaitObject(selector, timeout, name)
         device.findObject(selector).click()
     }
 
     private fun clickText(text: String, name: String) = click(By.text(text), LOAD_TIMEOUT, name)
+
+    /**
+     * Clicks a chat-settings preference row once it is enabled. The presence rows are re-added and
+     * re-enabled asynchronously as the presence config, connectivity and root node land, so a plain
+     * text click can land on a still-disabled row and be dropped.
+     */
+    private fun clickChatPreference(title: String, name: String) =
+        click(By.text(title).enabled(true), LOAD_TIMEOUT, name)
 
     private fun awaitChecked(tag: String, expected: Boolean, name: String) {
         val deadline = SystemClock.uptimeMillis() + LOAD_TIMEOUT
