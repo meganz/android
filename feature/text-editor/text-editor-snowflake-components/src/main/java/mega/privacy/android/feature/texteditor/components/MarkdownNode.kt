@@ -201,7 +201,7 @@ private fun MarkdownList(
     colors: MarkdownColors,
     modifier: Modifier = Modifier,
 ) {
-    val start = (list as? OrderedList)?.startNumber ?: 1
+    val start = (list as? OrderedList)?.markerStartNumber ?: 1
     Column(modifier = modifier.fillMaxWidth()) {
         var item = list.firstChild
         var index = start
@@ -415,8 +415,9 @@ private fun AnnotatedString.Builder.appendInline(node: Node, colors: MarkdownCol
         ) { appendInlineChildren(node, colors) }
 
         is Image -> appendInlineChildren(node, colors) // v1: render alt text only, no remote load
-        is SoftLineBreak -> append(" ")
-        is HardLineBreak -> append("\n")
+        // Soft breaks render as real line breaks (not the web-style space join): matches the
+        // raw source, the rich editor, and Obsidian-style apps, so View <-> Edit never reflows.
+        is SoftLineBreak, is HardLineBreak -> append("\n")
         else -> appendInlineChildren(node, colors)
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.android.tools.screenshot.PreviewTest
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -23,10 +24,11 @@ import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocu
  */
 class MarkdownParityScreenshotTest {
 
-    private val fixture = """
+    private val textFixture = """
         # Trip notes
 
         Planning the **spring** trip with *flexible* dates, `inline code` and a [booking link](https://mega.io).
+        This hard-wrapped line renders as a line break in both surfaces.
 
         - Book flights
         - [x] Reserve hotel
@@ -36,6 +38,12 @@ class MarkdownParityScreenshotTest {
         2. Fly out
 
         > Remember to check passport expiry.
+        >
+        > Also pack the chargers.
+    """.trimIndent()
+
+    private val boxFixture = """
+        Budget so far:
 
         ```kotlin
         val budget = 1200
@@ -50,6 +58,18 @@ class MarkdownParityScreenshotTest {
     @CombinedThemePreviews
     @Composable
     fun PreviewVersusRichEditor() {
+        ParityStack(fixture = textFixture, editorHeight = 620.dp)
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun PreviewVersusRichEditorBoxes() {
+        ParityStack(fixture = boxFixture, editorHeight = 360.dp)
+    }
+
+    @Composable
+    private fun ParityStack(fixture: String, editorHeight: Dp) {
         AndroidThemeForPreviews {
             Column {
                 val blocks = remember { parseTopLevelBlocks(fixture) }
@@ -63,7 +83,7 @@ class MarkdownParityScreenshotTest {
                 val richState = remember {
                     RichDocumentState(MarkdownToRichDocumentConverter().convert(fixture))
                 }
-                Box(modifier = Modifier.height(760.dp)) {
+                Box(modifier = Modifier.height(editorHeight)) {
                     RichDocumentEditor(state = richState)
                 }
             }

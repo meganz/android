@@ -14,7 +14,15 @@ import androidx.compose.ui.text.TextRange
 sealed interface RichBlockKind {
     data object Paragraph : RichBlockKind
     data class Heading(val level: Int) : RichBlockKind
-    data class Item(val ordered: Boolean, val indent: Int, val checked: Boolean?) : RichBlockKind
+
+    /** [startNumber] only on the first item of an ordered run not starting at 1. */
+    data class Item(
+        val ordered: Boolean,
+        val indent: Int,
+        val checked: Boolean?,
+        val startNumber: Int? = null,
+    ) : RichBlockKind
+
     data class Quote(val depth: Int) : RichBlockKind
 }
 
@@ -177,7 +185,10 @@ class RichDocumentState(document: RichDocument) {
         val (beforeSpans, afterSpans) = splitSpans(block.text.spans, splitAt, removeTo)
         val newKind = when {
             kind is RichBlockKind.Heading && afterText.isEmpty() -> RichBlockKind.Paragraph
-            kind is RichBlockKind.Item -> kind.copy(checked = kind.checked?.let { false })
+            // The continuation is never a run start, so it must not carry the start number.
+            kind is RichBlockKind.Item ->
+                kind.copy(checked = kind.checked?.let { false }, startNumber = null)
+
             else -> kind
         }
         block.text.textFieldState.edit { replace(splitAt, length, "") }
@@ -308,6 +319,7 @@ class RichDocumentState(document: RichDocument) {
                         indent = kind.indent,
                         checked = kind.checked,
                         text = block.text.toRichText(),
+                        startNumber = kind.startNumber,
                     )
 
                     is RichBlockKind.Quote ->
@@ -340,7 +352,7 @@ private fun RichBlock.toEditState(): RichBlockEditState = when (this) {
         RichTextBlockEditState(RichBlockKind.Heading(level), text.toBlockState())
 
     is RichBlock.ListItem -> RichTextBlockEditState(
-        RichBlockKind.Item(ordered, indent, checked),
+        RichBlockKind.Item(ordered, indent, checked, startNumber),
         text.toBlockState(),
     )
 

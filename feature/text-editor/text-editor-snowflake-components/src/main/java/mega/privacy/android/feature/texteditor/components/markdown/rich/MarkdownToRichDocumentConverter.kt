@@ -124,6 +124,8 @@ class MarkdownToRichDocumentConverter @Inject constructor() {
         listIndent: Int,
         out: MutableList<RichBlock>,
     ) {
+        // Only a run starting away from 1 needs its start recorded (on its first item).
+        var startNumber = (list as? OrderedList)?.markerStartNumber?.takeIf { it != 1 }
         var item = list.firstChild
         while (item != null) {
             if (item is ListItem) {
@@ -150,7 +152,8 @@ class MarkdownToRichDocumentConverter @Inject constructor() {
                     }
                     child = child.next
                 }
-                out += RichBlock.ListItem(ordered, listIndent, checked, itemText)
+                out += RichBlock.ListItem(ordered, listIndent, checked, itemText, startNumber)
+                startNumber = null
                 remaining.forEach { extra ->
                     when (extra) {
                         is BulletList ->

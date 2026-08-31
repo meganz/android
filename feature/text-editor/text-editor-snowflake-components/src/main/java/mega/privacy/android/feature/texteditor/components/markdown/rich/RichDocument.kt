@@ -22,12 +22,15 @@ sealed interface RichBlock {
      * One list item. Nesting is flattened into [indent] (0-based depth), the Notes/Docs model.
      *
      * @property checked Task-box state; null when the item is not a task.
+     * @property startNumber For the FIRST item of an ordered run that does not start at 1, the
+     * source's start number (e.g. `5.`); null otherwise. Preserves numbering across round-trips.
      */
     data class ListItem(
         val ordered: Boolean,
         val indent: Int,
         val checked: Boolean?,
         val text: RichText,
+        val startNumber: Int? = null,
     ) : RichBlock
 
     /** One quoted paragraph; [depth] > 1 for quotes inside quotes. */

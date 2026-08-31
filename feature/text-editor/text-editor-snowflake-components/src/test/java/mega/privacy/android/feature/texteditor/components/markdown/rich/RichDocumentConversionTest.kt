@@ -168,6 +168,46 @@ internal class RichDocumentConversionTest {
     }
 
     @Test
+    fun `test that an ordered list start number survives the round trip`() {
+        val document = toModel.convert("5. five\n6. six")
+
+        val first = document.blocks[0] as RichBlock.ListItem
+        val second = document.blocks[1] as RichBlock.ListItem
+        assertThat(first.startNumber).isEqualTo(5)
+        assertThat(second.startNumber).isNull()
+        assertThat(toMarkdown.convert(document)).isEqualTo("5. five\n6. six")
+        assertStable("5. five\n6. six")
+    }
+
+    @Test
+    fun `test that a list starting at one carries no start number`() {
+        val document = toModel.convert("1. one\n2. two")
+
+        assertThat((document.blocks[0] as RichBlock.ListItem).startNumber).isNull()
+    }
+
+    @Test
+    fun `test that a start number after other content survives the round trip`() {
+        // CommonMark requires content between two ordered lists (a list can only interrupt a
+        // paragraph when it starts at 1); this is the shape a real restarted list takes.
+        val markdown = "1. a\n\ntext\n\n5. b"
+
+        assertThat(roundTrip(markdown)).isEqualTo(markdown)
+        assertStable(markdown)
+    }
+
+    @Test
+    fun `test that a blank line between ordered items is one loose list, not a restart`() {
+        // "5." here is cosmetic: CommonMark parses one loose list numbered from 1, so the
+        // serializer's continued numbering matches what any renderer would show.
+        val document = toModel.convert("1. a\n\n5. b")
+
+        assertThat((document.blocks[1] as RichBlock.ListItem).startNumber).isNull()
+        assertThat(toMarkdown.convert(document)).isEqualTo("1. a\n2. b")
+        assertStable("1. a\n\n5. b")
+    }
+
+    @Test
     fun `test that convert emits code fences longer than any backtick run in the code`() {
         val document = RichDocument(
             listOf(RichBlock.CodeBlock(null, "a ``` b")),

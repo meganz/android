@@ -295,6 +295,32 @@ class RichDocumentEditorTest {
     }
 
     @Test
+    fun `test that ordered items respect the run's start number`() {
+        setEditor(
+            RichDocument(
+                listOf(
+                    RichBlock.ListItem(
+                        ordered = true,
+                        indent = 0,
+                        checked = null,
+                        text = RichText("five"),
+                        startNumber = 5,
+                    ),
+                    RichBlock.ListItem(
+                        ordered = true,
+                        indent = 0,
+                        checked = null,
+                        text = RichText("six"),
+                    ),
+                ),
+            ),
+        )
+
+        composeRule.onNodeWithText("5. ").assertExists()
+        composeRule.onNodeWithText("6. ").assertExists()
+    }
+
+    @Test
     fun `test that raw source blocks render like the preview instead of showing syntax`() {
         val table = "| City | Nights |\n|------|--------|\n| Rome | 3 |"
         setEditor(RichDocument(listOf(RichBlock.RawSource(table))))

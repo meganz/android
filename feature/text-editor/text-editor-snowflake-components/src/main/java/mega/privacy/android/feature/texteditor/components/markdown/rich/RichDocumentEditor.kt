@@ -202,15 +202,7 @@ private fun RichTextBlockRow(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .padding(
-                when (kind) {
-                    is RichBlockKind.Heading -> MarkdownBlockSpacing.heading(kind.level)
-                    is RichBlockKind.Item, is RichBlockKind.Quote ->
-                        MarkdownBlockSpacing.listOrQuoteRow
-
-                    RichBlockKind.Paragraph -> MarkdownBlockSpacing.block
-                },
-            ),
+            .padding(textRowPadding(state.blocks, index, kind)),
         verticalAlignment = Alignment.Top,
     ) {
         when (kind) {
@@ -246,6 +238,17 @@ private fun RichTextBlockRow(
             },
             modifier = Modifier
                 .weight(1f)
+                // Inside a continuous quote the paragraph gap moves INSIDE the row, so the
+                // full-height bar spans it — one unbroken bar, like the preview's frame.
+                .then(
+                    if (kind is RichBlockKind.Quote &&
+                        kindAt(state.blocks, index + 1) is RichBlockKind.Quote
+                    ) {
+                        Modifier.padding(MarkdownBlockSpacing.nested)
+                    } else {
+                        Modifier
+                    },
+                )
                 .focusRequester(focusRequester)
                 .onFocusChanged { if (it.isFocused) state.focusedIndex = index }
                 .onPreviewKeyEvent { event ->
@@ -333,20 +336,73 @@ private fun handleUndoRedoKey(event: KeyEvent, state: RichDocumentState): Boolea
     }
 }
 
-/** 1-based number of an ordered item: counts ordered predecessors at the same indent. */
+/**
+ * Row padding mirroring the preview's rhythm: flattened list/quote rows stay tight, the LAST
+ * row of a run carries the preview's block gap, and adjacent quote rows drop the outer gap
+ * entirely so their bars join into one continuous bar.
+ */
+private fun textRowPadding(
+    blocks: List<RichBlockEditState>,
+    index: Int,
+    kind: RichBlockKind,
+): PaddingValues = when (kind) {
+    is RichBlockKind.Heading -> MarkdownBlockSpacing.heading(kind.level)
+    RichBlockKind.Paragraph -> MarkdownBlockSpacing.block
+
+    is RichBlockKind.Item -> {
+        val next = kindAt(blocks, index + 1) as? RichBlockKind.Item
+        // A different list type at the SAME indent starts a new list; a deeper or shallower
+        // neighbor is nesting within the same run and stays tight, like the preview.
+        val endsRun = next == null || (next.indent == kind.indent && next.ordered != kind.ordered)
+        PaddingValues(
+            top = MarkdownBlockSpacing.listOrQuoteGap,
+            bottom = if (endsRun) {
+                MarkdownBlockSpacing.runEndGap
+            } else {
+                MarkdownBlockSpacing.listOrQuoteGap
+            },
+        )
+    }
+
+    is RichBlockKind.Quote -> PaddingValues(
+        top = if (kindAt(blocks, index - 1) is RichBlockKind.Quote) {
+            0.dp
+        } else {
+            MarkdownBlockSpacing.listOrQuoteGap
+        },
+        bottom = if (kindAt(blocks, index + 1) is RichBlockKind.Quote) {
+            0.dp
+        } else {
+            MarkdownBlockSpacing.runEndGap
+        },
+    )
+}
+
+private fun kindAt(blocks: List<RichBlockEditState>, index: Int): RichBlockKind? =
+    (blocks.getOrNull(index) as? RichTextBlockEditState)?.kind
+
+/**
+ * 1-based number of an ordered item: counts ordered predecessors at the same indent, offset by
+ * the run's start number when its first item carries one.
+ */
 private fun orderedNumber(blocks: List<RichBlockEditState>, index: Int): Int {
     val kind = (blocks.getOrNull(index) as? RichTextBlockEditState)?.kind
             as? RichBlockKind.Item ?: return 1
-    var number = 1
+    var start = kind.startNumber ?: 1
+    var offset = 0
     for (i in index - 1 downTo 0) {
         val previous = (blocks.getOrNull(i) as? RichTextBlockEditState)?.kind
                 as? RichBlockKind.Item ?: break
         when {
             previous.indent < kind.indent -> break
             previous.indent > kind.indent -> continue
-            previous.ordered -> number++
+            previous.ordered -> {
+                offset++
+                previous.startNumber?.let { start = it }
+            }
+
             else -> break
         }
     }
-    return number
+    return start + offset
 }

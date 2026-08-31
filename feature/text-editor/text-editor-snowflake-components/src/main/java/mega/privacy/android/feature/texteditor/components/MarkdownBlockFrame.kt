@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.feature.texteditor.components.MarkdownBlockSpacing.listOrQuoteRow
 
 /**
  * Shared chrome for Markdown block constructs — the single source of truth for how list rows,
@@ -50,6 +51,15 @@ internal object MarkdownBlockSpacing {
     val block = PaddingValues(bottom = 12.dp)
     val thematicBreak = PaddingValues(vertical = 12.dp)
     val nested = PaddingValues(bottom = 4.dp)
+
+    /** One edge of [listOrQuoteRow], for flattened rows that pad their edges independently. */
+    val listOrQuoteGap = 2.dp
+
+    /**
+     * Bottom of the LAST row of a flattened list/quote run: the row gap plus the block gap the
+     * preview puts after the whole list/quote block, so run boundaries match across surfaces.
+     */
+    val runEndGap = 14.dp
 }
 
 /** The leading decoration of a list item row. */

@@ -50,7 +50,12 @@ class RichDocumentToMarkdownConverter @Inject constructor() {
                 // Deeper indents reset when a shallower item appears; same-level items count up.
                 orderedCounters.keys.filter { it > block.indent }.forEach(orderedCounters::remove)
                 val marker = if (block.ordered) {
-                    val number = (orderedCounters[block.indent] ?: 0) + 1
+                    // A run head's start number seeds the count. It is deliberately ignored
+                    // mid-run (a live counter wins): CommonMark cannot express a restart in
+                    // adjacent items anyway — a list not starting at 1 needs other content
+                    // before it, which is exactly when the counter has been reset.
+                    val runStart = block.startNumber?.minus(1)
+                    val number = (orderedCounters[block.indent] ?: runStart ?: 0) + 1
                     orderedCounters[block.indent] = number
                     "$number. "
                 } else {

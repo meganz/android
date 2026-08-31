@@ -59,6 +59,13 @@ class MarkdownPreviewTest {
     }
 
     @Test
+    fun `test that soft line breaks render as line breaks like the rich editor`() {
+        setContent("first line\nsecond line")
+
+        assertTextDisplayed("first line\nsecond line")
+    }
+
+    @Test
     fun `test that heading text is rendered without its markers`() {
         setContent("# Install guide")
 
