@@ -57,6 +57,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 import java.io.File
+import java.io.FileNotFoundException
+import java.io.RandomAccessFile
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -454,6 +456,115 @@ internal class FileFacadeTest {
             assertThat(actual).isEqualTo(expected)
         }
     }
+
+    @Test
+    fun `test that saveTextOnContentUri writes the text when the provider accepts the write truncate mode`() =
+        runTest {
+            val target = File(temporaryFolder, "supported.txt").apply { writeText(STALE_CONTENT) }
+            mockStatic(Uri::class.java).use { _ ->
+                val uri = stubContentUri(CONTENT_URI)
+                val contentResolver = stubContentResolver()
+                val descriptor = descriptorFor(target, truncateOnOpen = true)
+                whenever(contentResolver.openFileDescriptor(uri, "wt")) doReturn descriptor
+
+                val actual = underTest.saveTextOnContentUri(CONTENT_URI, NEW_CONTENT)
+
+                assertThat(actual).isTrue()
+                assertThat(target.readText()).isEqualTo(NEW_CONTENT)
+                verify(contentResolver, never()).openFileDescriptor(uri, "w")
+            }
+        }
+
+    @Test
+    fun `test that saveTextOnContentUri leaves no stale tail when the provider rejects the write truncate mode`() =
+        runTest {
+            val target = File(temporaryFolder, "wt-rejected.txt").apply { writeText(STALE_CONTENT) }
+            mockStatic(Uri::class.java).use { _ ->
+                val uri = stubContentUri(CONTENT_URI)
+                val contentResolver = stubContentResolver()
+                val descriptor = descriptorFor(target, truncateOnOpen = false)
+                whenever(
+                    contentResolver.openFileDescriptor(uri, "wt")
+                ) doThrow UnsupportedOperationException("Mode not supported")
+                whenever(contentResolver.openFileDescriptor(uri, "w")) doReturn descriptor
+
+                val actual = underTest.saveTextOnContentUri(CONTENT_URI, NEW_CONTENT)
+
+                assertThat(actual).isTrue()
+                assertThat(target.readText()).isEqualTo(NEW_CONTENT)
+            }
+        }
+
+    @Test
+    fun `test that saveTextOnContentUri leaves no stale tail when the provider returns a null descriptor for the write truncate mode`() =
+        runTest {
+            val target = File(temporaryFolder, "wt-null.txt").apply { writeText(STALE_CONTENT) }
+            mockStatic(Uri::class.java).use { _ ->
+                val uri = stubContentUri(CONTENT_URI)
+                val contentResolver = stubContentResolver()
+                val descriptor = descriptorFor(target, truncateOnOpen = false)
+                whenever(contentResolver.openFileDescriptor(uri, "wt")) doReturn null
+                whenever(contentResolver.openFileDescriptor(uri, "w")) doReturn descriptor
+
+                val actual = underTest.saveTextOnContentUri(CONTENT_URI, NEW_CONTENT)
+
+                assertThat(actual).isTrue()
+                assertThat(target.readText()).isEqualTo(NEW_CONTENT)
+            }
+        }
+
+    @Test
+    fun `test that saveTextOnContentUri returns false when both modes are rejected`() =
+        runTest {
+            mockStatic(Uri::class.java).use { _ ->
+                val uri = stubContentUri(CONTENT_URI)
+                val contentResolver = stubContentResolver()
+                whenever(
+                    contentResolver.openFileDescriptor(eq(uri), any())
+                ) doThrow FileNotFoundException("No such document")
+
+                val actual = underTest.saveTextOnContentUri(CONTENT_URI, NEW_CONTENT)
+
+                assertThat(actual).isFalse()
+                verify(contentResolver).openFileDescriptor(uri, "wt")
+                verify(contentResolver).openFileDescriptor(uri, "w")
+            }
+        }
+
+    @Test
+    fun `test that saveTextOnContentUri leaves no stale tail when the provider accepts the write truncate mode without honouring it`() =
+        runTest {
+            val target = File(temporaryFolder, "wt-ignored.txt").apply { writeText(STALE_CONTENT) }
+            mockStatic(Uri::class.java).use { _ ->
+                val uri = stubContentUri(CONTENT_URI)
+                val contentResolver = stubContentResolver()
+                val descriptor = descriptorFor(target, truncateOnOpen = false)
+                whenever(contentResolver.openFileDescriptor(uri, "wt")) doReturn descriptor
+
+                val actual = underTest.saveTextOnContentUri(CONTENT_URI, NEW_CONTENT)
+
+                assertThat(actual).isTrue()
+                assertThat(target.readText()).isEqualTo(NEW_CONTENT)
+                verify(contentResolver, never()).openFileDescriptor(uri, "w")
+            }
+        }
+
+    @Test
+    fun `test that saveTextOnContentUri does not reopen in the write mode when the write itself fails`() =
+        runTest {
+            val target = File(temporaryFolder, "write-fails.txt").apply { writeText(STALE_CONTENT) }
+            mockStatic(Uri::class.java).use { _ ->
+                val uri = stubContentUri(CONTENT_URI)
+                val contentResolver = stubContentResolver()
+                val descriptor = readOnlyDescriptorFor(target)
+                whenever(contentResolver.openFileDescriptor(uri, "wt")) doReturn descriptor
+
+                val actual = underTest.saveTextOnContentUri(CONTENT_URI, NEW_CONTENT)
+
+                assertThat(actual).isFalse()
+                verify(contentResolver, never()).openFileDescriptor(uri, "w")
+            }
+        }
 
     @Test
     fun `test that getDocumentEntities returns the mapped entities from a list of content uris`() =
@@ -2572,5 +2683,35 @@ internal class FileFacadeTest {
         whenever(documentFileWrapper.fromUri(uri, true)) doReturn documentFile
         whenever(documentFileWrapper.fromUri(uri, false)) doReturn documentFile
         return uri
+    }
+
+    private fun stubContentResolver(): ContentResolver = mock<ContentResolver>().also {
+        whenever(context.contentResolver) doReturn it
+    }
+
+    private fun stubContentUri(uriString: String): Uri = mock<Uri> {
+        on { this.scheme } doReturn "content"
+    }.also { whenever(Uri.parse(uriString)) doReturn it }
+
+    /**
+     * Emulates what a DocumentsProvider hands back for each write mode: "wt" arrives already
+     * truncated, "w" arrives positioned at 0 over the previous content.
+     */
+    private fun descriptorFor(file: File, truncateOnOpen: Boolean): ParcelFileDescriptor {
+        val access = RandomAccessFile(file, "rw")
+        if (truncateOnOpen) access.setLength(0)
+        return mock<ParcelFileDescriptor> { on { fileDescriptor } doReturn access.fd }
+    }
+
+    private fun readOnlyDescriptorFor(file: File): ParcelFileDescriptor {
+        val access = RandomAccessFile(file, "r")
+        return mock<ParcelFileDescriptor> { on { fileDescriptor } doReturn access.fd }
+    }
+
+    private companion object {
+        const val CONTENT_URI =
+            "content://com.android.externalstorage.documents/document/primary%3ASync%2F.megaignore"
+        const val STALE_CONTENT = "a considerably longer previous content"
+        const val NEW_CONTENT = "-:*.tmp"
     }
 }

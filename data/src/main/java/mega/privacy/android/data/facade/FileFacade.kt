@@ -12,6 +12,7 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.ParcelFileDescriptor
 import android.os.StatFs
 import android.os.storage.StorageManager
 import android.os.storage.StorageVolume
@@ -414,20 +415,56 @@ internal class FileFacade @Inject constructor(
     override suspend fun setLastModified(path: String, timestamp: Long) =
         File(path).takeIf { it.exists() }?.setLastModified(timestamp)
 
-    override suspend fun saveTextOnContentUri(uri: String, text: String) =
-        withContext(Dispatchers.IO) {
-            runCatching {
-                val file = context.contentResolver.openFileDescriptor(uri.toUri(), "w")
-                file?.use {
-                    FileOutputStream(file.fileDescriptor).use {
-                        it.write(text.toByteArray())
-                    }
-                } ?: return@runCatching false
-            }.fold(
-                onSuccess = { true },
-                onFailure = { false }
-            )
+    override suspend fun saveTextOnContentUri(uri: String, text: String): Boolean {
+        val contentUri = uri.toUri()
+        val bytes = text.toByteArray()
+        return withContext(Dispatchers.IO) {
+            val descriptor = openToWrite(contentUri, MODE_WRITE_TRUNCATE)
+                ?: openToWrite(contentUri, MODE_WRITE)
+                ?: return@withContext false
+            descriptor.use { writeWholeContent(it, bytes) }
         }
+    }
+
+    /**
+     * Opens [uri] for writing in [mode].
+     *
+     * [MODE_WRITE_TRUNCATE] is optional in the DocumentsProvider contract, so a provider that
+     * rejects it has to be retried in [MODE_WRITE]; the rejected mode is logged to keep that
+     * diagnosable. Only a refused open is worth retrying - once a descriptor is handed over the
+     * mode is supported, and reopening would just discard what has already been written.
+     */
+    private fun openToWrite(uri: Uri, mode: String): ParcelFileDescriptor? = runCatching {
+        context.contentResolver.openFileDescriptor(uri, mode)
+            ?: error("Provider returned no file descriptor")
+    }.onFailure {
+        Timber.w(it, "Could not open $uri in mode \"$mode\"")
+    }.getOrNull()
+
+    /**
+     * Makes [bytes] the whole content of [descriptor].
+     *
+     * Neither [MODE_WRITE] nor a provider that accepts [MODE_WRITE_TRUNCATE] without honouring it
+     * shortens the file, so whatever a previous, longer content left past [bytes] is dropped once
+     * the write is through. Truncating afterwards rather than upfront keeps the file intact until
+     * the new content is in: descriptors that cannot seek have no such tail to drop, and their
+     * refusal must not fail an otherwise complete write.
+     *
+     * @return true if and only if [bytes] were written.
+     */
+    private fun writeWholeContent(
+        descriptor: ParcelFileDescriptor,
+        bytes: ByteArray,
+    ) = runCatching {
+        FileOutputStream(descriptor.fileDescriptor).use { stream ->
+            stream.write(bytes)
+            runCatching { stream.channel.truncate(bytes.size.toLong()) }
+                .onFailure { Timber.w(it, "Could not drop the content past ${bytes.size} bytes") }
+        }
+        true
+    }.onFailure {
+        Timber.w(it, "Could not write the content uri")
+    }.getOrDefault(false)
 
     override suspend fun getUriForFile(file: File, authority: String): Uri =
         withContext(Dispatchers.IO) {
@@ -1908,6 +1945,8 @@ internal class FileFacade @Inject constructor(
         private var isDirectQuerySupported: Boolean? = null
 
         const val EXTERNAL_STORAGE_AUTHORITY = "com.android.externalstorage.documents"
+        const val MODE_WRITE = "w"
+        const val MODE_WRITE_TRUNCATE = "wt"
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val PHOTO_DIR = "MEGA Photos"
         const val OFFLINE_DIR = "MEGA Offline"
