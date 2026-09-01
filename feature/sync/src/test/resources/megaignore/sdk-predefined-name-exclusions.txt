@@ -1,0 +1,24 @@
+# Verbatim copy of the SDK's predefined name exclusions, in source order.
+#
+# Source:     DefaultFilterChain::mPredefinedNameExclusions
+#             sdk/src/main/jni/mega/sdk/src/syncfilter.cpp:249-259
+#             declared at sdk/src/main/jni/mega/sdk/include/mega/syncfilter.h:110
+# Pinned SDK: 20260826.085232-rel   (megaSdkVersion in build.gradle.kts)
+#
+# The list is a private static member of a C++ class and is not exposed through any
+# Java binding, so a unit test cannot read it from the prebuilt SDK. Re-check this
+# copy by hand whenever megaSdkVersion moves.
+#
+# The C++ writes the seventh entry as two adjacent string literals,
+# "*.sb-????????" "-??????", to keep ??- out of trigraph interpretation. The compiler
+# concatenates them into the single pattern below.
+#
+# Lines starting with # are comments. Every other line is one pattern, verbatim.
+Thumbs.db
+desktop.ini
+~*
+.*
+*~.*
+*.crdownload
+*.sb-????????-??????
+*.tmp
