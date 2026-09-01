@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -299,11 +300,15 @@ private fun CodeBlockRow(
 private fun RawSourceRow(block: RawSourceEditState, colors: MarkdownColors) {
     // Rendered through the preview's block components so unsupported constructs (tables,
     // HTML, images) look exactly like View mode. Not editable — the verbatim source slice
-    // still serializes untouched, which is what keeps them lossless.
+    // still serializes untouched, which is what keeps them lossless. The SelectionContainer
+    // keeps this content copyable like every other block (the editable blocks get selection
+    // from their text fields).
     val nodes = remember(block.source) { parseTopLevelBlocks(block.source) }
-    Column(modifier = Modifier.fillMaxWidth()) {
-        nodes.forEach { node ->
-            MarkdownBlock(node = node, colors = colors)
+    SelectionContainer {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            nodes.forEach { node ->
+                MarkdownBlock(node = node, colors = colors)
+            }
         }
     }
 }
@@ -354,13 +359,14 @@ private fun textRowPadding(
         // A different list type at the SAME indent starts a new list; a deeper or shallower
         // neighbor is nesting within the same run and stays tight, like the preview.
         val endsRun = next == null || (next.indent == kind.indent && next.ordered != kind.ordered)
+        val rowGap = if (kind.checked != null) {
+            MarkdownBlockSpacing.taskRowGap
+        } else {
+            MarkdownBlockSpacing.listOrQuoteGap
+        }
         PaddingValues(
-            top = MarkdownBlockSpacing.listOrQuoteGap,
-            bottom = if (endsRun) {
-                MarkdownBlockSpacing.runEndGap
-            } else {
-                MarkdownBlockSpacing.listOrQuoteGap
-            },
+            top = rowGap,
+            bottom = if (endsRun) MarkdownBlockSpacing.runEndGap else rowGap,
         )
     }
 

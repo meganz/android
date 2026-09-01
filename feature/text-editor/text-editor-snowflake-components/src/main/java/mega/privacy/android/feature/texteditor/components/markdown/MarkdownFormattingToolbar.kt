@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
@@ -42,6 +43,7 @@ enum class MarkdownFormatAction {
     HeadingCycle,
     BulletList,
     OrderedList,
+    TaskList,
     Quote,
     Link,
 }
@@ -130,6 +132,13 @@ fun MarkdownFormattingToolbar(
                     icon = Icons.Default.FormatListNumbered,
                     contentDescription = "Numbered list",
                     isActive = formats.isOrderedList,
+                    onAction = onAction,
+                )
+                ToolbarToggleButton(
+                    action = MarkdownFormatAction.TaskList,
+                    icon = Icons.Default.Checklist,
+                    contentDescription = "Checklist",
+                    isActive = formats.isTaskList,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(

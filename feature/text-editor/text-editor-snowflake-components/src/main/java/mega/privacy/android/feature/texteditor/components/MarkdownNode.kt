@@ -110,7 +110,12 @@ internal fun rememberMarkdownColors(): MarkdownColors = MarkdownColors(
  * (inside list items / quotes) use a tighter, uniform gap.
  */
 private fun blockSpacing(node: Node, nested: Boolean): Modifier {
-    if (nested) return Modifier.padding(MarkdownBlockSpacing.nested)
+    if (nested) {
+        // The nested gap separates SIBLINGS inside a list item or quote; the LAST child adds
+        // none, so a single-paragraph row measures exactly like the rich editor's flattened
+        // row and switching View <-> Edit does not change list heights.
+        return if (node.next != null) Modifier.padding(MarkdownBlockSpacing.nested) else Modifier
+    }
     return when (node) {
         is Heading -> Modifier.padding(MarkdownBlockSpacing.heading(node.level))
         is ThematicBreak -> Modifier.padding(MarkdownBlockSpacing.thematicBreak)

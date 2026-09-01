@@ -257,15 +257,33 @@ class RichDocumentState(document: RichDocument) {
         }
     }
 
-    /** Toolbar list action: toggles the focused block's list marker, or flips its list type. */
+    /**
+     * Toolbar list action: toggles the focused block's list marker, flips its list type, or
+     * sheds a task box back to a plain marker. Bullet, numbered, and task lists behave as
+     * three mutually exclusive list flavors.
+     */
     fun toggleFocusedListItem(ordered: Boolean) {
         val block = focusedTextBlock ?: return
         recordUndo()
         val kind = block.kind
         block.kind = when {
-            kind is RichBlockKind.Item && kind.ordered == ordered -> RichBlockKind.Paragraph
-            kind is RichBlockKind.Item -> kind.copy(ordered = ordered)
+            kind is RichBlockKind.Item && kind.ordered == ordered && kind.checked == null ->
+                RichBlockKind.Paragraph
+
+            kind is RichBlockKind.Item -> kind.copy(ordered = ordered, checked = null)
             else -> RichBlockKind.Item(ordered = ordered, indent = 0, checked = null)
+        }
+    }
+
+    /** Toolbar checklist action: toggles the focused block's task box (unchecked when added). */
+    fun toggleFocusedTaskItem() {
+        val block = focusedTextBlock ?: return
+        recordUndo()
+        val kind = block.kind
+        block.kind = when {
+            kind is RichBlockKind.Item && kind.checked != null -> RichBlockKind.Paragraph
+            kind is RichBlockKind.Item -> kind.copy(checked = false)
+            else -> RichBlockKind.Item(ordered = false, indent = 0, checked = false)
         }
     }
 

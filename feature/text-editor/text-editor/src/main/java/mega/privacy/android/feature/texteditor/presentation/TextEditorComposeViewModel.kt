@@ -561,6 +561,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             MarkdownFormatAction.HeadingCycle -> rich.cycleFocusedHeading()
             MarkdownFormatAction.BulletList -> rich.toggleFocusedListItem(ordered = false)
             MarkdownFormatAction.OrderedList -> rich.toggleFocusedListItem(ordered = true)
+            MarkdownFormatAction.TaskList -> rich.toggleFocusedTaskItem()
             MarkdownFormatAction.Quote -> rich.toggleFocusedQuote()
             MarkdownFormatAction.Link -> requestRichLinkDialog(rich)
         }

@@ -13,6 +13,7 @@ data class MarkdownSelectionFormats(
     val headingLevel: Int? = null,
     val isBulletList: Boolean = false,
     val isOrderedList: Boolean = false,
+    val isTaskList: Boolean = false,
     val isQuote: Boolean = false,
 ) {
     companion object {

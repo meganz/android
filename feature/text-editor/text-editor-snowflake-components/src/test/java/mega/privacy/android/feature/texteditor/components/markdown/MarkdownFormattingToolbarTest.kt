@@ -42,6 +42,7 @@ class MarkdownFormattingToolbarTest {
             MarkdownFormatAction.HeadingCycle,
             MarkdownFormatAction.BulletList,
             MarkdownFormatAction.OrderedList,
+            MarkdownFormatAction.TaskList,
             MarkdownFormatAction.Quote,
             MarkdownFormatAction.InlineCode,
             MarkdownFormatAction.Link,

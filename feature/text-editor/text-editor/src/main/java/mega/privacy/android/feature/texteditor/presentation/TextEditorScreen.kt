@@ -1039,8 +1039,11 @@ private fun richSelectionFormats(
                     selection.min > it.start && selection.max <= it.end
         },
         headingLevel = (kind as? RichBlockKind.Heading)?.level,
-        isBulletList = kind is RichBlockKind.Item && !kind.ordered,
-        isOrderedList = kind is RichBlockKind.Item && kind.ordered,
+        // Bullet, numbered, and task lists are three exclusive flavors: a task item lights
+        // only the checklist button, whatever its underlying marker type.
+        isBulletList = kind is RichBlockKind.Item && !kind.ordered && kind.checked == null,
+        isOrderedList = kind is RichBlockKind.Item && kind.ordered && kind.checked == null,
+        isTaskList = kind is RichBlockKind.Item && kind.checked != null,
         isQuote = kind is RichBlockKind.Quote,
     )
 }

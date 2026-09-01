@@ -264,6 +264,58 @@ internal class RichDocumentStateTest {
     }
 
     @Test
+    fun `test that toggleFocusedTaskItem cycles paragraph to task and back`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("todo")))
+        state.focusedIndex = 0
+        val block = state.blocks[0] as RichTextBlockEditState
+
+        state.toggleFocusedTaskItem()
+        assertThat(block.kind)
+            .isEqualTo(RichBlockKind.Item(ordered = false, indent = 0, checked = false))
+
+        state.toggleFocusedTaskItem()
+        assertThat(block.kind).isEqualTo(RichBlockKind.Paragraph)
+    }
+
+    @Test
+    fun `test that toggleFocusedTaskItem adds a box to an existing list item`() {
+        val state = stateOf(
+            RichBlock.ListItem(ordered = true, indent = 1, checked = null, RichText("t")),
+        )
+        state.focusedIndex = 0
+
+        state.toggleFocusedTaskItem()
+
+        assertThat((state.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Item(ordered = true, indent = 1, checked = false))
+    }
+
+    @Test
+    fun `test that the list toggle sheds the task box instead of clearing the item`() {
+        val state = stateOf(
+            RichBlock.ListItem(ordered = false, indent = 0, checked = true, RichText("t")),
+        )
+        state.focusedIndex = 0
+
+        state.toggleFocusedListItem(ordered = false)
+
+        assertThat((state.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Item(ordered = false, indent = 0, checked = null))
+    }
+
+    @Test
+    fun `test that toggleFocusedTaskItem is undoable`() {
+        val state = stateOf(RichBlock.Paragraph(RichText("todo")))
+        state.focusedIndex = 0
+
+        state.toggleFocusedTaskItem()
+        assertThat(state.undo()).isTrue()
+
+        assertThat((state.blocks[0] as RichTextBlockEditState).kind)
+            .isEqualTo(RichBlockKind.Paragraph)
+    }
+
+    @Test
     fun `test that toggleFocusedQuote toggles between quote and paragraph`() {
         val state = stateOf(RichBlock.Paragraph(RichText("text")))
         state.focusedIndex = 0

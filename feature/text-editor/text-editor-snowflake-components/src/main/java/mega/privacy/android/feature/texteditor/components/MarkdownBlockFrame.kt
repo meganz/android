@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material3.Checkbox
@@ -24,8 +25,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.feature.texteditor.components.MarkdownBlockSpacing.listOrQuoteRow
+import mega.privacy.android.feature.texteditor.components.MarkdownBlockSpacing.taskRow
 
 /**
  * Shared chrome for Markdown block constructs — the single source of truth for how list rows,
@@ -54,6 +58,12 @@ internal object MarkdownBlockSpacing {
 
     /** One edge of [listOrQuoteRow], for flattened rows that pad their edges independently. */
     val listOrQuoteGap = 2.dp
+
+    /** Task rows breathe a little more than plain list rows so the boxes read as separate. */
+    val taskRow = PaddingValues(vertical = 4.dp)
+
+    /** One edge of [taskRow], the flattened-row counterpart. */
+    val taskRowGap = 4.dp
 
     /**
      * Bottom of the LAST row of a flattened list/quote run: the row gap plus the block gap the
@@ -87,7 +97,13 @@ internal fun MarkdownListItemFrame(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(MarkdownBlockSpacing.listOrQuoteRow),
+            .padding(
+                if (marker is MarkdownListMarker.TaskCheckbox) {
+                    MarkdownBlockSpacing.taskRow
+                } else {
+                    MarkdownBlockSpacing.listOrQuoteRow
+                },
+            ),
         verticalAlignment = Alignment.Top,
     ) {
         MarkdownListItemChrome(marker = marker, colors = colors, indent = indent)
@@ -111,14 +127,37 @@ internal fun MarkdownListItemChrome(
     )
     DisableSelection {
         when (marker) {
-            is MarkdownListMarker.TaskCheckbox -> Checkbox(
-                checked = marker.checked,
-                onCheckedChange = marker.onCheckedChange,
-                enabled = marker.enabled,
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .height(24.dp),
-            )
+            is MarkdownListMarker.TaskCheckbox -> {
+                // The checkbox glyph is centered on the text's FIRST line: the marker box is
+                // sized from the body line height (sp-based, so it tracks font scale) instead
+                // of the component's tap container, whose extra height rides below the line.
+                // The row stays top-aligned so wrapped lines flow under the marker.
+                val firstLineHeight = with(LocalDensity.current) {
+                    MaterialTheme.typography.bodyMedium.lineHeight.toDp()
+                }
+                Box(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .height(firstLineHeight)
+                        .toggleable(
+                            value = marker.checked,
+                            enabled = marker.enabled,
+                            role = Role.Checkbox,
+                            onValueChange = marker.onCheckedChange,
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Checkbox(
+                        checked = marker.checked,
+                        // Display-only: interactivity and semantics live on the wrapping
+                        // toggleable. Always rendered with enabled colors — the disabled
+                        // tint is illegible in dark mode, and the read-only preview should
+                        // show the task state clearly, just not accept taps.
+                        onCheckedChange = null,
+                        enabled = true,
+                    )
+                }
+            }
 
             is MarkdownListMarker.Number -> Text(
                 text = "${marker.number}. ",

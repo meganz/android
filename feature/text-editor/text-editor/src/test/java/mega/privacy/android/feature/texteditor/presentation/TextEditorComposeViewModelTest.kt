@@ -86,7 +86,6 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.io.IOException
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
@@ -103,6 +102,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import java.io.IOException
 
 /** Mirrors the private `DOWNLOAD_COOLDOWN` in [TextEditorComposeViewModel]. */
 private const val DOWNLOAD_COOLDOWN_MS = 800L
@@ -555,6 +555,10 @@ internal class TextEditorComposeViewModelTest {
             underTest.applyFormatAction(MarkdownFormatAction.OrderedList)
             assertThat(block.kind)
                 .isEqualTo(RichBlockKind.Item(ordered = true, indent = 0, checked = null))
+
+            underTest.applyFormatAction(MarkdownFormatAction.TaskList)
+            assertThat(block.kind)
+                .isEqualTo(RichBlockKind.Item(ordered = true, indent = 0, checked = false))
 
             underTest.applyFormatAction(MarkdownFormatAction.Quote)
             assertThat(block.kind).isEqualTo(RichBlockKind.Quote(1))
