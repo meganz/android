@@ -9,7 +9,7 @@ import mega.privacy.android.app.presentation.qrcode.mapper.CombineQRCodeAndAvata
 import mega.privacy.android.app.presentation.qrcode.mapper.GetCircleBitmapMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.LoadBitmapFromFileMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
-import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 import org.mockito.kotlin.mock
 

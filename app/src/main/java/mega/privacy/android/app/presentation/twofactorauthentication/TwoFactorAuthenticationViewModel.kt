@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.NUMBER_PINS
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState

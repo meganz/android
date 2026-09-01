@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.MegaException

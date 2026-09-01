@@ -75,10 +75,10 @@ import mega.privacy.android.shared.account.presentation.widget.view.Avatar
 import mega.privacy.android.app.presentation.extensions.dialogContent
 import mega.privacy.android.app.presentation.extensions.dialogTitle
 import mega.privacy.android.app.presentation.extensions.printEmail
-import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
-import mega.privacy.android.app.presentation.qrcode.mycode.view.QRCode
+import mega.privacy.android.core.sharedcomponents.qr.QRCode
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest

@@ -8,13 +8,13 @@ import mega.privacy.android.app.presentation.qrcode.mapper.CombineQRCodeAndAvata
 import mega.privacy.android.app.presentation.qrcode.mapper.DefaultCombineQRCodeAndAvatarMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.DefaultGetCircleBitmapMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.DefaultLoadBitmapFromFileMapper
-import mega.privacy.android.app.presentation.qrcode.mapper.DefaultQRCodeMapper
+import mega.privacy.android.core.sharedcomponents.qr.DefaultQRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.DefaultSaveBitmapToFileMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.GetCircleBitmapMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.LoadBitmapFromFileMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapperImpl
-import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 
 /**

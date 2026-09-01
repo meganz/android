@@ -36,6 +36,9 @@ dependencies {
     implementation(lib.coil3)
     implementation(lib.coil.compose)
 
+    // QR code generation
+    implementation(google.zxing)
+
     //test
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))

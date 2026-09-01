@@ -12,7 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.settings.model.qrTargetPreference
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE

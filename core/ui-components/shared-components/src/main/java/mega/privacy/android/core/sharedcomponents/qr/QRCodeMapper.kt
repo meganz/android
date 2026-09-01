@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.qrcode.mapper
+package mega.privacy.android.core.sharedcomponents.qr
 
 import android.graphics.Bitmap
 

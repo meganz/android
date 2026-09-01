@@ -1,10 +1,9 @@
-package mega.privacy.android.app.presentation.qrcode.mycode.view
+package mega.privacy.android.core.sharedcomponents.qr
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,8 +19,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
-import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
+import mega.android.core.ui.tokens.theme.DSTokens
 
 /**
  * QR code for a [text]
@@ -35,7 +33,7 @@ fun QRCode(
     qrCodeMapper: QRCodeMapper,
     modifier: Modifier = Modifier,
     bgColor: Color = Color.Transparent,
-    penColor: Color = MaterialTheme.colors.black_white,
+    penColor: Color = DSTokens.colors.icon.primary,
 ) {
     var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     val scope = rememberCoroutineScope()

@@ -20,7 +20,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.core.sharedcomponents.qr.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.ScreenType
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
