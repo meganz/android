@@ -73,6 +73,9 @@ pipeline {
         gitLabConnection('GitLabConnection')
     }
     environment {
+
+        ARTIFACTORY_USER = credentials('ARTIFACTORY_USER')
+        ARTIFACTORY_ACCESS_TOKEN = credentials('ARTIFACTORY_ACCESS_TOKEN')
         LC_ALL = 'en_US.UTF-8'
         LANG = 'en_US.UTF-8'
 
