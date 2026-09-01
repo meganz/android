@@ -35,6 +35,8 @@ dependencyResolutionManagement {
 }
 
 
+rootProject.name = "MEGA"
+
 if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     include(":sdk")
 }
