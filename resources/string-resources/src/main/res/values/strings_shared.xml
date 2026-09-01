@@ -3935,4 +3935,41 @@
     <string name="account_usage_get_more_storage_button">Get more storage</string>
     <!-- The word "Error" on its own, used as a title or a prefix that the error message follows -->
     <string name="general_error_word">Error</string>
+    <!-- Chat list last-message preview shown when a call is currently ongoing in a one-to-one or group chat -->
+    <string name="ongoing_call_messages">Ongoing call</string>
+    <!-- Chat list last-message preview shown when a meeting call is currently in progress -->
+    <string name="meetings_list_ongoing_call_message">Meeting in progress</string>
+    <!-- Chat list last-message preview shown when a one-to-one call has ended; followed by the call duration -->
+    <string name="call_ended_message">[A]Call ended[/A][C]. Duration: [/C]</string>
+    <!-- Chat list last-message preview shown when a group or meeting call has ended; followed by the call duration -->
+    <string name="group_call_ended_message">[A]Group call ended[/A][C]. Duration: [/C]</string>
+    <!-- Chat list last-message preview shown when a group or meeting call has ended without any duration -->
+    <string name="group_call_ended_no_duration_message">[A]Group call ended[/A]</string>
+    <!-- Chat list last-message preview shown when a call was rejected by the callee -->
+    <string name="call_rejected_messages">[A]Call was rejected[/A]</string>
+    <!-- Chat list last-message preview shown to the caller when their call was not answered -->
+    <string name="call_not_answered_messages">[A]Call was not answered[/A]</string>
+    <!-- Chat list last-message preview shown to the callee for a call they missed -->
+    <string name="call_missed_messages">[A]Missed call[/A]</string>
+    <!-- Chat list last-message preview shown when a call failed due to an error -->
+    <string name="call_failed_messages">[A]Call failed[/A]</string>
+    <!-- Chat list last-message preview shown to the caller when they cancelled the call -->
+    <string name="call_cancelled_messages">[A]Call was cancelled[/A]</string>
+    <!-- Chat list last-message preview shown when a scheduled meeting was updated; %1$s is the name of the person who updated it -->
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <!-- Hours component of an ended-call duration in the chat list last-message preview; %1$s is the number of hours -->
+    <plurals name="plural_call_ended_messages_hours">
+        <item quantity="one">[B]%1$s hour[/B]</item>
+        <item quantity="other">[B]%1$s hours[/B]</item>
+    </plurals>
+    <!-- Minutes component of an ended-call duration in the chat list last-message preview; %1$s is the number of minutes -->
+    <plurals name="plural_call_ended_messages_minutes">
+        <item quantity="one">[B]%1$s minute[/B]</item>
+        <item quantity="other">[B]%1$s minutes[/B]</item>
+    </plurals>
+    <!-- Seconds component of an ended-call duration in the chat list last-message preview; %1$d is the number of seconds -->
+    <plurals name="plural_call_ended_messages_seconds">
+        <item quantity="one">[B]%1$d second[/B]</item>
+        <item quantity="other">[B]%1$d seconds[/B]</item>
+    </plurals>
 </resources>
