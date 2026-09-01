@@ -3972,4 +3972,6 @@
         <item quantity="one">[B]%1$d second[/B]</item>
         <item quantity="other">[B]%1$d seconds[/B]</item>
     </plurals>
+    <!-- Checkbox label in the new text file dialog to create a rich text (.md) file instead of a plain text file -->
+    <string name="new_text_file_rich_text_formatting_label">Rich text formatting</string>
 </resources>

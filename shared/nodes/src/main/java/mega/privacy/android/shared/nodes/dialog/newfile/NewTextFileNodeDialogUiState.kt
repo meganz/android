@@ -25,17 +25,21 @@ sealed interface NewTextFileNodeDialogUiState {
      * @property fileNameException Validation exception from the last positive action, or null.
      * @property validationSuccessEvent Triggered with the trimmed file name when validation
      * succeeds, so the caller can run its positive action.
+     * @property showRichTextOption True when the "Rich text" checkbox is available: the dialog
+     * creates text files (not links) and the Markdown editing feature flags are enabled.
      */
     data class Data(
         val parentNodeId: NodeId,
         val fileName: String,
         val fileNameException: NodeNameException?,
         val validationSuccessEvent: StateEventWithContent<String>,
+        val showRichTextOption: Boolean = false,
     ) : NewTextFileNodeDialogUiState
 
     companion object {
         const val DEFAULT_TEXT_FILE_EXTENSION = ".txt"
         const val DEFAULT_LINK_FILE_EXTENSION = ".url"
+        const val RICH_TEXT_FILE_EXTENSION = ".md"
     }
 }
 

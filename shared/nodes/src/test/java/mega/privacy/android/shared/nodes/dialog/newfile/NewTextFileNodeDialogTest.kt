@@ -1,6 +1,9 @@
 package mega.privacy.android.shared.nodes.dialog.newfile
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -8,6 +11,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -41,12 +45,83 @@ class NewTextFileNodeDialogTest {
         fileName: String = DEFAULT_TEXT_FILE_EXTENSION,
         fileNameException: NodeNameException? = null,
         validationSuccessEvent: StateEventWithContent<String> = consumed(),
+        showRichTextOption: Boolean = false,
     ) = NewTextFileNodeDialogUiState.Data(
         parentNodeId = parentNodeId,
         fileName = fileName,
         fileNameException = fileNameException,
         validationSuccessEvent = validationSuccessEvent,
+        showRichTextOption = showRichTextOption,
     )
+
+    @Test
+    fun `test that the rich text checkbox is hidden when the option is off`() {
+        composeTestRule.setContent {
+            NewTextFileNodeDialog(
+                uiState = defaultState(showRichTextOption = false),
+                title = title,
+                onConfirm = {},
+                onFileNameChanged = {},
+                validateFileName = {},
+                onValidationSuccessEventConsumed = {},
+            )
+        }
+
+        composeTestRule.onNodeWithTag(NEW_TEXT_FILE_RICH_TEXT_CHECKBOX_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that checking rich text swaps the extension to md and back`() {
+        val fileNames = mutableListOf<String>()
+        composeTestRule.setContent {
+            NewTextFileNodeDialog(
+                uiState = defaultState(showRichTextOption = true),
+                title = title,
+                onConfirm = {},
+                onFileNameChanged = { fileNames += it },
+                validateFileName = {},
+                onValidationSuccessEventConsumed = {},
+            )
+        }
+
+        composeTestRule.onNodeWithTag(NEW_TEXT_FILE_RICH_TEXT_CHECKBOX_TAG).performClick()
+        assertThat(fileNames.last()).isEqualTo(".md")
+        composeTestRule.onNodeWithTag(NEW_TEXT_FILE_RICH_TEXT_CHECKBOX_TAG).assertIsOn()
+
+        composeTestRule.onNodeWithTag(NEW_TEXT_FILE_RICH_TEXT_CHECKBOX_TAG).performClick()
+        assertThat(fileNames.last()).isEqualTo(".txt")
+        composeTestRule.onNodeWithTag(NEW_TEXT_FILE_RICH_TEXT_CHECKBOX_TAG).assertIsOff()
+    }
+
+    @Test
+    fun `test that typing another extension unchecks the rich text checkbox`() {
+        composeTestRule.setContent {
+            NewTextFileNodeDialog(
+                uiState = defaultState(showRichTextOption = true),
+                title = title,
+                onConfirm = {},
+                onFileNameChanged = {},
+                validateFileName = {},
+                onValidationSuccessEventConsumed = {},
+            )
+        }
+
+        composeTestRule.onNodeWithTag(NEW_TEXT_FILE_RICH_TEXT_CHECKBOX_TAG).performClick()
+        composeTestRule.onNodeWithTag(NEW_TEXT_FILE_RICH_TEXT_CHECKBOX_TAG).assertIsOn()
+
+        composeTestRule.onNode(hasSetTextAction()).performTextReplacement("data.json")
+
+        composeTestRule.onNodeWithTag(NEW_TEXT_FILE_RICH_TEXT_CHECKBOX_TAG).assertIsOff()
+    }
+
+    @Test
+    fun `test that withFileExtension replaces or appends the trailing extension`() {
+        assertThat("notes.txt".withFileExtension(".md")).isEqualTo("notes.md")
+        assertThat("notes".withFileExtension(".md")).isEqualTo("notes.md")
+        assertThat(".txt".withFileExtension(".md")).isEqualTo(".md")
+        assertThat("a.b.c".withFileExtension(".md")).isEqualTo("a.b.md")
+        assertThat("notes.".withFileExtension(".txt")).isEqualTo("notes.txt")
+    }
 
     @Test
     fun `test that dialog is displayed with default file name`() {

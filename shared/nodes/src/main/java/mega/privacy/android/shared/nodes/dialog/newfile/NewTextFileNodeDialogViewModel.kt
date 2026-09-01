@@ -12,16 +12,20 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.NodeNameException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.IsValidTextFileUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
 import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.DEFAULT_LINK_FILE_EXTENSION
+import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.DEFAULT_TEXT_FILE_EXTENSION
 import timber.log.Timber
 
 /**
@@ -33,6 +37,7 @@ class NewTextFileNodeDialogViewModel @AssistedInject constructor(
     private val validateNodeNameUseCase: ValidateNodeNameUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val isValidTextFileUseCase: IsValidTextFileUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @Assisted private val args: Args,
 ) : ViewModel() {
 
@@ -40,6 +45,22 @@ class NewTextFileNodeDialogViewModel @AssistedInject constructor(
     private val fileNameExceptionChannel = Channel<NodeNameException?>(Channel.CONFLATED)
     private val validationSuccessEventChannel =
         Channel<StateEventWithContent<String>>(Channel.BUFFERED)
+
+    /**
+     * The "Rich text" checkbox only applies to text files (not `.url` links) and only while
+     * the Markdown rendering + editing flags are both on. Emits exactly ONCE, after the flags
+     * resolve, so the ui state stays [NewTextFileNodeDialogUiState.Loading] (nothing shown)
+     * until the dialog's final shape is known — the checkbox must not blink in after the
+     * dialog is already visible.
+     */
+    private val richTextOptionFlow = flow {
+        emit(
+            args.defaultExtension == DEFAULT_TEXT_FILE_EXTENSION && runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.TextEditorMarkdownRendering) &&
+                        getFeatureFlagValueUseCase(ApiFeatures.TextEditorWysiwyg)
+            }.getOrDefault(false),
+        )
+    }
 
     val uiState: StateFlow<NewTextFileNodeDialogUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
@@ -49,12 +70,14 @@ class NewTextFileNodeDialogViewModel @AssistedInject constructor(
                 .onStart { emit(null) },
             validationSuccessEventChannel.receiveAsFlow()
                 .onStart { emit(consumed()) },
-        ) { fileName, fileNameException, validationSuccessEvent ->
+            richTextOptionFlow,
+        ) { fileName, fileNameException, validationSuccessEvent, showRichTextOption ->
             NewTextFileNodeDialogUiState.Data(
                 parentNodeId = args.parentNodeId,
                 fileName = fileName,
                 fileNameException = fileNameException,
                 validationSuccessEvent = validationSuccessEvent,
+                showRichTextOption = showRichTextOption,
             )
         }.asUiStateFlow(
             viewModelScope,

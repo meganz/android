@@ -46,6 +46,7 @@ dependencies {
     implementation(lib.mega.core.ui.tokens)
 
     implementation(lib.kotlin.ktx)
+    implementation(lib.kotlinx.collections.immutable)
     implementation(lib.logging.timber)
     implementation(lib.mega.analytics)
 

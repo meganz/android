@@ -14,7 +14,9 @@ import mega.privacy.android.domain.exception.EmptyNodeNameException
 import mega.privacy.android.domain.exception.InvalidNodeExtensionException
 import mega.privacy.android.domain.exception.InvalidNodeNameException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.IsValidTextFileUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
 import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.DEFAULT_LINK_FILE_EXTENSION
@@ -38,6 +40,7 @@ class NewTextFileNodeDialogViewModelTest {
     private val validateNodeNameUseCase = mock<ValidateNodeNameUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val isValidTextFileUseCase = mock<IsValidTextFileUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private fun newViewModel(
         parentNodeId: NodeId = NodeId(123L),
@@ -46,11 +49,18 @@ class NewTextFileNodeDialogViewModelTest {
         validateNodeNameUseCase = validateNodeNameUseCase,
         getRootNodeUseCase = getRootNodeUseCase,
         isValidTextFileUseCase = isValidTextFileUseCase,
+        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         args = NewTextFileNodeDialogViewModel.Args(
             parentNodeId = parentNodeId,
             defaultExtension = defaultExtension,
         ),
     )
+
+    private suspend fun stubMarkdownFlags(enabled: Boolean) {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.TextEditorMarkdownRendering))
+            .thenReturn(enabled)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.TextEditorWysiwyg)).thenReturn(enabled)
+    }
 
     @AfterEach
     fun resetMocks() {
@@ -58,7 +68,43 @@ class NewTextFileNodeDialogViewModelTest {
             validateNodeNameUseCase,
             getRootNodeUseCase,
             isValidTextFileUseCase,
+            getFeatureFlagValueUseCase,
         )
+    }
+
+    @Test
+    fun `test that the rich text option shows when both markdown flags are enabled`() = runTest {
+        stubMarkdownFlags(enabled = true)
+        val underTest = newViewModel()
+
+        underTest.uiState.test {
+            // The FIRST rendered state already shows the option: the state stays Loading until
+            // the flags resolve, so the checkbox never blinks in after the dialog is visible.
+            assertThat(awaitData().showRichTextOption).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that the rich text option stays hidden when the flags are disabled`() = runTest {
+        stubMarkdownFlags(enabled = false)
+        val underTest = newViewModel()
+
+        underTest.uiState.test {
+            assertThat(awaitData().showRichTextOption).isFalse()
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `test that the rich text option never shows for link files`() = runTest {
+        stubMarkdownFlags(enabled = true)
+        val underTest = newViewModel(defaultExtension = DEFAULT_LINK_FILE_EXTENSION)
+
+        underTest.uiState.test {
+            assertThat(awaitData().showRichTextOption).isFalse()
+            expectNoEvents()
+        }
+        verifyNoInteractions(getFeatureFlagValueUseCase)
     }
 
     @Test
