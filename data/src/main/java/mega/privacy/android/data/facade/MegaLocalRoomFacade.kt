@@ -21,6 +21,7 @@ import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.MediaPlaybackInfoEntityMapper
 import mega.privacy.android.data.mapper.MediaPlaybackInfoMapper
@@ -119,6 +120,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val homeWidgetConfigurationMapper: HomeWidgetConfigurationMapper,
     private val homePinnedItemDao: Lazy<HomePinnedItemDao>,
     private val homePinnedItemMapper: HomePinnedItemMapper,
+    private val deviceGateway: DeviceGateway,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.get().insertOrUpdateContact(contactEntityMapper(contact))
@@ -606,14 +608,15 @@ internal class MegaLocalRoomFacade @Inject constructor(
     }
 
     override suspend fun insertOrUpdatePlaybackInfo(info: MediaPlaybackInfo) {
-        mediaPlaybackInfoDao.get().insertOrUpdatePlaybackInfo(
-            mediaPlaybackInfoEntityMapper(info)
+        mediaPlaybackInfoDao.get().insertAndPrune(
+            mediaPlaybackInfoEntityMapper(info, deviceGateway.getCurrentTimeInMillis())
         )
     }
 
     override suspend fun insertOrUpdatePlaybackInfos(infos: List<MediaPlaybackInfo>) {
-        mediaPlaybackInfoDao.get().insertOrUpdatePlaybackInfos(
-            infos.map { info -> mediaPlaybackInfoEntityMapper(info) }
+        val updatedAt = deviceGateway.getCurrentTimeInMillis()
+        mediaPlaybackInfoDao.get().insertAndPruneAll(
+            infos.map { info -> mediaPlaybackInfoEntityMapper(info, updatedAt) }
         )
     }
 

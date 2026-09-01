@@ -540,6 +540,20 @@ class DefaultMediaPlayerRepositoryTest {
     }
 
     @Test
+    fun `test that saveAudioPlaybackInfo does not persist anything after clearAllPlaybackInfos`() =
+        runTest {
+            val playbackInfo = mock<MediaPlaybackInfo> {
+                on { mediaHandle }.thenReturn(expectedHandle)
+            }
+            underTest.updateAudioPlaybackInfo(playbackInfo)
+
+            underTest.clearAllPlaybackInfos()
+            underTest.saveAudioPlaybackInfo()
+
+            verify(megaLocalRoomGateway, never()).insertOrUpdatePlaybackInfo(any())
+        }
+
+    @Test
     fun `test that insertOrUpdatePlaybackInfo of megaLocalRoomGateway is invoked`() = runTest {
         val playbackInfo = mock<MediaPlaybackInfo> {
             on { mediaHandle }.thenReturn(expectedHandle)

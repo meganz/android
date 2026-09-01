@@ -309,6 +309,10 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun clearAllPlaybackInfos() {
         megaLocalRoomGateway.clearAllPlaybackInfos()
+        // The legacy audio player keeps the latest position in memory until its own teardown
+        // saves it. Dropping the cache here stops that save from writing the cleared record
+        // back after a logout.
+        latestAudioPlaybackInfo = null
     }
 
     override suspend fun saveAudioPlaybackInfo() {

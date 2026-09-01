@@ -30,6 +30,7 @@ import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_INSERT_LIST_SIZE
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.mapper.MediaPlaybackInfoEntityMapper
 import mega.privacy.android.data.mapper.MediaPlaybackInfoMapper
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
@@ -138,6 +139,9 @@ internal class MegaLocalRoomFacadeTest {
     private val homeWidgetConfigurationMapper = mock<HomeWidgetConfigurationMapper>()
     private val homePinnedItemDao = mock<HomePinnedItemDao>()
     private val homePinnedItemMapper = mock<HomePinnedItemMapper>()
+    private val deviceGateway = mock<DeviceGateway>()
+
+    private val testUpdatedAt = 1735689600000L
 
     @BeforeAll
     fun setUp() {
@@ -183,6 +187,7 @@ internal class MegaLocalRoomFacadeTest {
             homeWidgetConfigurationMapper = homeWidgetConfigurationMapper,
             homePinnedItemDao = { homePinnedItemDao },
             homePinnedItemMapper = homePinnedItemMapper,
+            deviceGateway = deviceGateway,
         )
     }
 
@@ -222,7 +227,9 @@ internal class MegaLocalRoomFacadeTest {
             homeWidgetConfigurationMapper,
             homePinnedItemDao,
             homePinnedItemMapper,
+            deviceGateway,
         )
+        whenever(deviceGateway.getCurrentTimeInMillis()).thenReturn(testUpdatedAt)
     }
 
     @Test
@@ -984,10 +991,11 @@ internal class MegaLocalRoomFacadeTest {
     fun `test that insertOrUpdatePlaybackInfo insert the mapped entity`() = runTest {
         val testItem = mock<MediaPlaybackInfo>()
         val testEntity = mock<MediaPlaybackInfoEntity>()
-        whenever(mediaPlaybackInfoEntityMapper(testItem)).thenReturn(testEntity)
+        whenever(mediaPlaybackInfoEntityMapper(testItem, testUpdatedAt)).thenReturn(testEntity)
 
         underTest.insertOrUpdatePlaybackInfo(testItem)
-        verify(mediaPlaybackInfoDao).insertOrUpdatePlaybackInfo(testEntity)
+        verify(mediaPlaybackInfoDao)
+            .insertAndPrune(testEntity, MediaPlaybackInfoDao.MAX_STORED_PLAYBACK_INFOS)
     }
 
     @Test
@@ -999,11 +1007,13 @@ internal class MegaLocalRoomFacadeTest {
             mock<MediaPlaybackInfoEntity>()
         }
         testItems.forEachIndexed { index, item ->
-            whenever(mediaPlaybackInfoEntityMapper(item)).thenReturn(testEntities[index])
+            whenever(mediaPlaybackInfoEntityMapper(item, testUpdatedAt))
+                .thenReturn(testEntities[index])
         }
 
         underTest.insertOrUpdatePlaybackInfos(testItems)
-        verify(mediaPlaybackInfoDao).insertOrUpdatePlaybackInfos(testEntities)
+        verify(mediaPlaybackInfoDao)
+            .insertAndPruneAll(testEntities, MediaPlaybackInfoDao.MAX_STORED_PLAYBACK_INFOS)
     }
 
     @Test

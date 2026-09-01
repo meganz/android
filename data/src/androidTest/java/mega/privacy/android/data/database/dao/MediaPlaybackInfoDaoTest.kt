@@ -293,4 +293,145 @@ class MediaPlaybackInfoDaoTest {
                 assertThat(newTestInfo?.totalDuration).isEqualTo(handle * 20L)
             }
         }
+
+    @Test
+    fun `test_that_insert_and_prune_keeps_only_the_newest_rows`() = runTest {
+        (1..10L).forEach { handle ->
+            mediaPlaybackInfoDao.insertAndPrune(
+                entity = MediaPlaybackInfoEntity(
+                    mediaHandle = handle,
+                    mediaType = MediaType.Video,
+                    currentPosition = handle * 1000L,
+                    totalDuration = handle * 2000L,
+                    updatedAt = handle,
+                ),
+                maxItems = 3,
+            )
+        }
+
+        val remaining = mediaPlaybackInfoDao.getAllPlaybackInfos().first()
+        assertThat(remaining.map { it.mediaHandle }).containsExactly(10L, 9L, 8L)
+    }
+
+    @Test
+    fun `test_that_insert_and_prune_keeps_every_row_when_the_count_is_below_the_limit`() = runTest {
+        (1..3L).forEach { handle ->
+            mediaPlaybackInfoDao.insertAndPrune(
+                entity = MediaPlaybackInfoEntity(
+                    mediaHandle = handle,
+                    mediaType = MediaType.Video,
+                    currentPosition = handle * 1000L,
+                    totalDuration = handle * 2000L,
+                    updatedAt = handle,
+                ),
+                maxItems = 3,
+            )
+        }
+
+        val remaining = mediaPlaybackInfoDao.getAllPlaybackInfos().first()
+        assertThat(remaining.map { it.mediaHandle }).containsExactly(1L, 2L, 3L)
+    }
+
+    @Test
+    fun `test_that_rewriting_an_existing_row_never_prunes`() = runTest {
+        // Build three rows under a limit that cannot trigger a prune.
+        (1..3L).forEach { handle ->
+            mediaPlaybackInfoDao.insertAndPrune(
+                entity = MediaPlaybackInfoEntity(
+                    mediaHandle = handle,
+                    mediaType = MediaType.Video,
+                    currentPosition = handle * 1000L,
+                    totalDuration = handle * 2000L,
+                    updatedAt = handle,
+                ),
+                maxItems = 3,
+            )
+        }
+        assertThat(mediaPlaybackInfoDao.getAllPlaybackInfos().first()).hasSize(3)
+
+        // Rewriting an existing row under a tighter limit: pruning here would drop a row, so all
+        // three surviving proves the write skipped the prune rather than running a no-op one.
+        mediaPlaybackInfoDao.insertAndPrune(
+            entity = MediaPlaybackInfoEntity(
+                mediaHandle = 1L,
+                mediaType = MediaType.Video,
+                currentPosition = 9999L,
+                totalDuration = 4000L,
+                updatedAt = 1L,
+            ),
+            maxItems = 2,
+        )
+
+        val remaining = mediaPlaybackInfoDao.getAllPlaybackInfos().first()
+        assertThat(remaining.map { it.mediaHandle }).containsExactly(1L, 2L, 3L)
+        assertThat(remaining.first { it.mediaHandle == 1L }.currentPosition).isEqualTo(9999L)
+    }
+
+    @Test
+    fun `test_that_adding_a_new_row_prunes`() = runTest {
+        (1..3L).forEach { handle ->
+            mediaPlaybackInfoDao.insertAndPrune(
+                entity = MediaPlaybackInfoEntity(
+                    mediaHandle = handle,
+                    mediaType = MediaType.Video,
+                    currentPosition = handle * 1000L,
+                    totalDuration = handle * 2000L,
+                    updatedAt = handle,
+                ),
+                maxItems = 3,
+            )
+        }
+
+        mediaPlaybackInfoDao.insertAndPrune(
+            entity = MediaPlaybackInfoEntity(
+                mediaHandle = 4L,
+                mediaType = MediaType.Video,
+                currentPosition = 4000L,
+                totalDuration = 8000L,
+                updatedAt = 4L,
+            ),
+            maxItems = 2,
+        )
+
+        val remaining = mediaPlaybackInfoDao.getAllPlaybackInfos().first()
+        assertThat(remaining.map { it.mediaHandle }).containsExactly(4L, 3L)
+    }
+
+    @Test
+    fun `test_that_prune_breaks_timestamp_ties_by_media_handle`() = runTest {
+        (1..4L).forEach { handle ->
+            mediaPlaybackInfoDao.insertAndPrune(
+                entity = MediaPlaybackInfoEntity(
+                    mediaHandle = handle,
+                    mediaType = MediaType.Video,
+                    currentPosition = handle * 1000L,
+                    totalDuration = handle * 2000L,
+                    updatedAt = 100L,
+                ),
+                maxItems = 2,
+            )
+        }
+
+        val remaining = mediaPlaybackInfoDao.getAllPlaybackInfos().first()
+        assertThat(remaining.map { it.mediaHandle }).containsExactly(4L, 3L)
+    }
+
+    @Test
+    fun `test_that_insert_and_prune_all_prunes_after_the_batch`() = runTest {
+        mediaPlaybackInfoDao.insertAndPruneAll(
+            entities = (1..10L).map { handle ->
+                MediaPlaybackInfoEntity(
+                    mediaHandle = handle,
+                    mediaType = MediaType.Video,
+                    currentPosition = handle * 1000L,
+                    totalDuration = handle * 2000L,
+                    updatedAt = handle,
+                )
+            },
+            maxItems = 4,
+        )
+
+        val remaining = mediaPlaybackInfoDao.getAllPlaybackInfos().first()
+        assertThat(remaining.map { it.mediaHandle }).containsExactly(10L, 9L, 8L, 7L)
+    }
 }

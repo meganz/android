@@ -19,6 +19,7 @@ class MediaPlaybackInfoEntityMapperTest {
     private val expectedCurrentPosition = 100000L
     private val expectedTotalDuration = 654321L
     private val expectedMediaType = MediaType.Audio
+    private val expectedUpdatedAt = 1735689600000L
 
     private val expectedMediaPlaybackInfo = mock<MediaPlaybackInfo> {
         on { mediaHandle }.thenReturn(expectedHandle)
@@ -35,8 +36,20 @@ class MediaPlaybackInfoEntityMapperTest {
     @Test
     fun `test that MediaPlaybackInfoEntity can be mapped correctly`() =
         runTest {
-            val item = underTest(expectedMediaPlaybackInfo)
+            val item = underTest(expectedMediaPlaybackInfo, expectedUpdatedAt)
             assertMappedMediaPlaybackInfoEntityObject(item)
+        }
+
+    @Test
+    fun `test that the mapped updatedAt is the value passed by the caller`() =
+        runTest {
+            val first = underTest(expectedMediaPlaybackInfo, 1L)
+            val second = underTest(expectedMediaPlaybackInfo, 2L)
+
+            assertAll(
+                { assertThat(first.updatedAt).isEqualTo(1L) },
+                { assertThat(second.updatedAt).isEqualTo(2L) },
+            )
         }
 
     private fun assertMappedMediaPlaybackInfoEntityObject(
@@ -49,7 +62,7 @@ class MediaPlaybackInfoEntityMapperTest {
                 { assertThat(it.totalDuration).isEqualTo(expectedTotalDuration) },
                 { assertThat(it.currentPosition).isEqualTo(expectedCurrentPosition) },
                 { assertThat(it.mediaType).isEqualTo(expectedMediaType) },
-                { assertThat(it.updatedAt).isGreaterThan(0L) },
+                { assertThat(it.updatedAt).isEqualTo(expectedUpdatedAt) },
             )
         }
     }

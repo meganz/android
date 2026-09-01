@@ -9,10 +9,16 @@ import javax.inject.Inject
  */
 class MediaPlaybackInfoEntityMapper @Inject constructor() {
 
-    operator fun invoke(info: MediaPlaybackInfo) = MediaPlaybackInfoEntity(
+    /**
+     * @param info the domain playback info to map
+     * @param updatedAt epoch millis to stamp the row with, supplied by the caller so the
+     * mapping stays a pure function of its inputs
+     */
+    operator fun invoke(info: MediaPlaybackInfo, updatedAt: Long) = MediaPlaybackInfoEntity(
         mediaHandle = info.mediaHandle,
         totalDuration = info.totalDuration,
         currentPosition = info.currentPosition,
-        mediaType = info.mediaType
+        mediaType = info.mediaType,
+        updatedAt = updatedAt,
     )
 }

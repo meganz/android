@@ -27,5 +27,5 @@ data class MediaPlaybackInfoEntity(
     @ColumnInfo(name = "media_type")
     val mediaType: MediaType,
     @ColumnInfo(name = "updated_at", defaultValue = "0")
-    val updatedAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = 0L,
 )
