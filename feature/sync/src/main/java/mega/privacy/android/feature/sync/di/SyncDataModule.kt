@@ -33,6 +33,7 @@ import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStoreName
 import mega.privacy.android.feature.sync.data.gateway.syncPromotionDataStore
 import mega.privacy.android.feature.sync.data.gateway.syncPromotionDataStoreName
 import mega.privacy.android.feature.sync.data.repository.SyncDebrisRepositoryImpl
+import mega.privacy.android.feature.sync.data.repository.SyncExclusionsRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncNewFolderParamsRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncNotificationRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncPreferencesRepositoryImpl
@@ -40,6 +41,7 @@ import mega.privacy.android.feature.sync.data.repository.SyncPromotionPreference
 import mega.privacy.android.feature.sync.data.repository.SyncRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncSolvedIssuesRepositoryImpl
 import mega.privacy.android.feature.sync.domain.repository.SyncDebrisRepository
+import mega.privacy.android.feature.sync.domain.repository.SyncExclusionsRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncNewFolderParamsRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncNotificationRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncPreferencesRepository
@@ -84,6 +86,10 @@ internal interface SyncDataModule {
     @Binds
     @Singleton
     fun bindSyncDebrisRepository(implementation: SyncDebrisRepositoryImpl): SyncDebrisRepository
+
+    @Binds
+    @Singleton
+    fun bindSyncExclusionsRepository(implementation: SyncExclusionsRepositoryImpl): SyncExclusionsRepository
 
     @Binds
     @Singleton

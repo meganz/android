@@ -589,10 +589,25 @@ interface FileGateway {
     /**
      * Checks if an uri can be read
      *
+     * The value must carry a scheme. A bare filesystem path resolves to no document and answers
+     * false whether or not it is readable, so anything that may be a path belongs in the
+     * [UriPath] overload.
+     *
      * @param stringUri the uri to check
      * @return true if the uri can be read, false otherwise
      */
     suspend fun canReadUri(stringUri: String): Boolean
+
+    /**
+     * Checks if an uri path can be read
+     *
+     * Unlike the [String] overload this accepts a bare filesystem path as well as a uri, because
+     * a [UriPath] is either, and resolves the missing scheme rather than failing on it.
+     *
+     * @param uriPath the file or folder represented by an Uri or a path
+     * @return true if it can be read, false otherwise
+     */
+    suspend fun canReadUri(uriPath: UriPath): Boolean
 
     /**
      * Checks if a specific folder has a child with a specific name

@@ -887,6 +887,37 @@ internal class FileFacadeTest {
         }
     }
 
+    @ParameterizedTest(name = "canRead: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that canReadUri resolves a bare path through the file scheme`(canRead: Boolean) =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                val path = "/storage/emulated/0/Sync"
+                val schemeless = mock<Uri> { on { scheme } doReturn null }
+                val fileUri = mock<Uri> { on { scheme } doReturn "file" }
+                val documentFile = mock<DocumentFile> { on { canRead() } doReturn canRead }
+                whenever(Uri.parse(path)) doReturn schemeless
+                whenever(Uri.fromFile(File(path))) doReturn fileUri
+                whenever(documentFileWrapper.fromUri(fileUri)) doReturn documentFile
+
+                assertThat(underTest.canReadUri(UriPath(path))).isEqualTo(canRead)
+                verify(documentFileWrapper).fromUri(fileUri)
+            }
+        }
+
+    @Test
+    fun `test that canReadUri keeps a content uri as it is`() = runTest {
+        mockStatic(Uri::class.java).use {
+            val treeUri = "content://com.android.externalstorage.documents/tree/primary%3ASync"
+            val uri = mock<Uri> { on { scheme } doReturn "content" }
+            val documentFile = mock<DocumentFile> { on { canRead() } doReturn true }
+            whenever(Uri.parse(treeUri)) doReturn uri
+            whenever(documentFileWrapper.fromUri(uri)) doReturn documentFile
+
+            assertThat(underTest.canReadUri(UriPath(treeUri))).isTrue()
+        }
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
     fun `test that childFileExistsSync returns the correct child uris`(

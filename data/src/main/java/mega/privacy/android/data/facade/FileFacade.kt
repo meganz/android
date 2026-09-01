@@ -1431,6 +1431,9 @@ internal class FileFacade @Inject constructor(
     override suspend fun canReadUri(stringUri: String) =
         getDocumentFileFromUri(stringUri.toUri())?.canRead() == true
 
+    override suspend fun canReadUri(uriPath: UriPath) =
+        getDocumentFileFromUri(uriPath.toUri())?.canRead() == true
+
     override fun childFileExistsSync(parentFolder: UriPath, childName: String): Boolean {
         val parentUri = parentFolder.toUri()
         // Fast path: 1-row query for ExternalStorageProvider (~5ms vs ~2000ms full scan)
