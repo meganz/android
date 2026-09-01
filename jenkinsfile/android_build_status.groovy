@@ -7,7 +7,7 @@ BUILD_STEP = ""
 
 GMS_APK_BUILD_LOG = "gms_build.log"
 
-CACHE_KEY_DEBUG_LOG = "cache_key_debug.txt"
+UNIT_TEST_BUILD_LOG = "unit_test_build.log"
 
 LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
@@ -291,23 +291,10 @@ pipeline {
                                     def moduleList = common.getUnitTestModuleList()
                                     def failedModules = []
 
-                                    // Temporary diagnostics: log the build cache key inputs of one
-                                    // small, representative task chain so runs of this job and the
-                                    // CD job on the same source tree can be diffed. The pipe through
-                                    // tee keeps a failure here from failing the stage.
-                                    sh "${GRADLE_CI} -Dorg.gradle.caching.debug=true " +
-                                            ":core:formatter:testDebugUnitTestCoverage 2>&1 " +
-                                            "| tee ${CACHE_KEY_DEBUG_LOG}"
                                     try {
-                                        println("cache key debug log: " +
-                                                common.uploadFileToArtifactory(CACHE_KEY_DEBUG_LOG))
-                                    } catch (Exception e) {
-                                        println("cache key debug log upload skipped: ${e}")
-                                    }
-
-                                    try {
-                                        sh "${GRADLE_CI} runAllUnitTestsWithCoverage"
+                                        sh "set -o pipefail && ${GRADLE_CI} runAllUnitTestsWithCoverage 2>&1 | tee ${UNIT_TEST_BUILD_LOG}"
                                     } finally {
+                                        uploadUnitTestBuildLog()
 
                                         failedModules = detectFailedTestModules(moduleList)
 
@@ -697,6 +684,25 @@ def unitTestArchiveLink(String reportPath, String archiveTargetName) {
         result = "Unit Test report not available, perhaps test code has compilation error. Please check full build log."
     }
     return result
+}
+
+/**
+ * Compresses the unit test build log and uploads it to Artifactory.
+ *
+ * Jenkins only archives a console log when a build fails, which leaves successful builds with no
+ * record of which tasks were served from the remote build cache. Uploading it on every run is what
+ * makes the cache hit rate of the two pipelines comparable (AND-24778).
+ */
+def uploadUnitTestBuildLog() {
+    try {
+        sh "gzip -c ${UNIT_TEST_BUILD_LOG} > ${UNIT_TEST_BUILD_LOG}.gz"
+        // `common` is a local of the pipeline body, so script-level methods reload it.
+        common = load('jenkinsfile/common.groovy')
+        println("unit test build log: " +
+                common.uploadFileToArtifactory("${UNIT_TEST_BUILD_LOG}.gz"))
+    } catch (Exception e) {
+        println("unit test build log upload skipped: ${e}")
+    }
 }
 
 /**

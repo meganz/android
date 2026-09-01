@@ -378,20 +378,20 @@ pipeline {
                     BUILD_STEP = "Upload Code Coverage"
 
                     util.useArtifactory() {
-                        // Temporary diagnostics: same task chain as the MR pipeline logs,
-                        // so cache key inputs of both jobs can be diffed for one tree.
-                        String cacheKeyDebugLog = "cache_key_debug.txt"
-                        sh "./gradlew --no-daemon -Dorg.gradle.caching.debug=true " +
-                                ":core:formatter:testDebugUnitTestCoverage 2>&1 " +
-                                "| tee ${cacheKeyDebugLog}"
+                        String unitTestBuildLog = "unit_test_build.log"
                         try {
-                            println("cache key debug log: " +
-                                    common.uploadFileToArtifactory("android_upload", cacheKeyDebugLog))
-                        } catch (Exception e) {
-                            println("cache key debug log upload skipped: ${e}")
+                            sh "set -o pipefail && ./gradlew --no-daemon runAllUnitTestsWithCoverage 2>&1 | tee ${unitTestBuildLog}"
+                        } finally {
+                            // Uploaded on every run, not just on failure, so the cache hit rate of
+                            // this job can be compared with the MR pipeline's (AND-24778).
+                            try {
+                                sh "gzip -c ${unitTestBuildLog} > ${unitTestBuildLog}.gz"
+                                println("unit test build log: " + common.uploadFileToArtifactory(
+                                        "android_upload", "${unitTestBuildLog}.gz"))
+                            } catch (Exception e) {
+                                println("unit test build log upload skipped: ${e}")
+                            }
                         }
-
-                        sh "./gradlew --no-daemon runAllUnitTestsWithCoverage"
                         String artifactoryTargetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
                         String coverageSummaryFile = "coverage_summary.csv"
                         sh "./gradlew --no-daemon collectCoverage --modules \"${common.getCoverageModuleList(common.getUnitTestModuleList()).join(",")}\" --csv-output ${coverageSummaryFile}"
