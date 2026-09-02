@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.presentation.meeting.chat.ChatActivity
@@ -55,7 +54,6 @@ import javax.inject.Inject
  * @property coroutineScope                         [CoroutineScope]
  * @property megaApi                                [MegaApiAndroid]
  * @property megaChatApi                            [MegaApiAndroid]
- * @property app                                    [MegaApplication]
  * @property megaChatApiGateway                     [MegaChatApiGateway]
  * @property holdChatCallUseCase                    [HoldChatCallUseCase]
  * @property hangChatCallUseCase                    [HangChatCallUseCase]
@@ -115,8 +113,6 @@ class CallNotificationIntentService : Service() {
     @Inject
     lateinit var megaChatApiGateway: MegaChatApiGateway
 
-    var app: MegaApplication? = null
-
     private val coroutineScope: CoroutineScope by lazy {
         CoroutineScope(ioDispatcher)
     }
@@ -133,8 +129,6 @@ class CallNotificationIntentService : Service() {
      */
     override fun onCreate() {
         super.onCreate()
-
-        app = application as MegaApplication
     }
 
     /**

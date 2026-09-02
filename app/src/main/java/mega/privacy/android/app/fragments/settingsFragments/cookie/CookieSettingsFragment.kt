@@ -10,7 +10,6 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.TwoButtonsPreference
@@ -22,6 +21,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_POLICIES
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_SETTINGS
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
+import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.shared.ads.advertisements.GoogleAdsManager
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.settings.cookie.CookieType.ANALYTICS
@@ -37,6 +37,9 @@ class CookieSettingsFragment : SettingsBaseFragment(),
 
     @Inject
     lateinit var getDomainNameUseCase: GetDomainNameUseCase
+
+    @Inject
+    lateinit var cookieEnabledCheckWrapper: CookieEnabledCheckWrapper
 
     private val viewModel by viewModels<CookieSettingsViewModel>()
 
@@ -71,7 +74,7 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showCookies)
         viewLifecycleOwner.collectFlow(viewModel.onUpdateResult()) { value ->
             if (value == true) {
-                (context?.applicationContext as MegaApplication?)?.checkEnabledCookies()
+                cookieEnabledCheckWrapper.checkEnabledCookies()
             } else if (value == false) {
                 Toast.makeText(requireContext(), R.string.error_unknown, Toast.LENGTH_LONG).show()
             }

@@ -29,7 +29,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.main.controllers.ChatController
@@ -66,7 +65,6 @@ import javax.inject.Inject
  * @property hangChatCallByChatIdUseCase    [HangChatCallByChatIdUseCase]
  * @property megaApi                        [MegaApiAndroid]
  * @property megaChatApi                    [MegaChatApiAndroid]
- * @property app                            [MegaApplication]
  * @property monitorChatCallUpdatesUseCase  [MonitorChatCallUpdatesUseCase]
  * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
  * @property monitorCallScreenOpenedUseCase [MonitorCallScreenOpenedUseCase]
@@ -107,8 +105,6 @@ class CallService : LifecycleService() {
     private var monitorChatCallUpdatesJob: Job? = null
     private var monitorCallScreenOpenedUpdatesJob: Job? = null
 
-    var app: MegaApplication? = null
-
     private var currentChatId: Long = MEGACHAT_INVALID_HANDLE
     private var mBuilderCompat: NotificationCompat.Builder? = null
     private var mNotificationManager: NotificationManager? = null
@@ -126,8 +122,6 @@ class CallService : LifecycleService() {
      */
     override fun onCreate() {
         super.onCreate()
-
-        app = application as MegaApplication
 
         mBuilderCompat = NotificationCompat.Builder(this, notificationChannelId)
         mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
