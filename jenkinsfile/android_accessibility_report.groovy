@@ -216,6 +216,5 @@ private void sendReportToMR(String headline) {
     if (A11Y_REPORT_LINK) {
         lines.add("Report for designers: [${A11Y_REPORT_FILE}](${A11Y_REPORT_LINK})".toString())
     }
-    lines.add("Gate results: [Jenkins test report](${env.BUILD_URL}testReport)".toString())
     common.sendToMR(lines.join("<br/>"))
 }
