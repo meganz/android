@@ -22,7 +22,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MegaApplication;
+import dagger.hilt.android.EntryPointAccessors;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
@@ -45,7 +46,7 @@ public class AddContactsAdapter extends RecyclerView.Adapter<AddContactsAdapter.
         this.positionClicked = -1;
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();
         }
     }
 

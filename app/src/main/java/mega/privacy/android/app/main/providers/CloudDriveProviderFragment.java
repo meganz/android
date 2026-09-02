@@ -37,7 +37,8 @@ import java.util.List;
 import java.util.Stack;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import mega.privacy.android.app.MegaApplication;
+import dagger.hilt.android.EntryPointAccessors;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.main.CheckScrollInterface;
@@ -207,7 +208,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
         Timber.d("onCreate");
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();
         }
         if (megaApi.getRootNode() == null) {
             return;

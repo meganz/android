@@ -1,12 +1,12 @@
 package mega.privacy.android.app.main.listeners;
 
-import android.app.Activity;
 import android.content.Context;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import mega.privacy.android.app.MegaApplication;
+import dagger.hilt.android.EntryPointAccessors;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
@@ -45,7 +45,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         dbH = DbHandlerModuleKt.getDbHandler();
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();
         }
     }
 

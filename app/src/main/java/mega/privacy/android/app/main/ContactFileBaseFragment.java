@@ -18,7 +18,8 @@ import java.util.Stack;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import mega.privacy.android.app.MegaApplication;
+import dagger.hilt.android.EntryPointAccessors;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
@@ -65,7 +66,7 @@ public class ContactFileBaseFragment extends RotatableFragment {
         super.onCreate(savedInstanceState);
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();
         }
 
         if (aB == null) {

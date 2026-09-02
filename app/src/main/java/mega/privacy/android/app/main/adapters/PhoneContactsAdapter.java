@@ -10,7 +10,6 @@ import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_PO
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
-import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,7 +30,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
+import dagger.hilt.android.EntryPointAccessors;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
@@ -57,7 +57,7 @@ public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdap
 
     public PhoneContactsAdapter(Context context, ArrayList<PhoneContactInfo> phoneContacts) {
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();
         }
         setContext(context);
         this.phoneContacts = phoneContacts;
