@@ -39,12 +39,13 @@ import java.util.ListIterator;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import dagger.hilt.android.EntryPointAccessors;
 import kotlin.Unit;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.main.CheckScrollInterface;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
@@ -106,11 +107,11 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         Timber.d("onCreate");
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();
         }
 
         if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            megaChatApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaChatApi();
             if (context instanceof ChatExplorerActivity) {
                 ((ChatExplorerActivity) context).checkChatChanges();
             } else if (context instanceof FileExplorerActivity) {

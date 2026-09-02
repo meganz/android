@@ -26,11 +26,13 @@ import android.widget.ImageView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import dagger.hilt.android.EntryPointAccessors;
+
 import java.io.File;
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.listeners.ChatUserAvatarListener;
@@ -56,11 +58,11 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         this.fragment = _fragment;
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();
         }
 
         if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            megaChatApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaChatApi();
         }
     }
 

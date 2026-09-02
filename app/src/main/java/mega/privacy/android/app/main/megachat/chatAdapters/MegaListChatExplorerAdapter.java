@@ -31,11 +31,13 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import dagger.hilt.android.EntryPointAccessors;
+
 import java.io.File;
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
@@ -81,11 +83,11 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         this.listView = _listView;
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();
         }
 
         if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            megaChatApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaChatApi();
         }
 
         selectedItems = new SparseBooleanArray();
