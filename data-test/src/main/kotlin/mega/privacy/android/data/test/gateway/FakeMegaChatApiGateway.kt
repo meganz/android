@@ -974,13 +974,15 @@ class FakeMegaChatApiGateway(
             deliverSeededHistory(chatId, count)
         }
 
-    override fun setOnlineStatus(status: Int, listener: MegaChatRequestListenerInterface) =
+    override fun setOnlineStatus(status: Int, listener: MegaChatRequestListenerInterface) {
+        chatState.onlineStatus = status
         completeChatRequest(
             MegaChatApiGateway::setOnlineStatus,
             listOf(status, listener),
             listener,
             MegaChatRequest.TYPE_SET_ONLINE_STATUS,
         )
+    }
 
     override fun addChatLocalVideoListener(
         chatId: Long,

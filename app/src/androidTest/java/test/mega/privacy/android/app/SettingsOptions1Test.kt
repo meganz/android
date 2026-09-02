@@ -16,11 +16,16 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.boot.TestAppBoot
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.test.gateway.FakeMegaApiGateway
 import mega.privacy.android.data.test.gateway.FakeMegaChatApiGateway
+import mega.privacy.android.data.test.stub.StubMegaPushNotificationSettings
 import mega.privacy.android.data.test.stub.StubMegaRequest
+import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
@@ -46,7 +51,8 @@ import javax.inject.Inject
  * 1. **Only screens that reach the SDK through `MegaApiGateway` / `MegaChatApiGateway` are
  *    fake-backed.** The chat settings presence flows (AND-24539) and the rubbish-bin "empty" action
  *    (AND-24540) are gateway-backed since those refactors landed, which unblocked tc05–tc12 and
- *    tc17 in this suite.
+ *    tc17 in this suite. Chat notifications reach the SDK through the push-notification settings
+ *    attribute, so what the fake replies to each write is what the screen renders next.
  * 2. **Legacy `PreferenceFragment` screens carry no Compose test tags**, so their rows are driven by
  *    visible title text (`By.text`, resolved from the app's string resources). The Compose Camera
  *    Uploads screen and its radio dialogs are fully tagged, so those are driven by `By.res` — the
@@ -54,9 +60,11 @@ import javax.inject.Inject
  *    on its own window.
  *
  * Ported: tc01 (theme), tc03 (CU how-to/file-upload options), tc04 (CU keep-file-names + secondary
- * media), tc05–tc08 (chat online status), tc09 (auto-away with timeout), tc10 (persist status),
- * tc11 (last-green visibility), tc12 (rich URL previews), tc13 (calls sound notifications),
- * tc15 (clear offline files), tc17 (empty rubbish bin), tc20 (file-versioning toggle).
+ * media), tc05 (chat notifications and do not disturb), tc06 (auto-away with timeout),
+ * tc07 (status persistence), tc08 (chat online status), tc09 (last-green visibility),
+ * tc10 (chat image quality), tc11 (chat video quality), tc12 (rich URL previews),
+ * tc13 (calls sound notifications), tc15 (clear offline files), tc17 (empty rubbish bin),
+ * tc20 (file-versioning toggle).
  */
 @HiltAndroidTest
 class SettingsOptions1Test {
@@ -79,6 +87,9 @@ class SettingsOptions1Test {
     @Inject
     lateinit var setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase
 
+    @Inject
+    lateinit var setChatImageQuality: SetChatImageQuality
+
     private val instrumentation get() = InstrumentationRegistry.getInstrumentation()
 
     private val targetContext get() = instrumentation.targetContext
@@ -95,6 +106,11 @@ class SettingsOptions1Test {
             Timber.plant(Timber.DebugTree())
         }
         hiltRule.inject()
+
+        // The chat settings screens are legacy activities that recover the chat session through
+        // the real MegaChatApi, which derives its database name from a fixed offset in the session
+        // and aborts the process on anything shorter.
+        fakeMegaApi.account.session = LONG_ENOUGH_SESSION
 
         // Pre-grant the permissions the settings flows request so their launchers return
         // synchronously instead of showing a system dialog (notifications for boot; media for
@@ -208,8 +224,110 @@ class SettingsOptions1Test {
     }
 
     /**
-     * tc05–tc08 — changing the chat online status through the status dialog requests the SDK with
+     * tc05 — the chat notifications screen offers the do-not-disturb periods, muting for one of
+     * them requests the SDK and reports the mute on both notification screens, and the master
+     * chat-notifications switch hides and restores the do-not-disturb row.
+     *
+     * The SDK owns the resulting push-notification settings and the screens render from its reply,
+     * so each step seeds the settings the fake replies with before triggering the write.
+     */
+    @Test
+    fun chatNotificationsDoNotDisturbOptionsAndMasterSwitch() {
+        stubPushNotificationSettings(dndEnabled = false, dndTimestamp = DND_UNSET)
+        openChatSettings()
+
+        val chatNotifications = str("title_properties_contact_notifications_for_chat")
+        val doNotDisturb = str("title_dialog_mute_chat_notifications")
+        val notificationsOn = str("mute_chat_notification_option_on")
+        val doNotDisturbOff = str("mute_chatroom_notification_option_off")
+
+        awaitObject(preferenceSummary(notificationsOn), LOAD_TIMEOUT, "chat-notifications-summary")
+        clickChatPreference(chatNotifications, "chat-notifications-row")
+
+        awaitObject(
+            preferenceTitle(str("title_properties_chat_contact_message_sound")),
+            LOAD_TIMEOUT,
+            "message-sound-row",
+        )
+        awaitObject(preferenceTitle(str("settings_chat_vibration")), LOAD_TIMEOUT, "vibration-row")
+        awaitObject(preferenceSummary(doNotDisturbOff), LOAD_TIMEOUT, "do-not-disturb-summary-off")
+
+        click(preferenceTitle(doNotDisturb), LOAD_TIMEOUT, "do-not-disturb-row")
+        awaitObject(
+            By.text(str("subtitle_dialog_mute_chat_notifications")),
+            LOAD_TIMEOUT,
+            "do-not-disturb-dialog",
+        )
+        listOf(
+            muteMinutesOption(30),
+            muteHoursOption(1),
+            muteHoursOption(6),
+            muteHoursOption(24),
+            muteUntilMorningOption(),
+        ).forEachIndexed { index, option ->
+            awaitObject(By.text(option), LOAD_TIMEOUT, "do-not-disturb-option-$index")
+        }
+        awaitObject(
+            By.text(str("general_dialog_cancel_button")),
+            LOAD_TIMEOUT,
+            "do-not-disturb-dialog-cancel",
+        )
+
+        stubPushNotificationSettings(
+            dndEnabled = true,
+            dndTimestamp = System.currentTimeMillis() / 1000 + THIRTY_MINUTES_IN_SECONDS,
+        )
+        clickText(muteMinutesOption(30), "do-not-disturb-30-minutes-option")
+        clickText(str("general_ok"), "do-not-disturb-dialog-ok")
+
+        awaitInvocations("setPushNotificationSettings") {
+            fakeMegaApi.invocations.filter { it.methodName == "setPushNotificationSettings" }
+        }
+        awaitObject(mutedUntilSummary(), LOAD_TIMEOUT, "do-not-disturb-muted-summary")
+
+        device.pressBack()
+        awaitObject(
+            preferenceTitle(str("set_status_option_label")),
+            LOAD_TIMEOUT,
+            "back-on-chat-settings",
+        )
+        awaitObject(mutedUntilSummary(), LOAD_TIMEOUT, "chat-notifications-muted-summary")
+        clickChatPreference(chatNotifications, "chat-notifications-row-reopen")
+
+        stubPushNotificationSettings(dndEnabled = false, dndTimestamp = DND_UNSET)
+        click(preferenceTitle(chatNotifications), LOAD_TIMEOUT, "chat-notifications-switch-on")
+        awaitObject(
+            preferenceSummary(doNotDisturbOff),
+            LOAD_TIMEOUT,
+            "do-not-disturb-summary-off-again",
+        )
+
+        stubPushNotificationSettings(dndEnabled = true, dndTimestamp = DND_INDEFINITE)
+        click(preferenceTitle(chatNotifications), LOAD_TIMEOUT, "chat-notifications-switch-off")
+        awaitGone(preferenceTitle(doNotDisturb), "do-not-disturb-row-hidden")
+
+        stubPushNotificationSettings(dndEnabled = false, dndTimestamp = DND_UNSET)
+        click(preferenceTitle(chatNotifications), LOAD_TIMEOUT, "chat-notifications-switch-on-again")
+        awaitObject(preferenceTitle(doNotDisturb), LOAD_TIMEOUT, "do-not-disturb-row-restored")
+
+        device.pressBack()
+        awaitObject(
+            preferenceTitle(str("set_status_option_label")),
+            LOAD_TIMEOUT,
+            "back-on-chat-settings-again",
+        )
+        awaitObject(
+            preferenceSummary(notificationsOn),
+            LOAD_TIMEOUT,
+            "chat-notifications-summary-on-again",
+        )
+    }
+
+    /**
+     * tc08 — changing the chat online status through the status dialog requests the SDK with
      * the matching status value and updates the shown selection (away, busy, offline, then online).
+     * The shown status comes from the presence config the screen reads when it opens, so each
+     * change is confirmed on a freshly entered screen.
      *
      * Carries the demo-clip camera holds: short pauses on each state, ending on a 2s hold.
      */
@@ -235,23 +353,32 @@ class SettingsOptions1Test {
             clickText(statusLabel, "status-option-$sdkStatus")
             awaitGone(By.text(dialogCancel), "status-dialog-dismissed")
 
-            awaitObject(By.text(statusLabel), LOAD_TIMEOUT, "status-summary-$sdkStatus")
             awaitInvocations("setOnlineStatus($sdkStatus)") {
                 fakeMegaChat.invocationsOf(MegaChatApiGateway::setOnlineStatus)
                     .filter { it.arguments.firstOrNull() == sdkStatus }
             }
+            reopenChatSettings(statusLabel)
             Thread.sleep(1_000)
         }
 
         Thread.sleep(2_000)
     }
 
-    /** tc09 — enabling auto-away requests the default timeout, and its dialog sets a custom one. */
+    /**
+     * tc06 — enabling auto-away requests the default timeout, its dialog sets a custom one and
+     * clamps out-of-range values, and turning auto-away back off hides the timeout row.
+     *
+     * The timeout summary is rendered from the presence config, which the screen reads when it
+     * opens, so each clamped value is verified on a freshly entered screen.
+     */
     @Test
     fun chatAutoAwayEnableAndTimeoutDialogRequestGateway() {
         openChatSettings()
 
-        clickChatPreference(str("settings_autoaway_title"), "auto-away-switch")
+        val autoAway = str("settings_autoaway_title")
+        val autoAwayTimeout = str("settings_autoaway_subtitle")
+
+        clickChatPreference(autoAway, "auto-away-switch")
         awaitInvocations("setPresenceAutoaway(true, 300)") {
             fakeMegaChat.invocationsOf(MegaChatApiGateway::setPresenceAutoaway)
                 .filter { it.arguments[0] == true && it.arguments[1] == 300 }
@@ -263,38 +390,94 @@ class SettingsOptions1Test {
             "auto-away-default-summary",
         )
 
-        clickChatPreference(str("settings_autoaway_subtitle"), "auto-away-timeout-row")
-        awaitObject(
-            By.text(str("title_dialog_set_autoaway_value")),
-            LOAD_TIMEOUT,
-            "auto-away-dialog",
-        )
-        val input = By.res(viewId("autoaway_edittext"))
-        awaitObject(input, LOAD_TIMEOUT, "auto-away-input")
-        device.findObject(input).text = "10"
-        click(By.res(viewId("autoaway_set_button")), LOAD_TIMEOUT, "auto-away-set-button")
-
+        setAutoAwayTimeout("10")
         awaitInvocations("setPresenceAutoaway(true, 600)") {
             fakeMegaChat.invocationsOf(MegaChatApiGateway::setPresenceAutoaway)
                 .filter { it.arguments[0] == true && it.arguments[1] == 600 }
         }
-    }
 
-    /** tc10 — toggling status persistence requests the SDK to persist the status. */
-    @Test
-    fun chatPersistStatusToggleRequestsGateway() {
-        openChatSettings()
+        setAutoAwayTimeout("9999")
+        awaitInvocations("setPresenceAutoaway(true, ${MAX_AUTO_AWAY_MINUTES * 60})") {
+            fakeMegaChat.invocationsOf(MegaChatApiGateway::setPresenceAutoaway)
+                .filter { it.arguments[0] == true && it.arguments[1] == MAX_AUTO_AWAY_MINUTES * 60 }
+        }
+        reopenChatSettings()
+        awaitObject(
+            preferenceSummary(str("settings_autoaway_value", MAX_AUTO_AWAY_MINUTES)),
+            LOAD_TIMEOUT,
+            "auto-away-clamped-to-maximum-summary",
+        )
 
-        clickChatPreference(str("settings_persistence_title"), "persistence-row")
+        setAutoAwayTimeout("0")
+        awaitInvocations("setPresenceAutoaway(true, 60)") {
+            fakeMegaChat.invocationsOf(MegaChatApiGateway::setPresenceAutoaway)
+                .filter { it.arguments[0] == true && it.arguments[1] == 60 }
+        }
+        reopenChatSettings()
+        awaitObject(
+            preferenceSummary(str("settings_autoaway_value", 1)),
+            LOAD_TIMEOUT,
+            "auto-away-clamped-to-minimum-summary",
+        )
 
-        awaitInvocations("setPresencePersist(true)") {
-            fakeMegaChat.invocationsOf(MegaChatApiGateway::setPresencePersist)
-                .filter { it.arguments.firstOrNull() == true }
+        clickChatPreference(autoAway, "auto-away-switch-off")
+        awaitGone(preferenceTitle(autoAwayTimeout), "auto-away-timeout-row-hidden")
+        awaitInvocations("setPresenceAutoaway(false, 0)") {
+            fakeMegaChat.invocationsOf(MegaChatApiGateway::setPresenceAutoaway)
+                .filter { it.arguments[0] == false }
         }
     }
 
     /**
-     * tc11 — toggling last-seen visibility requests the SDK. The row is interactable because the
+     * tc07 — the shown status follows the presence config, and persisting the status requests the
+     * SDK and hides the auto-away rows until persistence is turned back off.
+     */
+    @Test
+    fun chatPersistStatusToggleRequestsGateway() {
+        openChatSettings()
+
+        val persistence = str("settings_persistence_title")
+        val autoAway = str("settings_autoaway_title")
+
+        awaitObject(
+            preferenceSummary(str("settings_chat_status_online")),
+            LOAD_TIMEOUT,
+            "status-summary-online",
+        )
+        awaitObject(
+            preferenceSummary(str("settings_persistence_subtitle")),
+            LOAD_TIMEOUT,
+            "persistence-row",
+        )
+        awaitObject(preferenceTitle(autoAway), LOAD_TIMEOUT, "auto-away-row")
+
+        clickChatPreference(persistence, "persistence-row-on")
+        awaitInvocations("setPresencePersist(true)") {
+            fakeMegaChat.invocationsOf(MegaChatApiGateway::setPresencePersist)
+                .filter { it.arguments.firstOrNull() == true }
+        }
+
+        // The presence rows are rendered from the presence config the screen reads when it opens.
+        reopenChatSettings()
+        awaitObject(
+            preferenceSummary(str("settings_persistence_subtitle")),
+            LOAD_TIMEOUT,
+            "persistence-row-persisting",
+        )
+        awaitGone(preferenceTitle(autoAway), "auto-away-row-hidden")
+
+        clickChatPreference(persistence, "persistence-row-off")
+        awaitInvocations("setPresencePersist(false)") {
+            fakeMegaChat.invocationsOf(MegaChatApiGateway::setPresencePersist)
+                .filter { it.arguments.firstOrNull() == false }
+        }
+
+        reopenChatSettings()
+        awaitObject(preferenceTitle(autoAway), LOAD_TIMEOUT, "auto-away-row-restored")
+    }
+
+    /**
+     * tc09 — toggling last-seen visibility requests the SDK. The row is interactable because the
      * fake's default presence config (Online status) has landed by the time [openChatSettings]
      * returns — the fragment disables it while the config is missing.
      */
@@ -310,6 +493,62 @@ class SettingsOptions1Test {
             fakeMegaChat.invocationsOf(MegaChatApiGateway::setLastGreenVisible)
                 .filter { it.arguments.firstOrNull() == true }
         }
+    }
+
+    /** tc10 — the chat image quality picked on its own screen becomes the Chat settings summary. */
+    @Test
+    fun chatImageQualitySelectionUpdatesSummary() {
+        runBlocking { setChatImageQuality(ChatImageQuality.Automatic) }
+        openChatSettings()
+
+        val imageQuality = str("settings_chat_image_quality")
+        scrollToText(imageQuality)
+        awaitObject(
+            preferenceSummary(str("automatic_image_quality")),
+            LOAD_TIMEOUT,
+            "image-quality-summary-automatic",
+        )
+
+        listOf("high_image_quality", "optimised_image_quality").forEach { quality ->
+            scrollToText(imageQuality)
+            clickChatPreference(imageQuality, "image-quality-row")
+            awaitObject(
+                By.text(str("automatic_image_quality_text")),
+                LOAD_TIMEOUT,
+                "image-quality-screen",
+            )
+            clickText(str(quality), "image-quality-option-$quality")
+
+            device.pressBack()
+            awaitObject(
+                preferenceSummary(str(quality)),
+                LOAD_TIMEOUT,
+                "image-quality-summary-$quality",
+            )
+        }
+    }
+
+    /** tc11 — the chat video quality picked in its dialog becomes the Chat settings summary. */
+    @Test
+    fun chatVideoQualitySelectionUpdatesSummary() {
+        openChatSettings()
+
+        val videoQuality = str("settings_chat_upload_quality")
+        val low = str("settings_chat_upload_quality_low")
+        scrollToText(videoQuality)
+        clickChatPreference(videoQuality, "video-quality-row")
+
+        listOf(
+            low,
+            str("settings_chat_upload_quality_medium"),
+            str("settings_chat_upload_quality_high"),
+            str("settings_chat_upload_quality_original"),
+        ).forEachIndexed { index, option ->
+            awaitObject(By.text(option), LOAD_TIMEOUT, "video-quality-option-$index")
+        }
+        clickText(low, "video-quality-low-option")
+
+        awaitObject(preferenceSummary(low), LOAD_TIMEOUT, "video-quality-summary-low")
     }
 
     /** tc12 — toggling rich URL previews requests the SDK to enable them. */
@@ -430,6 +669,23 @@ class SettingsOptions1Test {
 
     private fun openChatSettings() {
         openSettings()
+        enterChatSettings(str("settings_chat_status_online"))
+    }
+
+    /**
+     * Returns to Settings and enters Chat settings again. The presence rows are rendered from the
+     * presence config the screen reads when it opens, so a presence change only shows on a screen
+     * entered after it.
+     */
+    private fun reopenChatSettings(shownStatus: String = str("settings_chat_status_online")) {
+        device.pressBack()
+        // The Chat settings toolbar carries the same title as the Settings row that opens it, so
+        // confirm the screen behind is up before entering again.
+        awaitObject(By.text(str("set_color_theme_label")), LOAD_TIMEOUT, "back-on-settings-screen")
+        enterChatSettings(shownStatus)
+    }
+
+    private fun enterChatSettings(shownStatus: String) {
         val chat = str("section_chat")
         scrollToText(chat)
         // The Chat row enables asynchronously once the chat session and connectivity land.
@@ -441,6 +697,24 @@ class SettingsOptions1Test {
             LOAD_TIMEOUT,
             "chat-settings-screen",
         )
+        // The shown status is only written once the presence config has been applied, so it marks
+        // the point where the presence rows reflect the config rather than the layout defaults.
+        awaitObject(preferenceSummary(shownStatus), LOAD_TIMEOUT, "chat-settings-shown-status")
+    }
+
+    /** Opens the auto-away timeout dialog and confirms [minutes] as the new value. */
+    private fun setAutoAwayTimeout(minutes: String) {
+        clickChatPreference(str("settings_autoaway_subtitle"), "auto-away-timeout-row")
+        awaitObject(
+            By.text(str("title_dialog_set_autoaway_value")),
+            LOAD_TIMEOUT,
+            "auto-away-dialog",
+        )
+        val input = By.res(viewId("autoaway_edittext"))
+        awaitObject(input, LOAD_TIMEOUT, "auto-away-input")
+        device.findObject(input).text = minutes
+        click(By.res(viewId("autoaway_set_button")), LOAD_TIMEOUT, "auto-away-set-button")
+        awaitGone(By.text(str("title_dialog_set_autoaway_value")), "auto-away-dialog-dismissed")
     }
 
     private fun openCameraUploadsSettings() {
@@ -481,6 +755,51 @@ class SettingsOptions1Test {
 
     // endregion
 
+    // region push notification settings helpers
+
+    /**
+     * Seeds what the fake replies with for the next push-notification settings read or write. The
+     * SDK reply is the single source the notification screens render from, and the stub cannot
+     * derive a new mute state from the settings the app hands it, so tests state it up front.
+     */
+    private fun stubPushNotificationSettings(dndEnabled: Boolean, dndTimestamp: Long) {
+        val settings = StubMegaPushNotificationSettings(
+            globalChatsDndEnabled = dndEnabled,
+            globalChatsDnd = dndTimestamp,
+        )
+        fakeMegaApi.stubRequest(
+            MegaApiGateway::getPushNotificationSettings,
+            request = StubMegaRequest(megaPushNotificationSettings = settings),
+        )
+        fakeMegaApi.stubRequest(
+            MegaApiGateway::setPushNotificationSettings,
+            request = StubMegaRequest(megaPushNotificationSettings = settings),
+        )
+    }
+
+    private fun muteMinutesOption(minutes: Int) = TextUtil.removeFormatPlaceholder(
+        plural("plural_call_ended_messages_minutes", minutes, minutes),
+    )
+
+    private fun muteHoursOption(hours: Int) = TextUtil.removeFormatPlaceholder(
+        plural("plural_call_ended_messages_hours", hours, hours),
+    )
+
+    /** The last mute option, which names the next morning the mute would end on. */
+    private fun muteUntilMorningOption() = str(
+        if (TimeUtils.isUntilThisMorning()) "mute_chatroom_notification_option_until_this_morning"
+        else "mute_chatroom_notification_option_until_tomorrow_morning"
+    )
+
+    /**
+     * Matches a preference summary reporting a mute end time. The end time itself is a formatted
+     * clock value, so only the leading part of the plural is matched.
+     */
+    private fun mutedUntilSummary(): BySelector = By.res(PREFERENCE_SUMMARY_ID)
+        .textContains(plural("chat_notifications_muted_until_specific_time", 1, "").trim())
+
+    // endregion
+
     // region UiAutomator helpers
 
     private fun str(name: String): String {
@@ -495,8 +814,24 @@ class SettingsOptions1Test {
         return targetContext.getString(id, *args)
     }
 
+    private fun plural(name: String, quantity: Int, vararg args: Any): String {
+        val id = targetContext.resources.getIdentifier(name, "plurals", targetContext.packageName)
+        require(id != 0) { "plurals resource not found: $name" }
+        return targetContext.resources.getQuantityString(id, quantity, *args)
+    }
+
     /** Fully-qualified resource id for a legacy view id in the app package. */
     private fun viewId(name: String): String = "${targetContext.packageName}:id/$name"
+
+    /**
+     * Matches the title of a preference row. Scoping to the row's own text view keeps a match off
+     * the toolbar, which on some settings screens carries the same title as one of its rows.
+     */
+    private fun preferenceTitle(title: String): BySelector =
+        By.res(PREFERENCE_TITLE_ID).text(title)
+
+    private fun preferenceSummary(summary: String): BySelector =
+        By.res(PREFERENCE_SUMMARY_ID).text(summary)
 
     private fun click(selector: BySelector, timeout: Long, name: String) {
         awaitObject(selector, timeout, name)
@@ -511,7 +846,7 @@ class SettingsOptions1Test {
      * text click can land on a still-disabled row and be dropped.
      */
     private fun clickChatPreference(title: String, name: String) =
-        click(By.text(title).enabled(true), LOAD_TIMEOUT, name)
+        click(preferenceTitle(title).enabled(true), LOAD_TIMEOUT, name)
 
     private fun awaitChecked(tag: String, expected: Boolean, name: String) {
         val deadline = SystemClock.uptimeMillis() + LOAD_TIMEOUT
@@ -568,6 +903,23 @@ class SettingsOptions1Test {
         const val LOAD_TIMEOUT = 15_000L
         const val POLL_INTERVAL_MS = 100L
         const val MAX_SCROLL_SWIPES = 12
+
+        /** A session as long as a real one, so the chat SDK can name its database from it. */
+        const val LONG_ENOUGH_SESSION =
+            "fakeSessionfakeSessionfakeSessionfakeSessionfakeSessionfakeSession"
+
+        /** Auto-away timeout bound the app clamps user input to, in minutes. */
+        const val MAX_AUTO_AWAY_MINUTES = 1457
+
+        const val THIRTY_MINUTES_IN_SECONDS = 30 * 60L
+
+        /** Global chat do-not-disturb values: never set, and muted until turned back on. */
+        const val DND_UNSET = -1L
+        const val DND_INDEFINITE = 0L
+
+        /** Title and summary text views of a legacy preference row. */
+        const val PREFERENCE_TITLE_ID = "android:id/title"
+        const val PREFERENCE_SUMMARY_ID = "android:id/summary"
 
         /** Main navigation item test tag for the Menu tab (`MenuHomeScreen` destination). */
         const val MENU_NAV_ITEM_TAG = "main_navigation:navigation_item_MenuHomeScreen"
