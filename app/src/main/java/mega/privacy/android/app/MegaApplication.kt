@@ -1,8 +1,6 @@
 package mega.privacy.android.app
 
-import android.app.Activity
 import android.app.Application
-import android.content.Intent
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.StrictMode
@@ -26,7 +24,6 @@ import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.globalmanagement.ChatApiListenerCoordinator
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.SmsVerificationState
-import mega.privacy.android.app.meeting.CallService
 import mega.privacy.android.app.workmanager.WorkManagerConfigurationProvider
 import mega.privacy.android.data.gateway.LogFlushGateway
 import mega.privacy.android.data.qualifier.MegaApi
@@ -34,10 +31,8 @@ import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
-import mega.privacy.android.navigation.destination.ChatNavKey
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
 import timber.log.Timber
 import javax.inject.Inject
@@ -134,7 +129,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
      *
      */
     override fun onCreate() {
-        instance = this
         super<Application>.onCreate()
         enableStrictMode()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -251,31 +245,10 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
         callChangesObserver.showOneCallNotification(incomingCall)
 
     /**
-     * Open call service
-     *
-     * @param chatId
-     */
-    fun openCallService(chatId: Long) {
-        if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-            Timber.d("Start call Service. Chat iD = $chatId")
-            Intent(this, CallService::class.java).run {
-                putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
-                startForegroundService(this)
-            }
-        }
-    }
-
-    /**
      * Reset my account info
      *
      */
     fun resetMyAccountInfo() = myAccountInfo.resetDefaults()
-
-    /**
-     * Current activity
-     */
-    val currentActivity: Activity?
-        get() = activityLifecycleHandler.getCurrentActivity()
 
     /**
      * WorkManager resolves this on-demand, which can happen before Hilt has injected this
@@ -307,14 +280,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
         var isWebOpenDueToEmailVerification = false
             private set
 
-        private lateinit var instance: MegaApplication
-
-        /**
-         * Get instance
-         */
-        @JvmStatic
-        fun getInstance(): MegaApplication = instance
-
         /**
          * Set is web open due to email verification
          *
@@ -324,18 +289,5 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
         fun setIsWebOpenDueToEmailVerification(isWebOpenDueToEmailVerification: Boolean) {
             this.isWebOpenDueToEmailVerification = isWebOpenDueToEmailVerification
         }
-
-        /**
-         * Get push notification setting management
-         */
-        @JvmStatic
-        fun getPushNotificationSettingManagement(): PushNotificationSettingManagement =
-            instance.pushNotificationSettingManagement
-
-        /**
-         * Get chat management
-         */
-        @JvmStatic
-        fun getChatManagement(): ChatManagement = instance.chatManagement
     }
 }

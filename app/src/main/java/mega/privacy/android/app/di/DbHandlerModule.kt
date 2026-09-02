@@ -7,7 +7,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors.fromApplication
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.LegacyDatabaseHandler
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.SqliteDatabaseHandler
 import mega.privacy.android.data.database.DatabaseHandler
 import javax.inject.Singleton
@@ -33,7 +32,7 @@ class DatabaseHandlerModule {
  * This method is to inject DatabaseHandler into non-Android classes by Hilt
  */
 fun getDbHandler(): LegacyDatabaseHandler = fromApplication(
-    MegaApplication.getInstance(),
+    LegacyStaticAppContext.context,
     DatabaseHandlerEntryPoint::class.java).dbH
 
 /**

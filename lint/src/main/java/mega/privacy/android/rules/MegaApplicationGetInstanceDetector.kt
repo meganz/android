@@ -15,8 +15,8 @@ import org.jetbrains.uast.UCallExpression
  *
  * This is the guardrail for the MegaApplication statics burn-down: the goal is to stop the app
  * reaching into the singleton for global state and instead obtain dependencies through Hilt
- * injection or a Hilt `@EntryPoint`. Existing call sites are frozen via the `:app` lint baseline,
- * so only NEW usages fail the build.
+ * injection or a Hilt `@EntryPoint`. The burn-down is complete and `MegaApplication.getInstance()`
+ * has been removed, so this is a hard (fatal) error: any reintroduction fails the build.
  */
 @Suppress("UnstableApiUsage")
 internal class MegaApplicationGetInstanceDetector : Detector(), Detector.UastScanner {
@@ -58,15 +58,14 @@ internal class MegaApplicationGetInstanceDetector : Detector(), Detector.UastSca
             briefDescription = BRIEF_DESCRIPTION,
             explanation = """
                 MegaApplication.getInstance() exposes the application singleton so that global \
-                state and dependencies can be reached from anywhere. This is being burned down: \
-                every new access makes the class harder to test and hides \
+                state and dependencies can be reached from anywhere. It has been fully burned down \
+                and removed: every access makes the class harder to test and hides \
                 real dependencies. Inject what you need via Hilt, or use a Hilt @EntryPoint for \
-                classes that cannot be constructor-injected. Existing call sites are frozen in \
-                the :app lint baseline, so only new usages fail the build.
+                classes that cannot be constructor-injected.
             """,
             category = CORRECTNESS,
             priority = 9,
-            severity = Severity.ERROR,
+            severity = Severity.FATAL,
             Implementation(MegaApplicationGetInstanceDetector::class.java, Scope.JAVA_FILE_SCOPE)
         )
     }

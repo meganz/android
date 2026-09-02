@@ -5,8 +5,9 @@ import com.google.android.gms.tasks.Task
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.di.GlobalManagementEntryPoint
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.middlelayer.iar.RatingHandler
 import timber.log.Timber
@@ -23,10 +24,14 @@ class RatingHandlerImpl @Inject constructor(@ApplicationContext context: Context
     override fun showReviewDialog(context: Context, listener: OnCompleteListener) {
         val manager: ReviewManager = ReviewManagerFactory.create(context)
         val request: Task<ReviewInfo> = manager.requestReviewFlow()
+        val activityLifecycleHandler = EntryPointAccessors.fromApplication(
+            context,
+            GlobalManagementEntryPoint::class.java,
+        ).activityLifecycleHandler()
         request.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val reviewInfo: ReviewInfo = task.result
-                MegaApplication.getInstance().currentActivity?.let {
+                activityLifecycleHandler.getCurrentActivity()?.let {
                     val flow: Task<Void> = manager.launchReviewFlow(it, reviewInfo)
                     flow.addOnCompleteListener {
                         Timber.d("Rating Task Complete")

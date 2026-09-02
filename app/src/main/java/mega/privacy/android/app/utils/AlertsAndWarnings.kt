@@ -12,10 +12,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import mega.privacy.android.app.MegaApplication
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.di.GlobalManagementEntryPoint
+import mega.privacy.android.app.di.LegacyStaticAppContext
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -34,7 +36,11 @@ object AlertsAndWarnings {
      */
     @JvmStatic
     fun showOverDiskQuotaPaywallWarning() {
-        showOverDiskQuotaPaywallWarning(MegaApplication.getInstance().currentActivity, false)
+        val activityLifecycleHandler = EntryPointAccessors.fromApplication(
+            LegacyStaticAppContext.context,
+            GlobalManagementEntryPoint::class.java,
+        ).activityLifecycleHandler()
+        showOverDiskQuotaPaywallWarning(activityLifecycleHandler.getCurrentActivity(), false)
     }
 
     /**

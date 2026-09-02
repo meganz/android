@@ -7,7 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.di.LegacyStaticAppContext
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenOptionMapper
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.mapStartScreenOption
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -64,7 +64,7 @@ class TempStartScreenUseCaseStaticModule {
  */
 fun getMonitorStartScreenPreference(): MonitorStartScreenPreference =
     EntryPointAccessors.fromApplication(
-        MegaApplication.getInstance(),
+        LegacyStaticAppContext.context,
         MonitorStartScreenPreferenceEntryPoint::class.java).monitorStartScreenPreference
 
 /**
