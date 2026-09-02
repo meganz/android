@@ -1,6 +1,7 @@
 package mega.privacy.android.data.test.state
 
 import nz.mega.sdk.MegaChatApi
+import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
 
@@ -47,6 +48,14 @@ class FakeChatState {
     val chatRooms: MutableMap<Long, MegaChatRoom> = mutableMapOf()
 
     /**
+     * Chat list items by chat id; the chat-list feed on the fake gateway
+     * (`getChatListItem` / `getChatListItems`) resolves through this map. A room must have a
+     * matching list item here to appear in the chat list, because the repository combines the
+     * [MegaChatRoom] with its [MegaChatListItem] to build each list row.
+     */
+    val chatListItems: MutableMap<Long, MegaChatListItem> = mutableMapOf()
+
+    /**
      * Message history by chat id, ordered oldest first. `loadMessages` on the fake gateway
      * delivers these newest to oldest, as the SDK does; give each message a unique `msgId` and
      * distinct timestamps so the app's message store keeps them in order.
@@ -71,6 +80,7 @@ class FakeChatState {
         myFullname = "Test User"
         myEmail = "test@mega.nz"
         chatRooms.clear()
+        chatListItems.clear()
         chatMessages.clear()
     }
 }

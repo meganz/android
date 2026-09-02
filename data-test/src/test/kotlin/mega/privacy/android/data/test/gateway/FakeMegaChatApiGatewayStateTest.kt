@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.test.state.FakeChatState
+import mega.privacy.android.data.test.stub.StubMegaChatListItem
 import mega.privacy.android.data.test.stub.StubMegaChatRoom
 import nz.mega.sdk.MegaChatApi
 import org.junit.jupiter.api.BeforeEach
@@ -153,13 +154,38 @@ class FakeMegaChatApiGatewayStateTest {
     }
 
     @Test
-    fun `test that room list getters return seeded rooms without type filtering when chat state is populated`() {
-        val room = StubMegaChatRoom()
-        underTest.chatState.chatRooms[1L] = room
+    fun `test that room list getters partition seeded rooms by type when chat state is populated`() {
+        val individual = StubMegaChatRoom(chatId = 1L)
+        val group = StubMegaChatRoom(chatId = 2L, isGroup = true)
+        val meeting = StubMegaChatRoom(chatId = 3L, isGroup = true, isMeeting = true)
+        val noteToSelf = StubMegaChatRoom(chatId = 4L, isNoteToSelf = true)
+        underTest.chatState.chatRooms[1L] = individual
+        underTest.chatState.chatRooms[2L] = group
+        underTest.chatState.chatRooms[3L] = meeting
+        underTest.chatState.chatRooms[4L] = noteToSelf
 
-        assertThat(underTest.getMeetingChatRooms()).containsExactly(room)
-        assertThat(underTest.getGroupChatRooms()).containsExactly(room)
-        assertThat(underTest.getIndividualChatRooms()).containsExactly(room)
+        assertThat(underTest.getIndividualChatRooms()).containsExactly(individual)
+        assertThat(underTest.getGroupChatRooms()).containsExactly(group)
+        assertThat(underTest.getMeetingChatRooms()).containsExactly(meeting)
+    }
+
+    @Test
+    fun `test that getChatListItem returns the seeded item when chat state is populated`() {
+        val item = StubMegaChatListItem(chatId = 42L)
+        underTest.chatState.chatListItems[42L] = item
+
+        assertThat(underTest.getChatListItem(42L)).isSameInstanceAs(item)
+        assertThat(underTest.getChatListItem(43L)).isNull()
+    }
+
+    @Test
+    fun `test that getChatListItems returns all seeded items when chat state is populated`() {
+        val itemA = StubMegaChatListItem(chatId = 1L)
+        val itemB = StubMegaChatListItem(chatId = 2L)
+        underTest.chatState.chatListItems[1L] = itemA
+        underTest.chatState.chatListItems[2L] = itemB
+
+        assertThat(underTest.getChatListItems(0, 0)).containsExactly(itemA, itemB)
     }
 
     @Test

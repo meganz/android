@@ -455,17 +455,17 @@ class FakeMegaChatApiGateway(
 
     override fun getMeetingChatRooms(): List<MegaChatRoom>? =
         engine.dispatchBlocking(MegaChatApiGateway::getMeetingChatRooms, emptyList()) {
-            chatState.chatRooms.values.toList()
+            chatState.chatRooms.values.filter { it.isMeeting }
         }
 
     override fun getGroupChatRooms(): List<MegaChatRoom>? =
         engine.dispatchBlocking(MegaChatApiGateway::getGroupChatRooms, emptyList()) {
-            chatState.chatRooms.values.toList()
+            chatState.chatRooms.values.filter { it.isGroup && !it.isMeeting }
         }
 
     override fun getIndividualChatRooms(): List<MegaChatRoom>? =
         engine.dispatchBlocking(MegaChatApiGateway::getIndividualChatRooms, emptyList()) {
-            chatState.chatRooms.values.toList()
+            chatState.chatRooms.values.filter { !it.isGroup && !it.isMeeting && !it.isNoteToSelf }
         }
 
     override fun getChatRoomByUser(userHandle: Long): MegaChatRoom? =
@@ -532,11 +532,13 @@ class FakeMegaChatApiGateway(
         }
 
     override fun getChatListItem(chatId: Long): MegaChatListItem? =
-        engine.dispatchBlocking(MegaChatApiGateway::getChatListItem, listOf(chatId)) { null }
+        engine.dispatchBlocking(MegaChatApiGateway::getChatListItem, listOf(chatId)) {
+            chatState.chatListItems[chatId]
+        }
 
     override fun getChatListItems(mask: Int, filter: Int): List<MegaChatListItem>? =
         engine.dispatchBlocking(MegaChatApiGateway::getChatListItems, listOf(mask, filter)) {
-            emptyList()
+            chatState.chatListItems.values.toList()
         }
 
     override fun getChatCall(chatId: Long): MegaChatCall? =
