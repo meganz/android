@@ -1,6 +1,7 @@
 /**
  * Scheduled pipeline that runs the :a11y-test accessibility checks on a Gradle Managed Device
- * and posts a designer-facing HTML report of the findings to Slack.
+ * and posts a designer-facing HTML report of the findings to Slack. When the build is triggered
+ * by a GitLab merge request, the same findings digest is also posted as a comment on that MR.
  *
  * Developer-owned "gate" findings fail the instrumented tests and mark this build UNSTABLE.
  * Design-owned findings (text/image contrast, text size) never fail the tests; they are
@@ -43,12 +44,12 @@ A11Y_REPORT_FILE = "accessibility_report.html"
 A11Y_SUMMARY_FILE = "accessibility_summary.txt"
 
 /**
- * Findings digest read from A11Y_SUMMARY_FILE, for the Slack message.
+ * Findings digest read from A11Y_SUMMARY_FILE, for the Slack message and the MR comment.
  */
 A11Y_SLACK_SUMMARY = ""
 
 /**
- * Artifactory link of the uploaded HTML report, shared in the Slack message.
+ * Artifactory link of the uploaded HTML report, shared in the Slack message and the MR comment.
  */
 A11Y_REPORT_LINK = ""
 
@@ -68,6 +69,9 @@ pipeline {
         gitLabConnection('GitLabConnection')
     }
     environment {
+
+        ARTIFACTORY_USER = credentials('ARTIFACTORY_USER')
+        ARTIFACTORY_ACCESS_TOKEN = credentials('ARTIFACTORY_ACCESS_TOKEN')
 
         LC_ALL = "en_US.UTF-8"
         LANG = "en_US.UTF-8"
@@ -91,6 +95,9 @@ pipeline {
                     String jenkinsLog = common.uploadFileToArtifactory("accessibility_report", CONSOLE_LOG_FILE)
                     String buildLog = "Build Log: <${jenkinsLog}|${CONSOLE_LOG_FILE}>"
                     slackSend color: "danger", message: buildLog + "\n" + comment
+                    if (common.hasGitLabMergeRequest()) {
+                        common.sendToMR("${comment}<br/>Build Log: [${CONSOLE_LOG_FILE}](${jenkinsLog})")
+                    }
                 }
             }
         }
@@ -100,12 +107,14 @@ pipeline {
                         "```${A11Y_SLACK_SUMMARY}```\n" +
                         "Gate failures: ${BUILD_URL}testReport"
                 sendReportToSlack(message, "warning")
+                sendReportToMR(":warning: **Android accessibility report** — some checks failed the developer gate")
             }
         }
         success {
             script {
                 def message = "Android accessibility report:\n```${A11Y_SLACK_SUMMARY}```"
                 sendReportToSlack(message, "good")
+                sendReportToMR(":white_check_mark: **Android accessibility report**")
             }
         }
         cleanup {
@@ -187,4 +196,25 @@ pipeline {
 private void sendReportToSlack(String message, String color) {
     String reportLine = A11Y_REPORT_LINK ? "\nReport for designers: <${A11Y_REPORT_LINK}|${A11Y_REPORT_FILE}>" : ""
     slackSend color: color, message: message + reportLine
+}
+
+/**
+ * Comments the findings digest and the report links on the merge request that triggered this
+ * build. Does nothing for scheduled or manual builds.
+ *
+ * @param headline first line of the comment, e.g. the build outcome
+ */
+private void sendReportToMR(String headline) {
+    if (!common.hasGitLabMergeRequest()) {
+        return
+    }
+    List<String> lines = [headline]
+    if (A11Y_SLACK_SUMMARY) {
+        lines.addAll(A11Y_SLACK_SUMMARY.readLines())
+    }
+    if (A11Y_REPORT_LINK) {
+        lines.add("Report for designers: [${A11Y_REPORT_FILE}](${A11Y_REPORT_LINK})".toString())
+    }
+    lines.add("Gate results: [Jenkins test report](${env.BUILD_URL}testReport)".toString())
+    common.sendToMR(lines.join("<br/>"))
 }
