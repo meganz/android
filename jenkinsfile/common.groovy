@@ -43,6 +43,10 @@ def getMrNumberInCD() {
 
 /**
  * send message to GitLab MR comment
+ *
+ * Uses --form-string, not --form: curl reads ';' in a --form value as the start of ';type='
+ * and a leading '@' as a file path, which silently truncates or corrupts the comment.
+ *
  * @param message message to send
  */
 void sendToMR(String message) {
@@ -53,7 +57,7 @@ void sendToMR(String message) {
         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
             env.MESSAGE_BODY = message
             env.MERGE_REQUEST_URL = "${env.GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MESSAGE_BODY}\" ${MERGE_REQUEST_URL}'
+            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form-string body=\"${MESSAGE_BODY}\" ${MERGE_REQUEST_URL}'
         }
     }
 }
@@ -798,19 +802,23 @@ Map collectBuildStats(long agentAcquiredMs, Map stageDurationsMs, Map stageNodeN
     }
 
     Map stages = [
-            build_apk_ms: stageDurationsMs['build_apk_ms'],
-            unit_test_ms: stageDurationsMs['unit_test_ms'],
-            lint_ms     : stageDurationsMs['lint_ms'],
+            build_apk_ms   : stageDurationsMs['build_apk_ms'],
+            unit_test_ms   : stageDurationsMs['unit_test_ms'],
+            lint_ms        : stageDurationsMs['lint_ms'],
+            weblate_gate_ms: stageDurationsMs['weblate_gate_ms'],
+            code_review_ms : stageDurationsMs['code_review_ms'],
     ]
 
     Map nodes = [
-            build_apk: stageNodeNames['build_apk'],
-            unit_test: stageNodeNames['unit_test'],
-            lint     : stageNodeNames['lint'],
+            build_apk   : stageNodeNames['build_apk'],
+            unit_test   : stageNodeNames['unit_test'],
+            lint        : stageNodeNames['lint'],
+            weblate_gate: stageNodeNames['weblate_gate'],
+            code_review : stageNodeNames['code_review'],
     ]
 
     return [
-            schema_version  : 1,
+            schema_version  : 2,
             status          : status?.toLowerCase(),
             skipped         : skipped,
             code_review_only: codeReviewOnly,

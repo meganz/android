@@ -11,11 +11,12 @@ LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
 LINT_REPORT_SUMMARY_MAP = [:]
 
-// Per-stage timing for build-stats collection. Keys: 'build_apk_ms', 'unit_test_ms', 'lint_ms'.
+// Per-stage timing for build-stats collection. Keys: 'build_apk_ms', 'unit_test_ms', 'lint_ms',
+// 'weblate_gate_ms', 'code_review_ms'.
 STAGE_START_MS = [:]
 STAGE_DURATIONS_MS = [:]
 
-// Per-stage agent name. Keys: 'build_apk', 'unit_test', 'lint'.
+// Per-stage agent name. Keys: 'build_apk', 'unit_test', 'lint', 'weblate_gate', 'code_review'.
 STAGE_NODE_NAMES = [:]
 
 // Captured at the top of the first agent-running stage so queue-wait (scheduled → agent acquired)
@@ -25,12 +26,18 @@ AGENT_ACQUIRED_TIME = null
 MERGE_REQUEST_FILE_CHANGES_MESSAGE = ""
 COVERAGE_SUMMARY = ""
 
+// Set on the Build APK agent: gms_build.log exists on no other workspace.
+BUILD_WARNINGS = "None"
+
 // key is module name, value is the link of the unit test html report uploaded to GitLab
 UNIT_TEST_RESULT_LINK_MAP = [:]
 
 JSON_LINT_REPORT_LINK = ""
 
 NODE_LABELS = 'mac-jenkins-slave-android'
+
+// Short, off-critical-path stages. The OR keeps them schedulable when the Intel agent is offline.
+LIGHT_NODE_LABELS = 'mac-jenkins-slave-android || mac-intel'
 
 // Daemon is reused across a stage's Gradle invocations and bounded by the idle timeout below,
 // since agents run multiple executors and an explicit stop would hit a sibling stage's daemon.
@@ -62,7 +69,7 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '1'))
         timeout(time: 1, unit: 'HOURS')
         gitLabConnection('GitLabConnection')
-        // A newer push makes the running build's result irrelevant; free its three agents.
+        // A newer push makes the running build's result irrelevant; free its agents.
         disableConcurrentBuilds(abortPrevious: true)
     }
     environment {
@@ -175,7 +182,7 @@ pipeline {
                         String duration = getBuildDurationStr()
                         String buildMessage = ":white_check_mark: Build Succeeded!(Build: ${env.BUILD_NUMBER}) (Duration: ${duration})\n\n" +
                                 "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
-                                "\n\n**Build Warnings:**\n" + getBuildWarnings() + "\n\n"
+                                "\n\n**Build Warnings:**\n" + BUILD_WARNINGS + "\n\n"
 
                         // Create the String to be posted as a comment in Gitlab
                         String mergeRequestMessage
@@ -232,6 +239,7 @@ pipeline {
             failFast true
             parallel {
                 stage('Build APK (GMS+QA)') {
+                    agent { label NODE_LABELS }
                     when {
                         expression { !shouldSkipBuild() && !isCodeReviewOnly() && !isWeblateCheckOnly() }
                     }
@@ -263,6 +271,11 @@ pipeline {
                                 if (s != null) {
                                     STAGE_DURATIONS_MS['build_apk_ms'] = System.currentTimeMillis() - s
                                 }
+                                try {
+                                    BUILD_WARNINGS = getBuildWarnings()
+                                } catch (Exception e) {
+                                    println("[build-warnings] skipped: ${e}")
+                                }
                             }
                         }
                         failure {
@@ -270,11 +283,13 @@ pipeline {
                                 BUILD_STEP = "Build APK (GMS+QA)"
                             }
                         }
+                        cleanup {
+                            cleanWs(cleanWhenFailure: true)
+                        }
                     }
                 } //stage('Build APK (GMS+QA)')
 
                 stage('Unit Test and Code Coverage') {
-                    agent { label NODE_LABELS }
                     when {
                         expression { !shouldSkipBuild() && !isCodeReviewOnly() && !isWeblateCheckOnly() }
                     }
@@ -327,9 +342,8 @@ pipeline {
                                 BUILD_STEP = "Unit Test and Code Coverage"
                             }
                         }
-                        cleanup {
-                            cleanWs(cleanWhenFailure: true)
-                        }
+                        // No cleanWs: this stage shares the pipeline agent, whose workspace the
+                        // pipeline post blocks still need. The pipeline-level cleanup wipes it.
                     }
                 } //stage('Unit Test and Code Coverage')
 
@@ -382,7 +396,7 @@ pipeline {
                 }  //stage('Lint Check')
 
                 stage('Weblate Strings Check') {
-                    agent { label NODE_LABELS }
+                    agent { label LIGHT_NODE_LABELS }
                     when {
                         expression { isWeblateCheckOnly() || (!shouldSkipBuild() && !isCodeReviewOnly()) }
                     }
@@ -441,13 +455,16 @@ pipeline {
                 } //stage('Weblate Strings Check')
 
                 stage('Code Review') {
-                    agent { label NODE_LABELS }
+                    agent { label LIGHT_NODE_LABELS }
                     when {
                         expression { shouldRunCodeReview() }
                     }
                     steps {
                         gitlabCommitStatus(name: 'Code Review') {
                             script {
+                                STAGE_START_MS['code_review_ms'] = System.currentTimeMillis()
+                                STAGE_NODE_NAMES['code_review'] = env.NODE_NAME
+
                                 def skillFile = common.checkoutProcessSkill('android-code-review')
                                 def targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: 'develop'
 
@@ -487,6 +504,12 @@ pipeline {
                     }
                     post {
                         always {
+                            script {
+                                def s = STAGE_START_MS['code_review_ms']
+                                if (s != null) {
+                                    STAGE_DURATIONS_MS['code_review_ms'] = System.currentTimeMillis() - s
+                                }
+                            }
                             archiveArtifacts artifacts: "${CODE_REVIEW_OUTPUT_FILE},${CODE_REVIEW_SUMMARY_FILE},${CODE_REVIEW_ERROR_REPORT_FILE}", allowEmptyArchive: true
                         }
                         cleanup {
