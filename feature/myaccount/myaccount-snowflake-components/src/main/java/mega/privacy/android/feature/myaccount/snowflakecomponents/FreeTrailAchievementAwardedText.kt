@@ -1,4 +1,4 @@
-package mega.privacy.android.core.achievementcomponents
+package mega.privacy.android.feature.myaccount.snowflakecomponents
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

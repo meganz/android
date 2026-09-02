@@ -1,4 +1,4 @@
-package mega.privacy.android.core.achievementcomponents
+package mega.privacy.android.feature.myaccount.snowflakecomponents
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule

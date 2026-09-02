@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "mega.privacy.android.core.achievementcomponents"
+    namespace = "mega.privacy.android.feature.myaccount.snowflakecomponents"
     testOptions {
         unitTests {
             targetSdk = 34

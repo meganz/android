@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.achievements.freetrial.view.FreeTrialViewTestTags.DESCRIPTION
-import mega.privacy.android.core.achievementcomponents.FreeTrailAchievementAwardedText
+import mega.privacy.android.feature.myaccount.snowflakecomponents.FreeTrailAchievementAwardedText
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton

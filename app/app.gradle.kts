@@ -270,7 +270,7 @@ dependencies {
     implementation(project(":feature:photos:photos-snowflake-components"))
     implementation(project(":feature:notifications:notifications-snowflakes"))
     implementation(project(":core:ui-components:shared-components"))
-    implementation(project(":core:ui-components:achievement-snowflake-components"))
+    implementation(project(":feature:myaccount:myaccount-snowflake-components"))
     implementation(project(":core:navigation-snowflake-components"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:coroutine"))
@@ -282,7 +282,7 @@ dependencies {
     preBuiltSdkDependency(rootProject.extra)
     implementation(project(":core:passcode:passcode"))
     implementation(project(":core:transfers"))
-    implementation(project(":feature:myaccount"))
+    implementation(project(":feature:myaccount:myaccount"))
     implementation(project(":feature:settings"))
     implementation(project(":third-party-lib:twemoji"))
 

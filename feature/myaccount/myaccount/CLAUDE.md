@@ -1,8 +1,8 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code when working in the `:feature:myaccount` module.
+This file provides guidance to Claude Code when working in the `:feature:myaccount:myaccount` module.
 
-> Module path: `:feature:myaccount` · Build file: `feature/myaccount/myaccount.gradle.kts` · Namespace: `mega.privacy.android.feature.myaccount`
+> Module path: `:feature:myaccount:myaccount` · Build file: `feature/myaccount/myaccount/myaccount.gradle.kts` · Namespace: `mega.privacy.android.feature.myaccount`
 
 ## Overview
 This module provides the "My Account" Home-screen widget. It surfaces the user's avatar, name, account type, and storage/quota usage as a compact, clickable card on the Home screen, and routes the user to the appropriate account/upgrade destination when tapped.
