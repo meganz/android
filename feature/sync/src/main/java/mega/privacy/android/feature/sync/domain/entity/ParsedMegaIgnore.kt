@@ -56,4 +56,43 @@ data class ParsedMegaIgnore(
      */
     val preservedLines: List<String>
         get() = entries.filterIsInstance<MegaIgnoreEntry.PreservedEntry>().map { it.line }
+
+    /**
+     * The lines the SDK refuses to parse, in file order, each with the line number to show the
+     * user.
+     *
+     * The number is derived from the entry's position rather than stored on it, because [entries]
+     * is what an edit rewrites and a number held on an entry would survive the line moving.
+     */
+    val invalidLines: List<InvalidLine>
+        get() = entries.mapIndexedNotNull { index, entry ->
+            (entry as? MegaIgnoreEntry.InvalidEntry)
+                ?.let { InvalidLine(lineNumber = index + FIRST_LINE_NUMBER, entry = it) }
+        }
+
+    /**
+     * Whether the SDK refuses this file, and with it every rule the file holds.
+     *
+     * The SDK's loader abandons the file on the first line it cannot parse and commits nothing, so
+     * a single bad line leaves the sync with no exclusions at all rather than with the rules that
+     * parsed. Anything reporting what is being excluded has to consult this first: presenting
+     * [rules] as active while this is true tells the user the opposite of what the sync is doing.
+     */
+    val isRejectedBySdk: Boolean
+        get() = entries.any { it is MegaIgnoreEntry.InvalidEntry }
+
+    /**
+     * A line the SDK refuses, together with where it sits in the file.
+     *
+     * @property lineNumber the line's position, counting from one, as the file will be written
+     * @property entry the line itself
+     */
+    data class InvalidLine(
+        val lineNumber: Int,
+        val entry: MegaIgnoreEntry.InvalidEntry,
+    )
+
+    private companion object {
+        const val FIRST_LINE_NUMBER = 1
+    }
 }

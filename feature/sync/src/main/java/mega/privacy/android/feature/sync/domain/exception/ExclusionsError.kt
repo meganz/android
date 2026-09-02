@@ -34,6 +34,17 @@ sealed class ExclusionsError(message: String, cause: Throwable?) : Exception(mes
         ExclusionsError("The storage provider rejected creating a dotfile", cause)
 
     /**
+     * The sync root can be read but not written, so the exclusions can be shown and never saved.
+     * A grant taken with read only access, or a provider that hands out read only trees, is the
+     * common cause.
+     *
+     * Distinct from [NoPermission], which says the root cannot be reached at all: this one leaves
+     * the rules readable, so they are still worth showing.
+     */
+    class NoWriteAccess(cause: Throwable? = null) :
+        ExclusionsError("No write access to the exclusions file", cause)
+
+    /**
      * The file was reachable but the new content could not be written to it.
      */
     class WriteFailed(cause: Throwable? = null) :

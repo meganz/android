@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
@@ -24,6 +26,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.IOException
@@ -48,6 +51,7 @@ internal class SyncExclusionsRepositoryImplTest {
     @BeforeEach
     fun setUp() {
         underTest = repositoryWith(megaIgnoreFileMapper)
+        fileGateway.stub { on { canWriteUri(any()) } doReturn true }
     }
 
     @AfterEach
@@ -65,7 +69,8 @@ internal class SyncExclusionsRepositoryImplTest {
 
             val actual = underTest.getExclusions(localRoot)
 
-            assertThat(actual.getOrNull()).isEqualTo(ParsedMegaIgnore(entries = emptyList()))
+            assertThat(actual.getOrNull()?.exclusions)
+                .isEqualTo(ParsedMegaIgnore(entries = emptyList()))
         }
 
     @Test
@@ -99,7 +104,7 @@ internal class SyncExclusionsRepositoryImplTest {
 
         val actual = underTest.getExclusions(localRoot)
 
-        assertThat(actual.getOrNull()).isEqualTo(parsed)
+        assertThat(actual.getOrNull()?.exclusions).isEqualTo(parsed)
     }
 
     @Test
@@ -110,7 +115,7 @@ internal class SyncExclusionsRepositoryImplTest {
 
             val actual = underTestWithRealMapper.getExclusions(localRoot)
 
-            assertThat(actual.getOrNull()?.entries).isEmpty()
+            assertThat(actual.getOrNull()?.exclusions?.entries).isEmpty()
         }
 
     @Test
@@ -121,7 +126,7 @@ internal class SyncExclusionsRepositoryImplTest {
 
         val actual = underTest.getExclusions(localRoot)
 
-        assertThat(actual.getOrNull()?.hadBom).isTrue()
+        assertThat(actual.getOrNull()?.exclusions?.hadBom).isTrue()
     }
 
     @Test
@@ -333,6 +338,151 @@ internal class SyncExclusionsRepositoryImplTest {
 
     // endregion
 
+    // region write preflight
+
+    @ParameterizedTest(name = "canWriteUri = {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that getExclusions reports whether the root can be written to`(writable: Boolean) =
+        runTest {
+            stubExistingFile("-:*.tmp")
+            whenever(megaIgnoreFileMapper("-:*.tmp")) doReturn EMPTY_MODEL
+            whenever(fileGateway.canWriteUri(localRoot)) doReturn writable
+
+            val actual = underTest.getExclusions(localRoot)
+
+            assertThat(actual.getOrNull()?.isWritable).isEqualTo(writable)
+        }
+
+    /**
+     * A root that can be read but not written still has rules worth showing, and hiding them
+     * would be a worse answer than the generic error the save used to fail with.
+     */
+    @Test
+    fun `test that getExclusions still returns the rules when the root cannot be written to`() =
+        runTest {
+            val parsed = ParsedMegaIgnore(entries = listOf(MegaIgnoreEntry.PreservedEntry("-:a")))
+            stubExistingFile("-:a")
+            whenever(megaIgnoreFileMapper("-:a")) doReturn parsed
+            whenever(fileGateway.canWriteUri(localRoot)) doReturn false
+
+            val actual = underTest.getExclusions(localRoot)
+
+            assertThat(actual.isSuccess).isTrue()
+            assertThat(actual.getOrNull()?.exclusions).isEqualTo(parsed)
+        }
+
+    @ParameterizedTest(name = "canWriteUri = {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that getExclusions reports writability when the sync has no exclusions yet`(
+        writable: Boolean,
+    ) = runTest {
+        whenever(fileGateway.getChildByName(localRoot, MEGA_IGNORE)) doReturn null
+        whenever(fileGateway.canReadUri(localRoot)) doReturn true
+        whenever(fileGateway.canWriteUri(localRoot)) doReturn writable
+
+        val actual = underTest.getExclusions(localRoot)
+
+        assertThat(actual.getOrNull()?.isWritable).isEqualTo(writable)
+    }
+
+    /**
+     * The probe has to be the root rather than the file: with no `.megaignore` there yet, the
+     * question is whether one could be created, and a document that does not exist answers
+     * nothing.
+     */
+    @Test
+    fun `test that getExclusions probes write access on the root rather than on the file`() =
+        runTest {
+            stubExistingFile("-:a")
+            whenever(megaIgnoreFileMapper("-:a")) doReturn EMPTY_MODEL
+
+            underTest.getExclusions(localRoot)
+
+            verify(fileGateway).canWriteUri(localRoot)
+            verify(fileGateway, never()).canWriteUri(exclusionsFile)
+        }
+
+    @Test
+    fun `test that getExclusions reports the root as not writable when the write probe throws`() =
+        runTest {
+            stubExistingFile("-:a")
+            whenever(megaIgnoreFileMapper("-:a")) doReturn EMPTY_MODEL
+            whenever(fileGateway.canWriteUri(localRoot)) doThrow
+                    SecurityException("Permission denial")
+
+            val actual = underTest.getExclusions(localRoot)
+
+            assertThat(actual.isSuccess).isTrue()
+            assertThat(actual.getOrNull()?.isWritable).isFalse()
+        }
+
+    @Test
+    fun `test that getExclusions lets cancellation from the write probe through`() = runTest {
+        stubExistingFile("-:a")
+        whenever(megaIgnoreFileMapper("-:a")) doReturn EMPTY_MODEL
+        whenever(fileGateway.canWriteUri(localRoot)) doThrow CancellationException("Scope closed")
+
+        assertThrows(CancellationException::class.java) {
+            runBlocking { underTest.getExclusions(localRoot) }
+        }
+    }
+
+    @Test
+    fun `test that setExclusions returns NoWriteAccess when the root cannot be written to`() =
+        runTest {
+            whenever(fileGateway.canReadUri(localRoot)) doReturn true
+            whenever(fileGateway.canWriteUri(localRoot)) doReturn false
+
+            val actual = underTest.setExclusions(localRoot, EMPTY_MODEL)
+
+            assertThat(actual.exceptionOrNull())
+                .isInstanceOf(ExclusionsError.NoWriteAccess::class.java)
+        }
+
+    @Test
+    fun `test that setExclusions writes nothing when the root cannot be written to`() = runTest {
+        whenever(fileGateway.canReadUri(localRoot)) doReturn true
+        whenever(fileGateway.canWriteUri(localRoot)) doReturn false
+
+        underTest.setExclusions(localRoot, EMPTY_MODEL)
+
+        verify(fileGateway, never()).createChildFileSync(any(), any(), any())
+        verify(fileGateway, never()).saveTextOnContentUri(any(), any())
+    }
+
+    /**
+     * A revoked grant, a deleted folder and an unmounted card all report false to both probes, so
+     * a write probe alone cannot tell "read only" from "gone". Answering NoWriteAccess there would
+     * have the user shown rules as read only while the other call on the same state asks them to
+     * re-pick the folder.
+     */
+    @Test
+    fun `test that both calls report an unreachable root as NoPermission`() = runTest {
+        whenever(fileGateway.getChildByName(localRoot, MEGA_IGNORE)) doReturn null
+        whenever(fileGateway.canReadUri(localRoot)) doReturn false
+        whenever(fileGateway.canWriteUri(localRoot)) doReturn false
+
+        val read = underTest.getExclusions(localRoot)
+        val write = underTest.setExclusions(localRoot, EMPTY_MODEL)
+
+        assertThat(read.exceptionOrNull()).isInstanceOf(ExclusionsError.NoPermission::class.java)
+        assertThat(write.exceptionOrNull()).isInstanceOf(ExclusionsError.NoPermission::class.java)
+    }
+
+    @Test
+    fun `test that setExclusions does not blame write access when the root cannot be read`() =
+        runTest {
+            whenever(fileGateway.canReadUri(localRoot)) doReturn false
+            whenever(fileGateway.canWriteUri(localRoot)) doReturn false
+
+            val actual = underTest.setExclusions(localRoot, EMPTY_MODEL)
+
+            assertThat(actual.exceptionOrNull())
+                .isNotInstanceOf(ExclusionsError.NoWriteAccess::class.java)
+        }
+
+    // endregion
+
     // region root shape
 
     /**
@@ -384,7 +534,7 @@ internal class SyncExclusionsRepositoryImplTest {
         whenever(fileGateway.saveTextOnContentUri(eq(exclusionsFile.value), any())) doReturn true
 
         val loaded = underTestWithRealMapper.getExclusions(localRoot).getOrThrow()
-        underTestWithRealMapper.setExclusions(localRoot, loaded)
+        underTestWithRealMapper.setExclusions(localRoot, loaded.exclusions)
 
         verify(fileGateway).saveTextOnContentUri(exclusionsFile.value, original)
     }

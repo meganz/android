@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.domain.repository
 
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.feature.sync.domain.entity.ExclusionsSnapshot
 import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
 
 /**
@@ -18,12 +19,17 @@ import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
 internal interface SyncExclusionsRepository {
 
     /**
-     * Reads the exclusions of the sync rooted at [localRoot].
+     * Reads the exclusions of the sync rooted at [localRoot], along with whether they could be
+     * written back.
      *
      * A root with no `.megaignore` yet is not an error: it yields an empty [ParsedMegaIgnore],
      * which is what a fresh sync legitimately has. Reading never creates the file.
+     *
+     * A root that cannot be written to is not an error either. Its rules are still reported, with
+     * [ExclusionsSnapshot.isWritable] false, because refusing to show rules we have already read
+     * would be a worse answer than showing them as read only.
      */
-    suspend fun getExclusions(localRoot: UriPath): Result<ParsedMegaIgnore>
+    suspend fun getExclusions(localRoot: UriPath): Result<ExclusionsSnapshot>
 
     /**
      * Replaces the exclusions of the sync rooted at [localRoot], creating the file when the sync

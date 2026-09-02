@@ -1,7 +1,10 @@
 package mega.privacy.android.feature.sync.data.mapper.exclusion
 
+import mega.privacy.android.feature.sync.data.mapper.exclusion.MegaIgnoreLineVerdict.Companion.UNSIGNED_64_MAX
+import mega.privacy.android.feature.sync.domain.entity.InvalidLineReason
 import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreEntry
 import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
+import java.math.BigInteger
 import javax.inject.Inject
 
 /**
@@ -9,10 +12,11 @@ import javax.inject.Inject
  * to [MegaIgnoreLineMapper].
  *
  * Lines are kept in file order and never grouped by kind, because the SDK evaluates filters
- * last-match-wins: reordering them changes which rule wins. A line the line mapper cannot model —
- * a regex rule, a comment, a `±sync:.megaignore` directive, a syntax error — is carried through as
- * a [MegaIgnoreEntry.PreservedEntry] rather than dropped, since dropping it would silently change
- * what the SDK enforces. Nothing here ever synthesizes a `sync:.megaignore` line.
+ * last-match-wins: reordering them changes which rule wins. A line the line mapper cannot model is
+ * carried through verbatim rather than dropped, since dropping it would silently change what the
+ * SDK enforces — as a [MegaIgnoreEntry.PreservedEntry] when the SDK accepts it, and as a
+ * [MegaIgnoreEntry.InvalidEntry] when it does not. Nothing here ever synthesizes a
+ * `sync:.megaignore` line.
  *
  * A line break is any of CR, LF or CRLF, which is what the SDK's own reader accepts, so a file
  * written on Windows splits into the same lines here as it does there.
@@ -37,11 +41,12 @@ internal class MegaIgnoreFileMapper @Inject constructor(
     operator fun invoke(content: String): ParsedMegaIgnore {
         val hadBom = content.startsWith(BOM)
         val lines = (if (hadBom) content.drop(1) else content).lines()
+        val bounds = SizeBounds()
 
         return ParsedMegaIgnore(
             entries = lines
                 .dropLast(if (lines.last().isEmpty()) 1 else 0)
-                .map { line -> megaIgnoreLineMapper(line) ?: MegaIgnoreEntry.PreservedEntry(line) },
+                .map { line -> entryFor(line, bounds) },
             hadBom = hadBom,
         )
     }
@@ -56,6 +61,71 @@ internal class MegaIgnoreFileMapper @Inject constructor(
     operator fun invoke(parsedMegaIgnore: ParsedMegaIgnore): String = buildString {
         if (parsedMegaIgnore.hadBom) append(BOM)
         parsedMegaIgnore.entries.joinTo(this, LINE_TERMINATOR) { megaIgnoreLineMapper(it) }
+    }
+
+    private fun entryFor(line: String, bounds: SizeBounds): MegaIgnoreEntry =
+        reasonFor(line, bounds)?.let { MegaIgnoreEntry.InvalidEntry(line, it) }
+            ?: megaIgnoreLineMapper(line)
+            ?: MegaIgnoreEntry.PreservedEntry(line)
+
+    /**
+     * Why the SDK refuses [line], if it does.
+     *
+     * Only the stateful half of that answer stops at the first refusal. A line malformed in its
+     * own text stays reported past that point, because nothing about it depends on how far the
+     * loader had read, and a user fixing a file is better served seeing every such line at once
+     * than one more of them per save. A bound collision is the opposite: it is a claim about
+     * bounds the loader had applied, so past the point where it stopped there is no such claim to
+     * make.
+     */
+    private fun reasonFor(line: String, bounds: SizeBounds): InvalidLineReason? =
+        when (val verdict = megaIgnoreLineMapper.classify(line)) {
+            is MegaIgnoreLineVerdict.Rejected -> {
+                bounds.abandon()
+                verdict.reason
+            }
+
+            is MegaIgnoreLineVerdict.MovesSizeBound -> InvalidLineReason.EqualSizeBounds
+                .takeIf { bounds.applyAndRejects(verdict.bound, verdict.bytes) }
+
+            MegaIgnoreLineVerdict.Accepted -> null
+        }
+
+    /**
+     * The pair of size bounds as the SDK holds them while it reads a file: one object, both ends
+     * starting wide open, each `exclude-` line overwriting one end.
+     *
+     * The bounds are compared after every line rather than at the end, which is what makes a file
+     * whose final bounds are perfectly sane still refused over an intermediate pair.
+     *
+     * Folding stops at the first line the SDK refuses, because its loader returns there and reads
+     * no further. Carrying the bounds on past that point would blame the next size line for
+     * colliding with a bound the SDK never applied.
+     */
+    private class SizeBounds {
+        private var lower: BigInteger = BigInteger.ZERO
+        private var upper: BigInteger = UNSIGNED_64_MAX
+        private var abandoned = false
+
+        /**
+         * Applies one bound and answers whether the SDK abandons the file at this line.
+         */
+        fun applyAndRejects(bound: SizeBound, bytes: BigInteger): Boolean {
+            if (abandoned) return false
+            when (bound) {
+                SizeBound.Lower -> lower = bytes
+                SizeBound.Upper -> upper = bytes
+            }
+            abandoned = lower == upper
+            return abandoned
+        }
+
+        /**
+         * Records that the loader stopped at a line refused for some other reason.
+         */
+        fun abandon() {
+            abandoned = true
+        }
     }
 
     private companion object {

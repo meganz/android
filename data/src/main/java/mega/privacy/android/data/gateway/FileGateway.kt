@@ -610,6 +610,19 @@ interface FileGateway {
     suspend fun canReadUri(uriPath: UriPath): Boolean
 
     /**
+     * Checks if an uri path can be written to
+     *
+     * Like the [UriPath] overload of `canReadUri` this accepts a bare filesystem path as well as a
+     * uri and resolves the missing scheme, so a caller holding something that may be either does
+     * not have to know which it has. There is no [String] overload: one would answer false for
+     * every scheme-less path.
+     *
+     * @param uriPath the file or folder represented by an Uri or a path
+     * @return true if it can be written to, false otherwise
+     */
+    suspend fun canWriteUri(uriPath: UriPath): Boolean
+
+    /**
      * Checks if a specific folder has a child with a specific name
      */
     fun childFileExistsSync(parentFolder: UriPath, childName: String): Boolean

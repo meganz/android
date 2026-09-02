@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.data.mapper.exclusion
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.feature.sync.domain.entity.InvalidLineReason
 import mega.privacy.android.feature.sync.domain.entity.MegaIgnoreEntry
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionClass
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionMatchType
@@ -13,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import java.math.BigInteger
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -270,8 +272,8 @@ internal class MegaIgnoreLineMapperTest {
         Arguments.of("exclude-smaller:100", MegaIgnoreEntry.SizeSmallerEntry(100)),
         Arguments.of("exclude-larger:100", MegaIgnoreEntry.SizeLargerEntry(100)),
         Arguments.of("exclude-larger: 100", MegaIgnoreEntry.SizeLargerEntry(100)),
-        Arguments.of("exclude-larger:100  ", MegaIgnoreEntry.SizeLargerEntry(100)),
         Arguments.of("exclude-larger:1k", MegaIgnoreEntry.SizeLargerEntry(1024)),
+        Arguments.of("exclude-larger:1k  ", MegaIgnoreEntry.SizeLargerEntry(1024)),
         Arguments.of("exclude-larger:1K", MegaIgnoreEntry.SizeLargerEntry(1024)),
         Arguments.of("exclude-larger:1m", MegaIgnoreEntry.SizeLargerEntry(1048576)),
         Arguments.of("exclude-larger:1M", MegaIgnoreEntry.SizeLargerEntry(1048576)),
@@ -293,6 +295,7 @@ internal class MegaIgnoreLineMapperTest {
             "exclude-larger:1x",
             "exclude-larger:k",
             "exclude-larger:1 k",
+            "exclude-larger:100  ",
             "Exclude-Larger:5",
             "EXCLUDE-SMALLER:5",
             "exclude-larger",
@@ -471,4 +474,186 @@ internal class MegaIgnoreLineMapperTest {
         Arguments.of("exclude-larger:1k", "exclude-larger:1024"),
         Arguments.of("exclude-larger: 100", "exclude-larger:100"),
     )
+    // region classification
+
+    /**
+     * The false positive that matters most: the mapper returns null for every one of these, yet
+     * the SDK parses the file happily. Reporting them as invalid would tell the user their
+     * exclusions are being ignored when they are being applied.
+     */
+    @ParameterizedTest(name = "\"{0}\"")
+    @ValueSource(
+        strings = [
+            "-r:temp",
+            "-R:temp",
+            "-dr:temp",
+            "+R:a/b",
+            "-R:^cache$",
+            "+r:^cache/.*$",
+            "#-r:temp",
+            "#",
+            "# a plain comment",
+            "#-:temp",
+            "##-:temp",
+            "+sync:.megaignore",
+            "-sync:.megaignore",
+            "",
+            "   ",
+            "\t",
+            "-:",
+            "-:   ",
+        ]
+    )
+    fun `test that classify accepts a line the app cannot model`(line: String) {
+        assertThat(underTest.classify(line)).isEqualTo(MegaIgnoreLineVerdict.Accepted)
+    }
+
+    @ParameterizedTest(name = "\"{0}\" -> {1}")
+    @MethodSource("provideRejectedLines")
+    fun `test that classify rejects a line the sdk refuses`(
+        line: String,
+        expected: InvalidLineReason,
+    ) {
+        assertThat(underTest.classify(line))
+            .isEqualTo(MegaIgnoreLineVerdict.Rejected(expected))
+    }
+
+    private fun provideRejectedLines(): Stream<Arguments> = Stream.of(
+        Arguments.of("temp", InvalidLineReason.MissingExclusionClass),
+        Arguments.of(":temp", InvalidLineReason.MissingExclusionClass),
+        Arguments.of("x:temp", InvalidLineReason.MissingExclusionClass),
+        Arguments.of(" -:temp", InvalidLineReason.MissingExclusionClass),
+        Arguments.of("\t-:temp", InvalidLineReason.MissingExclusionClass),
+        Arguments.of("Exclude-Larger:5", InvalidLineReason.MissingExclusionClass),
+        Arguments.of(" # a comment", InvalidLineReason.CommentNotAtLineStart),
+        Arguments.of("\t# a comment", InvalidLineReason.CommentNotAtLineStart),
+        Arguments.of("-temp", InvalidLineReason.MissingSeparator),
+        Arguments.of("-", InvalidLineReason.MissingSeparator),
+        Arguments.of("+d", InvalidLineReason.MissingSeparator),
+        Arguments.of("-A:temp", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("-D:temp", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("-P:temp", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("-dz:temp", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("-d node_modules:x", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("-dtemp/a:b", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("-gd:temp", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("-Nd:temp", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("-dd:temp", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("+sync:.megaignoreX", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("-sync:.megaignor", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("+sync:.megaignore ", InvalidLineReason.UnexpectedFlagCharacter),
+        Arguments.of("exclude-other:5", InvalidLineReason.UnknownDirective),
+        Arguments.of("exclude-larger", InvalidLineReason.UnknownDirective),
+        Arguments.of("e", InvalidLineReason.UnknownDirective),
+        Arguments.of("exclude-larger :5", InvalidLineReason.UnknownDirective),
+        Arguments.of("exclude-larger:", InvalidLineReason.MalformedSizeValue),
+        Arguments.of("exclude-larger:   ", InvalidLineReason.MalformedSizeValue),
+        Arguments.of("exclude-larger:abc", InvalidLineReason.MalformedSizeValue),
+        Arguments.of("exclude-larger:-5", InvalidLineReason.MalformedSizeValue),
+        Arguments.of("exclude-larger:+5", InvalidLineReason.MalformedSizeValue),
+        Arguments.of("exclude-larger:1.5k", InvalidLineReason.MalformedSizeValue),
+        Arguments.of("exclude-larger:1kb", InvalidLineReason.MalformedSizeValue),
+        Arguments.of("exclude-larger:1x", InvalidLineReason.MalformedSizeValue),
+        Arguments.of("exclude-smaller:١٠", InvalidLineReason.MalformedSizeValue),
+        Arguments.of("exclude-larger:1k x", InvalidLineReason.MalformedSizeValue),
+        Arguments.of("exclude-larger:100 ", InvalidLineReason.IllegalTrailingWhitespace),
+        Arguments.of("exclude-larger:100\t", InvalidLineReason.IllegalTrailingWhitespace),
+        Arguments.of("exclude-larger:1 k", InvalidLineReason.IllegalTrailingWhitespace),
+        Arguments.of(
+            "exclude-larger:18446744073709551616",
+            InvalidLineReason.SizeValueOutOfRange,
+        ),
+        Arguments.of(
+            "exclude-larger:99999999999999999999999",
+            InvalidLineReason.SizeValueOutOfRange,
+        ),
+        Arguments.of(
+            "exclude-larger:99999999999999999999t",
+            InvalidLineReason.SizeValueOutOfRange,
+        ),
+        Arguments.of(
+            "exclude-larger:9223372036854775807k",
+            InvalidLineReason.SizeValueOutOfRange,
+        ),
+    )
+
+    @ParameterizedTest(name = "\"{0}\" -> {1}")
+    @MethodSource("provideSizeBoundLines")
+    fun `test that classify reports which bound a size line moves`(
+        line: String,
+        expected: MegaIgnoreLineVerdict,
+    ) {
+        assertThat(underTest.classify(line)).isEqualTo(expected)
+    }
+
+    private fun provideSizeBoundLines(): Stream<Arguments> = Stream.of(
+        Arguments.of("exclude-smaller:0", sizeBound(SizeBound.Lower, 0)),
+        Arguments.of("exclude-smaller:100", sizeBound(SizeBound.Lower, 100)),
+        Arguments.of("exclude-larger:100", sizeBound(SizeBound.Upper, 100)),
+        Arguments.of("exclude-larger: 100", sizeBound(SizeBound.Upper, 100)),
+        Arguments.of("exclude-larger:1k", sizeBound(SizeBound.Upper, 1024)),
+        Arguments.of("exclude-larger:1K  ", sizeBound(SizeBound.Upper, 1024)),
+        Arguments.of("exclude-larger:100M", sizeBound(SizeBound.Upper, 104857600)),
+        Arguments.of("exclude-larger:1t", sizeBound(SizeBound.Upper, 1099511627776)),
+    )
+
+    /**
+     * The SDK holds both bounds unsigned, so a bound wider than a [Long] is legal to it even
+     * though no size entry here can carry it. Such a line has to stay valid and keep moving the
+     * bound, or a file the SDK enforces would be reported as refused.
+     */
+    @ParameterizedTest(name = "\"{0}\" -> {1}")
+    @MethodSource("provideUnmodellableSizeBoundLines")
+    fun `test that classify accepts a size bound too wide for the model`(
+        line: String,
+        expected: BigInteger,
+    ) {
+        assertThat(underTest.classify(line))
+            .isEqualTo(MegaIgnoreLineVerdict.MovesSizeBound(SizeBound.Upper, expected))
+        assertThat(underTest(line)).isNull()
+    }
+
+    private fun provideUnmodellableSizeBoundLines(): Stream<Arguments> = Stream.of(
+        Arguments.of("exclude-larger:9223372036854775808", BigInteger("9223372036854775808")),
+        Arguments.of("exclude-larger:8388608t", BigInteger("9223372036854775808")),
+        Arguments.of(
+            "exclude-larger:18446744073709551615",
+            BigInteger("18446744073709551615"),
+        ),
+    )
+
+    /**
+     * Pins the two answers together the only way that matters: anything the mapper models must be
+     * something the SDK accepts, or an edit would be written into a file the SDK refuses.
+     */
+    @ParameterizedTest(name = "\"{0}\"")
+    @ValueSource(
+        strings = [
+            "-:temp",
+            "+:temp",
+            "-d:temp",
+            "-s:temp",
+            "-N:temp",
+            "-n:a/b",
+            "-p:temp",
+            "-G:temp",
+            "#-:temp",
+            "#+sNG:a/b",
+            "-:temp   ",
+            "-:temp ",
+            "exclude-smaller:100",
+            "exclude-larger:2048",
+            "exclude-larger:100M",
+        ]
+    )
+    fun `test that classify never rejects a line the mapper models`(line: String) {
+        assertThat(underTest(line)).isNotNull()
+        assertThat(underTest.classify(line))
+            .isNotInstanceOf(MegaIgnoreLineVerdict.Rejected::class.java)
+    }
+
+    private fun sizeBound(bound: SizeBound, bytes: Long) =
+        MegaIgnoreLineVerdict.MovesSizeBound(bound, BigInteger.valueOf(bytes))
+
+    // endregion
 }
