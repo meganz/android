@@ -1967,16 +1967,12 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
         super.onResume()
         Timber.d("onResume")
         if (!isOffLine && !fromChat && !isFolderLink && type != Constants.FILE_LINK_ADAPTER && type != Constants.ZIP_ADAPTER) {
-            lifecycleScope.launch {
-                val node = withContext(ioDispatcher) {
-                    megaApi.getNodeByHandle(handle)
-                }
-                if (node == null && inside && !fromDownload) {
-                    finish()
-                    return@launch
-                }
-                updateFile()
+            if (inside && !fromDownload) {
+                viewModel.closeIfNodeRemoved(
+                    localPath = path ?: uri?.takeIf { it.scheme == "file" }?.path
+                )
             }
+            lifecycleScope.launch { updateFile() }
         }
     }
 

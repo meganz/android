@@ -10,10 +10,12 @@ import java.io.File
  * @property shareFilesEvent Event to share files
  * @property openFileEvent Event to open file, contains offline information, file and file type info
  * @property sharesNodeLinksEvent Event to share nodes, contains first node's name and links
+ * @property isPdfViewerComposeEnabled Whether PDFs open in the Compose viewer. The remote flag
+ * resolves seconds late, so the default must match it or early taps route to the other viewer.
  */
 data class OfflineNodeActionsUiState(
     val shareFilesEvent: StateEventWithContent<List<File>> = consumed(),
     val openFileEvent: StateEventWithContent<OfflineNodeActionUiEntity> = consumed(),
     val sharesNodeLinksEvent: StateEventWithContent<Pair<String?, String>> = consumed(),
-    val isPdfViewerComposeEnabled: Boolean = false,
+    val isPdfViewerComposeEnabled: Boolean = true,
 )

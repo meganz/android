@@ -35,6 +35,7 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
@@ -45,11 +46,13 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.offline.IsOfflinePathUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -88,6 +91,9 @@ class PdfViewerViewModel @Inject constructor(
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val getNodeAccessUseCase: GetNodeAccessUseCase,
+    private val doesNodeExistUseCase: DoesNodeExistUseCase,
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
+    private val isOfflinePathUseCase: IsOfflinePathUseCase,
 ) : ViewModel() {
 
     private val handle: Long
@@ -116,6 +122,35 @@ class PdfViewerViewModel @Inject constructor(
         monitorTransferEvents()
     }
 
+    /**
+     * Closes the viewer when the node it shows was removed from the account. An offline copy, an
+     * unloaded node tree and a failed lookup all look like a removal but are not.
+     *
+     * @param localPath path of the rendered file when it is local, null when streamed.
+     */
+    fun closeIfNodeRemoved(localPath: String?) {
+        if (handle == INVALID_HANDLE) return
+        viewModelScope.launch {
+            val nodeExists = runCatching { doesNodeExistUseCase(NodeId(handle)) }
+                .getOrElse {
+                    Timber.e(it, "Failed to resolve node $handle")
+                    return@launch
+                }
+            if (nodeExists || isOfflineFile(localPath) || !isNodeTreeLoaded()) return@launch
+
+            Timber.d("Closing the viewer: node $handle is no longer in the account")
+            _state.update { it.copy(shouldFinishActivity = true) }
+        }
+    }
+
+    private suspend fun isOfflineFile(localPath: String?) = localPath != null &&
+            runCatching { isOfflinePathUseCase(localPath) }
+                .onFailure { Timber.e(it, "Failed to check whether $localPath is offline") }
+                .getOrDefault(false)
+
+    private suspend fun isNodeTreeLoaded() = runCatching { rootNodeExistsUseCase() }
+        .onFailure { Timber.e(it, "Failed to check whether the node tree is loaded") }
+        .getOrDefault(false)
 
     private fun checkLastPageViewed() {
         if (handle != INVALID_HANDLE) {

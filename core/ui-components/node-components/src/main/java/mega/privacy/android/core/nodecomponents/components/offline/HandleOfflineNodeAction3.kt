@@ -175,7 +175,7 @@ private suspend fun openFile(
                 val navKey = LegacyPdfViewerNavKey(
                     nodeHandle = content.nodeId.longValue,
                     nodeContentUri = NodeContentUri.LocalContentUri(content.file),
-                    nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                    nodeSourceType = NodeSourceTypeInt.OFFLINE_ADAPTER,
                     mimeType = content.mimeType,
                 )
                 onNavigate(navKey)

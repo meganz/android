@@ -70,7 +70,6 @@ class OfflineNodeActionsViewModel @Inject constructor(
                 _uiState.update { it.copy(isPdfViewerComposeEnabled = enabled) }
             }.onFailure {
                 Timber.e(it, "Failed to load PDF viewer feature flag")
-                _uiState.update { it.copy(isPdfViewerComposeEnabled = false) }
             }
         }
     }

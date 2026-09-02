@@ -39,6 +39,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
@@ -49,11 +50,13 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.offline.IsOfflinePathUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -117,6 +120,9 @@ internal class PdfViewerViewModelTest {
     private val deleteNodeByHandleUseCase = mock<DeleteNodeByHandleUseCase>()
     private val exportNodeUseCase = mock<ExportNodeUseCase>()
     private val getNodeAccessUseCase = mock<GetNodeAccessUseCase>()
+    private val doesNodeExistUseCase = mock<DoesNodeExistUseCase>()
+    private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
+    private val isOfflinePathUseCase = mock<IsOfflinePathUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -151,6 +157,9 @@ internal class PdfViewerViewModelTest {
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
             exportNodeUseCase = exportNodeUseCase,
             getNodeAccessUseCase = getNodeAccessUseCase,
+            doesNodeExistUseCase = doesNodeExistUseCase,
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
+            isOfflinePathUseCase = isOfflinePathUseCase,
         )
     }
 
@@ -168,6 +177,9 @@ internal class PdfViewerViewModelTest {
             moveNodeToRubbishBinUseCase,
             deleteNodeByHandleUseCase,
             getNodeAccessUseCase,
+            doesNodeExistUseCase,
+            rootNodeExistsUseCase,
+            isOfflinePathUseCase,
         )
     }
 
@@ -1087,6 +1099,112 @@ internal class PdfViewerViewModelTest {
             assertThat(content).isEqualTo(MoveOrRemoveNodeResult.RemoveFailed)
         }
     }
+
+    @Test
+    internal fun `test that closeIfNodeRemoved does not finish the activity when the node still exists`() =
+        runTest {
+            val handle = 123456789L
+            savedStateHandle = SavedStateHandle(mapOf("HANDLE" to handle))
+            whenever(doesNodeExistUseCase(NodeId(handle))).thenReturn(true)
+            initTest()
+
+            underTest.closeIfNodeRemoved(localPath = null)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().shouldFinishActivity).isFalse()
+            }
+            verifyNoInteractions(isOfflinePathUseCase, rootNodeExistsUseCase)
+        }
+
+    @Test
+    internal fun `test that closeIfNodeRemoved finishes the activity when the node is removed and the node tree is loaded`() =
+        runTest {
+            val handle = 123456789L
+            savedStateHandle = SavedStateHandle(mapOf("HANDLE" to handle))
+            whenever(doesNodeExistUseCase(NodeId(handle))).thenReturn(false)
+            whenever(rootNodeExistsUseCase()).thenReturn(true)
+            initTest()
+
+            underTest.closeIfNodeRemoved(localPath = null)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().shouldFinishActivity).isTrue()
+            }
+        }
+
+    @Test
+    internal fun `test that closeIfNodeRemoved does not finish the activity when the file is an offline copy`() =
+        runTest {
+            val handle = 123456789L
+            val offlinePath = "/data/user/0/mega/files/MEGA Offline/sample.pdf"
+            savedStateHandle = SavedStateHandle(mapOf("HANDLE" to handle))
+            whenever(doesNodeExistUseCase(NodeId(handle))).thenReturn(false)
+            whenever(isOfflinePathUseCase(offlinePath)).thenReturn(true)
+            initTest()
+
+            underTest.closeIfNodeRemoved(localPath = offlinePath)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().shouldFinishActivity).isFalse()
+            }
+            verifyNoInteractions(rootNodeExistsUseCase)
+        }
+
+    @Test
+    internal fun `test that closeIfNodeRemoved does not finish the activity when the node tree is not loaded`() =
+        runTest {
+            val handle = 123456789L
+            val localPath = "/storage/emulated/0/Download/sample.pdf"
+            savedStateHandle = SavedStateHandle(mapOf("HANDLE" to handle))
+            whenever(doesNodeExistUseCase(NodeId(handle))).thenReturn(false)
+            whenever(isOfflinePathUseCase(localPath)).thenReturn(false)
+            whenever(rootNodeExistsUseCase()).thenReturn(false)
+            initTest()
+
+            underTest.closeIfNodeRemoved(localPath = localPath)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().shouldFinishActivity).isFalse()
+            }
+        }
+
+    @Test
+    internal fun `test that closeIfNodeRemoved does not finish the activity when the node lookup fails`() =
+        runTest {
+            val handle = 123456789L
+            savedStateHandle = SavedStateHandle(mapOf("HANDLE" to handle))
+            whenever(doesNodeExistUseCase(NodeId(handle)))
+                .thenThrow(RuntimeException("lookup failed"))
+            initTest()
+
+            underTest.closeIfNodeRemoved(localPath = null)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().shouldFinishActivity).isFalse()
+            }
+            verifyNoInteractions(isOfflinePathUseCase, rootNodeExistsUseCase)
+        }
+
+    @Test
+    internal fun `test that closeIfNodeRemoved does not resolve the node when the handle is invalid`() =
+        runTest {
+            savedStateHandle = SavedStateHandle()
+            initTest()
+
+            underTest.closeIfNodeRemoved(localPath = null)
+            advanceUntilIdle()
+
+            verifyNoInteractions(
+                doesNodeExistUseCase,
+                isOfflinePathUseCase,
+                rootNodeExistsUseCase,
+            )
+        }
 
     companion object {
         @JvmField
