@@ -145,10 +145,15 @@ internal fun TimelineRevampScreen(
         handleNotificationPermissionResult = handleNotificationPermissionResult,
     )
 
+    val layoutDirection = LocalLayoutDirection.current
+    val startInset = contentPadding.calculateStartPadding(layoutDirection)
+    val endInset = contentPadding.calculateEndPadding(layoutDirection)
+    val insetModifier = modifier.padding(start = startInset, end = endInset)
+
     when {
         showEnableCameraUploadsPage -> {
             EnableCameraUploadsContent(
-                modifier = modifier
+                modifier = insetModifier
                     .padding(horizontal = 16.dp)
                     .testTag(TIMELINE_REVAMP_ENABLE_CU_CONTENT_TAG),
                 onEnable = onNavigateToCameraUploadsSettings,
@@ -157,13 +162,15 @@ internal fun TimelineRevampScreen(
 
         uiState is TimelineRevampUiState.Loading -> {
             MediaSkeletonView(
-                modifier = modifier.testTag(TIMELINE_REVAMP_LOADING_SKELETON_TAG),
+                modifier = insetModifier.testTag(TIMELINE_REVAMP_LOADING_SKELETON_TAG),
             )
         }
 
         uiState is TimelineRevampUiState.Empty -> {
             EmptyStateView(
-                modifier = Modifier.testTag(TIMELINE_REVAMP_EMPTY_VIEW_TAG),
+                modifier = Modifier
+                    .padding(start = startInset, end = endInset)
+                    .testTag(TIMELINE_REVAMP_EMPTY_VIEW_TAG),
                 imagePainter = painterResource(R.drawable.il_glass_image),
                 title = stringResource(sharedR.string.timeline_tab_empty_body_no_media_found)
             )
@@ -171,7 +178,7 @@ internal fun TimelineRevampScreen(
 
         uiState is TimelineRevampUiState.Data -> {
             TimelineRevampContent(
-                modifier = modifier.fillMaxSize(),
+                modifier = insetModifier.fillMaxSize(),
                 contentPadding = contentPadding,
                 sections = uiState.sections,
                 sectionStartOffsets = uiState.sectionStartOffsets,
@@ -254,18 +261,11 @@ private fun TimelineRevampContent(
     val lazyGridState = rememberLazyGridState()
     val cardListState = rememberLazyListState()
     val configuration = LocalConfiguration.current
-    val layoutDirection = LocalLayoutDirection.current
 
-    // Add bottom clearance so the last item can scroll clear of the floating MediaTimePeriodSelector,
-    // mirroring the legacy Timeline tab.
-    val contentPaddingWithSelector = remember(contentPadding, layoutDirection) {
-        PaddingValues(
-            start = contentPadding.calculateStartPadding(layoutDirection),
-            end = contentPadding.calculateEndPadding(layoutDirection),
-            top = contentPadding.calculateTopPadding(),
-            bottom = contentPadding.calculateBottomPadding() + TIMELINE_REVAMP_SELECTOR_CLEARANCE,
-        )
-    }
+    val contentPaddingWithSelector = PaddingValues(
+        top = contentPadding.calculateTopPadding(),
+        bottom = contentPadding.calculateBottomPadding() + TIMELINE_REVAMP_SELECTOR_CLEARANCE,
+    )
     val columns =
         if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             gridSize.portrait
