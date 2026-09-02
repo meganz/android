@@ -19,8 +19,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.badge.Badge
-import mega.android.core.ui.components.badge.BadgeType
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
@@ -62,8 +60,7 @@ fun QuotaRecommendedPlanCard(
             .clip(cardShape)
             .testTag(TEST_TAG_QUOTA_RECOMMENDED_CARD),
     ) {
-        Badge(
-            badgeType = BadgeType.Mega,
+        QuotaPlanBadge(
             text = badgeLabel,
             modifier = Modifier.testTag(TEST_TAG_QUOTA_RECOMMENDED_BADGE),
         )

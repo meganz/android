@@ -65,7 +65,7 @@ class QuotaWarningMessageMapperTest {
     }
 
     @Test
-    fun `test that free user transfer running low on download maps to running low title and warning`() {
+    fun `test that free user transfer running low maps to the limited quota title and warning`() {
         val result = underTest(
             type = QuotaWarningType.Transfer,
             trigger = QuotaWarningTrigger.Download,
@@ -75,10 +75,10 @@ class QuotaWarningMessageMapperTest {
         )
 
         assertThat(result.titleId)
-            .isEqualTo(sharedR.string.subscription_quota_transfer_low_title)
+            .isEqualTo(sharedR.string.subscription_quota_transfer_limited_title)
         assertThat(result.titleTakesPercentage).isFalse()
         assertThat(result.subtitleId)
-            .isEqualTo(sharedR.string.subscription_quota_transfer_low_download_subtitle)
+            .isEqualTo(sharedR.string.subscription_quota_transfer_low_subtitle)
         assertThat(result.metric).isEqualTo(QuotaMetric.Transfer)
         assertThat(result.showLearnMore).isTrue()
         assertThat(result.level).isEqualTo(QuotaUsageLevel.Warning)
@@ -97,20 +97,32 @@ class QuotaWarningMessageMapperTest {
         assertThat(result.titleId)
             .isEqualTo(sharedR.string.subscription_quota_transfer_percentage_used_title)
         assertThat(result.titleTakesPercentage).isTrue()
+        assertThat(result.subtitleId)
+            .isEqualTo(sharedR.string.subscription_quota_transfer_low_pro_subtitle)
     }
 
     @Test
-    fun `test that transfer running low on streaming maps to the streaming subtitle`() {
-        val result = underTest(
-            type = QuotaWarningType.Transfer,
-            trigger = QuotaWarningTrigger.Streaming,
-            storageState = StorageState.Unknown,
-            isTransferOverQuota = false,
-            isProUser = false,
-        )
+    fun `test that transfer running low maps to the same subtitle whatever the trigger`() {
+        val subtitles = listOf(
+            QuotaWarningTrigger.General,
+            QuotaWarningTrigger.Download,
+            QuotaWarningTrigger.Streaming,
+        ).map { trigger ->
+            underTest(
+                type = QuotaWarningType.Transfer,
+                trigger = trigger,
+                storageState = StorageState.Unknown,
+                isTransferOverQuota = false,
+                isProUser = false,
+            ).subtitleId
+        }
 
-        assertThat(result.subtitleId)
-            .isEqualTo(sharedR.string.subscription_quota_transfer_low_streaming_subtitle)
+        assertThat(subtitles)
+            .containsExactly(
+                sharedR.string.subscription_quota_transfer_low_subtitle,
+                sharedR.string.subscription_quota_transfer_low_subtitle,
+                sharedR.string.subscription_quota_transfer_low_subtitle,
+            )
     }
 
     @Test
@@ -152,7 +164,7 @@ class QuotaWarningMessageMapperTest {
     }
 
     @Test
-    fun `test that highest plan transfer running low on download maps to the manage-plan subtitle`() {
+    fun `test that highest plan transfer running low maps to the manage-plan subtitle`() {
         val result = underTest(
             type = QuotaWarningType.Transfer,
             trigger = QuotaWarningTrigger.Download,
@@ -163,7 +175,7 @@ class QuotaWarningMessageMapperTest {
         )
 
         assertThat(result.subtitleId)
-            .isEqualTo(sharedR.string.subscription_quota_transfer_low_download_highest_plan_subtitle)
+            .isEqualTo(sharedR.string.subscription_quota_transfer_low_highest_plan_subtitle)
         assertThat(result.subtitleHasLink).isTrue()
         assertThat(result.showLearnMore).isFalse()
     }

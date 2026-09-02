@@ -146,7 +146,7 @@ class QuotaWarningUpgradeScreenTest {
         )
 
         val subtitle = composeRule.activity.getString(
-            sharedR.string.subscription_quota_transfer_low_download_subtitle
+            sharedR.string.subscription_quota_transfer_low_subtitle
         )
         val learnMore = composeRule.activity.getString(sharedR.string.general_learn_more)
         composeRule.onNodeWithTag(TEST_TAG_QUOTA_WARNING_SUBTITLE)

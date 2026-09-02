@@ -111,11 +111,8 @@ class QuotaWarningMessageMapper @Inject constructor() {
                 sharedR.string.subscription_quota_transfer_over_download_highest_plan_subtitle
             }
 
-            QuotaWarningScenario.TransferAlmostUsed -> if (isStreaming) {
-                sharedR.string.subscription_quota_transfer_low_streaming_highest_plan_subtitle
-            } else {
-                sharedR.string.subscription_quota_transfer_low_download_highest_plan_subtitle
-            }
+            QuotaWarningScenario.TransferAlmostUsed ->
+                sharedR.string.subscription_quota_transfer_low_highest_plan_subtitle
         }
     }
 
@@ -141,6 +138,12 @@ class QuotaWarningMessageMapper @Inject constructor() {
         )
     }
 
+    /**
+     * Only an exhausted quota names the transfer that hit it: it is reported by whatever was
+     * blocked, so the app knows. A quota merely running low is reported by the SDK against
+     * everything queued, without saying what that is, so [trigger] cannot be named there and the
+     * copy differs by account tier instead.
+     */
     private fun transferMessage(
         scenario: QuotaWarningScenario,
         trigger: QuotaWarningTrigger,
@@ -165,13 +168,13 @@ class QuotaWarningMessageMapper @Inject constructor() {
                 titleId = if (isProUser) {
                     sharedR.string.subscription_quota_transfer_percentage_used_title
                 } else {
-                    sharedR.string.subscription_quota_transfer_low_title
+                    sharedR.string.subscription_quota_transfer_limited_title
                 },
                 titleTakesPercentage = isProUser,
-                subtitleId = if (isStreaming) {
-                    sharedR.string.subscription_quota_transfer_low_streaming_subtitle
+                subtitleId = if (isProUser) {
+                    sharedR.string.subscription_quota_transfer_low_pro_subtitle
                 } else {
-                    sharedR.string.subscription_quota_transfer_low_download_subtitle
+                    sharedR.string.subscription_quota_transfer_low_subtitle
                 },
                 showLearnMore = true,
                 metric = QuotaMetric.Transfer,
