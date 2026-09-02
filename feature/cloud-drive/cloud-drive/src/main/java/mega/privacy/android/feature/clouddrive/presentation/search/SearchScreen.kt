@@ -120,7 +120,7 @@ fun SearchScreen(
                 NodeSelectionModeAppBar(
                     count = uiState.selectedItemsCount,
                     isAllSelected = uiState.isAllSelected,
-                    isSelecting = uiState.isSelecting,
+                    isSelecting = false,
                     onSelectAllClicked = { viewModel.processAction(SearchUiAction.SelectAllItems) },
                     onCancelSelectionClicked = { viewModel.processAction(SearchUiAction.DeselectAllItems) }
                 )
@@ -134,7 +134,7 @@ fun SearchScreen(
                 visible = nodeActionState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
                 multiNodeActionHandler = selectionModeActionHandler,
                 selectedNodes = uiState.selectedNodes,
-                isSelecting = uiState.isSelecting,
+                isSelecting = false,
             )
         },
         loadingContent = {

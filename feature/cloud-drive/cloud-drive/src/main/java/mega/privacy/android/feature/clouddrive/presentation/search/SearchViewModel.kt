@@ -22,13 +22,11 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
@@ -130,7 +128,6 @@ class SearchViewModel @AssistedInject constructor(
         )
 
     private val searchQueryFlow = MutableStateFlow("")
-    private var nodeMultiSelectionJob: Job? = null
     private var searchJob: Job? = null
 
     init {
@@ -182,6 +179,7 @@ class SearchViewModel @AssistedInject constructor(
     }
 
     private fun updateFilter(result: SearchFilterResult) {
+        deselectAllItems()
         _uiState.update { state ->
             when (result) {
                 is SearchFilterResult.Type -> state.copy(typeFilterOption = result.option)
@@ -229,7 +227,6 @@ class SearchViewModel @AssistedInject constructor(
             return
         }
 
-        deselectAllItems()
         runCatching {
             cancelCancelTokenUseCase()
             val nodes = searchUseCase(
@@ -239,6 +236,7 @@ class SearchViewModel @AssistedInject constructor(
             )
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
+                existingItems = uiState.value.items,
                 nodeSourceType = args.nodeSourceType,
                 isPublicNodes = args.nodeSourceType == NodeSourceType.FOLDER_LINK,
             )
@@ -376,61 +374,17 @@ class SearchViewModel @AssistedInject constructor(
         _uiState.update { state ->
             state.copy(items = updatedItems)
         }
-
-        // Cancel any ongoing multi-selection job if user manually deselects all items
-        if (!uiState.value.isInSelectionMode) {
-            nodeMultiSelectionJob?.cancel()
-        }
     }
 
-    /**
-     * Deselect all items and reset selection state
-     */
     private fun deselectAllItems() {
-        nodeMultiSelectionJob?.cancel()
-        val updatedItems = uiState.value.items.map { it.copy(isSelected = false) }
         _uiState.update { state ->
-            state.copy(
-                items = updatedItems,
-                isSelecting = false
-            )
+            state.copy(items = state.items.map { it.copy(isSelected = false) })
         }
     }
 
-    /**
-     * Select all items
-     */
     private fun selectAllItems() {
-        nodeMultiSelectionJob?.cancel()
-        nodeMultiSelectionJob = viewModelScope.launch {
-            runCatching {
-                // Select all items that are already loaded
-                performAllItemSelection()
-                // If nodes are still loading, wait until fully loaded then select all
-                if (uiState.value.nodesLoadingState != NodesLoadingState.FullyLoaded) {
-                    _uiState.update { state ->
-                        state.copy(isSelecting = true)
-                    }
-                    uiState.first { it.nodesLoadingState == NodesLoadingState.FullyLoaded }
-                    if (isActive) {
-                        performAllItemSelection()
-                    }
-                }
-            }.onFailure {
-                _uiState.update { state ->
-                    state.copy(isSelecting = false)
-                }
-            }
-        }
-    }
-
-    private fun performAllItemSelection() {
-        val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
         _uiState.update { state ->
-            state.copy(
-                items = updatedItems,
-                isSelecting = false
-            )
+            state.copy(items = state.items.map { it.copy(isSelected = true) })
         }
     }
 
@@ -653,6 +607,7 @@ class SearchViewModel @AssistedInject constructor(
      * Activate a tag filter without touching the search field
      */
     private fun onSelectTag(tag: String) {
+        deselectAllItems()
         _uiState.update { it.copy(tagFilterOption = tag).withSearchLoadingIfActive() }
         launchSearch(_uiState.value.searchText)
     }
@@ -661,6 +616,7 @@ class SearchViewModel @AssistedInject constructor(
      * Clear the tag filter, falling back to a plain text search or the pre-search state
      */
     private fun onClearTagFilter() {
+        deselectAllItems()
         _uiState.update { it.copy(tagFilterOption = null).withSearchLoadingIfActive() }
         launchSearch(_uiState.value.searchText)
     }

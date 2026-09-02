@@ -30,7 +30,6 @@ data class SearchUiState(
     val isHiddenNodeSettingsLoading: Boolean = true,
     val isHiddenNodesEnabled: Boolean = false,
     val showHiddenNodes: Boolean = false,
-    val isSelecting: Boolean = false,
     val isContactVerificationOn: Boolean = false,
     val showContactNotVerifiedBanner: Boolean = false,
     val typeFilterOption: TypeFilterOption? = null,

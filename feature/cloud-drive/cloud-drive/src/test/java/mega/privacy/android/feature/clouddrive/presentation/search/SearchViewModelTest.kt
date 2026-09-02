@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -1087,7 +1088,6 @@ class SearchViewModelTest {
 
         val updatedState = underTest.uiState.value
         assertThat(updatedState.isInSelectionMode).isFalse()
-        assertThat(updatedState.isSelecting).isFalse()
         assertThat(updatedState.items[0].isSelected).isFalse()
         assertThat(updatedState.items[1].isSelected).isFalse()
     }
@@ -1117,8 +1117,6 @@ class SearchViewModelTest {
         testScheduler.advanceUntilIdle()
 
         val stateAfterSelectAll = underTest.uiState.value
-        // Verify that isSelecting is false and all items are selected
-        assertThat(stateAfterSelectAll.isSelecting).isFalse()
         assertThat(stateAfterSelectAll.isInSelectionMode).isTrue()
         assertThat(stateAfterSelectAll.items[0].isSelected).isTrue()
         assertThat(stateAfterSelectAll.items[1].isSelected).isTrue()
@@ -2098,5 +2096,158 @@ class SearchViewModelTest {
         advanceUntilIdle()
 
         assertThat(underTest.uiState.value.typeFilterOption).isEqualTo(TypeFilterOption.Video)
+    }
+
+    @Test
+    fun `test that monitorNodeUpdates keeps selected items when search results are refreshed`() =
+        runTest {
+            val node1 = mock<TypedNode> {
+                on { id } doReturn NodeId(1L)
+            }
+            val node2 = mock<TypedNode> {
+                on { id } doReturn NodeId(2L)
+            }
+            setupTestData(listOf(node1, node2))
+            val nodeUpdates = MutableSharedFlow<NodeChanges>()
+            whenever(
+                monitorNodeUpdatesByIdUseCase(
+                    NodeId(parentHandle),
+                    nodeSourceType,
+                    acceptAllUpdates = true
+                )
+            ).thenReturn(nodeUpdates)
+            whenever(
+                nodeUiItemMapper(
+                    nodeList = any(),
+                    existingItems = anyOrNull(),
+                    nodeSourceType = any(),
+                    isPublicNodes = any(),
+                    showPublicLinkCreationTime = any(),
+                    highlightedNodeId = anyOrNull(),
+                    highlightedNames = anyOrNull(),
+                    isContactVerificationOn = any(),
+                )
+            ).thenAnswer { invocation ->
+                val existingItems = invocation.getArgument<List<NodeUiItem<TypedNode>>?>(1)
+                val selectedIds = existingItems.orEmpty()
+                    .filter { it.isSelected }
+                    .map { it.node.id }
+                listOf(node1, node2).map { node ->
+                    NodeUiItem(node = node, isSelected = node.id in selectedIds)
+                }
+            }
+            val underTest = createViewModel()
+            underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+            advanceUntilIdle()
+            underTest.processAction(
+                SearchUiAction.ItemLongClicked(underTest.uiState.value.items[0])
+            )
+
+            underTest.uiState.test {
+                nodeUpdates.emit(NodeChanges.Attributes)
+                advanceUntilIdle()
+
+                verify(searchUseCase, times(2)).invoke(
+                    parentHandle = any(),
+                    nodeSourceType = any(),
+                    searchParameters = any(),
+                )
+                val state = expectMostRecentItem()
+                assertThat(state.isInSelectionMode).isTrue()
+                assertThat(state.items[0].isSelected).isTrue()
+                assertThat(state.items[1].isSelected).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that SelectFilter exits selection mode when a filter is applied`() = runTest {
+        val underTest = createViewModelInSelectionMode()
+
+        underTest.uiState.test {
+            underTest.processAction(
+                SearchUiAction.SelectFilter(SearchFilterResult.Type(TypeFilterOption.Video))
+            )
+            advanceUntilIdle()
+
+            val state = expectMostRecentItem()
+            assertThat(state.isInSelectionMode).isFalse()
+            assertThat(state.items.none { it.isSelected }).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that SelectTag exits selection mode when a tag filter is applied`() = runTest {
+        val underTest = createViewModelInSelectionMode()
+
+        underTest.uiState.test {
+            underTest.processAction(SearchUiAction.SelectTag("tag"))
+            advanceUntilIdle()
+
+            val state = expectMostRecentItem()
+            assertThat(state.isInSelectionMode).isFalse()
+            assertThat(state.items.none { it.isSelected }).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that ClearTagFilter exits selection mode when the tag filter is cleared`() = runTest {
+        val underTest = createViewModelInSelectionMode()
+        underTest.processAction(SearchUiAction.SelectTag("tag"))
+        advanceUntilIdle()
+        underTest.processAction(SearchUiAction.ItemLongClicked(underTest.uiState.value.items[0]))
+        assertThat(underTest.uiState.value.isInSelectionMode).isTrue()
+
+        underTest.uiState.test {
+            underTest.processAction(SearchUiAction.ClearTagFilter)
+            advanceUntilIdle()
+
+            val state = expectMostRecentItem()
+            assertThat(state.isInSelectionMode).isFalse()
+            assertThat(state.items.none { it.isSelected }).isTrue()
+        }
+    }
+
+    /**
+     * Search results with the first item selected. The mapper carries the selection of
+     * [NodeUiItemMapper]'s existing items over, so any refresh keeps it unless it is cleared.
+     */
+    private fun TestScope.createViewModelInSelectionMode(): SearchViewModel {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+        }
+        val node2 = mock<TypedNode> {
+            on { id } doReturn NodeId(2L)
+        }
+        setupTestData(listOf(node1, node2))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        runBlocking {
+            whenever(
+                nodeUiItemMapper(
+                    nodeList = any(),
+                    existingItems = anyOrNull(),
+                    nodeSourceType = any(),
+                    isPublicNodes = any(),
+                    showPublicLinkCreationTime = any(),
+                    highlightedNodeId = anyOrNull(),
+                    highlightedNames = anyOrNull(),
+                    isContactVerificationOn = any(),
+                )
+            ).thenAnswer { invocation ->
+                val existingItems = invocation.getArgument<List<NodeUiItem<TypedNode>>?>(1)
+                val selectedIds = existingItems.orEmpty()
+                    .filter { it.isSelected }
+                    .map { it.node.id }
+                listOf(node1, node2).map { node ->
+                    NodeUiItem(node = node, isSelected = node.id in selectedIds)
+                }
+            }
+        }
+        val underTest = createViewModel()
+        underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+        advanceUntilIdle()
+        underTest.processAction(SearchUiAction.ItemLongClicked(underTest.uiState.value.items[0]))
+        assertThat(underTest.uiState.value.isInSelectionMode).isTrue()
+        return underTest
     }
 }
