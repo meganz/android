@@ -107,14 +107,14 @@ pipeline {
                         "```${A11Y_SLACK_SUMMARY}```\n" +
                         "Gate failures: ${BUILD_URL}testReport"
                 sendReportToSlack(message, "warning")
-                sendReportToMR(":warning: **Android accessibility report** — some checks failed the developer gate")
+                sendReportToMR(common, ":warning: **Android accessibility report** — some checks failed the developer gate")
             }
         }
         success {
             script {
                 def message = "Android accessibility report:\n```${A11Y_SLACK_SUMMARY}```"
                 sendReportToSlack(message, "good")
-                sendReportToMR(":white_check_mark: **Android accessibility report**")
+                sendReportToMR(common, ":white_check_mark: **Android accessibility report**")
             }
         }
         cleanup {
@@ -202,9 +202,11 @@ private void sendReportToSlack(String message, String color) {
  * Comments the findings digest and the report links on the merge request that triggered this
  * build. Does nothing for scheduled or manual builds.
  *
+ * @param common the common functions loaded from common.groovy; script-level locals are not
+ * visible from methods, so it has to be passed in
  * @param headline first line of the comment, e.g. the build outcome
  */
-private void sendReportToMR(String headline) {
+private void sendReportToMR(def common, String headline) {
     if (!common.hasGitLabMergeRequest()) {
         return
     }
