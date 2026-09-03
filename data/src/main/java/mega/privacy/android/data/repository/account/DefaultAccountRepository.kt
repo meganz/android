@@ -83,6 +83,7 @@ import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.entity.transfer.TransferQuotaWarningTrigger
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.ChangeEmailException
@@ -662,6 +663,14 @@ internal class DefaultAccountRepository @Inject constructor(
         trigger: StorageQuotaWarningTrigger,
         epochDay: Long,
     ) = accountPreferencesGateway.setStorageQuotaWarningShownDay(trigger.name, epochDay)
+
+    override suspend fun getTransferQuotaWarningShownDay(trigger: TransferQuotaWarningTrigger) =
+        accountPreferencesGateway.getTransferQuotaWarningShownDay(trigger.name)
+
+    override suspend fun setTransferQuotaWarningShownDay(
+        trigger: TransferQuotaWarningTrigger,
+        epochDay: Long,
+    ) = accountPreferencesGateway.setTransferQuotaWarningShownDay(trigger.name, epochDay)
 
     private suspend fun handleAccountDetail(request: MegaRequest): AccountDetail {
         val newDetail = accountDetailMapper(

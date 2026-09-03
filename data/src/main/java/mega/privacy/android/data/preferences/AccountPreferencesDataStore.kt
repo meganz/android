@@ -35,6 +35,7 @@ private const val LATEST_TARGET_TIMESTAMP_COPY = "LATEST_TARGET_PATH_TIMESTAMP_C
 private const val LATEST_TARGET_TIMESTAMP_MOVE = "LATEST_TARGET_PATH_TIMESTAMP_MOVE"
 private const val LAST_REGISTERED_EMAIL = "LAST_REGISTERED_EMAIL"
 private const val STORAGE_QUOTA_WARNING_SHOWN_DAY = "STORAGE_QUOTA_WARNING_SHOWN_DAY"
+private const val TRANSFER_QUOTA_WARNING_SHOWN_DAY = "TRANSFER_QUOTA_WARNING_SHOWN_DAY"
 
 private val Context.accountPreferencesDataStore: DataStore<Preferences> by preferencesDataStore(
     name = accountPreferenceFileName,
@@ -131,6 +132,21 @@ class AccountPreferencesDataStore @Inject constructor(
         }
     }
 
+    override suspend fun getTransferQuotaWarningShownDay(trigger: String): Long? =
+        withContext(ioDispatcher) {
+            context.accountPreferencesDataStore
+                .monitor(transferQuotaWarningShownDayKey(trigger))
+                .firstOrNull()
+        }
+
+    override suspend fun setTransferQuotaWarningShownDay(trigger: String, epochDay: Long) {
+        withContext(ioDispatcher) {
+            context.accountPreferencesDataStore.edit {
+                it[transferQuotaWarningShownDayKey(trigger)] = epochDay
+            }
+        }
+    }
+
     override suspend fun clearPreferences() {
         withContext(ioDispatcher) {
             // After clearing all preferences, restore the last registered email if it exists.
@@ -165,4 +181,7 @@ class AccountPreferencesDataStore @Inject constructor(
 
     private fun storageQuotaWarningShownDayKey(trigger: String) =
         longPreferencesKey("${STORAGE_QUOTA_WARNING_SHOWN_DAY}_$trigger")
+
+    private fun transferQuotaWarningShownDayKey(trigger: String) =
+        longPreferencesKey("${TRANSFER_QUOTA_WARNING_SHOWN_DAY}_$trigger")
 }

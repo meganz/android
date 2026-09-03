@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.entity.transfer.TransferQuotaWarningTrigger
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -283,6 +284,27 @@ interface AccountRepository {
      */
     suspend fun setStorageQuotaWarningShownDay(
         trigger: StorageQuotaWarningTrigger,
+        epochDay: Long,
+    )
+
+    /**
+     * Get the calendar day the transfer quota running low warning was last shown on for the given
+     * trigger.
+     *
+     * @param trigger [TransferQuotaWarningTrigger]
+     * @return the epoch day, or null if it has never been shown for that trigger.
+     */
+    suspend fun getTransferQuotaWarningShownDay(trigger: TransferQuotaWarningTrigger): Long?
+
+    /**
+     * Set the calendar day the transfer quota running low warning was last shown on for the given
+     * trigger.
+     *
+     * @param trigger  [TransferQuotaWarningTrigger]
+     * @param epochDay the calendar day it was shown on.
+     */
+    suspend fun setTransferQuotaWarningShownDay(
+        trigger: TransferQuotaWarningTrigger,
         epochDay: Long,
     )
 
