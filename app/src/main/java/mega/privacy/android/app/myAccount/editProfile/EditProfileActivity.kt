@@ -62,7 +62,6 @@ import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
-import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_LAND
 import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_PORT
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
@@ -75,6 +74,7 @@ import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -289,8 +289,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             showChangeEmailDialog(null)
         }
 
-        allowNameAndEmailEdition()
-
         binding.changePassword.setOnClickListener {
             startActivity(Intent(this, ChangePasswordActivity::class.java))
         }
@@ -323,9 +321,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
     }
 
-    private fun allowNameAndEmailEdition() {
+    private fun allowNameAndEmailEdition(accountType: AccountType) {
         val permitEditNameAndEmail =
-            !(megaApi.isBusinessAccount && myAccountInfo.accountType == BUSINESS) || megaApi.isMasterBusinessAccount
+            !(megaApi.isBusinessAccount && accountType == AccountType.BUSINESS) || megaApi.isMasterBusinessAccount
         binding.changeName.isVisible = permitEditNameAndEmail
         binding.changeNameSeparator.separator.isVisible = permitEditNameAndEmail
         binding.changeEmail.isVisible = permitEditNameAndEmail
@@ -337,6 +335,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             binding.headerLayout.firstLineToolbar.text = state.name
             binding.headerLayout.secondLineToolbar.text = state.email
             binding.progressBar.isVisible = state.isLoading
+
+            allowNameAndEmailEdition(state.accountType)
 
             state.changeEmailResult?.let {
                 showChangeEmailResult(it)

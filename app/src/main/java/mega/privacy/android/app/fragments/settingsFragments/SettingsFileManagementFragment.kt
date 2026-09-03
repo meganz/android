@@ -45,9 +45,9 @@ import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.shared.resources.R as sharedR
-import nz.mega.sdk.MegaAccountDetails
 import timber.log.Timber
 import javax.inject.Inject
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -242,7 +242,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
                     if (!viewModel.isConnected) return false
                     if (it.isChecked) {
                         showRbSchedulerValueDialog(true)
-                    } else if (myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+                    } else if (viewModel.state.value.accountType == AccountType.FREE) {
                         (activity as? FileManagementPreferencesActivity)?.showRBNotDisabledDialog()
                         it.onPreferenceClickListener = null
                         it.isChecked = true
@@ -347,7 +347,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
                 val subtitle = getString(R.string.settings_rb_scheduler_enable_subtitle)
                 it.summary = "$subtitle ${
                     getString(
-                        if (myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE)
+                        if (viewModel.state.value.accountType == AccountType.FREE)
                             R.string.settings_rb_scheduler_enable_period_FREE
                         else
                             R.string.settings_rb_scheduler_enable_period_PRO
@@ -493,7 +493,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             requestFocus()
         }
         val text = TextView(activity)
-        if (myAccountInfo.accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+        if (viewModel.state.value.accountType?.isPaid == true) {
             text.text =
                 activity.getFormattedStringOrDefault(R.string.settings_rb_scheduler_enable_period_PRO)
         } else {

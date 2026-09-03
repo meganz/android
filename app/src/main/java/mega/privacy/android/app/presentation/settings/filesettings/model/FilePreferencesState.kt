@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.settings.filesettings.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.domain.entity.AccountType
 
 /**
  * State of the File Preferences screen.
@@ -15,6 +16,7 @@ import de.palm.composestateevents.consumed
  * @property isRubbishBinAutopurgeEnabled Whether the rubbish bin autopurge is enabled.
  * @property rubbishBinAutopurgePeriod Period of the rubbish bin autopurge in days.
  * @property errorMessageId Id of the error message.
+ * @property accountType Type of the current account.
  */
 data class FilePreferencesState(
     val numberOfPreviousVersions: Int? = null,
@@ -26,5 +28,6 @@ data class FilePreferencesState(
     val emptyRubbishBinEvent: StateEventWithContent<Throwable?>,
     val isRubbishBinAutopurgeEnabled: Boolean = false,
     val rubbishBinAutopurgePeriod: Int = 0,
-    val errorMessageId: Int = 0
+    val errorMessageId: Int = 0,
+    val accountType: AccountType? = null,
 )

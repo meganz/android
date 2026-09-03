@@ -30,7 +30,6 @@ class MyAccountInfo @Inject constructor(
     }
 
     var usedStorage = INVALID_VALUE.toLong()
-    var accountType = INVALID_VALUE
     var formattedUsedRubbish = ""
 
     /**
@@ -40,7 +39,6 @@ class MyAccountInfo @Inject constructor(
      */
     fun resetDefaults() {
         usedStorage = INVALID_VALUE.toLong()
-        accountType = INVALID_VALUE
         formattedUsedRubbish = ""
     }
 
@@ -52,7 +50,6 @@ class MyAccountInfo @Inject constructor(
         Timber.d("Expires on: ${getDateString(accountInfo.proExpiration)}")
 
         val storage = numDetails and HAS_STORAGE_DETAILS != 0
-        val pro = numDetails and HAS_PRO_DETAILS != 0
 
         if (storage) {
             if (megaApi.rubbishNode != null) {
@@ -63,11 +60,5 @@ class MyAccountInfo @Inject constructor(
 
             usedStorage = accountInfo.storageUsed
         }
-
-        if (pro) {
-            accountType = accountInfo.proLevel
-        }
-
-        Timber.d("pro level: ${accountInfo.proLevel}")
     }
 }

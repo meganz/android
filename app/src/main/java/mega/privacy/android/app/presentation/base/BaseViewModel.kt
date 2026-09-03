@@ -5,11 +5,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.base.model.BaseState
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.business.MonitorBusinessAccountExpiredUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -21,6 +24,7 @@ import javax.inject.Inject
 class BaseViewModel @Inject constructor(
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private var monitorBusinessAccountExpiredUseCase: MonitorBusinessAccountExpiredUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BaseState())
@@ -36,6 +40,15 @@ class BaseViewModel @Inject constructor(
             monitorBusinessAccountExpiredUseCase().collect {
                 _state.update { state -> state.copy(showExpiredBusinessAlert = true) }
             }
+        }
+        viewModelScope.launch {
+            monitorAccountDetailUseCase()
+                .catch { Timber.e(it, "Exception monitoring account details") }
+                .collect { accountDetail ->
+                    _state.update { state ->
+                        state.copy(accountType = accountDetail.levelDetail?.accountType)
+                    }
+                }
         }
     }
 

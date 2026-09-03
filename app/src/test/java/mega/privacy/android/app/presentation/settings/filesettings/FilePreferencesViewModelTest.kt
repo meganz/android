@@ -12,11 +12,16 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.cache.ClearCacheUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheSizeUseCase
@@ -79,6 +84,10 @@ internal class FilePreferencesViewModelTest {
     private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase>() {
         on { invoke() }.thenReturn(myAccountUpdateFlow)
     }
+    private val accountDetailFlow = MutableStateFlow(AccountDetail())
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
+        on { invoke() }.thenReturn(accountDetailFlow)
+    }
 
     @BeforeEach
     fun setUp() {
@@ -125,7 +134,8 @@ internal class FilePreferencesViewModelTest {
             setRubbishBinAutopurgePeriodUseCase,
             isRubbishBinAutopurgePeriodValidUseCase,
             cleanRubbishBinUseCase,
-            monitorMyAccountUpdateUseCase
+            monitorMyAccountUpdateUseCase,
+            monitorAccountDetailUseCase,
         )
     }
 
@@ -342,6 +352,27 @@ internal class FilePreferencesViewModelTest {
         advanceUntilIdle()
         underTest.monitorMyAccountUpdateEvent.test {
             assertThat(awaitItem()).isEqualTo(myAccountUpdate)
+        }
+    }
+
+    @Test
+    fun `test that account type is updated when monitor account detail emits`() = runTest {
+        accountDetailFlow.emit(
+            AccountDetail(
+                levelDetail = AccountLevelDetail(
+                    accountType = AccountType.PRO_I,
+                    subscriptionStatus = null,
+                    subscriptionRenewTime = 0L,
+                    accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                    proExpirationTime = 0L,
+                    accountPlanDetail = null,
+                    accountSubscriptionDetailList = emptyList(),
+                )
+            )
+        )
+        advanceUntilIdle()
+        underTest.state.test {
+            assertThat(awaitItem().accountType).isEqualTo(AccountType.PRO_I)
         }
     }
 

@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.settings.filesettings.model.FilePre
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.cache.ClearCacheUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheSizeUseCase
@@ -56,6 +57,7 @@ class FilePreferencesViewModel @Inject constructor(
     private val isRubbishBinAutopurgePeriodValidUseCase: IsRubbishBinAutopurgePeriodValidUseCase,
     private val cleanRubbishBinUseCase: CleanRubbishBinUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FilePreferencesState(emptyRubbishBinEvent = consumed()))
 
@@ -95,6 +97,13 @@ class FilePreferencesViewModel @Inject constructor(
                 .catch { Timber.w("Exception monitoring user updates: $it") }
                 .filter { it == UserChanges.DisableVersions }
                 .collect { getFileVersionOption() }
+        }
+        viewModelScope.launch {
+            monitorAccountDetailUseCase()
+                .catch { Timber.w("Exception monitoring account details: $it") }
+                .collect { accountDetail ->
+                    _state.update { it.copy(accountType = accountDetail.levelDetail?.accountType) }
+                }
         }
         getFileVersionOption()
         getRubbishBinAutopurgeInfo()

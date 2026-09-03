@@ -18,7 +18,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDER
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_LINKS
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.Util
@@ -59,7 +58,6 @@ import mega.privacy.mobile.analytics.event.LinkSetPasswordFileButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LinkSetPasswordFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFileDialogEvent
 import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFolderDialogEvent
-import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -84,7 +82,6 @@ class GetLinkViewModel @Inject constructor(
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     @ApplicationContext private val context: Context,
-    private val myAccountInfo: MyAccountInfo,
     private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
     private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
@@ -306,8 +303,7 @@ class GetLinkViewModel @Inject constructor(
      *
      * @return True if the account is Pro, false otherwise.
      */
-    fun isPro(): Boolean =
-        myAccountInfo.accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE
+    fun isPro(): Boolean = _state.value.accountType?.isPaid == true
 
     /**
      * Updates the node from which the link is getting or managing.

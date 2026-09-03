@@ -3,11 +3,16 @@ package mega.privacy.android.app.getLink
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDER
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_LINKS
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -21,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -50,7 +56,6 @@ class GetLinkViewModelTest {
             encryptLinkWithPasswordUseCase = mock(),
             exportNodeUseCase = mock(),
             context = mock(),
-            myAccountInfo = mock(),
             hasSensitiveDescendantUseCase = hasSensitiveDescendantUseCase,
             hasSensitiveInheritedUseCase = hasSensitiveInheritedUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
@@ -160,4 +165,27 @@ class GetLinkViewModelTest {
 
             assertThat(result).isEqualTo(shouldShow)
         }
+
+    @ParameterizedTest
+    @EnumSource(AccountType::class)
+    fun `test that isPro returns true only for paid accounts`(accountType: AccountType) = runTest {
+        whenever(monitorAccountDetailUseCase()).thenReturn(
+            flowOf(
+                AccountDetail(
+                    levelDetail = AccountLevelDetail(
+                        accountType = accountType,
+                        subscriptionStatus = null,
+                        subscriptionRenewTime = 0L,
+                        accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                        proExpirationTime = 0L,
+                        accountPlanDetail = null,
+                        accountSubscriptionDetailList = emptyList(),
+                    )
+                )
+            )
+        )
+        initUnderTest()
+
+        assertThat(underTest.isPro()).isEqualTo(accountType.isPaid)
+    }
 }

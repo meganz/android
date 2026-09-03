@@ -29,6 +29,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.appstate.MegaActivity
@@ -37,7 +38,6 @@ import mega.privacy.android.app.appstate.global.initialisation.appcreate.Session
 import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.LAUNCH_INTENT
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.ChatApiListenerCoordinator
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.SmsVerificationState
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.PermissionRequester
@@ -69,6 +69,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.AccountBlockedEvent
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.PurchaseType
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.Skus
@@ -98,7 +99,6 @@ import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
-import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
@@ -114,7 +114,6 @@ import kotlin.time.Duration.Companion.seconds
  * @property megaApiFolder                  [MegaApiAndroid]
  * @property megaChatApi                    [MegaChatApiAndroid]
  * @property dbH                            [DatabaseHandler]
- * @property myAccountInfo                  [MyAccountInfo]
  * @property outMetrics                     [DisplayMetrics]
  * @property getAccountDetailsUseCase
  * @property billingViewModel
@@ -136,9 +135,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     @Inject
     lateinit var dbH: LegacyDatabaseHandler
-
-    @Inject
-    lateinit var myAccountInfo: MyAccountInfo
 
     @Inject
     lateinit var getAccountDetailsUseCase: GetAccountDetailsUseCase
@@ -264,7 +260,10 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false)
 
             if (isExpiredBusinessAlertShown) {
-                showExpiredBusinessAlert()
+                lifecycleScope.launch {
+                    viewModel.state.first { it.accountType != null }
+                    showExpiredBusinessAlert()
+                }
             }
 
             if (getBoolean(UPGRADE_ALERT_SHOWN, false)) {
@@ -673,8 +672,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             return
         }
 
-        val isProFlexiAccount =
-            myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_PRO_FLEXI
+        val isProFlexiAccount = viewModel.state.value.accountType == AccountType.PRO_FLEXI
 
         val builder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
