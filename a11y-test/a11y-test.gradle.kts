@@ -38,6 +38,14 @@ dependencies {
     androidTestImplementation(androidx.compose.foundation)
     androidTestImplementation(androidx.compose.activity)
     androidTestImplementation(androidx.material3)
+    // Screen-level sweeps mount stateless feature-module screens directly, so the modules that
+    // own them and the modules declaring their UI-state types are compile-time dependencies.
+    androidTestImplementation(project(":feature:settings"))
+    androidTestImplementation(project(":feature:transfers:transfers"))
+    androidTestImplementation(project(":feature:payment:payment-snowflake-components"))
+    androidTestImplementation(project(":domain"))
+    androidTestImplementation(project(":core:analytics:analytics-test"))
+    androidTestImplementation(project(":resources:string-resources"))
     androidTestImplementation(lib.mega.core.ui)
     androidTestImplementation(lib.kotlinx.collections.immutable)
     androidTestImplementation(testlib.androidx.compose.ui.test.junit4)
