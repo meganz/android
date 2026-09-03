@@ -34,7 +34,6 @@ import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
 import coil3.util.CoilUtils
 import dagger.hilt.android.EntryPointAccessors
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
@@ -510,7 +509,10 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             }
 
             Constants.FOLDER_LINK_ADAPTER -> {
-                megaApi = ((context as Activity).application as MegaApplication).megaApiFolder
+                megaApi = EntryPointAccessors.fromApplication(
+                    context.applicationContext,
+                    MegaApiEntryPoint::class.java,
+                ).megaApiFolder()
             }
 
             else -> {}
@@ -519,8 +521,10 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         this.listFragment = recyclerView
 
         if (megaApi == null) {
-            megaApi = ((context as Activity).application as MegaApplication)
-                .megaApi
+            megaApi = EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                MegaApiEntryPoint::class.java,
+            ).megaApi()
         }
     }
 

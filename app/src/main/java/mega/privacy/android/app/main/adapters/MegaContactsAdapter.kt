@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.adapters
 
-import android.app.Activity
 import android.content.Context
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
@@ -12,10 +11,10 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.EntryPointAccessors
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaContactAdapter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.main.adapters.mapper.MegaContactAdapterToContactItemUiStateMapper
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
@@ -48,8 +47,14 @@ class MegaContactsAdapter @VisibleForTesting internal constructor(
         contacts = contacts,
         listFragment = listFragment,
         adapterType = adapterType,
-        megaApi = ((context as Activity).application as MegaApplication).megaApi,
-        megaChatApi = (context.application as MegaApplication).megaChatApi,
+        megaApi = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            MegaApiEntryPoint::class.java,
+        ).megaApi(),
+        megaChatApi = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            MegaApiEntryPoint::class.java,
+        ).megaChatApi(),
         contactItemUiStateMapper = EntryPointAccessors.fromApplication(
             context.applicationContext,
             MegaContactsAdapterEntryPoint::class.java,

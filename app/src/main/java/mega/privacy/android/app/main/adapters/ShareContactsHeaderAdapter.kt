@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.adapters
 
-import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -12,9 +11,9 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.EntryPointAccessors
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.main.ShareContactInfo
 import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter.ViewHolderShareContacts
 import mega.privacy.android.app.main.adapters.mapper.ShareContactInfoToContactItemUiStateMapper
@@ -42,8 +41,14 @@ class ShareContactsHeaderAdapter @VisibleForTesting internal constructor(
     constructor(context: Context, shareContacts: ArrayList<ShareContactInfo>?) : this(
         context = context,
         shareContacts = shareContacts,
-        megaApi = ((context as Activity).application as MegaApplication).megaApi,
-        megaChatApi = (context.application as MegaApplication).megaChatApi,
+        megaApi = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            MegaApiEntryPoint::class.java,
+        ).megaApi(),
+        megaChatApi = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            MegaApiEntryPoint::class.java,
+        ).megaChatApi(),
         contactItemUiStateMapper = EntryPointAccessors.fromApplication(
             context.applicationContext,
             ShareContactsHeaderAdapterEntryPoint::class.java,

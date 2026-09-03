@@ -21,7 +21,6 @@ import dagger.hilt.android.EntryPointAccessors;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -57,9 +56,9 @@ public class NodeController {
         this.isFolderLink = isFolderLink;
         if (megaApi == null) {
             if (isFolderLink) {
-                megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApiFolder();
+                megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApiFolder();
             } else {
-                megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+                megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();
             }
         }
     }
