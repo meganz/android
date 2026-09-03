@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.texteditor.components.markdown.rich
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.delete
+import androidx.compose.foundation.text.input.insert
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +58,29 @@ data class RichFocusRequest(val index: Int, val selection: TextRange)
 /** A one-shot request to split a block (Enter), consumed by the editor UI on the UI thread. */
 data class RichSplitRequest(val index: Int, val start: Int, val end: Int)
 
+/** A one-shot request to re-apply a pasted multi-line insert as parsed Markdown. */
+data class RichSmartInsertRequest(
+    val index: Int,
+    val start: Int,
+    val end: Int,
+    val text: String,
+)
+
+/** A position in the rich document: a block index plus a character offset in its text. */
+data class RichDocPosition(val blockIndex: Int, val offset: Int) : Comparable<RichDocPosition> {
+    override fun compareTo(other: RichDocPosition): Int =
+        compareValuesBy(this, other, { it.blockIndex }, { it.offset })
+}
+
+/** A cross-block document selection; [start] <= [end] in document order. */
+data class RichDocSelection(val start: RichDocPosition, val end: RichDocPosition) {
+    companion object {
+        /** Builds a selection with the two positions put in document order. */
+        fun between(a: RichDocPosition, b: RichDocPosition): RichDocSelection =
+            if (a <= b) RichDocSelection(a, b) else RichDocSelection(b, a)
+    }
+}
+
 /**
  * Editing state of a whole rich document: the observable block list plus which block holds
  * focus. Bridges the immutable [RichDocument] model to always-editable per-block state, and
@@ -72,6 +97,36 @@ class RichDocumentState(document: RichDocument) {
     var pendingFocus: RichFocusRequest? by mutableStateOf(null)
 
     var pendingSplit: RichSplitRequest? by mutableStateOf(null)
+
+    /**
+     * The cross-block "document selection" (long-press + drag across blocks). Independent of
+     * the per-field editing selection: it is painted through the span pipeline and copied via
+     * [selectedText]; the fields never see it.
+     */
+    var documentSelection: RichDocSelection? by mutableStateOf(null)
+
+    /**
+     * One-shot request to replace [documentSelection] with typed text ("" = plain delete),
+     * recorded from the text input pipeline; the editor performs it on the UI thread.
+     */
+    var pendingSelectionReplacement: String? by mutableStateOf(null)
+
+    fun requestDeleteSelection() {
+        pendingSelectionReplacement = ""
+    }
+
+    fun requestReplaceSelection(text: String) {
+        pendingSelectionReplacement = text
+    }
+
+    /** One-shot request for a paste-like insert, recorded from the text input pipeline. */
+    var pendingSmartInsert: RichSmartInsertRequest? by mutableStateOf(null)
+
+    fun requestSmartInsert(index: Int, start: Int, end: Int, text: String) {
+        pendingSmartInsert = RichSmartInsertRequest(index, start, end, text)
+    }
+
+    private val markdownConverter by lazy { MarkdownToRichDocumentConverter() }
 
     // Document-level undo: per-field text undo cannot cover structural operations
     // (split/merge/retype) or span changes, and would desync spans from text, so the whole
@@ -137,6 +192,333 @@ class RichDocumentState(document: RichDocument) {
         focusedIndex = focusedIndex?.coerceIn(0, (blocks.size - 1).coerceAtLeast(0))
         pendingFocus = null
         pendingSplit = null
+        pendingSelectionReplacement = null
+        pendingSmartInsert = null
+        documentSelection = null
+    }
+
+    /** The part of [documentSelection] covering the block at [index], or null. */
+    fun documentSelectionIn(index: Int): TextRange? {
+        val selection = documentSelection ?: return null
+        if (index < selection.start.blockIndex || index > selection.end.blockIndex) return null
+        val length = blockTextLength(index) ?: return null
+        val from = if (index == selection.start.blockIndex) selection.start.offset else 0
+        val to = if (index == selection.end.blockIndex) selection.end.offset else length
+        val range = TextRange(from.coerceIn(0, length), to.coerceIn(0, length))
+        return range.takeIf { it.min < it.max || selection.start.blockIndex != selection.end.blockIndex }
+    }
+
+    /**
+     * Moves one edge of [documentSelection] to [position] (a selection-handle drag). Edges
+     * cannot cross, matching native handle behavior: a move that would pass the other edge is
+     * ignored.
+     */
+    fun moveSelectionEdge(isStart: Boolean, position: RichDocPosition) {
+        val selection = documentSelection ?: return
+        documentSelection = when {
+            isStart && position < selection.end -> selection.copy(start = position)
+            !isStart && position > selection.start -> selection.copy(end = position)
+            else -> selection
+        }
+    }
+
+    /**
+     * Deletes the content covered by [documentSelection]: partial text on the edge blocks,
+     * whole blocks in between, and the two remnants joined when both are text blocks — one
+     * undo step. Returns false when there is nothing to delete.
+     */
+    fun deleteDocumentSelection(): Boolean {
+        val selection = documentSelection?.takeIf { it.start != it.end } ?: return false
+        if (blocks.isEmpty()) return false
+        documentSelection = null
+        recordUndo()
+        val startIndex = selection.start.blockIndex.coerceIn(0, blocks.size - 1)
+        val endIndex = selection.end.blockIndex.coerceIn(startIndex, blocks.size - 1)
+        if (startIndex == endIndex) {
+            deleteWithinBlock(startIndex, selection.start.offset, selection.end.offset)
+        } else {
+            deleteWithinBlock(endIndex, 0, selection.end.offset)
+            for (index in endIndex - 1 downTo startIndex + 1) {
+                blocks.removeAt(index)
+            }
+            deleteWithinBlock(
+                startIndex,
+                selection.start.offset,
+                blockTextLength(startIndex) ?: Int.MAX_VALUE,
+            )
+            val first = blocks.getOrNull(startIndex)
+            val second = blocks.getOrNull(startIndex + 1)
+            if (first is RichTextBlockEditState && second is RichTextBlockEditState) {
+                val joinAt = first.text.textFieldState.text.length
+                first.text.textFieldState.edit { append(second.text.textFieldState.text) }
+                first.text.spans = RichSpanAdjuster.normalize(
+                    first.text.spans + second.text.spans.map {
+                        it.copy(start = it.start + joinAt, end = it.end + joinAt)
+                    },
+                )
+                blocks.removeAt(startIndex + 1)
+            }
+        }
+        val caret = selection.start.offset.coerceIn(0, blockTextLength(startIndex) ?: 0)
+        pendingFocus = RichFocusRequest(startIndex, TextRange(caret))
+        return true
+    }
+
+    /**
+     * Replaces [documentSelection] with [insert]: the selection is deleted and the typed text
+     * lands at the join; a lone newline instead splits the merged block there (Enter).
+     */
+    fun replaceDocumentSelection(insert: String): Boolean {
+        if (!deleteDocumentSelection()) return false
+        val target = pendingFocus ?: return true
+        if (insert.isEmpty()) return true
+        when (val block = blocks.getOrNull(target.index)) {
+            // Code is the one multi-line block kind: newlines go in verbatim.
+            is CodeBlockEditState -> {
+                val at = target.selection.start
+                block.code.edit { insert(at, insert) }
+                pendingFocus = RichFocusRequest(target.index, TextRange(at + insert.length))
+            }
+
+            is RichTextBlockEditState ->
+                insertContent(target.index, target.selection.start, insert)
+
+            else -> Unit
+        }
+        return true
+    }
+
+    /**
+     * A paste-like insert at [start]..[end] of the text block at [index]: Markdown syntax in
+     * the pasted text is applied as real structure, plain text falls back to line-per-block
+     * insertion. One undo step.
+     */
+    fun smartInsert(index: Int, start: Int, end: Int, text: String) {
+        if (blocks.getOrNull(index) !is RichTextBlockEditState) return
+        recordUndo()
+        deleteWithinBlock(index, start, end)
+        insertContent(index, start, text)
+    }
+
+    /**
+     * Inserted text that parses into Markdown STRUCTURE (several blocks, a non-paragraph
+     * kind, inline styles) is spliced in as blocks and spans — pasted Markdown formats
+     * itself. Anything else inserts as plain text, one block per line.
+     */
+    private fun insertContent(index: Int, at: Int, text: String) {
+        val parsed = markdownConverter.convert(text)
+        val single = parsed.blocks.singleOrNull()
+        val isPlain = parsed.blocks.isEmpty() ||
+                (single is RichBlock.Paragraph && single.text.spans.isEmpty())
+        if (isPlain) {
+            insertPlainSegments(index, at, text)
+        } else {
+            spliceBlocks(index, at, parsed.blocks)
+        }
+    }
+
+    /** Text blocks are single-line by invariant: each newline becomes a block split. */
+    private fun insertPlainSegments(startIndex: Int, startAt: Int, text: String) {
+        var index = startIndex
+        var at = startAt
+        text.split("\n").forEachIndexed { segmentIndex, segment ->
+            if (segmentIndex > 0) {
+                performSplit(index, at)
+                index++
+                at = 0
+            }
+            if (segment.isNotEmpty()) {
+                insertIntoTextBlock(index, at, segment)
+                at += segment.length
+            }
+        }
+        pendingFocus = RichFocusRequest(index, TextRange(at))
+    }
+
+    private fun spliceBlocks(index: Int, at: Int, newBlocks: List<RichBlock>) {
+        val target = blocks.getOrNull(index) as? RichTextBlockEditState ?: return
+        val targetKind = target.kind
+        val text = target.text.textFieldState.text.toString()
+        val split = at.coerceIn(0, text.length)
+        val tailText = text.substring(split)
+        val (headSpans, tailSpans) = splitSpans(target.text.spans, split, split)
+        target.text.textFieldState.edit { replace(split, length, "") }
+        target.text.spans = headSpans
+
+        val states = newBlocks.map { it.toEditState() }.toMutableList()
+        val firstState = states.firstOrNull() ?: return
+        // Pasting at the start of a block adopts the first pasted block wholesale, kind
+        // included. Mid-text, only a plain PARAGRAPH merges into the sentence — a pasted
+        // heading, list item or quote keeps its identity as its own block.
+        if (split == 0) {
+            blocks[index] = firstState
+            states.removeAt(0)
+        } else if (firstState is RichTextBlockEditState && firstState.kind == RichBlockKind.Paragraph) {
+            target.text.textFieldState.edit { append(firstState.text.textFieldState.text) }
+            target.text.spans = RichSpanAdjuster.normalize(
+                target.text.spans + firstState.text.spans.map {
+                    it.copy(start = it.start + split, end = it.end + split)
+                },
+            )
+            states.removeAt(0)
+        }
+        states.forEachIndexed { offset, state -> blocks.add(index + 1 + offset, state) }
+        val lastIndex = index + states.size
+
+        // The remainder of the split block joins the end of the pasted content, keeping the
+        // caret at the seam like a native paste.
+        val lastBlock = blocks.getOrNull(lastIndex)
+        val caret: RichFocusRequest = if (tailText.isEmpty() && tailSpans.isEmpty()) {
+            RichFocusRequest(lastIndex, TextRange(blockTextLength(lastIndex) ?: 0))
+        } else if (lastBlock is RichTextBlockEditState && lastBlock.kind == RichBlockKind.Paragraph) {
+            val joinAt = lastBlock.text.textFieldState.text.length
+            lastBlock.text.textFieldState.edit { append(tailText) }
+            lastBlock.text.spans = RichSpanAdjuster.normalize(
+                lastBlock.text.spans + tailSpans.map {
+                    it.copy(start = it.start + joinAt, end = it.end + joinAt)
+                },
+            )
+            RichFocusRequest(lastIndex, TextRange(joinAt))
+        } else {
+            val tailKind = when (targetKind) {
+                is RichBlockKind.Item ->
+                    targetKind.copy(checked = targetKind.checked?.let { false }, startNumber = null)
+
+                else -> targetKind
+            }
+            blocks.add(
+                lastIndex + 1,
+                RichTextBlockEditState(tailKind, RichTextBlockState(tailText, tailSpans)),
+            )
+            RichFocusRequest(lastIndex + 1, TextRange.Zero)
+        }
+        pendingFocus = caret
+    }
+
+    private fun insertIntoTextBlock(index: Int, at: Int, text: String) {
+        val block = blocks.getOrNull(index) as? RichTextBlockEditState ?: return
+        block.text.textFieldState.edit { insert(at, text) }
+        block.text.spans = RichSpanAdjuster.adjust(
+            block.text.spans,
+            listOf(RichSpanAdjuster.TextChange(at, at, at, at + text.length)),
+        )
+    }
+
+    private fun deleteWithinBlock(index: Int, from: Int, to: Int) {
+        when (val block = blocks.getOrNull(index)) {
+            is RichTextBlockEditState -> {
+                val length = block.text.textFieldState.text.length
+                val start = from.coerceIn(0, length)
+                val end = to.coerceIn(start, length)
+                if (start == end) return
+                block.text.textFieldState.edit { delete(start, end) }
+                block.text.spans = RichSpanAdjuster.adjust(
+                    block.text.spans,
+                    listOf(RichSpanAdjuster.TextChange(start, end, start, start)),
+                )
+            }
+
+            is CodeBlockEditState -> {
+                val length = block.code.text.length
+                val start = from.coerceIn(0, length)
+                val end = to.coerceIn(start, length)
+                if (start != end) block.code.edit { delete(start, end) }
+            }
+
+            else -> Unit
+        }
+    }
+
+    /** Selects every selectable block, first character to last. */
+    fun selectAllBlocks() {
+        val first = blocks.indices.firstOrNull { blockTextLength(it) != null } ?: return
+        val last = blocks.indices.last { blockTextLength(it) != null }
+        documentSelection = RichDocSelection(
+            RichDocPosition(first, 0),
+            RichDocPosition(last, blockTextLength(last) ?: 0),
+        )
+    }
+
+    /**
+     * The selected content as plain text: partial text on the edge blocks, whole blocks in
+     * between (raw source verbatim), joined with newlines. Null when nothing is selected.
+     */
+    fun selectedText(): String? {
+        val selection = documentSelection?.takeIf { it.start != it.end } ?: return null
+        val parts = mutableListOf<String>()
+        for (index in selection.start.blockIndex..selection.end.blockIndex) {
+            val text = when (val block = blocks.getOrNull(index)) {
+                is RichTextBlockEditState -> block.text.textFieldState.text.toString()
+                is CodeBlockEditState -> block.code.text.toString()
+                is RawSourceEditState -> block.source
+                else -> null
+            } ?: continue
+            val range = when (blocks.getOrNull(index)) {
+                is RawSourceEditState -> TextRange(0, text.length)
+                else -> documentSelectionIn(index) ?: TextRange(0, text.length)
+            }
+            parts += text.substring(range.min, range.max)
+        }
+        return parts.joinToString("\n").takeIf { it.isNotEmpty() }
+    }
+
+    /**
+     * The selected content as a standalone [RichDocument] for Markdown serialization: partial
+     * edge blocks keep their kind and sliced spans, interior blocks are included whole. Null
+     * when nothing is selected.
+     */
+    fun selectedDocument(): RichDocument? {
+        val selection = documentSelection?.takeIf { it.start != it.end } ?: return null
+        val sliced = mutableListOf<RichBlock>()
+        for (index in selection.start.blockIndex..selection.end.blockIndex) {
+            val from = if (index == selection.start.blockIndex) selection.start.offset else 0
+            val to = if (index == selection.end.blockIndex) selection.end.offset else Int.MAX_VALUE
+            slicedBlockAt(index, from, to)?.let(sliced::add)
+        }
+        return RichDocument(sliced).takeIf { it.blocks.isNotEmpty() }
+    }
+
+    private fun slicedBlockAt(index: Int, from: Int, to: Int): RichBlock? =
+        when (val block = blocks.getOrNull(index)) {
+            is RichTextBlockEditState -> {
+                val text = block.text.textFieldState.text.toString()
+                val start = from.coerceIn(0, text.length)
+                val end = to.coerceIn(start, text.length)
+                val upToEnd = splitSpans(block.text.spans, end, end).first
+                val spans = splitSpans(upToEnd, start, start).second
+                val richText = RichText(text.substring(start, end), spans)
+                when (val kind = block.kind) {
+                    RichBlockKind.Paragraph -> RichBlock.Paragraph(richText)
+                    is RichBlockKind.Heading -> RichBlock.Heading(kind.level, richText)
+                    is RichBlockKind.Item -> RichBlock.ListItem(
+                        ordered = kind.ordered,
+                        indent = kind.indent,
+                        checked = kind.checked,
+                        text = richText,
+                        startNumber = kind.startNumber,
+                    )
+
+                    is RichBlockKind.Quote -> RichBlock.Quote(kind.depth, richText)
+                }
+            }
+
+            is CodeBlockEditState -> {
+                val text = block.code.text.toString()
+                val start = from.coerceIn(0, text.length)
+                val end = to.coerceIn(start, text.length)
+                RichBlock.CodeBlock(block.language, text.substring(start, end))
+            }
+
+            is RawSourceEditState -> RichBlock.RawSource(block.source)
+            is ThematicBreakEditState -> RichBlock.ThematicBreak
+            else -> null
+        }
+
+    /** Length of the block's selectable text, or null when the block cannot anchor a selection. */
+    fun blockTextLength(index: Int): Int? = when (val block = blocks.getOrNull(index)) {
+        is RichTextBlockEditState -> block.text.textFieldState.text.length
+        is CodeBlockEditState -> block.code.text.length
+        else -> null
     }
 
     /** Checkbox tap on a task item; checkpointed for undo. */
@@ -168,8 +550,12 @@ class RichDocumentState(document: RichDocument) {
      * through [requestSplit]/[pendingSplit] instead of calling this directly.
      */
     fun splitBlock(index: Int, start: Int, end: Int = start) {
-        val block = blocks.getOrNull(index) as? RichTextBlockEditState ?: return
         recordUndo()
+        performSplit(index, start, end)
+    }
+
+    private fun performSplit(index: Int, start: Int, end: Int = start) {
+        val block = blocks.getOrNull(index) as? RichTextBlockEditState ?: return
         val kind = block.kind
         val text = block.text.textFieldState.text.toString()
         if (text.isEmpty()) {

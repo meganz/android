@@ -2,6 +2,7 @@ package mega.privacy.android.feature.texteditor.components.markdown.rich
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -20,8 +23,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
@@ -29,7 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
@@ -38,14 +45,27 @@ import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.Clipboard
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import mega.privacy.android.feature.texteditor.components.MarkdownBlock
 import mega.privacy.android.feature.texteditor.components.MarkdownBlockSpacing
 import mega.privacy.android.feature.texteditor.components.MarkdownCodeFrame
@@ -84,6 +104,26 @@ fun RichDocumentEditor(
     val visualStyles = rememberRichSpanVisualStyles()
     val colors = rememberMarkdownColors()
     val focusRequesters = remember(state) { mutableMapOf<Int, FocusRequester>() }
+    val geometry = remember(state) { RichSelectionGeometry() }
+    val textToolbar = LocalTextToolbar.current
+    val clipboard = LocalClipboard.current
+    val haptics = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+
+    // Edge autoscroll for selection drags: while a drag parks near the viewport edge, scroll
+    // a step every frame and keep extending the selection toward the stationary finger.
+    LaunchedEffect(state, geometry, listState) {
+        snapshotFlow { geometry.autoscroll != null }.collectLatest { active ->
+            if (!active) return@collectLatest
+            while (isActive) {
+                withFrameNanos { }
+                val request = geometry.autoscroll ?: break
+                listState.dispatchRawDelta(request.velocity)
+                geometry.docPositionAt(state, request.dragRoot)?.let(request.moveEdge)
+            }
+        }
+    }
 
     // Enter is only recorded by the input transformation (which runs in the text input
     // pipeline, off the composition applier); the actual block mutation happens here, on the
@@ -115,6 +155,23 @@ fun RichDocumentEditor(
     }
 
     LaunchedEffect(state) {
+        snapshotFlow { state.pendingSmartInsert }.collect { request ->
+            if (request == null) return@collect
+            state.pendingSmartInsert = null
+            state.smartInsert(request.index, request.start, request.end, request.text)
+        }
+    }
+
+    LaunchedEffect(state) {
+        snapshotFlow { state.pendingSelectionReplacement }.collect { replacement ->
+            if (replacement == null) return@collect
+            state.pendingSelectionReplacement = null
+            textToolbar.hide()
+            state.replaceDocumentSelection(replacement)
+        }
+    }
+
+    LaunchedEffect(state) {
         snapshotFlow { state.pendingFocus }.collect { request ->
             if (request == null) return@collect
             // Let the frame that composes a freshly split/merged block land first, so its
@@ -133,6 +190,41 @@ fun RichDocumentEditor(
         }
     }
 
+    // Any content or structure change invalidates the cross-block selection, exactly like a
+    // native field selection dies on edit. Deliberately keyed on the text itself rather than
+    // edit counters: the IME pushes no-op edits (re-committing unchanged text when the
+    // selection moves), which must not wipe a selection the user just made.
+    LaunchedEffect(state) {
+        snapshotFlow {
+            var signature = state.blocks.size
+            state.blocks.forEach { block ->
+                val text = when (block) {
+                    is RichTextBlockEditState -> block.text.textFieldState.text
+                    is CodeBlockEditState -> block.code.text
+                    else -> null
+                }
+                signature = 31 * signature + (text?.toString()?.hashCode() ?: 0)
+            }
+            signature
+        }
+            .drop(1)
+            .collect {
+                if (state.documentSelection != null) {
+                    state.documentSelection = null
+                    textToolbar.hide()
+                }
+            }
+    }
+
+    DisposableEffect(state, textToolbar) {
+        onDispose {
+            if (state.documentSelection != null) {
+                state.documentSelection = null
+                textToolbar.hide()
+            }
+        }
+    }
+
     // Same selection palette as the preview and the chunked source editor, instead of the
     // Material default, so selecting text looks the same on every editor surface.
     val selectionColors = remember(colors.text) {
@@ -142,7 +234,30 @@ fun RichDocumentEditor(
         )
     }
     CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
-        RichDocumentBlocks(state, visualStyles, colors, focusRequesters, modifier)
+        Box(modifier = modifier) {
+            RichDocumentBlocks(
+                state = state,
+                visualStyles = visualStyles,
+                colors = colors,
+                focusRequesters = focusRequesters,
+                geometry = geometry,
+                textToolbar = textToolbar,
+                clipboard = clipboard,
+                haptics = haptics,
+                scope = scope,
+                listState = listState,
+            )
+            DocumentSelectionHandles(
+                state = state,
+                geometry = geometry,
+                color = colors.text,
+                onDragStart = { textToolbar.hide() },
+                onDragStopped = {
+                    showDocumentSelectionMenu(state, geometry, textToolbar, clipboard, scope)
+                },
+                modifier = Modifier.matchParentSize(),
+            )
+        }
     }
 }
 
@@ -152,11 +267,54 @@ private fun RichDocumentBlocks(
     visualStyles: RichSpanVisualStyles,
     colors: MarkdownColors,
     focusRequesters: MutableMap<Int, FocusRequester>,
+    geometry: RichSelectionGeometry,
+    textToolbar: TextToolbar,
+    clipboard: Clipboard,
+    haptics: HapticFeedback,
+    scope: CoroutineScope,
+    listState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
+        state = listState,
         modifier = modifier
             .fillMaxSize()
+            .onGloballyPositioned { geometry.editorCoordinates = it }
+            .pointerInput(state, geometry) {
+                detectDocumentSelection(
+                    state = state,
+                    geometry = geometry,
+                    haptics = haptics,
+                    onClearSelection = {
+                        state.documentSelection = null
+                        textToolbar.hide()
+                    },
+                    onSelectionFinished = {
+                        showDocumentSelectionMenu(state, geometry, textToolbar, clipboard, scope)
+                    },
+                    // A word selection completed inside one field becomes a document selection
+                    // on release, so the handles the user then grabs are the cross-block ones —
+                    // the field's own popup handles can never leave their field. Deferred a
+                    // frame so the field's own up-handling settles before it is retired.
+                    onConvertSelection = { blockIndex, range ->
+                        scope.launch {
+                            withFrameNanos { }
+                            state.documentSelection = RichDocSelection(
+                                RichDocPosition(blockIndex, range.min),
+                                RichDocPosition(blockIndex, range.max),
+                            )
+                            editableFieldStateAt(state, blockIndex)?.let { field ->
+                                if (!field.selection.collapsed) {
+                                    field.edit { selection = TextRange(field.selection.max) }
+                                }
+                            }
+                            showDocumentSelectionMenu(
+                                state, geometry, textToolbar, clipboard, scope,
+                            )
+                        }
+                    },
+                )
+            }
             .testTag(RICH_DOCUMENT_EDITOR_TAG),
         // No top padding: matches the chunked source editor so switching edit modes does not
         // shift the content down (the collapsing top bar already provides the top spacing).
@@ -171,16 +329,18 @@ private fun RichDocumentBlocks(
                     visualStyles = visualStyles,
                     colors = colors,
                     focusRequester = focusRequesters.getOrPut(index) { FocusRequester() },
+                    geometry = geometry,
                 )
 
-                is CodeBlockEditState -> CodeBlockRow(index, block, state, colors)
+                is CodeBlockEditState ->
+                    CodeBlockRow(index, block, state, visualStyles, colors, geometry)
 
                 is ThematicBreakEditState -> HorizontalDivider(
                     color = colors.divider,
                     modifier = Modifier.padding(vertical = 12.dp),
                 )
 
-                is RawSourceEditState -> RawSourceRow(block, colors)
+                is RawSourceEditState -> RawSourceRow(index, block, colors, geometry)
             }
         }
         item(key = "tail-tap-area") {
@@ -212,8 +372,12 @@ private fun RichTextBlockRow(
     visualStyles: RichSpanVisualStyles,
     colors: MarkdownColors,
     focusRequester: FocusRequester,
+    geometry: RichSelectionGeometry,
 ) {
     val kind = block.kind
+    DisposableEffect(geometry, index) {
+        onDispose { geometry.clear(index) }
+    }
     // Typing styles follow the caret (Notes behavior: moving the caret resets pending toggles;
     // typing keeps the style because the fresh span already covers the new caret position).
     LaunchedEffect(block.text) {
@@ -254,15 +418,27 @@ private fun RichTextBlockRow(
             textStyle = blockTextStyle(kind, colors),
             cursorBrush = SolidColor(colors.text),
             inputTransformation = remember(block, index) {
-                RichSpanInputTransformation(block.text) { start, end ->
-                    state.requestSplit(index, start, end)
+                RichSpanInputTransformation(
+                    state = block.text,
+                    onSplit = { start, end -> state.requestSplit(index, start, end) },
+                    documentSelectionActive = { state.documentSelection != null },
+                    onReplaceDocumentSelection = { state.requestReplaceSelection(it) },
+                    onSmartInsert = { start, end, text ->
+                        state.requestSmartInsert(index, start, end, text)
+                    },
+                )
+            },
+            outputTransformation = remember(block, visualStyles, index) {
+                RichSpanOutputTransformation(block.text, visualStyles) {
+                    state.documentSelectionIn(index)
                 }
             },
-            outputTransformation = remember(block, visualStyles) {
-                RichSpanOutputTransformation(block.text, visualStyles)
-            },
+            onTextLayout = { getResult -> geometry.textLayoutProviders[index] = getResult },
             modifier = Modifier
                 .weight(1f)
+                .onGloballyPositioned {
+                    geometry.fieldBounds[index] = Rect(it.positionInRoot(), it.size.toSize())
+                }
                 // Inside a continuous quote the paragraph gap moves INSIDE the row, so the
                 // full-height bar spans it — one unbroken bar, like the preview's frame.
                 .then(
@@ -279,6 +455,13 @@ private fun RichTextBlockRow(
                 .onPreviewKeyEvent { event ->
                     when {
                         handleUndoRedoKey(event, state) -> true
+
+                        event.type == KeyEventType.KeyDown &&
+                                (event.key == Key.Backspace || event.key == Key.Delete) &&
+                                state.documentSelection != null -> {
+                            state.requestDeleteSelection()
+                            true
+                        }
 
                         event.type == KeyEventType.KeyDown &&
                                 event.key == Key.Backspace &&
@@ -298,8 +481,13 @@ private fun CodeBlockRow(
     index: Int,
     block: CodeBlockEditState,
     state: RichDocumentState,
+    visualStyles: RichSpanVisualStyles,
     colors: MarkdownColors,
+    geometry: RichSelectionGeometry,
 ) {
+    DisposableEffect(geometry, index) {
+        onDispose { geometry.clear(index) }
+    }
     MarkdownCodeFrame(
         colors = colors,
         modifier = Modifier.padding(MarkdownBlockSpacing.block),
@@ -311,17 +499,53 @@ private fun CodeBlockRow(
                 color = colors.text,
             ),
             cursorBrush = SolidColor(colors.text),
+            inputTransformation = remember(block) {
+                DocumentSelectionInputTransformation(
+                    documentSelectionActive = { state.documentSelection != null },
+                    onReplaceDocumentSelection = { state.requestReplaceSelection(it) },
+                )
+            },
+            outputTransformation = remember(block, visualStyles, index) {
+                DocumentSelectionOutputTransformation(visualStyles) {
+                    state.documentSelectionIn(index)
+                }
+            },
+            onTextLayout = { getResult -> geometry.textLayoutProviders[index] = getResult },
             modifier = Modifier
                 .fillMaxWidth()
+                .onGloballyPositioned {
+                    geometry.fieldBounds[index] = Rect(it.positionInRoot(), it.size.toSize())
+                }
                 .onFocusChanged { if (it.isFocused) state.focusedIndex = index }
-                .onPreviewKeyEvent { handleUndoRedoKey(it, state) }
+                .onPreviewKeyEvent { event ->
+                    when {
+                        handleUndoRedoKey(event, state) -> true
+
+                        event.type == KeyEventType.KeyDown &&
+                                (event.key == Key.Backspace || event.key == Key.Delete) &&
+                                state.documentSelection != null -> {
+                            state.requestDeleteSelection()
+                            true
+                        }
+
+                        else -> false
+                    }
+                }
                 .testTag(richBlockFieldTag(index)),
         )
     }
 }
 
 @Composable
-private fun RawSourceRow(block: RawSourceEditState, colors: MarkdownColors) {
+private fun RawSourceRow(
+    index: Int,
+    block: RawSourceEditState,
+    colors: MarkdownColors,
+    geometry: RichSelectionGeometry,
+) {
+    DisposableEffect(geometry, index) {
+        onDispose { geometry.clear(index) }
+    }
     // Rendered through the preview's block components so unsupported constructs (tables,
     // HTML, images) look exactly like View mode. Not editable — the verbatim source slice
     // still serializes untouched, which is what keeps them lossless. The SelectionContainer
@@ -329,7 +553,13 @@ private fun RawSourceRow(block: RawSourceEditState, colors: MarkdownColors) {
     // from their text fields).
     val nodes = remember(block.source) { parseTopLevelBlocks(block.source) }
     SelectionContainer {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned {
+                    geometry.rawBounds[index] = Rect(it.positionInRoot(), it.size.toSize())
+                },
+        ) {
             nodes.forEach { node ->
                 MarkdownBlock(node = node, colors = colors)
             }

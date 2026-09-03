@@ -501,6 +501,391 @@ internal class RichDocumentStateTest {
         }
     }
 
+    @Test
+    fun `test that RichDocSelection between orders positions across blocks`() {
+        val a = RichDocPosition(2, 1)
+        val b = RichDocPosition(0, 5)
+
+        assertThat(RichDocSelection.between(a, b)).isEqualTo(RichDocSelection(b, a))
+        assertThat(RichDocSelection.between(b, a)).isEqualTo(RichDocSelection(b, a))
+    }
+
+    @Test
+    fun `test that documentSelectionIn returns partial ranges on edge blocks and full ranges between`() {
+        val state = RichDocumentState(document)
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 2),
+            RichDocPosition(2, 2),
+        )
+
+        assertThat(state.documentSelectionIn(0)).isEqualTo(TextRange(2, 5))
+        assertThat(state.documentSelectionIn(1)).isEqualTo(TextRange(0, 4))
+        assertThat(state.documentSelectionIn(2)).isEqualTo(TextRange(0, 2))
+        assertThat(state.documentSelectionIn(3)).isNull()
+    }
+
+    @Test
+    fun `test that documentSelectionIn returns null when there is no selection or the block cannot select`() {
+        val state = RichDocumentState(document)
+
+        assertThat(state.documentSelectionIn(0)).isNull()
+
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(5, 0),
+            RichDocPosition(7, 0),
+        )
+
+        assertThat(state.documentSelectionIn(6)).isNull()
+        assertThat(state.documentSelectionIn(7)).isNull()
+    }
+
+    @Test
+    fun `test that deleteDocumentSelection removes edge slices and whole interior blocks`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first line", listOf(RichSpan(0, 5, RichSpanStyle.Bold)))),
+            RichBlock.RawSource("| a |"),
+            RichBlock.Paragraph(
+                RichText(
+                    "last line",
+                    listOf(RichSpan(5, 9, RichSpanStyle.Italic))
+                )
+            ),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 5),
+            RichDocPosition(2, 5),
+        )
+
+        assertThat(state.deleteDocumentSelection()).isTrue()
+
+        assertThat(state.blocks).hasSize(1)
+        val merged = state.blocks[0] as RichTextBlockEditState
+        assertThat(merged.text.textFieldState.text.toString()).isEqualTo("firstline")
+        assertThat(merged.text.spans).containsExactly(
+            RichSpan(0, 5, RichSpanStyle.Bold),
+            RichSpan(5, 9, RichSpanStyle.Italic),
+        )
+        assertThat(state.documentSelection).isNull()
+        assertThat(state.pendingFocus).isEqualTo(RichFocusRequest(0, TextRange(5)))
+    }
+
+    @Test
+    fun `test that deleteDocumentSelection deletes within one block and adjusts spans`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("abcdef", listOf(RichSpan(2, 6, RichSpanStyle.Bold)))),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 1),
+            RichDocPosition(0, 4),
+        )
+
+        assertThat(state.deleteDocumentSelection()).isTrue()
+
+        val block = state.blocks[0] as RichTextBlockEditState
+        assertThat(block.text.textFieldState.text.toString()).isEqualTo("aef")
+        assertThat(block.text.spans).containsExactly(RichSpan(1, 3, RichSpanStyle.Bold))
+    }
+
+    @Test
+    fun `test that deleteDocumentSelection keeps a code remnant as its own block`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("intro")),
+            RichBlock.CodeBlock("kotlin", "val x = 1"),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 2),
+            RichDocPosition(1, 4),
+        )
+
+        assertThat(state.deleteDocumentSelection()).isTrue()
+
+        assertThat(state.blocks).hasSize(2)
+        val paragraph = state.blocks[0] as RichTextBlockEditState
+        val code = state.blocks[1] as CodeBlockEditState
+        assertThat(paragraph.text.textFieldState.text.toString()).isEqualTo("in")
+        assertThat(code.code.text.toString()).isEqualTo("x = 1")
+    }
+
+    @Test
+    fun `test that replaceDocumentSelection deletes the selection and inserts the typed text`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first line")),
+            RichBlock.Paragraph(RichText("last line")),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 6),
+            RichDocPosition(1, 4),
+        )
+
+        assertThat(state.replaceDocumentSelection("X")).isTrue()
+
+        assertThat(state.blocks).hasSize(1)
+        val merged = state.blocks[0] as RichTextBlockEditState
+        assertThat(merged.text.textFieldState.text.toString()).isEqualTo("first X line")
+        assertThat(state.pendingFocus).isEqualTo(RichFocusRequest(0, TextRange(7)))
+    }
+
+    @Test
+    fun `test that replaceDocumentSelection splits multi-line inserted text into blocks`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first line")),
+            RichBlock.Paragraph(RichText("last line")),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 6),
+            RichDocPosition(1, 5),
+        )
+
+        assertThat(state.replaceDocumentSelection("one\ntwo\nthree")).isTrue()
+
+        assertThat(state.blocks).hasSize(3)
+        val texts = state.blocks.map {
+            (it as RichTextBlockEditState).text.textFieldState.text.toString()
+        }
+        assertThat(texts).containsExactly("first one", "two", "threeline").inOrder()
+        assertThat(state.pendingFocus).isEqualTo(RichFocusRequest(2, TextRange(5)))
+    }
+
+    @Test
+    fun `test that replaceDocumentSelection splits at the join when the typed text is a newline`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first line")),
+            RichBlock.Paragraph(RichText("last line")),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 5),
+            RichDocPosition(1, 5),
+        )
+
+        assertThat(state.replaceDocumentSelection("\n")).isTrue()
+
+        assertThat(state.blocks).hasSize(2)
+        val first = state.blocks[0] as RichTextBlockEditState
+        val second = state.blocks[1] as RichTextBlockEditState
+        assertThat(first.text.textFieldState.text.toString()).isEqualTo("first")
+        assertThat(second.text.textFieldState.text.toString()).isEqualTo("line")
+    }
+
+    @Test
+    fun `test that deleteDocumentSelection returns false when there is no selection`() {
+        val state = RichDocumentState(document)
+
+        assertThat(state.deleteDocumentSelection()).isFalse()
+
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(1, 2),
+            RichDocPosition(1, 2),
+        )
+
+        assertThat(state.deleteDocumentSelection()).isFalse()
+    }
+
+    @Test
+    fun `test that undo restores the document after deleteDocumentSelection`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first")),
+            RichBlock.Paragraph(RichText("second")),
+        )
+        val before = state.toDocument()
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 2),
+            RichDocPosition(1, 3),
+        )
+        state.deleteDocumentSelection()
+
+        assertThat(state.undo()).isTrue()
+
+        assertThat(state.toDocument()).isEqualTo(before)
+    }
+
+    @Test
+    fun `test that selectedDocument slices edge blocks with their spans and kinds`() {
+        val state = stateOf(
+            RichBlock.Heading(
+                2,
+                RichText("Title here", listOf(RichSpan(0, 5, RichSpanStyle.Bold)))
+            ),
+            RichBlock.RawSource("| a |"),
+            RichBlock.ListItem(
+                ordered = false, indent = 0, checked = null,
+                text = RichText("item text", listOf(RichSpan(0, 4, RichSpanStyle.Italic))),
+            ),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 2),
+            RichDocPosition(2, 4),
+        )
+
+        assertThat(state.selectedDocument()).isEqualTo(
+            RichDocument(
+                listOf(
+                    RichBlock.Heading(
+                        2,
+                        RichText("tle here", listOf(RichSpan(0, 3, RichSpanStyle.Bold)))
+                    ),
+                    RichBlock.RawSource("| a |"),
+                    RichBlock.ListItem(
+                        ordered = false, indent = 0, checked = null,
+                        text = RichText("item", listOf(RichSpan(0, 4, RichSpanStyle.Italic))),
+                    ),
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `test that replaceDocumentSelection applies markdown structure from pasted text`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("before after")),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 7),
+            RichDocPosition(0, 12),
+        )
+
+        assertThat(state.replaceDocumentSelection("**bold**\n\n# Heading")).isTrue()
+
+        assertThat(state.blocks).hasSize(2)
+        val first = state.blocks[0] as RichTextBlockEditState
+        assertThat(first.kind).isEqualTo(RichBlockKind.Paragraph)
+        assertThat(first.text.textFieldState.text.toString()).isEqualTo("before bold")
+        assertThat(first.text.spans).containsExactly(RichSpan(7, 11, RichSpanStyle.Bold))
+        val second = state.blocks[1] as RichTextBlockEditState
+        assertThat(second.kind).isEqualTo(RichBlockKind.Heading(1))
+        assertThat(second.text.textFieldState.text.toString()).isEqualTo("Heading")
+    }
+
+    @Test
+    fun `test that smartInsert splices markdown blocks and rejoins the tail`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("head tail")),
+        )
+
+        state.smartInsert(0, 5, 5, "- one\n- two\n")
+
+        val texts = state.blocks.map {
+            (it as RichTextBlockEditState).text.textFieldState.text.toString()
+        }
+        assertThat(texts).containsExactly("head ", "one", "two", "tail").inOrder()
+        val items = state.blocks.drop(1).take(2).map { (it as RichTextBlockEditState).kind }
+        assertThat(items).containsExactly(
+            RichBlockKind.Item(ordered = false, indent = 0, checked = null),
+            RichBlockKind.Item(ordered = false, indent = 0, checked = null),
+        )
+    }
+
+    @Test
+    fun `test that smartInsert falls back to plain line splitting when there is no structure`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("head tail")),
+        )
+
+        state.smartInsert(0, 4, 5, "one\ntwo")
+
+        val texts = state.blocks.map {
+            (it as RichTextBlockEditState).text.textFieldState.text.toString()
+        }
+        assertThat(texts).containsExactly("headone", "twotail").inOrder()
+    }
+
+    @Test
+    fun `test that moveSelectionEdge moves an edge across blocks`() {
+        val state = RichDocumentState(document)
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(1, 1),
+            RichDocPosition(1, 3),
+        )
+
+        state.moveSelectionEdge(isStart = false, position = RichDocPosition(4, 2))
+        state.moveSelectionEdge(isStart = true, position = RichDocPosition(0, 3))
+
+        assertThat(state.documentSelection).isEqualTo(
+            RichDocSelection(
+                RichDocPosition(0, 3),
+                RichDocPosition(4, 2),
+            ),
+        )
+    }
+
+    @Test
+    fun `test that moveSelectionEdge ignores a move that would cross the other edge`() {
+        val state = RichDocumentState(document)
+        val selection = RichDocSelection(
+            RichDocPosition(1, 1),
+            RichDocPosition(2, 2),
+        )
+        state.documentSelection = selection
+
+        state.moveSelectionEdge(isStart = true, position = RichDocPosition(2, 2))
+        state.moveSelectionEdge(isStart = false, position = RichDocPosition(1, 0))
+
+        assertThat(state.documentSelection).isEqualTo(selection)
+    }
+
+    @Test
+    fun `test that selectAllBlocks spans the first to the last selectable block`() {
+        val state = RichDocumentState(document)
+
+        state.selectAllBlocks()
+
+        assertThat(state.documentSelection).isEqualTo(
+            RichDocSelection(
+                RichDocPosition(0, 0),
+                RichDocPosition(5, "val x = 1".length),
+            ),
+        )
+    }
+
+    @Test
+    fun `test that selectedText joins edge slices with whole interior blocks including raw source`() {
+        val state = RichDocumentState(document)
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 2),
+            RichDocPosition(5, 3),
+        )
+
+        assertThat(state.selectedText()).isEqualTo(
+            "tle\nbody\none\ntask\nquoted\nval",
+        )
+    }
+
+    @Test
+    fun `test that selectedText includes trailing raw source when the selection ends past it`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("intro")),
+            RichBlock.RawSource("| a |\n|---|"),
+            RichBlock.Paragraph(RichText("outro")),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 0),
+            RichDocPosition(2, 5),
+        )
+
+        assertThat(state.selectedText()).isEqualTo("intro\n| a |\n|---|\noutro")
+    }
+
+    @Test
+    fun `test that selectedText returns null when the selection is collapsed`() {
+        val state = RichDocumentState(document)
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(1, 2),
+            RichDocPosition(1, 2),
+        )
+
+        assertThat(state.selectedText()).isNull()
+    }
+
+    @Test
+    fun `test that blockTextLength reports text and code lengths and null elsewhere`() {
+        val state = RichDocumentState(document)
+
+        assertThat(state.blockTextLength(0)).isEqualTo(5)
+        assertThat(state.blockTextLength(5)).isEqualTo("val x = 1".length)
+        assertThat(state.blockTextLength(6)).isNull()
+        assertThat(state.blockTextLength(7)).isNull()
+        assertThat(state.blockTextLength(99)).isNull()
+    }
+
     private fun block(state: RichDocumentState): RichTextBlockEditState =
         state.blocks[0] as RichTextBlockEditState
 
