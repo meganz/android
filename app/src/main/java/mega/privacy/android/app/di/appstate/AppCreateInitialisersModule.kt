@@ -23,6 +23,7 @@ import mega.privacy.android.app.appstate.global.initialisation.appcreate.Network
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.NotificationChannelsInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.PasscodeInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.RemoteConfigInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.appcreate.SdkBootInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.SdkSetupInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.SessionCheckState
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.SessionCheckStateInitialiser
@@ -30,6 +31,7 @@ import mega.privacy.android.app.appstate.global.initialisation.appcreate.StaticC
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.SyncMonitorInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.ThemeInitialiser
 import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.CriticalAsyncAppCreateInitialiser
 import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
 
 /**
@@ -41,6 +43,26 @@ import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCre
 @Module
 @InstallIn(SingletonComponent::class)
 internal class AppCreateInitialisersModule {
+
+    /**
+     * The critical SDK boot phase, run sequentially in this order: the native library must be
+     * loaded and the loggers attached before any SDK instance exists, and the folder API mirrors
+     * configuration from the already configured core instance.
+     */
+    @Provides
+    fun provideCriticalAsyncAppCreateInitialisers(
+        sdkBootInitialiser: SdkBootInitialiser,
+        sdkSetupInitialiser: SdkSetupInitialiser,
+        folderApiSetupInitialiser: FolderApiSetupInitialiser,
+        callObserverInitialiser: CallObserverInitialiser,
+        chatApiInitialiser: ChatApiInitialiser,
+    ): List<@JvmSuppressWildcards CriticalAsyncAppCreateInitialiser> = listOf(
+        sdkBootInitialiser,
+        sdkSetupInitialiser,
+        folderApiSetupInitialiser,
+        callObserverInitialiser,
+        chatApiInitialiser,
+    )
 
     @Provides
     fun provideAppCreateInitialisers(
@@ -79,12 +101,8 @@ internal class AppCreateInitialisersModule {
     @Provides
     fun provideSyncAppCreateInitialisers(
         loggingInitialiser: LoggingInitialiser,
-        sdkSetupInitialiser: SdkSetupInitialiser,
-        folderApiSetupInitialiser: FolderApiSetupInitialiser,
         crashReportingInitialiser: CrashReportingInitialiser,
         themeInitialiser: ThemeInitialiser,
-        callObserverInitialiser: CallObserverInitialiser,
-        chatApiInitialiser: ChatApiInitialiser,
         coilImageLoaderInitialiser: CoilImageLoaderInitialiser,
         staticContextInitialiser: StaticContextInitialiser,
         analyticsInitialiser: AnalyticsInitialiser,
@@ -93,11 +111,7 @@ internal class AppCreateInitialisersModule {
     ): List<@JvmSuppressWildcards SynchronousAppCreateInitialiser> = listOf(
         loggingInitialiser,
         crashReportingInitialiser,
-        sdkSetupInitialiser,
-        folderApiSetupInitialiser,
         themeInitialiser,
-        callObserverInitialiser,
-        chatApiInitialiser,
         coilImageLoaderInitialiser,
         staticContextInitialiser,
         analyticsInitialiser,

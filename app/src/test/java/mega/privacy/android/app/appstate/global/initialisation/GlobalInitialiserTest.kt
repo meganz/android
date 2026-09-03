@@ -3,10 +3,13 @@ package mega.privacy.android.app.appstate.global.initialisation
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
 import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiserAction
+import mega.privacy.android.navigation.contract.initialisation.CriticalAsyncAppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.CriticalAsyncAppCreateInitialiserAction
 import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
 import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiserAction
 import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiserAction
@@ -115,6 +118,126 @@ class GlobalInitialiserTest {
         }
 
         assertThat(invoked).containsExactly("other", "another")
+    }
+
+    @Test
+    fun `test that onAppCreate runs critical async initialisers before other async initialisers`() =
+        runTest {
+            val executionOrder = mutableListOf<String>()
+            val critical = CriticalAsyncAppCreateInitialiserAction(name = "critical") {
+                delay(100)
+                executionOrder += "critical"
+            }
+            val other = AsyncAppCreateInitialiserAction(name = "other") {
+                executionOrder += "other"
+            }
+
+            initUnderTest(
+                testScope = this,
+                criticalAsyncAppCreateInitialisers = listOf(critical),
+                asyncAppCreateInitialisers = setOf(other),
+            )
+
+            underTest.onAppCreate()
+            advanceUntilIdle()
+
+            assertThat(executionOrder).containsExactly("critical", "other").inOrder()
+        }
+
+    @Test
+    fun `test that onAppCreate runs critical async initialisers sequentially in list order`() =
+        runTest {
+            val executionOrder = mutableListOf<String>()
+            val first = CriticalAsyncAppCreateInitialiserAction(name = "first") {
+                delay(100)
+                executionOrder += "first"
+            }
+            val second = CriticalAsyncAppCreateInitialiserAction(name = "second") {
+                executionOrder += "second"
+            }
+
+            initUnderTest(
+                testScope = this,
+                criticalAsyncAppCreateInitialisers = listOf(first, second),
+            )
+
+            underTest.onAppCreate()
+            advanceUntilIdle()
+
+            assertThat(executionOrder).containsExactly("first", "second").inOrder()
+        }
+
+    @Test
+    fun `test that onAppCreate runs other async initialisers when a critical one fails`() =
+        runTest {
+            val invoked = mutableListOf<String>()
+            val critical = CriticalAsyncAppCreateInitialiserAction(name = "critical") {
+                throw RuntimeException("Critical async failure")
+            }
+            val other = AsyncAppCreateInitialiserAction(name = "other") {
+                invoked += "other"
+            }
+
+            initUnderTest(
+                testScope = this,
+                criticalAsyncAppCreateInitialisers = listOf(critical),
+                asyncAppCreateInitialisers = setOf(other),
+            )
+
+            assertDoesNotThrow {
+                underTest.onAppCreate()
+                advanceUntilIdle()
+            }
+
+            assertThat(invoked).containsExactly("other")
+        }
+
+    @Test
+    fun `test that onAppStart waits for critical async initialisers`() = runTest {
+        val executionOrder = mutableListOf<String>()
+        val critical = CriticalAsyncAppCreateInitialiserAction(name = "critical") {
+            delay(100)
+            executionOrder += "critical"
+        }
+        val appStart = AppStartInitialiserAction {
+            executionOrder += "appStart"
+        }
+
+        initUnderTest(
+            testScope = this,
+            criticalAsyncAppCreateInitialisers = listOf(critical),
+            appStartInitialisers = setOf(appStart),
+        )
+
+        underTest.onAppCreate()
+        underTest.onAppStart()
+        advanceUntilIdle()
+
+        assertThat(executionOrder).containsExactly("critical", "appStart").inOrder()
+    }
+
+    @Test
+    fun `test that onPostLogin waits for critical async initialisers`() = runTest {
+        val executionOrder = mutableListOf<String>()
+        val critical = CriticalAsyncAppCreateInitialiserAction(name = "critical") {
+            delay(100)
+            executionOrder += "critical"
+        }
+        val postLogin = PostLoginInitialiserAction { _, _ ->
+            executionOrder += "postLogin"
+        }
+
+        initUnderTest(
+            testScope = this,
+            criticalAsyncAppCreateInitialisers = listOf(critical),
+            postLoginInitialisers = setOf(postLogin),
+        )
+
+        underTest.onAppCreate()
+        underTest.onPostLogin("Session", true)
+        advanceUntilIdle()
+
+        assertThat(executionOrder).containsExactly("critical", "postLogin").inOrder()
     }
 
     @Test
@@ -237,15 +360,17 @@ class GlobalInitialiserTest {
     private fun initUnderTest(
         testScope: CoroutineScope,
         syncAppCreateInitialisers: List<SynchronousAppCreateInitialiser> = emptyList(),
+        criticalAsyncAppCreateInitialisers: List<CriticalAsyncAppCreateInitialiser> = emptyList(),
         asyncAppCreateInitialisers: Set<AsyncAppCreateInitialiser> = emptySet(),
         appStartInitialisers: Set<AppStartInitialiserAction> = emptySet(),
         postLoginInitialisers: Set<PostLoginInitialiserAction> = emptySet(),
     ) {
         underTest = GlobalInitialiser(
             coroutineScope = testScope,
-            syncAppCreateInitialisers = syncAppCreateInitialisers,
-            asyncAppCreateInitialisers = asyncAppCreateInitialisers,
-            appStartInitialisers = appStartInitialisers,
+            syncAppCreateInitialisers = { syncAppCreateInitialisers },
+            criticalAsyncAppCreateInitialisers = { criticalAsyncAppCreateInitialisers },
+            asyncAppCreateInitialisers = { asyncAppCreateInitialisers },
+            appStartInitialisers = { appStartInitialisers },
             postLoginInitialisers = { postLoginInitialisers },
         )
     }

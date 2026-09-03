@@ -36,7 +36,7 @@ internal class SyncGatewayImplTest {
 
     @BeforeEach
     fun setUp() {
-        underTest = SyncGatewayImpl(megaApi, appScope)
+        underTest = SyncGatewayImpl({ megaApi }, appScope)
     }
 
     @AfterEach

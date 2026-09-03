@@ -19,8 +19,11 @@ import java.security.spec.X509EncodedKeySpec
 import javax.inject.Inject
 
 internal class VerifyPurchaseFacade @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApiLazy: dagger.Lazy<MegaApiAndroid>,
 ) : VerifyPurchaseGateway {
+
+    private val megaApi: MegaApiAndroid
+        get() = megaApiLazy.get()
     /**
      * Verifies that the data was signed with the given signature, and returns the verified
      * purchase.

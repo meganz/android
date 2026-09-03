@@ -31,7 +31,7 @@ class SdkSetupInitialiserTest {
     }
 
     private fun underTest(appScope: CoroutineScope) = SdkSetupInitialiser(
-        megaApi = megaApi,
+        megaApiLazy = { megaApi },
         globalListener = globalListener,
         initialiseGlobalListenersUseCase = initialiseGlobalListenersUseCase,
         appScope = appScope,

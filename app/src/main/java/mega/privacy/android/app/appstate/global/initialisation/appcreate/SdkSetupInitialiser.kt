@@ -10,7 +10,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.global.InitialiseGlobalListenersUseCase
-import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.CriticalAsyncAppCreateInitialiser
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -20,21 +20,27 @@ import javax.inject.Inject
 /**
  * Configures the core MEGA SDK instance and attaches its global listeners.
  *
- * Synchronous: SSL retry, transfer methods and the global listeners must be in place before any
+ * Critical: SSL retry, transfer methods and the global listeners must be in place before any
  * other unit or app code talks to the SDK. Buffer size, SDK language and the resource limit stay
  * fire-and-forget in the application scope, exactly as they ran at androidx.startup provider
  * time.
+ *
+ * The SDK dependency is lazy so that constructing this initialiser never constructs the SDK
+ * instance, whose creation blocks until the native library has finished loading.
  */
 internal class SdkSetupInitialiser @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApiLazy: dagger.Lazy<MegaApiAndroid>,
     private val globalListener: GlobalListener,
     private val initialiseGlobalListenersUseCase: InitialiseGlobalListenersUseCase,
     @ApplicationScope private val appScope: CoroutineScope,
     @ApplicationContext private val context: Context,
-) : SynchronousAppCreateInitialiser {
+) : CriticalAsyncAppCreateInitialiser {
     override val name = "SdkSetupInitialiser"
 
-    override operator fun invoke() {
+    private val megaApi: MegaApiAndroid
+        get() = megaApiLazy.get()
+
+    override suspend operator fun invoke() {
         megaApi.retrySSLerrors(true)
         megaApi.downloadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
         megaApi.uploadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE

@@ -71,8 +71,11 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
         get() = _megaApiFolder.get()
 
     @Inject
-    @get:JvmName("megaChatApi")
-    lateinit var megaChatApi: MegaChatApiAndroid
+    lateinit var _megaChatApi: Lazy<MegaChatApiAndroid>
+
+    val megaChatApi: MegaChatApiAndroid
+        @JvmName("megaChatApi")
+        get() = _megaChatApi.get()
 
     @Inject
     lateinit var _dbH: Lazy<LegacyDatabaseHandler>
@@ -86,7 +89,10 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
         }
 
     @Inject
-    lateinit var myAccountInfo: MyAccountInfo
+    lateinit var _myAccountInfo: Lazy<MyAccountInfo>
+
+    val myAccountInfo: MyAccountInfo
+        get() = _myAccountInfo.get()
 
     @Inject
     lateinit var updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase
@@ -102,18 +108,30 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
     lateinit var activityLifecycleHandler: ActivityLifecycleHandler
 
     @Inject
-    @get:JvmName("pushNotificationSettingManagement")
-    lateinit var pushNotificationSettingManagement: PushNotificationSettingManagement
+    lateinit var _pushNotificationSettingManagement: Lazy<PushNotificationSettingManagement>
+
+    val pushNotificationSettingManagement: PushNotificationSettingManagement
+        @JvmName("pushNotificationSettingManagement")
+        get() = _pushNotificationSettingManagement.get()
 
     @Inject
-    @get:JvmName("chatManagement")
-    lateinit var chatManagement: ChatManagement
+    lateinit var _chatManagement: Lazy<ChatManagement>
+
+    val chatManagement: ChatManagement
+        @JvmName("chatManagement")
+        get() = _chatManagement.get()
 
     @Inject
-    lateinit var callChangesObserver: CallChangesObserver
+    lateinit var _callChangesObserver: Lazy<CallChangesObserver>
+
+    val callChangesObserver: CallChangesObserver
+        get() = _callChangesObserver.get()
 
     @Inject
-    lateinit var chatApiListenerCoordinator: ChatApiListenerCoordinator
+    lateinit var _chatApiListenerCoordinator: Lazy<ChatApiListenerCoordinator>
+
+    private val chatApiListenerCoordinator: ChatApiListenerCoordinator
+        get() = _chatApiListenerCoordinator.get()
 
     @Inject
     lateinit var globalInitialiser: GlobalInitialiser

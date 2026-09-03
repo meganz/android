@@ -8,8 +8,11 @@ import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 class DefaultStreamingGateway @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApiLazy: dagger.Lazy<MegaApiAndroid>,
 ) : StreamingGateway {
+
+    private val megaApi: MegaApiAndroid
+        get() = megaApiLazy.get()
 
     override suspend fun getLocalLink(node: MegaNode): String? =
         megaApi.httpServerGetLocalLink(node)

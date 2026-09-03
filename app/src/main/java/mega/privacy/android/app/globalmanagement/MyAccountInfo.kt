@@ -19,8 +19,11 @@ import javax.inject.Singleton
  */
 @Singleton
 class MyAccountInfo @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApiLazy: dagger.Lazy<MegaApiAndroid>,
 ) {
+
+    private val megaApi: MegaApiAndroid
+        get() = megaApiLazy.get()
 
     companion object {
         const val HAS_STORAGE_DETAILS = 0x01

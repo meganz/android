@@ -73,9 +73,12 @@ import javax.inject.Singleton
  */
 @Singleton
 internal class MegaApiFacade @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApiLazy: dagger.Lazy<MegaApiAndroid>,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) : MegaApiGateway {
+
+    private val megaApi: MegaApiAndroid
+        get() = megaApiLazy.get()
 
     override fun getWaitingReason() = megaApi.isWaiting
 

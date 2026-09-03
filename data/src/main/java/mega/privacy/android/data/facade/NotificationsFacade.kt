@@ -14,8 +14,11 @@ import javax.inject.Inject
  * @property megaApi
  */
 internal class NotificationsFacade @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApiLazy: dagger.Lazy<MegaApiAndroid>,
 ) : NotificationsGateway {
+
+    private val megaApi: MegaApiAndroid
+        get() = megaApiLazy.get()
 
     override fun getNotifications(listener: MegaRequestListenerInterface) {
         megaApi.getNotifications(listener)

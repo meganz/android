@@ -1,5 +1,6 @@
 package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
+import kotlinx.coroutines.test.runTest
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.Test
@@ -14,12 +15,12 @@ class FolderApiSetupInitialiserTest {
     private val megaApi = mock<MegaApiAndroid>()
     private val megaApiFolder = mock<MegaApiAndroid>()
     private val underTest = FolderApiSetupInitialiser(
-        megaApi = megaApi,
-        megaApiFolder = megaApiFolder,
+        megaApiLazy = { megaApi },
+        megaApiFolderLazy = { megaApiFolder },
     )
 
     @Test
-    fun `test that invoke mirrors the core api configuration on the folder api`() {
+    fun `test that invoke mirrors the core api configuration on the folder api`() = runTest {
         whenever(megaApi.httpServerGetMaxBufferSize()).thenReturn(1234)
 
         underTest()
@@ -31,7 +32,7 @@ class FolderApiSetupInitialiserTest {
     }
 
     @Test
-    fun `test that invoke sets the account auth token when logged in`() {
+    fun `test that invoke sets the account auth token when logged in`() = runTest {
         whenever(megaApi.isLoggedIn).thenReturn(1)
         whenever(megaApi.accountAuth).thenReturn("auth-token")
 
@@ -41,7 +42,7 @@ class FolderApiSetupInitialiserTest {
     }
 
     @Test
-    fun `test that invoke does not set the account auth token when logged out`() {
+    fun `test that invoke does not set the account auth token when logged out`() = runTest {
         whenever(megaApi.isLoggedIn).thenReturn(0)
 
         underTest()

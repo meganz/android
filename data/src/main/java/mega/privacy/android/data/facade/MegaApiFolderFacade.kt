@@ -20,8 +20,11 @@ import javax.inject.Inject
  * @property megaApiFolder
  */
 internal class MegaApiFolderFacade @Inject constructor(
-    @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
+    @MegaApiFolder private val megaApiFolderLazy: dagger.Lazy<MegaApiAndroid>,
 ) : MegaApiFolderGateway {
+
+    private val megaApiFolder: MegaApiAndroid
+        get() = megaApiFolderLazy.get()
 
     override suspend fun setAccountAuth(authentication: String?) {
         megaApiFolder.accountAuth = authentication

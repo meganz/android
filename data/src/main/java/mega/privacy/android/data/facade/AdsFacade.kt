@@ -13,8 +13,11 @@ import javax.inject.Inject
  * provides methods to fetch ads and to query ads (check if ads should be shown)
  */
 internal class AdsFacade @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApiLazy: dagger.Lazy<MegaApiAndroid>,
 ) : AdsGateway {
+
+    private val megaApi: MegaApiAndroid
+        get() = megaApiLazy.get()
 
     override fun fetchAds(
         adFlags: Int,

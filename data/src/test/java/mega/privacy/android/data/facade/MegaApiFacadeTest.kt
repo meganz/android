@@ -32,7 +32,7 @@ internal class MegaApiFacadeTest {
     @BeforeAll
     fun setUp() {
         underTest = MegaApiFacade(
-            megaApi = megaApi,
+            megaApiLazy = { megaApi },
             sharingScope = sharingScope,
         )
     }

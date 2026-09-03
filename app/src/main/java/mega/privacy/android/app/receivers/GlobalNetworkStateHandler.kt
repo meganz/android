@@ -22,12 +22,15 @@ import javax.inject.Singleton
  */
 @Singleton
 class GlobalNetworkStateHandler @Inject constructor(
-    private val megaChatApi: MegaChatApiAndroid,
-    @MegaApi private val megaApi: MegaApiAndroid,
+    private val megaChatApiLazy: dagger.Lazy<MegaChatApiAndroid>,
+    @MegaApi private val megaApiLazy: dagger.Lazy<MegaApiAndroid>,
     private val application: Application,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) {
+    private val megaChatApi get() = megaChatApiLazy.get()
+    private val megaApi get() = megaApiLazy.get()
+
     var localIpAddress: String? = ""
 
     /**

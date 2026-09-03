@@ -46,7 +46,7 @@ internal class MegaChatApiFacadeTest {
     @BeforeAll
     fun setUp() {
         underTest = MegaChatApiFacade(
-            chatApi = chatApi,
+            chatApiLazy = { chatApi },
             sharingScope = sharingScope,
         )
     }
@@ -172,7 +172,7 @@ internal class MegaChatApiFacadeTest {
             .whenever(chatApi).closeChatRoom(eq(secondChatId), any())
 
         val scope = CoroutineScope(Dispatchers.IO)
-        val facade = MegaChatApiFacade(chatApi = chatApi, sharingScope = scope)
+        val facade = MegaChatApiFacade(chatApiLazy = { chatApi }, sharingScope = scope)
 
         try {
             scope.launch { facade.openChatRoom(firstChatId).collect {} }
@@ -204,7 +204,7 @@ internal class MegaChatApiFacadeTest {
             .whenever(chatApi).closeChatRoom(eq(chatId), any())
 
         val scope = CoroutineScope(Dispatchers.IO)
-        val facade = MegaChatApiFacade(chatApi = chatApi, sharingScope = scope)
+        val facade = MegaChatApiFacade(chatApiLazy = { chatApi }, sharingScope = scope)
 
         try {
             val collectJob = scope.launch { facade.openChatRoom(chatId).collect {} }

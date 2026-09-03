@@ -21,12 +21,29 @@ interface AppCreateInitialiser {
  * Convenience [AppCreateInitialiser] wrapping a given suspend [action].
  *
  * @property name Stable identifier for this unit.
- * @property isCritical Whether this unit is critical. See [AppCreateInitialiser] for semantics.
  */
 open class AsyncAppCreateInitialiserAction(
     override val name: String,
     private val action: suspend () -> Unit,
 ) : AsyncAppCreateInitialiser {
+    override suspend operator fun invoke() {
+        action()
+    }
+}
+
+/**
+ * Convenience [CriticalAsyncAppCreateInitialiser] wrapping a given suspend [action].
+ *
+ * No production usages yet: production initialisers are injectable classes implementing
+ * [CriticalAsyncAppCreateInitialiser] directly. This wrapper exists for tests and for
+ * lambda-based contributions, mirroring the other `*InitialiserAction` classes in this file.
+ *
+ * @property name Stable identifier for this unit.
+ */
+open class CriticalAsyncAppCreateInitialiserAction(
+    override val name: String,
+    private val action: suspend () -> Unit,
+) : CriticalAsyncAppCreateInitialiser {
     override suspend operator fun invoke() {
         action()
     }

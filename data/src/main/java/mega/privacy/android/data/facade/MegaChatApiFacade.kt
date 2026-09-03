@@ -51,9 +51,12 @@ import javax.inject.Inject
  * @property sharingScope [CoroutineScope]
  */
 internal class MegaChatApiFacade @Inject constructor(
-    private val chatApi: MegaChatApiAndroid,
+    private val chatApiLazy: dagger.Lazy<MegaChatApiAndroid>,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) : MegaChatApiGateway {
+
+    private val chatApi: MegaChatApiAndroid
+        get() = chatApiLazy.get()
 
     override val initState: Int
         get() = chatApi.initState

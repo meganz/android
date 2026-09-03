@@ -34,8 +34,8 @@ class GlobalNetworkStateHandlerTest {
     }
 
     private fun createUnderTest(applicationScope: CoroutineScope) = GlobalNetworkStateHandler(
-        megaChatApi = megaChatApi,
-        megaApi = megaApi,
+        megaChatApiLazy = { megaChatApi },
+        megaApiLazy = { megaApi },
         application = application,
         applicationScope = applicationScope,
         monitorConnectivityUseCase = monitorConnectivityUseCase,

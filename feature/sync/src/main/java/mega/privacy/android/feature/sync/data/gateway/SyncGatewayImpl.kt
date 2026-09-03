@@ -33,9 +33,12 @@ import kotlin.coroutines.resume
  * Gateway implementation to access Sync API
  */
 internal class SyncGatewayImpl @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApiLazy: dagger.Lazy<MegaApiAndroid>,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : SyncGateway {
+
+    private val megaApi: MegaApiAndroid
+        get() = megaApiLazy.get()
 
     override val syncUpdate = callbackFlow {
         val listener = OptionalMegaListenerInterface(
