@@ -70,6 +70,8 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
@@ -179,6 +181,7 @@ import org.mockito.Mockito.clearInvocations
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -585,6 +588,47 @@ class VideoPlayerViewModelV2Test {
             underTest.uiState.test {
                 assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
             }
+        }
+
+    @Test
+    fun `test that the playback snapshot reports an invalid handle when the media id is not numeric`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(intent = intent, rebuildPlaylist = false)
+            whenever(mediaPlayerGateway.getCurrentMediaItem())
+                .thenReturn(MediaItem.Builder().setMediaId("not-a-handle").build())
+            underTest.initVideoPlayerData(intent)
+
+            val captor = argumentCaptor<() -> MediaPlaybackInfo>()
+            verify(trackPlaybackPositionUseCase).invoke(captor.capture())
+
+            assertThat(captor.firstValue().mediaHandle)
+                .isEqualTo(MediaPlaybackInfo.INVALID_MEDIA_HANDLE)
+        }
+
+    @Test
+    fun `test that the playback snapshot reports the media id as the handle when it is numeric`() =
+        runTest {
+            val expectedHandle = 123456L
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(intent = intent, rebuildPlaylist = false)
+            whenever(mediaPlayerGateway.getCurrentMediaItem())
+                .thenReturn(MediaItem.Builder().setMediaId(expectedHandle.toString()).build())
+            whenever(mediaPlayerGateway.getCurrentItemDuration()).thenReturn(200_000L)
+            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(16_000L)
+            underTest.initVideoPlayerData(intent)
+
+            val captor = argumentCaptor<() -> MediaPlaybackInfo>()
+            verify(trackPlaybackPositionUseCase).invoke(captor.capture())
+
+            assertThat(captor.firstValue()).isEqualTo(
+                MediaPlaybackInfo(
+                    mediaHandle = expectedHandle,
+                    totalDuration = 200_000L,
+                    currentPosition = 16_000L,
+                    mediaType = MediaType.Video,
+                )
+            )
         }
 
     private fun initTestDataForTestingInvalidParams(

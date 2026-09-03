@@ -111,7 +111,8 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_NEAR_COMPLETION_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
-import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.FileNode
@@ -591,10 +592,12 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
             }
             runCatching {
                 trackPlaybackPositionUseCase {
-                    PlaybackInformation(
-                        mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong(),
-                        mediaPlayerGateway.getCurrentItemDuration(),
-                        mediaPlayerGateway.getCurrentPlayingPosition()
+                    MediaPlaybackInfo(
+                        mediaHandle = mediaPlayerGateway.getCurrentMediaItem()?.mediaId
+                            ?.toLongOrNull() ?: MediaPlaybackInfo.INVALID_MEDIA_HANDLE,
+                        totalDuration = mediaPlayerGateway.getCurrentItemDuration(),
+                        currentPosition = mediaPlayerGateway.getCurrentPlayingPosition(),
+                        mediaType = MediaType.Video,
                     )
                 }
             }.onFailure {

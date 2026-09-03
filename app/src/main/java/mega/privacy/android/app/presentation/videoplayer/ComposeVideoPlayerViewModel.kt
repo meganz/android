@@ -28,6 +28,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -86,7 +87,8 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_NEAR_COMPLETION_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
-import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.FileNode
@@ -449,12 +451,19 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     private fun initVideoPlaybackSources() {
         viewModelScope.launch {
             buildPlaybackSources(launchSource)
-            trackPlaybackPositionUseCase {
-                PlaybackInformation(
-                    mediaPlayerManager.getCurrentMediaItem()?.mediaId?.toLong(),
-                    mediaPlayerManager.getCurrentItemDuration(),
-                    mediaPlayerManager.getCurrentPlayingPosition()
-                )
+            runCatching {
+                trackPlaybackPositionUseCase {
+                    MediaPlaybackInfo(
+                        mediaHandle = mediaPlayerManager.getCurrentMediaItem()?.mediaId
+                            ?.toLongOrNull() ?: MediaPlaybackInfo.INVALID_MEDIA_HANDLE,
+                        totalDuration = mediaPlayerManager.getCurrentItemDuration(),
+                        currentPosition = mediaPlayerManager.getCurrentPlayingPosition(),
+                        mediaType = MediaType.Video,
+                    )
+                }
+            }.onFailure {
+                if (it is CancellationException) throw it
+                Timber.e(it, "Failed to track playback position")
             }
         }
     }

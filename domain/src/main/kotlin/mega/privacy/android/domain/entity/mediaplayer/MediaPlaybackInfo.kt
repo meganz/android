@@ -13,4 +13,12 @@ data class MediaPlaybackInfo(
     val totalDuration: Long,
     val currentPosition: Long,
     val mediaType: MediaType,
-)
+) {
+    companion object {
+        /**
+         * Handle carried by a snapshot taken while no media item is loaded. Both players
+         * early-return on it rather than persisting a position that belongs to nothing.
+         */
+        const val INVALID_MEDIA_HANDLE = -1L
+    }
+}

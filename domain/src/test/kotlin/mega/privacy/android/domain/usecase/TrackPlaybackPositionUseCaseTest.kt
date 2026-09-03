@@ -7,6 +7,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo.Companion.INVALID_MEDIA_HANDLE
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
@@ -47,81 +50,103 @@ class TrackPlaybackPositionUseCaseTest {
         Dispatchers.resetMain()
     }
 
+    private fun playbackInfo(
+        mediaHandle: Long = mediaId,
+        totalDuration: Long = 200_000,
+        currentPosition: Long,
+    ) = MediaPlaybackInfo(
+        mediaHandle = mediaHandle,
+        totalDuration = totalDuration,
+        currentPosition = currentPosition,
+        mediaType = MediaType.Video,
+    )
+
+    private fun playbackInformation(
+        mediaId: Long,
+        totalDuration: Long = 200_000,
+        currentPosition: Long,
+    ) = PlaybackInformation(
+        mediaId = mediaId,
+        totalDuration = totalDuration,
+        currentPosition = currentPosition,
+    )
+
     @Test
     fun `test that invoke with current position of the video is less than 15 seconds`() =
         runTest {
             whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit))
-            val currentPlaybackInfo = PlaybackInformation(
-                mediaId = mediaId,
-                totalDuration = 200_000,
-                currentPosition = 10_000
-            )
+            val currentPlaybackInfo = playbackInfo(currentPosition = 10_000)
 
-            val getCurrentPlaybackInformation =
-                mock<() -> PlaybackInformation> { on { invoke() }.thenReturn(currentPlaybackInfo) }
-            underTest(getCurrentPlaybackInformation)
+            val getCurrentPlaybackInfo =
+                mock<() -> MediaPlaybackInfo> { on { invoke() }.thenReturn(currentPlaybackInfo) }
+            underTest(getCurrentPlaybackInfo)
 
-            verify(getCurrentPlaybackInformation, times(1)).invoke()
+            verify(getCurrentPlaybackInfo, times(1)).invoke()
             verify(mediaPlayerRepository, never()).deletePlaybackInformation(mediaId)
-            verify(mediaPlayerRepository, never()).updatePlaybackInformation(currentPlaybackInfo)
+            verify(mediaPlayerRepository, never()).updatePlaybackInformation(any())
         }
 
     @Test
     fun `test that update playback info when the video position is more than 15 seconds`() =
         runTest {
             whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit, Unit))
-            val playbackInfo = PlaybackInformation(
-                mediaId = mediaId,
-                totalDuration = 200_000,
-                currentPosition = 15_000
-            )
+            val playbackInfo = playbackInfo(currentPosition = 15_000)
             val playbackInfoPassOneSecond = playbackInfo.copy(currentPosition = 16_000)
 
-            val getCurrentPlaybackInformation =
-                mock<() -> PlaybackInformation> {
+            val getCurrentPlaybackInfo =
+                mock<() -> MediaPlaybackInfo> {
                     on { invoke() }.thenReturn(
                         playbackInfo,
                         playbackInfoPassOneSecond
                     )
                 }
 
-            underTest(getCurrentPlaybackInformation)
+            underTest(getCurrentPlaybackInfo)
 
-            verify(getCurrentPlaybackInformation, times(2)).invoke()
-            verify(mediaPlayerRepository).updatePlaybackInformation(playbackInfoPassOneSecond)
+            verify(getCurrentPlaybackInfo, times(2)).invoke()
+            verify(mediaPlayerRepository).updatePlaybackInformation(
+                playbackInformation(mediaId = mediaId, currentPosition = 16_000)
+            )
         }
 
     @Test
     fun `test that correct media id is passed when deleting track progress`() = runTest {
         whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit, Unit))
-        val currentPlaybackInfo = PlaybackInformation(
-            mediaId = mediaId,
-            totalDuration = 200_000,
-            currentPosition = 10_000
-        )
+        val currentPlaybackInfo = playbackInfo(currentPosition = 10_000)
 
         val nextTrackId = mediaId + 1
+        val nextPlaybackInfo = playbackInfo(mediaHandle = nextTrackId, currentPosition = 199_000)
 
-        val nextPlaybackInfo = PlaybackInformation(
-            mediaId = nextTrackId,
-            totalDuration = 200_000,
-            currentPosition = 199_000
-        )
-
-        val getCurrentPlaybackInformation =
-            mock<() -> PlaybackInformation> {
+        val getCurrentPlaybackInfo =
+            mock<() -> MediaPlaybackInfo> {
                 on { invoke() }.thenReturn(
                     currentPlaybackInfo,
                     nextPlaybackInfo
                 )
             }
-        underTest(getCurrentPlaybackInformation)
+        underTest(getCurrentPlaybackInfo)
 
-        verify(getCurrentPlaybackInformation, times(2)).invoke()
+        verify(getCurrentPlaybackInfo, times(2)).invoke()
         verify(mediaPlayerRepository).deletePlaybackInformation(nextTrackId)
         verify(removeRecentlyUsedItemUseCase).invoke(nextTrackId)
         verify(mediaPlayerRepository, never()).deletePlaybackInformation(mediaId)
         verify(removeRecentlyUsedItemUseCase, never()).invoke(mediaId)
         verify(mediaPlayerRepository, never()).updatePlaybackInformation(any())
+    }
+
+    @Test
+    fun `test that nothing is tracked when the snapshot carries no media handle`() = runTest {
+        whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit))
+        val currentPlaybackInfo =
+            playbackInfo(mediaHandle = INVALID_MEDIA_HANDLE, currentPosition = 100_000)
+
+        val getCurrentPlaybackInfo =
+            mock<() -> MediaPlaybackInfo> { on { invoke() }.thenReturn(currentPlaybackInfo) }
+        underTest(getCurrentPlaybackInfo)
+
+        verify(getCurrentPlaybackInfo, times(1)).invoke()
+        verify(mediaPlayerRepository, never()).updatePlaybackInformation(any())
+        verify(mediaPlayerRepository, never()).deletePlaybackInformation(any())
+        verify(removeRecentlyUsedItemUseCase, never()).invoke(any())
     }
 }
