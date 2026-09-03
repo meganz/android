@@ -15,12 +15,12 @@ import androidx.work.impl.utils.WorkProgressUpdater
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import com.google.common.util.concurrent.Futures
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -166,7 +166,6 @@ import org.robolectric.annotation.Config
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Test class of [CameraUploadsWorker]
@@ -2031,11 +2030,17 @@ internal class CameraUploadsWorkerTest {
         runTest {
             setupDefaultCheckConditionMocks()
             doReturn(STOP_REASON_TIMEOUT).whenever(underTest).stopReason
+            // WorkManager resolves these on a real background executor. While the worker awaits
+            // them the test scheduler is idle and free to advance virtual time past the 5s
+            // finalization timeout before finalization is even entered.
+            doReturn(Futures.immediateFuture<Void?>(null))
+                .whenever(underTest).setForegroundAsync(any())
+            doReturn(Futures.immediateFuture<Void?>(null))
+                .whenever(underTest).setProgressAsync(any())
             var finalizationCancelled = false
             whenever(deleteCameraUploadsTemporaryRootDirectoryUseCase()) doSuspendableAnswer {
                 try {
-                    delay(10.seconds)
-                    true
+                    awaitCancellation()
                 } catch (e: CancellationException) {
                     finalizationCancelled = true
                     throw e
