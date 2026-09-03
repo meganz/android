@@ -9,9 +9,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesCheck
-import com.google.android.apps.common.testing.accessibility.framework.checks.SpeakableTextPresentCheck
-import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.R as CoreUiR
 import mega.android.core.ui.components.button.MegaOutlinedButton
 import mega.android.core.ui.components.button.MegaRadioButton
@@ -170,37 +167,27 @@ class ButtonsAccessibilityTest {
     }
 
     @Test
-    fun test_that_checkboxes_pass_accessibility_checks_when_the_missing_label_baseline_is_suppressed() {
-        // The core-ui Checkbox ships without a speakable label and cannot be fixed in this
-        // repository, so SpeakableTextPresentCheck is baselined for this test only.
-        composeTestRule.enableAccessibilityChecks(
-            megaAccessibilityValidator(
-                reporter = reporter,
-                baselineSuppressions = matchesCheck(SpeakableTextPresentCheck::class.java),
-            )
-        )
+    fun test_that_checkboxes_pass_accessibility_checks() {
         composeTestRule.setSweepContent {
             Checkbox(
                 checked = true,
                 onCheckStateChanged = {},
+                contentDescription = "Checked option",
             )
             Checkbox(
                 checked = false,
                 onCheckStateChanged = {},
+                contentDescription = "Unchecked option",
             )
             Checkbox(
                 checked = true,
                 onCheckStateChanged = {},
                 enabled = false,
+                contentDescription = "Disabled option",
             )
         }
 
         composeTestRule.onRoot().tryPerformAccessibilityChecks()
-
-        val suppressedBaseline = reporter.entries.filter {
-            it.checkName == "SpeakableTextPresentCheck" && it.resultType == "SUPPRESSED"
-        }
-        assertThat(suppressedBaseline).isNotEmpty()
     }
 
     @Test

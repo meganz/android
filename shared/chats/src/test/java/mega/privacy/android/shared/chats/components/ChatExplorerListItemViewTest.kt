@@ -4,8 +4,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -160,17 +163,19 @@ class ChatExplorerListItemViewTest {
     }
 
     @Test
-    fun `test that checkbox shows check icon when item is selected`() {
+    fun `test that checkbox is checked when item is selected`() {
         setContent(isSelected = true)
-        composeTestRule.onNodeWithContentDescription("check icon", useUnmergedTree = true)
-            .assertIsDisplayed()
+        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true)
+            .onFirst()
+            .assertIsOn()
     }
 
     @Test
-    fun `test that checkbox does not show check icon when item is not selected`() {
+    fun `test that checkbox is not checked when item is not selected`() {
         setContent(isSelected = false)
-        composeTestRule.onNodeWithContentDescription("check icon", useUnmergedTree = true)
-            .assertDoesNotExist()
+        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true)
+            .onFirst()
+            .assertIsOff()
     }
 
     @Test

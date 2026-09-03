@@ -7,9 +7,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesCheck
-import com.google.android.apps.common.testing.accessibility.framework.checks.DuplicateClickableBoundsCheck
-import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.R as CoreUiR
 import mega.android.core.ui.components.button.SecondarySmallIconButton
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -72,16 +69,7 @@ class TopAppBarsAccessibilityTest {
     }
 
     @Test
-    fun test_that_search_top_app_bar_passes_accessibility_checks_when_the_duplicate_bounds_baseline_is_suppressed() {
-        // The core-ui search app bar stacks two long-clickable elements on the search action's
-        // location and cannot be fixed in this repository, so DuplicateClickableBoundsCheck is
-        // baselined for this test only.
-        composeTestRule.enableAccessibilityChecks(
-            megaAccessibilityValidator(
-                reporter = reporter,
-                baselineSuppressions = matchesCheck(DuplicateClickableBoundsCheck::class.java),
-            )
-        )
+    fun test_that_search_top_app_bar_passes_accessibility_checks() {
         composeTestRule.setSweepContent {
             MegaSearchTopAppBar(
                 navigationType = AppBarNavigationType.Back {},
@@ -91,11 +79,6 @@ class TopAppBarsAccessibilityTest {
         }
 
         composeTestRule.onRoot().tryPerformAccessibilityChecks()
-
-        val suppressedBaseline = reporter.entries.filter {
-            it.checkName == "DuplicateClickableBoundsCheck" && it.resultType == "SUPPRESSED"
-        }
-        assertThat(suppressedBaseline).isNotEmpty()
     }
 
     @Test
