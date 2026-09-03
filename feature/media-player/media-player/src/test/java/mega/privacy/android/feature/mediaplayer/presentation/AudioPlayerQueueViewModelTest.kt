@@ -10,6 +10,8 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioContinuousPlaybackEnabledUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioContinuousPlaybackEnabledUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState
@@ -32,25 +34,44 @@ class AudioPlayerQueueViewModelTest {
 
     private lateinit var underTest: AudioPlayerQueueViewModel
     private lateinit var playerStateFlow: MutableSharedFlow<AudioControllerState>
+    private lateinit var continuousPlaybackFlow: MutableSharedFlow<Boolean>
 
     private val gateway = mock<AudioMediaControllerGateway>()
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
+    private val monitorAudioContinuousPlaybackEnabledUseCase =
+        mock<MonitorAudioContinuousPlaybackEnabledUseCase>()
+    private val setAudioContinuousPlaybackEnabledUseCase =
+        mock<SetAudioContinuousPlaybackEnabledUseCase>()
 
     @BeforeEach
     fun setUp() {
         // replay = 1 ensures the collected value is delivered even if the coroutine subscribes
         // after the emit call (due to lazy test-scheduler ordering).
         playerStateFlow = MutableSharedFlow(replay = 1)
+        continuousPlaybackFlow = MutableSharedFlow(replay = 1)
+        continuousPlaybackFlow.tryEmit(true)
         whenever(gateway.playerState).thenReturn(playerStateFlow)
+        whenever(monitorAudioContinuousPlaybackEnabledUseCase()).thenReturn(continuousPlaybackFlow)
+        initTestClass()
+    }
+
+    private fun initTestClass() {
         underTest = AudioPlayerQueueViewModel(
             gateway = gateway,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
+            monitorAudioContinuousPlaybackEnabledUseCase = monitorAudioContinuousPlaybackEnabledUseCase,
+            setAudioContinuousPlaybackEnabledUseCase = setAudioContinuousPlaybackEnabledUseCase,
         )
     }
 
     @AfterEach
     fun tearDown() {
-        reset(gateway, getNodeByHandleUseCase)
+        reset(
+            gateway,
+            getNodeByHandleUseCase,
+            monitorAudioContinuousPlaybackEnabledUseCase,
+            setAudioContinuousPlaybackEnabledUseCase,
+        )
     }
 
     private suspend fun ReceiveTurbine<AudioPlayerQueueUiState>.awaitDataState(): AudioPlayerQueueUiState.Data =
@@ -90,25 +111,42 @@ class AudioPlayerQueueViewModelTest {
     }
 
     @Test
-    fun `test that uiState maps isContinuousPlayback true when repeat mode is not OFF`() = runTest {
-        underTest.uiState.test {
-            awaitItem() // Loading state
+    fun `test that uiState maps isContinuousPlayback true when the preference is enabled`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading state
 
-            playerStateFlow.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_ALL))
+                continuousPlaybackFlow.emit(true)
+                playerStateFlow.emit(AudioControllerState())
 
-            val state = awaitDataState()
-            assertThat(state.isContinuousPlayback).isTrue()
+                val state = awaitDataStateUntil { it.isContinuousPlayback }
+                assertThat(state.isContinuousPlayback).isTrue()
+            }
         }
-    }
 
     @Test
-    fun `test that uiState maps isContinuousPlayback false when repeat mode is OFF`() = runTest {
+    fun `test that uiState maps isContinuousPlayback false when the preference is disabled`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading state
+
+                continuousPlaybackFlow.emit(false)
+                playerStateFlow.emit(AudioControllerState())
+
+                val state = awaitDataStateUntil { !it.isContinuousPlayback }
+                assertThat(state.isContinuousPlayback).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that uiState maps isContinuousPlayback independently of the repeat mode`() = runTest {
         underTest.uiState.test {
             awaitItem() // Loading state
 
-            playerStateFlow.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_OFF))
+            continuousPlaybackFlow.emit(false)
+            playerStateFlow.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_ONE))
 
-            val state = awaitDataState()
+            val state = awaitDataStateUntil { !it.isContinuousPlayback }
             assertThat(state.isContinuousPlayback).isFalse()
         }
     }
@@ -221,14 +259,14 @@ class AudioPlayerQueueViewModelTest {
                 awaitDataState() // state update with null playingFromName
                 awaitDataState() // playingFromName resolved
 
-                // Emit the same handle again with an unrelated field changed: repeatMode makes
-                // the resulting Data differ (StateFlow would swallow an identical value), while
-                // distinctUntilChanged on the handle still suppresses the re-fetch.
+                // Emit the same handle again with an unrelated field changed: currentQueueIndex
+                // makes the resulting Data differ (StateFlow would swallow an identical value),
+                // while distinctUntilChanged on the handle still suppresses the re-fetch.
                 playerStateFlow.emit(
                     AudioControllerState(
                         currentMediaItemId = "same-id",
                         currentMediaItemHandle = 1L,
-                        repeatMode = Player.REPEAT_MODE_ALL,
+                        currentQueueIndex = 1,
                     )
                 )
                 awaitDataState() // state update (no playingFromName re-fetch expected)
@@ -300,15 +338,15 @@ class AudioPlayerQueueViewModelTest {
         }
 
     @Test
-    fun `test that setContinuousPlayback sets REPEAT_MODE_ALL when enabled is true`() = runTest {
+    fun `test that setContinuousPlayback saves the preference when enabled is true`() = runTest {
         underTest.setContinuousPlayback(true)
-        verify(gateway).setRepeatMode(Player.REPEAT_MODE_ALL)
+        verify(setAudioContinuousPlaybackEnabledUseCase)(true)
     }
 
     @Test
-    fun `test that setContinuousPlayback sets REPEAT_MODE_OFF when enabled is false`() = runTest {
+    fun `test that setContinuousPlayback saves the preference when enabled is false`() = runTest {
         underTest.setContinuousPlayback(false)
-        verify(gateway).setRepeatMode(Player.REPEAT_MODE_OFF)
+        verify(setAudioContinuousPlaybackEnabledUseCase)(false)
     }
 
     @Test

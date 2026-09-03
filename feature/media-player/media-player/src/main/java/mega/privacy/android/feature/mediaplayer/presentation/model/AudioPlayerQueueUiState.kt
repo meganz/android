@@ -22,7 +22,7 @@ sealed interface AudioPlayerQueueUiState {
      * @property currentArtist Artist of the currently playing item.
      * @property currentArtworkUri Artwork URI of the currently playing item.
      * @property currentThumbnailData Thumbnail data for the currently playing node.
-     * @property isContinuousPlayback Whether the player loops the queue continuously.
+     * @property isContinuousPlayback Whether playback moves on to the next queue item automatically.
      * @property playingFromName Name of the folder or source the queue is playing from.
      */
     data class Data(

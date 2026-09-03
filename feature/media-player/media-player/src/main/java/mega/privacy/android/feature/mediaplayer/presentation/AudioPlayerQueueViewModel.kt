@@ -2,7 +2,6 @@ package mega.privacy.android.feature.mediaplayer.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,8 +13,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioContinuousPlaybackEnabledUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioContinuousPlaybackEnabledUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQueueUiState
@@ -33,6 +35,8 @@ import timber.log.Timber
 internal class AudioPlayerQueueViewModel @Inject constructor(
     private val gateway: AudioMediaControllerGateway,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
+    private val monitorAudioContinuousPlaybackEnabledUseCase: MonitorAudioContinuousPlaybackEnabledUseCase,
+    private val setAudioContinuousPlaybackEnabledUseCase: SetAudioContinuousPlaybackEnabledUseCase,
 ) : ViewModel() {
 
     val uiState: StateFlow<AudioPlayerQueueUiState> by lazy(LazyThreadSafetyMode.NONE) {
@@ -61,11 +65,18 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
                 emit(null)
             }
 
+        val continuousPlaybackFlow = monitorAudioContinuousPlaybackEnabledUseCase()
+            .catch {
+                Timber.e(it, "Failed to monitor continuous playback preference")
+                emit(true)
+            }
+
         combine(
             gateway.playerState
                 .catch { Timber.e(it, "Failed to collect player state in queue ViewModel") },
             playingFromNameFlow,
-        ) { state, playingFromName ->
+            continuousPlaybackFlow,
+        ) { state, playingFromName, continuousPlaybackEnabled ->
             val enrichedItems = state.queueItems.mapIndexed { index, item ->
                 if (index == state.currentQueueIndex) {
                     item.copy(
@@ -85,7 +96,7 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
                 currentThumbnailData = state.currentMediaItemHandle?.let {
                     ThumbnailRequest.fromHandle(it)
                 },
-                isContinuousPlayback = state.repeatMode != Player.REPEAT_MODE_OFF,
+                isContinuousPlayback = continuousPlaybackEnabled,
                 playingFromName = playingFromName,
             )
         }.asUiStateFlow(
@@ -99,9 +110,17 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
         gateway.seekToMediaItem(index)
     }
 
-    /** Sets continuous playback. When [enabled], the queue loops indefinitely; otherwise it stops after the last item. */
+    /**
+     * Sets continuous playback. When [enabled], playback moves on to the next queue item;
+     * otherwise it pauses once the current item ends -- unless a repeat mode is keeping it going.
+     *
+     * Only the preference is written: the player service observes it and applies the result.
+     */
     fun setContinuousPlayback(enabled: Boolean) {
-        gateway.setRepeatMode(if (enabled) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF)
+        viewModelScope.launch {
+            runCatching { setAudioContinuousPlaybackEnabledUseCase(enabled) }
+                .onFailure { Timber.e(it, "Failed to save continuous playback preference") }
+        }
     }
 
     /** Moves the queue item at [fromIndex] to [toIndex], keeping playback of the current item uninterrupted. */

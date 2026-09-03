@@ -4,11 +4,13 @@ import android.content.Intent
 import androidx.media3.common.Player
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
@@ -35,6 +37,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -57,8 +61,10 @@ class AudioPlayerViewModelTest {
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
     private val setAudioShuffleEnabledUseCase = mock<SetAudioShuffleEnabledUseCase>()
     private val setAudioRepeatModeUseCase = mock<SetAudioRepeatModeUseCase>()
-    private val repeatToggleModeByExoPlayerMapper = mock<RepeatToggleModeByExoPlayerMapper>()
     private val deleteAudioPlaybackInfoUseCase = mock<DeleteAudioPlaybackInfoUseCase>()
+
+    // Real instance: a stateless mapper, so the tests exercise the real repeat-mode cycle.
+    private val repeatToggleModeByExoPlayerMapper = RepeatToggleModeByExoPlayerMapper()
 
     // Real instance: a plain in-memory holder, recreated per test so a pending event never
     // leaks into the next ViewModel.
@@ -100,7 +106,6 @@ class AudioPlayerViewModelTest {
             getNodeByHandleUseCase,
             setAudioShuffleEnabledUseCase,
             setAudioRepeatModeUseCase,
-            repeatToggleModeByExoPlayerMapper,
             deleteAudioPlaybackInfoUseCase,
         )
     }
@@ -244,54 +249,186 @@ class AudioPlayerViewModelTest {
     }
 
     @Test
-    fun `test that cycleRepeatMode sets ALL when current mode is OFF`() = runTest {
+    fun `test that cycleRepeatMode persists REPEAT_ALL when current mode is OFF`() = runTest {
         underTest.uiState.test {
             awaitItem() // Loading
             gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_OFF))
             awaitItem() // Data
             underTest.cycleRepeatMode()
-            verify(gateway).setRepeatMode(Player.REPEAT_MODE_ALL)
         }
+
+        verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ALL.ordinal)
     }
 
     @Test
-    fun `test that cycleRepeatMode sets ONE when current mode is ALL`() = runTest {
+    fun `test that cycleRepeatMode persists REPEAT_ONE when current mode is ALL`() = runTest {
         underTest.uiState.test {
             awaitItem() // Loading
             gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_ALL))
             awaitItem() // Data
             underTest.cycleRepeatMode()
-            verify(gateway).setRepeatMode(Player.REPEAT_MODE_ONE)
         }
+
+        verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ONE.ordinal)
     }
 
     @Test
-    fun `test that cycleRepeatMode sets OFF when current mode is ONE`() = runTest {
+    fun `test that cycleRepeatMode persists REPEAT_NONE when current mode is ONE`() = runTest {
         underTest.uiState.test {
             awaitItem() // Loading
             gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_ONE))
             awaitItem() // Data
             underTest.cycleRepeatMode()
-            verify(gateway).setRepeatMode(Player.REPEAT_MODE_OFF)
         }
+
+        verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_NONE.ordinal)
     }
 
     @Test
-    fun `test that setAudioRepeatModeUseCase is called when repeat mode changes`() = runTest {
-        whenever(repeatToggleModeByExoPlayerMapper(Player.REPEAT_MODE_ALL))
-            .thenReturn(RepeatToggleMode.REPEAT_ALL)
+    fun `test that cycleRepeatMode does not persist a repeat mode before the player state arrives`() =
+        runTest {
+            underTest.cycleRepeatMode()
+            advanceUntilIdle()
 
-        underTest.uiState.test {
-            awaitItem() // Loading
-            gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_OFF))
-            awaitItem() // Data (initial)
-
-            gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_ALL))
-            awaitItem() // Data with new repeat mode
+            verify(setAudioRepeatModeUseCase, never()).invoke(any())
         }
 
-        verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ALL.ordinal)
-    }
+    @Test
+    fun `test that consecutive cycleRepeatMode calls advance the mode before the player reports it`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_OFF))
+                awaitItem() // Data
+
+                underTest.cycleRepeatMode()
+                underTest.cycleRepeatMode()
+            }
+            advanceUntilIdle()
+
+            inOrder(setAudioRepeatModeUseCase) {
+                verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ALL.ordinal)
+                verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ONE.ordinal)
+            }
+        }
+
+    @Test
+    fun `test that four consecutive cycleRepeatMode calls write the whole cycle in order`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_OFF))
+                awaitItem() // Data
+
+                underTest.cycleRepeatMode()
+                underTest.cycleRepeatMode()
+                underTest.cycleRepeatMode()
+                gatewayPlayerState.emit(
+                    AudioControllerState(
+                        repeatMode = Player.REPEAT_MODE_OFF,
+                        currentPositionMs = 1_000L,
+                    )
+                )
+                awaitItem() // Data from a position tick, still reporting the old mode
+
+                underTest.cycleRepeatMode()
+            }
+            advanceUntilIdle()
+
+            inOrder(setAudioRepeatModeUseCase) {
+                verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ALL.ordinal)
+                verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ONE.ordinal)
+                verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_NONE.ordinal)
+                verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ALL.ordinal)
+            }
+        }
+
+    @Test
+    fun `test that cycleRepeatMode resumes from the player state once it reports the pending mode`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_OFF))
+                awaitItem() // Data
+
+                underTest.cycleRepeatMode()
+                gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_ALL))
+                awaitItem() // Data with the applied mode
+
+                underTest.cycleRepeatMode()
+            }
+            advanceUntilIdle()
+
+            verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ONE.ordinal)
+        }
+
+    @Test
+    fun `test that a repeat mode report clears a stale pending mode once no write is in flight`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_OFF))
+                awaitItem() // Data
+
+                underTest.cycleRepeatMode() // pending = ALL
+                advanceUntilIdle() // the write settles without the player ever reporting ALL
+
+                // Another writer (e.g. the queue screen's continuous-playback toggle) settled
+                // the player on a different mode.
+                gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_ONE))
+                awaitItem() // Data with the externally applied mode
+
+                underTest.cycleRepeatMode()
+            }
+            advanceUntilIdle()
+
+            // The second tap must cycle from the reported ONE, not from the stale pending ALL.
+            verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_NONE.ordinal)
+        }
+
+    @Test
+    fun `test that a repeat mode report keeps the pending mode while a write is in flight`() =
+        runTest {
+            val writeGate = CompletableDeferred<Unit>()
+            whenever(setAudioRepeatModeUseCase(any())).doSuspendableAnswer { writeGate.await() }
+
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_OFF))
+                awaitItem() // Data
+
+                underTest.cycleRepeatMode() // pending = ALL, write suspended at the gate
+
+                // A report of a mode the tap never asked for arrives while the write is still
+                // in flight — it may simply be an older state, so pending must survive it.
+                gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_ONE))
+                awaitItem() // Data with the reported mode
+
+                underTest.cycleRepeatMode()
+            }
+            writeGate.complete(Unit)
+            advanceUntilIdle()
+
+            inOrder(setAudioRepeatModeUseCase) {
+                verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ALL.ordinal)
+                verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ONE.ordinal)
+            }
+        }
+
+    @Test
+    fun `test that setAudioRepeatModeUseCase is not called when the player reports a repeat mode change`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_OFF))
+                awaitItem() // Data (initial)
+
+                gatewayPlayerState.emit(AudioControllerState(repeatMode = Player.REPEAT_MODE_ALL))
+                awaitItem() // Data with new repeat mode
+            }
+
+            verify(setAudioRepeatModeUseCase, never()).invoke(any())
+        }
 
     @Test
     fun `test that setCurrentIntent updates adapter type in uiState`() = runTest {

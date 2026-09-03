@@ -43,9 +43,6 @@ interface AudioMediaControllerGateway {
     /** Enables or disables shuffle mode. */
     fun setShuffleEnabled(enabled: Boolean)
 
-    /** Sets the repeat mode to one of [androidx.media3.common.Player] REPEAT_MODE_* constants. */
-    fun setRepeatMode(mode: Int)
-
     /** Stops playback without releasing the player. */
     fun stop()
 

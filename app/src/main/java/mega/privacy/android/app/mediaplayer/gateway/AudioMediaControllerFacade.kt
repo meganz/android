@@ -319,10 +319,6 @@ internal class AudioMediaControllerFacade @Inject constructor(
         controller?.setShuffleModeEnabled(enabled)
     }
 
-    override fun setRepeatMode(mode: Int) {
-        controller?.setRepeatMode(mode)
-    }
-
     override fun setPlaybackSpeed(speed: Float) {
         controller?.setPlaybackSpeed(speed)
     }

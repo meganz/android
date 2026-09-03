@@ -3,7 +3,6 @@ package mega.privacy.android.feature.mediaplayer.presentation
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -50,8 +49,9 @@ import timber.log.Timber
  * ViewModel for the revamped audio player.
  *
  * Collects raw player state from [AudioMediaControllerGateway] and maps it to [uiState].
- * Shuffle/repeat changes are persisted and analytics events are tracked here, keeping the
- * gateway focused on Media3 interaction only.
+ * Shuffle changes are persisted and analytics events are tracked here, keeping the gateway
+ * focused on Media3 interaction only. Repeat mode is written straight to the preference by
+ * [cycleRepeatMode] instead, because the player service derives it from there.
  *
  * [isPodcastMode] is resolved as early as possible: when [startPlayback] receives the launch
  * intent, the node's duration is fetched from [GetNodeByHandleUseCase] before Media3 connects,
@@ -101,6 +101,15 @@ class AudioPlayerViewModel @Inject constructor(
     private var prefetchJob: Job? = null
     private var sleepTimerJob: Job? = null
     private var endOfTrackSourceItemId: String? = null
+
+    // The repeat mode the last tap asked for, held until the player reports it. Taps arrive
+    // faster than the write can travel through the preference and back, so cycling from what
+    // the player currently reports would derive the same next mode twice and lose a tap.
+    // Reconciled against any reported mode once no writes are in flight (see handleSideEffects):
+    // another writer (e.g. the queue screen's continuous-playback toggle) may have settled the
+    // player on a mode this value never asked for, and it must not go stale.
+    private var pendingRepeatMode: RepeatToggleMode? = null
+    private var pendingRepeatModeWrites = 0
 
     private data class IntentData(
         val adapterType: Int,
@@ -179,6 +188,12 @@ class AudioPlayerViewModel @Inject constructor(
 
         if (prev.repeatMode != current.repeatMode) {
             val toggleMode = repeatToggleModeByExoPlayerMapper(current.repeatMode)
+            // A pending mode settles on its own report; with no write left in flight, whatever
+            // is reported is the final word from the last writer (which may be another screen),
+            // so a stale pending value is dropped rather than kept to mis-base the next tap.
+            if (toggleMode == pendingRepeatMode || pendingRepeatModeWrites == 0) {
+                pendingRepeatMode = null
+            }
             when (toggleMode) {
                 RepeatToggleMode.REPEAT_ONE ->
                     Analytics.tracker.trackEvent(AudioPlayerLoopPlayingItemEnabledEvent)
@@ -188,7 +203,6 @@ class AudioPlayerViewModel @Inject constructor(
 
                 else -> {}
             }
-            viewModelScope.launch { setAudioRepeatModeUseCase(toggleMode.ordinal) }
         }
 
         if (prev.mediaItemCount > 0 && current.isIdle) {
@@ -335,15 +349,38 @@ class AudioPlayerViewModel @Inject constructor(
         gateway.seekTo(maxOf(0L, state.currentPositionMs - SEEK_15_SECONDS_MS))
     }
 
+    /**
+     * Cycles the repeat mode NONE -> ALL -> ONE -> NONE.
+     *
+     * Only the preference is written: the player service observes it and applies the resulting
+     * mode, so a single writer owns the repeat mode and its dependency on continuous playback.
+     * The write travels through the preference and back before the player reports the new mode,
+     * so the cycle starts from [pendingRepeatMode] while a previous tap is still in flight.
+     */
     fun cycleRepeatMode() {
-        val state = currentControllerState ?: return
-        gateway.setRepeatMode(
-            when (state.repeatMode) {
-                Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
-                Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
-                else -> Player.REPEAT_MODE_OFF
+        val currentMode = pendingRepeatMode
+            ?: currentControllerState?.let { repeatToggleModeByExoPlayerMapper(it.repeatMode) }
+            ?: return
+        val nextMode = when (currentMode) {
+            RepeatToggleMode.REPEAT_NONE -> RepeatToggleMode.REPEAT_ALL
+            RepeatToggleMode.REPEAT_ALL -> RepeatToggleMode.REPEAT_ONE
+            RepeatToggleMode.REPEAT_ONE -> RepeatToggleMode.REPEAT_NONE
+        }
+        pendingRepeatMode = nextMode
+        pendingRepeatModeWrites++
+        viewModelScope.launch {
+            try {
+                runCatching { setAudioRepeatModeUseCase(nextMode.ordinal) }
+                    .onFailure {
+                        Timber.e(it, "Failed to save repeat mode preference")
+                        // Leaving it set would make the next tap cycle on from a mode the player
+                        // never reached.
+                        if (pendingRepeatMode == nextMode) pendingRepeatMode = null
+                    }
+            } finally {
+                pendingRepeatModeWrites--
             }
-        )
+        }
     }
 
     private fun setCurrentIntent(intent: Intent) {

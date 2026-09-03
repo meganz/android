@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.MediaPlayerRepository
@@ -14,7 +13,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MonitorAudioContinuousPlaybackEnabledUseCaseTest {
     private lateinit var underTest: MonitorAudioContinuousPlaybackEnabledUseCase

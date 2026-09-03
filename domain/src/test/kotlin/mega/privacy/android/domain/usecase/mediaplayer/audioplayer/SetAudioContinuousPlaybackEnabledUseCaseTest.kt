@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
@@ -25,6 +26,7 @@ class SetAudioContinuousPlaybackEnabledUseCaseTest {
     fun setUp() {
         underTest = SetAudioContinuousPlaybackEnabledUseCase(
             mediaPlayerRepository = mediaPlayerRepository,
+            audioPlaybackModeMutex = Mutex(),
         )
     }
 

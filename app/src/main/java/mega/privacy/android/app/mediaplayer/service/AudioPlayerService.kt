@@ -45,12 +45,14 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioResumePositionUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioBackgroundPlayEnabledUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioContinuousPlaybackEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.PersistAudioPlaybackInfoUseCase
@@ -106,6 +108,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
     @Inject
     lateinit var monitorAudioRepeatModeUseCase: MonitorAudioRepeatModeUseCase
+
+    @Inject
+    lateinit var monitorAudioContinuousPlaybackEnabledUseCase: MonitorAudioContinuousPlaybackEnabledUseCase
 
     @Inject
     lateinit var megaApiHttpServerStopUseCase: MegaApiHttpServerStopUseCase
@@ -176,20 +181,41 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             .build()
             .also { exoPlayer ->
                 exoPlayer.addListener(createPlayerListener())
-                // Apply persisted shuffle/repeat preferences asynchronously.
+                // Apply the persisted shuffle preference asynchronously. Repeat mode is applied
+                // by observePreferences(), together with continuous playback.
                 lifecycleScope.launch {
-                    val shuffleEnabled = monitorAudioShuffleEnabledUseCase()
+                    exoPlayer.shuffleModeEnabled = monitorAudioShuffleEnabledUseCase()
                         .catch { Timber.e(it, "Failed to load shuffle preference") }
                         .firstOrNull() ?: false
-                    val repeatMode = monitorAudioRepeatModeUseCase()
-                        .catch { Timber.e(it, "Failed to load repeat mode preference") }
-                        .firstOrNull()
-                    exoPlayer.shuffleModeEnabled = shuffleEnabled
-                    if (repeatMode != null) {
-                        exoPlayer.repeatMode = exoPlayerRepeatModeMapper(repeatMode)
-                    }
                 }
             }
+    }
+
+    /**
+     * Applies the persisted repeat mode and continuous-playback preferences to the player.
+     *
+     * The preferences are the single source of truth for both: this only reads them, so the
+     * invariants between the two are left to the use cases that write them.
+     *
+     * [ExoPlayer.setPauseAtEndOfMediaItems] acts independently of the repeat mode -- it pauses at
+     * the end of every item whatever the mode is -- so it may only be used to stop after the
+     * current track when no repeat mode is asking playback to carry on.
+     */
+    private fun applyPlaybackMode(
+        repeatMode: RepeatToggleMode,
+        continuousPlaybackEnabled: Boolean,
+    ) {
+        val exoPlayer = player ?: return
+        val effectiveMode =
+            if (repeatMode == RepeatToggleMode.REPEAT_ALL && !continuousPlaybackEnabled) {
+                RepeatToggleMode.REPEAT_NONE
+            } else {
+                repeatMode
+            }
+        exoPlayer.repeatMode = exoPlayerRepeatModeMapper(effectiveMode)
+        exoPlayer.setPauseAtEndOfMediaItems(
+            !continuousPlaybackEnabled && effectiveMode == RepeatToggleMode.REPEAT_NONE
+        )
     }
 
     /**
@@ -266,6 +292,18 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             monitorAudioBackgroundPlayEnabledUseCase()
                 .catch { Timber.e(it, "Failed to monitor background play preference") }
                 .collect { isBackgroundPlayEnabled = it }
+        }
+        lifecycleScope.launch {
+            combine(
+                monitorAudioRepeatModeUseCase(),
+                monitorAudioContinuousPlaybackEnabledUseCase(),
+            ) { repeatMode, continuousPlaybackEnabled ->
+                repeatMode to continuousPlaybackEnabled
+            }
+                .catch { Timber.e(it, "Failed to monitor playback mode preferences") }
+                .collect { (repeatMode, continuousPlaybackEnabled) ->
+                    applyPlaybackMode(repeatMode, continuousPlaybackEnabled)
+                }
         }
     }
 
