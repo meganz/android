@@ -321,20 +321,46 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             }
 
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(nodeRepository.doesNodeExist(nodeId)).thenReturn(false)
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
             whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
-                flowOf(
-                    UserUpdate(
-                        emptyMap(),
-                        emptyMap()
-                    )
-                )
+                emptyFlow()
             )
 
             underTest(nodeId, NodeSourceType.INCOMING_SHARES).test {
-                // Both NodeChanges.Remove and NodeChanges.Attributes may emit
-                val firstItem = awaitItem()
-                assertThat(firstItem).isIn(listOf(NodeChanges.Remove, NodeChanges.Attributes))
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Remove)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when subfolder of incoming share still exists`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val folderNode = mock<FolderNode> {
+                on { id } doReturn nodeId
+                on { parentId } doReturn NodeId(0L)
+                on { isInRubbishBin } doReturn false
+                on { isIncomingShare } doReturn false
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(folderNode to emptyList<NodeChanges>())
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(nodeRepository.doesNodeExist(nodeId)).thenReturn(true)
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
+                emptyFlow()
+            )
+
+            underTest(nodeId, NodeSourceType.INCOMING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
                 cancelAndConsumeRemainingEvents()
             }
         }

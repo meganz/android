@@ -91,10 +91,16 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
         }
         .map {
             val isNodeRemoved = it.changes.keys.any { node ->
-                // Folder moved to rubbish bin or removed from incoming shares
-                node is FolderNode
-                        && node.id == effectiveNodeId
-                        && (node.isInRubbishBin || (nodeSourceType == NodeSourceType.INCOMING_SHARES && !node.isIncomingShare))
+                if (node !is FolderNode || node.id != effectiveNodeId) return@any false
+
+                val isMovedToRubbishBin = node.isInRubbishBin
+                // isIncomingShare is only true for the share root, so for subfolders
+                // confirm the node is actually gone before treating it as removed.
+                val isRemovedFromIncomingShares = nodeSourceType == NodeSourceType.INCOMING_SHARES
+                        && !node.isIncomingShare
+                        && !nodeRepository.doesNodeExist(effectiveNodeId)
+
+                isMovedToRubbishBin || isRemovedFromIncomingShares
             }
             if (isNodeRemoved) NodeChanges.Remove else NodeChanges.Attributes
         }
