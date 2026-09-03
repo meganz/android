@@ -948,7 +948,9 @@ private fun MediaScreen.MediaContent(
                                 .fillMaxWidth()
                                 .navigationBarsPadding()
                                 .align(Alignment.BottomCenter),
-                            isVisible = timelineRevampUiState is TimelineRevampUiState.Data && revampSelectorVisible,
+                            isVisible = timelineRevampUiState is TimelineRevampUiState.Data &&
+                                    revampSelectorVisible &&
+                                    selectedPhotoIds.isEmpty(),
                             selectedTimePeriod = selectedTimePeriod,
                             onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                             periods = listOf(
