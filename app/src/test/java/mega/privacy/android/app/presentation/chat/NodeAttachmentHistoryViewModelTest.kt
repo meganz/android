@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -53,6 +54,7 @@ class NodeAttachmentHistoryViewModelTest {
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
     private val getChatFileUseCase = mock<GetChatFileUseCase>()
     private val copyChatNodesUseCase = mock<CopyChatNodesUseCase>()
+    private val signalChatPresenceActivity = mock<SignalChatPresenceActivity>()
 
     private lateinit var viewModel: NodeAttachmentHistoryViewModel
 
@@ -67,6 +69,7 @@ class NodeAttachmentHistoryViewModelTest {
             getChatFileUseCase = getChatFileUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             copyChatNodesUseCase = copyChatNodesUseCase,
+            signalChatPresenceActivity = signalChatPresenceActivity,
             megaNavigator = megaNavigator
         )
     }
@@ -81,6 +84,7 @@ class NodeAttachmentHistoryViewModelTest {
         getChatFileUseCase,
         isAvailableOfflineUseCase,
         copyChatNodesUseCase,
+        signalChatPresenceActivity,
     )
 
     @Test
@@ -306,5 +310,13 @@ class NodeAttachmentHistoryViewModelTest {
         viewModel.copyAttachmentsToForward(chatId, messageIds, newNodeParent)
 
         assertThat(viewModel.copyResultFlow.value?.error).isInstanceOf(ForeignNodeException::class.java)
+    }
+
+    @Test
+    fun `test that signalChatPresence invokes signalChatPresenceActivity`() = runTest {
+        viewModel.signalChatPresence()
+        advanceUntilIdle()
+
+        verify(signalChatPresenceActivity).invoke()
     }
 }

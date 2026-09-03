@@ -300,7 +300,12 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
                     if (adapter == null) {
                         adapter =
-                            NodeAttachmentHistoryAdapter(this, listView, chatController).apply {
+                            NodeAttachmentHistoryAdapter(
+                                this,
+                                listView,
+                                chatController,
+                                onUserInteraction = viewModel::signalChatPresence,
+                            ).apply {
                                 messages = chatMessages
                             }
                     }
@@ -1221,7 +1226,12 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
             if (chatMessages?.isNotEmpty() == true) {
                 if (adapter == null) {
-                    adapter = NodeAttachmentHistoryAdapter(this, listView, chatController).apply {
+                    adapter = NodeAttachmentHistoryAdapter(
+                        this,
+                        listView,
+                        chatController,
+                        onUserInteraction = viewModel::signalChatPresence,
+                    ).apply {
                         messages = chatMessages
                     }
                     listView?.layoutManager = mLayoutManager
@@ -1273,7 +1283,12 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         //Create adapter
         if (adapter == null) {
             Timber.d("Create adapter")
-            adapter = NodeAttachmentHistoryAdapter(this, listView, chatController).apply {
+            adapter = NodeAttachmentHistoryAdapter(
+                this,
+                listView,
+                chatController,
+                onUserInteraction = viewModel::signalChatPresence,
+            ).apply {
                 messages = chatMessages
             }
             listView?.layoutManager = mLayoutManager

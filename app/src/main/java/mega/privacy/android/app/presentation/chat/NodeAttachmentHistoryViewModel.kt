@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CopyChatNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
+import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -46,6 +47,7 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
     private val getChatFileUseCase: GetChatFileUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val copyChatNodesUseCase: CopyChatNodesUseCase,
+    private val signalChatPresenceActivity: SignalChatPresenceActivity,
     private val megaNavigator: MegaNavigator,
 ) : ViewModel() {
 
@@ -82,6 +84,16 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
      * Flow of [NameCollisionUiEntity] to notify the name collisions
      */
     val collisionsFlow = _collisionsFlow.asStateFlow()
+
+    /**
+     * Signals that the user is active in the chat so presence stays up to date.
+     */
+    fun signalChatPresence() {
+        viewModelScope.launch {
+            runCatching { signalChatPresenceActivity() }
+                .onFailure { Timber.e(it) }
+        }
+    }
 
     /**
      * Get latest [StorageState] from [MonitorStorageStateEventUseCase] use case.

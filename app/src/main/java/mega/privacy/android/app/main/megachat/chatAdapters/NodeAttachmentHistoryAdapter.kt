@@ -30,9 +30,10 @@ import coil3.request.SuccessResult
 import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
 import coil3.util.CoilUtils.dispose
-import mega.privacy.android.app.MegaApplication
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.app.di.MegaApiEntryPoint
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.ChatNonContactNameListener
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
@@ -49,10 +50,11 @@ class NodeAttachmentHistoryAdapter(
     private val context: Context,
     private val listFragment: RecyclerView?,
     private val chatController: ChatController,
+    private val onUserInteraction: () -> Unit,
 ) : RecyclerView.Adapter<NodeAttachmentHistoryAdapter.ViewHolderBrowserList?>(),
     View.OnClickListener, OnLongClickListener {
     private val megaChatApi: MegaChatApiAndroid =
-        ((context as Activity).application as MegaApplication).getMegaChatApi()
+        EntryPointAccessors.fromApplication(context, MegaApiEntryPoint::class.java).megaChatApi()
     var messages: ArrayList<MegaChatMessage>? = null
         set(value) {
             field = value
@@ -463,7 +465,7 @@ class NodeAttachmentHistoryAdapter(
 
     override fun onClick(v: View) {
         Timber.d("onClick")
-        ((context as Activity).application as MegaApplication).sendSignalPresenceActivity()
+        onUserInteraction()
 
         val holder = v.tag as ViewHolderBrowserList
         val currentPosition = holder.adapterPosition
@@ -542,7 +544,7 @@ class NodeAttachmentHistoryAdapter(
 
     override fun onLongClick(view: View): Boolean {
         Timber.d("OnLongCLick")
-        ((context as Activity).application as MegaApplication).sendSignalPresenceActivity()
+        onUserInteraction()
 
         val holder = view.tag as ViewHolderBrowserList
         val currentPosition = holder.adapterPosition
