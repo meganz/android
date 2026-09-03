@@ -7,7 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScannerHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -27,7 +27,7 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ScanDocumentViewModelTest {
-    private val scannerHandler = mock<ScannerHandler>()
+    private val scannerHandler = mock<DocumentScannerHandler>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val navigationEventQueue = mock<NavigationEventQueue>()
 

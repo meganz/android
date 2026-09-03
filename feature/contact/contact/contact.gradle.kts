@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":resources:string-resources"))
     implementation(project(":shared:contact"))
     implementation(project(":core:ui-components:node-components"))
+    implementation(project(":core:ui-components:shared-components"))
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)

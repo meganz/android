@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.scanner
+package mega.privacy.android.core.sharedcomponents.scanner
 
 /**
  * Sealed class containing different Results from successfully installing the ML Kit Barcode Scanner

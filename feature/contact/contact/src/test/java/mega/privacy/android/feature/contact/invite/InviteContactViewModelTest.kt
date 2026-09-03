@@ -12,9 +12,9 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanner
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScannerModuleIsNotInstalled
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.EmailInvitationsInputValidity
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -68,7 +68,7 @@ class InviteContactViewModelTest {
     private val inviteContactWithEmailsUseCase = mock<InviteContactWithEmailsUseCase>()
     private val createContactLinkUseCase = mock<CreateContactLinkUseCase>()
     private val areThereOngoingVideoCallsUseCase = mock<AreThereOngoingVideoCallsUseCase>()
-    private val scannerHandler = mock<ScannerHandler>()
+    private val scannerHandler = mock<BarcodeScanner>()
     private val parseScannedContactLinkHandleUseCase = mock<ParseScannedContactLinkHandleUseCase>()
     private val queryScannedContactLinkUseCase = mock<QueryScannedContactLinkUseCase>()
     private val inviteContactWithHandleUseCase = mock<InviteContactWithHandleUseCase>()

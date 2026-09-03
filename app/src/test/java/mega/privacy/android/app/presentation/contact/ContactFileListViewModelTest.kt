@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScannerHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
@@ -59,7 +59,7 @@ internal class ContactFileListViewModelTest {
     private val copyNodesUseCase: CopyNodesUseCase = mock()
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase = mock()
     private val filePrepareUseCase: FilePrepareUseCase = mock()
-    private val scannerHandler: ScannerHandler = mock()
+    private val scannerHandler: DocumentScannerHandler = mock()
     private val nodeNameCollision = mock<NodeNameCollision.Default> {
         on { nodeHandle }.thenReturn(2L)
         on { collisionHandle }.thenReturn(123L)

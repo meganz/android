@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScannerHandler
 import mega.privacy.android.domain.usecase.documentscanner.isCustomScannerEnabled
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
@@ -24,7 +24,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ScanDocumentViewModel @Inject constructor(
-    private val scannerHandler: ScannerHandler,
+    private val scannerHandler: DocumentScannerHandler,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val navigationEventQueue: NavigationEventQueue,
 ) : ViewModel() {

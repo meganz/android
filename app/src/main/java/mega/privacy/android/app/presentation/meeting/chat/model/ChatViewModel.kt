@@ -43,7 +43,7 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScannerHandler
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.call.ChatCall
@@ -270,7 +270,7 @@ class ChatViewModel @Inject constructor(
     private val broadcastUpgradeDialogClosedUseCase: BroadcastUpgradeDialogClosedUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
-    private val scannerHandler: ScannerHandler,
+    private val scannerHandler: DocumentScannerHandler,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     actionFactories: Set<@JvmSuppressWildcards (ChatViewModel) -> MessageAction>,
 ) : ViewModel() {

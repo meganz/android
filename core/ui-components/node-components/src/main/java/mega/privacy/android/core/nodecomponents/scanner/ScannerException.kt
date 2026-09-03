@@ -1,11 +1,6 @@
 package mega.privacy.android.core.nodecomponents.scanner
 
 /**
- * An exception that should be thrown whenever the [com.google.mlkit.vision.codescanner.GmsBarcodeScanning] module has not been installed.
- */
-class BarcodeScannerModuleIsNotInstalled : Exception()
-
-/**
  * An Exception that should be thrown whenever the [com.google.mlkit.vision.documentscanner.GmsDocumentScanning] module has not been installed
  */
 class DocumentScannerModuleIsNotInstalled : Exception()

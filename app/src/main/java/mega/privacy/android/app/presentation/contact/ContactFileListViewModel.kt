@@ -14,7 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScannerHandler
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -47,7 +47,7 @@ class ContactFileListViewModel @Inject constructor(
     private val copyNodesUseCase: CopyNodesUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
     private val filePrepareUseCase: FilePrepareUseCase,
-    private val scannerHandler: ScannerHandler,
+    private val scannerHandler: DocumentScannerHandler,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ContactFileListUiState())
 

@@ -26,9 +26,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.core.coroutine.asUiStateFlow
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanner
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScannerModuleIsNotInstalled
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
@@ -103,7 +103,7 @@ class AddContactViewModel @AssistedInject constructor(
     private val getLocalContactsUseCase: GetLocalContactsUseCase,
     private val getLocalContactsFromUriUseCase: GetLocalContactsFromUriUseCase,
     private val contactItemUiStateMapper: ContactItemUiStateMapper,
-    private val scannerHandler: ScannerHandler,
+    private val scannerHandler: BarcodeScanner,
     private val parseScannedContactLinkHandleUseCase: ParseScannedContactLinkHandleUseCase,
     private val queryScannedContactLinkUseCase: QueryScannedContactLinkUseCase,
     private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase,

@@ -25,9 +25,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanner
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScannerModuleIsNotInstalled
 import mega.privacy.android.domain.entity.contacts.EmailInvitationsInputValidity
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
@@ -89,7 +89,7 @@ class InviteContactViewModel @AssistedInject constructor(
     private val inviteContactWithEmailsUseCase: InviteContactWithEmailsUseCase,
     private val createContactLinkUseCase: CreateContactLinkUseCase,
     private val areThereOngoingVideoCallsUseCase: AreThereOngoingVideoCallsUseCase,
-    private val scannerHandler: ScannerHandler,
+    private val scannerHandler: BarcodeScanner,
     private val parseScannedContactLinkHandleUseCase: ParseScannedContactLinkHandleUseCase,
     private val queryScannedContactLinkUseCase: QueryScannedContactLinkUseCase,
     private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase,

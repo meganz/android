@@ -7,9 +7,9 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanner
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScannerModuleIsNotInstalled
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -72,7 +72,7 @@ class AddContactViewModelTest {
         contactItemStatusMapper = ContactItemStatusMapper(),
         contactItemAvatarMapper = ContactItemAvatarMapper(),
     )
-    private val scannerHandler = mock<ScannerHandler>()
+    private val scannerHandler = mock<BarcodeScanner>()
     private val parseScannedContactLinkHandleUseCase = mock<ParseScannedContactLinkHandleUseCase>()
     private val queryScannedContactLinkUseCase = mock<QueryScannedContactLinkUseCase>()
     private val inviteContactWithHandleUseCase = mock<InviteContactWithHandleUseCase>()

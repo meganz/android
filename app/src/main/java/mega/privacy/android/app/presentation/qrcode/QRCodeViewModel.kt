@@ -23,9 +23,9 @@ import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import com.google.mlkit.common.MlKitException
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanner
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScannerModuleIsNotInstalled
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.domain.entity.StorageState
@@ -78,7 +78,7 @@ class QRCodeViewModel @Inject constructor(
     private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase,
     private val avatarContentMapper: AvatarContentMapper,
     private val myQRCodeTextErrorMapper: MyQRCodeTextErrorMapper,
-    private val scannerHandler: ScannerHandler,
+    private val scannerHandler: BarcodeScanner,
     private val doesUriPathHaveSufficientSpaceUseCase: DoesUriPathHaveSufficientSpaceUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,

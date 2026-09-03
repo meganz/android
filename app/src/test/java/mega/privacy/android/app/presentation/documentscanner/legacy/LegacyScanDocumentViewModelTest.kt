@@ -7,7 +7,7 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScannerHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,7 +23,7 @@ class LegacyScanDocumentViewModelTest {
 
     private lateinit var underTest: LegacyScanDocumentViewModel
 
-    private val scannerHandler = mock<ScannerHandler>()
+    private val scannerHandler = mock<DocumentScannerHandler>()
 
     @BeforeEach
     fun setUp() {

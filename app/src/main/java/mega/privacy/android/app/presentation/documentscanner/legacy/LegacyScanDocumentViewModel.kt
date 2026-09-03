@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScannerHandler
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -34,7 +34,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 internal class LegacyScanDocumentViewModel @Inject constructor(
-    private val scannerHandler: ScannerHandler,
+    private val scannerHandler: DocumentScannerHandler,
 ) : ViewModel() {
 
     private val scannerReadyEventChannel =

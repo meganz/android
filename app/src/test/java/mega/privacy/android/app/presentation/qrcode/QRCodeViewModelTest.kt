@@ -22,8 +22,8 @@ import mega.privacy.android.shared.account.presentation.mapper.AvatarContentMapp
 import mega.privacy.android.shared.account.presentation.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.sharedcomponents.scanner.BarcodeScanner
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -87,7 +87,7 @@ class QRCodeViewModelTest {
     private val inviteContactWithHandleUseCase = mock<InviteContactWithHandleUseCase>()
     private val avatarContentMapper = mock<AvatarContentMapper>()
     private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
-    private val scannerHandler = mock<ScannerHandler>()
+    private val scannerHandler = mock<BarcodeScanner>()
     private val doesUriPathHaveSufficientSpaceUseCase =
         mock<DoesUriPathHaveSufficientSpaceUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
