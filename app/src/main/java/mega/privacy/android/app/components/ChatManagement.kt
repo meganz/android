@@ -6,10 +6,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.CountDownTimer
 import androidx.preference.PreferenceManager
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.globalmanagement.IncomingCallNotifier
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.utils.CallUtil
@@ -59,6 +60,7 @@ class ChatManagement @Inject constructor(
     private val removeChatOpeningWithLinkUseCase: RemoveChatOpeningWithLinkUseCase,
     private val isChatOpeningWithLinkUseCase: IsChatOpeningWithLinkUseCase,
     @ApplicationContext private val appContext: Context,
+    private val incomingCallNotifier: Lazy<IncomingCallNotifier>,
 ) {
     private var countDownTimerToEndCall: CountDownTimer? = null
 
@@ -602,8 +604,8 @@ class ChatManagement @Inject constructor(
         }
 
         Timber.d("Show incoming call notification")
-        val app = appContext as MegaApplication
-        app.showOneCallNotification(call)
+        addNotificationShown(chatId)
+        incomingCallNotifier.get().invoke(call)
     }
 
     /**

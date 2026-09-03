@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
-import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
 import mega.privacy.android.app.meeting.RtcAudioManagerController
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.notifications.CallPushMessageNotificationManager
@@ -68,6 +67,7 @@ class CallChangesObserver @Inject constructor(
     private val application: Application,
     private val chatManagement: ChatManagement,
     private val rtcAudioManagerController: RtcAudioManagerController,
+    private val incomingCallNotifier: IncomingCallNotifier,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
@@ -514,15 +514,8 @@ class CallChangesObserver @Inject constructor(
      * @param incomingCall The incoming call
      */
     fun showOneCallNotification(incomingCall: MegaChatCall) {
-        Timber.d("Show incoming call notification and start to sound. Chat ID is ${incomingCall.chatid}")
-        LegacyAudioPlayerService.pauseAudioPlayer(application)
-        rtcAudioManagerController.createOrUpdateAudioManager(
-            false,
-            Constants.AUDIO_MANAGER_CALL_RINGING,
-        )
         chatManagement.addNotificationShown(incomingCall.chatid)
-        ChatAdvancedNotificationBuilder.newInstance(application)
-            .showOneCallNotification(incomingCall)
+        incomingCallNotifier(incomingCall)
     }
 
     private suspend fun checkCallDestroyed(
