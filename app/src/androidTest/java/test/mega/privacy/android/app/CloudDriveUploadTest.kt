@@ -117,9 +117,8 @@ class CloudDriveUploadTest {
         // excluded: all are safe in the test process.
         TestAppBoot.runCoreInitializers()
 
-        // The node list is loaded via getChildren(filter, ...); the filter is an opaque SDK
-        // object, so resolve children through the fake node tree explicitly. The tree starts
-        // with only the root nodes, so Cloud Drive is initially empty.
+        // The node list is loaded via getChildren(filter, ...); pin it to the Cloud Drive root.
+        // The tree starts with only the root nodes, so Cloud Drive is initially empty.
         fakeMegaApi.stub(MegaApiGateway::getChildren) {
             fakeMegaApi.nodeTree.childrenOf(rootHandle)
         }

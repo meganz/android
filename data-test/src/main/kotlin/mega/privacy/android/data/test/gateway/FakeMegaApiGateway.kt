@@ -12,6 +12,8 @@ import mega.privacy.android.data.test.engine.FakeGatewayStubbing
 import mega.privacy.android.data.test.state.FakeAccountState
 import mega.privacy.android.data.test.state.FakeNodeTree
 import mega.privacy.android.data.test.state.FakeShareState
+import mega.privacy.android.data.test.state.childrenMatching
+import mega.privacy.android.data.test.state.nodesMatching
 import mega.privacy.android.data.test.stub.StubMegaAccountDetails
 import mega.privacy.android.data.test.stub.StubMegaCancelToken
 import mega.privacy.android.data.test.stub.StubMegaError
@@ -87,7 +89,9 @@ private const val DETAILS_FLAG_SESSIONS = 0x20
  *
  * Default behaviour: the fake represents a logged-in account (see [FakeAccountState]) with a node
  * tree seeded with Cloud Drive / Rubbish Bin / Vault roots (see [FakeNodeTree]). Node reads resolve
- * through [nodeTree], account reads through [account], share and public-link reads through
+ * through [nodeTree] — including the filter-based listings [getChildren] and [searchWithFilter],
+ * which read the filter's location, name, node type, favourite, sensitivity and timestamp
+ * constraints — account reads through [account], share and public-link reads through
  * [shares] (see [FakeShareState]); other queries return empty/neutral values
  * and listener-based commands complete successfully with API_OK. No deep SDK behaviour is
  * simulated: commands such as copy/move/delete never mutate [nodeTree]; tests needing tree changes
@@ -1998,7 +2002,7 @@ class FakeMegaApiGateway(
             MegaApiGateway::searchWithFilter,
             listOf(filter, order, megaCancelToken, megaSearchPage),
         ) {
-            emptyList()
+            nodeTree.nodesMatching(filter)
         }
 
     override suspend fun getChildren(
@@ -2011,7 +2015,7 @@ class FakeMegaApiGateway(
             MegaApiGateway::getChildren,
             listOf(filter, order, megaCancelToken, megaSearchPage),
         ) {
-            emptyList()
+            nodeTree.childrenMatching(filter)
         }
 
     override fun openShareDialog(megaNode: MegaNode, listener: MegaRequestListenerInterface) {

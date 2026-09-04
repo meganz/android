@@ -83,8 +83,7 @@ class RenameNodeTest {
         // are safe in the test process.
         TestAppBoot.runCoreInitializers()
 
-        // The node list is loaded via getChildren(filter, ...); the filter is an opaque SDK object,
-        // so resolve children through the fake node tree explicitly.
+        // The node list is loaded via getChildren(filter, ...); pin it to the Cloud Drive root.
         fakeMegaApi.stub(MegaApiGateway::getChildren) {
             fakeMegaApi.nodeTree.childrenOf(rootHandle)
         }

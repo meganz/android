@@ -305,10 +305,9 @@ class HomeScreenTest {
     // region seeding helpers
 
     /**
-     * Seeds a file node in the fake tree and answers every node search with it — the Favourites,
-     * Audio and Search screens all resolve their content through
-     * [MegaApiGateway.searchWithFilter], whose filter is an opaque native SDK object, so the
-     * search is answered by method rather than by filter contents.
+     * Seeds a file node in the fake tree and pins every node search to it — the Favourites, Audio
+     * and Search screens resolve their content through [MegaApiGateway.searchWithFilter], and the
+     * fake does not apply the file-category constraint the Audio section searches by.
      */
     private fun seedSearchableFile(
         fileName: String,

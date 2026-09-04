@@ -28,6 +28,7 @@ class FakeNodeTree {
     /** Vault (Backups) root, handle 3. */
     val vaultNode: MegaNode = StubMegaNode(handle = 3L, name = "Vault", isFolder = true)
 
+    private val rootHandles = setOf(rootNode.handle, rubbishBinNode.handle, vaultNode.handle)
     private val nodesByHandle = linkedMapOf<Long, MegaNode>()
     private val parentHandleByHandle = linkedMapOf<Long, Long>()
 
@@ -60,6 +61,16 @@ class FakeNodeTree {
             .filterValues { it == parentHandle }
             .keys
             .mapNotNull { nodesByHandle[it] }
+
+    /** Every node below [parentHandle], depth first, in insertion order. */
+    fun descendantsOf(parentHandle: Long): List<MegaNode> =
+        childrenOf(parentHandle).flatMap { child ->
+            listOf(child) + descendantsOf(child.handle)
+        }
+
+    /** Every added node, in insertion order; the three seeded roots are not included. */
+    fun addedNodes(): List<MegaNode> =
+        nodesByHandle.values.filterNot { it.handle in rootHandles }
 
     /** Remove the node with [handle] and all of its descendants. */
     fun removeNode(handle: Long) {

@@ -36,6 +36,7 @@ class StubSdkObjectsSmokeTest {
         StubMegaRecentActionBucket(),
         StubMegaRecentActionBucketList(),
         StubMegaCancelToken(),
+        StubMegaSearchFilter(),
         StubMegaDateSection(),
         StubMegaDateSectionList(),
         StubMegaFileServiceReclaimOptions(),

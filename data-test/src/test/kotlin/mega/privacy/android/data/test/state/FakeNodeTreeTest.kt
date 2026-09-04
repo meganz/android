@@ -67,6 +67,33 @@ class FakeNodeTreeTest {
     }
 
     @Test
+    fun `test that descendantsOf returns the whole subtree depth first`() {
+        val folder = StubMegaNode(handle = 10L, name = "folder", isFolder = true)
+        val nested = StubMegaNode(handle = 11L, name = "nested.txt")
+        val sibling = StubMegaNode(handle = 12L, name = "sibling.txt")
+        underTest.addNode(folder, parentHandle = 1L)
+        underTest.addNode(nested, parentHandle = 10L)
+        underTest.addNode(sibling, parentHandle = 1L)
+
+        assertThat(underTest.descendantsOf(1L))
+            .containsExactly(folder, nested, sibling)
+            .inOrder()
+    }
+
+    @Test
+    fun `test that descendantsOf returns empty when the parent has no children`() {
+        assertThat(underTest.descendantsOf(1L)).isEmpty()
+    }
+
+    @Test
+    fun `test that addedNodes returns every node but the seeded roots`() {
+        val node = StubMegaNode(handle = 10L, name = "a.jpg")
+        underTest.addNode(node, parentHandle = 1L)
+
+        assertThat(underTest.addedNodes()).containsExactly(node)
+    }
+
+    @Test
     fun `test that addNode replaces the existing node when the handle already exists`() {
         underTest.addNode(StubMegaNode(handle = 10L, name = "old.jpg"), parentHandle = 1L)
         val replacement = StubMegaNode(handle = 10L, name = "new.jpg")
