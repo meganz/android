@@ -94,12 +94,16 @@ private val UndoCheckpointDebounce = 1.seconds
  * The rich editor surface: every block is always directly editable — no Markdown syntax, no
  * tap-to-reveal. Block structure (bullets, numbers, checkboxes, quote bars, code boxes) is
  * chrome drawn outside the text fields; inline formatting is applied by the span engine.
+ *
+ * @param autoFocusWhenEmpty Focus the first block and open the keyboard when the document is
+ * a single empty block (a freshly created file); an existing document is never grabbed.
  */
 @OptIn(FlowPreview::class)
 @Composable
 fun RichDocumentEditor(
     state: RichDocumentState,
     modifier: Modifier = Modifier,
+    autoFocusWhenEmpty: Boolean = false,
 ) {
     val visualStyles = rememberRichSpanVisualStyles()
     val colors = rememberMarkdownColors()
@@ -122,6 +126,15 @@ fun RichDocumentEditor(
                 listState.dispatchRawDelta(request.velocity)
                 geometry.docPositionAt(state, request.dragRoot)?.let(request.moveEdge)
             }
+        }
+    }
+
+    LaunchedEffect(state) {
+        val single = state.blocks.singleOrNull() as? RichTextBlockEditState
+        if (autoFocusWhenEmpty && single != null &&
+            single.text.textFieldState.text.isEmpty()
+        ) {
+            state.pendingFocus = RichFocusRequest(0, TextRange.Zero)
         }
     }
 

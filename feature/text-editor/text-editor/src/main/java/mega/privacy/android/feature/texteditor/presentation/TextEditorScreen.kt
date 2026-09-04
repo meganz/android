@@ -485,6 +485,8 @@ fun TextEditorScreen(
                                 if (useRichText && richState != null) {
                                     RichDocumentEditor(
                                         state = richState,
+                                        autoFocusWhenEmpty =
+                                            uiState.mode == TextEditorMode.Create,
                                         modifier = Modifier.fillMaxSize(),
                                     )
                                 } else if (useRichText) {

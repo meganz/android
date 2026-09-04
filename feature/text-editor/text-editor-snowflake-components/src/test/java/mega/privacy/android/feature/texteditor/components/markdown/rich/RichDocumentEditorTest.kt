@@ -3,6 +3,7 @@ package mega.privacy.android.feature.texteditor.components.markdown.rich
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.assertIsToggleable
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -39,6 +40,42 @@ class RichDocumentEditorTest {
                 RichDocumentEditor(state = state)
             }
         }
+    }
+
+    private fun setEditor(document: RichDocument, autoFocusWhenEmpty: Boolean) {
+        state = RichDocumentState(document)
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RichDocumentEditor(state = state, autoFocusWhenEmpty = autoFocusWhenEmpty)
+            }
+        }
+    }
+
+    @Test
+    fun `test that autoFocusWhenEmpty focuses the single empty block`() {
+        setEditor(
+            RichDocument(listOf(RichBlock.Paragraph(RichText("")))),
+            autoFocusWhenEmpty = true,
+        )
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).assertIsFocused()
+    }
+
+    @Test
+    fun `test that autoFocusWhenEmpty does not grab focus when the document has content`() {
+        setEditor(
+            RichDocument(listOf(RichBlock.Paragraph(RichText("existing")))),
+            autoFocusWhenEmpty = true,
+        )
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).assertIsNotFocused()
+    }
+
+    @Test
+    fun `test that an empty document is not focused by default`() {
+        setEditor(RichDocument(listOf(RichBlock.Paragraph(RichText("")))))
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).assertIsNotFocused()
     }
 
     @Test
