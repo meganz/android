@@ -973,7 +973,7 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             if (user != null) {
                 megaApiGateway.getContact(user)?.let { megaUser ->
-                    contactWrapper.getMegaUserNameDB(megaUser)
+                    contactWrapper.getMegaUserNameDB(context, megaUser)
                 } ?: user
             } else null
         }

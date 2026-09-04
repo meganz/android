@@ -149,7 +149,7 @@ class MegaProviderAdapter(
                     if (mS.nodeHandle == node.handle) {
                         val user = megaApi.getContact(mS.user)
                         if (user != null) {
-                            holder.textViewFileSize.text = ContactUtil.getMegaUserNameDB(user)
+                            holder.textViewFileSize.text = ContactUtil.getMegaUserNameDB(user, context)
                         } else {
                             holder.textViewFileSize.text = mS.user
                         }

@@ -400,7 +400,7 @@ class ContactAttachmentActivity : PasscodeActivity(), MegaRequestListenerInterfa
                     Contact(
                         userId,
                         email,
-                        ContactUtil.getNicknameContact(email),
+                        ContactUtil.getNicknameContact(email, this),
                         firstName,
                         lastName
                     ), i

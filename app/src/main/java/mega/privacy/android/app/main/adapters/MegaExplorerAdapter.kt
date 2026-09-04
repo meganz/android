@@ -655,7 +655,7 @@ class MegaExplorerAdapter(
                             if (megaShare.nodeHandle == node.handle) {
                                 binding.fileExplorerFilesize.text =
                                     megaApi.getContact(megaShare.user)?.let { user ->
-                                        getMegaUserNameDB(user)
+                                        getMegaUserNameDB(user, context)
                                     } ?: megaShare.user
                             }
                         }

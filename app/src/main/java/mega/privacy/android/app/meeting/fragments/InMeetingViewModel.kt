@@ -1500,7 +1500,7 @@ class InMeetingViewModel @Inject constructor(
      * @return The name of a participant
      */
     fun getParticipantFullName(peerId: Long): String? =
-        CallUtil.getUserNameCall(peerId, chatController, megaChatApi)
+        CallUtil.getUserNameCall(peerId, chatController, megaChatApi, context)
 
     /**
      * Method to find out if there is a participant in the call

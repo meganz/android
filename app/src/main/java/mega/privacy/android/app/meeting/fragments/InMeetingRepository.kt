@@ -127,7 +127,7 @@ class InMeetingRepository @Inject constructor(
             avatar = CallUtil.getDefaultAvatarCall(
                 context,
                 peerId,
-                CallUtil.getUserNameCall(peerId, chatController, megaChatApi).orEmpty()
+                CallUtil.getUserNameCall(peerId, chatController, megaChatApi, context).orEmpty()
             )
         }
 
@@ -299,7 +299,7 @@ class InMeetingRepository @Inject constructor(
             bitmap = CallUtil.getDefaultAvatarCall(
                 context,
                 peerId,
-                CallUtil.getUserNameCall(peerId, chatController, megaChatApi).orEmpty(),
+                CallUtil.getUserNameCall(peerId, chatController, megaChatApi, context).orEmpty(),
             )
         }
 

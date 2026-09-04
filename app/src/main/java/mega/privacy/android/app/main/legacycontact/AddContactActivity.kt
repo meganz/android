@@ -1959,7 +1959,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     }
 
     private fun createMegaContact(contact: MegaUser): MegaContactAdapter {
-        val contactDB = ContactUtil.getContactDB(contact.handle)
+        val contactDB = ContactUtil.getContactDB(contact.handle, this)
         var fullName = ContactUtil.getContactNameDB(contactDB)
         if (fullName == null) {
             fullName = contact.email

@@ -2,11 +2,12 @@ package mega.privacy.android.app.utils
 
 import android.content.Context
 import android.content.Intent
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME
 import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
-import mega.privacy.android.app.di.getDbHandler
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint
 import mega.privacy.android.domain.entity.Contact
 import nz.mega.sdk.MegaUser
 
@@ -20,13 +21,16 @@ object ContactUtil {
      */
     @JvmStatic
     @Deprecated("Use GetContactFromCacheByHandleUseCase instead.")
-    fun getContactDB(contactHandle: Long): Contact? =
-        getDbHandler().findContactByHandle(contactHandle)
+    fun getContactDB(contactHandle: Long, context: Context): Contact? =
+        EntryPointAccessors.fromApplication(
+            context,
+            DatabaseHandlerEntryPoint::class.java
+        ).dbH.findContactByHandle(contactHandle)
 
     @JvmStatic
-    fun getMegaUserNameDB(user: MegaUser?): String? {
+    fun getMegaUserNameDB(user: MegaUser?, context: Context): String? {
         if (user == null) return null
-        val nameContact = getContactNameDB(user.handle)
+        val nameContact = getContactNameDB(user.handle, context)
         if (nameContact != null) {
             return nameContact
         }
@@ -53,8 +57,8 @@ object ContactUtil {
     }
 
     @JvmStatic
-    fun getContactNameDB(contactHandle: Long): String? {
-        val contactDB = getContactDB(contactHandle)
+    fun getContactNameDB(contactHandle: Long, context: Context): String? {
+        val contactDB = getContactDB(contactHandle, context)
         if (contactDB != null) {
             return getContactNameDB(contactDB)
         }
@@ -63,14 +67,17 @@ object ContactUtil {
     }
 
     @JvmStatic
-    fun getNicknameContact(contactHandle: Long): String? {
-        val contactDB = getContactDB(contactHandle) ?: return null
+    fun getNicknameContact(contactHandle: Long, context: Context): String? {
+        val contactDB = getContactDB(contactHandle, context) ?: return null
         return contactDB.nickname
     }
 
     @JvmStatic
-    fun getNicknameContact(email: String?): String? {
-        val contactDB = getDbHandler().findContactByEmail(email)
+    fun getNicknameContact(email: String?, context: Context): String? {
+        val contactDB = EntryPointAccessors.fromApplication(
+            context,
+            DatabaseHandlerEntryPoint::class.java
+        ).dbH.findContactByEmail(email)
         if (contactDB != null) {
             return contactDB.nickname
         }
@@ -95,8 +102,8 @@ object ContactUtil {
     }
 
     @JvmStatic
-    fun getFirstNameDB(contactHandle: Long): String {
-        val contactDB = getContactDB(contactHandle)
+    fun getFirstNameDB(contactHandle: Long, context: Context): String {
+        val contactDB = getContactDB(contactHandle, context)
         if (contactDB != null) {
             val nicknameText = contactDB.nickname
             if (nicknameText != null) {
@@ -151,8 +158,8 @@ object ContactUtil {
      * @return The contact's email.
      */
     @JvmStatic
-    fun getContactEmailDB(contactHandle: Long): String? {
-        val contactDB = getContactDB(contactHandle)
+    fun getContactEmailDB(contactHandle: Long, context: Context): String? {
+        val contactDB = getContactDB(contactHandle, context)
         return if (contactDB != null) getContactEmailDB(contactDB) else null
     }
 

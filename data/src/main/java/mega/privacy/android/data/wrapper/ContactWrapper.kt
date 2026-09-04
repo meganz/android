@@ -15,7 +15,7 @@ interface ContactWrapper {
      * @param megaUser A potentially nullable [MegaUser]
      * @return The Mega User Name from the database, or null if it cannot be found
      */
-    fun getMegaUserNameDB(megaUser: MegaUser?): String?
+    fun getMegaUserNameDB(context: Context, megaUser: MegaUser?): String?
 
     /**
      * Notify first name update

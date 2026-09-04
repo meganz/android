@@ -409,7 +409,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             if (contact == null) {
                 finish()
             }
-            fullName = ContactUtil.getMegaUserNameDB(contact).orEmpty()
+            fullName = ContactUtil.getMegaUserNameDB(contact, this).orEmpty()
             fragmentContainer =
                 findViewById<View>(R.id.fragment_container_contact_properties) as FrameLayout
             Timber.d("Shared Folders are:")

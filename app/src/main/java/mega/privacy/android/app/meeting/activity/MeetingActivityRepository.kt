@@ -160,7 +160,7 @@ class MeetingActivityRepository @Inject constructor(
 
         if (bitmap == null) {
             getRemoteAvatar()
-            val username = CallUtil.getUserNameCall(peerId, chatController, megaChatApi).orEmpty()
+            val username = CallUtil.getUserNameCall(peerId, chatController, megaChatApi, context).orEmpty()
             bitmap = CallUtil.getDefaultAvatarCall(
                 context,
                 peerId,

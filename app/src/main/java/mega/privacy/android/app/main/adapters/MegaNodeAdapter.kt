@@ -1045,14 +1045,14 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
                 //Show the owner of the shared folder
                 val sharesIncoming = megaApi?.inSharesList
-                sharesIncoming?.let {
+                sharesIncoming?.let { list ->
                     for (j in sharesIncoming.indices) {
                         val mS = sharesIncoming[j]
                         if (mS.nodeHandle == node.handle) {
                             val user = megaApi?.getContact(mS.user)
                             val isContactVerifiedByMega = megaApi?.areCredentialsVerified(user)
                             if (user != null) {
-                                holder.textViewFileSize?.text = ContactUtil.getMegaUserNameDB(user)
+                                context?.let { holder.textViewFileSize?.text = ContactUtil.getMegaUserNameDB(user, it) }
                             } else {
                                 holder.textViewFileSize?.text = mS.user
                             }
@@ -1444,7 +1444,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         } else {
             val user = megaApi?.getContact(shareData?.user)
             if (user != null) {
-                holder.textViewFileSize?.text = ContactUtil.getMegaUserNameDB(user)
+                context?.let { holder.textViewFileSize?.text = ContactUtil.getMegaUserNameDB(user, it) }
             } else {
                 holder.textViewFileSize?.text = shareData?.user
             }

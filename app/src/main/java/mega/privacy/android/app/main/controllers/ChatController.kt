@@ -747,7 +747,7 @@ class ChatController @Inject constructor(
      */
     @Deprecated("")
     fun getParticipantFirstName(userHandle: Long): String? {
-        var firstName: String? = getFirstNameDB(userHandle)
+        var firstName: String? = getFirstNameDB(userHandle, context)
 
         if (isTextEmpty(firstName)) {
             firstName = getNonContactFirstName(userHandle)
@@ -778,7 +778,7 @@ class ChatController @Inject constructor(
      * @return The participant's full name.
      */
     fun getParticipantFullName(handle: Long): String? {
-        var fullName = getContactNameDB(handle)
+        var fullName = getContactNameDB(handle, context)
 
         if (isTextEmpty(fullName)) {
             fullName = getNonContactFullName(handle)
@@ -802,7 +802,7 @@ class ChatController @Inject constructor(
      * @return The participant's email.
      */
     fun getParticipantEmail(handle: Long): String? {
-        var email = getContactEmailDB(handle)
+        var email = getContactEmailDB(handle, context)
 
         if (isTextEmpty(email)) {
             email = getNonContactEmail(handle)

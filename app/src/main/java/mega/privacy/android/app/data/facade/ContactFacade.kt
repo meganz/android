@@ -7,8 +7,8 @@ import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 
 class ContactFacade @Inject constructor() : ContactWrapper {
-    override fun getMegaUserNameDB(megaUser: MegaUser?): String? =
-        ContactUtil.getMegaUserNameDB(megaUser)
+    override fun getMegaUserNameDB(context: Context, megaUser: MegaUser?): String? =
+        ContactUtil.getMegaUserNameDB(megaUser, context)
 
     override fun notifyFirstNameUpdate(context: Context, userHandle: Long) {
         ContactUtil.notifyFirstNameUpdate(context, userHandle)

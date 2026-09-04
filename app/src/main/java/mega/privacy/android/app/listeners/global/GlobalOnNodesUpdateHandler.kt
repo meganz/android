@@ -78,7 +78,7 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
 
             val userName = sharesIncoming.firstOrNull { it.nodeHandle == n.handle }?.let {
                 val user = megaApi.getContact(it.user)
-                ContactUtil.getMegaUserNameDB(user) ?: ""
+                ContactUtil.getMegaUserNameDB(user, appContext) ?: ""
             } ?: ""
 
             val folderName = (if (n.isNodeKeyDecrypted) n.name else notificationTitle).toCDATA(appContext)

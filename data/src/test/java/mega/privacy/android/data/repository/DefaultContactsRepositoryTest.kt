@@ -48,11 +48,11 @@ import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.exception.ContactDoesNotExistException
 import mega.privacy.android.domain.exception.MegaException
@@ -1422,7 +1422,7 @@ class DefaultContactsRepositoryTest {
             val userNameInDatabase = "Test Username in Database"
 
             whenever(megaApiGateway.getContact(any())).thenReturn(mock<MegaUser>())
-            whenever(contactWrapper.getMegaUserNameDB(any())).thenReturn(userNameInDatabase)
+            whenever(contactWrapper.getMegaUserNameDB(any(), any())).thenReturn(userNameInDatabase)
             assertThat(underTest.getContactUserNameFromDatabase(user)).isEqualTo(userNameInDatabase)
         }
 

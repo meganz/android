@@ -42,7 +42,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywall
 import mega.privacy.android.app.utils.AvatarUtil.getAvatarBitmap
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getUserAvatar
-import mega.privacy.android.app.utils.CallUtil.activateChrono
 import mega.privacy.android.app.utils.ChatUtil.getStatusBitmap
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.ContactUtil.getNicknameContact
@@ -890,18 +889,20 @@ object CallUtil {
      * @param peerId
      * @param chatController
      * @param megaChatApi
+     * @param context
      */
     @JvmStatic
     fun getUserNameCall(
         peerId: Long,
         chatController: ChatController,
         megaChatApi: MegaChatApiAndroid,
+        context: Context,
     ): String? {
         if (peerId == megaChatApi.myUserHandle) {
             return megaChatApi.myFullname
         }
 
-        val nickname = getNicknameContact(peerId)
+        val nickname = getNicknameContact(peerId, context)
         if (nickname != null) {
             return nickname
         }
