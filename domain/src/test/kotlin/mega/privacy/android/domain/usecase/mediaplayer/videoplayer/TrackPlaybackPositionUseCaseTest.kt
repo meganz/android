@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.mediaplayer.videoplayer
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,40 +12,53 @@ import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo.Companio
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.usecase.GetTickerUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TrackPlaybackPositionUseCaseTest {
     private lateinit var underTest: TrackPlaybackPositionUseCase
 
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
     private val removeRecentlyUsedItemUseCase = mock<RemoveRecentlyUsedItemUseCase>()
+    private val persistVideoPlaybackInfoUseCase = mock<PersistVideoPlaybackInfoUseCase>()
 
     private val mediaId: Long = 1234567
 
     private val getTicker = mock<GetTickerUseCase>()
 
-    @Before
+    @BeforeEach
     fun setUp() {
+        // PER_CLASS keeps one instance for the whole class, so the shared mocks carry
+        // invocations and stubbing between tests unless they are reset first.
+        reset(
+            mediaPlayerRepository,
+            removeRecentlyUsedItemUseCase,
+            persistVideoPlaybackInfoUseCase,
+            getTicker,
+        )
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = TrackPlaybackPositionUseCase(
             mediaPlayerRepository = mediaPlayerRepository,
             removeRecentlyUsedItemUseCase = removeRecentlyUsedItemUseCase,
+            persistVideoPlaybackInfoUseCase = persistVideoPlaybackInfoUseCase,
             getTickerUseCase = getTicker
         )
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -132,6 +145,63 @@ class TrackPlaybackPositionUseCaseTest {
         verify(mediaPlayerRepository, never()).deletePlaybackInformation(mediaId)
         verify(removeRecentlyUsedItemUseCase, never()).invoke(mediaId)
         verify(mediaPlayerRepository, never()).updatePlaybackInformation(any())
+    }
+
+    @Test
+    fun `test that the snapshot is also persisted to the database on every tracked tick`() =
+        runTest {
+            whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit))
+            val info = playbackInfo(currentPosition = 16_000)
+            val getCurrentPlaybackInfo =
+                mock<() -> MediaPlaybackInfo> { on { invoke() }.thenReturn(info) }
+
+            underTest(getCurrentPlaybackInfo)
+
+            verify(persistVideoPlaybackInfoUseCase).invoke(info)
+        }
+
+    @Test
+    fun `test that tracking continues when persisting the snapshot to the database fails`() =
+        runTest {
+            whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit))
+            val info = playbackInfo(currentPosition = 16_000)
+            whenever(persistVideoPlaybackInfoUseCase(info)).thenThrow(RuntimeException("boom"))
+            val getCurrentPlaybackInfo =
+                mock<() -> MediaPlaybackInfo> { on { invoke() }.thenReturn(info) }
+
+            underTest(getCurrentPlaybackInfo)
+
+            verify(mediaPlayerRepository).updatePlaybackInformation(
+                playbackInformation(mediaId = mediaId, currentPosition = 16_000)
+            )
+        }
+
+    @Test
+    fun `test that an unchanged snapshot is persisted to the database only once`() = runTest {
+        whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit, Unit, Unit))
+        val info = playbackInfo(currentPosition = 16_000)
+        val getCurrentPlaybackInfo =
+            mock<() -> MediaPlaybackInfo> { on { invoke() }.thenReturn(info) }
+
+        underTest(getCurrentPlaybackInfo)
+
+        verify(getCurrentPlaybackInfo, times(3)).invoke()
+        verify(persistVideoPlaybackInfoUseCase, times(1)).invoke(info)
+    }
+
+    @Test
+    fun `test that a snapshot is persisted again when the previous attempt failed`() = runTest {
+        whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit, Unit))
+        val info = playbackInfo(currentPosition = 16_000)
+        whenever(persistVideoPlaybackInfoUseCase(info))
+            .thenThrow(RuntimeException("boom"))
+            .thenAnswer { }
+        val getCurrentPlaybackInfo =
+            mock<() -> MediaPlaybackInfo> { on { invoke() }.thenReturn(info) }
+
+        underTest(getCurrentPlaybackInfo)
+
+        verify(persistVideoPlaybackInfoUseCase, times(2)).invoke(info)
     }
 
     @Test

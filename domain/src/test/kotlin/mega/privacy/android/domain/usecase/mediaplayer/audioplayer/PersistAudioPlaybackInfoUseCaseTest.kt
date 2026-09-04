@@ -57,7 +57,7 @@ class PersistAudioPlaybackInfoUseCaseTest {
     fun `test that invoke does nothing when the media handle is invalid`() = runTest {
         underTest(playbackInfo(currentPosition = TimeUnit.MINUTES.toMillis(10), handle = -1L))
 
-        verify(mediaPlayerRepository, never()).updateAndPersistAudioPlaybackInfo(any())
+        verify(mediaPlayerRepository, never()).updateAndPersistPlaybackInfo(any())
         verify(mediaPlayerRepository, never()).deleteMediaPlaybackInfo(any())
     }
 
@@ -66,7 +66,7 @@ class PersistAudioPlaybackInfoUseCaseTest {
         runTest {
             underTest(playbackInfo(currentPosition = TimeUnit.SECONDS.toMillis(15)))
 
-            verify(mediaPlayerRepository, never()).updateAndPersistAudioPlaybackInfo(any())
+            verify(mediaPlayerRepository, never()).updateAndPersistPlaybackInfo(any())
             verify(mediaPlayerRepository, never()).deleteMediaPlaybackInfo(any())
         }
 
@@ -77,7 +77,7 @@ class PersistAudioPlaybackInfoUseCaseTest {
 
             underTest(info)
 
-            verify(mediaPlayerRepository).updateAndPersistAudioPlaybackInfo(info)
+            verify(mediaPlayerRepository).updateAndPersistPlaybackInfo(info)
             verify(mediaPlayerRepository, never()).deleteMediaPlaybackInfo(any())
         }
 
@@ -94,7 +94,7 @@ class PersistAudioPlaybackInfoUseCaseTest {
 
             verify(mediaPlayerRepository).deleteMediaPlaybackInfo(mediaHandle)
             verify(removeRecentlyUsedItemUseCase).invoke(mediaHandle)
-            verify(mediaPlayerRepository, never()).updateAndPersistAudioPlaybackInfo(any())
+            verify(mediaPlayerRepository, never()).updateAndPersistPlaybackInfo(any())
         }
 
     @Test
@@ -142,7 +142,7 @@ class PersistAudioPlaybackInfoUseCaseTest {
 
             underTest(info)
 
-            verify(mediaPlayerRepository).updateAndPersistAudioPlaybackInfo(info)
+            verify(mediaPlayerRepository).updateAndPersistPlaybackInfo(info)
             verify(mediaPlayerRepository, never()).deleteMediaPlaybackInfo(any())
         }
 
@@ -152,7 +152,7 @@ class PersistAudioPlaybackInfoUseCaseTest {
 
         underTest(info)
 
-        verify(mediaPlayerRepository, never()).updateAndPersistAudioPlaybackInfo(any())
+        verify(mediaPlayerRepository, never()).updateAndPersistPlaybackInfo(any())
         verify(mediaPlayerRepository, never()).deleteMediaPlaybackInfo(any())
     }
 }

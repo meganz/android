@@ -45,7 +45,7 @@ class PersistAudioPlaybackInfoUseCase @Inject constructor(
             }
             removed.getOrThrow()
         } else {
-            mediaPlayerRepository.updateAndPersistAudioPlaybackInfo(info)
+            mediaPlayerRepository.updateAndPersistPlaybackInfo(info)
         }
     }
 }

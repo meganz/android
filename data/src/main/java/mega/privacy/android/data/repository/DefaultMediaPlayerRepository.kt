@@ -304,7 +304,12 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun deleteMediaPlaybackInfo(mediaHandle: Long) {
         megaLocalRoomGateway.deletePlaybackInfo(mediaHandle)
-        latestAudioPlaybackInfo = null
+        // The cache belongs to the legacy audio player, so only the deleted item's own entry is
+        // dropped — video deletes go through the same method and must not discard an unrelated
+        // audio position that has not been flushed yet.
+        if (latestAudioPlaybackInfo?.mediaHandle == mediaHandle) {
+            latestAudioPlaybackInfo = null
+        }
     }
 
     override suspend fun clearAllPlaybackInfos() {
@@ -322,13 +327,13 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     }
 
     override suspend fun updateAudioPlaybackInfo(info: MediaPlaybackInfo) {
-        if (info.mediaHandle != -1L) {
+        if (info.mediaHandle != MediaPlaybackInfo.INVALID_MEDIA_HANDLE) {
             latestAudioPlaybackInfo = info
         }
     }
 
-    override suspend fun updateAndPersistAudioPlaybackInfo(info: MediaPlaybackInfo) {
-        if (info.mediaHandle == -1L) return
+    override suspend fun updateAndPersistPlaybackInfo(info: MediaPlaybackInfo) {
+        if (info.mediaHandle == MediaPlaybackInfo.INVALID_MEDIA_HANDLE) return
         withContext(ioDispatcher) {
             megaLocalRoomGateway.insertOrUpdatePlaybackInfo(info)
         }

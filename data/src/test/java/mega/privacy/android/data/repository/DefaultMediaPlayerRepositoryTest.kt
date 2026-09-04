@@ -534,6 +534,34 @@ class DefaultMediaPlayerRepositoryTest {
     }
 
     @Test
+    fun `test that deleteMediaPlaybackInfo drops the cached audio info when the handle matches`() =
+        runTest {
+            val playbackInfo = mock<MediaPlaybackInfo> {
+                on { mediaHandle }.thenReturn(expectedHandle)
+            }
+            underTest.updateAudioPlaybackInfo(playbackInfo)
+
+            underTest.deleteMediaPlaybackInfo(expectedHandle)
+            underTest.saveAudioPlaybackInfo()
+
+            verify(megaLocalRoomGateway, never()).insertOrUpdatePlaybackInfo(any())
+        }
+
+    @Test
+    fun `test that deleteMediaPlaybackInfo keeps the cached audio info when another handle is deleted`() =
+        runTest {
+            val playbackInfo = mock<MediaPlaybackInfo> {
+                on { mediaHandle }.thenReturn(expectedHandle)
+            }
+            underTest.updateAudioPlaybackInfo(playbackInfo)
+
+            underTest.deleteMediaPlaybackInfo(expectedHandle + 1)
+            underTest.saveAudioPlaybackInfo()
+
+            verify(megaLocalRoomGateway).insertOrUpdatePlaybackInfo(playbackInfo)
+        }
+
+    @Test
     fun `test that clearAllPlaybackInfos of megaLocalRoomGateway is invoked`() = runTest {
         underTest.clearAllPlaybackInfos()
         verify(megaLocalRoomGateway).clearAllPlaybackInfos()
@@ -575,22 +603,22 @@ class DefaultMediaPlayerRepositoryTest {
         }
 
     @Test
-    fun `test that updateAndPersistAudioPlaybackInfo persists the playback info immediately`() =
+    fun `test that updateAndPersistPlaybackInfo persists the playback info immediately`() =
         runTest {
             val playbackInfo = mock<MediaPlaybackInfo> {
                 on { mediaHandle }.thenReturn(expectedHandle)
             }
-            underTest.updateAndPersistAudioPlaybackInfo(playbackInfo)
+            underTest.updateAndPersistPlaybackInfo(playbackInfo)
             verify(megaLocalRoomGateway).insertOrUpdatePlaybackInfo(playbackInfo)
         }
 
     @Test
-    fun `test that updateAndPersistAudioPlaybackInfo does not persist when media handle is -1`() =
+    fun `test that updateAndPersistPlaybackInfo does not persist when media handle is -1`() =
         runTest {
             val playbackInfo = mock<MediaPlaybackInfo> {
                 on { mediaHandle }.thenReturn(-1)
             }
-            underTest.updateAndPersistAudioPlaybackInfo(playbackInfo)
+            underTest.updateAndPersistPlaybackInfo(playbackInfo)
             verify(megaLocalRoomGateway, never()).insertOrUpdatePlaybackInfo(any())
         }
 
