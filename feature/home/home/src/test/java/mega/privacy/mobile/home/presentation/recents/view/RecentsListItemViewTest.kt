@@ -1,8 +1,10 @@
 package mega.privacy.mobile.home.presentation.recents.view
 
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.icon.pack.R as IconPackR
@@ -278,5 +280,31 @@ class RecentsListItemViewTest {
         }
 
         composeRule.onNodeWithTag(VERSION_ICON_TEST_TAG, true).assertExists()
+    }
+
+    @Test
+    fun `test that version icon is placed before share icon and folder name when showVersion is true`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsListItemView(
+                    title = title,
+                    parentFolderName = parentFolderName,
+                    shareIcon = shareIcon,
+                    showVersion = true,
+                    onItemClicked = {},
+                    onMenuClicked = {}
+                )
+            }
+        }
+
+        val versionIconRight =
+            composeRule.onNodeWithTag(VERSION_ICON_TEST_TAG, true).getUnclippedBoundsInRoot().right
+        val shareIconLeft =
+            composeRule.onNodeWithTag(SHARES_ICON_TEST_TAG, true).getUnclippedBoundsInRoot().left
+        val folderNameLeft =
+            composeRule.onNodeWithTag(FOLDER_NAME_TEST_TAG, true).getUnclippedBoundsInRoot().left
+
+        assertThat(versionIconRight.value).isAtMost(shareIconLeft.value)
+        assertThat(versionIconRight.value).isAtMost(folderNameLeft.value)
     }
 }

@@ -196,6 +196,17 @@ fun RecentsListItemView(
                     .padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
+                if (showVersion) {
+                    MegaIcon(
+                        imageVector = IconPack.Small.Thin.Outline.ClockRotate,
+                        tint = IconColor.Secondary,
+                        contentDescription = "Version",
+                        modifier = Modifier
+                            .size(16.dp)
+                            .testTag(VERSION_ICON_TEST_TAG)
+                    )
+                }
+
                 shareIcon?.let { icon ->
                     Image(
                         modifier = Modifier
@@ -216,17 +227,6 @@ fun RecentsListItemView(
                         .weight(1f, false)
                         .testTag(FOLDER_NAME_TEST_TAG),
                 )
-
-                if (showVersion) {
-                    MegaIcon(
-                        imageVector = IconPack.Small.Thin.Outline.ClockRotate,
-                        tint = IconColor.Secondary,
-                        contentDescription = "Version",
-                        modifier = Modifier
-                            .size(16.dp)
-                            .testTag(VERSION_ICON_TEST_TAG)
-                    )
-                }
             }
         }
 
