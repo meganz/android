@@ -66,6 +66,8 @@ import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCR
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_UNAVAILABLE_BANNER
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_TERMS_AND_POLICIES
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_YEARLY_CHIP
+import mega.privacy.android.feature.payment.presentation.upgrade.upgradeAccountHeaderImageRes
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -525,6 +527,22 @@ class UpgradeAccountScreenTest {
         )
 
         composeRule.onNodeWithTag(TEST_TAG_IMAGE_HEADER).assertExists()
+    }
+
+    @Test
+    fun `test that offer header uses the tall artwork in the side panel and the wide banner otherwise`() {
+        assertThat(upgradeAccountHeaderImageRes(showOfferBanner = true, isSidePanel = true))
+            .isEqualTo(iconPackR.drawable.subscription_offer_banner_landscape)
+        assertThat(upgradeAccountHeaderImageRes(showOfferBanner = true, isSidePanel = false))
+            .isEqualTo(iconPackR.drawable.subscription_offer_banner)
+    }
+
+    @Test
+    fun `test that header falls back to the pro header image when there is no offer`() {
+        assertThat(upgradeAccountHeaderImageRes(showOfferBanner = false, isSidePanel = true))
+            .isEqualTo(iconPackR.drawable.choose_account_type_header)
+        assertThat(upgradeAccountHeaderImageRes(showOfferBanner = false, isSidePanel = false))
+            .isEqualTo(iconPackR.drawable.choose_account_type_header)
     }
 
     @Test

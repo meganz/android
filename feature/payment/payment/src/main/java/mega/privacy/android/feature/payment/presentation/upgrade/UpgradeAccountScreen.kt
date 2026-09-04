@@ -2,6 +2,7 @@ package mega.privacy.android.feature.payment.presentation.upgrade
 
 import android.content.Context
 import android.content.res.Configuration
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -460,29 +461,40 @@ fun UpgradeAccountScreen(
  * Header artwork for the upgrade screen: the seasonal offer banner when an offer is being
  * highlighted, otherwise the standard Pro header image. Rendered as a full-width top banner in
  * portrait and as the full-height left panel in the landscape two-pane layout.
+ *
+ * The offer artwork ships in two framings of the same campaign render: a wide 16:9 crop for the
+ * portrait banner and a tall crop for the side panel. Cropping the wide asset into the narrow side
+ * panel would keep only a blown-up sliver of the scene.
  */
 @Composable
 private fun UpgradeAccountHeaderImage(
     showOfferBanner: Boolean,
+    isSidePanel: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Image(
         modifier = modifier.testTag(TEST_TAG_IMAGE_HEADER),
-        painter = painterResource(
-            if (showOfferBanner) {
-                IconPackR.drawable.subscription_offer_banner
-            } else {
-                IconPackR.drawable.choose_account_type_header
-            }
-        ),
+        painter = painterResource(upgradeAccountHeaderImageRes(showOfferBanner, isSidePanel)),
         contentDescription = "Header Image",
         contentScale = ContentScale.Crop,
     )
 }
 
 /**
+ * [isSidePanel] tracks the layout role rather than device orientation: the single-column layout
+ * keeps the wide banner even in landscape, so only the two-pane side panel takes the tall framing.
+ */
+@DrawableRes
+internal fun upgradeAccountHeaderImageRes(showOfferBanner: Boolean, isSidePanel: Boolean): Int =
+    when {
+        showOfferBanner && isSidePanel -> IconPackR.drawable.subscription_offer_banner_landscape
+        showOfferBanner -> IconPackR.drawable.subscription_offer_banner
+        else -> IconPackR.drawable.choose_account_type_header
+    }
+
+/**
  * Default single-column layout: the header image scrolls as the first item above [content], taking
- * only [headerLayoutHeight] of the list so [content] rises into the fade (DSN-3131). The image is
+ * only [headerLayoutHeight] of the list so [content] rises into the fade. The image is
  * omitted while the full-page skeleton is shown.
  */
 @Composable
@@ -518,6 +530,7 @@ private fun PortraitUpgradeAccountLayout(
                     ) {
                         UpgradeAccountHeaderImage(
                             showOfferBanner = showOfferBanner,
+                            isSidePanel = false,
                             modifier = Modifier.fillMaxSize(),
                         )
                         if (showHeaderFade) {
@@ -536,7 +549,7 @@ private fun PortraitUpgradeAccountLayout(
 
 /**
  * Landscape two-pane layout for the revamped subscription page: the header image fills the left
- * panel edge-to-edge while [content] scrolls in the right column (DSN-3131 landscape design). The
+ * panel edge-to-edge while [content] scrolls in the right column. The
  * right column clears only the status bar; the transparent top app bar's back button floats over
  * the image on the left.
  */
@@ -550,6 +563,7 @@ private fun LandscapeUpgradeAccountLayout(
     Row(modifier = Modifier.fillMaxSize()) {
         UpgradeAccountHeaderImage(
             showOfferBanner = showOfferBanner,
+            isSidePanel = true,
             modifier = Modifier
                 .weight(LANDSCAPE_IMAGE_WEIGHT)
                 .fillMaxHeight(),
@@ -790,13 +804,43 @@ private fun UpgradeAccountScreenRevampLandscapePreview(
     }
 }
 
+@Preview(name = "Revamp landscape - single offer", widthDp = 800, heightDp = 400)
+@Composable
+private fun UpgradeAccountScreenSingleOfferLandscapePreview() {
+    val landscapeConfiguration = Configuration(LocalConfiguration.current).apply {
+        orientation = Configuration.ORIENTATION_LANDSCAPE
+    }
+    AndroidTheme(isSystemInDarkTheme()) {
+        CompositionLocalProvider(LocalConfiguration provides landscapeConfiguration) {
+            UpgradeAccountScreen(
+                uiState = UpgradeAccountState(
+                    localisedSubscriptionsList = UpgradeAccountPreviewProvider.singleOfferSubscriptionsList,
+                    isSubscriptionFeatureAvailable = true,
+                    cheapestSubscriptionAvailable = UpgradeAccountPreviewProvider.subscriptionProLite,
+                ),
+                accountStorageUiState = AccountStorageUIState(
+                    baseStorage = 15L * 1024 * 1024 * 1024,
+                    totalStorage = 100L * 1024 * 1024 * 1024,
+                ),
+                isNewCreationAccount = false,
+                isUpgradeAccount = false,
+                isSubscriptionRevampEnabled = true,
+                onInAppCheckoutClick = { },
+                onFreePlanClicked = {},
+                maybeLaterClicked = {},
+                onBack = {}
+            )
+        }
+    }
+}
+
 /**
  * Height of the header image when shown as the portrait top banner.
  */
 private val HEADER_IMAGE_HEIGHT = 180.dp
 
 /**
- * Height of the portrait banner in the DSN-3131 frame.
+ * Height of the offer/revamp header image when shown as the portrait top banner.
  */
 private val REVAMP_HEADER_IMAGE_HEIGHT = 222.dp
 
