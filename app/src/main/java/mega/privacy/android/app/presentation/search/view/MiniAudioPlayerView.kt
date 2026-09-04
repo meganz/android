@@ -84,12 +84,15 @@ fun MiniAudioPlayerView(modifier: Modifier, lifecycle: Lifecycle) {
  * @param modifier Modifier
  * @param lifecycleOwner LifecycleOwner
  * @param onVisibilityChanged Callback invoked when visibility changes, receives the new visibility state
+ * @param applyNavigationBarsPadding Inset the player from the system navigation bar while visible,
+ * for hosts where nothing below the player already does so
  */
 @Composable
 fun MiniAudioPlayerView(
     modifier: Modifier = Modifier,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     onVisibilityChanged: ((Boolean) -> Unit)? = null,
+    applyNavigationBarsPadding: Boolean = false,
 ) {
     val miniPlayerHeight = dimensionResource(R.dimen.audio_player_mini_controller_height)
 
@@ -117,7 +120,7 @@ fun MiniAudioPlayerView(
 
     Box(
         modifier = modifier
-            .conditional(!isFullyHidden && isNavigationRailVisible) {
+            .conditional(!isFullyHidden && (isNavigationRailVisible || applyNavigationBarsPadding)) {
                 navigationBarsPadding()
             }
             .height(containerHeight)

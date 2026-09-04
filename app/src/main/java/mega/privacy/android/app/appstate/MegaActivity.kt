@@ -68,6 +68,7 @@ import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmai
 import mega.privacy.android.app.presentation.login.savePasswordCredential
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
+import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
@@ -82,6 +83,7 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.contract.state.LocalMiniAudioPlayer
 import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.LoginNavKey
@@ -374,7 +376,13 @@ class MegaActivity : FragmentActivity() {
                                 }
 
                                 CompositionLocalProvider(
-                                    LocalSnackBarHostState provides snackbarHostState
+                                    LocalSnackBarHostState provides snackbarHostState,
+                                    LocalMiniAudioPlayer provides { modifier, applyNavigationBarsPadding ->
+                                        MiniAudioPlayerView(
+                                            modifier = modifier,
+                                            applyNavigationBarsPadding = applyNavigationBarsPadding,
+                                        )
+                                    },
                                 ) {
                                     if (currentNavKey == null || !navigationHandler.isFetchNodeDestination(
                                             currentNavKey

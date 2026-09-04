@@ -66,6 +66,7 @@ import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.Unav
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.contract.state.LocalMiniAudioPlayer
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
@@ -190,35 +191,42 @@ internal fun FolderLinkScreen(
                     onNavigate = navigationHandler::navigate,
                     showAdsForScreen = uiState.shouldShowAdsForLink,
                 ) { modifier ->
-                    if (uiState.isInSelectionMode) {
-                        NodeSelectionModeBottomBar(
-                            modifier = modifier,
-                            availableActions = nodeOptionsActionUiState.availableActions,
-                            visibleActions = nodeOptionsActionUiState.visibleActions,
-                            visible = nodeOptionsActionUiState.visibleActions.isNotEmpty(),
-                            multiNodeActionHandler = selectionModeActionHandler,
-                            selectedNodes = uiState.selectedNodes,
-                            isSelecting = false,
-                        )
-                    } else {
-                        uiState.currentFolderNode?.let { folderNode ->
-                            if (isLoaded && !uiState.items.isEmpty()) {
-                                InlineAnchoredButtonGroup(
-                                    modifier = modifier
-                                        .testTag(FOLDER_LINK_BOTTOM_BAR_TAG),
-                                    primaryButtonText = stringResource(sharedR.string.node_option_save_to_mega),
-                                    primaryButtonLeadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
-                                    onPrimaryButtonClick = {
-                                        singleNodeActionHandler(SaveToMegaMenuAction(), folderNode)
-
-                                    },
-                                    textOnlyButtonText = stringResource(sharedR.string.general_save_to_device),
-                                    onTextOnlyButtonClick = {
-                                        singleNodeActionHandler(DownloadMenuAction(), folderNode)
-                                    },
-                                    applyInsets = true
-                                )
-                            }
+                    val folderNode = uiState.currentFolderNode
+                    val showsFolderActions =
+                        folderNode != null && isLoaded && uiState.items.isNotEmpty()
+                    // Only the folder action buttons inset themselves from the navigation bar;
+                    // without them the mini player is the last thing above the ad slot.
+                    val miniPlayerAppliesNavigationBarsPadding = !showsFolderActions
+                    Column(modifier = modifier.fillMaxWidth()) {
+                        if (!uiState.isInSelectionMode) {
+                            LocalMiniAudioPlayer.current(
+                                Modifier.fillMaxWidth(),
+                                miniPlayerAppliesNavigationBarsPadding,
+                            )
+                        }
+                        if (uiState.isInSelectionMode) {
+                            NodeSelectionModeBottomBar(
+                                availableActions = nodeOptionsActionUiState.availableActions,
+                                visibleActions = nodeOptionsActionUiState.visibleActions,
+                                visible = nodeOptionsActionUiState.visibleActions.isNotEmpty(),
+                                multiNodeActionHandler = selectionModeActionHandler,
+                                selectedNodes = uiState.selectedNodes,
+                                isSelecting = false,
+                            )
+                        } else if (showsFolderActions && folderNode != null) {
+                            InlineAnchoredButtonGroup(
+                                modifier = Modifier.testTag(FOLDER_LINK_BOTTOM_BAR_TAG),
+                                primaryButtonText = stringResource(sharedR.string.node_option_save_to_mega),
+                                primaryButtonLeadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
+                                onPrimaryButtonClick = {
+                                    singleNodeActionHandler(SaveToMegaMenuAction(), folderNode)
+                                },
+                                textOnlyButtonText = stringResource(sharedR.string.general_save_to_device),
+                                onTextOnlyButtonClick = {
+                                    singleNodeActionHandler(DownloadMenuAction(), folderNode)
+                                },
+                                applyInsets = true
+                            )
                         }
                     }
                 }
