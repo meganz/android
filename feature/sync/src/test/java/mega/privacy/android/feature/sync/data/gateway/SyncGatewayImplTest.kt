@@ -169,4 +169,24 @@ internal class SyncGatewayImplTest {
 
         assertThat(result).isEqualTo(megaError)
     }
+
+    @Test
+    fun `test that rescanSync calls rescanSync on MegaApi with the re-fingerprint flag`() =
+        runTest {
+            val folderPairId = 123L
+
+            underTest.rescanSync(folderPairId, reFingerprint = true)
+
+            verify(megaApi).rescanSync(folderPairId, true)
+        }
+
+    @Test
+    fun `test that rescanSync passes the re-fingerprint flag through when it is turned off`() =
+        runTest {
+            val folderPairId = 123L
+
+            underTest.rescanSync(folderPairId, reFingerprint = false)
+
+            verify(megaApi).rescanSync(folderPairId, false)
+        }
 }

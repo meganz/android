@@ -207,6 +207,25 @@ internal class SyncRepositoryImplTest {
         assertThat(result).isEqualTo(syncId)
     }
 
+    @Test
+    fun `test that rescanSync calls rescanSync on the gateway`() = runTest {
+        val syncId = 123L
+
+        underTest.rescanSync(syncId, reFingerprint = true)
+
+        verify(syncGateway).rescanSync(syncId, true)
+    }
+
+    @Test
+    fun `test that rescanSync passes the re-fingerprint flag through when it is turned off`() =
+        runTest {
+            val syncId = 123L
+
+            underTest.rescanSync(syncId, reFingerprint = false)
+
+            verify(syncGateway).rescanSync(syncId, false)
+        }
+
     private fun provideSyncTypeMapperParametersDirect(): Stream<Arguments> = Stream.of(
         Arguments.of(SyncType.TYPE_TWOWAY, MegaSync.SyncType.TYPE_TWOWAY),
         Arguments.of(SyncType.TYPE_BACKUP, MegaSync.SyncType.TYPE_BACKUP),

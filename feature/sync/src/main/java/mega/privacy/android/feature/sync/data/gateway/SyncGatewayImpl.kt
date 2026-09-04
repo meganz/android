@@ -126,6 +126,11 @@ internal class SyncGatewayImpl @Inject constructor(
         megaApi.pauseSync(folderPairId)
     }
 
+    override fun rescanSync(folderPairId: Long, reFingerprint: Boolean) {
+        Timber.d("Rescanning sync $folderPairId, reFingerprint: $reFingerprint")
+        megaApi.rescanSync(folderPairId, reFingerprint)
+    }
+
     override suspend fun getSyncStalledIssues(): List<MegaSyncStall>? {
         return if (megaApi.isSyncStalled) {
             suspendCancellableCoroutine { continuation ->

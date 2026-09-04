@@ -77,6 +77,11 @@ internal class SyncRepositoryImpl @Inject constructor(
         syncGateway.resumeSync(folderPairId)
     }
 
+    override suspend fun rescanSync(folderPairId: Long, reFingerprint: Boolean) =
+        withContext(ioDispatcher) {
+            syncGateway.rescanSync(folderPairId, reFingerprint)
+        }
+
     override suspend fun getFolderPairs(): List<FolderPair> = withContext(ioDispatcher) {
         runCatching {
             mapToDomain(syncGateway.getFolderPairs())

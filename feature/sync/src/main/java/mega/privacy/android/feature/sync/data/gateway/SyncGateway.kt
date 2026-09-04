@@ -73,6 +73,16 @@ internal interface SyncGateway {
     fun pauseSync(folderPairId: Long)
 
     /**
+     * Force the sync to re-read its filters and walk its local root again.
+     *
+     * @param folderPairId - id of the folder pair to rescan. Passing MegaApiJava.INVALID_HANDLE
+     * (-1) makes the SDK rescan every sync, so callers must pass a resolved id.
+     * @param reFingerprint - whether local files are fingerprinted again, which catches content
+     * changes that mtime alone does not reveal
+     */
+    fun rescanSync(folderPairId: Long, reFingerprint: Boolean)
+
+    /**
      * Get sync stalled issues
      */
     suspend fun getSyncStalledIssues(): List<MegaSyncStall>?

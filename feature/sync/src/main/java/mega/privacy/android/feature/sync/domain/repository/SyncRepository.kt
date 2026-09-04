@@ -57,6 +57,16 @@ interface SyncRepository {
     suspend fun resumeSync(folderPairId: Long)
 
     /**
+     * Forces the given sync to re-read its filters and walk its local root again.
+     *
+     * @param folderPairId The id of the folder pair to rescan. An invalid handle (-1) makes the
+     * SDK rescan every sync, so callers must pass a resolved id.
+     * @param reFingerprint Whether local files are fingerprinted again, which catches content
+     * changes that mtime alone does not reveal.
+     */
+    suspend fun rescanSync(folderPairId: Long, reFingerprint: Boolean)
+
+    /**
      * Monitors the syncing process for the given folder pair.
      *
      * @return [Flow<Unit>]Returns the folder pair with the given id.

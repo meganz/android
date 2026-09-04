@@ -10,6 +10,7 @@ import mega.privacy.android.feature.sync.domain.entity.SyncExclusionMatchType
 import mega.privacy.android.feature.sync.domain.entity.SyncExclusionRule
 import mega.privacy.android.feature.sync.domain.exception.ExclusionsError
 import mega.privacy.android.feature.sync.domain.repository.SyncExclusionsRepository
+import mega.privacy.android.feature.sync.domain.usecase.sync.RescanSyncUseCase
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -22,10 +23,12 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.concurrent.CancellationException
 import java.util.stream.Stream
@@ -36,9 +39,12 @@ internal class SetSyncExclusionsUseCaseTest {
     private lateinit var underTest: SetSyncExclusionsUseCase
 
     private val syncExclusionsRepository = mock<SyncExclusionsRepository>()
+    private val rescanSyncUseCase = mock<RescanSyncUseCase>()
 
     private val localRoot =
         UriPath("content://com.android.externalstorage.documents/tree/primary%3ASync")
+
+    private val syncId = 8_113L
 
     private val interleaved = ParsedMegaIgnore(
         entries = listOf(
@@ -51,12 +57,15 @@ internal class SetSyncExclusionsUseCaseTest {
 
     @BeforeAll
     fun setup() {
-        underTest = SetSyncExclusionsUseCase(syncExclusionsRepository = syncExclusionsRepository)
+        underTest = SetSyncExclusionsUseCase(
+            syncExclusionsRepository = syncExclusionsRepository,
+            rescanSyncUseCase = rescanSyncUseCase,
+        )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(syncExclusionsRepository)
+        reset(syncExclusionsRepository, rescanSyncUseCase)
     }
 
     @Test
@@ -64,7 +73,7 @@ internal class SetSyncExclusionsUseCaseTest {
         whenever(syncExclusionsRepository.setExclusions(localRoot, interleaved)) doReturn
                 Result.success(Unit)
 
-        val actual = underTest(localRoot, interleaved)
+        val actual = underTest(syncId, localRoot, interleaved)
 
         assertThat(actual.isSuccess).isTrue()
     }
@@ -75,7 +84,7 @@ internal class SetSyncExclusionsUseCaseTest {
             whenever(syncExclusionsRepository.setExclusions(localRoot, interleaved)) doReturn
                     Result.success(Unit)
 
-            underTest(localRoot, interleaved)
+            underTest(syncId, localRoot, interleaved)
 
             verify(syncExclusionsRepository).setExclusions(localRoot, interleaved)
         }
@@ -85,7 +94,7 @@ internal class SetSyncExclusionsUseCaseTest {
         whenever(syncExclusionsRepository.setExclusions(localRoot, interleaved)) doReturn
                 Result.success(Unit)
 
-        underTest(localRoot, interleaved)
+        underTest(syncId, localRoot, interleaved)
 
         val captor = argumentCaptor<ParsedMegaIgnore>()
         verify(syncExclusionsRepository).setExclusions(any(), captor.capture())
@@ -101,7 +110,7 @@ internal class SetSyncExclusionsUseCaseTest {
         whenever(syncExclusionsRepository.setExclusions(localRoot, interleaved)) doReturn
                 Result.failure(error)
 
-        val actual = underTest(localRoot, interleaved)
+        val actual = underTest(syncId, localRoot, interleaved)
 
         assertThat(actual.isFailure).isTrue()
         assertThat(actual.exceptionOrNull()).isInstanceOf(error.javaClass)
@@ -116,7 +125,71 @@ internal class SetSyncExclusionsUseCaseTest {
         }
 
         assertThrows(CancellationException::class.java) {
-            runBlocking { underTest(localRoot, interleaved) }
+            runBlocking { underTest(syncId, localRoot, interleaved) }
+        }
+    }
+
+    @Test
+    fun `test that invoke rescans the sync once the write succeeds`() = runTest {
+        whenever(syncExclusionsRepository.setExclusions(localRoot, interleaved)) doReturn
+                Result.success(Unit)
+
+        underTest(syncId, localRoot, interleaved)
+
+        verify(rescanSyncUseCase).invoke(syncId)
+    }
+
+    @Test
+    fun `test that invoke writes the exclusions before it rescans the sync`() = runTest {
+        whenever(syncExclusionsRepository.setExclusions(localRoot, interleaved)) doReturn
+                Result.success(Unit)
+
+        underTest(syncId, localRoot, interleaved)
+
+        val order = inOrder(syncExclusionsRepository, rescanSyncUseCase)
+        order.verify(syncExclusionsRepository).setExclusions(localRoot, interleaved)
+        order.verify(rescanSyncUseCase).invoke(syncId)
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideWriteFailures")
+    fun `test that invoke does not rescan the sync when the write fails`(
+        name: String,
+        error: Throwable,
+    ) = runTest {
+        whenever(syncExclusionsRepository.setExclusions(localRoot, interleaved)) doReturn
+                Result.failure(error)
+
+        underTest(syncId, localRoot, interleaved)
+
+        verifyNoInteractions(rescanSyncUseCase)
+    }
+
+    @Test
+    fun `test that invoke returns a failure carrying the throwable when the rescan fails`() =
+        runTest {
+            val error = RuntimeException("The SDK rejected the rescan")
+            whenever(syncExclusionsRepository.setExclusions(localRoot, interleaved)) doReturn
+                    Result.success(Unit)
+            rescanSyncUseCase.stub { onBlocking { invoke(syncId) } doThrow error }
+
+            val actual = underTest(syncId, localRoot, interleaved)
+
+            assertThat(actual.isFailure).isTrue()
+            assertThat(actual.exceptionOrNull()).isSameInstanceAs(error)
+        }
+
+    @Test
+    fun `test that invoke lets cancellation from the rescan through rather than reporting it as a failure`() {
+        syncExclusionsRepository.stub {
+            onBlocking { setExclusions(localRoot, interleaved) } doReturn Result.success(Unit)
+        }
+        rescanSyncUseCase.stub {
+            onBlocking { invoke(syncId) } doThrow CancellationException("Scope closed")
+        }
+
+        assertThrows(CancellationException::class.java) {
+            runBlocking { underTest(syncId, localRoot, interleaved) }
         }
     }
 
