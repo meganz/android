@@ -7,9 +7,14 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -290,9 +295,11 @@ private fun ViewModeLazyColumn(
                 start = if (showLineNumbers) 0.dp else 16.dp,
                 end = 16.dp,
                 // No top padding: aligns with collapsing top bar when bars are visible
-                bottom = 8.dp,
             ),
-        contentPadding = PaddingValues(bottom = ViewModeBottomContentPadding),
+        contentPadding = PaddingValues(
+            bottom = 8.dp + ViewModeBottomContentPadding +
+                    WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
+        ),
     ) {
         items(
             count = chunkCount,
@@ -357,10 +364,12 @@ private fun EditModeLazyColumn(
             .fillMaxSize()
             .padding(
                 start = if (showLineNumbers) 0.dp else 16.dp,
-                end = 16.dp,
-                // No top padding: aligns with collapsing top bar when bars are visible
-                bottom = 8.dp,
+                end = 16.dp
             ),
+        contentPadding = PaddingValues(
+            bottom = 8.dp + WindowInsets.navigationBars.exclude(WindowInsets.ime)
+                .asPaddingValues().calculateBottomPadding(),
+        ),
     ) {
         items(
             count = chunkCount,

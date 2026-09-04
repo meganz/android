@@ -10,9 +10,14 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -347,7 +352,13 @@ private fun RichDocumentBlocks(
             .testTag(RICH_DOCUMENT_EDITOR_TAG),
         // No top padding: matches the chunked source editor so switching edit modes does not
         // shift the content down (the collapsing top bar already provides the top spacing).
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+        // ime excluded: the editor container already applies imePadding.
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            bottom = 16.dp + WindowInsets.navigationBars.exclude(WindowInsets.ime)
+                .asPaddingValues().calculateBottomPadding(),
+        ),
     ) {
         items(count = state.blocks.size, key = { it }) { index ->
             when (val block = state.blocks[index]) {

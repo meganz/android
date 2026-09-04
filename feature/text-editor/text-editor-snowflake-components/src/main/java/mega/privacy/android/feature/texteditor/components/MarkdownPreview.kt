@@ -7,7 +7,11 @@ import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -191,7 +195,8 @@ fun MarkdownPreview(
                         contentPadding = PaddingValues(
                             start = 16.dp,
                             end = 16.dp,
-                            bottom = 16.dp,
+                            bottom = 16.dp + WindowInsets.navigationBars
+                                .asPaddingValues().calculateBottomPadding(),
                         ),
                     ) {
                         items(parsed.size) { index ->
@@ -266,7 +271,12 @@ private fun FullSelectionPreview(
                         .fillMaxSize()
                         .verticalScroll(scrollState)
                         // No top padding — same alignment rule as the LazyColumn path.
-                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 16.dp + WindowInsets.navigationBars
+                                .asPaddingValues().calculateBottomPadding(),
+                        ),
                 ) {
                     blocks.forEachIndexed { index, node ->
                         MarkdownBlock(
@@ -282,7 +292,9 @@ private fun FullSelectionPreview(
         }
         MarkdownColumnScrollbar(
             state = scrollState,
-            modifier = Modifier.align(Alignment.CenterEnd),
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .navigationBarsPadding(),
         )
     }
 }

@@ -4,8 +4,6 @@ import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -39,11 +37,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableFloatState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,20 +46,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -72,7 +60,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
@@ -86,6 +73,10 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.delayedTrue
+import mega.android.core.ui.modifiers.ScrollToHideBehavior
+import mega.android.core.ui.modifiers.applyScrollToHideBehavior
+import mega.android.core.ui.modifiers.applyScrollToHideBottomBarBehavior
+import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.texteditor.components.MarkdownPreview
@@ -116,7 +107,6 @@ import kotlin.math.abs
 /** Epsilon in px for float comparison when deciding if top bar is fully hidden. */
 private const val BARS_HIDDEN_EPSILON_PX = 1f
 
-private const val REVEAL_ANIMATION_MS = 200
 private const val ENTRANCE_ANIMATION_MS = 300
 private const val FLING_SNAP_ANIMATION_MS = 150
 private val BottomBarSlideDistance = 100.dp
@@ -190,12 +180,21 @@ fun TextEditorScreen(
     }
     val isEditable = uiState.mode == TextEditorMode.Edit || uiState.mode == TextEditorMode.Create
     val scope = rememberCoroutineScope()
-
-    val scrollBarState = rememberScrollToHideBarState(uiState.mode, scope)
-    val barsHidden by scrollBarState.barsHidden
-    val bottomBarTranslationY by scrollBarState.bottomBarTranslationY
-    val bottomBarEntranceOffset = scrollBarState.bottomBarEntranceOffset
-    val bottomBarSlideDistancePx = scrollBarState.bottomBarSlideDistancePx
+    val scrollToHideBehavior =
+        rememberScrollToHideBehavior(snapAnimationSpec = tween(FLING_SNAP_ANIMATION_MS))
+    LaunchedEffect(uiState.mode) { scrollToHideBehavior.reset() }
+    val barsHidden by remember(scrollToHideBehavior) {
+        derivedStateOf {
+            isBarsHidden(
+                topBarHeightPx = -scrollToHideBehavior.heightOffsetLimit,
+                topBarOffsetPx = scrollToHideBehavior.offset,
+            )
+        }
+    }
+    val density = LocalDensity.current
+    val bottomBarSlideDistancePx =
+        remember(density) { with(density) { BottomBarSlideDistance.toPx() } }
+    val bottomBarEntranceOffset = remember(density) { Animatable(bottomBarSlideDistancePx) }
 
     val chunkCount = remember(uiState.totalLineCount, uiState.contentVersion) {
         viewModel.getChunkCount()
@@ -290,7 +289,7 @@ fun TextEditorScreen(
 
     BackHandler {
         when {
-            barsHidden -> scrollBarState.revealBar()
+            barsHidden -> scope.launch { scrollToHideBehavior.expand() }
             uiState.showDiscardDialog -> viewModel.dismissDiscardDialog()
             else -> viewModel.handleClose()
         }
@@ -362,7 +361,7 @@ fun TextEditorScreen(
             },
             topBar = {
                 CollapsingTopBar(
-                    scrollBarState = scrollBarState,
+                    scrollToHideBehavior = scrollToHideBehavior,
                     mode = uiState.mode,
                     fileName = uiState.fileName,
                     scope = scope,
@@ -382,21 +381,13 @@ fun TextEditorScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .navigationBarsPadding()
-                    // Match the top bar's horizontal safe area (it uses safeDrawing) so the content and
-                    // fast-scroll thumb stay clear of the landscape display cutout instead of running
-                    // under it while the toolbar is inset — keeping the back button/title aligned with
-                    // the text. Reading the same safeDrawing channel as the toolbar also ensures the
-                    // inset recomputes on a portrait→landscape rotation, which displayCutout did not
-                    // (AND-23925). navigationBarsPadding above consumes the nav-bar inset first, so this
-                    // only adds the cutout portion and never double-pads the side bars.
                     .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
-                    .nestedScroll(scrollBarState.scrollConnection)
+                    .nestedScroll(scrollToHideBehavior.nestedScrollConnection)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         enabled = barsHidden,
-                    ) { scrollBarState.revealBar() },
+                    ) { scope.launch { scrollToHideBehavior.expand() } },
             ) {
                 when {
                     uiState.isLoading -> {
@@ -474,7 +465,14 @@ fun TextEditorScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .then(
-                                    if (useRichText) Modifier.imePadding() else Modifier,
+                                    // Nav inset consumed first, so imePadding adds only the rest.
+                                    if (useRichText) {
+                                        Modifier
+                                            .navigationBarsPadding()
+                                            .imePadding()
+                                    } else {
+                                        Modifier
+                                    },
                                 ),
                         ) {
                             Box(
@@ -526,6 +524,7 @@ fun TextEditorScreen(
                                         itemCount = chunkCount,
                                         modifier = Modifier
                                             .align(Alignment.CenterEnd)
+                                            .navigationBarsPadding()
                                             .fillMaxHeight(),
                                         tooltipText = { chunkIndex, fractionWithinChunk ->
                                             val startLine =
@@ -581,7 +580,10 @@ fun TextEditorScreen(
                 LaunchedEffect(showBottomBar) {
                     if (showBottomBar) {
                         bottomBarEntranceOffset.snapTo(bottomBarSlideDistancePx)
-                        bottomBarEntranceOffset.animateTo(0f, animationSpec = tween(ENTRANCE_ANIMATION_MS))
+                        bottomBarEntranceOffset.animateTo(
+                            0f,
+                            animationSpec = tween(ENTRANCE_ANIMATION_MS)
+                        )
                     } else {
                         bottomBarEntranceOffset.snapTo(bottomBarSlideDistancePx)
                     }
@@ -590,11 +592,13 @@ fun TextEditorScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
+                            .navigationBarsPadding()
                             .padding(bottom = 16.dp)
-                            .graphicsLayer {
-                                translationY =
-                                    bottomBarEntranceOffset.value + bottomBarTranslationY
-                            },
+                            .graphicsLayer { translationY = bottomBarEntranceOffset.value }
+                            .applyScrollToHideBottomBarBehavior(
+                                behavior = scrollToHideBehavior,
+                                slideDistance = BottomBarSlideDistance,
+                            ),
                     ) {
                         MegaFloatingToolbar(
                             modifier = Modifier.align(Alignment.BottomCenter),
@@ -604,6 +608,7 @@ fun TextEditorScreen(
                                 when (action) {
                                     is TextEditorBottomBarAction.Edit ->
                                         viewModel.setEditMode(lazyListState.firstVisibleItemIndex)
+
                                     is TextEditorBottomBarAction ->
                                         viewModel.onBottomBarAction(action)
                                 }
@@ -617,12 +622,12 @@ fun TextEditorScreen(
 }
 
 /**
- * Top bar that collapses upward as the user scrolls down, and reveals when
- * scrolling back up or tapping. Uses a custom [Layout] for pixel-precise offset.
+ * Top bar that collapses upward as the user scrolls down (via the core-ui
+ * [ScrollToHideBehavior]) and reveals when scrolling back up or tapping.
  */
 @Composable
 private fun CollapsingTopBar(
-    scrollBarState: ScrollToHideBarState,
+    scrollToHideBehavior: ScrollToHideBehavior,
     mode: TextEditorMode,
     fileName: String,
     scope: CoroutineScope,
@@ -643,62 +648,47 @@ private fun CollapsingTopBar(
         // same top inset, letting the collapsing toolbar shrink all the way to zero behind this spacer.
         // No background needed: MegaScaffold already paints pageBackground behind the top bar.
         Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
-        Layout(
-            content = {
-                Box(
-                    modifier = Modifier.onGloballyPositioned { coordinates ->
-                        scrollBarState.topBarHeightPx = coordinates.size.height.toFloat()
-                    },
-                ) {
-                    val onTitleClick: () -> Unit = remember(scope, lazyListState, scrollBarState) {
-                        {
-                            scope.launch {
-                                lazyListState.animateScrollToItem(0)
-                                scrollBarState.topBarOffsetPx = 0f
-                            }
-                            Unit
-                        }
-                    }
-                    val onClose = remember(viewModel) {
-                        { viewModel.handleClose() }
-                    }
-                    val onSaveToolbar = remember(viewModel) {
-                        { viewModel.saveFile() }
-                    }
-                    when (mode) {
-                        TextEditorMode.Edit, TextEditorMode.Create -> TextEditorEditModeTopAppBar(
-                            title = fileName,
-                            onClose = onClose,
-                            onSave = onSaveToolbar,
-                            onMenuAction = viewModel::onMenuAction,
-                            onTitleClick = onTitleClick,
-                            isMarkdown = isMarkdown,
-                            showEditModeSwitch = showEditModeSwitch,
-                            isRichTextMode = isRichTextMode,
-                            showActions = showActions,
-                        )
-
-                        else -> TextEditorViewModeTopAppBar(
-                            title = fileName,
-                            onBack = viewModel::handleClose,
-                            onMenuAction = viewModel::onMenuAction,
-                            onOpenNodeOptions = onOpenNodeOptions,
-                            onTitleClick = onTitleClick,
-                            isMarkdownPreview = isMarkdownPreview,
-                            showActions = showActions,
-                        )
+        Box(
+            modifier = Modifier
+                .applyScrollToHideBehavior(scrollToHideBehavior)
+                .consumeWindowInsets(WindowInsets.statusBars),
+        ) {
+            val onTitleClick: () -> Unit = remember(scope, lazyListState, scrollToHideBehavior) {
+                {
+                    scope.launch {
+                        lazyListState.animateScrollToItem(0)
+                        scrollToHideBehavior.expand()
                     }
                 }
-            },
-            modifier = Modifier
-                .clipToBounds()
-                .consumeWindowInsets(WindowInsets.statusBars),
-        ) { measurables, constraints ->
-            val placeable = measurables[0].measure(constraints.copy(minHeight = 0))
-            val visibleHeight =
-                (placeable.height + scrollBarState.topBarOffsetPx.toInt()).coerceAtLeast(0)
-            layout(constraints.maxWidth, visibleHeight) {
-                placeable.placeRelative(0, scrollBarState.topBarOffsetPx.toInt())
+            }
+            val onClose = remember(viewModel) {
+                { viewModel.handleClose() }
+            }
+            val onSaveToolbar = remember(viewModel) {
+                { viewModel.saveFile() }
+            }
+            when (mode) {
+                TextEditorMode.Edit, TextEditorMode.Create -> TextEditorEditModeTopAppBar(
+                    title = fileName,
+                    onClose = onClose,
+                    onSave = onSaveToolbar,
+                    onMenuAction = viewModel::onMenuAction,
+                    onTitleClick = onTitleClick,
+                    isMarkdown = isMarkdown,
+                    showEditModeSwitch = showEditModeSwitch,
+                    isRichTextMode = isRichTextMode,
+                    showActions = showActions,
+                )
+
+                else -> TextEditorViewModeTopAppBar(
+                    title = fileName,
+                    onBack = viewModel::handleClose,
+                    onMenuAction = viewModel::onMenuAction,
+                    onOpenNodeOptions = onOpenNodeOptions,
+                    onTitleClick = onTitleClick,
+                    isMarkdownPreview = isMarkdownPreview,
+                    showActions = showActions,
+                )
             }
         }
     }
@@ -714,136 +704,6 @@ internal fun isBarsHidden(
     epsilon: Float = BARS_HIDDEN_EPSILON_PX,
 ): Boolean = topBarHeightPx > 0f && topBarOffsetPx <= -topBarHeightPx + epsilon
 
-/**
- * State and connection for scroll-to-hide top bar and linked bottom bar.
- * Use [rememberScrollToHideBarState] to create.
- */
-internal class ScrollToHideBarState(
-    private val topBarHeightPxState: MutableFloatState,
-    private val topBarOffsetPxState: MutableFloatState,
-    val barsHidden: State<Boolean>,
-    val bottomBarSlideDistancePx: Float,
-    val bottomBarTranslationY: State<Float>,
-    val bottomBarEntranceOffset: Animatable<Float, AnimationVector1D>,
-    val scrollConnection: NestedScrollConnection,
-    private val scope: CoroutineScope,
-) {
-    private var revealJob: Job? = null
-
-    var topBarHeightPx: Float
-        get() = topBarHeightPxState.floatValue
-        set(value) {
-            topBarHeightPxState.floatValue = value
-        }
-
-    var topBarOffsetPx: Float
-        get() = topBarOffsetPxState.floatValue
-        set(value) {
-            topBarOffsetPxState.floatValue = value
-        }
-
-    fun revealBar() {
-        revealJob?.cancel()
-        revealJob = scope.launch {
-            try {
-                animate(
-                    topBarOffsetPxState.floatValue,
-                    0f,
-                    animationSpec = tween(REVEAL_ANIMATION_MS),
-                ) { v, _ ->
-                    topBarOffsetPxState.floatValue = v
-                }
-            } finally {
-                if (revealJob === coroutineContext[Job]) {
-                    revealJob = null
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun rememberScrollToHideBarState(
-    mode: TextEditorMode,
-    scope: CoroutineScope,
-): ScrollToHideBarState {
-    val density = LocalDensity.current
-    val topBarHeightPxState = remember { mutableFloatStateOf(0f) }
-    val topBarOffsetPxState = remember { mutableFloatStateOf(0f) }
-    val bottomBarSlideDistancePx = remember(density) { with(density) { BottomBarSlideDistance.toPx() } }
-    val barsHiddenState: State<Boolean> = remember {
-        derivedStateOf {
-            isBarsHidden(
-                topBarHeightPxState.floatValue,
-                topBarOffsetPxState.floatValue,
-            )
-        }
-    }
-    val bottomBarTranslationYState: State<Float> = remember {
-        derivedStateOf {
-            val h = topBarHeightPxState.floatValue
-            val o = topBarOffsetPxState.floatValue
-            if (h > 0f) (-o / h).coerceIn(0f, 1f) * bottomBarSlideDistancePx else 0f
-        }
-    }
-    val bottomBarEntranceOffset = remember(density) {
-        Animatable(bottomBarSlideDistancePx)
-    }
-    LaunchedEffect(mode) { topBarOffsetPxState.floatValue = 0f }
-    val scrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                if (available.y < 0f && topBarHeightPxState.floatValue > 0f) {
-                    topBarOffsetPxState.floatValue =
-                        (topBarOffsetPxState.floatValue + available.y)
-                            .coerceIn(-topBarHeightPxState.floatValue, 0f)
-                }
-                return Offset.Zero
-            }
-
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource,
-            ): Offset {
-                val revealDelta = consumed.y + available.y.coerceAtLeast(0f)
-                if (revealDelta > 0f && topBarHeightPxState.floatValue > 0f) {
-                    topBarOffsetPxState.floatValue =
-                        (topBarOffsetPxState.floatValue + revealDelta)
-                            .coerceIn(-topBarHeightPxState.floatValue, 0f)
-                }
-                return Offset.Zero
-            }
-
-            override suspend fun onPostFling(
-                consumed: Velocity,
-                available: Velocity,
-            ): Velocity {
-                val height = topBarHeightPxState.floatValue
-                val offset = topBarOffsetPxState.floatValue
-                if (height > 0f && offset > -height && offset < 0f) {
-                    val target = if (offset > -height / 2) 0f else -height
-                    animate(offset, target, animationSpec = tween(FLING_SNAP_ANIMATION_MS)) { v, _ ->
-                        topBarOffsetPxState.floatValue = v
-                    }
-                }
-                return Velocity.Zero
-            }
-        }
-    }
-    return remember(scope) {
-        ScrollToHideBarState(
-            topBarHeightPxState = topBarHeightPxState,
-            topBarOffsetPxState = topBarOffsetPxState,
-            barsHidden = barsHiddenState,
-            bottomBarSlideDistancePx = bottomBarSlideDistancePx,
-            bottomBarTranslationY = bottomBarTranslationYState,
-            bottomBarEntranceOffset = bottomBarEntranceOffset,
-            scrollConnection = scrollConnection,
-            scope = scope,
-        )
-    }
-}
 
 @Composable
 private fun TextEditorErrorContent(
