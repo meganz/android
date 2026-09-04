@@ -13,7 +13,9 @@ import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerServiceViewModel
+import mega.privacy.android.app.meeting.facade.CameraInUseFacade
 import mega.privacy.android.app.meeting.facade.RTCAudioManagerFacade
+import mega.privacy.android.app.meeting.gateway.CameraInUseGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.facade.AlbumStringResourceGateway
@@ -70,4 +72,8 @@ abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindRTCAudioManagerGateway(implementation: RTCAudioManagerFacade): RTCAudioManagerGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindCameraInUseGateway(implementation: CameraInUseFacade): CameraInUseGateway
 }
