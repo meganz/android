@@ -655,8 +655,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             mimeType = mimetype.type,
                             content = localPath?.let { NodeContentUri.LocalContentUri(File(it)) }
                                 ?: viewModel.getNodeContentUri(vNode.handle),
-                            // Limits the node options to download, as the legacy viewer did.
-                            nodeSourceType = NodeSourceType.MEDIA_PLAYER_VERSIONS,
+                            nodeSourceType = NodeSourceType.VERSIONS,
                         )
                     }.onFailure { exception ->
                         Timber.e(exception, "Failed to open the PDF viewer")

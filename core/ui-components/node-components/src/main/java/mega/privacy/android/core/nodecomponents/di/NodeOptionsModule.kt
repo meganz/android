@@ -23,6 +23,7 @@ import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerDefault
 import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerImageViewerMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerVersionsMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerZipFileMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.VersionsMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlaylistOptionProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.VideoRecentlyWatchedOptionProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.VideosMenuOptionProvider
@@ -149,6 +150,12 @@ abstract class NodeOptionsModule {
     @IntoSet
     abstract fun bindVideoPlayerVersionsOptionsProvider(
         provider: MediaPlayerVersionsMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindVersionsOptionsProvider(
+        provider: VersionsMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 
     @Binds

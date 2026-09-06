@@ -437,7 +437,7 @@ class MegaNavigatorImplTest {
                 fileName = "version.pdf",
                 mimeType = "application/pdf",
                 content = NodeContentUri.RemoteContentUri("http://127.0.0.1/version.pdf", true),
-                nodeSourceType = NodeSourceType.MEDIA_PLAYER_VERSIONS,
+                nodeSourceType = NodeSourceType.VERSIONS,
             )
 
             verify(navigationQueue).emit(
@@ -447,7 +447,7 @@ class MegaNavigatorImplTest {
                         contentUri = "http://127.0.0.1/version.pdf",
                         isLocalContent = false,
                         shouldStopHttpServer = true,
-                        nodeSourceType = NodeSourceType.MEDIA_PLAYER_VERSIONS,
+                        nodeSourceType = NodeSourceType.VERSIONS,
                         mimeType = "application/pdf",
                         title = "version.pdf",
                     )
@@ -468,7 +468,7 @@ class MegaNavigatorImplTest {
                 fileName = "version.pdf",
                 mimeType = "application/pdf",
                 content = NodeContentUri.LocalContentUri(File("/local/version.pdf")),
-                nodeSourceType = NodeSourceType.MEDIA_PLAYER_VERSIONS,
+                nodeSourceType = NodeSourceType.VERSIONS,
             )
 
             verify(navigationQueue).emit(
@@ -478,7 +478,7 @@ class MegaNavigatorImplTest {
                         contentUri = "/local/version.pdf",
                         isLocalContent = true,
                         shouldStopHttpServer = false,
-                        nodeSourceType = NodeSourceType.MEDIA_PLAYER_VERSIONS,
+                        nodeSourceType = NodeSourceType.VERSIONS,
                         mimeType = "application/pdf",
                         title = "version.pdf",
                     )

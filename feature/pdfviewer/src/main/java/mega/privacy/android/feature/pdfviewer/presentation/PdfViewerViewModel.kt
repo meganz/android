@@ -705,6 +705,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
             NodeSourceType.RUBBISH_BIN,
             NodeSourceType.BACKUPS,
             NodeSourceType.CLOUD_DRIVE,
+            NodeSourceType.VERSIONS,
                 -> PdfViewerSource.CloudNode(
                 nodeHandle = args.nodeHandle,
                 contentUri = contentUri,

@@ -46,6 +46,7 @@ class NodeSourceTypeToViewTypeMapperTest {
         Arguments.of(NodeSourceType.OTHER, null),
         Arguments.of(NodeSourceType.MEDIA_PLAYER_DEFAULT, null),
         Arguments.of(NodeSourceType.MEDIA_PLAYER_VERSIONS, null),
+        Arguments.of(NodeSourceType.VERSIONS, null),
         Arguments.of(NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER, null),
     )
 }

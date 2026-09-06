@@ -473,6 +473,26 @@ class PdfViewerViewModelTest {
         }
 
     @Test
+    fun `test that createSourceFromArgs returns CloudNode with VERSIONS type when nodeSourceType is VERSIONS`() =
+        runTest {
+            val versionsArgs = defaultArgs.copy(
+                nodeHandle = 24680L,
+                nodeSourceType = NodeSourceType.VERSIONS,
+            )
+            underTest = initViewModel(args = versionsArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+
+                assertThat(state.source).isInstanceOf(PdfViewerSource.CloudNode::class.java)
+                val source = state.source as PdfViewerSource.CloudNode
+                assertThat(source.nodeHandle).isEqualTo(24680L)
+                assertThat(source.nodeSourceType).isEqualTo(NodeSourceType.VERSIONS)
+            }
+        }
+
+    @Test
     fun `test that observeConnectivity updates isOnline to true when connected`() = runTest {
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
         underTest = initViewModel()

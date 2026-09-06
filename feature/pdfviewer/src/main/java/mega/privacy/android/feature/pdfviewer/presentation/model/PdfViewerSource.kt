@@ -16,12 +16,12 @@ internal sealed class PdfViewerSource {
     abstract val isRemote: Boolean
 
     /**
-     * PDF from a MEGA cloud node (Cloud Drive, Rubbish Bin, or Backups).
+     * PDF from a MEGA cloud node (Cloud Drive, Rubbish Bin, Backups, or a file version).
      *
      * @param nodeHandle The node handle
      * @param contentUri The content URI string (local path or remote URL)
      * @param isLocalContent True if content is local
-     * @param nodeSourceType The specific source type (CLOUD_DRIVE, RUBBISH_BIN, or BACKUPS)
+     * @param nodeSourceType The specific source type (CLOUD_DRIVE, RUBBISH_BIN, BACKUPS, or VERSIONS)
      */
     data class CloudNode(
         val nodeHandle: Long,

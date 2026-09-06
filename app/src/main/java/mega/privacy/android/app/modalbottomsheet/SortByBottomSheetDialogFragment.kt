@@ -79,6 +79,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     NodeSourceType.CHAT,
                     NodeSourceType.MEDIA_PLAYER_DEFAULT,
                     NodeSourceType.MEDIA_PLAYER_VERSIONS,
+                    NodeSourceType.VERSIONS,
                     NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER,
                     NodeSourceType.MEDIA_PLAYER_ZIP_FILE,
                         -> ORDER_CLOUD

@@ -82,6 +82,7 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
         Arguments.of(NodeSourceType.MEDIA_PLAYER_DEFAULT, mockCloudSortOrder),
         Arguments.of(NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER, mockCloudSortOrder),
         Arguments.of(NodeSourceType.MEDIA_PLAYER_VERSIONS, mockCloudSortOrder),
+        Arguments.of(NodeSourceType.VERSIONS, mockCloudSortOrder),
         Arguments.of(NodeSourceType.MEDIA_PLAYER_ZIP_FILE, mockCloudSortOrder),
     )
 

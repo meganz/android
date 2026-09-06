@@ -43,6 +43,7 @@ import mega.privacy.android.domain.qualifier.features.Offline
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
 import mega.privacy.android.domain.qualifier.features.Timeline
+import mega.privacy.android.domain.qualifier.features.Versions
 import javax.inject.Singleton
 
 @Module
@@ -119,6 +120,18 @@ abstract class NodeSelectionModeModule {
             downloadSelectionMenuItem,
             saveToMegaSelectionMenuItem,
         )
+
+        /**
+         * Provide the bottom bar options for a node opened from the version list. Kept in step with
+         * the version's node-options sheet, which offers downloading a copy and nothing else.
+         */
+        @Provides
+        @ElementsIntoSet
+        @Versions
+        @Singleton
+        fun provideVersionsToolbarItems(
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(downloadSelectionMenuItem)
 
         @Provides
         @ElementsIntoSet

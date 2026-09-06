@@ -124,6 +124,12 @@ enum class NodeSourceType {
     MEDIA_PLAYER_VERSIONS,
 
     /**
+     * When node source is the version list of a file. A version is not a file of its own, so it
+     * only offers the actions that make sense on a past revision.
+     */
+    VERSIONS,
+
+    /**
      * When node source is Media Player opened from Image Viewer
      */
     MEDIA_PLAYER_IMAGE_VIEWER,

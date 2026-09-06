@@ -59,6 +59,7 @@ import mega.privacy.android.domain.qualifier.features.Links
 import mega.privacy.android.domain.qualifier.features.Offline
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
+import mega.privacy.android.domain.qualifier.features.Versions
 import mega.privacy.android.domain.qualifier.features.VideoPlaylist
 import mega.privacy.android.domain.qualifier.features.VideoRecentlyWatched
 import mega.privacy.android.domain.qualifier.features.Videos
@@ -435,6 +436,17 @@ abstract class NodeActionsBottomSheetModule {
         @MediaPlayerVersions
         @Singleton
         fun provideVideoPlayerVersionsBottomSheetOptions(
+            downloadMenuAction: DownloadBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> = setOf(downloadMenuAction)
+
+        /**
+         * Provide bottom sheet options for a node opened from the version list
+         */
+        @Provides
+        @ElementsIntoSet
+        @Versions
+        @Singleton
+        fun provideVersionsBottomSheetOptions(
             downloadMenuAction: DownloadBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> = setOf(downloadMenuAction)
 
