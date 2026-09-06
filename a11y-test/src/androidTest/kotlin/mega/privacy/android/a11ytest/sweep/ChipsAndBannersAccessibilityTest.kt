@@ -1,19 +1,14 @@
 package mega.privacy.android.a11ytest.sweep
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.R as CoreUiR
 import mega.android.core.ui.components.banner.InlineErrorBanner
 import mega.android.core.ui.components.banner.InlineWarningBanner
 import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.chip.MegaChip
-import mega.privacy.android.a11ytest.AccessibilityCheckReporter
-import mega.privacy.android.a11ytest.megaAccessibilityValidator
-import org.junit.Before
+import mega.privacy.android.a11ytest.ThemeReporters
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,17 +23,11 @@ class ChipsAndBannersAccessibilityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter =
-        AccessibilityCheckReporter(reportName = "ChipsAndBannersAccessibilityTest")
-
-    @Before
-    fun setUp() {
-        composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))
-    }
+    private val reporters = ThemeReporters("ChipsAndBannersAccessibilityTest")
 
     @Test
     fun test_that_chips_pass_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             MegaChip(
                 selected = true,
                 text = "Images",
@@ -63,12 +52,12 @@ class ChipsAndBannersAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_inline_banners_pass_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             InlineWarningBanner(
                 body = "Your storage is almost full.",
                 showCancelButton = true,
@@ -81,12 +70,12 @@ class ChipsAndBannersAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_top_banner_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             TopWarningBanner(
                 body = "You are offline. Changes will sync later.",
                 showCancelButton = false,
@@ -94,6 +83,6 @@ class ChipsAndBannersAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 }

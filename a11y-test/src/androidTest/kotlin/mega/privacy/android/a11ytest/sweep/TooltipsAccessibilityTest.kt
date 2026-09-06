@@ -10,7 +10,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.tryPerformAccessibilityChecks
@@ -25,10 +24,8 @@ import mega.android.core.ui.components.tooltip.popup.interactive.InteractiveTool
 import mega.android.core.ui.components.tooltip.popup.interactive.InteractiveTooltipStepCounterProperties
 import mega.android.core.ui.components.tooltip.popup.simple.SimpleLeftDirectionTooltipPopup
 import mega.android.core.ui.components.tooltip.popup.simple.SimpleTooltipContentTitleAndBody
-import mega.privacy.android.a11ytest.AccessibilityCheckReporter
-import mega.privacy.android.a11ytest.megaAccessibilityValidator
+import mega.privacy.android.a11ytest.ThemeReporters
 import org.hamcrest.CoreMatchers.anyOf
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,16 +42,11 @@ class TooltipsAccessibilityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter = AccessibilityCheckReporter(reportName = "TooltipsAccessibilityTest")
-
-    @Before
-    fun setUp() {
-        composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))
-    }
+    private val reporters = ThemeReporters("TooltipsAccessibilityTest")
 
     @Test
     fun test_that_simple_tooltip_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             var anchorCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
             Box(
                 modifier = Modifier
@@ -72,7 +64,7 @@ class TooltipsAccessibilityTest {
             }
         }
 
-        composeTestRule.onNodeWithText("New feature").tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme { onNodeWithText("New feature").tryPerformAccessibilityChecks() }
     }
 
     @Test
@@ -81,16 +73,13 @@ class TooltipsAccessibilityTest {
         // for this test only: the close icon is a clickable without speakable text, and the
         // inline text buttons are clickables only 28dp tall, below the 48dp touch target
         // minimum.
-        composeTestRule.enableAccessibilityChecks(
-            megaAccessibilityValidator(
-                reporter = reporter,
-                baselineSuppressions = anyOf(
-                    matchesCheck(SpeakableTextPresentCheck::class.java),
-                    matchesCheck(TouchTargetSizeCheck::class.java),
-                ),
-            )
-        )
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(
+            reporters = reporters,
+            baselineSuppressions = anyOf(
+                matchesCheck(SpeakableTextPresentCheck::class.java),
+                matchesCheck(TouchTargetSizeCheck::class.java),
+            ),
+        ) {
             var anchorCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
             Box(
                 modifier = Modifier
@@ -120,13 +109,15 @@ class TooltipsAccessibilityTest {
             }
         }
 
-        composeTestRule.onNodeWithText("Sync your folders").tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme {
+            onNodeWithText("Sync your folders").tryPerformAccessibilityChecks()
+        }
 
-        val suppressedMissingLabel = reporter.entries.filter {
+        val suppressedMissingLabel = reporters.entries.filter {
             it.checkName == "SpeakableTextPresentCheck" && it.resultType == "SUPPRESSED"
         }
         assertThat(suppressedMissingLabel).isNotEmpty()
-        val suppressedTouchTarget = reporter.entries.filter {
+        val suppressedTouchTarget = reporters.entries.filter {
             it.checkName == "TouchTargetSizeCheck" &&
                 it.resultType == "SUPPRESSED" &&
                 it.metadata.containsKey(TouchTargetSizeCheck.KEY_HEIGHT)

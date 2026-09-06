@@ -1,17 +1,12 @@
 package mega.privacy.android.a11ytest.sweep
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.components.tabs.MegaFixedTabRow
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.model.TabItems
-import mega.privacy.android.a11ytest.AccessibilityCheckReporter
-import mega.privacy.android.a11ytest.megaAccessibilityValidator
-import org.junit.Before
+import mega.privacy.android.a11ytest.ThemeReporters
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,16 +21,11 @@ class TabsAccessibilityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter = AccessibilityCheckReporter(reportName = "TabsAccessibilityTest")
-
-    @Before
-    fun setUp() {
-        composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))
-    }
+    private val reporters = ThemeReporters("TabsAccessibilityTest")
 
     @Test
     fun test_that_fixed_tab_row_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             MegaFixedTabRow(
                 tabIndex = 0,
                 items = listOf(
@@ -47,12 +37,12 @@ class TabsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_scrollable_tab_row_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             MegaScrollableTabRow(
                 tabIndex = 1,
                 items = listOf(
@@ -67,6 +57,6 @@ class TabsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 }

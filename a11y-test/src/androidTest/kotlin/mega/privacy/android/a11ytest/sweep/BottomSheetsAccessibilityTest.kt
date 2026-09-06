@@ -3,7 +3,6 @@ package mega.privacy.android.a11ytest.sweep
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.tryPerformAccessibilityChecks
@@ -13,9 +12,7 @@ import mega.android.core.ui.components.list.OneLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.a11ytest.AccessibilityCheckReporter
-import mega.privacy.android.a11ytest.megaAccessibilityValidator
-import org.junit.Before
+import mega.privacy.android.a11ytest.ThemeReporters
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,16 +29,11 @@ class BottomSheetsAccessibilityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter = AccessibilityCheckReporter(reportName = "BottomSheetsAccessibilityTest")
-
-    @Before
-    fun setUp() {
-        composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))
-    }
+    private val reporters = ThemeReporters("BottomSheetsAccessibilityTest")
 
     @Test
     fun test_that_modal_bottom_sheet_with_list_items_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             MegaModalBottomSheet(
                 sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
                 bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
@@ -53,12 +45,12 @@ class BottomSheetsAccessibilityTest {
             }
         }
 
-        composeTestRule.onNodeWithText("Share link").tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme { onNodeWithText("Share link").tryPerformAccessibilityChecks() }
     }
 
     @Test
     fun test_that_modal_bottom_sheet_with_page_background_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             MegaModalBottomSheet(
                 sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
                 bottomSheetBackground = MegaModalBottomSheetBackground.PageBackground,
@@ -68,6 +60,6 @@ class BottomSheetsAccessibilityTest {
             }
         }
 
-        composeTestRule.onNodeWithText("Sheet content").tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme { onNodeWithText("Sheet content").tryPerformAccessibilityChecks() }
     }
 }

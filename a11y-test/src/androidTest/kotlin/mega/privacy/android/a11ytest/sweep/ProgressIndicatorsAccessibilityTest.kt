@@ -1,10 +1,7 @@
 package mega.privacy.android.a11ytest.sweep
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
 import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
@@ -13,9 +10,7 @@ import mega.android.core.ui.components.indicators.MegaAnimatedLinearProgressIndi
 import mega.android.core.ui.components.indicators.ProgressBarIndicator
 import mega.android.core.ui.components.indicators.SmallInfiniteSpinnerIndicator
 import mega.android.core.ui.components.indicators.SmallSpinnerIndicator
-import mega.privacy.android.a11ytest.AccessibilityCheckReporter
-import mega.privacy.android.a11ytest.megaAccessibilityValidator
-import org.junit.Before
+import mega.privacy.android.a11ytest.ThemeReporters
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,17 +25,11 @@ class ProgressIndicatorsAccessibilityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter =
-        AccessibilityCheckReporter(reportName = "ProgressIndicatorsAccessibilityTest")
-
-    @Before
-    fun setUp() {
-        composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))
-    }
+    private val reporters = ThemeReporters("ProgressIndicatorsAccessibilityTest")
 
     @Test
     fun test_that_determinate_progress_indicators_pass_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             ProgressBarIndicator(progressPercentage = 0f)
             ProgressBarIndicator(progressPercentage = 50f)
             ProgressBarIndicator(progressPercentage = 100f)
@@ -49,7 +38,7 @@ class ProgressIndicatorsAccessibilityTest {
             MegaAnimatedLinearProgressIndicator(indicatorProgress = 0.5f)
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
@@ -57,13 +46,13 @@ class ProgressIndicatorsAccessibilityTest {
         // Indeterminate indicators animate forever, so Compose never reports idle while the
         // clock auto-advances; pausing it renders a single stable frame to check against.
         composeTestRule.mainClock.autoAdvance = false
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             InfiniteProgressBarIndicator()
             SmallInfiniteSpinnerIndicator()
             LargeInfiniteSpinnerIndicator()
         }
         composeTestRule.mainClock.advanceTimeBy(500)
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 }

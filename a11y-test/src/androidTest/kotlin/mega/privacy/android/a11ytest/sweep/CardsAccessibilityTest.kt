@@ -4,10 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesCheck
@@ -19,9 +16,7 @@ import mega.android.core.ui.components.card.PlanFeature
 import mega.android.core.ui.components.card.PlansCard
 import mega.android.core.ui.components.card.RoundCard
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.a11ytest.AccessibilityCheckReporter
-import mega.privacy.android.a11ytest.megaAccessibilityValidator
-import org.junit.Before
+import mega.privacy.android.a11ytest.ThemeReporters
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,16 +31,11 @@ class CardsAccessibilityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter = AccessibilityCheckReporter(reportName = "CardsAccessibilityTest")
-
-    @Before
-    fun setUp() {
-        composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))
-    }
+    private val reporters = ThemeReporters("CardsAccessibilityTest")
 
     @Test
     fun test_that_round_card_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             RoundCard(modifier = Modifier.fillMaxWidth()) {
                 MegaText(
                     modifier = Modifier.padding(16.dp),
@@ -55,7 +45,7 @@ class CardsAccessibilityTest {
             }
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
@@ -63,13 +53,10 @@ class CardsAccessibilityTest {
         // The plans card renders its link as a plain clickable text only 40dp tall, below the
         // 48dp touch target minimum. This cannot be fixed in this repository, so
         // TouchTargetSizeCheck is baselined for this test only.
-        composeTestRule.enableAccessibilityChecks(
-            megaAccessibilityValidator(
-                reporter = reporter,
-                baselineSuppressions = matchesCheck(TouchTargetSizeCheck::class.java),
-            )
-        )
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(
+            reporters = reporters,
+            baselineSuppressions = matchesCheck(TouchTargetSizeCheck::class.java),
+        ) {
             PlansCard(
                 modifier = Modifier.fillMaxWidth(),
                 title = "Pro I",
@@ -96,9 +83,9 @@ class CardsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
 
-        val suppressedBaseline = reporter.entries.filter {
+        val suppressedBaseline = reporters.entries.filter {
             it.checkName == "TouchTargetSizeCheck" &&
                 it.resultType == "SUPPRESSED" &&
                 it.metadata.containsKey(TouchTargetSizeCheck.KEY_HEIGHT)

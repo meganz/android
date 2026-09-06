@@ -4,10 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.R as CoreUiR
 import mega.android.core.ui.components.button.MegaOutlinedButton
@@ -19,9 +16,7 @@ import mega.android.core.ui.components.button.SecondaryNavigationIconButton
 import mega.android.core.ui.components.button.TextOnlyButton
 import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.toggle.Toggle
-import mega.privacy.android.a11ytest.AccessibilityCheckReporter
-import mega.privacy.android.a11ytest.megaAccessibilityValidator
-import org.junit.Before
+import mega.privacy.android.a11ytest.ThemeReporters
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,16 +31,11 @@ class ButtonsAccessibilityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter = AccessibilityCheckReporter(reportName = "ButtonsAccessibilityTest")
-
-    @Before
-    fun setUp() {
-        composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))
-    }
+    private val reporters = ThemeReporters("ButtonsAccessibilityTest")
 
     @Test
     fun test_that_filled_buttons_pass_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             PrimaryFilledButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = "Primary enabled",
@@ -82,12 +72,12 @@ class ButtonsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_outlined_and_text_only_buttons_pass_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             MegaOutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = "Outlined enabled",
@@ -116,12 +106,12 @@ class ButtonsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_icon_buttons_pass_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             PrimarySmallIconButton(
                 icon = painterResource(CoreUiR.drawable.ic_close_medium_thin_outline),
                 onClick = {},
@@ -140,12 +130,12 @@ class ButtonsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_radio_buttons_pass_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             MegaRadioButton(
                 identifier = "selected",
                 onOptionSelected = {},
@@ -163,12 +153,12 @@ class ButtonsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_checkboxes_pass_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             Checkbox(
                 checked = true,
                 onCheckStateChanged = {},
@@ -187,12 +177,12 @@ class ButtonsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_toggles_pass_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             Toggle(
                 isChecked = true,
                 onCheckedChange = {},
@@ -208,6 +198,6 @@ class ButtonsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 }

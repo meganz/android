@@ -1,18 +1,13 @@
 package mega.privacy.android.a11ytest.screen
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.a11ytest.AccessibilityCheckReporter
-import mega.privacy.android.a11ytest.megaAccessibilityValidator
+import mega.privacy.android.a11ytest.ThemeReporters
 import mega.privacy.android.domain.entity.preference.SortingPreference
 import mega.privacy.android.domain.entity.preference.ViewModePreference
 import mega.privacy.android.feature.settings.presentation.model.SortingAndViewModeSettingsUiState
 import mega.privacy.android.feature.settings.presentation.view.SortingAndViewModeSettingsView
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,17 +25,11 @@ class SortingAndViewModeSettingsScreenAccessibilityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter =
-        AccessibilityCheckReporter(reportName = "SortingAndViewModeSettingsScreenAccessibilityTest")
-
-    @Before
-    fun setUp() {
-        composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))
-    }
+    private val reporters = ThemeReporters("SortingAndViewModeSettingsScreenAccessibilityTest")
 
     @Test
     fun test_that_the_populated_settings_screen_passes_accessibility_checks() {
-        composeTestRule.setScreenContent {
+        val sweep = composeTestRule.setScreenContent(reporters) {
             SortingAndViewModeSettingsView(
                 uiState = SortingAndViewModeSettingsUiState.Data(
                     sortingPreference = SortingPreference.PerFolder,
@@ -52,12 +41,12 @@ class SortingAndViewModeSettingsScreenAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_the_loading_settings_screen_passes_accessibility_checks() {
-        composeTestRule.setScreenContent {
+        val sweep = composeTestRule.setScreenContent(reporters) {
             SortingAndViewModeSettingsView(
                 uiState = SortingAndViewModeSettingsUiState.Loading,
                 onSetSortingPreference = {},
@@ -66,6 +55,6 @@ class SortingAndViewModeSettingsScreenAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 }

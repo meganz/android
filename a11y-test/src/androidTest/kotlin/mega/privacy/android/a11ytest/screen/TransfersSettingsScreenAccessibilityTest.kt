@@ -1,23 +1,19 @@
 package mega.privacy.android.a11ytest.screen
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesCheck
 import com.google.android.apps.common.testing.accessibility.framework.checks.TouchTargetSizeCheck
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.a11ytest.AccessibilityCheckReporter
-import mega.privacy.android.a11ytest.megaAccessibilityValidator
+import mega.privacy.android.a11ytest.ThemeReporters
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.feature.transfers.presentation.settings.model.TransfersSettingsUiState
 import mega.privacy.android.feature.transfers.presentation.settings.view.TransfersSettingsView
 import mega.privacy.android.shared.resources.R as sharedR
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,17 +34,11 @@ class TransfersSettingsScreenAccessibilityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter =
-        AccessibilityCheckReporter(reportName = "TransfersSettingsScreenAccessibilityTest")
-
-    @Before
-    fun setUp() {
-        composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))
-    }
+    private val reporters = ThemeReporters("TransfersSettingsScreenAccessibilityTest")
 
     @Test
     fun test_that_the_populated_transfers_settings_screen_passes_accessibility_checks() {
-        composeTestRule.setScreenContent {
+        val sweep = composeTestRule.setScreenContent(reporters) {
             TransfersSettingsView(
                 uiState = TransfersSettingsUiState.Data(
                     maxDownloadConnections = 4,
@@ -61,7 +51,7 @@ class TransfersSettingsScreenAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
@@ -70,13 +60,10 @@ class TransfersSettingsScreenAccessibilityTest {
         // clickable but only 32dp wide, below the 48dp touch target minimum. The handle belongs to
         // the prebuilt core-ui sheet and cannot be fixed in this repository, so TouchTargetSizeCheck
         // is baselined for this test only.
-        composeTestRule.enableAccessibilityChecks(
-            megaAccessibilityValidator(
-                reporter = reporter,
-                baselineSuppressions = matchesCheck(TouchTargetSizeCheck::class.java),
-            )
-        )
-        composeTestRule.setScreenContent {
+        val sweep = composeTestRule.setScreenContent(
+            reporters = reporters,
+            baselineSuppressions = matchesCheck(TouchTargetSizeCheck::class.java),
+        ) {
             TransfersSettingsView(
                 uiState = TransfersSettingsUiState.Data(
                     maxDownloadConnections = 4,
@@ -99,10 +86,11 @@ class TransfersSettingsScreenAccessibilityTest {
 
         // The options modal renders in its own window, so the checks have to start from a node
         // inside it rather than from the screen root.
-        composeTestRule.onNodeWithText(UNLABELLED_CONNECTIONS_OPTION)
-            .tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme {
+            onNodeWithText(UNLABELLED_CONNECTIONS_OPTION).tryPerformAccessibilityChecks()
+        }
 
-        val suppressedBaseline = reporter.entries.filter {
+        val suppressedBaseline = reporters.entries.filter {
             it.checkName == "TouchTargetSizeCheck" &&
                 it.resultType == "SUPPRESSED" &&
                 it.metadata.containsKey(TouchTargetSizeCheck.KEY_WIDTH)
@@ -112,7 +100,7 @@ class TransfersSettingsScreenAccessibilityTest {
 
     @Test
     fun test_that_the_loading_transfers_settings_screen_passes_accessibility_checks() {
-        composeTestRule.setScreenContent {
+        val sweep = composeTestRule.setScreenContent(reporters) {
             TransfersSettingsView(
                 uiState = TransfersSettingsUiState.Loading,
                 onSetMaxDownloadConnections = {},
@@ -121,7 +109,7 @@ class TransfersSettingsScreenAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 }
 

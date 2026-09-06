@@ -2,19 +2,14 @@ package mega.privacy.android.a11ytest.sweep
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.R as CoreUiR
 import mega.android.core.ui.components.button.SecondarySmallIconButton
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.privacy.android.a11ytest.AccessibilityCheckReporter
-import mega.privacy.android.a11ytest.megaAccessibilityValidator
-import org.junit.Before
+import mega.privacy.android.a11ytest.ThemeReporters
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,28 +24,23 @@ class TopAppBarsAccessibilityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter = AccessibilityCheckReporter(reportName = "TopAppBarsAccessibilityTest")
-
-    @Before
-    fun setUp() {
-        composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))
-    }
+    private val reporters = ThemeReporters("TopAppBarsAccessibilityTest")
 
     @Test
     fun test_that_top_app_bar_with_back_navigation_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             MegaTopAppBar(
                 title = "Cloud drive",
                 navigationType = AppBarNavigationType.Back {},
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_top_app_bar_with_subtitle_and_actions_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             MegaTopAppBar(
                 title = "Shared folder",
                 navigationType = AppBarNavigationType.Close {},
@@ -65,12 +55,12 @@ class TopAppBarsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_search_top_app_bar_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             MegaSearchTopAppBar(
                 navigationType = AppBarNavigationType.Back {},
                 title = "Search",
@@ -78,12 +68,12 @@ class TopAppBarsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 
     @Test
     fun test_that_search_top_app_bar_in_searching_mode_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             MegaSearchTopAppBar(
                 navigationType = AppBarNavigationType.Back {},
                 title = "Search",
@@ -94,6 +84,6 @@ class TopAppBarsAccessibilityTest {
             )
         }
 
-        composeTestRule.onRoot().tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme()
     }
 }

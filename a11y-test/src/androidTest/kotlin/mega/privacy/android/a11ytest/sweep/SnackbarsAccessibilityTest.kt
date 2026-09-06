@@ -5,15 +5,12 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.components.snackbar.MegaSnackbar
-import mega.privacy.android.a11ytest.AccessibilityCheckReporter
-import mega.privacy.android.a11ytest.megaAccessibilityValidator
-import org.junit.Before
+import mega.privacy.android.a11ytest.ThemeReporters
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,16 +25,11 @@ class SnackbarsAccessibilityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val reporter = AccessibilityCheckReporter(reportName = "SnackbarsAccessibilityTest")
-
-    @Before
-    fun setUp() {
-        composeTestRule.enableAccessibilityChecks(megaAccessibilityValidator(reporter))
-    }
+    private val reporters = ThemeReporters("SnackbarsAccessibilityTest")
 
     @Test
     fun test_that_snackbar_with_message_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             val hostState = remember { SnackbarHostState() }
             LaunchedEffect(hostState) {
                 hostState.showSnackbar(
@@ -48,12 +40,12 @@ class SnackbarsAccessibilityTest {
             MegaSnackbar(snackBarHostState = hostState)
         }
 
-        composeTestRule.onNodeWithText("File uploaded").tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme { onNodeWithText("File uploaded").tryPerformAccessibilityChecks() }
     }
 
     @Test
     fun test_that_snackbar_with_action_passes_accessibility_checks() {
-        composeTestRule.setSweepContent {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             val hostState = remember { SnackbarHostState() }
             LaunchedEffect(hostState) {
                 hostState.showSnackbar(
@@ -65,6 +57,6 @@ class SnackbarsAccessibilityTest {
             MegaSnackbar(snackBarHostState = hostState)
         }
 
-        composeTestRule.onNodeWithText("Undo").tryPerformAccessibilityChecks()
+        sweep.checkInEachTheme { onNodeWithText("Undo").tryPerformAccessibilityChecks() }
     }
 }
