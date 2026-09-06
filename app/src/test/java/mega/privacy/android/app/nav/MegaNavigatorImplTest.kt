@@ -16,6 +16,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -28,6 +29,7 @@ import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,6 +44,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 import kotlin.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -405,5 +408,67 @@ class MegaNavigatorImplTest {
                 isNull(),
             )
             verify(context, never()).startActivity(any())
+        }
+
+    @Test
+    fun `test that openPdfViewer emits a nav key for remote content`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+            underTest.openPdfViewer(
+                context = context,
+                nodeHandle = 123L,
+                fileName = "version.pdf",
+                mimeType = "application/pdf",
+                content = NodeContentUri.RemoteContentUri("http://127.0.0.1/version.pdf", true),
+                nodeSourceType = NodeSourceType.MEDIA_PLAYER_VERSIONS,
+            )
+
+            verify(navigationQueue).emit(
+                argThat<List<NavKey>> { navKeys ->
+                    navKeys.size == 1 && navKeys[0] == PdfViewerNavKey(
+                        nodeHandle = 123L,
+                        contentUri = "http://127.0.0.1/version.pdf",
+                        isLocalContent = false,
+                        shouldStopHttpServer = true,
+                        nodeSourceType = NodeSourceType.MEDIA_PLAYER_VERSIONS,
+                        mimeType = "application/pdf",
+                        title = "version.pdf",
+                    )
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
+        }
+
+    @Test
+    fun `test that openPdfViewer emits a local nav key for local content`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+            underTest.openPdfViewer(
+                context = context,
+                nodeHandle = 123L,
+                fileName = "version.pdf",
+                mimeType = "application/pdf",
+                content = NodeContentUri.LocalContentUri(File("/local/version.pdf")),
+                nodeSourceType = NodeSourceType.MEDIA_PLAYER_VERSIONS,
+            )
+
+            verify(navigationQueue).emit(
+                argThat<List<NavKey>> { navKeys ->
+                    navKeys.size == 1 && navKeys[0] == PdfViewerNavKey(
+                        nodeHandle = 123L,
+                        contentUri = "/local/version.pdf",
+                        isLocalContent = true,
+                        shouldStopHttpServer = false,
+                        nodeSourceType = NodeSourceType.MEDIA_PLAYER_VERSIONS,
+                        mimeType = "application/pdf",
+                        title = "version.pdf",
+                    )
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
         }
 }

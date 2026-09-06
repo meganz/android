@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.payment.QuotaWarningTrigger
@@ -418,6 +419,27 @@ interface AppNavigator {
         content: NodeContentUri.LocalContentUri,
         type: Int?,
         nodeId: NodeId,
+    )
+
+    /**
+     * Open a PDF in the Compose PDF viewer, hosted by the single Activity shell. Launches the shell
+     * first when called from a legacy Activity, which is then closed as the shell is brought to the
+     * front - back from the viewer returns to the shell, not to the caller.
+     *
+     * @param context Context
+     * @param nodeHandle the handle of the file node
+     * @param fileName the name of the file, shown as the viewer title
+     * @param mimeType the MIME type of the file
+     * @param content NodeContentUri
+     * @param nodeSourceType the source the node is opened from, which decides the node options
+     */
+    fun openPdfViewer(
+        context: Context,
+        nodeHandle: Long,
+        fileName: String,
+        mimeType: String,
+        content: NodeContentUri,
+        nodeSourceType: NodeSourceType,
     )
 
     /**

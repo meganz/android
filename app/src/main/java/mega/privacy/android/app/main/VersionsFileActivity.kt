@@ -2,21 +2,17 @@ package mega.privacy.android.app.main
 
 import android.content.DialogInterface
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ActionMode
-import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,18 +35,18 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.presentation.versions.VersionsFileViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
@@ -649,72 +645,27 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     megaNodeUtilWrapper.manageURLNode(this, megaApi, vNode)
                 }
 
-                mimetype.isPdf -> {
-                    val pdfIntent = Intent(this, PdfViewerActivity::class.java)
-                    pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-                    pdfIntent.putExtra(
-                        Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                        Constants.VERSIONS_ADAPTER
-                    )
-                    val localPath = FileUtil.getLocalFile(vNode)
-                    if (localPath != null) {
-                        val mediaFile = File(localPath)
-                        if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
-                            pdfIntent.setDataAndType(
-                                FileProvider.getUriForFile(
-                                    this,
-                                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                                    mediaFile
-                                ), MimeTypeList.typeForName(vNode.name).type
-                            )
-                        } else {
-                            pdfIntent.setDataAndType(
-                                Uri.fromFile(mediaFile),
-                                MimeTypeList.typeForName(vNode.name).type
-                            )
-                        }
-                        pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    } else {
-                        megaNodeUtilWrapper.setupStreamingServer()
-                        val url = megaApi.httpServerGetLocalLink(vNode)
-                        if (url != null) {
-                            val parsedUri = Uri.parse(url)
-                            if (parsedUri != null) {
-                                pdfIntent.setDataAndType(parsedUri, mimetype.type)
-                            } else {
-                                showSnackbar(
-                                    Constants.SNACKBAR_TYPE,
-                                    getString(sharedR.string.general_text_error),
-                                    -1
-                                )
-                            }
-                        } else {
-                            showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                getString(sharedR.string.general_text_error),
-                                -1
-                            )
-                        }
+                mimetype.isPdf -> lifecycleScope.launch {
+                    runCatching {
+                        val localPath = FileUtil.getLocalFile(vNode)
+                        megaNavigator.openPdfViewer(
+                            context = this@VersionsFileActivity,
+                            nodeHandle = vNode.handle,
+                            fileName = vNode.name,
+                            mimeType = mimetype.type,
+                            content = localPath?.let { NodeContentUri.LocalContentUri(File(it)) }
+                                ?: viewModel.getNodeContentUri(vNode.handle),
+                            // Limits the node options to download, as the legacy viewer did.
+                            nodeSourceType = NodeSourceType.MEDIA_PLAYER_VERSIONS,
+                        )
+                    }.onFailure { exception ->
+                        Timber.e(exception, "Failed to open the PDF viewer")
+                        showSnackbar(
+                            Constants.SNACKBAR_TYPE,
+                            getString(sharedR.string.general_text_error),
+                            -1,
+                        )
                     }
-                    pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, vNode.handle)
-                    putThumbnailLocation(
-                        pdfIntent,
-                        binding.recyclerViewVersionsFile,
-                        position,
-                        Constants.VIEWER_FROM_FILE_BROWSER,
-                        adapter
-                    )
-                    if (MegaApiUtils.isIntentAvailable(this, pdfIntent)) {
-                        startActivity(pdfIntent)
-                    } else {
-                        Toast.makeText(
-                            this,
-                            getString(R.string.intent_not_available),
-                            Toast.LENGTH_LONG
-                        ).show()
-                        downloadNodes(listOf(vNode))
-                    }
-                    overridePendingTransition(0, 0)
                 }
 
                 mimetype.isOpenableTextFile(vNode.size) -> {

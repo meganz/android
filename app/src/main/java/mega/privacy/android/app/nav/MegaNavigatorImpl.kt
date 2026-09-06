@@ -85,6 +85,7 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -117,6 +118,7 @@ import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.ShareLinkNavKey
@@ -747,6 +749,36 @@ internal class MegaNavigatorImpl @Inject constructor(
             mimeType = mimeType,
         )
         context.startActivity(pdfIntent)
+    }
+
+    override fun openPdfViewer(
+        context: Context,
+        nodeHandle: Long,
+        fileName: String,
+        mimeType: String,
+        content: NodeContentUri,
+        nodeSourceType: NodeSourceType,
+    ) {
+        val (contentUri, isLocalContent, shouldStopHttpServer) = when (content) {
+            is NodeContentUri.LocalContentUri -> Triple(content.file.path, true, false)
+            is NodeContentUri.RemoteContentUri -> Triple(
+                content.url,
+                false,
+                content.shouldStopHttpSever,
+            )
+        }
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = PdfViewerNavKey(
+                nodeHandle = nodeHandle,
+                contentUri = contentUri,
+                isLocalContent = isLocalContent,
+                shouldStopHttpServer = shouldStopHttpServer,
+                nodeSourceType = nodeSourceType,
+                mimeType = mimeType,
+                title = fileName,
+            ),
+        )
     }
 
     override fun openPdfViewerFromChat(
