@@ -23,6 +23,14 @@ class MediaHandleStore @Inject constructor() {
 
     fun getHandle(mediaId: String): Long? = store[mediaId]
 
+    /**
+     * Removes the mappings for [mediaIds] only. Scoped removal keeps entries registered by a
+     * queue build that is still in flight intact, unlike [clear].
+     */
+    fun remove(mediaIds: Collection<String>) {
+        mediaIds.forEach { store.remove(it) }
+    }
+
     fun clear() {
         store.clear()
     }

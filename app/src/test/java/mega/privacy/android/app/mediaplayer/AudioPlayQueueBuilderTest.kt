@@ -9,13 +9,18 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.mediaplayer.model.AudioPlayQueueParams
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
@@ -54,6 +59,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
@@ -384,6 +390,80 @@ class AudioPlayQueueBuilderTest {
                 // the first emission.  cancelAndIgnoreRemainingEvents() handles any
                 // residual events from the streaming-server setup coroutines.
                 cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that firstPlayIndex tracks the built list when a preceding node fails to resolve`() =
+        runTest {
+            // Uri.parse is unavailable in JVM unit tests, but the full-queue URL resolution
+            // path calls String.toUri(); a static mock keeps the flow on the streaming branch.
+            Mockito.mockStatic(Uri::class.java).use { _ ->
+                whenever(Uri.parse(any())).thenReturn(mock())
+                val node1 = mock<TypedAudioNode> { on { id }.thenReturn(NodeId(1L)) }
+                val node2 = mock<TypedAudioNode> { on { id }.thenReturn(NodeId(2L)) }
+                val node3 = mock<TypedAudioNode> { on { id }.thenReturn(NodeId(3L)) }
+                whenever(getAudioNodesUseCase(any())).thenReturn(listOf(node1, node2, node3))
+                // node1's stream URL cannot be resolved, so it is skipped from the built queue.
+                whenever(getLocalLinkFromMegaApiUseCase(1L)).thenReturn(null)
+                whenever(getLocalLinkFromMegaApiUseCase(2L)).thenReturn("http://server/2")
+                whenever(getLocalLinkFromMegaApiUseCase(3L)).thenReturn("http://server/3")
+                whenever(audioNodeToMediaItemMapper(any<TypedAudioNode>(), any<Uri>()))
+                    .thenReturn(mock())
+                val params = buildParams(
+                    adapterType = AUDIO_BROWSE_ADAPTER,
+                    handle = 2L,
+                    isPlayQueue = true,
+                )
+
+                underTest(params).test {
+                    awaitItem() // fast single-item emission
+
+                    val full = awaitItem()
+
+                    assertThat(full.mediaItems).hasSize(2)
+                    assertThat(full.newIndexForCurrentItem).isEqualTo(0)
+                    awaitComplete()
+                }
+            }
+        }
+
+    @Test
+    fun `test that buildFullQueue emits an empty result when filtering removes every node`() =
+        runTest {
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            val sensitiveNode = mock<TypedAudioNode> {
+                on { id }.thenReturn(NodeId(1L))
+                on { isMarkedSensitive }.thenReturn(true)
+            }
+            whenever(getAudioNodesUseCase(any())).thenReturn(listOf(sensitiveNode))
+            val params = buildParams(
+                adapterType = AUDIO_BROWSE_ADAPTER,
+                handle = 1L,
+                isPlayQueue = true,
+            )
+
+            underTest.buildFullQueue(params).test {
+                val emitted = awaitItem()
+
+                assertThat(emitted.mediaItems).isEmpty()
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that buildFullQueue emits nothing when the source cannot build a queue`() =
+        runTest {
+            val params = buildParams(adapterType = FROM_CHAT, isPlayQueue = true)
+
+            underTest.buildFullQueue(params).test {
+                awaitComplete()
             }
         }
 

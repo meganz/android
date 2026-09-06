@@ -28,8 +28,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -38,15 +40,21 @@ import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaEventQueue
 import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
 import mega.privacy.android.app.mediaplayer.AudioPlayQueueBuilder
+import mega.privacy.android.app.mediaplayer.AudioPlayQueueFilterDiff
 import mega.privacy.android.app.mediaplayer.isStreamingOverQuotaError
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.AudioPlayQueueParams
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
@@ -57,9 +65,13 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioR
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.PersistAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.TrackAndSaveAudioPlaybackInfoUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodeAccessibilityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStreamOverQuotaEventUseCase
+import mega.privacy.android.feature.mediaplayer.data.AudioPlayerError
+import mega.privacy.android.feature.mediaplayer.data.AudioPlayerErrorEventQueue
 import mega.privacy.android.feature.mediaplayer.data.AudioResumeEvent
 import mega.privacy.android.feature.mediaplayer.data.AudioResumeEventQueue
 import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
@@ -68,6 +80,7 @@ import mega.privacy.android.feature.mediaplayer.navigation.AudioPlayerScreenNavK
 import mega.privacy.mobile.analytics.event.AudioPlayerIsActivatedEvent
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Audio player service using [MediaSessionService] (Media3-recommended approach).
@@ -137,6 +150,18 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     lateinit var monitorStreamOverQuotaEventUseCase: MonitorStreamOverQuotaEventUseCase
 
     @Inject
+    lateinit var getBusinessStatusUseCase: GetBusinessStatusUseCase
+
+    @Inject
+    lateinit var checkNodeAccessibilityUseCase: CheckNodeAccessibilityUseCase
+
+    @Inject
+    lateinit var isConnectedToInternetUseCase: IsConnectedToInternetUseCase
+
+    @Inject
+    lateinit var audioPlayerErrorEventQueue: AudioPlayerErrorEventQueue
+
+    @Inject
     lateinit var isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase
 
     @Inject
@@ -161,6 +186,8 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     // after the player has already moved to the next item and its duration is no longer readable.
     private var lastPlaybackInfo: MediaPlaybackInfo? = null
     private var isTransferOverQuota = false
+    private var playbackRetryCount = 0
+    private var retryJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -307,15 +334,36 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         }
     }
 
+    private data class HiddenNodesFilterKey(
+        val showHiddenItems: Boolean,
+        val accountType: AccountType?,
+        val isBusinessExpired: Boolean,
+    )
+
     private fun observeHiddenNodeSettingChanges() {
         lifecycleScope.launch {
             combine(
                 monitorShowHiddenItemsUseCase(),
                 monitorAccountDetailUseCase(),
-            ) { showHidden, accountDetail -> showHidden to accountDetail }
+            ) { showHidden, accountDetail ->
+                val accountType = accountDetail.levelDetail?.accountType
+                HiddenNodesFilterKey(
+                    showHiddenItems = showHidden,
+                    accountType = accountType,
+                    isBusinessExpired = accountType?.isBusinessAccount == true &&
+                            runCatching { getBusinessStatusUseCase() }
+                                .getOrNull() == BusinessAccountStatus.Expired,
+                )
+            }
+                // Only a change in the actual filter inputs justifies a rebuild — AccountDetail
+                // re-emits for unrelated reasons (storage usage updates etc.), and rebuilding on
+                // each of those would keep interrupting playback mid-session.
+                .distinctUntilChanged()
                 .drop(1) // Skip the initial emission — play queue already built on first load.
                 .catch { Timber.e(it, "Failed to monitor hidden node settings") }
-                .collect { lastPlayQueueParams?.let { params -> rebuildPlayQueue(params) } }
+                .collect {
+                    lastPlayQueueParams?.let { params -> rebuildPlayQueueForFilterChange(params) }
+                }
         }
     }
 
@@ -447,8 +495,17 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             if (!playWhenReady) return
             when {
                 isTransferOverQuota -> handlePlayRequestedWhileOverQuota()
-                player?.playbackState == Player.STATE_IDLE -> player?.prepare()
+                player?.playbackState == Player.STATE_IDLE -> {
+                    // Pressing play after a terminal error is a deliberate action: grant a
+                    // fresh retry budget instead of failing immediately at the exhausted count.
+                    playbackRetryCount = 0
+                    player?.prepare()
+                }
             }
+        }
+
+        override fun onPlaybackStateChanged(state: Int) {
+            if (state == Player.STATE_READY) playbackRetryCount = 0
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -459,20 +516,60 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             // When over quota, playback is stopped instead of re-prepared — retries can never
             // succeed, and pressing play re-checks the quota and re-raises the warning
             // (see handlePlayRequestedWhileOverQuota).
-            lifecycleScope.launch {
+            retryJob = lifecycleScope.launch {
                 val isOverQuota =
                     isStreamingOverQuotaError(error.errorCode, isInTransferOverQuotaUseCase)
                 // The flag is re-checked after the suspending query: the over-quota event can
                 // arrive while the query is in flight, and prepare() would undo the stop it
                 // performed.
-                if (isOverQuota || isTransferOverQuota) {
-                    isTransferOverQuota = true
-                    enterOverQuotaPausedState()
-                } else {
-                    player?.prepare()
+                when {
+                    isOverQuota || isTransferOverQuota -> {
+                        isTransferOverQuota = true
+                        enterOverQuotaPausedState()
+                    }
+
+                    // A blocked (taken-down) node can never play; checked on the first error so
+                    // the retry loop is not spent on a request that always fails.
+                    playbackRetryCount == 0 && isCurrentNodeBlocked() ->
+                        enterPlaybackErrorState(AudioPlayerError.NodeBlocked)
+
+                    playbackRetryCount < MAX_PLAYBACK_RETRIES -> {
+                        playbackRetryCount++
+                        // Immediate retries would burn the whole budget inside a single
+                        // transient network blip; back off a little longer on each attempt.
+                        delay(PLAYBACK_RETRY_BACKOFF * playbackRetryCount)
+                        player?.prepare()
+                    }
+
+                    else -> enterPlaybackErrorState(
+                        AudioPlayerError.RetryExhausted(
+                            isNetworkAvailable = runCatching { isConnectedToInternetUseCase() }
+                                .getOrDefault(true),
+                        )
+                    )
                 }
             }
         }
+    }
+
+    private suspend fun isCurrentNodeBlocked(): Boolean {
+        val handle = player?.currentMediaItem?.mediaId
+            ?.let { mediaHandleStore.getHandle(it) } ?: return false
+        return runCatching { checkNodeAccessibilityUseCase(NodeId(handle)) }
+            .exceptionOrNull() is BlockedMegaException
+    }
+
+    /**
+     * Terminal playback error: retries cannot help, so playback is stopped (like the over-quota
+     * state, keeping the queue and position so a deliberate play press can retry with a fresh
+     * budget — see onPlayWhenReadyChanged), the mini player is hidden, and the error is parked
+     * for the player screen to announce.
+     */
+    private fun enterPlaybackErrorState(error: AudioPlayerError) {
+        player?.pause()
+        player?.stop()
+        MiniAudioPlayerController.notifyV2AudioPlayerPlaying(false)
+        audioPlayerErrorEventQueue.emit(error)
     }
 
     override fun onUpdateNotification(session: MediaSession, startInForeground: Boolean) {
@@ -576,7 +673,13 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
     private fun rebuildPlayQueue(params: AudioPlayQueueParams) {
         playQueueBuildJob?.cancel()
+        // A new session gets a fresh retry budget, and an in-flight backoff from the previous
+        // session must not fire a stray prepare() into it.
+        retryJob?.cancel()
+        playbackRetryCount = 0
         playQueueBuildJob = lifecycleScope.launch {
+            // Starting new playback invalidates any terminal error the screen never showed.
+            audioPlayerErrorEventQueue.clear()
             val isOpeningDifferentItem = player?.currentMediaItem?.mediaId
                 ?.let { mediaHandleStore.getHandle(it) } != params.handle
             // Switching items invalidates an announcement the player screen never showed —
@@ -590,13 +693,115 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 }
                 .getOrNull()
             shouldAnnounceResume = isOpeningDifferentItem && resumePositionMs != null
+            var anySourcesApplied = false
             audioPlayQueueBuilder(params)
                 .catch { Timber.e(it, "Failed to build audio play queue") }
                 .collect { mediaSources ->
                     needStopStreamingServer =
                         needStopStreamingServer || mediaSources.serverStarted
                     applyMediaSources(mediaSources, resumePositionMs)
+                    anySourcesApplied = anySourcesApplied || mediaSources.mediaItems.isNotEmpty()
                 }
+            // Nothing was produced and nothing is loaded from before: the screen would stay on
+            // its loading state forever, so surface the failure instead.
+            if (!anySourcesApplied && player?.mediaItemCount == 0) {
+                audioPlayerErrorEventQueue.emit(
+                    AudioPlayerError.QueueBuildFailed(
+                        isNetworkAvailable = runCatching { isConnectedToInternetUseCase() }
+                            .getOrDefault(true),
+                    )
+                )
+            }
+        }
+    }
+
+    /**
+     * Rebuilds the play queue after the hidden-nodes filter inputs change.
+     *
+     * Unlike [rebuildPlayQueue] this is anchored on the item that is currently playing rather
+     * than the originally launched one, skips the fast single-item emission, and applies the
+     * result as an in-place diff so playback is not interrupted or repositioned.
+     */
+    private fun rebuildPlayQueueForFilterChange(params: AudioPlayQueueParams) {
+        playQueueBuildJob?.cancel()
+        retryJob?.cancel()
+        playbackRetryCount = 0
+        playQueueBuildJob = lifecycleScope.launch {
+            val currentHandle = player?.currentMediaItem?.mediaId
+                ?.let { mediaHandleStore.getHandle(it) }
+            val anchoredParams = currentHandle?.let { params.copy(handle = it) } ?: params
+            audioPlayQueueBuilder.buildFullQueue(anchoredParams)
+                .catch { Timber.e(it, "Failed to rebuild audio play queue after filter change") }
+                .collect { mediaSources ->
+                    needStopStreamingServer =
+                        needStopStreamingServer || mediaSources.serverStarted
+                    applyFilterRebuild(mediaSources)
+                }
+        }
+    }
+
+    /**
+     * Applies a filter-change rebuild as a diff around the currently playing item.
+     *
+     * The branch selection lives in [AudioPlayQueueFilterDiff]: keep the playing item's
+     * MediaItem instance and rebuild around it (playback and position untouched), reset onto
+     * the nearest surviving successor preserving playWhenReady, or — when nothing survived the
+     * filter — stop the player entirely, since keeping hidden content playing would defeat the
+     * privacy setting.
+     */
+    private fun applyFilterRebuild(mediaSources: MediaPlaySources) {
+        val currentPlayer = player ?: return
+        val newItems = mediaSources.mediaItems
+
+        val beforeIds = timelineMediaIds(currentPlayer)
+        val currentIndex = currentPlayer.currentMediaItemIndex
+        val action = AudioPlayQueueFilterDiff.resolve(
+            oldTimelineHandles = List(currentPlayer.mediaItemCount) { index ->
+                mediaHandleStore.getHandle(currentPlayer.getMediaItemAt(index).mediaId)
+            },
+            oldCurrentIndex = currentIndex,
+            newHandles = newItems.map { mediaHandleStore.getHandle(it.mediaId) },
+        )
+
+        when (action) {
+            AudioPlayQueueFilterDiff.Action.StopPlayback -> {
+                stopPlayerAndSelf()
+                return
+            }
+
+            is AudioPlayQueueFilterDiff.Action.KeepCurrent -> {
+                val newIndexOfCurrent = action.newIndexOfCurrent
+                if (currentIndex + 1 < currentPlayer.mediaItemCount) {
+                    currentPlayer.removeMediaItems(currentIndex + 1, currentPlayer.mediaItemCount)
+                }
+                if (currentIndex > 0) {
+                    currentPlayer.removeMediaItems(0, currentIndex)
+                }
+                if (newIndexOfCurrent > 0) {
+                    currentPlayer.addMediaItems(0, newItems.subList(0, newIndexOfCurrent))
+                }
+                if (newIndexOfCurrent + 1 < newItems.size) {
+                    currentPlayer.addMediaItems(
+                        newIndexOfCurrent + 1,
+                        newItems.subList(newIndexOfCurrent + 1, newItems.size),
+                    )
+                }
+                // The rebuilt duplicate of the playing item never enters the timeline (the old
+                // instance is kept), so its freshly registered mapping must be dropped explicitly.
+                mediaHandleStore.remove(listOf(newItems[newIndexOfCurrent].mediaId))
+            }
+
+            is AudioPlayQueueFilterDiff.Action.ResetToSurvivor -> {
+                currentPlayer.setMediaItems(newItems, action.startIndex, 0L)
+                currentPlayer.prepare()
+            }
+        }
+        mediaHandleStore.remove(beforeIds - timelineMediaIds(currentPlayer))
+    }
+
+    private fun timelineMediaIds(currentPlayer: Player): Set<String> = buildSet {
+        for (i in 0 until currentPlayer.mediaItemCount) {
+            add(currentPlayer.getMediaItemAt(i).mediaId)
         }
     }
 
@@ -604,6 +809,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         val currentPlayer = player ?: return
         if (mediaSources.mediaItems.isEmpty()) return
 
+        val beforeIds = timelineMediaIds(currentPlayer)
         val startIndex = mediaSources.newIndexForCurrentItem.coerceAtLeast(0)
         val targetMediaId = mediaSources.mediaItems.getOrNull(startIndex)?.mediaId
 
@@ -650,6 +856,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 }
             }
         }
+        // Drop handle mappings only for the IDs this update removed from the timeline; entries
+        // registered by a queue build still in flight must stay untouched.
+        mediaHandleStore.remove(beforeIds - timelineMediaIds(currentPlayer))
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
@@ -727,6 +936,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     companion object {
+        private const val MAX_PLAYBACK_RETRIES = 6
+        private val PLAYBACK_RETRY_BACKOFF = 500.milliseconds
+
         private const val ACTION_STOP =
             "mega.privacy.android.app.mediaplayer.AudioPlayerService.STOP"
         private const val ACTION_DISMISS =

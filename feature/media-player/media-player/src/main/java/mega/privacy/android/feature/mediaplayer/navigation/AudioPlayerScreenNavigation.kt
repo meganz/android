@@ -15,6 +15,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.model.SnackbarAttributes
@@ -26,6 +29,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsA
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.mediaplayer.components.PlaybackSpeedBottomSheet
+import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerErrorDialog
 import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerQueueContent
 import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerQueueViewModel
 import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerScreen
@@ -51,6 +55,9 @@ data class AudioPlayerScreenNavKey(val launchId: String) : NavKey, Parcelable {
     }
 }
 
+/** How long a restored entry without a launch intent waits for a running session to report in. */
+private val ACTIVE_SESSION_TIMEOUT = 3.seconds
+
 internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
     navigationHandler: NavigationHandler,
     launchSourceHolder: AudioPlayerLaunchSourceHolder,
@@ -62,8 +69,27 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
         val viewModel = hiltViewModel<AudioPlayerViewModel>(activity)
 
         LaunchedEffect(navKey.launchId) {
-            val intent = launchSourceHolder.consume(navKey.launchId) ?: return@LaunchedEffect
-            viewModel.startPlayback(intent)
+            val intent = launchSourceHolder.consume(navKey.launchId)
+            when {
+                intent != null -> viewModel.startPlayback(intent)
+
+                navKey.launchId == AudioPlayerScreenNavKey.RESUME_LAUNCH_ID -> Unit
+
+                // A configuration change also re-runs this effect with the payload already
+                // consumed; the ViewModel survived it and playback may simply still be loading,
+                // so the restore timeout below must not apply.
+                viewModel.hasStartedPlayback -> Unit
+
+                else -> {
+                    // Restored after process death: the launch payload is gone. Give the media
+                    // controller a short window to prove a session is still running (the service
+                    // may have survived the UI process); otherwise leave the now-empty screen.
+                    val hasSession = withTimeoutOrNull(ACTIVE_SESSION_TIMEOUT) {
+                        viewModel.hasActiveSession.first { it }
+                    }
+                    if (hasSession == null) navigationHandler.back()
+                }
+            }
         }
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -98,6 +124,27 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
             )
             viewModel.onResumeEventConsumed()
         }
+        val playbackError by viewModel.playbackError.collectAsStateWithLifecycle()
+        playbackError?.let { error ->
+            AudioPlayerErrorDialog(
+                error = error,
+                onDismiss = {
+                    viewModel.onPlaybackErrorConsumed()
+                    viewModel.stopPlayer()
+                    navigationHandler.back()
+                },
+            )
+        }
+
+        val sessionEnded by viewModel.sessionEnded.collectAsStateWithLifecycle()
+        LaunchedEffect(sessionEnded) {
+            if (sessionEnded) {
+                viewModel.onSessionEndedConsumed()
+                // A parked error owns the exit: its dialog's OK button navigates back itself.
+                if (viewModel.playbackError.value == null) navigationHandler.back()
+            }
+        }
+
         var showSpeedSheet by remember { mutableStateOf(false) }
         var showSleepTimerSheet by remember { mutableStateOf(false) }
 

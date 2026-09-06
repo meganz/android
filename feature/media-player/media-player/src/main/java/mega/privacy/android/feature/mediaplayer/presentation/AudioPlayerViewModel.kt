@@ -11,11 +11,13 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -30,6 +32,8 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepea
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.feature.mediaplayer.data.AudioPlayerError
+import mega.privacy.android.feature.mediaplayer.data.AudioPlayerErrorEventQueue
 import mega.privacy.android.feature.mediaplayer.data.AudioResumeEventQueue
 import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.data.mapper.RepeatToggleModeByExoPlayerMapper
@@ -69,6 +73,7 @@ class AudioPlayerViewModel @Inject constructor(
     private val deleteAudioPlaybackInfoUseCase: DeleteAudioPlaybackInfoUseCase,
     private val repeatToggleModeByExoPlayerMapper: RepeatToggleModeByExoPlayerMapper,
     private val audioResumeEventQueue: AudioResumeEventQueue,
+    private val audioPlayerErrorEventQueue: AudioPlayerErrorEventQueue,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
@@ -94,6 +99,39 @@ class AudioPlayerViewModel @Inject constructor(
 
     /** Current sleep timer state. Updated every second while a countdown is running. */
     val sleepTimerState: StateFlow<SleepTimerState> = _sleepTimerState.asStateFlow()
+
+    private val _playbackError = MutableStateFlow<AudioPlayerError?>(null)
+
+    /** Terminal playback error waiting to be announced, cleared via [onPlaybackErrorConsumed]. */
+    val playbackError: StateFlow<AudioPlayerError?> = _playbackError.asStateFlow()
+
+    /**
+     * Emits true once the connected player holds a non-empty queue. Lets the route entry decide
+     * whether a screen restored without a launch intent (process death) still has a running
+     * session to show, or should navigate back.
+     */
+    val hasActiveSession: Flow<Boolean> = gateway.playerState.map { it.mediaItemCount > 0 }
+
+    /**
+     * True once a launch intent has been handed to [startPlayback] in this process. The route
+     * entry uses it to tell a configuration-change re-entry (payload already consumed, playback
+     * possibly still loading) apart from a restore after process death.
+     */
+    var hasStartedPlayback: Boolean = false
+        private set
+
+    private val _sessionEnded = MutableStateFlow(false)
+
+    /**
+     * True when the playback session this screen was showing has ended (the service stopped:
+     * queue emptied by the hidden-nodes filter, mini player closed, logout). The route entry
+     * navigates back so the screen does not keep displaying content that no longer plays --
+     * or, for a hidden queue, content the user just asked to hide. Cleared via
+     * [onSessionEndedConsumed] and when new playback starts.
+     */
+    val sessionEnded: StateFlow<Boolean> = _sessionEnded.asStateFlow()
+
+    private var hadActiveSession = false
 
     private var currentControllerState: AudioControllerState? = null
     private var lastMediaItemId: String? = null
@@ -125,6 +163,29 @@ class AudioPlayerViewModel @Inject constructor(
     init {
         observePlayerState()
         observeResumeEvents()
+        observePlaybackErrors()
+    }
+
+    private fun observePlaybackErrors() {
+        viewModelScope.launch {
+            audioPlayerErrorEventQueue.events.collect {
+                // The collected value is only a wake-up signal; consume() claims the event
+                // atomically so a concurrent clear() cannot lead to a double delivery.
+                audioPlayerErrorEventQueue.consume()?.let { error ->
+                    _playbackError.value = error
+                }
+            }
+        }
+    }
+
+    /** Marks the pending playback error as shown so the dialog is not repeated. */
+    fun onPlaybackErrorConsumed() {
+        _playbackError.value = null
+    }
+
+    /** Marks the session-ended signal as handled so it fires at most once per session. */
+    fun onSessionEndedConsumed() {
+        _sessionEnded.value = false
     }
 
     private fun observeResumeEvents() {
@@ -231,6 +292,17 @@ class AudioPlayerViewModel @Inject constructor(
     }
 
     private fun mapToUiState(state: AudioControllerState) {
+        if (state.isSessionEnded && hadActiveSession) {
+            _sessionEnded.value = true
+        }
+        if (state.mediaItemCount == 0) {
+            // Nothing is loaded in the player: a fresh connect before the service builds the
+            // queue, or a restart after process death. Mapping this to Data would render an
+            // empty player shell, so stay on the last state (initially Loading) until items
+            // arrive.
+            return
+        }
+        hadActiveSession = true
         val existing = playerState.value as? AudioPlayerUiState.Data
         val data = intentData
         if (state.currentMediaItemId != lastMediaItemId) {
@@ -295,6 +367,9 @@ class AudioPlayerViewModel @Inject constructor(
     }
 
     fun startPlayback(intent: Intent) {
+        hasStartedPlayback = true
+        hadActiveSession = false
+        _sessionEnded.value = false
         setCurrentIntent(intent)
         val handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_VALUE.toLong())
         if (handle != INVALID_VALUE.toLong()) {
@@ -302,6 +377,11 @@ class AudioPlayerViewModel @Inject constructor(
         }
         val rebuildPlaylist = intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)
         if (rebuildPlaylist) {
+            // This ViewModel outlives the player screen, so an error consumed while the screen
+            // was closed would otherwise pop up over the brand-new playback session. Reopening
+            // without a rebuild keeps the error: playback is still stopped by it, and the dialog
+            // is what tells the user why.
+            _playbackError.value = null
             gateway.startService(intent)
         }
     }

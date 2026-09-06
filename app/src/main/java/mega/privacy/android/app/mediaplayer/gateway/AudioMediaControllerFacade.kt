@@ -81,7 +81,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
                         // ourselves via reconnectController(). In that case the new future is
                         // already stored in controllerFuture and must not be released here.
                         if (isReconnecting) return
-                        updateState { copy(isIdle = true) }
+                        updateState { copy(isIdle = true, isSessionEnded = true) }
                         stopPositionPolling()
                         controller.removeListener(playerListener)
                         this@AudioMediaControllerFacade.controller = null

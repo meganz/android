@@ -17,6 +17,7 @@ import androidx.media3.common.Player
  * @property mediaItemCount Total number of media items in the queue.
  * @property isBuffering True when the player is buffering (i.e. [Player.STATE_BUFFERING] is active).
  * @property isIdle True when [Player.STATE_IDLE] is active, which indicates the player has stopped and is no longer holding any playback session.
+ * @property isSessionEnded True when the MediaController was disconnected because the service ended the session (queue emptied by filtering, mini player closed, logout). Never true for a live connection.
  * @property title Title of the current media item from its [androidx.media3.common.MediaMetadata].
  * @property artist Artist of the current media item from its [androidx.media3.common.MediaMetadata].
  * @property artworkUri Artwork URI of the current media item from its [androidx.media3.common.MediaMetadata].
@@ -35,6 +36,7 @@ data class AudioControllerState(
     val mediaItemCount: Int = 0,
     val isBuffering: Boolean = false,
     val isIdle: Boolean = false,
+    val isSessionEnded: Boolean = false,
     val title: String? = null,
     val artist: String? = null,
     val artworkUri: String? = null,
