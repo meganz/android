@@ -275,6 +275,7 @@ internal fun ChatListScreenContent(
                     addTextTabWithScrollableContent(
                         tabItem = TabItems(
                             title = stringResource(sharedR.string.general_chats_label),
+                            showBadge = uiState.chatsHaveUnread,
                             testTag = CHAT_LIST_CHATS_TAB_TAG,
                         ),
                     ) { _, tabModifier ->
@@ -295,6 +296,7 @@ internal fun ChatListScreenContent(
                     addTextTabWithScrollableContent(
                         tabItem = TabItems(
                             title = stringResource(sharedR.string.chat_tab_meetings_title),
+                            showBadge = uiState.meetingsHaveUnread,
                             testTag = CHAT_LIST_MEETINGS_TAB_TAG,
                         ),
                     ) { _, tabModifier ->
@@ -344,7 +346,9 @@ private val previewChats = persistentListOf(
         title = "Mieko Kawakami",
         lastMessage = "See you tomorrow!",
         lastTimestampFormatted = "Today 14:25",
-        scheduledTimestampFormatted = null,
+        header = null,
+        pendingMeeting = null,
+        showRecurringIcon = false,
         unreadCount = 5,
         isMuted = false,
         highlight = true,
@@ -362,7 +366,9 @@ private val previewChats = persistentListOf(
         title = "Recipe test #14",
         lastMessage = "Anna: Seeya all soon!",
         lastTimestampFormatted = "1 May 2022 17:53",
-        scheduledTimestampFormatted = null,
+        header = null,
+        pendingMeeting = null,
+        showRecurringIcon = false,
         unreadCount = 0,
         isMuted = true,
         highlight = false,
@@ -381,6 +387,8 @@ private fun ChatListScreenPreview() {
             uiState = ChatListUiState.Data(
                 chats = ChatListTabState.Results(previewChats),
                 meetings = ChatListTabState.Empty,
+                chatsHaveUnread = true,
+                meetingsHaveUnread = false,
             ),
             showMeetingTab = false,
             onBackClick = {},
@@ -398,6 +406,8 @@ private fun ChatListScreenSearchActivePreview() {
             uiState = ChatListUiState.Data(
                 chats = ChatListTabState.Results(previewChats),
                 meetings = ChatListTabState.Empty,
+                chatsHaveUnread = true,
+                meetingsHaveUnread = false,
             ),
             showMeetingTab = false,
             searchMode = true,
@@ -418,6 +428,8 @@ private fun ChatListScreenNoResultsPreview() {
             uiState = ChatListUiState.Data(
                 chats = ChatListTabState.NoSearchResults,
                 meetings = ChatListTabState.NoSearchResults,
+                chatsHaveUnread = false,
+                meetingsHaveUnread = false,
             ),
             showMeetingTab = false,
             searchMode = true,
@@ -438,6 +450,8 @@ private fun ChatListScreenSelectionModePreview() {
             uiState = ChatListUiState.Data(
                 chats = ChatListTabState.Results(previewChats),
                 meetings = ChatListTabState.Empty,
+                chatsHaveUnread = false,
+                meetingsHaveUnread = false,
             ),
             showMeetingTab = false,
             searchMode = false,

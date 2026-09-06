@@ -3972,4 +3972,18 @@
     </plurals>
     <!-- Checkbox label in the new text file dialog to create a rich text (.md) file instead of a plain text file -->
     <string name="new_text_file_rich_text_formatting_label">Rich text formatting</string>
+    <!-- Meetings list: section header shown above meetings scheduled for the current day -->
+    <string name="meetings_list_header_today">Today</string>
+    <!-- Meetings list: section header shown above meetings that have already taken place -->
+    <string name="meetings_list_past_header">Past meetings</string>
+    <!-- Meetings list: label for a one-off meeting scheduled to happen in the future -->
+    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <!-- Meetings list: label for a meeting that repeats on a schedule -->
+    <string name="meetings_list_recurring_meeting_label">Recurring meeting</string>
+    <!-- Meetings list: schedule label for a meeting that repeats every day. Placeholder is the time range, e.g. "10:00am - 11:00am" -->
+    <string name="meetings_list_scheduled_meeting_daily_label">%1$s daily</string>
+    <!-- Meetings list: schedule label for a meeting that repeats every week. Placeholder is the time range, e.g. "10:00am - 11:00am" -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%1$s weekly</string>
+    <!-- Meetings list: schedule label for a meeting that repeats every month. Placeholder is the time range, e.g. "10:00am - 11:00am" -->
+    <string name="meetings_list_scheduled_meeting_monthly_label">%1$s monthly</string>
 </resources>

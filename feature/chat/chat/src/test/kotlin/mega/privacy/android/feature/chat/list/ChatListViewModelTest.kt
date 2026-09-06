@@ -239,12 +239,42 @@ class ChatListViewModelTest {
     }
 
     @Test
-    fun `test that header time mapper lambda returns null`() = runTest {
+    fun `test that header time mapper lambda delegates to the timestamp mapper`() = runTest {
         stubChatRooms()
+        whenever(chatRoomTimestampMapper.getHeaderTimeFormatted(meetingRoomItem, null))
+            .thenReturn("Today")
 
         underTest.uiState.test { awaitDataState() }
 
-        assertThat(capturedHeaderTimeMapper?.invoke(chatRoomItem, null)).isNull()
+        assertThat(capturedHeaderTimeMapper?.invoke(meetingRoomItem, null)).isEqualTo("Today")
+    }
+
+    @Test
+    fun `test that a tab has no unread badge when no chat room is unread`() = runTest {
+        stubChatRooms()
+
+        underTest.uiState.test {
+            val actual = awaitDataState()
+
+            assertThat(actual.chatsHaveUnread).isFalse()
+            assertThat(actual.meetingsHaveUnread).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that a tab has an unread badge when a chat room has unread messages`() = runTest {
+        stubChatRooms()
+        chatRoomUiItemMapper.stub {
+            on { invoke(chatRoomItem) } doReturn chatRoomUiItem(1L, "Chat", unreadCount = 3)
+            on { invoke(meetingRoomItem) } doReturn meetingUiItem
+        }
+
+        underTest.uiState.test {
+            val actual = awaitDataState()
+
+            assertThat(actual.chatsHaveUnread).isTrue()
+            assertThat(actual.meetingsHaveUnread).isFalse()
+        }
     }
 
     @Test
@@ -404,13 +434,16 @@ class ChatListViewModelTest {
         chatId: Long,
         title: String,
         lastMessage: String? = null,
+        unreadCount: Int = 0,
     ) = ChatRoomUiItem(
         chatId = chatId,
         title = title,
         lastMessage = lastMessage,
         lastTimestampFormatted = null,
-        scheduledTimestampFormatted = null,
-        unreadCount = 0,
+        header = null,
+        pendingMeeting = null,
+        showRecurringIcon = false,
+        unreadCount = unreadCount,
         isMuted = false,
         highlight = false,
         isNoteToSelf = false,

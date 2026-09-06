@@ -47,6 +47,41 @@ class ChatRoomItemViewScreenshotTest {
         RowWithStatus(ContactItemStatus.Online, hasOngoingCall = true)
     }
 
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ChatRoomItemRecurringMeeting() {
+        AndroidThemeForPreviews {
+            ChatRoomItemView(
+                item = meetingRow(
+                    pendingMeeting = ChatRoomUiItem.PendingMeeting.Recurring(
+                        scheduledTime = "10:00am - 11:00am",
+                        recurrence = ChatRoomUiItem.PendingMeeting.Recurrence.Weekly,
+                    ),
+                    showRecurringIcon = true,
+                ),
+                onItemClick = {},
+            )
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ChatRoomItemUpcomingMeeting() {
+        AndroidThemeForPreviews {
+            ChatRoomItemView(
+                item = meetingRow(
+                    pendingMeeting = ChatRoomUiItem.PendingMeeting.OneOff(
+                        scheduledTime = "10:00am - 11:00am",
+                    ),
+                    showRecurringIcon = false,
+                ),
+                onItemClick = {},
+            )
+        }
+    }
+
     @Composable
     private fun RowWithStatus(status: ContactItemStatus, hasOngoingCall: Boolean = false) {
         AndroidThemeForPreviews {
@@ -56,7 +91,9 @@ class ChatRoomItemViewScreenshotTest {
                     title = "Mieko Kawakami",
                     lastMessage = "See you tomorrow!",
                     lastTimestampFormatted = "Today 14:25",
-                    scheduledTimestampFormatted = null,
+                    header = null,
+                    pendingMeeting = null,
+                    showRecurringIcon = false,
                     unreadCount = 5,
                     isMuted = false,
                     highlight = true,
@@ -73,4 +110,24 @@ class ChatRoomItemViewScreenshotTest {
             )
         }
     }
+
+    private fun meetingRow(
+        pendingMeeting: ChatRoomUiItem.PendingMeeting,
+        showRecurringIcon: Boolean,
+    ) = ChatRoomUiItem(
+        chatId = 2L,
+        title = "Weekly sync",
+        lastMessage = null,
+        lastTimestampFormatted = "1 May 2022 17:53",
+        header = null,
+        pendingMeeting = pendingMeeting,
+        showRecurringIcon = showRecurringIcon,
+        unreadCount = 0,
+        isMuted = false,
+        highlight = false,
+        isNoteToSelf = false,
+        avatar = ChatRoomUiItem.ChatRoomUiAvatar.Meeting,
+        status = ContactItemStatus.Unknown,
+        hasOngoingCall = false,
+    )
 }

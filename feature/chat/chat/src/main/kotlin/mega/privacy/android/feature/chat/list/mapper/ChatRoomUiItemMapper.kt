@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem.ChatRoomUiAvatar
+import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem.PendingMeeting
 import javax.inject.Inject
 
 /**
@@ -22,9 +23,11 @@ internal class ChatRoomUiItemMapper @Inject constructor() {
         title = item.title,
         lastMessage = item.lastMessage?.takeIf(String::isNotBlank),
         lastTimestampFormatted = item.lastTimestampFormatted,
-        scheduledTimestampFormatted = (item as? ChatRoomItem.MeetingChatRoomItem)
+        header = item.header?.takeIf(String::isNotBlank),
+        pendingMeeting = (item as? ChatRoomItem.MeetingChatRoomItem)
             ?.takeIf { it.isPendingMeeting() }
-            ?.scheduledTimestampFormatted,
+            ?.toPendingMeeting(),
+        showRecurringIcon = item.isRecurringMeeting() && !item.isCancelledRecurringMeeting(),
         unreadCount = item.unreadCount,
         isMuted = item.isMuted && item !is ChatRoomItem.NoteToSelfChatRoomItem,
         highlight = item.highlight,
@@ -45,6 +48,16 @@ internal class ChatRoomUiItemMapper @Inject constructor() {
             .toContactItemStatus(),
         hasOngoingCall = item.hasOngoingCall() && item !is ChatRoomItem.NoteToSelfChatRoomItem,
     )
+
+    private fun ChatRoomItem.MeetingChatRoomItem.toPendingMeeting(): PendingMeeting {
+        val time = scheduledTimestampFormatted?.takeIf(String::isNotBlank)
+        return when {
+            isRecurringDaily -> PendingMeeting.Recurring(time, PendingMeeting.Recurrence.Daily)
+            isRecurringWeekly -> PendingMeeting.Recurring(time, PendingMeeting.Recurrence.Weekly)
+            isRecurringMonthly -> PendingMeeting.Recurring(time, PendingMeeting.Recurrence.Monthly)
+            else -> PendingMeeting.OneOff(time)
+        }
+    }
 
     private fun UserChatStatus?.toContactItemStatus(): ContactItemStatus = when (this) {
         UserChatStatus.Online -> ContactItemStatus.Online

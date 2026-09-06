@@ -10,7 +10,11 @@ import mega.android.core.ui.components.contact.state.ContactItemStatus
  * @property title Title of the chat room.
  * @property lastMessage Last message preview, null when there is nothing to show.
  * @property lastTimestampFormatted Formatted last activity time, null while still resolving.
- * @property scheduledTimestampFormatted Formatted scheduled time for pending meetings.
+ * @property header Section header to render above this row on the meetings list, null when the row
+ * does not start a new section.
+ * @property pendingMeeting Scheduled-meeting decoration for a pending meeting row, null for regular
+ * chats, non-pending meetings and note-to-self.
+ * @property showRecurringIcon Whether to show the recurring-meeting indicator next to the title.
  * @property unreadCount Number of unread messages.
  * @property isMuted Whether notifications are muted for the chat room.
  * @property highlight Whether the last message should be highlighted.
@@ -25,7 +29,9 @@ data class ChatRoomUiItem(
     val title: String,
     val lastMessage: String?,
     val lastTimestampFormatted: String?,
-    val scheduledTimestampFormatted: String?,
+    val header: String?,
+    val pendingMeeting: PendingMeeting?,
+    val showRecurringIcon: Boolean,
     val unreadCount: Int,
     val isMuted: Boolean,
     val highlight: Boolean,
@@ -34,6 +40,50 @@ data class ChatRoomUiItem(
     val status: ContactItemStatus,
     val hasOngoingCall: Boolean,
 ) {
+
+    /**
+     * Scheduled-meeting decoration for a pending meeting row.
+     */
+    @Immutable
+    sealed interface PendingMeeting {
+
+        /**
+         * Formatted scheduled time range of the meeting, e.g. "10:00am - 11:00am"; null while still
+         * resolving.
+         */
+        val scheduledTime: String?
+
+        /**
+         * A one-off meeting scheduled once in the future.
+         *
+         * @property scheduledTime Formatted scheduled time range.
+         */
+        @Immutable
+        data class OneOff(
+            override val scheduledTime: String?,
+        ) : PendingMeeting
+
+        /**
+         * A meeting that repeats on a schedule.
+         *
+         * @property scheduledTime Formatted scheduled time range.
+         * @property recurrence How often the meeting repeats.
+         */
+        @Immutable
+        data class Recurring(
+            override val scheduledTime: String?,
+            val recurrence: Recurrence,
+        ) : PendingMeeting
+
+        /**
+         * Recurrence period of a recurring meeting.
+         */
+        enum class Recurrence {
+            Daily,
+            Weekly,
+            Monthly,
+        }
+    }
 
     /**
      * Leading avatar variants for a chat list row.

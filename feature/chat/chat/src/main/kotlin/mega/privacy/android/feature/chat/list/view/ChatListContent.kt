@@ -1,8 +1,11 @@
 package mega.privacy.android.feature.chat.list.view
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -14,13 +17,18 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.LinkColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.chat.list.model.ChatListTabState
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -70,17 +78,40 @@ internal fun ChatListContent(
             contentPadding = contentPadding,
         ) {
             items(items = state.items, key = ChatRoomUiItem::chatId) { item ->
-                ChatRoomItemView(
-                    item = item,
-                    onItemClick = onItemClick,
-                    onItemLongClick = onItemLongClick,
-                    selectionMode = selectionMode,
-                    isSelected = item.chatId in selectedChatIds,
-                    onSelectionToggle = onSelectionToggle,
-                )
+                Column {
+                    item.header?.let { header ->
+                        ChatListSectionHeader(text = header)
+                    }
+                    ChatRoomItemView(
+                        item = item,
+                        onItemClick = onItemClick,
+                        onItemLongClick = onItemLongClick,
+                        selectionMode = selectionMode,
+                        isSelected = item.chatId in selectedChatIds,
+                        onSelectionToggle = onSelectionToggle,
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+private fun ChatListSectionHeader(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    MegaText(
+        text = text,
+        textColor = TextColor.Primary,
+        style = AppTheme.typography.bodyMedium,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .testTag(CHAT_LIST_SECTION_HEADER_TAG),
+    )
 }
 
 @Composable
@@ -152,6 +183,7 @@ private fun ChatListNoResultsView(
 
 private const val LEARN_MORE_URL = "https://mega.io/chatandmeetings"
 
+internal const val CHAT_LIST_SECTION_HEADER_TAG = "chat_list_content:section_header"
 internal const val CHAT_LIST_TAG = "chat_list_content:chat_list"
 internal const val MEETING_LIST_TAG = "chat_list_content:meeting_list"
 internal const val CHAT_LIST_EMPTY_TAG = "chat_list_content:chat_empty"

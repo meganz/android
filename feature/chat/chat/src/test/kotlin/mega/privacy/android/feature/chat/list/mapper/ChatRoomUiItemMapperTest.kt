@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
+import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem.ChatRoomUiAvatar
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,7 +49,9 @@ class ChatRoomUiItemMapperTest {
         assertThat(actual.title).isEqualTo("Mieko Kawakami")
         assertThat(actual.lastMessage).isEqualTo("See you tomorrow!")
         assertThat(actual.lastTimestampFormatted).isEqualTo("Today 14:25")
-        assertThat(actual.scheduledTimestampFormatted).isNull()
+        assertThat(actual.header).isNull()
+        assertThat(actual.pendingMeeting).isNull()
+        assertThat(actual.showRecurringIcon).isFalse()
         assertThat(actual.unreadCount).isEqualTo(5)
         assertThat(actual.isMuted).isTrue()
         assertThat(actual.highlight).isTrue()
@@ -90,7 +93,7 @@ class ChatRoomUiItemMapperTest {
     }
 
     @Test
-    fun `test that invoke maps the scheduled timestamp when the meeting is pending`() {
+    fun `test that invoke maps a one-off pending meeting to a one-off pending meeting decoration`() {
         val item = ChatRoomItem.MeetingChatRoomItem(
             chatId = 4L,
             title = "Weekly sync",
@@ -101,22 +104,80 @@ class ChatRoomUiItemMapperTest {
         val actual = underTest(item)
 
         assertThat(actual.avatar).isEqualTo(ChatRoomUiAvatar.Meeting)
-        assertThat(actual.scheduledTimestampFormatted).isEqualTo("10:00am - 11:00am")
+        assertThat(actual.pendingMeeting)
+            .isEqualTo(ChatRoomUiItem.PendingMeeting.OneOff("10:00am - 11:00am"))
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideRecurrences")
+    fun `test that invoke maps a recurring pending meeting to a recurring pending meeting decoration`(
+        item: ChatRoomItem.MeetingChatRoomItem,
+        expected: ChatRoomUiItem.PendingMeeting.Recurrence,
+    ) {
+        val actual = underTest(item)
+
+        assertThat(actual.pendingMeeting).isEqualTo(
+            ChatRoomUiItem.PendingMeeting.Recurring("10:00am - 11:00am", expected)
+        )
+        assertThat(actual.showRecurringIcon).isTrue()
     }
 
     @Test
-    fun `test that invoke maps a null scheduled timestamp when the meeting is cancelled`() {
+    fun `test that invoke maps a null pending meeting when the meeting is cancelled`() {
         val item = ChatRoomItem.MeetingChatRoomItem(
             chatId = 4L,
             title = "Weekly sync",
             isPending = true,
             isCancelled = true,
+            isRecurringWeekly = true,
             scheduledTimestampFormatted = "10:00am - 11:00am",
         )
 
         val actual = underTest(item)
 
-        assertThat(actual.scheduledTimestampFormatted).isNull()
+        assertThat(actual.pendingMeeting).isNull()
+        assertThat(actual.showRecurringIcon).isFalse()
+    }
+
+    @Test
+    fun `test that invoke maps the recurring icon for a non-pending recurring meeting`() {
+        val item = ChatRoomItem.MeetingChatRoomItem(
+            chatId = 4L,
+            title = "Weekly sync",
+            isPending = false,
+            isRecurringWeekly = true,
+        )
+
+        val actual = underTest(item)
+
+        assertThat(actual.showRecurringIcon).isTrue()
+        assertThat(actual.pendingMeeting).isNull()
+    }
+
+    @Test
+    fun `test that invoke maps the section header of a meeting`() {
+        val item = ChatRoomItem.MeetingChatRoomItem(
+            chatId = 4L,
+            title = "Weekly sync",
+            header = "Today",
+        )
+
+        val actual = underTest(item)
+
+        assertThat(actual.header).isEqualTo("Today")
+    }
+
+    @Test
+    fun `test that invoke maps a blank section header to null`() {
+        val item = ChatRoomItem.MeetingChatRoomItem(
+            chatId = 4L,
+            title = "Weekly sync",
+            header = " ",
+        )
+
+        val actual = underTest(item)
+
+        assertThat(actual.header).isNull()
     }
 
     @Test
@@ -235,6 +296,39 @@ class ChatRoomUiItemMapperTest {
         Arguments.of(UserChatStatus.Busy, ContactItemStatus.Busy),
         Arguments.of(UserChatStatus.Offline, ContactItemStatus.Offline),
         Arguments.of(UserChatStatus.Invalid, ContactItemStatus.Unknown),
+    )
+
+    private fun provideRecurrences(): Stream<Arguments> = Stream.of(
+        Arguments.of(
+            ChatRoomItem.MeetingChatRoomItem(
+                chatId = 4L,
+                title = "Weekly sync",
+                isPending = true,
+                isRecurringDaily = true,
+                scheduledTimestampFormatted = "10:00am - 11:00am",
+            ),
+            ChatRoomUiItem.PendingMeeting.Recurrence.Daily,
+        ),
+        Arguments.of(
+            ChatRoomItem.MeetingChatRoomItem(
+                chatId = 4L,
+                title = "Weekly sync",
+                isPending = true,
+                isRecurringWeekly = true,
+                scheduledTimestampFormatted = "10:00am - 11:00am",
+            ),
+            ChatRoomUiItem.PendingMeeting.Recurrence.Weekly,
+        ),
+        Arguments.of(
+            ChatRoomItem.MeetingChatRoomItem(
+                chatId = 4L,
+                title = "Weekly sync",
+                isPending = true,
+                isRecurringMonthly = true,
+                scheduledTimestampFormatted = "10:00am - 11:00am",
+            ),
+            ChatRoomUiItem.PendingMeeting.Recurrence.Monthly,
+        ),
     )
 
     private fun provideCallStatuses(): Stream<Arguments> = Stream.of(

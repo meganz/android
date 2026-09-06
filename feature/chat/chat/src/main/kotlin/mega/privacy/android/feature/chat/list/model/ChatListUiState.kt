@@ -18,9 +18,15 @@ sealed interface ChatListUiState {
      *
      * @property chats Content of the Chats tab, already reflecting the active search query.
      * @property meetings Content of the Meetings tab, already reflecting the active search query.
+     * @property chatsHaveUnread Whether the Chats tab has any unread chat room, driving its tab
+     * badge. Independent of the active search query.
+     * @property meetingsHaveUnread Whether the Meetings tab has any unread meeting, driving its tab
+     * badge. Independent of the active search query.
      */
     data class Data(
         val chats: ChatListTabState,
         val meetings: ChatListTabState,
+        val chatsHaveUnread: Boolean,
+        val meetingsHaveUnread: Boolean,
     ) : ChatListUiState
 }

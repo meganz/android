@@ -94,6 +94,19 @@ internal fun ChatRoomItemView(
                             .testTag(CHAT_ROOM_ITEM_MUTE_TAG),
                     )
                 }
+                if (item.showRecurringIcon) {
+                    MegaIcon(
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.RotateCw),
+                        tint = IconColor.Secondary,
+                        contentDescription = stringResource(
+                            sharedR.string.meetings_list_recurring_meeting_label
+                        ),
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .size(16.dp)
+                            .testTag(CHAT_ROOM_ITEM_RECURRING_TAG),
+                    )
+                }
                 if (item.hasOngoingCall) {
                     MegaIcon(
                         painter = rememberVectorPainter(IconPack.Medium.Thin.Solid.Phone01),
@@ -110,26 +123,30 @@ internal fun ChatRoomItemView(
             }
         },
         subtitle = {
-            val message = item.scheduledTimestampFormatted ?: item.lastMessage
-            message?.let {
-                MegaText(
-                    text = it,
-                    textColor = if (item.highlight) TextColor.Accent else TextColor.Secondary,
-                    style = AppTheme.typography.bodyMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.testTag(CHAT_ROOM_ITEM_MESSAGE_TAG),
-                )
-            }
-            item.lastTimestampFormatted?.let {
-                MegaText(
-                    text = it,
-                    textColor = TextColor.Secondary,
-                    style = AppTheme.typography.bodySmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.testTag(CHAT_ROOM_ITEM_TIMESTAMP_TAG),
-                )
+            val pendingMeeting = item.pendingMeeting
+            if (pendingMeeting != null) {
+                PendingMeetingSubtitle(item = item, pendingMeeting = pendingMeeting)
+            } else {
+                item.lastMessage?.let {
+                    MegaText(
+                        text = it,
+                        textColor = if (item.highlight) TextColor.Accent else TextColor.Secondary,
+                        style = AppTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.testTag(CHAT_ROOM_ITEM_MESSAGE_TAG),
+                    )
+                }
+                item.lastTimestampFormatted?.let {
+                    MegaText(
+                        text = it,
+                        textColor = TextColor.Secondary,
+                        style = AppTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.testTag(CHAT_ROOM_ITEM_TIMESTAMP_TAG),
+                    )
+                }
             }
         },
         trailingElement = {
@@ -157,6 +174,65 @@ internal fun ChatRoomItemView(
         },
         onLongClickListener = onItemLongClick?.let { { it(item.chatId) } },
     )
+}
+
+@Composable
+private fun PendingMeetingSubtitle(
+    item: ChatRoomUiItem,
+    pendingMeeting: ChatRoomUiItem.PendingMeeting,
+) {
+    val scheduleLabel = pendingMeeting.scheduledTime?.let { time ->
+        when (pendingMeeting) {
+            is ChatRoomUiItem.PendingMeeting.Recurring -> stringResource(
+                when (pendingMeeting.recurrence) {
+                    ChatRoomUiItem.PendingMeeting.Recurrence.Daily ->
+                        sharedR.string.meetings_list_scheduled_meeting_daily_label
+
+                    ChatRoomUiItem.PendingMeeting.Recurrence.Weekly ->
+                        sharedR.string.meetings_list_scheduled_meeting_weekly_label
+
+                    ChatRoomUiItem.PendingMeeting.Recurrence.Monthly ->
+                        sharedR.string.meetings_list_scheduled_meeting_monthly_label
+                },
+                time,
+            )
+
+            is ChatRoomUiItem.PendingMeeting.OneOff -> time
+        }
+    } ?: item.lastMessage
+    scheduleLabel?.let {
+        MegaText(
+            text = it,
+            textColor = TextColor.Secondary,
+            style = AppTheme.typography.bodyMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.testTag(CHAT_ROOM_ITEM_MESSAGE_TAG),
+        )
+    }
+    val bottomLabel = if (item.highlight) {
+        item.lastMessage
+    } else {
+        stringResource(
+            when (pendingMeeting) {
+                is ChatRoomUiItem.PendingMeeting.Recurring ->
+                    sharedR.string.meetings_list_recurring_meeting_label
+
+                is ChatRoomUiItem.PendingMeeting.OneOff ->
+                    sharedR.string.meetings_list_upcoming_meeting_label
+            }
+        )
+    }
+    bottomLabel?.let {
+        MegaText(
+            text = it,
+            textColor = if (item.highlight) TextColor.Accent else TextColor.Secondary,
+            style = AppTheme.typography.bodySmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.testTag(CHAT_ROOM_ITEM_TIMESTAMP_TAG),
+        )
+    }
 }
 
 @Composable
@@ -242,6 +318,7 @@ internal const val CHAT_ROOM_ITEM_AVATAR_TAG = "chat_room_item:avatar"
 internal const val CHAT_ROOM_ITEM_STATUS_TAG = "chat_room_item:status_dot"
 internal const val CHAT_ROOM_ITEM_TITLE_TAG = "chat_room_item:title"
 internal const val CHAT_ROOM_ITEM_MUTE_TAG = "chat_room_item:mute_icon"
+internal const val CHAT_ROOM_ITEM_RECURRING_TAG = "chat_room_item:recurring_icon"
 internal const val CHAT_ROOM_ITEM_CALL_TAG = "chat_room_item:call_indicator"
 internal const val CHAT_ROOM_ITEM_MESSAGE_TAG = "chat_room_item:last_message"
 internal const val CHAT_ROOM_ITEM_TIMESTAMP_TAG = "chat_room_item:timestamp"
@@ -284,7 +361,9 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
             title = "Mieko Kawakami",
             lastMessage = "See you tomorrow!",
             lastTimestampFormatted = "Today 14:25",
-            scheduledTimestampFormatted = null,
+            header = null,
+            pendingMeeting = null,
+            showRecurringIcon = false,
             unreadCount = 5,
             isMuted = false,
             highlight = true,
@@ -302,7 +381,9 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
             title = "Recipe test #14",
             lastMessage = "Anna: Seeya all soon!",
             lastTimestampFormatted = "1 May 2022 17:53",
-            scheduledTimestampFormatted = null,
+            header = null,
+            pendingMeeting = null,
+            showRecurringIcon = false,
             unreadCount = 150,
             isMuted = true,
             highlight = false,
@@ -316,7 +397,12 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
             title = "Weekly sync",
             lastMessage = null,
             lastTimestampFormatted = "1 May 2022 17:53",
-            scheduledTimestampFormatted = "10:00am - 11:00am",
+            header = "Today",
+            pendingMeeting = ChatRoomUiItem.PendingMeeting.Recurring(
+                scheduledTime = "10:00am - 11:00am",
+                recurrence = ChatRoomUiItem.PendingMeeting.Recurrence.Weekly,
+            ),
+            showRecurringIcon = true,
             unreadCount = 0,
             isMuted = false,
             highlight = false,
@@ -330,7 +416,9 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
             title = "Note to self",
             lastMessage = "Remember the keys",
             lastTimestampFormatted = "Monday 14:25",
-            scheduledTimestampFormatted = null,
+            header = null,
+            pendingMeeting = null,
+            showRecurringIcon = false,
             unreadCount = 0,
             isMuted = false,
             highlight = false,

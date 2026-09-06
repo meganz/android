@@ -57,6 +57,8 @@ internal class ChatListViewModel @Inject constructor(
             ChatListUiState.Data(
                 chats = tabState(chats, query),
                 meetings = tabState(meetings, query),
+                chatsHaveUnread = chats.anyUnread(),
+                meetingsHaveUnread = meetings.anyUnread(),
             )
         }.catch { e ->
             Timber.e(e, "Failed to load chat list")
@@ -143,7 +145,7 @@ internal class ChatListViewModel @Inject constructor(
             lastMessage = chatLastMessageFormatter::invoke,
             lastTimeMapper = chatRoomTimestampMapper::getLastTimeFormatted,
             meetingTimeMapper = chatRoomTimestampMapper::getMeetingTimeFormatted,
-            headerTimeMapper = { _, _ -> null },
+            headerTimeMapper = chatRoomTimestampMapper::getHeaderTimeFormatted,
         ).map { items ->
             items.map(chatRoomUiItemMapper::invoke).toImmutableList()
         }.catch { e ->
@@ -173,4 +175,6 @@ internal class ChatListViewModel @Inject constructor(
     private fun ChatRoomUiItem.matches(query: String): Boolean =
         title.contains(query, ignoreCase = true)
                 || lastMessage?.contains(query, ignoreCase = true) == true
+
+    private fun List<ChatRoomUiItem>.anyUnread(): Boolean = any { it.unreadCount > 0 }
 }
