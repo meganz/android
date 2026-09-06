@@ -2,12 +2,17 @@ package mega.privacy.android.feature.chat.list.formatter
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.core.formatter.emoji.EmojiShortcodeConverter
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
+import mega.privacy.android.domain.entity.chat.ContainsMetaType
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatListItemUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
@@ -27,7 +32,24 @@ import javax.inject.Inject
  *
  * The dispatch in [invoke] is keyed by [ChatListItem.lastMessageType]: each
  * message family is a dedicated branch, and any type without a dedicated branch
- * falls back to the raw last-message text so previews never regress.
+ * falls back to the genuine-unknown handling (blank content becomes the
+ * "unrecognizable" string; otherwise the emoji-converted content, prefixed with
+ * the sender in group chats) so previews never regress.
+ *
+ * Attachment families (node attachments, contact attachments and voice clips)
+ * are sender-prefixed and reproduce the legacy chat-list wording: a node
+ * attachment shows the first attached node's name, a contact attachment shows the
+ * "contacts sent" count, and a voice clip shows the clip duration read from the
+ * attached [AudioFileTypeInfo] and rendered as `m:ss`.
+ *
+ * Contains-meta messages (rich previews, geolocations and giphys) resolve their
+ * preview text from [ChatMessage.containsMeta], matching the legacy meta wording.
+ *
+ * Identity look-ups ([GetMyUserHandleUseCase] and [GetMyFullNameUseCase]) are
+ * memoised per formatter instance: each wraps a cheap SDK read in a dispatcher
+ * hop, and both are read once per formatted row. Caching a single successful,
+ * non-null result avoids repeating that hop; the instance is unscoped and
+ * recreated on account switch, so the cache never outlives the signed-in user.
  *
  * Management-message families (participant changes, privilege changes, title
  * changes, history truncation, retention time, and chat-link/private-mode
@@ -54,6 +76,10 @@ internal class ChatLastMessageFormatter @Inject constructor(
     private val emojiShortcodeConverter: EmojiShortcodeConverter,
 ) {
 
+    private val identityMutex = Mutex()
+    private var cachedMyHandle: Long? = null
+    private var cachedMyFullName: String? = null
+
     /**
      * Format the last-message preview for the given chat.
      *
@@ -79,7 +105,12 @@ internal class ChatLastMessageFormatter @Inject constructor(
             ChatRoomLastMessage.CallEnded -> callEndedPreview(item)
             ChatRoomLastMessage.SchedMeeting -> scheduledMeetingPreview(item)
 
-            else -> item.lastMessage
+            ChatRoomLastMessage.NodeAttachment -> nodeAttachmentPreview(item)
+            ChatRoomLastMessage.ContactAttachment -> contactAttachmentPreview(item)
+            ChatRoomLastMessage.VoiceClip -> voiceClipPreview(item)
+            ChatRoomLastMessage.ContainsMeta -> containsMetaPreview(item)
+
+            else -> unknownTypePreview(item)
         }
     }
 
@@ -232,6 +263,65 @@ internal class ChatLastMessageFormatter @Inject constructor(
             )
         )
 
+    private suspend fun nodeAttachmentPreview(item: ChatListItem): String {
+        val message = getChatMessageUseCase(item.chatId, item.lastMessageId) ?: return item.lastMessage
+        val nodeName = message.nodeList.firstOrNull()?.name
+        val content = nodeName?.takeIf { it.isNotBlank() }
+            ?: emojiShortcodeConverter.convert(item.lastMessage)
+        return "${senderPrefix(item)}: $content"
+    }
+
+    private suspend fun contactAttachmentPreview(item: ChatListItem): String {
+        val message = getChatMessageUseCase(item.chatId, item.lastMessageId) ?: return item.lastMessage
+        val content = emojiShortcodeConverter.convert(
+            context.getString(sharedR.string.contacts_sent, message.usersCount.toString())
+        )
+        return "${senderPrefix(item)}: $content"
+    }
+
+    private suspend fun voiceClipPreview(item: ChatListItem): String {
+        val message = getChatMessageUseCase(item.chatId, item.lastMessageId) ?: return item.lastMessage
+        val duration = (message.nodeList.firstOrNull() as? FileNode)
+            ?.type?.let { it as? AudioFileTypeInfo }
+            ?.duration
+        val content = duration?.let(::voiceClipDuration) ?: VOICE_CLIP_NO_DURATION
+        return "${senderPrefix(item)}: $content"
+    }
+
+    private suspend fun containsMetaPreview(item: ChatListItem): String {
+        val message = getChatMessageUseCase(item.chatId, item.lastMessageId) ?: return item.lastMessage
+        val meta = message.containsMeta
+        val content = when (meta?.type) {
+            ContainsMetaType.RICH_PREVIEW -> meta.textMessage
+            ContainsMetaType.GEOLOCATION ->
+                context.getString(sharedR.string.title_geolocation_message)
+
+            ContainsMetaType.GIPHY -> meta.giphy?.title.orEmpty()
+            else -> return item.lastMessage
+        }
+        return "${senderPrefix(item)}: $content"
+    }
+
+    private suspend fun unknownTypePreview(item: ChatListItem): String {
+        if (item.lastMessage.isBlank()) {
+            return context.getString(sharedR.string.error_message_unrecognizable)
+        }
+        val content = emojiShortcodeConverter.convert(item.lastMessage)
+        return if (item.isGroup) "${senderPrefix(item)}: $content" else content
+    }
+
+    private fun voiceClipDuration(duration: Duration): String =
+        duration.toComponents { hours, minutes, seconds, _ ->
+            val minutesString = if (minutes < 10) "0$minutes" else "$minutes"
+            val secondsString = if (seconds < 10) "0$seconds" else "$seconds"
+            val hoursString = when {
+                hours <= 0L -> ""
+                hours < 10L -> "0$hours:"
+                else -> "$hours:"
+            }
+            "$hoursString$minutesString:$secondsString"
+        }
+
     private suspend fun callUnansweredOrMissed(senderHandle: Long, selfString: Int): String {
         val resId = if (senderHandle == myHandle()) {
             selfString
@@ -335,8 +425,7 @@ internal class ChatLastMessageFormatter @Inject constructor(
 
     private suspend fun resolveName(handle: Long, chatId: Long): String =
         if (handle == myHandle()) {
-            runCatching { getMyFullNameUseCase() }.getOrNull()?.takeIf { it.isNotBlank() }
-                ?: context.getString(sharedR.string.chat_last_message_sender_me)
+            myFullName() ?: context.getString(sharedR.string.chat_last_message_sender_me)
         } else {
             runCatching { getMessageSenderNameUseCase(handle, chatId) }
                 .getOrNull()?.takeIf { it.isNotBlank() }
@@ -345,20 +434,29 @@ internal class ChatLastMessageFormatter @Inject constructor(
 
     private suspend fun senderPrefix(item: ChatListItem): String =
         if (item.lastMessageSender == myHandle()) {
-            runCatching { getMyFullNameUseCase() }.getOrNull()?.takeIf { it.isNotBlank() }
-                ?: context.getString(sharedR.string.chat_last_message_sender_me)
+            myFullName() ?: context.getString(sharedR.string.chat_last_message_sender_me)
         } else {
             runCatching { getMessageSenderNameUseCase(item.lastMessageSender, item.chatId) }
                 .getOrNull()?.takeIf { it.isNotBlank() }
                 ?: context.getString(sharedR.string.chat_last_message_sender_unknown)
         }
 
-    private suspend fun myHandle(): Long? = runCatching { getMyUserHandleUseCase() }.getOrNull()
+    private suspend fun myHandle(): Long? = identityMutex.withLock {
+        cachedMyHandle ?: runCatching { getMyUserHandleUseCase() }.getOrNull()
+            ?.also { cachedMyHandle = it }
+    }
+
+    private suspend fun myFullName(): String? = identityMutex.withLock {
+        cachedMyFullName ?: runCatching { getMyFullNameUseCase() }.getOrNull()
+            ?.takeIf { it.isNotBlank() }
+            ?.also { cachedMyFullName = it }
+    }
 
     private fun noHistoryPreview(): String =
         context.getString(sharedR.string.chat_last_message_no_history)
 
     private companion object {
+        const val VOICE_CLIP_NO_DURATION = "--:--"
         const val SECONDS_IN_MINUTE = 60L
         const val SECONDS_IN_HOUR = SECONDS_IN_MINUTE * 60
         const val SECONDS_IN_DAY = SECONDS_IN_HOUR * 24

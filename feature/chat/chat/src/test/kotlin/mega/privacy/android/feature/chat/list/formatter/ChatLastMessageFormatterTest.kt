@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.formatter.emoji.EmojiShortcodeConverter
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatListItem
@@ -15,6 +16,11 @@ import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.chat.ContainsMeta
+import mega.privacy.android.domain.entity.chat.ContainsMetaType
+import mega.privacy.android.domain.entity.chat.Giphy
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatListItemUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
@@ -34,6 +40,8 @@ import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -217,16 +225,223 @@ class ChatLastMessageFormatterTest {
         }
 
     @Test
-    fun `test that invoke returns the raw last message for a not yet implemented type`() = runTest {
+    fun `test that invoke returns the unrecognizable string when an unknown type has blank content`() =
+        runTest {
+            whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+                chatId = CHAT_ID,
+                lastMessage = "   ",
+                lastMessageType = ChatRoomLastMessage.RevokeNodeAttachment,
+                isGroup = true,
+            )
+
+            assertThat(underTest(CHAT_ID)).isEqualTo(
+                context.getString(sharedR.string.error_message_unrecognizable)
+            )
+        }
+
+    @Test
+    fun `test that invoke prefixes an unknown group type with the sender and converted content`() =
+        runTest {
+            whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+                chatId = CHAT_ID,
+                lastMessage = "Some :smile: text",
+                lastMessageType = ChatRoomLastMessage.RevokeNodeAttachment,
+                lastMessageSender = SENDER_HANDLE,
+                isGroup = true,
+            )
+            whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+            whenever(getMessageSenderNameUseCase(SENDER_HANDLE, CHAT_ID)) doReturn "Alice"
+            whenever(emojiShortcodeConverter.convert("Some :smile: text")) doReturn "Some 😄 text"
+
+            assertThat(underTest(CHAT_ID)).isEqualTo("Alice: Some 😄 text")
+        }
+
+    @Test
+    fun `test that invoke returns the converted content without a prefix for an unknown one to one type`() =
+        runTest {
+            whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+                chatId = CHAT_ID,
+                lastMessage = "Some text",
+                lastMessageType = ChatRoomLastMessage.RevokeNodeAttachment,
+                isGroup = false,
+            )
+
+            assertThat(underTest(CHAT_ID)).isEqualTo("Some text")
+        }
+
+    @Test
+    fun `test that invoke formats a node attachment with the first node name`() = runTest {
+        val node = nodeWithName("holiday.jpg")
         whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
             chatId = CHAT_ID,
-            lastMessage = "raw contact attachment text",
-            lastMessageType = ChatRoomLastMessage.ContactAttachment,
+            lastMessage = "raw text",
+            lastMessageId = MESSAGE_ID,
+            lastMessageType = ChatRoomLastMessage.NodeAttachment,
+            lastMessageSender = SENDER_HANDLE,
             isGroup = true,
         )
+        whenever(getChatMessageUseCase(CHAT_ID, MESSAGE_ID)) doReturn managementMessage(
+            userHandle = SENDER_HANDLE,
+        ).copy(nodeList = listOf(node))
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(SENDER_HANDLE, CHAT_ID)) doReturn "Alice"
 
-        assertThat(underTest(CHAT_ID)).isEqualTo("raw contact attachment text")
+        assertThat(underTest(CHAT_ID)).isEqualTo("Alice: holiday.jpg")
     }
+
+    @Test
+    fun `test that invoke falls back to the converted last message for a node attachment without nodes`() =
+        runTest {
+            whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+                chatId = CHAT_ID,
+                lastMessage = "attachment :smile:",
+                lastMessageId = MESSAGE_ID,
+                lastMessageType = ChatRoomLastMessage.NodeAttachment,
+                lastMessageSender = SENDER_HANDLE,
+                isGroup = true,
+            )
+            whenever(getChatMessageUseCase(CHAT_ID, MESSAGE_ID)) doReturn managementMessage(
+                userHandle = SENDER_HANDLE,
+            )
+            whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+            whenever(getMessageSenderNameUseCase(SENDER_HANDLE, CHAT_ID)) doReturn "Alice"
+            whenever(emojiShortcodeConverter.convert("attachment :smile:")) doReturn "attachment 😄"
+
+            assertThat(underTest(CHAT_ID)).isEqualTo("Alice: attachment 😄")
+        }
+
+    @Test
+    fun `test that invoke formats a contact attachment with the users count`() = runTest {
+        whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+            chatId = CHAT_ID,
+            lastMessage = "raw text",
+            lastMessageId = MESSAGE_ID,
+            lastMessageType = ChatRoomLastMessage.ContactAttachment,
+            lastMessageSender = SENDER_HANDLE,
+            isGroup = true,
+        )
+        whenever(getChatMessageUseCase(CHAT_ID, MESSAGE_ID)) doReturn managementMessage(
+            userHandle = SENDER_HANDLE,
+        ).copy(usersCount = 3L)
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(SENDER_HANDLE, CHAT_ID)) doReturn "Alice"
+
+        assertThat(underTest(CHAT_ID)).isEqualTo(
+            "Alice: " + context.getString(sharedR.string.contacts_sent, "3")
+        )
+    }
+
+    @Test
+    fun `test that invoke formats a voice clip with its duration`() = runTest {
+        val node = voiceClipNode(1.minutes + 3.seconds)
+        whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+            chatId = CHAT_ID,
+            lastMessage = "raw text",
+            lastMessageId = MESSAGE_ID,
+            lastMessageType = ChatRoomLastMessage.VoiceClip,
+            lastMessageSender = SENDER_HANDLE,
+            isGroup = true,
+        )
+        whenever(getChatMessageUseCase(CHAT_ID, MESSAGE_ID)) doReturn managementMessage(
+            userHandle = SENDER_HANDLE,
+        ).copy(nodeList = listOf(node))
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(SENDER_HANDLE, CHAT_ID)) doReturn "Alice"
+
+        assertThat(underTest(CHAT_ID)).isEqualTo("Alice: 01:03")
+    }
+
+    @Test
+    fun `test that invoke falls back to a placeholder duration for a voice clip without audio info`() =
+        runTest {
+            whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+                chatId = CHAT_ID,
+                lastMessage = "raw text",
+                lastMessageId = MESSAGE_ID,
+                lastMessageType = ChatRoomLastMessage.VoiceClip,
+                lastMessageSender = SENDER_HANDLE,
+                isGroup = true,
+            )
+            whenever(getChatMessageUseCase(CHAT_ID, MESSAGE_ID)) doReturn managementMessage(
+                userHandle = SENDER_HANDLE,
+            )
+            whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+            whenever(getMessageSenderNameUseCase(SENDER_HANDLE, CHAT_ID)) doReturn "Alice"
+
+            assertThat(underTest(CHAT_ID)).isEqualTo("Alice: --:--")
+        }
+
+    @Test
+    fun `test that invoke formats a rich preview meta message with its text`() = runTest {
+        stubMetaMessage(
+            containsMeta(type = ContainsMetaType.RICH_PREVIEW, textMessage = "https://mega.io"),
+        )
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(SENDER_HANDLE, CHAT_ID)) doReturn "Alice"
+
+        assertThat(underTest(CHAT_ID)).isEqualTo("Alice: https://mega.io")
+    }
+
+    @Test
+    fun `test that invoke formats a geolocation meta message`() = runTest {
+        stubMetaMessage(containsMeta(type = ContainsMetaType.GEOLOCATION))
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(SENDER_HANDLE, CHAT_ID)) doReturn "Alice"
+
+        assertThat(underTest(CHAT_ID)).isEqualTo(
+            "Alice: " + context.getString(sharedR.string.title_geolocation_message)
+        )
+    }
+
+    @Test
+    fun `test that invoke formats a giphy meta message with its title`() = runTest {
+        stubMetaMessage(
+            containsMeta(
+                type = ContainsMetaType.GIPHY,
+                giphy = giphy(title = "Happy Friday"),
+            ),
+        )
+        whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+        whenever(getMessageSenderNameUseCase(SENDER_HANDLE, CHAT_ID)) doReturn "Alice"
+
+        assertThat(underTest(CHAT_ID)).isEqualTo("Alice: Happy Friday")
+    }
+
+    @Test
+    fun `test that invoke falls back to the raw message for a meta message without meta`() = runTest {
+        whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+            chatId = CHAT_ID,
+            lastMessage = "raw text",
+            lastMessageId = MESSAGE_ID,
+            lastMessageType = ChatRoomLastMessage.ContainsMeta,
+            lastMessageSender = SENDER_HANDLE,
+            isGroup = true,
+        )
+        whenever(getChatMessageUseCase(CHAT_ID, MESSAGE_ID)) doReturn managementMessage(
+            userHandle = SENDER_HANDLE,
+        )
+
+        assertThat(underTest(CHAT_ID)).isEqualTo("raw text")
+    }
+
+    @Test
+    fun `test that invoke resolves the identity use cases at most once across multiple invocations`() =
+        runTest {
+            whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+                chatId = CHAT_ID,
+                lastMessage = "Hello there",
+                lastMessageType = ChatRoomLastMessage.Normal,
+                lastMessageSender = MY_HANDLE,
+                isGroup = true,
+            )
+            whenever(getMyUserHandleUseCase()) doReturn MY_HANDLE
+            whenever(getMyFullNameUseCase()) doReturn "My Name"
+
+            repeat(3) { assertThat(underTest(CHAT_ID)).isEqualTo("My Name: Hello there") }
+
+            verify(getMyUserHandleUseCase, times(1))()
+            verify(getMyFullNameUseCase, times(1))()
+        }
 
     @Test
     fun `test that invoke falls back to the raw message when the management message cannot be resolved`() =
@@ -726,6 +941,54 @@ class ChatLastMessageFormatterTest {
         text.replace("[A]", "").replace("[/A]", "")
             .replace("[B]", "").replace("[/B]", "")
             .replace("[C]", "").replace("[/C]", "")
+
+    private suspend fun stubMetaMessage(meta: ContainsMeta) {
+        whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
+            chatId = CHAT_ID,
+            lastMessage = "raw text",
+            lastMessageId = MESSAGE_ID,
+            lastMessageType = ChatRoomLastMessage.ContainsMeta,
+            lastMessageSender = SENDER_HANDLE,
+            isGroup = true,
+        )
+        whenever(getChatMessageUseCase(CHAT_ID, MESSAGE_ID)) doReturn managementMessage(
+            userHandle = SENDER_HANDLE,
+        ).copy(containsMeta = meta)
+    }
+
+    private fun nodeWithName(name: String): Node = mock {
+        on { this.name } doReturn name
+    }
+
+    private fun voiceClipNode(duration: Duration): FileNode = mock {
+        on { type } doReturn AudioFileTypeInfo(
+            mimeType = "audio/mp4",
+            extension = "m4a",
+            duration = duration,
+        )
+    }
+
+    private fun containsMeta(
+        type: ContainsMetaType,
+        textMessage: String = "",
+        giphy: Giphy? = null,
+    ) = ContainsMeta(
+        type = type,
+        textMessage = textMessage,
+        richPreview = null,
+        geolocation = null,
+        giphy = giphy,
+    )
+
+    private fun giphy(title: String) = Giphy(
+        mp4Src = null,
+        webpSrc = null,
+        title = title,
+        mp4Size = 0,
+        webpSize = 0,
+        width = 0,
+        height = 0,
+    )
 
     private suspend fun stubManagementMessage(type: ChatRoomLastMessage, message: ChatMessage) {
         whenever(getChatListItemUseCase(CHAT_ID)) doReturn ChatListItem(
