@@ -14,6 +14,7 @@ lint/bin/
 
 ### Android Studio files ###
 *.iml
+.idea/.name
 .idea/assetWizardSettings.xml
 .idea/modules.xml
 .idea/jarRepositories.xml
