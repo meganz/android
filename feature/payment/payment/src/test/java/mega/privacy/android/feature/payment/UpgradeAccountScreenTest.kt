@@ -6,6 +6,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEqualTo
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -57,6 +58,7 @@ import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_LAZY_C
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_MONTHLY_CHIP
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_OFFER_EXPIRED_DIALOG
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_OFFER_HEADER_BADGE
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_OFFER_HEADER_CAMPAIGN
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_REVAMP_PLAN_CARD
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_REVAMP_TITLE
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_REVAMP_UPGRADE_HINT
@@ -218,6 +220,16 @@ class UpgradeAccountScreenTest {
 
     private val singleOfferSubscriptionsList = listOf(
         subscriptionProIOffer,
+        subscriptionProII,
+        subscriptionProIII,
+    )
+
+    private val subscriptionProIYearlyOnlyOffer = subscriptionProIOffer.copy(
+        monthlySubscription = subscriptionProIMonthly,
+    )
+
+    private val yearlyOnlyOfferSubscriptionsList = listOf(
+        subscriptionProIYearlyOnlyOffer,
         subscriptionProII,
         subscriptionProIII,
     )
@@ -911,6 +923,80 @@ class UpgradeAccountScreenTest {
         composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
             .performScrollToNode(hasTestTag("${TEST_TAG_REVAMP_PLAN_CARD}2"))
             .assertExists()
+    }
+
+    @Test
+    fun `test that single offer keeps the discounted card on top when switching to monthly without a monthly discount`() {
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            uiState = offerUiState(subscriptions = yearlyOnlyOfferSubscriptionsList),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_BILLING_PERIOD_MONTHLY))
+        composeRule.onNodeWithTag(TEST_TAG_BILLING_PERIOD_MONTHLY).performClick()
+
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_TITLE).assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_OFFER_HEADER_BADGE))
+            .assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_OFFER_PRICE_CARD))
+            .assertExists()
+    }
+
+    @Test
+    fun `test that the featured card buys the discounted yearly plan when monthly is selected`() {
+        var clickedSubscription: Subscription? = null
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            onBuyPlanClick = { clickedSubscription = it },
+            uiState = offerUiState(subscriptions = yearlyOnlyOfferSubscriptionsList),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_BILLING_PERIOD_MONTHLY))
+        composeRule.onNodeWithTag(TEST_TAG_BILLING_PERIOD_MONTHLY).performClick()
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_OFFER_PRICE_CARD_BUTTON))
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_PRICE_CARD_BUTTON).performClick()
+
+        assertThat(clickedSubscription)
+            .isEqualTo(subscriptionProIYearlyOnlyOffer.yearlySubscription)
+    }
+
+    @Test
+    fun `test that the offer plan is listed for the selected period when its offer is for the other period`() {
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            uiState = offerUiState(subscriptions = yearlyOnlyOfferSubscriptionsList),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_BILLING_PERIOD_MONTHLY))
+        composeRule.onNodeWithTag(TEST_TAG_BILLING_PERIOD_MONTHLY).performClick()
+
+        // Pro I is featured as the discounted yearly offer, so its monthly plan stays buyable below.
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag("${TEST_TAG_REVAMP_PLAN_CARD}2"))
+            .assertExists()
+    }
+
+    @Test
+    fun `test that single offer campaign name is kept when the selected period has no discount`() {
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            uiState = offerUiState(subscriptions = yearlyOnlyOfferSubscriptionsList),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_BILLING_PERIOD_MONTHLY))
+        composeRule.onNodeWithTag(TEST_TAG_BILLING_PERIOD_MONTHLY).performClick()
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_OFFER_HEADER_CAMPAIGN))
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_HEADER_CAMPAIGN)
+            .assertTextContains("Black Friday: 50% off")
     }
 
     private fun offerUiState(

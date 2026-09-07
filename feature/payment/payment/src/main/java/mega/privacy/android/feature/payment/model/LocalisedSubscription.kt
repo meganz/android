@@ -128,6 +128,9 @@ data class LocalisedSubscription(
         get() = monthlySubscription?.discountedAmountMonthly != null ||
                 yearlySubscription?.discountedAmountMonthly != null
 
+    fun hasDiscountFor(isMonthly: Boolean): Boolean =
+        getSubscription(isMonthly)?.discountedAmountMonthly != null
+
     /**
      * Get subscription for the given period. Returns null if not available for that period.
      */

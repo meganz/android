@@ -116,6 +116,80 @@ class UpgradeAccountOfferHighlightTest {
     }
 
     @Test
+    fun `test that offerHighlight is Single for both periods when only the yearly plan is discounted`() {
+        val discounted = subscription(
+            AccountType.PRO_I,
+            discountedMonthly = false,
+            discountedYearly = true,
+        )
+        val state = state(discounted, subscription(AccountType.PRO_II, discounted = false))
+
+        assertThat(state.offerHighlight(isMonthly = false, isUpgradeAccount = false))
+            .isEqualTo(OfferHighlight.Single(discounted))
+        // Single persists across periods so the offer stays featured on the monthly tab too.
+        assertThat(state.offerHighlight(isMonthly = true, isUpgradeAccount = false))
+            .isEqualTo(OfferHighlight.Single(discounted))
+    }
+
+    @Test
+    fun `test that offerHighlight is Single on the monthly period when the discounted plan is yearly only`() {
+        val yearlyOnly = subscription(
+            AccountType.PRO_I,
+            discountedMonthly = false,
+            discountedYearly = true,
+        ).copy(monthlySubscription = null)
+        val state = state(yearlyOnly, subscription(AccountType.PRO_II, discounted = false))
+
+        assertThat(state.offerHighlight(isMonthly = true, isUpgradeAccount = false))
+            .isEqualTo(OfferHighlight.Single(yearlyOnly))
+    }
+
+    @Test
+    fun `test that offerPeriodIsMonthly keeps the offer period when the selected period has no discount`() {
+        val yearlyDiscounted = subscription(
+            AccountType.PRO_I,
+            discountedMonthly = false,
+            discountedYearly = true,
+        )
+
+        assertThat(yearlyDiscounted.offerPeriodIsMonthly(isMonthly = true)).isFalse()
+        assertThat(yearlyDiscounted.offerPeriodIsMonthly(isMonthly = false)).isFalse()
+    }
+
+    @Test
+    fun `test that offerPeriodIsMonthly follows the selected period when both are discounted`() {
+        val bothDiscounted = subscription(AccountType.PRO_I, discounted = true)
+
+        assertThat(bothDiscounted.offerPeriodIsMonthly(isMonthly = true)).isTrue()
+        assertThat(bothDiscounted.offerPeriodIsMonthly(isMonthly = false)).isFalse()
+    }
+
+    @Test
+    fun `test that offerHighlight is None when the offer period is the current plan`() {
+        val current = subscription(
+            AccountType.PRO_I,
+            discountedMonthly = false,
+            discountedYearly = true,
+        )
+        val state = UpgradeAccountState(
+            localisedSubscriptionsList = listOf(
+                current,
+                subscription(AccountType.PRO_II, discounted = false),
+            ),
+            isSubscriptionFeatureAvailable = true,
+            currentSubscriptionPlan = AccountType.PRO_I,
+            subscriptionCycle = AccountSubscriptionCycle.YEARLY,
+            subscriptionStatus = SubscriptionStatus.VALID,
+        )
+
+        // The featured card would offer the yearly plan the user already owns, on either tab.
+        assertThat(state.offerHighlight(isMonthly = false, isUpgradeAccount = true))
+            .isEqualTo(OfferHighlight.None)
+        assertThat(state.offerHighlight(isMonthly = true, isUpgradeAccount = true))
+            .isEqualTo(OfferHighlight.None)
+    }
+
+    @Test
     fun `test that offerHighlight excludes the current recurring plan on its own period`() {
         val current = subscription(AccountType.PRO_I, discounted = true)
         val result = UpgradeAccountState(
