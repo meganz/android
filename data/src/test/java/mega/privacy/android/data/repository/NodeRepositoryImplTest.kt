@@ -84,6 +84,7 @@ import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaShare.ACCESS_READ
+import nz.mega.sdk.MegaShare.ACCESS_READWRITE
 import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncList
@@ -640,6 +641,72 @@ internal class NodeRepositoryImplTest {
             val actual = underTest.getAllIncomingShares(sortOrder)
 
             assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that getContactIncomingSharesSortedByOrder returns empty list when contact is not found`() =
+        runTest {
+            val email = "contact@mega.co.nz"
+            whenever(megaApiGateway.getContact(email)).thenReturn(null)
+
+            val actual = underTest.getContactIncomingSharesSortedByOrder(
+                email = email,
+                order = SortOrder.ORDER_NONE,
+            )
+
+            assertThat(actual).isEmpty()
+        }
+
+    @Test
+    fun `test that getContactIncomingSharesSortedByOrder maps each in share with its own access and the contact verification state`() =
+        runTest {
+            val email = "contact@mega.co.nz"
+            val sortOrderInt = 5
+            val user = mock<MegaUser>()
+            val node1 = mock<MegaNode>()
+            val node2 = mock<MegaNode>()
+            val share1 = mock<ShareData>()
+            val share2 = mock<ShareData>()
+            whenever(sortOrderIntMapper(SortOrder.ORDER_SIZE_ASC)).thenReturn(sortOrderInt)
+            whenever(megaApiGateway.getContact(email)).thenReturn(user)
+            whenever(megaApiGateway.areCredentialsVerified(user)).thenReturn(true)
+            whenever(megaApiGateway.getInShares(user, sortOrderInt))
+                .thenReturn(listOf(node1, node2))
+            whenever(megaApiGateway.getAccess(node1)).thenReturn(ACCESS_READ)
+            whenever(megaApiGateway.getAccess(node2)).thenReturn(ACCESS_READWRITE)
+            whenever(shareDataMapper(email, node1, ACCESS_READ, true)).thenReturn(share1)
+            whenever(shareDataMapper(email, node2, ACCESS_READWRITE, true)).thenReturn(share2)
+
+            val actual = underTest.getContactIncomingSharesSortedByOrder(
+                email = email,
+                order = SortOrder.ORDER_SIZE_ASC,
+            )
+
+            assertThat(actual).containsExactly(share1, share2).inOrder()
+            verify(megaApiGateway).getInShares(user, sortOrderInt)
+        }
+
+    @Test
+    fun `test that getContactIncomingSharesSortedByOrder maps in shares as unverified when the contact credentials are not verified`() =
+        runTest {
+            val email = "contact@mega.co.nz"
+            val sortOrderInt = 0
+            val user = mock<MegaUser>()
+            val node = mock<MegaNode>()
+            val share = mock<ShareData>()
+            whenever(sortOrderIntMapper(SortOrder.ORDER_NONE)).thenReturn(sortOrderInt)
+            whenever(megaApiGateway.getContact(email)).thenReturn(user)
+            whenever(megaApiGateway.areCredentialsVerified(user)).thenReturn(false)
+            whenever(megaApiGateway.getInShares(user, sortOrderInt)).thenReturn(listOf(node))
+            whenever(megaApiGateway.getAccess(node)).thenReturn(ACCESS_READ)
+            whenever(shareDataMapper(email, node, ACCESS_READ, false)).thenReturn(share)
+
+            val actual = underTest.getContactIncomingSharesSortedByOrder(
+                email = email,
+                order = SortOrder.ORDER_NONE,
+            )
+
+            assertThat(actual).containsExactly(share)
         }
 
     @Test

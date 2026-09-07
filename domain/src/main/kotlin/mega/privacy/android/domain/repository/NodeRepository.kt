@@ -68,6 +68,22 @@ interface NodeRepository {
     suspend fun getAllIncomingShares(order: SortOrder): List<ShareData>
 
     /**
+     * Provides the incoming shares of a single contact, sorted by the given order.
+     *
+     * Unlike [getAllIncomingShares] this fetches only the given contact's root shared nodes
+     * instead of every contact's shares, producing a [ShareData] per node with the real access
+     * level and verification state.
+     *
+     * @param email Email of the contact whose incoming shares are requested.
+     * @param order Sorting order to use.
+     * @return List of [ShareData] shared by the contact, sorted by [order].
+     */
+    suspend fun getContactIncomingSharesSortedByOrder(
+        email: String,
+        order: SortOrder,
+    ): List<ShareData>
+
+    /**
      * check whether the node is in rubbish bin or not
      *
      * @return Boolean

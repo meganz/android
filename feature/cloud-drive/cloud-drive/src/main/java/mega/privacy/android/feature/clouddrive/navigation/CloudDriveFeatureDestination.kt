@@ -11,6 +11,7 @@ import mega.privacy.android.feature.clouddrive.presentation.folderlink.folderLin
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineScreen
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
 import mega.privacy.android.feature.clouddrive.presentation.search.searchScreen
+import mega.privacy.android.feature.clouddrive.presentation.shares.contactshares.contactSharedFolders
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.openPasswordLinkDialog
 import mega.privacy.android.feature.clouddrive.presentation.shares.shares
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -37,6 +38,8 @@ class CloudDriveFeatureDestination : FeatureDestination {
             )
 
             shares(navigationHandler, transferHandler)
+
+            contactSharedFolders(navigationHandler, transferHandler)
 
             offlineScreen(
                 navigationHandler = navigationHandler,

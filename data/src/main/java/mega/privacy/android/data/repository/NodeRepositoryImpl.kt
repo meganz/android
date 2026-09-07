@@ -62,6 +62,7 @@ import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.FolderTypeData
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -253,6 +254,18 @@ internal class NodeRepositoryImpl @Inject constructor(
         unverifiedSharesMapped + verifiedShares
             .filter { it.user != null }
             .map { shareDataMapper(it, 1) }
+    }
+
+    override suspend fun getContactIncomingSharesSortedByOrder(
+        email: String,
+        order: SortOrder,
+    ): List<ShareData> = withContext(ioDispatcher) {
+        val contact = megaApiGateway.getContact(email) ?: return@withContext emptyList()
+        val isVerified = megaApiGateway.areCredentialsVerified(contact)
+        megaApiGateway.getInShares(contact, sortOrderIntMapper(order)).map { node: MegaNode ->
+            val nodeAccess = megaApiGateway.getAccess(node)
+            shareDataMapper(email, node, nodeAccess, isVerified)
+        }
     }
 
     override suspend fun isNodeInRubbishBin(nodeId: NodeId) = withContext(ioDispatcher) {

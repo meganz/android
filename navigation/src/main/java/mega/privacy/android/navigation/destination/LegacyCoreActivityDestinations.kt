@@ -165,8 +165,7 @@ data class ContactInfoNavKey(
 data class NodeAttachmentHistoryNavKey(val chatId: Long) : NavKey
 
 /**
- * Navigation key for the list of folders a contact shares with the user
- * (ContactFileListActivity).
+ * Navigation key for the list of folders a contact shares with the user.
  *
  * @param email Email of the contact.
  */

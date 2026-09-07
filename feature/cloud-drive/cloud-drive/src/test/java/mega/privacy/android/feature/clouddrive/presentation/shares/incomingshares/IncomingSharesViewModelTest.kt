@@ -39,11 +39,13 @@ import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeU
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -75,6 +77,7 @@ class IncomingSharesViewModelTest {
     private val setOthersSortOrder: SetOthersSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
+    private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
@@ -103,6 +106,7 @@ class IncomingSharesViewModelTest {
             setOthersSortOrder,
             nodeSortConfigurationUiMapper,
             getContactVerificationWarningUseCase,
+            snackbarEventQueue,
         )
     }
 
@@ -120,6 +124,7 @@ class IncomingSharesViewModelTest {
         setOthersSortOrder = setOthersSortOrder,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
         getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+        snackbarEventQueue = snackbarEventQueue,
     )
 
     private suspend fun setupTestData(items: List<ShareNode>) {
@@ -217,6 +222,23 @@ class IncomingSharesViewModelTest {
             val stateAfterConsume = awaitItem() // State after consuming the event
             assertThat(stateAfterConsume.navigateBack).isEqualTo(consumed)
         }
+    }
+
+    @Test
+    fun `test that loading stops and an error message is queued when loadNodes fails`() = runTest {
+        setupTestData(emptyList())
+        whenever(getIncomingSharesChildrenNodeUseCase(eq(-1L), anyOrNull()))
+            .thenThrow(RuntimeException("Failed to fetch shares"))
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.items).isEmpty()
+        }
+        verify(snackbarEventQueue).queueMessage(sharedR.string.general_request_failed_message)
     }
 
     @Test

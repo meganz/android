@@ -4,7 +4,6 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.contact.navigation.addContactLegacyDestination
 import mega.privacy.android.app.presentation.contactinfo.navigation.contactInfoDestination
-import mega.privacy.android.app.presentation.contactinfo.navigation.contactSharedFoldersDestination
 import mega.privacy.android.app.presentation.contactinfo.navigation.nodeAttachmentHistoryDestination
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -22,7 +21,6 @@ class FileContactFeatureDestination : FeatureDestination {
             addContactLegacyDestination(navigationHandler = navigationHandler)
             contactInfoDestination(navigationHandler = navigationHandler)
             nodeAttachmentHistoryDestination(navigationHandler = navigationHandler)
-            contactSharedFoldersDestination(navigationHandler = navigationHandler)
         }
 
 }

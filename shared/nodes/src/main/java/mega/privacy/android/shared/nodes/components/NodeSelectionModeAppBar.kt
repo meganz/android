@@ -19,6 +19,7 @@ fun NodeSelectionModeAppBar(
     modifier: Modifier = Modifier,
 ) {
     MegaTopAppBar(
+        modifier = modifier,
         navigationType = AppBarNavigationType.Close(onCancelSelectionClicked),
         title = if (isSelecting) {
             stringResource(sharedResR.string.app_bar_selection_mode_description)

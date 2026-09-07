@@ -68,6 +68,7 @@ import kotlin.reflect.KFunction5
 import kotlin.reflect.KFunction6
 import kotlin.reflect.KSuspendFunction1
 import kotlin.reflect.KSuspendFunction2
+import kotlin.reflect.KSuspendFunction3
 
 private const val DETAILS_FLAG_STORAGE = 0x01
 private const val DETAILS_FLAG_TRANSFER = 0x02
@@ -379,6 +380,9 @@ class FakeMegaApiGateway(
         MegaApiGateway::getInShares
 
     private val getInSharesByUserRef: KSuspendFunction2<MegaApiGateway, MegaUser, List<MegaNode>> =
+        MegaApiGateway::getInShares
+
+    private val getInSharesByUserAndOrderRef: KSuspendFunction3<MegaApiGateway, MegaUser, Int, List<MegaNode>> =
         MegaApiGateway::getInShares
 
     private val getOutSharesByOrderRef: KSuspendFunction2<MegaApiGateway, Int, List<MegaShare>> =
@@ -1349,11 +1353,17 @@ class FakeMegaApiGateway(
         engine.dispatch(getInSharesByOrderRef, listOf(order)) { shares.incomingShareNodes() }
 
     override suspend fun getInShares(user: MegaUser): List<MegaNode> =
-        engine.dispatch(getInSharesByUserRef, listOf(user)) {
-            shares.incomingShares
-                .filter { it.ownerEmail == user.email }
-                .mapNotNull { nodeTree.nodeByHandle(it.nodeHandle) }
+        engine.dispatch(getInSharesByUserRef, listOf(user)) { incomingShareNodesFrom(user) }
+
+    override suspend fun getInShares(user: MegaUser, order: Int): List<MegaNode> =
+        engine.dispatch(getInSharesByUserAndOrderRef, listOf(user, order)) {
+            incomingShareNodesFrom(user)
         }
+
+    private fun incomingShareNodesFrom(user: MegaUser): List<MegaNode> =
+        shares.incomingShares
+            .filter { it.ownerEmail == user.email }
+            .mapNotNull { nodeTree.nodeByHandle(it.nodeHandle) }
 
     override suspend fun getUserFromInShare(node: MegaNode, recursive: Boolean): MegaUser? =
         engine.dispatch(MegaApiGateway::getUserFromInShare, listOf(node, recursive)) {

@@ -21,7 +21,6 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
-import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
@@ -37,7 +36,6 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
-import mega.privacy.android.navigation.destination.ContactSharedFoldersNavKey
 import mega.privacy.android.navigation.destination.NodeAttachmentHistoryNavKey
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
@@ -169,25 +167,6 @@ fun EntryProviderScope<NavKey>.nodeAttachmentHistoryDestination(
             context.startActivity(
                 Intent(context, NodeAttachmentHistoryActivity::class.java)
                     .putExtra("chatId", navKey.chatId)
-            )
-            navigationHandler.back()
-        }
-    }
-}
-
-/**
- * Registers the [ContactSharedFoldersNavKey] destination, bridging to the legacy
- * [ContactFileListActivity] that lists the folders a contact shares with the user.
- */
-fun EntryProviderScope<NavKey>.contactSharedFoldersDestination(
-    navigationHandler: NavigationHandler,
-) {
-    entry<ContactSharedFoldersNavKey>(metadata = transparentMetadata()) { navKey ->
-        val context = LocalContext.current
-        LaunchedEffect(Unit) {
-            context.startActivity(
-                Intent(context, ContactFileListActivity::class.java)
-                    .putExtra(Constants.NAME, navKey.email)
             )
             navigationHandler.back()
         }

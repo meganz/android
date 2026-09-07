@@ -1437,6 +1437,15 @@ interface MegaApiGateway {
     suspend fun getInShares(user: MegaUser): List<MegaNode>
 
     /**
+     * Get a sorted list with all inbound sharings from one MegaUser
+     *
+     * @param user MegaUser sharing folders with this account
+     * @param order Sorting order to use
+     * @return List of MegaNode objects that this user is sharing with this account
+     */
+    suspend fun getInShares(user: MegaUser, order: Int): List<MegaNode>
+
+    /**
      * Get the owner of this node or null if is not an incoming shared node
      * @param node that is being shared
      * @param recursive if true root node of [node] will be checked, if false the [node] itself will be checked
