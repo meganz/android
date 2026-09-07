@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.texteditor.components.markdown.rich
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,9 +14,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -57,6 +62,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import kotlinx.coroutines.CoroutineScope
@@ -84,6 +90,10 @@ const val RICH_DOCUMENT_EDITOR_TAG = "rich_document_editor"
 fun richBlockFieldTag(index: Int): String = "rich_document_editor:block_$index"
 
 const val RICH_DOCUMENT_TAIL_TAP_TAG = "rich_document_editor:tail_tap_area"
+
+/** Cell tag; row 0 is the header row, body rows start at 1. */
+fun richTableCellTag(block: Int, row: Int, column: Int): String =
+    "rich_document_editor:block_${block}_cell_${row}_$column"
 
 private val TailTapAreaHeight = 160.dp
 
@@ -158,6 +168,7 @@ fun RichDocumentEditor(
                 when (block) {
                     is RichTextBlockEditState -> block.text.editCount
                     is CodeBlockEditState -> block.code.text.length
+                    is TableBlockEditState -> block.allCells.sumOf { it.editCount }
                     else -> 0
                 }
             }
@@ -210,13 +221,18 @@ fun RichDocumentEditor(
     LaunchedEffect(state) {
         snapshotFlow {
             var signature = state.blocks.size
-            state.blocks.forEach { block ->
-                val text = when (block) {
-                    is RichTextBlockEditState -> block.text.textFieldState.text
-                    is CodeBlockEditState -> block.code.text
-                    else -> null
-                }
+            fun add(text: CharSequence?) {
                 signature = 31 * signature + (text?.toString()?.hashCode() ?: 0)
+            }
+            state.blocks.forEach { block ->
+                when (block) {
+                    is RichTextBlockEditState -> add(block.text.textFieldState.text)
+                    is CodeBlockEditState -> add(block.code.text)
+                    is TableBlockEditState ->
+                        block.allCells.forEach { add(it.textFieldState.text) }
+
+                    else -> add(null)
+                }
             }
             signature
         }
@@ -353,6 +369,9 @@ private fun RichDocumentBlocks(
                     modifier = Modifier.padding(vertical = 12.dp),
                 )
 
+                is TableBlockEditState ->
+                    TableBlockRow(index, block, state, visualStyles, colors, geometry)
+
                 is RawSourceEditState -> RawSourceRow(index, block, colors, geometry)
             }
         }
@@ -464,7 +483,12 @@ private fun RichTextBlockRow(
                     },
                 )
                 .focusRequester(focusRequester)
-                .onFocusChanged { if (it.isFocused) state.focusedIndex = index }
+                .onFocusChanged {
+                    if (it.isFocused) {
+                        state.focusedIndex = index
+                        state.focusedCell = null
+                    }
+                }
                 .onPreviewKeyEvent { event ->
                     when {
                         handleUndoRedoKey(event, state) -> true
@@ -529,7 +553,12 @@ private fun CodeBlockRow(
                 .onGloballyPositioned {
                     geometry.fieldBounds[index] = Rect(it.positionInRoot(), it.size.toSize())
                 }
-                .onFocusChanged { if (it.isFocused) state.focusedIndex = index }
+                .onFocusChanged {
+                    if (it.isFocused) {
+                        state.focusedIndex = index
+                        state.focusedCell = null
+                    }
+                }
                 .onPreviewKeyEvent { event ->
                     when {
                         handleUndoRedoKey(event, state) -> true
@@ -546,6 +575,88 @@ private fun CodeBlockRow(
                 }
                 .testTag(richBlockFieldTag(index)),
         )
+    }
+}
+
+@Composable
+private fun TableBlockRow(
+    index: Int,
+    block: TableBlockEditState,
+    state: RichDocumentState,
+    visualStyles: RichSpanVisualStyles,
+    colors: MarkdownColors,
+    geometry: RichSelectionGeometry,
+) {
+    DisposableEffect(geometry, index) {
+        onDispose { geometry.clear(index) }
+    }
+    // Cell TEXTS are editable in place; table structure is not. Chrome mirrors the preview's
+    // table frame, and the row registers like a raw row so the cross-block selection gesture
+    // stays out.
+    Column(
+        modifier = Modifier
+            .padding(MarkdownBlockSpacing.block)
+            .horizontalScroll(rememberScrollState())
+            .border(1.dp, colors.divider, RoundedCornerShape(4.dp))
+            .onGloballyPositioned {
+                geometry.rawBounds[index] = Rect(it.positionInRoot(), it.size.toSize())
+            },
+    ) {
+        TableEditRow(index, 0, block.header, header = true, state, visualStyles, colors)
+        HorizontalDivider(color = colors.divider)
+        block.rows.forEachIndexed { rowIndex, row ->
+            TableEditRow(index, rowIndex + 1, row, header = false, state, visualStyles, colors)
+            HorizontalDivider(color = colors.divider)
+        }
+    }
+}
+
+@Composable
+private fun TableEditRow(
+    blockIndex: Int,
+    rowIndex: Int,
+    cells: List<RichTextBlockState>,
+    header: Boolean,
+    state: RichDocumentState,
+    visualStyles: RichSpanVisualStyles,
+    colors: MarkdownColors,
+) {
+    Row {
+        cells.forEachIndexed { columnIndex, cellState ->
+            LaunchedEffect(cellState) {
+                snapshotFlow { cellState.textFieldState.selection }
+                    .collect { cellState.syncTypingStylesToCaret() }
+            }
+            BasicTextField(
+                state = cellState.textFieldState,
+                textStyle = MaterialTheme.typography.bodyMedium
+                    .let { if (header) it.copy(fontWeight = FontWeight.Bold) else it }
+                    .copy(color = colors.text),
+                cursorBrush = SolidColor(colors.text),
+                inputTransformation = remember(cellState) {
+                    // Cells are single-line: the no-op split swallows Enter.
+                    RichSpanInputTransformation(
+                        state = cellState,
+                        onSplit = { _, _ -> },
+                        sanitizeNewlines = true,
+                    )
+                },
+                outputTransformation = remember(cellState, visualStyles) {
+                    RichSpanOutputTransformation(cellState, visualStyles)
+                },
+                modifier = Modifier
+                    .width(TableEditCellWidth)
+                    .padding(8.dp)
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            state.focusedIndex = blockIndex
+                            state.focusedCell = cellState
+                        }
+                    }
+                    .onPreviewKeyEvent { handleUndoRedoKey(it, state) }
+                    .testTag(richTableCellTag(blockIndex, rowIndex, columnIndex)),
+            )
+        }
     }
 }
 
@@ -679,3 +790,5 @@ private fun orderedNumber(blocks: List<RichBlockEditState>, index: Int): Int {
     }
     return start + offset
 }
+
+private val TableEditCellWidth = 140.dp

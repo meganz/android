@@ -86,7 +86,36 @@ class RichDocumentToMarkdownConverter @Inject constructor() {
             RichBlock.ThematicBreak -> "---"
 
             is RichBlock.RawSource -> block.source
+
+            is RichBlock.Table -> serializeTable(block)
         }
+
+    private fun serializeTable(table: RichBlock.Table): String {
+        // GFM requires pipes inside cells escaped everywhere, code spans included.
+        fun cell(text: RichText): String =
+            serializeInline(singleLine(text), escapeLineStarts = false).replace("|", "\\|")
+
+        fun line(cells: List<RichText>): String =
+            cells.joinToString(" | ", prefix = "| ", postfix = " |") { cell(it) }
+
+        val delimiter = table.alignments.joinToString(" | ", prefix = "| ", postfix = " |") {
+            when (it) {
+                RichTableAlignment.Left -> ":---"
+                RichTableAlignment.Center -> ":---:"
+                RichTableAlignment.Right -> "---:"
+                null -> "---"
+            }
+        }
+        return buildString {
+            append(line(table.header))
+            append('\n')
+            append(delimiter)
+            table.rows.forEach { row ->
+                append('\n')
+                append(line(row))
+            }
+        }
+    }
 
     /** Headings and list items are single-line constructs; inner newlines become spaces. */
     private fun singleLine(text: RichText): RichText =

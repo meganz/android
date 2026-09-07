@@ -52,6 +52,40 @@ class ThematicBreakEditState : RichBlockEditState
 /** Unsupported Markdown kept verbatim; rendered read-only and re-emitted byte-identical. */
 class RawSourceEditState(val source: String) : RichBlockEditState
 
+/**
+ * A GFM table whose cell TEXTS are editable in place (structure is not). [originalSource]
+ * holds the verbatim Markdown so an untouched table serializes byte-identically; it is null
+ * once the table came from an edited snapshot and normalized emission is already the truth.
+ */
+class TableBlockEditState(
+    val originalSource: String?,
+    val initial: RichBlock.Table,
+) : RichBlockEditState {
+    val alignments: List<RichTableAlignment?> = initial.alignments
+    val header: List<RichTextBlockState> =
+        initial.header.map { RichTextBlockState(it.text, it.spans) }
+    val rows: List<List<RichTextBlockState>> =
+        initial.rows.map { row -> row.map { RichTextBlockState(it.text, it.spans) } }
+
+    val allCells: List<RichTextBlockState> = header + rows.flatten()
+
+    fun toTable(): RichBlock.Table = RichBlock.Table(
+        alignments = alignments,
+        header = header.map { it.toRichText() },
+        rows = rows.map { row -> row.map { it.toRichText() } },
+    )
+
+    /** Untouched tables keep their verbatim bytes; edited ones serialize normalized. */
+    fun toDocumentBlock(): RichBlock {
+        val current = toTable()
+        return if (originalSource != null && current == initial) {
+            RichBlock.RawSource(originalSource)
+        } else {
+            current
+        }
+    }
+}
+
 /** A one-shot request to focus a block and place its selection, consumed by the editor UI. */
 data class RichFocusRequest(val index: Int, val selection: TextRange)
 
@@ -139,6 +173,16 @@ class RichDocumentState(document: RichDocument) {
     val focusedTextBlock: RichTextBlockEditState?
         get() = focusedIndex?.let { blocks.getOrNull(it) } as? RichTextBlockEditState
 
+    /** The focused table cell's text state, while focus is inside a table. */
+    var focusedCell: RichTextBlockState? by mutableStateOf(null)
+
+    /**
+     * The text state INLINE format actions target: a focused table cell, else the focused
+     * block. Structural actions keep resolving [focusedTextBlock] and so no-op in cells.
+     */
+    val focusedInlineText: RichTextBlockState?
+        get() = focusedCell ?: focusedTextBlock?.text
+
     /**
      * Checkpoints the current document for undo. Called before every mutating operation (the
      * structural operations checkpoint themselves) and after typing bursts settle. An
@@ -195,6 +239,7 @@ class RichDocumentState(document: RichDocument) {
         pendingSelectionReplacement = null
         pendingSmartInsert = null
         documentSelection = null
+        focusedCell = null
     }
 
     /** The part of [documentSelection] covering the block at [index], or null. */
@@ -429,6 +474,62 @@ class RichDocumentState(document: RichDocument) {
         }
     }
 
+    /**
+     * Toggles [style] over the active cross-block [documentSelection]: removed when every
+     * selected character in every covered text block already carries it, applied otherwise.
+     * One undo step; the selection survives so styles can be stacked. Returns false when
+     * there is no document selection.
+     */
+    fun toggleStyleOverDocumentSelection(style: RichSpanStyle): Boolean {
+        if (documentSelection == null) return false
+        val ranges = documentSelectionRanges()
+        if (ranges.isEmpty()) return true
+        recordUndo()
+        val covered = ranges.all { (text, range) ->
+            RichSpanAdjuster.isCovered(text.spans, range.min, range.max, style)
+        }
+        ranges.forEach { (text, range) ->
+            text.spans = if (covered) {
+                RichSpanAdjuster.toggle(text.spans, range.min, range.max, style)
+            } else {
+                RichSpanAdjuster.normalize(
+                    text.spans + RichSpan(range.min, range.max, style),
+                )
+            }
+        }
+        return true
+    }
+
+    /** True when [style] covers the whole [documentSelection]; null without one. */
+    fun documentSelectionStyleCovered(style: RichSpanStyle): Boolean? =
+        documentSelectionCoveredStyles(setOf(style))?.contains(style)
+
+    /**
+     * The subset of [styles] covering every selected character of [documentSelection] (null
+     * without one) — one range walk for all styles, cheap enough for per-frame active states.
+     */
+    fun documentSelectionCoveredStyles(styles: Set<RichSpanStyle>): Set<RichSpanStyle>? {
+        if (documentSelection == null) return null
+        val ranges = documentSelectionRanges()
+        if (ranges.isEmpty()) return emptySet()
+        return styles.filterTo(mutableSetOf()) { style ->
+            ranges.all { (text, range) ->
+                RichSpanAdjuster.isCovered(text.spans, range.min, range.max, style)
+            }
+        }
+    }
+
+    private fun documentSelectionRanges(): List<Pair<RichTextBlockState, TextRange>> {
+        val selection = documentSelection ?: return emptyList()
+        val ranges = mutableListOf<Pair<RichTextBlockState, TextRange>>()
+        for (index in selection.start.blockIndex..selection.end.blockIndex) {
+            val text = (blocks.getOrNull(index) as? RichTextBlockEditState)?.text ?: continue
+            val range = documentSelectionIn(index) ?: continue
+            if (range.min < range.max) ranges += text to range
+        }
+        return ranges
+    }
+
     /** Selects every selectable block, first character to last. */
     fun selectAllBlocks() {
         val first = blocks.indices.firstOrNull { blockTextLength(it) != null } ?: return
@@ -451,10 +552,15 @@ class RichDocumentState(document: RichDocument) {
                 is RichTextBlockEditState -> block.text.textFieldState.text.toString()
                 is CodeBlockEditState -> block.code.text.toString()
                 is RawSourceEditState -> block.source
+                is TableBlockEditState -> when (val document = block.toDocumentBlock()) {
+                    is RichBlock.RawSource -> document.source
+                    else -> richTableSerializer.convert(RichDocument(listOf(document)))
+                }
+
                 else -> null
             } ?: continue
             val range = when (blocks.getOrNull(index)) {
-                is RawSourceEditState -> TextRange(0, text.length)
+                is RawSourceEditState, is TableBlockEditState -> TextRange(0, text.length)
                 else -> documentSelectionIn(index) ?: TextRange(0, text.length)
             }
             parts += text.substring(range.min, range.max)
@@ -510,6 +616,7 @@ class RichDocumentState(document: RichDocument) {
             }
 
             is RawSourceEditState -> RichBlock.RawSource(block.source)
+            is TableBlockEditState -> block.toDocumentBlock()
             is ThematicBreakEditState -> RichBlock.ThematicBreak
             else -> null
         }
@@ -735,6 +842,8 @@ class RichDocumentState(document: RichDocument) {
 
                 is ThematicBreakEditState -> RichBlock.ThematicBreak
                 is RawSourceEditState -> RichBlock.RawSource(block.source)
+
+                is TableBlockEditState -> block.toDocumentBlock()
             }
         },
     )
@@ -765,7 +874,17 @@ private fun RichBlock.toEditState(): RichBlockEditState = when (this) {
 
     is RichBlock.CodeBlock -> CodeBlockEditState(language, code)
     is RichBlock.ThematicBreak -> ThematicBreakEditState()
-    is RichBlock.RawSource -> RawSourceEditState(source)
+
+    is RichBlock.RawSource ->
+        richTableParser.parseTable(source)
+            ?.let { TableBlockEditState(originalSource = source, initial = it) }
+            ?: RawSourceEditState(source)
+
+    is RichBlock.Table -> TableBlockEditState(originalSource = null, initial = this)
 }
 
 private fun RichText.toBlockState(): RichTextBlockState = RichTextBlockState(text, spans)
+
+private val richTableParser by lazy { MarkdownToRichDocumentConverter() }
+
+private val richTableSerializer by lazy { RichDocumentToMarkdownConverter() }

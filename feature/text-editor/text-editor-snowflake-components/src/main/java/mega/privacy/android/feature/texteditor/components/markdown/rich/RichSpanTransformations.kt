@@ -31,6 +31,7 @@ class RichSpanInputTransformation(
     private val documentSelectionActive: (() -> Boolean)? = null,
     private val onReplaceDocumentSelection: ((String) -> Unit)? = null,
     private val onSmartInsert: ((start: Int, end: Int, text: String) -> Unit)? = null,
+    private val sanitizeNewlines: Boolean = false,
 ) : InputTransformation {
 
     override fun TextFieldBuffer.transformInput() {
@@ -55,6 +56,13 @@ class RichSpanInputTransformation(
                 revertAllChanges()
                 onSmartInsert.invoke(originalRange.min, originalRange.max, inserted)
                 return
+            }
+            // Single-line fields (table cells): a pasted newline becomes a space, then the
+            // rewritten change list flows into the span adjustment below as usual.
+            if (sanitizeNewlines && inserted.length > 1 && inserted.contains('\n')) {
+                val originalRange = changes.getOriginalRange(0)
+                revertAllChanges()
+                replace(originalRange.min, originalRange.max, inserted.replace('\n', ' '))
             }
         }
         val edits = (0 until changes.changeCount).map { index ->

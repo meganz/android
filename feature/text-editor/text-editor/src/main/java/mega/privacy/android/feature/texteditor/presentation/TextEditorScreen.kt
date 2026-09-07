@@ -93,6 +93,7 @@ import mega.privacy.android.feature.texteditor.components.TextEditorContent
 import mega.privacy.android.feature.texteditor.components.TextEditorFastScrollbar
 import mega.privacy.android.feature.texteditor.components.TextEditorLoadingUiDelay
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownEditInputTransformation
+import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormatAction
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownFormattingToolbar
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownLinkDialog
 import mega.privacy.android.feature.texteditor.components.markdown.MarkdownSelectionFormats
@@ -997,26 +998,50 @@ private fun RichEditToolbar(
     richState: RichDocumentState,
 ) {
     var formats by remember { mutableStateOf(MarkdownSelectionFormats.Empty) }
-    val focused = richState.focusedTextBlock
+    val focused = richState.focusedInlineText
     LaunchedEffect(focused) {
         if (focused == null) {
             formats = MarkdownSelectionFormats.Empty
             return@LaunchedEffect
         }
         // Everything the formats derive from (kind included) is read inside the snapshot flow,
-        // so structural retypes from the toolbar refresh the active states too.
+        // so structural retypes from the toolbar refresh the active states too. A table cell
+        // has no block kind; Paragraph keeps the structural buttons inactive there.
         snapshotFlow {
-            richSelectionFormats(
-                kind = focused.kind,
-                spans = focused.text.spans,
-                typingStyles = focused.text.typingStyles,
-                selection = focused.text.textFieldState.selection,
+            val base = richSelectionFormats(
+                kind = richState.focusedTextBlock?.kind ?: RichBlockKind.Paragraph,
+                spans = focused.spans,
+                typingStyles = focused.typingStyles,
+                selection = focused.textFieldState.selection,
             )
+            // A cross-block selection collapses the field selection; inline states then
+            // reflect coverage across the document selection instead.
+            val covered = richState.documentSelectionCoveredStyles(InlineToggleStyles)
+            if (covered != null) {
+                base.copy(
+                    isBold = RichSpanStyle.Bold in covered,
+                    isItalic = RichSpanStyle.Italic in covered,
+                    isStrikethrough = RichSpanStyle.Strikethrough in covered,
+                    isInlineCode = RichSpanStyle.Code in covered,
+                )
+            } else {
+                base
+            }
         }.collect { formats = it }
     }
     MarkdownFormattingToolbar(
         formats = formats,
         onAction = viewModel::applyFormatAction,
+        // Structural actions are disabled where they cannot act on what the user sees:
+        // table cells take inline styles only, and a cross-block selection would silently
+        // retype just the origin block.
+        disabledActions = if (richState.focusedCell != null ||
+            richState.documentSelection != null
+        ) {
+            StructuralFormatActions
+        } else {
+            emptySet()
+        },
     )
 }
 
@@ -1049,3 +1074,18 @@ private fun richSelectionFormats(
         isQuote = kind is RichBlockKind.Quote,
     )
 }
+
+private val StructuralFormatActions = setOf(
+    MarkdownFormatAction.HeadingCycle,
+    MarkdownFormatAction.BulletList,
+    MarkdownFormatAction.OrderedList,
+    MarkdownFormatAction.TaskList,
+    MarkdownFormatAction.Quote,
+)
+
+private val InlineToggleStyles = setOf(
+    RichSpanStyle.Bold,
+    RichSpanStyle.Italic,
+    RichSpanStyle.Strikethrough,
+    RichSpanStyle.Code,
+)

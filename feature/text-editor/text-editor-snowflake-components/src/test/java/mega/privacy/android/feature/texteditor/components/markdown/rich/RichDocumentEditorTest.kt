@@ -79,6 +79,65 @@ class RichDocumentEditorTest {
     }
 
     @Test
+    fun `test that table cell text is editable in place`() {
+        setEditor(RichDocument(listOf(RichBlock.RawSource("| a |\n| --- |\n| b |"))))
+
+        composeRule.onNodeWithTag(richTableCellTag(0, 1, 0)).performTextInput("x")
+
+        val table = state.blocks[0] as TableBlockEditState
+        assertThat(table.rows[0][0].textFieldState.text.toString()).isEqualTo("bx")
+    }
+
+    @Test
+    fun `test that Enter does not insert a newline in a table cell`() {
+        setEditor(RichDocument(listOf(RichBlock.RawSource("| a |\n| --- |\n| b |"))))
+
+        composeRule.onNodeWithTag(richTableCellTag(0, 1, 0)).performTextInput("\n")
+
+        val table = state.blocks[0] as TableBlockEditState
+        assertThat(table.rows[0][0].textFieldState.text.toString()).isEqualTo("b")
+    }
+
+    @Test
+    fun `test that a multi-line paste into a table cell becomes single-line text`() {
+        setEditor(RichDocument(listOf(RichBlock.RawSource("| a |\n| --- |\n| b |"))))
+
+        composeRule.onNodeWithTag(richTableCellTag(0, 1, 0)).performTextInput("x\ny")
+
+        val table = state.blocks[0] as TableBlockEditState
+        assertThat(table.rows[0][0].textFieldState.text.toString()).isEqualTo("bx y")
+    }
+
+    @Test
+    fun `test that focusing a table cell points focusedIndex at the table block`() {
+        setEditor(
+            RichDocument(
+                listOf(
+                    RichBlock.Paragraph(RichText("text")),
+                    RichBlock.RawSource("| a |\n| --- |\n| b |"),
+                ),
+            ),
+        )
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).requestFocus()
+        composeRule.waitForIdle()
+        assertThat(state.focusedIndex).isEqualTo(0)
+
+        composeRule.onNodeWithTag(richTableCellTag(1, 1, 0)).requestFocus()
+        composeRule.waitForIdle()
+
+        assertThat(state.focusedIndex).isEqualTo(1)
+        assertThat(state.focusedTextBlock).isNull()
+        assertThat(state.focusedCell).isSameInstanceAs(
+            (state.blocks[1] as TableBlockEditState).rows[0][0],
+        )
+
+        composeRule.onNodeWithTag(richBlockFieldTag(0)).requestFocus()
+        composeRule.waitForIdle()
+
+        assertThat(state.focusedCell).isNull()
+    }
+
+    @Test
     fun `test that blocks are directly editable without any reveal tap`() {
         setEditor(
             RichDocument(

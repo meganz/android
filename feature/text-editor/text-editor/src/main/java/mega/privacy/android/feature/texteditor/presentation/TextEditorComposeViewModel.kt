@@ -74,6 +74,7 @@ import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocu
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichDocumentToMarkdownConverter
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichSpanStyle
 import mega.privacy.android.feature.texteditor.components.markdown.rich.RichTextBlockEditState
+import mega.privacy.android.feature.texteditor.components.markdown.rich.RichTextBlockState
 import mega.privacy.android.feature.texteditor.presentation.model.MarkdownEditMode
 import mega.privacy.android.feature.texteditor.presentation.model.MarkdownLinkDialogUiState
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
@@ -545,8 +546,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     /**
-     * Toolbar actions in rich text mode: inline styles toggle spans on the focused block,
-     * structural actions retype the focused block, and Link opens the link dialog.
+     * Toolbar actions in rich text mode: inline styles toggle spans on the focused text (a
+     * block or a table cell), structural actions retype the focused block (and so no-op in
+     * table cells), and Link opens the link dialog.
      */
     private fun applyRichFormatAction(action: MarkdownFormatAction) {
         val rich = richDocumentState.value ?: return
@@ -568,16 +570,36 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     private fun toggleFocusedStyle(rich: RichDocumentState, style: RichSpanStyle) {
-        val block = rich.focusedTextBlock ?: return
+        // A cross-block selection collapses the field selection when it takes over, so
+        // format actions target the document selection while one is active.
+        if (rich.toggleStyleOverDocumentSelection(style)) return
+        val target = rich.focusedInlineText ?: return
         rich.recordUndo()
-        block.text.toggleStyle(style)
+        target.toggleStyle(style)
     }
 
     private fun requestRichLinkDialog(rich: RichDocumentState) {
-        val block = rich.focusedTextBlock ?: return
-        val selection = block.text.textFieldState.selection
-        val existing = block.text.linkAt(selection)
-        val text = block.text.textFieldState.text.toString()
+        // A single-block document selection converts back into a field selection so the
+        // dialog prefills and applies to the selected words; a multi-block one has no valid
+        // link target. The selection's own block becomes the focused target — the drag can
+        // have started in a different block, where focus still sits.
+        rich.documentSelection?.let { selection ->
+            if (selection.start.blockIndex != selection.end.blockIndex) return
+            val index = selection.start.blockIndex
+            val text = (rich.blocks.getOrNull(index) as? RichTextBlockEditState)?.text
+                ?: return
+            val range = rich.documentSelectionIn(index) ?: return
+            rich.focusedIndex = index
+            rich.focusedCell = null
+            text.textFieldState.edit {
+                this.selection = TextRange(range.min, range.max)
+            }
+            rich.documentSelection = null
+        }
+        val target = rich.focusedInlineText ?: return
+        val selection = target.textFieldState.selection
+        val existing = target.linkAt(selection)
+        val text = target.textFieldState.text.toString()
         _uiState.update {
             it.copy(
                 linkDialog = MarkdownLinkDialogUiState(
@@ -590,25 +612,25 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
     }
 
-    /** The focused rich block when the link dialog is confirmed from rich text mode. */
-    private fun richTextBlockForLink(): RichTextBlockEditState? {
+    /** The focused rich text (block or table cell) when the link dialog is confirmed. */
+    private fun richTextForLink(): RichTextBlockState? {
         val ui = _uiState.value
         if (!ui.isWysiwygCapable || ui.markdownEditMode != MarkdownEditMode.RichText) return null
-        return richDocumentState.value?.focusedTextBlock
+        return richDocumentState.value?.focusedInlineText
     }
 
     fun confirmLink(linkText: String, url: String) {
-        richTextBlockForLink()?.let { block ->
+        richTextForLink()?.let { target ->
             richDocumentState.value?.recordUndo()
-            block.text.applyLink(linkText, url)
+            target.applyLink(linkText, url)
         }
         dismissLinkDialog()
     }
 
     fun removeLink() {
-        richTextBlockForLink()?.let { block ->
+        richTextForLink()?.let { target ->
             richDocumentState.value?.recordUndo()
-            block.text.removeLink()
+            target.removeLink()
         }
         dismissLinkDialog()
     }

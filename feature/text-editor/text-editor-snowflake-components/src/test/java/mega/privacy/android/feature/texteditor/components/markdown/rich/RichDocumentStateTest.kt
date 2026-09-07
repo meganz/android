@@ -886,6 +886,147 @@ internal class RichDocumentStateTest {
         assertThat(state.blockTextLength(99)).isNull()
     }
 
+    @Test
+    fun `test that an untouched table serializes back to its verbatim raw source`() {
+        val source = "| Name |   Age |\n| :--- | ----: |\n| Ada  |    36 |"
+        val state = stateOf(RichBlock.RawSource(source))
+
+        val table = state.blocks[0]
+        assertThat(table).isInstanceOf(TableBlockEditState::class.java)
+        assertThat(state.toDocument().blocks[0]).isEqualTo(RichBlock.RawSource(source))
+    }
+
+    @Test
+    fun `test that editing a table cell produces a table block that serializes normalized`() {
+        val source = "| Name | Age |\n| :--- | ---: |\n| **Ada** | 36 |"
+        val state = stateOf(RichBlock.RawSource(source))
+
+        val table = state.blocks[0] as TableBlockEditState
+        table.rows[0][1].textFieldState.edit { replace(0, length, "37") }
+
+        val block = state.toDocument().blocks[0] as RichBlock.Table
+        assertThat(block.rows[0][1].text).isEqualTo("37")
+        assertThat(block.rows[0][0]).isEqualTo(
+            RichText("Ada", listOf(RichSpan(0, 3, RichSpanStyle.Bold))),
+        )
+        assertThat(RichDocumentToMarkdownConverter().convert(RichDocument(listOf(block))))
+            .isEqualTo("| Name | Age |\n| :--- | ---: |\n| **Ada** | 37 |")
+    }
+
+    @Test
+    fun `test that a table with an image cell stays read-only raw source`() {
+        val source = "| a |\n| --- |\n| ![img](x.png) |"
+        val state = stateOf(RichBlock.RawSource(source))
+
+        assertThat(state.blocks[0]).isInstanceOf(RawSourceEditState::class.java)
+    }
+
+    @Test
+    fun `test that a pipe typed into a cell is escaped when serialized`() {
+        val source = "| a |\n| --- |\n| b |"
+        val state = stateOf(RichBlock.RawSource(source))
+        val table = state.blocks[0] as TableBlockEditState
+        table.rows[0][0].textFieldState.edit { replace(0, length, "x | y") }
+
+        val markdown = RichDocumentToMarkdownConverter().convert(state.toDocument())
+
+        assertThat(markdown).isEqualTo("| a |\n| --- |\n| x \\| y |")
+    }
+
+    @Test
+    fun `test that focusedInlineText prefers the focused cell over the focused block`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("text")),
+            RichBlock.RawSource("| a |\n| --- |\n| b |"),
+        )
+        state.focusedIndex = 0
+        assertThat(state.focusedInlineText).isSameInstanceAs(
+            (state.blocks[0] as RichTextBlockEditState).text,
+        )
+
+        val cell = (state.blocks[1] as TableBlockEditState).rows[0][0]
+        state.focusedIndex = 1
+        state.focusedCell = cell
+
+        assertThat(state.focusedInlineText).isSameInstanceAs(cell)
+        assertThat(state.focusedTextBlock).isNull()
+    }
+
+    @Test
+    fun `test that undo clears the focused cell`() {
+        val state = stateOf(RichBlock.RawSource("| a |\n| --- |\n| b |"))
+        val table = state.blocks[0] as TableBlockEditState
+        state.focusedCell = table.rows[0][0]
+        table.rows[0][0].textFieldState.edit { append("!") }
+        state.recordUndo()
+
+        state.undo()
+
+        assertThat(state.focusedCell).isNull()
+    }
+
+    @Test
+    fun `test that toggleStyleOverDocumentSelection applies the style across blocks`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first")),
+            RichBlock.Paragraph(RichText("second")),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 2),
+            RichDocPosition(1, 3),
+        )
+
+        assertThat(state.toggleStyleOverDocumentSelection(RichSpanStyle.Bold)).isTrue()
+
+        assertThat(block(state, 0).text.spans)
+            .containsExactly(RichSpan(2, 5, RichSpanStyle.Bold))
+        assertThat(block(state, 1).text.spans)
+            .containsExactly(RichSpan(0, 3, RichSpanStyle.Bold))
+        assertThat(state.documentSelection).isNotNull()
+    }
+
+    @Test
+    fun `test that toggleStyleOverDocumentSelection removes the style when fully covered`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first", listOf(RichSpan(0, 5, RichSpanStyle.Bold)))),
+            RichBlock.Paragraph(RichText("second", listOf(RichSpan(0, 6, RichSpanStyle.Bold)))),
+        )
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 0),
+            RichDocPosition(1, 6),
+        )
+
+        state.toggleStyleOverDocumentSelection(RichSpanStyle.Bold)
+
+        assertThat(block(state, 0).text.spans).isEmpty()
+        assertThat(block(state, 1).text.spans).isEmpty()
+    }
+
+    @Test
+    fun `test that documentSelectionStyleCovered reports coverage across the selection`() {
+        val state = stateOf(
+            RichBlock.Paragraph(RichText("first", listOf(RichSpan(0, 5, RichSpanStyle.Bold)))),
+            RichBlock.Paragraph(RichText("second", listOf(RichSpan(0, 3, RichSpanStyle.Bold)))),
+        )
+
+        assertThat(state.documentSelectionStyleCovered(RichSpanStyle.Bold)).isNull()
+
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 0),
+            RichDocPosition(1, 3),
+        )
+        assertThat(state.documentSelectionStyleCovered(RichSpanStyle.Bold)).isTrue()
+
+        state.documentSelection = RichDocSelection(
+            RichDocPosition(0, 0),
+            RichDocPosition(1, 6),
+        )
+        assertThat(state.documentSelectionStyleCovered(RichSpanStyle.Bold)).isFalse()
+    }
+
+    private fun block(state: RichDocumentState, index: Int): RichTextBlockEditState =
+        state.blocks[index] as RichTextBlockEditState
+
     private fun block(state: RichDocumentState): RichTextBlockEditState =
         state.blocks[0] as RichTextBlockEditState
 

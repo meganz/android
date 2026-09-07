@@ -46,9 +46,21 @@ sealed interface RichBlock {
      * the model's losslessness guarantee for unsupported Markdown.
      */
     data class RawSource(val source: String) : RichBlock
+
+    /**
+     * A GFM table with inline-only cells. Only produced for tables the user has EDITED —
+     * untouched tables stay [RawSource] so their bytes survive serialization verbatim.
+     */
+    data class Table(
+        val alignments: List<RichTableAlignment?>,
+        val header: List<RichText>,
+        val rows: List<List<RichText>>,
+    ) : RichBlock
 }
 
 /** Plain text plus inline formatting spans ([start] inclusive, [end] exclusive, may nest). */
+enum class RichTableAlignment { Left, Center, Right }
+
 data class RichText(
     val text: String,
     val spans: List<RichSpan> = emptyList(),

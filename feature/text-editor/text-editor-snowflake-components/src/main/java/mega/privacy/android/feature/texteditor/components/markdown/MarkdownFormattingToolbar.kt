@@ -68,6 +68,7 @@ fun MarkdownFormattingToolbar(
     formats: MarkdownSelectionFormats,
     onAction: (MarkdownFormatAction) -> Unit,
     modifier: Modifier = Modifier,
+    disabledActions: Set<MarkdownFormatAction> = emptySet(),
 ) {
     Box(
         modifier = modifier
@@ -97,6 +98,7 @@ fun MarkdownFormattingToolbar(
                     icon = Icons.Default.FormatBold,
                     contentDescription = "Bold",
                     isActive = formats.isBold,
+                    enabled = MarkdownFormatAction.Bold !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
@@ -104,6 +106,7 @@ fun MarkdownFormattingToolbar(
                     icon = Icons.Default.FormatItalic,
                     contentDescription = "Italic",
                     isActive = formats.isItalic,
+                    enabled = MarkdownFormatAction.Italic !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
@@ -111,6 +114,7 @@ fun MarkdownFormattingToolbar(
                     icon = Icons.Default.FormatStrikethrough,
                     contentDescription = "Strikethrough",
                     isActive = formats.isStrikethrough,
+                    enabled = MarkdownFormatAction.Strikethrough !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
@@ -118,6 +122,7 @@ fun MarkdownFormattingToolbar(
                     icon = Icons.Default.Title,
                     contentDescription = "Heading",
                     isActive = formats.headingLevel != null,
+                    enabled = MarkdownFormatAction.HeadingCycle !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
@@ -125,6 +130,7 @@ fun MarkdownFormattingToolbar(
                     icon = Icons.Default.FormatListBulleted,
                     contentDescription = "Bulleted list",
                     isActive = formats.isBulletList,
+                    enabled = MarkdownFormatAction.BulletList !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
@@ -132,6 +138,7 @@ fun MarkdownFormattingToolbar(
                     icon = Icons.Default.FormatListNumbered,
                     contentDescription = "Numbered list",
                     isActive = formats.isOrderedList,
+                    enabled = MarkdownFormatAction.OrderedList !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
@@ -139,6 +146,7 @@ fun MarkdownFormattingToolbar(
                     icon = Icons.Default.Checklist,
                     contentDescription = "Checklist",
                     isActive = formats.isTaskList,
+                    enabled = MarkdownFormatAction.TaskList !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
@@ -146,6 +154,7 @@ fun MarkdownFormattingToolbar(
                     icon = Icons.Default.FormatQuote,
                     contentDescription = "Quote",
                     isActive = formats.isQuote,
+                    enabled = MarkdownFormatAction.Quote !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
@@ -153,6 +162,7 @@ fun MarkdownFormattingToolbar(
                     icon = Icons.Default.Code,
                     contentDescription = "Code",
                     isActive = formats.isInlineCode,
+                    enabled = MarkdownFormatAction.InlineCode !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(
@@ -160,6 +170,7 @@ fun MarkdownFormattingToolbar(
                     icon = Icons.Default.Link,
                     contentDescription = "Link",
                     isActive = formats.isLink,
+                    enabled = MarkdownFormatAction.Link !in disabledActions,
                     onAction = onAction,
                 )
             }
@@ -173,16 +184,20 @@ private fun ToolbarToggleButton(
     icon: ImageVector,
     contentDescription: String,
     isActive: Boolean,
+    enabled: Boolean,
     onAction: (MarkdownFormatAction) -> Unit,
 ) {
     IconToggleButton(
         checked = isActive,
         onCheckedChange = { onAction(action) },
+        enabled = enabled,
         colors = IconButtonDefaults.iconToggleButtonColors(
             containerColor = DSTokens.colors.background.pageBackground,
             contentColor = DSTokens.colors.icon.primary,
             checkedContainerColor = DSTokens.colors.background.surface2,
             checkedContentColor = DSTokens.colors.icon.accent,
+            disabledContainerColor = DSTokens.colors.background.pageBackground,
+            disabledContentColor = DSTokens.colors.icon.disabled,
         ),
         shape = IconButtonDefaults.filledShape,
         modifier = Modifier

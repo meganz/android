@@ -2,6 +2,9 @@ package mega.privacy.android.feature.texteditor.components.markdown.rich
 
 import org.commonmark.ext.gfm.strikethrough.Strikethrough
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
+import org.commonmark.ext.gfm.tables.TableBlock
+import org.commonmark.ext.gfm.tables.TableCell
+import org.commonmark.ext.gfm.tables.TableRow
 import org.commonmark.ext.gfm.tables.TablesExtension
 import org.commonmark.ext.task.list.items.TaskListItemMarker
 import org.commonmark.ext.task.list.items.TaskListItemsExtension
@@ -179,6 +182,53 @@ class MarkdownToRichDocumentConverter @Inject constructor() {
     }
 
     /** True when any item (recursively) holds block content beyond its text and sublists. */
+    /**
+     * Parses [source] as a single GFM table with inline-only cells, for in-place table
+     * editing. Null when it is not exactly one table, or a cell holds content the inline
+     * model cannot represent (image, HTML) — those stay verbatim raw source.
+     */
+    fun parseTable(source: String): RichBlock.Table? {
+        val document = parser.parse(source)
+        val table = document.firstChild as? TableBlock ?: return null
+        if (table.next != null || hasUnsupportedInline(table)) return null
+        val headerCells = mutableListOf<RichText>()
+        val alignments = mutableListOf<RichTableAlignment?>()
+        val rows = mutableListOf<List<RichText>>()
+        var section = table.firstChild
+        while (section != null) {
+            var row = section.firstChild
+            while (row != null) {
+                if (row is TableRow) {
+                    val cells = mutableListOf<RichText>()
+                    var cell = row.firstChild
+                    while (cell != null) {
+                        if (cell is TableCell) {
+                            cells += inlineText(cell)
+                            if (headerCells.isEmpty()) {
+                                alignments += when (cell.alignment) {
+                                    TableCell.Alignment.LEFT -> RichTableAlignment.Left
+                                    TableCell.Alignment.CENTER -> RichTableAlignment.Center
+                                    TableCell.Alignment.RIGHT -> RichTableAlignment.Right
+                                    else -> null
+                                }
+                            }
+                        }
+                        cell = cell.next
+                    }
+                    if (headerCells.isEmpty()) {
+                        headerCells += cells
+                    } else {
+                        rows += List(headerCells.size) { cells.getOrElse(it) { RichText("") } }
+                    }
+                }
+                row = row.next
+            }
+            section = section.next
+        }
+        if (headerCells.isEmpty()) return null
+        return RichBlock.Table(alignments, headerCells, rows)
+    }
+
     private fun hasUnsupportedItemContent(list: Node): Boolean {
         var item = list.firstChild
         while (item != null) {
