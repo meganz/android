@@ -898,6 +898,7 @@ private fun MediaScreen.MediaContent(
                             onZoomIn = onTimelineRevampZoomIn,
                             onZoomOut = onTimelineRevampZoomOut,
                             onPinchActiveChanged = onTimelineRevampPinchActiveChanged,
+                            isPinchToZoomEnabled = uiState.isTimelinePinchToZoomEnabled == true,
                             onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                             onNodeClicked = { node, anchorIndex ->
                                 when {

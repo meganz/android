@@ -320,6 +320,33 @@ class TimelineRevampScreenTest {
     }
 
     @Test
+    fun `test that a pinch on the grid does not zoom when pinch to zoom is disabled`() {
+        var zoomIns = 0
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = (0..2).associateWith { index -> photoNode(id = index + 1L) },
+            ),
+            onZoomIn = { zoomIns++ },
+            isPinchToZoomEnabled = false,
+        )
+
+        composeRule.onNodeWithTag(TIMELINE_REVAMP_CONTENT_GRID_TAG).performTouchInput {
+            spreadFingers(from = 40f, to = 62f)
+        }
+
+        assertThat(zoomIns).isEqualTo(0)
+    }
+
+    @Test
     fun `test that a pinch does not zoom when a drag selection is already active`() {
         val selectedIds = mutableStateSetOf<Long>()
         var zoomIns = 0
@@ -958,6 +985,7 @@ class TimelineRevampScreenTest {
         onZoomIn: () -> Unit = {},
         onPinchActiveChanged: (Boolean) -> Unit = {},
         onPendingSelectionCountChanged: (Int) -> Unit = {},
+        isPinchToZoomEnabled: Boolean = true,
     ) = setScreenContent(
         { uiState },
         selectedPhotoIds,
@@ -966,6 +994,7 @@ class TimelineRevampScreenTest {
         onZoomIn,
         onPinchActiveChanged,
         onPendingSelectionCountChanged,
+        isPinchToZoomEnabled,
     )
 
     private fun ComposeContentTestRule.setScreenContent(
@@ -977,6 +1006,7 @@ class TimelineRevampScreenTest {
         onZoomIn: () -> Unit = {},
         onPinchActiveChanged: (Boolean) -> Unit = {},
         onPendingSelectionCountChanged: (Int) -> Unit = {},
+        isPinchToZoomEnabled: Boolean = true,
     ) {
         setContent {
             TimelineRevampScreen(
@@ -989,6 +1019,7 @@ class TimelineRevampScreenTest {
                 onZoomIn = onZoomIn,
                 onZoomOut = {},
                 onPinchActiveChanged = onPinchActiveChanged,
+                isPinchToZoomEnabled = isPinchToZoomEnabled,
                 onPendingSelectionCountChanged = onPendingSelectionCountChanged,
                 onMediaTimePeriodSelected = {},
                 onNodeClicked = { _, _ -> },
