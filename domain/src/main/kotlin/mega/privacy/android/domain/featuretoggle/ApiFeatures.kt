@@ -344,6 +344,18 @@ enum class ApiFeatures(
         experimentName = "ccont",
         description = "Enable the Compose version of the contact screens",
         defaultValue = false,
+    ),
+
+    /**
+     * Pinch-to-zoom on the media timeline (AND-23805).
+     * When enabled, pinching the timeline grid steps the grid size between Compact, Default and
+     * Large. When disabled, the gesture is not attached and the grid size is only changeable from
+     * the grid-size menu.
+     */
+    TimelinePinchToZoom(
+        experimentName = "atptz",
+        description = "Enable pinch-to-zoom on the media timeline",
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {

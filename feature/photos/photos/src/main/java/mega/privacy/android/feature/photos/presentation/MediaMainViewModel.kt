@@ -23,6 +23,7 @@ class MediaMainViewModel @Inject constructor(
 
     init {
         getTimelineRevampFlag()
+        getPinchToZoomFlag()
     }
 
     /**
@@ -44,6 +45,19 @@ class MediaMainViewModel @Inject constructor(
                 val isEnabled = getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)
                 uiState.update {
                     it.copy(isTimelineRevampEnabled = isEnabled)
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    private fun getPinchToZoomFlag() {
+        viewModelScope.launch {
+            runCatching {
+                val isEnabled = getFeatureFlagValueUseCase(ApiFeatures.TimelinePinchToZoom)
+                uiState.update {
+                    it.copy(isTimelinePinchToZoomEnabled = isEnabled)
                 }
             }.onFailure {
                 Timber.e(it)

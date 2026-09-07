@@ -129,6 +129,7 @@ internal fun TimelineRevampScreen(
     contentPadding: PaddingValues = PaddingValues(),
     onSelectorVisibleChanged: (Boolean) -> Unit = {},
     onPinchActiveChanged: (Boolean) -> Unit = {},
+    isPinchToZoomEnabled: Boolean = false,
     onPendingSelectionCountChanged: (Int) -> Unit = {},
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
@@ -194,6 +195,7 @@ internal fun TimelineRevampScreen(
                 onZoomIn = onZoomIn,
                 onZoomOut = onZoomOut,
                 onPinchActiveChanged = onPinchActiveChanged,
+                isPinchToZoomEnabled = isPinchToZoomEnabled,
                 onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
@@ -247,6 +249,7 @@ private fun TimelineRevampContent(
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
     onPinchActiveChanged: (Boolean) -> Unit,
+    isPinchToZoomEnabled: Boolean,
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?, Int) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
@@ -367,6 +370,7 @@ private fun TimelineRevampContent(
                 onZoomIn = onZoomIn,
                 onZoomOut = onZoomOut,
                 onPinchActiveChanged = onPinchActiveChanged,
+                isPinchToZoomEnabled = isPinchToZoomEnabled,
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
                 onScrollingChanged = onScrollingChanged,
@@ -396,6 +400,7 @@ private fun TimelineRevampGrid(
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
     onPinchActiveChanged: (Boolean) -> Unit,
+    isPinchToZoomEnabled: Boolean,
     onNodeClicked: (PhotosNodeContentItemV2?, Int) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
     onScrollingChanged: (Boolean) -> Unit,
@@ -668,10 +673,16 @@ private fun TimelineRevampGrid(
                     },
                     onDragSelectEnded = { resolvePendingDragSelection() },
                 )
-                .photosZoomGestureDetector(
-                    onZoomIn = onZoomIn,
-                    onZoomOut = onZoomOut,
-                    onPinchActiveChanged = onPinchActiveChanged,
+                .then(
+                    if (isPinchToZoomEnabled) {
+                        Modifier.photosZoomGestureDetector(
+                            onZoomIn = onZoomIn,
+                            onZoomOut = onZoomOut,
+                            onPinchActiveChanged = onPinchActiveChanged,
+                        )
+                    } else {
+                        Modifier
+                    }
                 )
                 .testTag(TIMELINE_REVAMP_CONTENT_GRID_TAG),
             state = lazyGridState,

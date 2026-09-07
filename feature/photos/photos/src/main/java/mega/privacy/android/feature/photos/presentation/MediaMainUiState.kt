@@ -5,4 +5,5 @@ package mega.privacy.android.feature.photos.presentation
  */
 data class MediaMainUiState(
     val isTimelineRevampEnabled: Boolean? = null,
+    val isTimelinePinchToZoomEnabled: Boolean? = null,
 )
