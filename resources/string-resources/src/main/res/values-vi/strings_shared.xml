@@ -2875,4 +2875,72 @@
     <string name="account_usage_backups_label">Sao lưu dự phòng</string>
     <string name="account_usage_get_more_storage_button">Lấy thêm không gian</string>
     <string name="general_error_word">Lỗi</string>
+    <string name="ongoing_call_messages">Cuộc gọi đang diễn ra</string>
+    <string name="meetings_list_ongoing_call_message">Cuộc họp đang diễn ra</string>
+    <string name="call_ended_message">[A]Cuộc gọi chấm dứt[/A][C]. Thời lượng: [/C]</string>
+    <string name="group_call_ended_message">[A]Cuộc gọi nhóm kết thúc[/A][C]. Thời lượng: [/C]</string>
+    <string name="group_call_ended_no_duration_message">[A]Cuộc gọi nhóm kết thúc[/A]</string>
+    <string name="call_rejected_messages">[A]Cuộc gọi bị từ chối[/A]</string>
+    <string name="call_not_answered_messages">[A]Cuộc gọi không có trả lời[/A]</string>
+    <string name="call_missed_messages">[A]Cuộc gọi nhỡ[/A]</string>
+    <string name="call_failed_messages">[A]Cuộc gọi không thực hiện được[/A]</string>
+    <string name="call_cancelled_messages">[A]Cuộc gọi bị hủy[/A]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] đã cập nhật cuộc họp[/B]</string>
+    <plurals name="plural_call_ended_messages_hours">
+        <item quantity="other">[B]%1$s giờ[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_minutes">
+        <item quantity="other">[B]%1$s phút[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_seconds">
+        <item quantity="other">[B]%1$d giây[/B]</item>
+    </plurals>
+    <string name="check_internet_connection_error">Không có kết nối internet. Kiểm tra kết nối của bạn và thử lại</string>
+    <string name="subscription_quota_transfer_limited_title">Hạn mức truyền tải bị giới hạn</string>
+    <string name="subscription_quota_transfer_low_subtitle">Hạn mức truyền tải của bạn có thể sắp hết. Do đó, các lượt tải xuống hoặc phát trực tuyến của bạn có thể bị gián đoạn. Nâng cấp gói để có thêm hạn mức truyền tải.</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">Nâng cấp gói để có thêm hạn mức truyền tải.</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Quản lý gói của bạn tại [A]mega.io[/A] để có thêm hạn mức truyền tải</string>
+    <string name="audio_player_resumed_snackbar_message">Tiếp tục từ %1$s</string>
+    <string name="new_text_file_rich_text_formatting_label">Định dạng văn bản phong phú</string>
+    <string name="non_format_message_add_participant">%2$s đã thêm %1$s vào cuộc trò chuyện nhóm này</string>
+    <string name="non_format_message_remove_participant">%2$s đã xóa %1$s khỏi cuộc trò chuyện nhóm</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s đã đổi vai trò của %1$s thành người tổ chức</string>
+    <string name="video_player_zoom_fill_screen">Lấp đầy màn hình</string>
+    <string name="password_too_weak_error_message">Sử dụng mật khẩu mạnh hơn.</string>
+    <string name="media_timeline_sort_option_date_taken">Ngày chụp</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="other">Những người có liên kết này sẽ không còn quyền truy cập vào tệp hoặc thư mục nữa</item>
+    </plurals>
+    <string name="account_info_renews_today">Gia hạn hôm nay</string>
+    <string name="account_info_renews_tomorrow_date">Gia hạn vào ngày mai, %1$s</string>
+    <string name="account_info_expires_today">Hết hạn hôm nay</string>
+    <string name="account_info_expires_tomorrow_date">Hết hạn vào ngày mai, %1$s</string>
+    <string name="account_info_expired_yesterday">Đã hết hạn hôm qua</string>
+    <string name="contacts_sent">Đã gửi %s liên hệ</string>
+    <string name="error_message_unrecognizable">Không thể nhận dạng tin nhắn</string>
+    <string name="meetings_list_header_today">Hôm&#160;nay</string>
+    <string name="meetings_list_past_header">Các cuộc họp trước đây</string>
+    <string name="meetings_list_upcoming_meeting_label">Cuộc họp sắp tới</string>
+    <string name="meetings_list_recurring_meeting_label">Cuộc họp định kỳ</string>
+    <string name="title_referral_bonuses">Mời người tham gia MEGA</string>
+    <string name="expired_label">Hết</string>
+    <string name="general_num_days_left">Còn lại %1$d ngày</string>
+    <string name="title_achievement_invite_friends">Cách hoạt động</string>
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="other">Phần thưởng hết hạn trong %1$d ngày</item>
+    </plurals>
+    <string name="unlocked_rewards_title">Phần thưởng đã nhận</string>
+    <string name="unlocked_storage_title">Hạn mức lưu trữ</string>
+    <string name="storage_space">Lưu Trữ</string>
+    <string name="contact_invite">Mời</string>
+    <string name="title_install_app">Tải và cài app cho di&#160;động</string>
+    <string name="title_regitration">Thưởng đăng ký</string>
+    <string name="title_install_desktop">Cài app cho máy&#160;tính</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
 </resources>

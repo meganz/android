@@ -3935,4 +3935,112 @@
     <string name="account_usage_get_more_storage_button">Get more storage</string>
     <!-- The word "Error" on its own, used as a title or a prefix that the error message follows -->
     <string name="general_error_word">Error</string>
+    <!-- Chat list last-message preview shown when a call is currently ongoing in a one-to-one or group chat -->
+    <string name="ongoing_call_messages">Ongoing call</string>
+    <!-- Chat list last-message preview shown when a meeting call is currently in progress -->
+    <string name="meetings_list_ongoing_call_message">Meeting in progress</string>
+    <!-- Chat list last-message preview shown when a one-to-one call has ended; followed by the call duration -->
+    <string name="call_ended_message">[A]Call ended[/A][C]. Duration: [/C]</string>
+    <!-- Chat list last-message preview shown when a group or meeting call has ended; followed by the call duration -->
+    <string name="group_call_ended_message">[A]Group call ended[/A][C]. Duration: [/C]</string>
+    <!-- Chat list last-message preview shown when a group or meeting call has ended without any duration -->
+    <string name="group_call_ended_no_duration_message">[A]Group call ended[/A]</string>
+    <!-- Chat list last-message preview shown when a call was rejected by the callee -->
+    <string name="call_rejected_messages">[A]Call was rejected[/A]</string>
+    <!-- Chat list last-message preview shown to the caller when their call was not answered -->
+    <string name="call_not_answered_messages">[A]Call was not answered[/A]</string>
+    <!-- Chat list last-message preview shown to the callee for a call they missed -->
+    <string name="call_missed_messages">[A]Missed call[/A]</string>
+    <!-- Chat list last-message preview shown when a call failed due to an error -->
+    <string name="call_failed_messages">[A]Call failed[/A]</string>
+    <!-- Chat list last-message preview shown to the caller when they cancelled the call -->
+    <string name="call_cancelled_messages">[A]Call was cancelled[/A]</string>
+    <!-- Chat list last-message preview shown when a scheduled meeting was updated; %1$s is the name of the person who updated it -->
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <!-- Hours component of an ended-call duration in the chat list last-message preview; %1$s is the number of hours -->
+    <plurals name="plural_call_ended_messages_hours">
+        <item quantity="one">[B]%1$s hour[/B]</item>
+        <item quantity="other">[B]%1$s hours[/B]</item>
+    </plurals>
+    <!-- Minutes component of an ended-call duration in the chat list last-message preview; %1$s is the number of minutes -->
+    <plurals name="plural_call_ended_messages_minutes">
+        <item quantity="one">[B]%1$s minute[/B]</item>
+        <item quantity="other">[B]%1$s minutes[/B]</item>
+    </plurals>
+    <!-- Seconds component of an ended-call duration in the chat list last-message preview; %1$d is the number of seconds -->
+    <plurals name="plural_call_ended_messages_seconds">
+        <item quantity="one">[B]%1$d second[/B]</item>
+        <item quantity="other">[B]%1$d seconds[/B]</item>
+    </plurals>
+    <!-- Checkbox label in the new text file dialog to create a rich text (.md) file instead of a plain text file -->
+    <string name="new_text_file_rich_text_formatting_label">Rich text formatting</string>
+    <!-- Title of the quota-warning upsell screen when transfer quota is running low (free or logged-out users) -->
+    <string name="subscription_quota_transfer_limited_title">Limited transfer quota</string>
+    <!-- Subtitle of the quota-warning upsell screen when transfer quota is running low (free or logged-out users). Followed by a 'Learn more' link -->
+    <string name="subscription_quota_transfer_low_subtitle">Your transfer quota may be running low. As a result, your downloads or streams may be interrupted. Upgrade your plan for more transfer quota.</string>
+    <!-- Subtitle of the quota-warning upsell screen when a Pro user's transfer quota is running low. Followed by a 'Learn more' link -->
+    <string name="subscription_quota_transfer_low_pro_subtitle">Upgrade your plan to get more transfer quota.</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is running low on transfer quota. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Manage your plan at [A]mega.io[/A] for more transfer quota</string>
+    <!-- Meetings list: section header shown above meetings scheduled for the current day -->
+    <string name="meetings_list_header_today">Today</string>
+    <!-- Meetings list: section header shown above meetings that have already taken place -->
+    <string name="meetings_list_past_header">Past meetings</string>
+    <!-- Meetings list: label for a one-off meeting scheduled to happen in the future -->
+    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <!-- Meetings list: label for a meeting that repeats on a schedule -->
+    <string name="meetings_list_recurring_meeting_label">Recurring meeting</string>
+    <!-- Meetings list: schedule label for a meeting that repeats every day. Placeholder is the time range, e.g. "10:00am - 11:00am" -->
+    <string name="meetings_list_scheduled_meeting_daily_label">%1$s daily</string>
+    <!-- Meetings list: schedule label for a meeting that repeats every week. Placeholder is the time range, e.g. "10:00am - 11:00am" -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%1$s weekly</string>
+    <!-- Meetings list: schedule label for a meeting that repeats every month. Placeholder is the time range, e.g. "10:00am - 11:00am" -->
+    <string name="meetings_list_scheduled_meeting_monthly_label">%1$s monthly</string>
+    <!-- Achievements referral screen: toolbar title for the list of people invited to MEGA -->
+    <string name="title_referral_bonuses">Invite people to MEGA</string>
+    <!-- Achievements: label shown when a reward has expired -->
+    <string name="expired_label">Expired</string>
+    <!-- Achievements referral screen: number of days remaining before an invite reward expires. %1$d is the day count -->
+    <string name="general_num_days_left">%1$d days left</string>
+    <!-- Achievements info screen: "How it works" section heading -->
+    <string name="title_achievement_invite_friends">How it works</string>
+    <!-- Achievements info screen: description shown after the user was awarded storage for installing the mobile app. %1$s is the storage amount, e.g. "1 GB" -->
+    <string name="result_paragraph_info_achievement_install_mobile_app">You received %1$s of extra storage for installing our mobile app.</string>
+    <!-- Achievements info screen: description shown after the user was awarded storage for installing the desktop app. %1$s is the storage amount, e.g. "1 GB" -->
+    <string name="result_paragraph_info_achievement_install_desktop">You received %1$s of extra storage for installing our desktop app.</string>
+    <!-- Achievements info screen: description shown after the user was awarded the signup bonus storage. %1$s is the storage amount, e.g. "1 GB" -->
+    <string name="result_paragraph_info_achievement_registration">You received %1$s of extra storage as a sign up bonus.</string>
+    <!-- Achievements info screen: number of days until an awarded bonus expires. %1$d is the day count -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Achievements overview screen: header title above the total unlocked storage reward -->
+    <string name="unlocked_rewards_title">Unlocked rewards</string>
+    <!-- Achievements overview screen: caption below the total unlocked storage reward -->
+    <string name="unlocked_storage_title">Storage quota</string>
+    <!-- Achievements overview screen: caption shown under an awarded storage amount -->
+    <string name="storage_space">Storage</string>
+    <!-- Achievements overview screen: button to invite friends to MEGA -->
+    <string name="contact_invite">Invite</string>
+    <!-- Achievements overview screen: title of the "install our mobile app" reward row -->
+    <string name="title_install_app">Install our mobile app</string>
+    <!-- Achievements overview screen: title of the signup bonus reward row -->
+    <string name="title_regitration">Signup bonus</string>
+    <!-- Achievements overview screen: title of the "install our desktop app" reward row -->
+    <string name="title_install_desktop">Install our desktop app</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
 </resources>

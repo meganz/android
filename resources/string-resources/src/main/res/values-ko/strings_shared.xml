@@ -2912,4 +2912,54 @@
     <string name="account_usage_backups_label">백업</string>
     <string name="account_usage_get_more_storage_button">더 많은 저장소 받기</string>
     <string name="general_error_word">오류</string>
+    <string name="ongoing_call_messages">진행중인 통화</string>
+    <string name="meetings_list_ongoing_call_message">회의가 진행 중입니다</string>
+    <string name="call_ended_message">[A]통화 종료[/A][C]. 시간: [/C]</string>
+    <string name="group_call_ended_message">[A]단체 통화 종료[/A][C]. 통화 시간: [/C]</string>
+    <string name="group_call_ended_no_duration_message">[A]단체 통화 종료[/A]</string>
+    <string name="call_rejected_messages">[A]통화가 거절됨[/A]</string>
+    <string name="call_not_answered_messages">[A]통화에 응답하지 않음[/A]</string>
+    <string name="call_missed_messages">[A]부재중 전화[/A]</string>
+    <string name="call_failed_messages">[A]통화 실패[/A]</string>
+    <string name="call_cancelled_messages">[A]통화가 취소됨[/A]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A]님이 [B]회의를 수정하였습니다[/B]</string>
+    <plurals name="plural_call_ended_messages_hours">
+        <item quantity="other">[B]%1$s 시간[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_minutes">
+        <item quantity="other">[B]%1$s 분[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_seconds">
+        <item quantity="other">[B]%1$d 초[/B]</item>
+    </plurals>
+    <string name="subscription_quota_transfer_limited_title">제한된 전송 용량</string>
+    <string name="subscription_quota_transfer_low_subtitle">전송 용량이 부족해질 수 있습니다. 이로 인해 다운로드 또는 스트리밍이 중단될 수 있습니다. 더 많은 전송 용량을 확보하려면 요금제를 업그레이드하세요.</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">더 많은 전송 용량을 확보하려면 요금제를 업그레이드하세요.</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">더 많은 전송 용량을 확보하려면 [A]mega.io[/A]에서 요금제를 관리하세요</string>
+    <string name="new_text_file_rich_text_formatting_label">리치 텍스트 서식</string>
+    <string name="meetings_list_header_today">오늘</string>
+    <string name="meetings_list_past_header">지난 회의</string>
+    <string name="meetings_list_upcoming_meeting_label">다가오는 회의</string>
+    <string name="meetings_list_recurring_meeting_label">반복 회의</string>
+    <string name="title_referral_bonuses">MEGA에 사람들 초대</string>
+    <string name="expired_label">만료됨</string>
+    <string name="general_num_days_left">%1$d일 남음</string>
+    <string name="title_achievement_invite_friends">작동 원리</string>
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="other">%1$d일 내에 보너스가 만료됩니다</item>
+    </plurals>
+    <string name="unlocked_rewards_title">해제된 보상</string>
+    <string name="unlocked_storage_title">저장소 할당량</string>
+    <string name="storage_space">저장소</string>
+    <string name="contact_invite">초대</string>
+    <string name="title_install_app">모바일 앱 설치</string>
+    <string name="title_regitration">가입 보너스</string>
+    <string name="title_install_desktop">데스크톱 앱 설치</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]B</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]KB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]MB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]GB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]TB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]PB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]EB</string>
 </resources>

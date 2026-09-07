@@ -2923,4 +2923,60 @@
     <string name="account_usage_backups_label">バックアップ</string>
     <string name="account_usage_get_more_storage_button">ストレージをさらに増やす</string>
     <string name="general_error_word">エラー</string>
+    <string name="call_ended_message">[A]通話が終了しました[/A][C]。通話時間：[/C]</string>
+    <string name="group_call_ended_message">[A]グループ通話が終了しました[/A][C]。通話時間：[/C]</string>
+    <string name="group_call_ended_no_duration_message">[A]グループ通話が終了しました[/A]</string>
+    <string name="call_rejected_messages">[A]着信が拒否されました[/A]</string>
+    <string name="call_not_answered_messages">[A]着信に応答されませんでした[/A]</string>
+    <string name="call_missed_messages">[A]不在着信[/A]</string>
+    <string name="call_failed_messages">[A]通話に失敗しました[/A]</string>
+    <string name="call_cancelled_messages">[A]着信が取り消されました[/A]</string>
+    <plurals name="plural_call_ended_messages_hours">
+        <item quantity="other">[B]%1$s 時間[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_minutes">
+        <item quantity="other">[B]%1$s 分[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_seconds">
+        <item quantity="other">[B]%1$d 秒[/B]</item>
+    </plurals>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B]さんがミーティングを更新しました[/B]</string>
+    <string name="ongoing_call_messages">継続中の通話</string>
+    <string name="meetings_list_ongoing_call_message">ミーティング中</string>
+    <string name="new_text_file_rich_text_formatting_label">リッチテキスト形式</string>
+    <string name="subscription_quota_transfer_limited_title">転送容量の制限</string>
+    <string name="subscription_quota_transfer_low_subtitle">転送容量が残り少なくなっている可能性があります。そのため、ダウンロードやストリーミングが中断される場合があります。プランをアップグレードしていただくと、より豊富な転送容量で快適にお楽しみいただけます。</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">プランをアップグレードして、より豊富な転送容量でお楽しみください。</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">[A]mega.io[/A] でプランを管理して、転送容量を追加できます。</string>
+    <string name="meetings_list_header_today">今日</string>
+    <string name="meetings_list_past_header">過去のミーティング</string>
+    <string name="meetings_list_upcoming_meeting_label">今後のミーティング</string>
+    <string name="meetings_list_recurring_meeting_label">定期ミーティング</string>
+    <string name="title_referral_bonuses">友人や知り合いをMEGAに招待</string>
+    <string name="expired_label">失効日</string>
+    <string name="general_num_days_left">残り%1$d日</string>
+    <string name="title_achievement_invite_friends">仕組み</string>
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="other">ボーナスは%1$d日後に有効期限が切れます</item>
+    </plurals>
+    <string name="meetings_list_scheduled_meeting_daily_label">毎日 %1$s</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">毎週 %1$s</string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">毎月 %1$s</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">モバイルアプリのインストール特典として、追加ストレージ%1$sを獲得しました。</string>
+    <string name="result_paragraph_info_achievement_install_desktop">デスクトップアプリのインストール特典として、追加ストレージ%1$sを獲得しました。</string>
+    <string name="result_paragraph_info_achievement_registration">新規登録特典として、追加ストレージ%1$sを獲得しました。</string>
+    <string name="unlocked_rewards_title">ロック解除された報酬</string>
+    <string name="unlocked_storage_title">ストレージ容量</string>
+    <string name="storage_space">ストレージ</string>
+    <string name="contact_invite">招待</string>
+    <string name="title_install_app">当社のモバイルアプリをインストール</string>
+    <string name="title_regitration">サインアップボーナス</string>
+    <string name="title_install_desktop">MEGAデスクトップアプリをインストール</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
 </resources>

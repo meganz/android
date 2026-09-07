@@ -997,7 +997,7 @@
     <!-- Hidden nodes description: hide files and folders feature -->
     <string name="hidden_nodes_description_hide_files_folders_feature">Tek bir kolay adımla hassas dosyaları ve klasörleri gizlilik için saklayabilirsiniz.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Gözden uzak</string>
+    <string name="hidden_nodes_title_control_visibility">Gözden ırak</string>
     <!-- Hidden nodes description: control visibility feature -->
     <string name="hidden_nodes_description_control_visibility">Gizli dosyaları yalnızca siz; ister tek tek, ister Ayarlar’dan gizli öğeleri geçici olarak göstererek ortaya çıkarabilirsiniz.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
@@ -3055,4 +3055,64 @@
     <string name="account_usage_backups_label">Yedekler</string>
     <string name="account_usage_get_more_storage_button">Daha fazla depolama edin</string>
     <string name="general_error_word">Hata</string>
+    <string name="ongoing_call_messages">Devam eden arama</string>
+    <string name="meetings_list_ongoing_call_message">Toplantı devam ediyor</string>
+    <string name="call_ended_message">[A]Arama sona erdi[/A][C]. Süre: [/C]</string>
+    <string name="group_call_ended_message">[A]Grup araması sonra erdi[/A][C]. Süre: [/C]</string>
+    <string name="group_call_ended_no_duration_message">[A]Grup araması sona erdi[/A]</string>
+    <string name="call_rejected_messages">[A]Arama reddedildi[/A]</string>
+    <string name="call_not_answered_messages">[A]Arama cevaplanmadı[/A]</string>
+    <string name="call_missed_messages">[A]Cevapsız arama[/A]</string>
+    <string name="call_failed_messages">[A]Arama başarısız oldu[/A]</string>
+    <string name="call_cancelled_messages">[A]Arama iptal edildi[/A]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] toplantıyı güncelledi[/B]</string>
+    <plurals name="plural_call_ended_messages_hours">
+        <item quantity="one">[B]%1$s saat[/B]</item>
+        <item quantity="other">[B]%1$s saat[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_minutes">
+        <item quantity="one">[B]%1$s dakika[/B]</item>
+        <item quantity="other">[B]%1$s dakika[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_seconds">
+        <item quantity="one">[B]%1$d saniye[/B]</item>
+        <item quantity="other">[B]%1$d saniye[/B]</item>
+    </plurals>
+    <string name="new_text_file_rich_text_formatting_label">Zengin metin biçiminde</string>
+    <string name="subscription_quota_transfer_limited_title">Sınırlı aktarım kotası</string>
+    <string name="subscription_quota_transfer_low_subtitle">Aktarım kotanız azalıyor olabilir. Sonuç olarak, indirmeleriniz veya akışlarınız kesintiye uğrayabilir. Daha fazla aktarım kotası için planınızı yükseltin.</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">Daha fazla aktarım kotası almak için planınızı yükseltin.</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Daha fazla aktarım kotası için planınızı [A]mega.io[/A] üzerinden yönetin</string>
+    <string name="meetings_list_header_today">Bugün</string>
+    <string name="meetings_list_past_header">Geçmiş toplantılar</string>
+    <string name="meetings_list_upcoming_meeting_label">Yaklaşan toplantı</string>
+    <string name="meetings_list_recurring_meeting_label">Yinelenen toplantı</string>
+    <string name="title_referral_bonuses">MEGA’ya davet et</string>
+    <string name="expired_label">Süresi doldu</string>
+    <string name="general_num_days_left">%1$d gün kaldı</string>
+    <string name="title_achievement_invite_friends">Nasıl işliyor?</string>
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonusun süresi %1$d gün sonra doluyor</item>
+        <item quantity="other">Bonusun süresi %1$d gün sonra doluyor</item>
+    </plurals>
+    <string name="meetings_list_scheduled_meeting_daily_label">Günlük %1$s</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">Haftalık %1$s</string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">Aylık %1$s</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Mobil uygulamamızı yüklediğiniz için %1$s ek depolama alanı aldınız.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Masaüstü uygulamamızı yüklediğiniz için %1$s ek depolama alanı aldınız.</string>
+    <string name="result_paragraph_info_achievement_registration">Kaydolma bonusu olarak %1$s ek depolama alanı aldınız.</string>
+    <string name="unlocked_rewards_title">Kilidi açılmış ödüller</string>
+    <string name="unlocked_storage_title">Depolama kotası</string>
+    <string name="storage_space">Depolama alanı</string>
+    <string name="contact_invite">Davet et</string>
+    <string name="title_install_app">Mobil uygulamamızı yükleyin</string>
+    <string name="title_regitration">Kayıt bonusu</string>
+    <string name="title_install_desktop">Masaüstü uygulamamızı yükleyin</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
 </resources>

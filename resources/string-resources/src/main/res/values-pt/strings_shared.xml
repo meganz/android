@@ -3182,4 +3182,62 @@
     <string name="account_usage_backups_label">Backups</string>
     <string name="account_usage_get_more_storage_button">Obter mais armazenamento</string>
     <string name="general_error_word">Erro</string>
+    <string name="ongoing_call_messages">Chamada em andamento</string>
+    <string name="meetings_list_ongoing_call_message">Reunião em andamento</string>
+    <string name="call_ended_message">[A]Chamada finalizada[/A][C]. Duração:[/C]</string>
+    <string name="group_call_ended_message">[A]Chamada em grupo finalizada[/A][C]. Duração: [/C]</string>
+    <string name="group_call_ended_no_duration_message">[A]Chamada em grupo finalizada[/A]</string>
+    <string name="call_rejected_messages">[A]Chamada recusada[/A]</string>
+    <string name="call_not_answered_messages">[A]Chamada não atendida[/A]</string>
+    <string name="call_missed_messages">[A]Chamada perdida[/A]</string>
+    <string name="call_failed_messages">[A]Falha na chamada[/A]</string>
+    <string name="call_cancelled_messages">[A]Chamada cancelada[/A]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] atualizou a reunião[/B]</string>
+    <plurals name="plural_call_ended_messages_hours">
+        <item quantity="one">[B]%1$s hora[/B]</item>
+        <item quantity="many">[B]%1$s horas[/B]</item>
+        <item quantity="other">[B]%1$s horas[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_minutes">
+        <item quantity="one">[B]%1$s minuto[/B]</item>
+        <item quantity="many">[B]%1$s minutos[/B]</item>
+        <item quantity="other">[B]%1$s minutos[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_seconds">
+        <item quantity="one">[B]%1$d segundo[/B]</item>
+        <item quantity="many">[B]%1$d segundos[/B]</item>
+        <item quantity="other">[B]%1$d segundos[/B]</item>
+    </plurals>
+    <string name="new_text_file_rich_text_formatting_label">Formatação de texto enriquecido</string>
+    <string name="subscription_quota_transfer_limited_title">Cota de transferência limitada</string>
+    <string name="subscription_quota_transfer_low_subtitle">A sua cota de transferência pode estar acabando. Como resultado, o download e o streaming de dados podem ser interrompidos. Faça o upgrade do seu plano para obter mais cota de transferência.</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">Faça o upgrade do seu plano para obter mais cota de transferência.</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Gerencie o seu plano em [A]mega.io[/A] para obter mais cota de transferência</string>
+    <string name="meetings_list_header_today">Hoje</string>
+    <string name="meetings_list_past_header">Reuniões anteriores</string>
+    <string name="meetings_list_upcoming_meeting_label">Próxima reunião</string>
+    <string name="meetings_list_recurring_meeting_label">Reunião periódica</string>
+    <string name="title_referral_bonuses">Convidar amigos ao MEGA</string>
+    <string name="expired_label">Expirado</string>
+    <string name="general_num_days_left">%1$d dias restantes</string>
+    <string name="title_achievement_invite_friends">Como funciona</string>
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">O bônus expira em %1$d dias</item>
+        <item quantity="many">O bônus expira em %1$d de dias</item>
+        <item quantity="other">O bônus expira em %1$d dias</item>
+    </plurals>
+    <string name="unlocked_rewards_title">Bônus obtidos</string>
+    <string name="unlocked_storage_title">Espaço de armazenamento</string>
+    <string name="storage_space">Armazenamento</string>
+    <string name="contact_invite">Convidar</string>
+    <string name="title_install_app">Instalar o app móvel</string>
+    <string name="title_regitration">Bônus de cadastro</string>
+    <string name="title_install_desktop">Instalar o app para desktop</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
 </resources>
