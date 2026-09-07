@@ -42,6 +42,7 @@ dependencies {
     implementation(androidx.hilt.navigation)
     implementation(androidx.material3.adaptive.navigation.suite)
     implementation(androidx.navigation3.runtime)
+    implementation(androidx.constraintlayout.compose)
     implementation(lib.kotlin.serialisation)
     implementation(lib.mega.analytics)
     implementation(lib.mega.core.ui)
