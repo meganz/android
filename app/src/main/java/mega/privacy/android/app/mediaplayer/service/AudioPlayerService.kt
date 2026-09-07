@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -976,6 +977,17 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
          * because a started+bound service is not destroyed until all clients unbind — and the
          * mini player's MediaController only unbinds after receiving the notification.
          */
+        /**
+         * Starts the service, marking it as running before the request is handed to the system:
+         * [onCreate] only executes on a later main-loop pass, and a stop issued inside that
+         * window must still reach the service instead of being dropped by [stopAudioPlayer]'s
+         * guard.
+         */
+        fun start(context: Context, intent: Intent) {
+            isRunning = true
+            ContextCompat.startForegroundService(context, intent)
+        }
+
         fun stopAudioPlayer(context: Context) {
             // The stop command is delivered via startService: without this guard it would
             // first start a service that is not running just to stop it (spurious onCreate,

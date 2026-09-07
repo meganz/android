@@ -309,7 +309,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
         val extras = intent.extras ?: return
         val serviceIntent = Intent(context, AudioPlayerService::class.java).putExtras(extras)
         serviceIntent.setDataAndType(intent.data, intent.type)
-        runCatching { ContextCompat.startForegroundService(context, serviceIntent) }
+        runCatching { AudioPlayerService.start(context, serviceIntent) }
             .onFailure { Timber.e(it, "Failed to start AudioPlayerService") }
         reconnectController()
     }
