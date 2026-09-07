@@ -499,7 +499,7 @@ class SharedItemsTest {
         device.findObject(By.res(REMOVE_LINK_ACTION_TAG)).click()
 
         awaitObject(
-            By.text(str("remove_links_warning_message")),
+            By.text(plural("remove_link_dialog_description", 1)),
             LOAD_TIMEOUT,
             "$label-remove-link-dialog",
         )

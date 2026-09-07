@@ -39,6 +39,10 @@ class CustomiseNavigationJourneyTest : BottomNavigationTestBase() {
         click(CUSTOMISE_SAVE_BUTTON_TAG, "save-button")
         awaitAnalyticsEvent("CustomiseNavigationSaveButtonPressed")
 
+        // The save button also tracks its event when the selection is rejected, and only a
+        // persisted selection closes the screen; without this the bar assertions below would
+        // report a missing item rather than a selection the screen refused to save.
+        awaitGone(By.res(CUSTOMISE_SAVE_BUTTON_TAG), "customise-screen")
         awaitObject(By.res(CHAT_NAV_ITEM_TAG), LOAD_TIMEOUT, "chat-nav-item")
         assertBarOrder(
             CHAT_NAV_ITEM_TAG,

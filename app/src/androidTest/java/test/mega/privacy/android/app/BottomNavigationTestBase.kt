@@ -17,6 +17,7 @@ import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.boot.TestAppBoot
 import mega.privacy.android.app.flags.RemoteFeatureFlagSeeder
 import mega.privacy.android.data.test.gateway.FakeMegaApiGateway
+import mega.privacy.android.domain.usecase.SetHomeConfigurationTooltipShownUseCase
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.preference.SetCustomiseNavigationTooltipShownUseCase
@@ -65,6 +66,9 @@ abstract class BottomNavigationTestBase {
     @Inject
     lateinit var setCustomiseNavigationTooltipShownUseCase: SetCustomiseNavigationTooltipShownUseCase
 
+    @Inject
+    lateinit var setHomeConfigurationTooltipShownUseCase: SetHomeConfigurationTooltipShownUseCase
+
     protected val instrumentation get() = InstrumentationRegistry.getInstrumentation()
 
     protected val targetContext get() = instrumentation.targetContext
@@ -98,6 +102,11 @@ abstract class BottomNavigationTestBase {
         runBlocking {
             saveAccountCredentialsUseCase()
             getSpecificAccountDetailUseCase(storage = true, transfer = true, pro = true)
+
+            // The unrelated "Customise Home" onboarding tooltip lands on the same screen and
+            // labels its action "Explore" too, so leaving it on makes that text ambiguous and
+            // puts a popup over the Home content these journeys drive.
+            setHomeConfigurationTooltipShownUseCase()
         }
     }
 
@@ -137,16 +146,60 @@ abstract class BottomNavigationTestBase {
     /**
      * Toggles a customise-screen navigation item row by clicking the row's Toggle (the only
      * checkable node inside the row); rows themselves are not clickable on that screen.
+     *
+     * Toggling moves the row between the "Your navigation" and "Available to add" cards, so every
+     * toggle reflows the screen underneath the next one. The click is therefore confirmed against
+     * the row's checked state and repeated when it did not land, rather than assumed.
      */
     protected fun toggleNavigationItem(id: String) {
         val rowTag = navigationItemRowTag(id)
-        scrollToRes(rowTag, "navigation-item-row-$id")
-        val toggle = device.findObject(By.res(rowTag)).findObject(By.checkable(true))
-        if (toggle == null) {
-            dumpHierarchy("navigation-item-toggle-$id")
-            throw AssertionError("No checkable toggle inside row $rowTag; hierarchy in logcat tag UiDump")
+        val name = "navigation-item-row-$id"
+        scrollToRes(rowTag, name)
+        val before = awaitToggleState(rowTag)
+            ?: throw AssertionError("No checkable toggle inside row $rowTag${describe(name)}")
+
+        repeat(TOGGLE_ATTEMPTS) {
+            scrollToRes(rowTag, name)
+            device.waitForIdle()
+            clickToggle(rowTag)
+            if (awaitToggleState(rowTag) { it == !before } != null) return
         }
-        toggle.click()
+
+        throw AssertionError(
+            "Toggling $rowTag $TOGGLE_ATTEMPTS times never changed its checked state from " +
+                    "$before${describe(name)}",
+        )
+    }
+
+    /**
+     * Reads the checked state of the toggle inside [rowTag], or null when the row is absent or
+     * was recreated mid-read.
+     *
+     * Every read is a fresh lookup and every failure is tolerated: toggling a row moves it
+     * between the two cards, which destroys and recreates its node and staleness-invalidates
+     * anything captured across that reflow.
+     */
+    private fun toggleCheckedState(rowTag: String): Boolean? = runCatching {
+        device.findObject(By.res(rowTag))?.findObject(By.checkable(true))?.isChecked
+    }.getOrNull()
+
+    private fun clickToggle(rowTag: String) {
+        runCatching {
+            device.findObject(By.res(rowTag))?.findObject(By.checkable(true))?.click()
+        }
+    }
+
+    /** Polls [toggleCheckedState] for [rowTag] until it satisfies [predicate], else null. */
+    private fun awaitToggleState(
+        rowTag: String,
+        predicate: (Boolean) -> Boolean = { true },
+    ): Boolean? {
+        val deadline = SystemClock.uptimeMillis() + NAVIGATION_SETTLE_MS
+        while (SystemClock.uptimeMillis() < deadline) {
+            toggleCheckedState(rowTag)?.takeIf(predicate)?.let { return it }
+            Thread.sleep(POLL_INTERVAL_MS)
+        }
+        return null
     }
 
     /**
@@ -197,18 +250,16 @@ abstract class BottomNavigationTestBase {
             device.findObject(clickSelector)?.click()
             if (device.wait(Until.hasObject(expectedSelector), NAVIGATION_SETTLE_MS)) return
         }
-        dumpHierarchy(name)
         throw AssertionError(
-            "Clicking $name ($clickSelector) $attempts times never showed $expectedSelector; " +
-                    "hierarchy in logcat tag UiDump",
+            "Clicking $name ($clickSelector) $attempts times never showed " +
+                    "$expectedSelector${describe(name)}",
         )
     }
 
     protected fun awaitObject(selector: BySelector, timeout: Long, name: String): UiObject2 {
         if (!device.wait(Until.hasObject(selector), timeout)) {
-            dumpHierarchy(name)
             throw AssertionError(
-                "Timed out after ${timeout}ms waiting for $name ($selector); hierarchy in logcat tag UiDump",
+                "Timed out after ${timeout}ms waiting for $name ($selector)${describe(name)}",
             )
         }
         return device.findObject(selector)
@@ -216,9 +267,9 @@ abstract class BottomNavigationTestBase {
 
     protected fun awaitGone(selector: BySelector, name: String) {
         if (device.wait(Until.gone(selector), LOAD_TIMEOUT)) return
-        dumpHierarchy(name)
         throw AssertionError(
-            "Timed out after ${LOAD_TIMEOUT}ms waiting for $name ($selector) to disappear; hierarchy in logcat tag UiDump",
+            "Timed out after ${LOAD_TIMEOUT}ms waiting for $name ($selector) to " +
+                    "disappear${describe(name)}",
         )
     }
 
@@ -228,8 +279,9 @@ abstract class BottomNavigationTestBase {
      */
     protected fun assertNotPresent(selector: BySelector, name: String, settleMs: Long = ABSENCE_SETTLE_MS) {
         if (device.wait(Until.hasObject(selector), settleMs)) {
-            dumpHierarchy(name)
-            throw AssertionError("Expected $name ($selector) to be absent but it appeared; hierarchy in logcat tag UiDump")
+            throw AssertionError(
+                "Expected $name ($selector) to be absent but it appeared${describe(name)}",
+            )
         }
     }
 
@@ -252,13 +304,37 @@ abstract class BottomNavigationTestBase {
         awaitObject(selector, LOAD_TIMEOUT, name)
     }
 
-    private fun dumpHierarchy(name: String) {
+    /**
+     * Logs the full window hierarchy and returns a compact summary of it — one line per node that
+     * carries a resource id or text, with its checked state and visible bounds.
+     *
+     * The summary is appended to every assertion message because the CI device-test report keeps
+     * only the exception, not logcat, which left CI-only failures with nothing to diagnose from.
+     */
+    private fun dumpHierarchy(name: String): String {
         val stream = ByteArrayOutputStream()
         device.dumpWindowHierarchy(stream)
-        stream.toString("UTF-8").chunked(3000).forEachIndexed { index, chunk ->
+        val xml = stream.toString("UTF-8")
+        xml.chunked(3000).forEachIndexed { index, chunk ->
             Log.d("UiDump", "[$name#$index] $chunk")
         }
+        return NODE_PATTERN.findAll(xml)
+            .mapNotNull { match ->
+                val node = match.value
+                val id = node.attribute("resource-id")
+                val text = node.attribute("text")
+                if (id.isEmpty() && text.isEmpty()) return@mapNotNull null
+                "$id|$text|checked=${node.attribute("checked")}|${node.attribute("bounds")}"
+            }
+            .distinct()
+            .joinToString(separator = "\n")
     }
+
+    /** [dumpHierarchy] rendered for an assertion message. */
+    private fun describe(name: String) = "; screen was:\n${dumpHierarchy(name)}"
+
+    private fun String.attribute(name: String) =
+        Regex("$name=\"([^\"]*)\"").find(this)?.groupValues?.get(1).orEmpty()
 
     // endregion
 
@@ -313,7 +389,10 @@ abstract class BottomNavigationTestBase {
         const val ABSENCE_SETTLE_MS = 3_000L
         const val NAVIGATION_SETTLE_MS = 5_000L
         const val NAVIGATION_CLICK_ATTEMPTS = 3
+        const val TOGGLE_ATTEMPTS = 3
         const val MAX_SCROLL_SWIPES = 5
+
+        private val NODE_PATTERN = Regex("<node[^>]*>")
 
         /** Main navigation bar and per-item tags ("main_navigation:navigation_item_<NavKey>"). */
         const val NAVIGATION_BAR_TAG = "main_navigation:navigation_bar"

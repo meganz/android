@@ -22,6 +22,7 @@ import mega.privacy.android.data.test.stub.StubMegaRecentActionBucket
 import mega.privacy.android.data.test.stub.StubMegaRecentActionBucketList
 import mega.privacy.android.data.test.stub.StubMegaRequest
 import mega.privacy.android.data.test.stub.StubMegaTransfer
+import mega.privacy.android.domain.usecase.SetHomeConfigurationTooltipShownUseCase
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import nz.mega.sdk.MegaRequest
@@ -86,6 +87,9 @@ class HomeScreenTest {
     @Inject
     lateinit var getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase
 
+    @Inject
+    lateinit var setHomeConfigurationTooltipShownUseCase: SetHomeConfigurationTooltipShownUseCase
+
     private val instrumentation get() = InstrumentationRegistry.getInstrumentation()
 
     private val targetContext get() = instrumentation.targetContext
@@ -121,6 +125,10 @@ class HomeScreenTest {
         runBlocking {
             saveAccountCredentialsUseCase()
             getSpecificAccountDetailUseCase(storage = true, transfer = true, pro = true)
+
+            // The one-time "Customise Home" onboarding tooltip is a popup that covers the
+            // shortcut chips row, so on a fresh install it swallows taps meant for the chips.
+            setHomeConfigurationTooltipShownUseCase()
         }
     }
 
