@@ -21,6 +21,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
+import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
@@ -36,6 +37,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.getSelectedItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.rememberScrollUpVisibility
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
@@ -122,7 +124,11 @@ fun CloudDriveScreen(
         Analytics.tracker.trackEvent(CloudDriveScreenEvent)
     }
 
+    val scrollToHideBehavior = rememberScrollToHideBehavior()
+    val showNodeHeader = rememberScrollUpVisibility(scrollToHideBehavior)
+
     MegaScaffoldWithTopAppBarScrollBehavior(
+        scrollToHideBehavior = scrollToHideBehavior,
         topBar = {
             when (val state = uiState) {
                 is CloudDriveUiState.Loading -> {
@@ -236,6 +242,7 @@ fun CloudDriveScreen(
             @SuppressLint("ComposeViewModelForwarding")
             CloudDriveContent(
                 isTabContent = false,
+                showNodeHeader = showNodeHeader,
                 navigationHandler = navigationHandler,
                 uiState = uiState,
                 showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,

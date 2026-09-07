@@ -1,5 +1,10 @@
 package mega.privacy.android.shared.nodes.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -122,6 +127,72 @@ fun NodeHeaderItem(
                 )
             }
         }
+    }
+}
+
+/**
+ * [NodeHeaderItem] placed above a node list instead of inside it, expanding and collapsing with an
+ * animation as [visible] changes. It carries the same paddings the in list header uses, so both
+ * variants line up with the node items.
+ *
+ * The caller owns [visible] — typically derived from the scroll direction — and is responsible for
+ * suppressing the in list header, otherwise it is shown twice.
+ *
+ * @param visible whether the header is expanded
+ * @param onSortOrderClick callback triggered when sort order is clicked
+ * @param onChangeViewTypeClick callback triggered when view type toggle is clicked
+ * @param sortConfiguration current sort configuration (option and direction)
+ * @param isListView current view type - true for list view, false for grid view
+ * @param modifier optional [Modifier] for this composable
+ * @param onEnterMediaDiscoveryClick callback triggered when media discovery button is clicked
+ * @param showMediaDiscoveryButton whether to show the media discovery button
+ */
+@Composable
+fun ScrollToHideNodeHeaderItem(
+    visible: Boolean,
+    onSortOrderClick: () -> Unit,
+    onChangeViewTypeClick: () -> Unit,
+    sortConfiguration: NodeSortConfiguration,
+    isListView: Boolean,
+    modifier: Modifier = Modifier,
+    onEnterMediaDiscoveryClick: () -> Unit = {},
+    showMediaDiscoveryButton: Boolean = false,
+) {
+    AnimatedVisibility(
+        modifier = modifier,
+        visible = visible,
+        enter = expandVertically() + fadeIn(),
+        exit = shrinkVertically() + fadeOut(),
+    ) {
+        NodeHeaderItem(
+            modifier = Modifier
+                .padding(horizontal = DSTokens.spacings.s3)
+                .padding(bottom = DSTokens.spacings.s3),
+            onSortOrderClick = onSortOrderClick,
+            onChangeViewTypeClick = onChangeViewTypeClick,
+            onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+            sortConfiguration = sortConfiguration,
+            isListView = isListView,
+            showSortOrder = true,
+            showChangeViewType = true,
+            showMediaDiscoveryButton = showMediaDiscoveryButton,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ScrollToHideNodeHeaderItemPreview() {
+    AndroidThemeForPreviews {
+        ScrollToHideNodeHeaderItem(
+            visible = true,
+            onChangeViewTypeClick = {},
+            onSortOrderClick = {},
+            onEnterMediaDiscoveryClick = {},
+            isListView = true,
+            sortConfiguration = NodeSortConfiguration.default,
+            showMediaDiscoveryButton = true
+        )
     }
 }
 

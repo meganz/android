@@ -75,6 +75,7 @@ import mega.privacy.android.shared.account.overquota.view.OverQuotaWarningBanner
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.ScrollToHideNodeHeaderItem
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
@@ -117,6 +118,7 @@ internal fun CloudDriveContent(
     navigateToFolder: (TypedFolderNode, NodeSourceType) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
+    showNodeHeader: Boolean = true,
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
@@ -275,6 +277,41 @@ internal fun CloudDriveContent(
                 } else {
                     val folderName = uiState.title.text
                     var selectedFile: TypedFileNode? by remember { mutableStateOf(null) }
+                    val onSortOrderClick = {
+                        Analytics.tracker.trackEvent(SortButtonPressedEvent)
+                        showSortBottomSheet = true
+                    }
+                    val onChangeViewTypeClick = {
+                        onAction(
+                            ChangeViewTypeClicked(
+                                when (uiState.currentViewType) {
+                                    ViewType.LIST -> ViewType.GRID
+                                    ViewType.GRID -> ViewType.LIST
+                                }
+                            )
+                        )
+                    }
+                    val onEnterMediaDiscoveryClick = {
+                        navigationHandler.navigate(
+                            CloudDriveMediaDiscoveryNavKey(
+                                folderId = uiState.currentFolderId.longValue,
+                                folderName = folderName,
+                                fromFolderLink = false,
+                                nodeSourceType = uiState.nodeSourceType,
+                            )
+                        )
+                    }
+
+                    ScrollToHideNodeHeaderItem(
+                        visible = showNodeHeader,
+                        onSortOrderClick = onSortOrderClick,
+                        onChangeViewTypeClick = onChangeViewTypeClick,
+                        onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                        sortConfiguration = uiState.selectedSortConfiguration,
+                        isListView = isListView,
+                        showMediaDiscoveryButton = uiState.isMediaDiscoveryAllowed,
+                    )
+
                     NodesView(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -312,31 +349,12 @@ internal fun CloudDriveContent(
                         onLongClicked = { selectionState.toggleSelection(it.id) },
                         sortConfiguration = uiState.selectedSortConfiguration,
                         isListView = isListView,
-                        onSortOrderClick = {
-                            Analytics.tracker.trackEvent(SortButtonPressedEvent)
-                            showSortBottomSheet = true
-                        },
-                        onChangeViewTypeClicked = {
-                            onAction(
-                                ChangeViewTypeClicked(
-                                    when (uiState.currentViewType) {
-                                        ViewType.LIST -> ViewType.GRID
-                                        ViewType.GRID -> ViewType.LIST
-                                    }
-                                )
-                            )
-                        },
+                        onSortOrderClick = onSortOrderClick,
+                        onChangeViewTypeClicked = onChangeViewTypeClick,
+                        showSortOrder = false,
+                        showChangeViewType = false,
                         showMediaDiscoveryButton = uiState.isMediaDiscoveryAllowed,
-                        onEnterMediaDiscoveryClick = {
-                            navigationHandler.navigate(
-                                CloudDriveMediaDiscoveryNavKey(
-                                    folderId = uiState.currentFolderId.longValue,
-                                    folderName = folderName,
-                                    fromFolderLink = false,
-                                    nodeSourceType = uiState.nodeSourceType,
-                                )
-                            )
-                        },
+                        onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
                         inSelectionMode = isInSelectionMode,
                         bannerHeader = if (showOverQuotaWarning) {
                             {

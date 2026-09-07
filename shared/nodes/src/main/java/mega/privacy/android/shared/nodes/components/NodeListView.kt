@@ -68,12 +68,13 @@ internal fun <T : TypedNode> NodeListView(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         contentPadding = listContentPadding
     ) {
-        if (showSortOrder || showChangeViewType) {
-            if (bannerHeader != null) {
-                item(key = "bannerHeader") {
-                    bannerHeader()
-                }
+        if (bannerHeader != null) {
+            item(key = "bannerHeader") {
+                bannerHeader()
             }
+        }
+
+        if (showSortOrder || showChangeViewType) {
             item(key = "header") {
                 NodeHeaderItem(
                     modifier = Modifier

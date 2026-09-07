@@ -30,6 +30,7 @@ import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludeTopPadding
+import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
@@ -46,6 +47,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriv
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.getSelectedItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.rememberScrollUpVisibility
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.feature.sync.ui.synclist.SyncListTabFab
 import mega.privacy.android.feature.sync.ui.synclist.rememberSyncListFabState
@@ -163,10 +165,14 @@ internal fun DriveSyncScreen(
         AppBarNavigationType.None
     }
 
+    val scrollToHideBehavior = rememberScrollToHideBehavior()
+    val showNodeHeader = rememberScrollUpVisibility(scrollToHideBehavior)
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
+        scrollToHideBehavior = scrollToHideBehavior,
         topBar = {
             when (val state = cloudDriveUiState) {
                 is CloudDriveUiState.Loading -> {
@@ -292,6 +298,7 @@ internal fun DriveSyncScreen(
                     @SuppressLint("ComposeViewModelForwarding")
                     CloudDriveContent(
                         isTabContent = true,
+                        showNodeHeader = showNodeHeader,
                         navigationHandler = navigationHandler,
                         contentPadding = paddingValues.excludeTopPadding(),
                         uiState = cloudDriveUiState,

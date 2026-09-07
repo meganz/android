@@ -72,15 +72,16 @@ internal fun <T : TypedNode> NodeGridView(
         verticalArrangement = Arrangement.spacedBy(DSTokens.spacings.s3),
         contentPadding = listContentPadding
     ) {
-        if (showSortOrder || showChangeViewType) {
-            if (bannerHeader != null) {
-                item(
-                    key = "bannerHeader",
-                    span = { GridItemSpan(currentLineSpan = spanCount) }
-                ) {
-                    bannerHeader()
-                }
+        if (bannerHeader != null) {
+            item(
+                key = "bannerHeader",
+                span = { GridItemSpan(currentLineSpan = spanCount) }
+            ) {
+                bannerHeader()
             }
+        }
+
+        if (showSortOrder || showChangeViewType) {
             item(
                 key = "header",
                 span = { GridItemSpan(currentLineSpan = spanCount) }
