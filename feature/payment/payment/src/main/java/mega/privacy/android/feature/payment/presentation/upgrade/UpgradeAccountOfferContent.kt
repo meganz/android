@@ -46,14 +46,16 @@ internal fun UpgradeAccountState.offerPlansFor(
     isMonthly: Boolean,
     isUpgradeAccount: Boolean,
 ): List<LocalisedSubscription> = localisedSubscriptionsList.filter {
-    it.getSubscription(isMonthly)?.discountedAmountMonthly != null &&
+    it.hasDiscountFor(isMonthly) &&
             !isCurrentPlan(this, it.accountType, isMonthly, isUpgradeAccount)
 }
 
 /**
- * Classifies active offers: more than one discounted plan in either period -> [OfferHighlight.Multiple]
- * (persists across the Monthly/Yearly toggle); a single plan for [isMonthly] -> [OfferHighlight.Single];
- * none -> [OfferHighlight.None].
+ * Classifies active offers: more than one discounted plan in either period -> [OfferHighlight.Multiple];
+ * a single one -> [OfferHighlight.Single]; none -> [OfferHighlight.None].
+ *
+ * Both layouts persist across the Monthly/Yearly toggle. A single offer is dropped only when the
+ * plan it would feature is already the user's current plan in that period.
  */
 internal fun UpgradeAccountState.offerHighlight(
     isMonthly: Boolean,
@@ -67,19 +69,29 @@ internal fun UpgradeAccountState.offerHighlight(
         val plans = localisedSubscriptionsList.filter { it.accountType in offerTypesAnyPeriod }
         return OfferHighlight.Multiple(plans)
     }
-    return with(offerPlansFor(isMonthly, isUpgradeAccount)) {
-        when (size) {
-            0 -> OfferHighlight.None
-            else -> OfferHighlight.Single(first())
-        }
+    val offerType = offerTypesAnyPeriod.singleOrNull() ?: return OfferHighlight.None
+    val plan = localisedSubscriptionsList.firstOrNull { it.accountType == offerType }
+        ?: return OfferHighlight.None
+    val featuredIsMonthly = plan.offerPeriodIsMonthly(isMonthly)
+    if (isCurrentPlan(this, plan.accountType, featuredIsMonthly, isUpgradeAccount)) {
+        return OfferHighlight.None
     }
+    return OfferHighlight.Single(plan)
 }
+
+/**
+ * The period the featured offer renders in. A discount belongs to a single sku, so an offer the
+ * selected period does not cover is shown in the period that does rather than losing its discount.
+ */
+internal fun LocalisedSubscription.offerPeriodIsMonthly(isMonthly: Boolean): Boolean =
+    if (hasDiscountFor(isMonthly)) isMonthly else !isMonthly
 
 /**
  * Content of the single-offer subscription page: a promotional header
  * (badge, title, campaign name, countdown), a featured discounted [OfferPriceCard], then the shared
- * "Why go Pro?" card, current plan card, billing-period selector and the remaining (non-featured)
- * plans as regular price cards.
+ * "Why go Pro?" card, current plan card, billing-period selector and the remaining plans as regular
+ * price cards. The featured plan is listed too when the offer it carries is for the other period, so
+ * the selected period stays buyable.
  */
 internal fun LazyListScope.subscriptionOfferContent(
     uiState: UpgradeAccountState,
@@ -94,8 +106,10 @@ internal fun LazyListScope.subscriptionOfferContent(
     onPricingPageClick: () -> Unit,
     onOfferExpired: () -> Unit,
 ) {
+    val offerIsMonthly = offerSubscription.offerPeriodIsMonthly(isMonthly)
+
     item("offer_header") {
-        val subscription = offerSubscription.getSubscription(isMonthly)
+        val subscription = offerSubscription.getSubscription(offerIsMonthly)
         OfferHeader(
             campaignText = getCampaignName(
                 context = context,
@@ -111,7 +125,7 @@ internal fun LazyListScope.subscriptionOfferContent(
     item("offer_featured_card") {
         OfferPlanCardItem(
             offerSubscription = offerSubscription,
-            isMonthly = isMonthly,
+            isMonthly = offerIsMonthly,
             context = context,
             locale = locale,
             onInAppCheckoutClick = onInAppCheckoutClick,
@@ -143,7 +157,9 @@ internal fun LazyListScope.subscriptionOfferContent(
     } else {
         val remainingPlans = uiState.localisedSubscriptionsList
             .filter { it.hasSubscriptionFor(isMonthly) }
-            .filterNot { it.accountType == offerSubscription.accountType }
+            .filterNot {
+                it.accountType == offerSubscription.accountType && offerIsMonthly == isMonthly
+            }
             .filterNot { subscription ->
                 isCurrentRecurringPlan(
                     uiState = uiState,
@@ -241,8 +257,7 @@ internal fun LazyListScope.subscriptionMultipleOfferContent(
             plans,
             key = { _, subscription -> subscription.accountType.name }
         ) { index, subscription ->
-            val hasOffer = subscription.getSubscription(isMonthly)?.discountedAmountMonthly != null
-            if (hasOffer) {
+            if (subscription.hasDiscountFor(isMonthly)) {
                 OfferPlanCardItem(
                     offerSubscription = subscription,
                     isMonthly = isMonthly,
