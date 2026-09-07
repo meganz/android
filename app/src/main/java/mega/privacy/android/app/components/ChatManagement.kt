@@ -11,14 +11,19 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.globalmanagement.IncomingCallNotifier
+import mega.privacy.android.app.meeting.gateway.CameraInUseGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.VideoCaptureUtils
+import mega.privacy.android.domain.entity.call.LocalVideoAction
+import mega.privacy.android.domain.entity.call.LocalVideoContext
+import mega.privacy.android.domain.entity.call.LocalVideoTrigger
 import mega.privacy.android.domain.entity.statistics.EndedEmptyCallTimeout
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.call.GetChatCallInProgress
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.call.ResolveLocalVideoActionUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatOpeningWithLinkUseCase
 import mega.privacy.android.domain.usecase.chat.RemoveChatOpeningWithLinkUseCase
@@ -61,6 +66,9 @@ class ChatManagement @Inject constructor(
     private val isChatOpeningWithLinkUseCase: IsChatOpeningWithLinkUseCase,
     @ApplicationContext private val appContext: Context,
     private val incomingCallNotifier: Lazy<IncomingCallNotifier>,
+    private val resolveLocalVideoActionUseCase: ResolveLocalVideoActionUseCase,
+    private val getChatCallInProgress: GetChatCallInProgress,
+    private val cameraInUseGateway: CameraInUseGateway,
 ) {
     private var countDownTimerToEndCall: CountDownTimer? = null
 
@@ -635,36 +643,49 @@ class ChatManagement @Inject constructor(
      */
     private var screenOnOffReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == null) return
-            val callInProgress = CallUtil.getCallInProgress()
-            if (callInProgress == null || callInProgress.status != MegaChatCall.CALL_STATUS_JOINING && callInProgress.status != MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                return
+            val trigger = when (intent.action) {
+                Intent.ACTION_SCREEN_OFF -> LocalVideoTrigger.ScreenOff
+                Intent.ACTION_USER_PRESENT -> LocalVideoTrigger.UserPresent
+                else -> return
             }
-            if (!getVideoStatus(callInProgress.chatid)) {
-                isInTemporaryState = false
-                return
+            applicationScope.launch {
+                resolveAndApplyLocalVideoActions(trigger)
             }
-            when (intent.action) {
-                Intent.ACTION_SCREEN_OFF -> {
-                    rtcAudioManagerGateway.muteOrUnMute(true)
-                    isDisablingLocalVideo = false
-                    isInTemporaryState = true
-                    if (callInProgress.hasLocalVideo() && !isDisablingLocalVideo) {
-                        Timber.d("Screen locked, local video is going to be disabled")
-                        isScreenOn = false
-                        enableDisableVideo(callInProgress.chatid, enable = false)
-                    }
-                }
+        }
+    }
 
-                Intent.ACTION_USER_PRESENT -> {
-                    isDisablingLocalVideo = false
-                    isInTemporaryState = false
-                    if (!callInProgress.hasLocalVideo() && !isDisablingLocalVideo) {
-                        Timber.d("Screen unlocked, local video is going to be enabled")
-                        isScreenOn = true
-                        enableDisableVideo(callInProgress.chatid, enable = true)
-                    }
-                }
+    /**
+     * Build the current [LocalVideoContext], resolve the [LocalVideoAction]s for the given
+     * [trigger] via [resolveLocalVideoActionUseCase] and apply each returned action.
+     */
+    private suspend fun resolveAndApplyLocalVideoActions(trigger: LocalVideoTrigger) {
+        val call = getChatCallInProgress()
+        val context = LocalVideoContext(
+            callInProgress = call?.let {
+                LocalVideoContext.CallInProgress(
+                    chatId = it.chatId,
+                    status = it.status,
+                    hasLocalVideo = it.hasLocalVideo,
+                )
+            },
+            isVideoEnabled = call?.let { getVideoStatus(it.chatId) } ?: false,
+            isScreenOn = isScreenOn,
+            isFrontCameraInUse = cameraInUseGateway.isFrontCameraInUse(),
+            isDisablingLocalVideo = isDisablingLocalVideo,
+            isInTemporaryState = isInTemporaryState,
+        )
+        resolveLocalVideoActionUseCase(trigger, context).forEach { action ->
+            when (action) {
+                LocalVideoAction.MuteMic -> rtcAudioManagerGateway.muteOrUnMute(true)
+                is LocalVideoAction.SetScreenOn -> isScreenOn = action.isScreenOn
+                is LocalVideoAction.SetTemporaryState -> isInTemporaryState = action.isInTemporaryState
+                is LocalVideoAction.SetDisablingLocalVideo ->
+                    isDisablingLocalVideo = action.isDisablingLocalVideo
+
+                is LocalVideoAction.EnableVideo -> enableDisableVideo(action.chatId, enable = true)
+                is LocalVideoAction.DisableVideo -> enableDisableVideo(action.chatId, enable = false)
+                is LocalVideoAction.BroadcastLocalVideoChanged ->
+                    broadcastChangesInLocalVideoDueToProximitySensor(action.shouldVideoBeEnabled)
             }
         }
     }
@@ -683,36 +704,11 @@ class ChatManagement @Inject constructor(
      *
      * @param isNear True, if the device is close to the ear. False, if it is far away
      */
-    fun controlProximitySensor(isNear: Boolean) = CallUtil.getCallInProgress()?.let { call ->
-        if (call.status != MegaChatCall.CALL_STATUS_JOINING
-            && call.status != MegaChatCall.CALL_STATUS_IN_PROGRESS
-            || !isScreenOn || !VideoCaptureUtils.isFrontCameraInUse()
-        ) return@let
-
-        when {
-            !getVideoStatus(call.chatid) -> {
-                isInTemporaryState = false
-            }
-
-            isNear -> {
-                Timber.d("Proximity sensor, video off")
-                isDisablingLocalVideo = false
-                isInTemporaryState = true
-                broadcastChangesInLocalVideoDueToProximitySensor(false)
-                if (call.hasLocalVideo() && !isDisablingLocalVideo) {
-                    enableDisableVideo(chatId = call.chatid, enable = false)
-                }
-            }
-
-            else -> {
-                Timber.d("Proximity sensor, video on")
-                isDisablingLocalVideo = false
-                isInTemporaryState = false
-                broadcastChangesInLocalVideoDueToProximitySensor(true)
-                if (!call.hasLocalVideo() && !isDisablingLocalVideo) {
-                    enableDisableVideo(chatId = call.chatid, enable = true)
-                }
-            }
+    fun controlProximitySensor(isNear: Boolean) {
+        val trigger =
+            if (isNear) LocalVideoTrigger.ProximityNear else LocalVideoTrigger.ProximityFar
+        applicationScope.launch {
+            resolveAndApplyLocalVideoActions(trigger)
         }
     }
 }
