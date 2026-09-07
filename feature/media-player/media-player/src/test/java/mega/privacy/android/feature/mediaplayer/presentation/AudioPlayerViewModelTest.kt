@@ -1242,7 +1242,9 @@ class AudioPlayerViewModelTest {
 
         underTest.uiState.test {
             awaitItem() // Loading
-            gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123L))
+            gatewayPlayerState.emit(
+                audioControllerState(currentMediaItemHandle = 123L, mediaItemCount = 2)
+            )
             awaitItem() // Data
 
             nodeUpdates.emit(NodeUpdate(mapOf<Node, List<NodeChanges>>(removedNode to listOf(NodeChanges.Remove))))
@@ -1250,6 +1252,72 @@ class AudioPlayerViewModelTest {
             verify(gateway).skipToNext()
         }
     }
+
+    @Test
+    fun `test that removal of the playing node stops playback when it is the only queue item`() =
+        runTest {
+            val removedNode = mock<FileNode> { on { id }.thenReturn(NodeId(123L)) }
+
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(
+                    audioControllerState(currentMediaItemHandle = 123L, mediaItemCount = 1)
+                )
+                awaitItem() // Data
+
+                nodeUpdates.emit(NodeUpdate(mapOf<Node, List<NodeChanges>>(removedNode to listOf(NodeChanges.Remove))))
+
+                verify(gateway).stop()
+                verify(gateway, never()).skipToNext()
+            }
+        }
+
+    @Test
+    fun `test that removal of the playing node stops playback when it is the last item without repeat all`() =
+        runTest {
+            val removedNode = mock<FileNode> { on { id }.thenReturn(NodeId(123L)) }
+
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(
+                    audioControllerState(
+                        currentMediaItemHandle = 123L,
+                        mediaItemCount = 2,
+                        currentQueueIndex = 1,
+                    )
+                )
+                awaitItem() // Data
+
+                nodeUpdates.emit(NodeUpdate(mapOf<Node, List<NodeChanges>>(removedNode to listOf(NodeChanges.Remove))))
+
+                verify(gateway).stop()
+                verify(gateway, never()).skipToNext()
+            }
+        }
+
+    @Test
+    fun `test that removal of the playing node skips when repeat all can wrap the queue`() =
+        runTest {
+            val removedNode = mock<FileNode> { on { id }.thenReturn(NodeId(123L)) }
+
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(
+                    audioControllerState(
+                        currentMediaItemHandle = 123L,
+                        mediaItemCount = 2,
+                        currentQueueIndex = 1,
+                        repeatMode = Player.REPEAT_MODE_ALL,
+                    )
+                )
+                awaitItem() // Data
+
+                nodeUpdates.emit(NodeUpdate(mapOf<Node, List<NodeChanges>>(removedNode to listOf(NodeChanges.Remove))))
+
+                verify(gateway).skipToNext()
+                verify(gateway, never()).stop()
+            }
+        }
 
     @Test
     fun `test that node updates for other nodes are ignored`() = runTest {
@@ -1297,6 +1365,41 @@ class AudioPlayerViewModelTest {
 
                 verify(gateway).pause()
                 assertThat(underTest.sleepTimerState.value).isEqualTo(SleepTimerState.Inactive)
+            }
+        }
+
+    @Test
+    fun `test that EndOfTrack timer survives an in-playback backwards seek from the end`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(
+                    audioControllerState(
+                        currentMediaItemId = "track-1",
+                        isPlaying = true,
+                        repeatMode = Player.REPEAT_MODE_ONE,
+                        durationMs = 60_000L,
+                        currentPositionMs = 59_500L,
+                    )
+                )
+                awaitItem() // Data near the end of the track
+                underTest.setSleepTimer(SleepTimerOption.EndOfTrack)
+
+                // A seek back to mid-track while still playing lands far from the start,
+                // which a genuine repeat-one wrap never does.
+                gatewayPlayerState.emit(
+                    audioControllerState(
+                        currentMediaItemId = "track-1",
+                        isPlaying = true,
+                        repeatMode = Player.REPEAT_MODE_ONE,
+                        durationMs = 60_000L,
+                        currentPositionMs = 30_000L,
+                    )
+                )
+                awaitItem()
+
+                verify(gateway, never()).pause()
+                assertThat(underTest.sleepTimerState.value).isEqualTo(SleepTimerState.EndOfTrack)
             }
         }
 

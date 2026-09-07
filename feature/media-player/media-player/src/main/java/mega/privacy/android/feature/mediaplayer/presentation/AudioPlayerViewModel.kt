@@ -175,8 +175,8 @@ class AudioPlayerViewModel @Inject constructor(
 
     /**
      * Narrows the global node-update stream to the item currently playing: a rename refreshes
-     * the displayed name, a removal skips to the next item so the player does not keep serving
-     * a node that no longer exists.
+     * the displayed name, a removal moves playback off the deleted node so the player does not
+     * keep serving a node that no longer exists.
      */
     private fun observeNodeUpdates() {
         viewModelScope.launch {
@@ -193,10 +193,23 @@ class AudioPlayerViewModel @Inject constructor(
                         fetchNodeName(currentHandle)
                     }
                     if (NodeChanges.Remove in changes) {
-                        gateway.skipToNext()
+                        skipPastRemovedNode()
                     }
                 }
         }
+    }
+
+    /**
+     * Explicit navigation treats REPEAT_ONE as OFF, so at the queue boundary skipToNext is a
+     * no-op and the player would keep serving — or, under repeat-one, keep looping — the
+     * removed node; stop playback instead when no other item can take over.
+     */
+    private fun skipPastRemovedNode() {
+        val state = currentControllerState
+        val hasNext = state != null && state.mediaItemCount > 1 &&
+                (state.currentQueueIndex < state.mediaItemCount - 1 ||
+                        state.repeatMode == Player.REPEAT_MODE_ALL)
+        if (hasNext) gateway.skipToNext() else gateway.stop()
     }
 
     private fun observePlaybackErrors() {
@@ -326,14 +339,15 @@ class AudioPlayerViewModel @Inject constructor(
         // Under REPEAT_ONE the track end is a seamless loop: no item transition, isPlaying never
         // drops, only the position wraps back to the start. Without this the End-of-track timer
         // never fires and the track loops all night. The wrap is recognised by a large backwards
-        // jump from near the end while playback keeps running, which an ordinary user seek from
-        // that region cannot produce without pausing first.
+        // jump from near the end that lands near the start while playback keeps running; an
+        // in-playback seek from that region to anywhere past the opening moments does not match.
         if (_sleepTimerState.value is SleepTimerState.EndOfTrack &&
             current.currentMediaItemId == endOfTrackSourceItemId &&
             current.repeatMode == Player.REPEAT_MODE_ONE &&
             prev.isPlaying && current.isPlaying &&
             prev.durationMs > 0 &&
             prev.currentPositionMs >= prev.durationMs - END_OF_TRACK_THRESHOLD_MS &&
+            current.currentPositionMs <= END_OF_TRACK_THRESHOLD_MS &&
             prev.currentPositionMs > current.currentPositionMs + REPEAT_ONE_WRAP_THRESHOLD_MS
         ) {
             gateway.pause()
