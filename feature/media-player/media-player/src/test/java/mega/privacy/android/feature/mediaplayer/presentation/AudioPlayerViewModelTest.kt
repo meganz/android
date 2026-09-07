@@ -18,11 +18,16 @@ import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.feature.mediaplayer.data.AudioPlayerError
 import mega.privacy.android.feature.mediaplayer.data.AudioPlayerErrorEventQueue
 import mega.privacy.android.feature.mediaplayer.data.AudioResumeEvent
@@ -59,8 +64,10 @@ class AudioPlayerViewModelTest {
     // Recreated in setUp() so the replay cache from a previous test never leaks into the next
     // ViewModel instance and causes handleSideEffects to fire with stale state.
     private lateinit var gatewayPlayerState: MutableSharedFlow<AudioControllerState>
+    private lateinit var nodeUpdates: MutableSharedFlow<NodeUpdate>
     private val gateway = mock<AudioMediaControllerGateway>()
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val setAudioShuffleEnabledUseCase = mock<SetAudioShuffleEnabledUseCase>()
     private val setAudioRepeatModeUseCase = mock<SetAudioRepeatModeUseCase>()
     private val deleteAudioPlaybackInfoUseCase = mock<DeleteAudioPlaybackInfoUseCase>()
@@ -89,11 +96,14 @@ class AudioPlayerViewModelTest {
         // cache ensures the value is delivered once the coroutine does subscribe.
         gatewayPlayerState = MutableSharedFlow(replay = 1)
         whenever(gateway.playerState).thenReturn(gatewayPlayerState)
+        nodeUpdates = MutableSharedFlow()
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(nodeUpdates)
         audioResumeEventQueue = AudioResumeEventQueue()
         audioPlayerErrorEventQueue = AudioPlayerErrorEventQueue()
         underTest = AudioPlayerViewModel(
             gateway = gateway,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             setAudioShuffleEnabledUseCase = setAudioShuffleEnabledUseCase,
             setAudioRepeatModeUseCase = setAudioRepeatModeUseCase,
             deleteAudioPlaybackInfoUseCase = deleteAudioPlaybackInfoUseCase,
@@ -111,6 +121,7 @@ class AudioPlayerViewModelTest {
         reset(
             gateway,
             getNodeByHandleUseCase,
+            monitorNodeUpdatesUseCase,
             setAudioShuffleEnabledUseCase,
             setAudioRepeatModeUseCase,
             deleteAudioPlaybackInfoUseCase,
@@ -749,31 +760,36 @@ class AudioPlayerViewModelTest {
         }
 
     @Test
-    fun `test that isPodcastMode is true by default`() = runTest {
-        assertThat(underTest.isPodcastMode.value).isTrue()
+    fun `test that isPodcastMode is false by default`() = runTest {
+        assertThat(underTest.isPodcastMode.value).isFalse()
     }
 
     @Test
-    fun `test that isPodcastMode is set to false when player duration is below podcast threshold`() =
+    fun `test that isPodcastMode stays false when player duration is below podcast threshold`() =
         runTest {
             underTest.isPodcastMode.test {
-                awaitItem() // default true
+                awaitItem() // default false
                 gatewayPlayerState.emit(audioControllerState(durationMs = 5 * 60 * 1_000L))
-                assertThat(awaitItem()).isFalse()
+                expectNoEvents()
             }
         }
 
     @Test
-    fun `test that isPodcastMode remains true when player duration exceeds podcast threshold`() =
+    fun `test that isPodcastMode becomes true when player duration exceeds podcast threshold`() =
         runTest {
-            gatewayPlayerState.emit(audioControllerState(durationMs = 15 * 60 * 1_000L))
-            assertThat(underTest.isPodcastMode.value).isTrue()
+            underTest.isPodcastMode.test {
+                awaitItem() // default false
+                gatewayPlayerState.emit(audioControllerState(durationMs = 15 * 60 * 1_000L))
+                assertThat(awaitItem()).isTrue()
+            }
         }
 
     @Test
     fun `test that togglePlayerMode sets isPodcastMode to false when in podcast mode`() = runTest {
         underTest.isPodcastMode.test {
-            awaitItem() // default true
+            awaitItem() // default false
+            gatewayPlayerState.emit(audioControllerState(durationMs = 15 * 60 * 1_000L))
+            awaitItem() // podcast auto-detected
             underTest.togglePlayerMode()
             assertThat(awaitItem()).isFalse()
         }
@@ -782,9 +798,7 @@ class AudioPlayerViewModelTest {
     @Test
     fun `test that togglePlayerMode sets isPodcastMode to true when in music mode`() = runTest {
         underTest.isPodcastMode.test {
-            awaitItem() // default true
-            underTest.togglePlayerMode()
-            awaitItem() // false
+            awaitItem() // default false
             underTest.togglePlayerMode()
             assertThat(awaitItem()).isTrue()
         }
@@ -794,12 +808,12 @@ class AudioPlayerViewModelTest {
     fun `test that togglePlayerMode override is not overwritten by player state update`() =
         runTest {
             underTest.isPodcastMode.test {
-                awaitItem() // default true
+                awaitItem() // default false
                 underTest.togglePlayerMode()
-                assertThat(awaitItem()).isFalse()
-                // Same track, long duration — override must be preserved
+                assertThat(awaitItem()).isTrue()
+                // Same track, short duration — override must be preserved
                 gatewayPlayerState.emit(
-                    audioControllerState(durationMs = 15 * 60 * 1_000L, currentMediaItemId = null)
+                    audioControllerState(durationMs = 5 * 60 * 1_000L, currentMediaItemId = null)
                 )
                 expectNoEvents()
             }
@@ -808,11 +822,11 @@ class AudioPlayerViewModelTest {
     @Test
     fun `test that isPodcastMode updates from player state after track changes`() = runTest {
         underTest.isPodcastMode.test {
-            awaitItem() // default true
+            awaitItem() // default false
             gatewayPlayerState.emit(
                 audioControllerState(currentMediaItemId = "track1", durationMs = 15 * 60 * 1_000L)
             )
-            expectNoEvents() // already true, no emission
+            assertThat(awaitItem()).isTrue() // podcast auto-detected
             underTest.togglePlayerMode()
             assertThat(awaitItem()).isFalse()
             // Track change resets override — long duration → auto-detected as podcast
@@ -1195,6 +1209,130 @@ class AudioPlayerViewModelTest {
             assertThat(awaitItem()).isNull()
         }
     }
+
+    @Test
+    fun `test that a rename of the playing node refreshes currentPlayingItemName`() = runTest {
+        val originalNode = mock<FileNode> {
+            on { id }.thenReturn(NodeId(123L))
+            on { name }.thenReturn("original.mp3")
+        }
+        val renamedNode = mock<FileNode> {
+            on { id }.thenReturn(NodeId(123L))
+            on { name }.thenReturn("renamed.mp3")
+        }
+        whenever(getNodeByHandleUseCase(123L)).thenReturn(originalNode, renamedNode)
+
+        underTest.uiState.test {
+            awaitItem() // Loading
+            gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123L))
+            awaitItem() // Data with the original name
+
+            nodeUpdates.emit(
+                NodeUpdate(mapOf<Node, List<NodeChanges>>(renamedNode to listOf(NodeChanges.Name)))
+            )
+
+            val state = awaitItem() as AudioPlayerUiState.Data
+            assertThat(state.currentPlayingItemName).isEqualTo("renamed.mp3")
+        }
+    }
+
+    @Test
+    fun `test that removal of the playing node skips to the next item`() = runTest {
+        val removedNode = mock<FileNode> { on { id }.thenReturn(NodeId(123L)) }
+
+        underTest.uiState.test {
+            awaitItem() // Loading
+            gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123L))
+            awaitItem() // Data
+
+            nodeUpdates.emit(NodeUpdate(mapOf<Node, List<NodeChanges>>(removedNode to listOf(NodeChanges.Remove))))
+
+            verify(gateway).skipToNext()
+        }
+    }
+
+    @Test
+    fun `test that node updates for other nodes are ignored`() = runTest {
+        val otherNode = mock<FileNode> { on { id }.thenReturn(NodeId(999L)) }
+
+        underTest.uiState.test {
+            awaitItem() // Loading
+            gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123L))
+            awaitItem() // Data
+
+            nodeUpdates.emit(NodeUpdate(mapOf<Node, List<NodeChanges>>(otherNode to listOf(NodeChanges.Remove))))
+
+            verify(gateway, never()).skipToNext()
+        }
+    }
+
+    @Test
+    fun `test that EndOfTrack timer pauses playback when a repeat-one loop wraps the position`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(
+                    audioControllerState(
+                        currentMediaItemId = "track-1",
+                        isPlaying = true,
+                        repeatMode = Player.REPEAT_MODE_ONE,
+                        durationMs = 60_000L,
+                        currentPositionMs = 59_500L,
+                    )
+                )
+                awaitItem() // Data near the end of the track
+                underTest.setSleepTimer(SleepTimerOption.EndOfTrack)
+
+                // The loop wraps: same item, still playing, position jumps back to the start.
+                gatewayPlayerState.emit(
+                    audioControllerState(
+                        currentMediaItemId = "track-1",
+                        isPlaying = true,
+                        repeatMode = Player.REPEAT_MODE_ONE,
+                        durationMs = 60_000L,
+                        currentPositionMs = 500L,
+                    )
+                )
+                awaitItem() // Data after the wrap
+
+                verify(gateway).pause()
+                assertThat(underTest.sleepTimerState.value).isEqualTo(SleepTimerState.Inactive)
+            }
+        }
+
+    @Test
+    fun `test that EndOfTrack timer survives an ordinary backwards seek while paused`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(
+                    audioControllerState(
+                        currentMediaItemId = "track-1",
+                        isPlaying = true,
+                        repeatMode = Player.REPEAT_MODE_ONE,
+                        durationMs = 60_000L,
+                        currentPositionMs = 59_500L,
+                    )
+                )
+                awaitItem() // Data near the end of the track
+                underTest.setSleepTimer(SleepTimerOption.EndOfTrack)
+
+                // Paused before the jump back — not a seamless loop, must not trigger the timer.
+                gatewayPlayerState.emit(
+                    audioControllerState(
+                        currentMediaItemId = "track-1",
+                        isPlaying = false,
+                        repeatMode = Player.REPEAT_MODE_ONE,
+                        durationMs = 60_000L,
+                        currentPositionMs = 500L,
+                    )
+                )
+                awaitItem()
+
+                verify(gateway, never()).pause()
+                assertThat(underTest.sleepTimerState.value).isEqualTo(SleepTimerState.EndOfTrack)
+            }
+        }
 
     @Test
     fun `test that sessionEnded emits when the service ends an active session`() = runTest {

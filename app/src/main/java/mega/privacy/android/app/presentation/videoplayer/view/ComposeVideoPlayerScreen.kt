@@ -36,6 +36,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -91,6 +92,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
@@ -519,6 +521,11 @@ internal fun ComposeVideoPlayerScreen(
             .semantics {
                 testTagsAsResourceId = true
             },
+        // Queue-driven messages (hide/unhide results, download started, …) are rendered by the
+        // host at the end of the content below, lifted above the player controls; the default
+        // bottom-anchored slot would draw them over the seekbar and shares the same
+        // SnackbarHostState, so leaving it in place would also duplicate every snackbar.
+        snackbarHost = {},
     ) { _ ->
         key(orientation) {
             AndroidViewBinding(
@@ -940,6 +947,20 @@ internal fun ComposeVideoPlayerScreen(
                             )
                         }
                     },
+                )
+            }
+        }
+
+        val snackbarBottomPadding =
+            if (orientation == ORIENTATION_LANDSCAPE) SNACKBAR_BOTTOM_PADDING_LANDSCAPE
+            else SNACKBAR_BOTTOM_PADDING_PORTRAIT
+        LocalSnackBarHostState.current?.let { snackbarHostState ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = navBarInsets.bottom + snackbarBottomPadding),
                 )
             }
         }

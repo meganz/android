@@ -24,7 +24,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -53,20 +54,25 @@ internal class AudioMediaControllerFacade @Inject constructor(
 
     private val gatewayScope = CoroutineScope(SupervisorJob() + mainDispatcher)
 
-    private val _playerState = MutableSharedFlow<AudioControllerState>(replay = 1)
-    override val playerState: Flow<AudioControllerState> = _playerState
+    // StateFlow instead of SharedFlow(replay = 1): tryEmit on a suspending SharedFlow can
+    // silently drop a snapshot when a collector is slow; a StateFlow write never fails and
+    // conflation is safe because every emission is a full snapshot.
+    private val _playerState = MutableStateFlow<AudioControllerState?>(null)
+    override val playerState: Flow<AudioControllerState> = _playerState.filterNotNull()
 
     private var controller: MediaController? = null
     private var controllerFuture: ListenableFuture<MediaController>? = null
     private var positionPollingJob: Job? = null
     private var currentState = AudioControllerState()
     private var isReconnecting = false
+    private var isReleased = false
 
     init {
         connect()
     }
 
     private fun connect() {
+        if (isReleased) return
         val sessionToken = runCatching {
             SessionToken(context, ComponentName(context, AudioPlayerService::class.java))
         }.getOrElse {
@@ -153,7 +159,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
             queueItems = buildQueueItems(c),
             currentQueueIndex = c.safeQueueIndex(),
         )
-        _playerState.tryEmit(currentState)
+        _playerState.value = currentState
     }
 
     /**
@@ -166,7 +172,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
 
     private fun updateState(update: AudioControllerState.() -> AudioControllerState) {
         currentState = currentState.update()
-        _playerState.tryEmit(currentState)
+        _playerState.value = currentState
     }
 
     private val playerListener = object : Player.Listener {
@@ -201,20 +207,30 @@ internal class AudioMediaControllerFacade @Inject constructor(
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             val ctrl = controller ?: return
+            // Position/duration are refreshed here too: polling only runs while playing, so a
+            // track change while paused would otherwise keep showing the previous item's numbers.
             updateState {
                 copy(
                     currentMediaItemId = mediaItem?.mediaId,
                     currentMediaItemHandle = mediaItem?.mediaId?.let { mediaHandleStore.getHandle(it) },
                     currentQueueIndex = ctrl.safeQueueIndex(),
+                    currentPositionMs = ctrl.currentPosition.coerceAtLeast(0L),
+                    durationMs = ctrl.duration.coerceAtLeast(0L),
                 )
             }
         }
 
         override fun onPlaybackStateChanged(state: Int) {
+            val knownDuration = if (state == Player.STATE_READY) {
+                controller?.duration?.coerceAtLeast(0L)
+            } else {
+                null
+            }
             updateState {
                 copy(
                     isBuffering = state == Player.STATE_BUFFERING,
                     isIdle = state == Player.STATE_IDLE,
+                    durationMs = knownDuration ?: durationMs,
                 )
             }
         }
@@ -244,6 +260,21 @@ internal class AudioMediaControllerFacade @Inject constructor(
 
         override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
             updateState { copy(playbackSpeed = playbackParameters.speed) }
+        }
+
+        override fun onPositionDiscontinuity(
+            oldPosition: Player.PositionInfo,
+            newPosition: Player.PositionInfo,
+            reason: Int,
+        ) {
+            // Polling only runs while playing; without this, a seek while paused snaps the
+            // UI back to the stale position as soon as the scrubber is released.
+            updateState {
+                copy(
+                    currentPositionMs = newPosition.positionMs.coerceAtLeast(0L),
+                    durationMs = controller?.duration?.coerceAtLeast(0L) ?: durationMs,
+                )
+            }
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -342,6 +373,8 @@ internal class AudioMediaControllerFacade @Inject constructor(
     }
 
     override fun release() {
+        if (isReleased) return
+        isReleased = true
         stopPositionPolling()
         audioQueueItemFactory.clearCache()
         controller?.removeListener(playerListener)

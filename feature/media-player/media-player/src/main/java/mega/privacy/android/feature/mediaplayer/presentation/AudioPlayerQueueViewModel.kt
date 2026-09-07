@@ -127,4 +127,12 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
     fun moveQueueItem(fromIndex: Int, toIndex: Int) {
         gateway.moveMediaItem(fromIndex, toIndex)
     }
+
+    override fun onCleared() {
+        // The gateway binding is unscoped, so this ViewModel owns its own MediaController
+        // connection; without releasing it here every opened queue leaks a service binding
+        // whose listener keeps position polling alive for as long as playback continues.
+        gateway.release()
+        super.onCleared()
+    }
 }

@@ -191,6 +191,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
     override fun onCreate() {
         super.onCreate()
+        isRunning = true
         Analytics.tracker.trackEvent(AudioPlayerIsActivatedEvent)
         initializePlayer()
         initializeMediaNotificationProvider()
@@ -912,6 +913,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     override fun onDestroy() {
+        isRunning = false
         forceSaveCurrentPlaybackInfo()
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         playQueueBuildJob?.cancel()
@@ -936,6 +938,14 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     companion object {
+        /**
+         * Whether an instance of [AudioPlayerService] is currently running.
+         * Set in [onCreate] and cleared in [onDestroy].
+         */
+        @Volatile
+        var isRunning = false
+            private set
+
         private const val MAX_PLAYBACK_RETRIES = 6
         private val PLAYBACK_RETRY_BACKOFF = 500.milliseconds
 
@@ -967,6 +977,10 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
          * mini player's MediaController only unbinds after receiving the notification.
          */
         fun stopAudioPlayer(context: Context) {
+            // The stop command is delivered via startService: without this guard it would
+            // first start a service that is not running just to stop it (spurious onCreate,
+            // analytics event, player construction).
+            if (!isRunning) return
             context.startService(
                 Intent(context, AudioPlayerService::class.java).apply {
                     action = ACTION_STOP

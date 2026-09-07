@@ -138,7 +138,12 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
 
         val sessionEnded by viewModel.sessionEnded.collectAsStateWithLifecycle()
         LaunchedEffect(sessionEnded) {
-            if (sessionEnded) {
+            // The flow is the authority, not the composed snapshot: a session that ended while
+            // no screen was attached (mini player closed) leaves a stale true behind, and
+            // startPlayback clears the flow before this effect runs — but the Compose state
+            // lags one collection hop, so acting on the snapshot alone would pop a freshly
+            // opened player right back off the stack.
+            if (sessionEnded && viewModel.sessionEnded.value) {
                 viewModel.onSessionEndedConsumed()
                 // A parked error owns the exit: its dialog's OK button navigates back itself.
                 if (viewModel.playbackError.value == null) navigationHandler.back()

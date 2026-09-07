@@ -3,6 +3,7 @@ package mega.privacy.android.feature.mediaplayer.presentation
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +25,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -32,6 +34,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepea
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.feature.mediaplayer.data.AudioPlayerError
 import mega.privacy.android.feature.mediaplayer.data.AudioPlayerErrorEventQueue
 import mega.privacy.android.feature.mediaplayer.data.AudioResumeEventQueue
@@ -68,6 +71,7 @@ import timber.log.Timber
 class AudioPlayerViewModel @Inject constructor(
     private val gateway: AudioMediaControllerGateway,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val setAudioShuffleEnabledUseCase: SetAudioShuffleEnabledUseCase,
     private val setAudioRepeatModeUseCase: SetAudioRepeatModeUseCase,
     private val deleteAudioPlaybackInfoUseCase: DeleteAudioPlaybackInfoUseCase,
@@ -83,7 +87,9 @@ class AudioPlayerViewModel @Inject constructor(
     val uiState: StateFlow<AudioPlayerUiState> =
         playerState.asUiStateFlow(viewModelScope, AudioPlayerUiState.Loading)
 
-    private val _isPodcastMode = MutableStateFlow(true)
+    // Defaults to music: most audio is shorter than the podcast threshold, so this is the
+    // least likely wrong guess for sources the prefetch cannot resolve (chat, file links, zip).
+    private val _isPodcastMode = MutableStateFlow(false)
 
     /** Whether the player is currently in podcast mode. Available from the moment the launch
      * intent is processed, before Media3 finishes connecting. */
@@ -164,6 +170,33 @@ class AudioPlayerViewModel @Inject constructor(
         observePlayerState()
         observeResumeEvents()
         observePlaybackErrors()
+        observeNodeUpdates()
+    }
+
+    /**
+     * Narrows the global node-update stream to the item currently playing: a rename refreshes
+     * the displayed name, a removal skips to the next item so the player does not keep serving
+     * a node that no longer exists.
+     */
+    private fun observeNodeUpdates() {
+        viewModelScope.launch {
+            monitorNodeUpdatesUseCase()
+                .catch { Timber.e(it, "Failed to monitor node updates") }
+                .collect { update ->
+                    val currentHandle =
+                        (playerState.value as? AudioPlayerUiState.Data)?.currentPlayingHandle
+                            ?: return@collect
+                    val changes = update.changes.entries
+                        .firstOrNull { it.key.id.longValue == currentHandle }
+                        ?.value ?: return@collect
+                    if (NodeChanges.Name in changes) {
+                        fetchNodeName(currentHandle)
+                    }
+                    if (NodeChanges.Remove in changes) {
+                        gateway.skipToNext()
+                    }
+                }
+        }
     }
 
     private fun observePlaybackErrors() {
@@ -286,6 +319,24 @@ class AudioPlayerViewModel @Inject constructor(
             current.durationMs > 0 &&
             current.currentPositionMs >= current.durationMs - END_OF_TRACK_THRESHOLD_MS
         ) {
+            _sleepTimerState.value = SleepTimerState.Inactive
+            endOfTrackSourceItemId = null
+        }
+
+        // Under REPEAT_ONE the track end is a seamless loop: no item transition, isPlaying never
+        // drops, only the position wraps back to the start. Without this the End-of-track timer
+        // never fires and the track loops all night. The wrap is recognised by a large backwards
+        // jump from near the end while playback keeps running, which an ordinary user seek from
+        // that region cannot produce without pausing first.
+        if (_sleepTimerState.value is SleepTimerState.EndOfTrack &&
+            current.currentMediaItemId == endOfTrackSourceItemId &&
+            current.repeatMode == Player.REPEAT_MODE_ONE &&
+            prev.isPlaying && current.isPlaying &&
+            prev.durationMs > 0 &&
+            prev.currentPositionMs >= prev.durationMs - END_OF_TRACK_THRESHOLD_MS &&
+            prev.currentPositionMs > current.currentPositionMs + REPEAT_ONE_WRAP_THRESHOLD_MS
+        ) {
+            gateway.pause()
             _sleepTimerState.value = SleepTimerState.Inactive
             endOfTrackSourceItemId = null
         }
@@ -597,6 +648,10 @@ class AudioPlayerViewModel @Inject constructor(
         private const val SEEK_15_SECONDS_MS = 15_000L
         private val SLEEP_TIMER_TICK = 1.seconds
         private const val END_OF_TRACK_THRESHOLD_MS = 1_500L
+
+        // A repeat-one loop rewinds by nearly the whole track; anything above this is treated
+        // as the wrap rather than position-poll jitter.
+        private const val REPEAT_ONE_WRAP_THRESHOLD_MS = 5_000L
 
         // Intent extra keys — must match values used in :app when building the launch intent
         private const val INTENT_EXTRA_KEY_HANDLE = "HANDLE"
