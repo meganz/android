@@ -2914,4 +2914,54 @@
     <string name="account_usage_backups_label">สำรองข้อมูล</string>
     <string name="account_usage_get_more_storage_button">รับพื้นที่เก็บข้อมูลมากกว่านี้</string>
     <string name="general_error_word">ผิดพลาด</string>
+    <string name="ongoing_call_messages">สายที่กำลังโทร</string>
+    <string name="meetings_list_ongoing_call_message">กำลังประชุมอยู่</string>
+    <string name="call_ended_message">[A]วางสายแล้ว[/A][C] ระยะเวลา: [/C]</string>
+    <string name="group_call_ended_message">[A]สิ้นสุดการโทรกลุ่มแล้ว[/A][C] รวมระยะเวลา: [/C]</string>
+    <string name="group_call_ended_no_duration_message">[A]สิ้นสุดการโทรกลุ่ม[/A]</string>
+    <string name="call_rejected_messages">[A]สายถูกปฏิเสธ[/A]</string>
+    <string name="call_not_answered_messages">[A]ไม่ได้รับสาย[/A]</string>
+    <string name="call_missed_messages">[A]สายที่ไม่ได้รับ[/A]</string>
+    <string name="call_failed_messages">[A]โทรไม่สำเร็จ[/A]</string>
+    <string name="call_cancelled_messages">[A]สายถูกยกเลิก[/A]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] อัปเดตการประชุมแล้ว[/B]</string>
+    <plurals name="plural_call_ended_messages_hours">
+        <item quantity="other">[B]%1$s ชั่วโมง[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_minutes">
+        <item quantity="other">[B]%1$s นาที[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_seconds">
+        <item quantity="other">[B]%1$d วินาที[/B]</item>
+    </plurals>
+    <string name="subscription_quota_transfer_limited_title">โควตาการโอนย้ายมีจำกัด</string>
+    <string name="subscription_quota_transfer_low_subtitle">โควตาการโอนย้ายของคุณอาจใกล้หมด ซึ่งอาจทำให้การดาวน์โหลดหรือสตรีมมิงของคุณหยุดชะงัก อัปเกรดแพ็กเกจของคุณเพื่อรับโควตาการโอนย้ายเพิ่มเติม</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">อัปเกรดแพ็กเกจของคุณเพื่อรับโควตาการโอนย้ายเพิ่มเติม</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">จัดการแพ็กเกจของคุณที่ [A]mega.io[/A] เพื่อรับโควตาการโอนย้ายเพิ่มเติม</string>
+    <string name="new_text_file_rich_text_formatting_label">การจัดรูปแบบข้อความสมบูรณ์</string>
+    <string name="meetings_list_header_today">วันนี้</string>
+    <string name="meetings_list_past_header">การประชุมที่ผ่านมา</string>
+    <string name="meetings_list_upcoming_meeting_label">การประชุมที่จะเกิดขึ้น</string>
+    <string name="meetings_list_recurring_meeting_label">การประชุมที่เป็นกิจวัตร</string>
+    <string name="title_referral_bonuses">ชวนเพื่อนมาใช้ MEGA</string>
+    <string name="expired_label">หมดอายุแล้ว</string>
+    <string name="general_num_days_left">เหลือเวลาอีก %1$d วัน</string>
+    <string name="title_achievement_invite_friends">วิธีการทำงาน</string>
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="other">โบนัสจะหมดอายุภายใน %1$d วัน</item>
+    </plurals>
+    <string name="unlocked_rewards_title">ปลดล็อกรางวัล</string>
+    <string name="unlocked_storage_title">โควต้าพื้นที่เก็บข้อมูล</string>
+    <string name="storage_space">ที่เก็บข้อมูล</string>
+    <string name="contact_invite">เชิญ</string>
+    <string name="title_install_app">ติดตั้งแอปของเราบนมือถือ</string>
+    <string name="title_regitration">โบนัสการลงทะเบียน</string>
+    <string name="title_install_desktop">ติดตั้งแอปสำหรับเดสก์ท็อป</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
 </resources>

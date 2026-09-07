@@ -2742,7 +2742,7 @@
     <string name="deep_link_content_unavailable_dialog_message">帳戶無法存取您嘗試檢視的內容。</string>
     <string name="share_link_expires_on">連結有效期限至%1$s</string>
     <string name="share_link_expired">連結已失效</string>
-    <string name="share_link_password_dialog_title">分享連結密碼</string>
+    <string name="share_link_password_dialog_title">連結密碼</string>
     <string name="share_link_password_dialog_message">您要一併分享此連結的密碼嗎？</string>
     <string name="video_editor_crop_free">免費</string>
     <string name="video_editor_crop_original">原始檔</string>
@@ -2889,4 +2889,87 @@
     <string name="account_usage_backups_label">備份</string>
     <string name="account_usage_get_more_storage_button">獲得更多儲存空間</string>
     <string name="general_error_word">錯誤</string>
+    <string name="ongoing_call_messages">正在進行中的通話</string>
+    <string name="meetings_list_ongoing_call_message">會議進行中</string>
+    <string name="call_ended_message">[A]通話結束[/A][C]。通話時間：[/C]</string>
+    <string name="group_call_ended_message">[A]群組通話結束[/A][C]。通話時間：[/C]</string>
+    <string name="group_call_ended_no_duration_message">[A]群組通話結束[/A]</string>
+    <string name="call_rejected_messages">[A]通話被拒[/A]</string>
+    <string name="call_not_answered_messages">[A]通話未接[/A]</string>
+    <string name="call_missed_messages">[A]未接來電[/A]</string>
+    <string name="call_failed_messages">[A]通話失敗[/A]</string>
+    <string name="call_cancelled_messages">[A]通話取消[/A]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B]已更新會議[/B]</string>
+    <plurals name="plural_call_ended_messages_hours">
+        <item quantity="other">[B]%1$s小時[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_minutes">
+        <item quantity="other">[B]%1$s分[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_seconds">
+        <item quantity="other">[B]%1$d秒[/B]</item>
+    </plurals>
+    <string name="media_timeline_sort_option_date_taken">拍攝日期</string>
+    <string name="check_internet_connection_error">沒有網路連線。檢查您的連線後再試一次</string>
+    <string name="subscription_quota_transfer_limited_title">傳輸配額有限</string>
+    <string name="subscription_quota_transfer_low_subtitle">您的傳輸配額可能即將用完，導致下載或串流播放可能中斷。升級方案以取得更多傳輸配額。</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">升級方案以取得更多傳輸配額。</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">在[A]mega.io[/A]管理您的方案以取得更多傳輸配額</string>
+    <string name="audio_player_resumed_snackbar_message">從 %1$s 繼續播放</string>
+    <string name="new_text_file_rich_text_formatting_label">豐富文字格式</string>
+    <string name="non_format_message_add_participant">%2$s已將%1$s加入這個群組聊天</string>
+    <string name="non_format_message_remove_participant">%2$s已將%1$s移出群組聊天</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s已將%1$s的角色變更為主持人</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s已將%1$s的角色變更為標準</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s已將%1$s的角色變更為唯讀</string>
+    <string name="video_player_zoom_fit_to_screen">符合螢幕</string>
+    <string name="video_player_zoom_fill_screen">填滿螢幕</string>
+    <string name="share_link_updated_and_copied_snackbar">連結已更新並複製到剪貼簿</string>
+    <string name="share_link_key_copied_snackbar">金鑰已複製到剪貼簿</string>
+    <plurals name="share_link_copied_snackbar">
+        <item quantity="other">連結已複製到剪貼簿</item>
+    </plurals>
+    <string name="password_too_weak_error_message">使用更強的密碼。</string>
+    <plurals name="remove_link_dialog_description">
+        <item quantity="other">擁有此連結的任何人將無法再存取該檔案或資料夾</item>
+    </plurals>
+    <string name="account_info_renews_today">今天續訂</string>
+    <string name="account_info_renews_tomorrow_date">明天續訂，%1$s</string>
+    <string name="account_info_expires_today">今天到期</string>
+    <string name="account_info_expires_tomorrow_date">明天到期，%1$s</string>
+    <string name="account_info_expired_yesterday">昨天已到期</string>
+    <string name="history_cleared_by">%1$s已清除聊天記錄</string>
+    <string name="non_format_history_cleared_by">%1$s已清除聊天記錄</string>
+    <string name="retention_history_changed_by">%1$s已將訊息清除時間變更為%2$s</string>
+    <string name="retention_history_disabled">%1$s已關閉訊息清除功能</string>
+    <string name="message_created_chat_link">%1$s已建立聊天連結</string>
+    <string name="message_deleted_chat_link">%1$s已移除聊天連結</string>
+    <string name="message_set_chat_private">%1$s已開啟加密金鑰輪換</string>
+    <string name="contacts_sent">已傳送%s位聯絡人</string>
+    <string name="error_message_unrecognizable">無法辨識的訊息</string>
+    <string name="meetings_list_header_today">今天</string>
+    <string name="meetings_list_past_header">過去的會議</string>
+    <string name="meetings_list_upcoming_meeting_label">即將進行的會議</string>
+    <string name="meetings_list_recurring_meeting_label">週期性會議</string>
+    <string name="title_referral_bonuses">邀請朋友加入MEGA</string>
+    <string name="expired_label">過期</string>
+    <string name="general_num_days_left">還剩%1$d天</string>
+    <string name="title_achievement_invite_friends">如何使用</string>
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="other">獎勵將在%1$d天後到期</item>
+    </plurals>
+    <string name="unlocked_rewards_title">已解鎖的獎勵</string>
+    <string name="unlocked_storage_title">儲存空間</string>
+    <string name="storage_space">儲存空間</string>
+    <string name="contact_invite">邀請</string>
+    <string name="title_install_app">安裝我們的手機應用程式</string>
+    <string name="title_regitration">註冊獎勵</string>
+    <string name="title_install_desktop">安裝我們的桌面應用程式</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
 </resources>

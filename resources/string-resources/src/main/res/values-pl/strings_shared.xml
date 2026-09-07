@@ -3313,4 +3313,66 @@
     <string name="account_usage_backups_label">Kopie zapasowe</string>
     <string name="account_usage_get_more_storage_button">Uzyskaj więcej pamięci</string>
     <string name="general_error_word">Błąd</string>
+    <string name="ongoing_call_messages">Trwające połączenie</string>
+    <string name="meetings_list_ongoing_call_message">Spotkanie w toku</string>
+    <string name="call_ended_message">[A]Rozmowa zakończona[/A][C]. Czas trwania: [/C]</string>
+    <string name="group_call_ended_message">[A]Połączenie grupowe zakończone[/A][C]. Czas trwania:[/C]</string>
+    <string name="group_call_ended_no_duration_message">[A]Połączenie grupowe zakończone[/A]</string>
+    <string name="call_rejected_messages">[A]Połączenie zostało odrzucone[/A]</string>
+    <string name="call_not_answered_messages">[A]Połączenie nie zostało odebrane[/A]</string>
+    <string name="call_missed_messages">[A]Nieodebrane połączenie[/A]</string>
+    <string name="call_failed_messages">[A]Połączenie nie powiodło się[/A]</string>
+    <string name="call_cancelled_messages">[A]Połączenie zostało anulowane[/A]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] zaktualizował spotkanie[/B]</string>
+    <plurals name="plural_call_ended_messages_hours">
+        <item quantity="one">[B]%1$s godzinę[/B]</item>
+        <item quantity="few">[B]%1$s godziny[/B]</item>
+        <item quantity="many">[B]%1$s godziny[/B]</item>
+        <item quantity="other">[B]%1$s godziny[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_minutes">
+        <item quantity="one">[B]%1$s minutę[/B]</item>
+        <item quantity="few">[B]%1$s minut[/B]</item>
+        <item quantity="many">[B]%1$s minut[/B]</item>
+        <item quantity="other">[B]%1$s minut[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_seconds">
+        <item quantity="one">[B]%1$d sekund[/B]</item>
+        <item quantity="few">[B]%1$d sekundy[/B]</item>
+        <item quantity="many">[B]%1$d sekundy[/B]</item>
+        <item quantity="other">[B]%1$d sekundy[/B]</item>
+    </plurals>
+    <string name="new_text_file_rich_text_formatting_label">Formatowanie tekstu</string>
+    <string name="subscription_quota_transfer_limited_title">Ograniczony limit transferu</string>
+    <string name="subscription_quota_transfer_low_subtitle">Twój limit transferu może się wkrótce wyczerpać. W rezultacie pobieranie lub strumieniowanie danych może zostać przerwane. Ulepsz swój plan, aby uzyskać więcej transferu.</string>
+    <string name="subscription_quota_transfer_low_pro_subtitle">Ulepsz swój plan, aby uzyskać więcej transferu.</string>
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Zarządzaj swoim planem na [A]mega.io[/A], aby uzyskać więcej transferu</string>
+    <string name="meetings_list_header_today">Dzisiaj</string>
+    <string name="meetings_list_past_header">Dotychczasowe spotkania</string>
+    <string name="meetings_list_upcoming_meeting_label">Najbliższe spotkanie</string>
+    <string name="meetings_list_recurring_meeting_label">Spotkanie cykliczne</string>
+    <string name="title_referral_bonuses">Zaproś ludzi do MEGA</string>
+    <string name="expired_label">Wygasło</string>
+    <string name="general_num_days_left">Pozostało %1$d dni</string>
+    <string name="title_achievement_invite_friends">Jak to działa</string>
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus wygasa za %1$d dzień</item>
+        <item quantity="few">Bonus wygasa za %1$d dni</item>
+        <item quantity="many">Bonus wygasa za %1$d dni</item>
+        <item quantity="other">Bonus wygasa za %1$d dni</item>
+    </plurals>
+    <string name="unlocked_rewards_title">Nagrody</string>
+    <string name="unlocked_storage_title">Limit pamięci</string>
+    <string name="storage_space">Powierzchnia</string>
+    <string name="contact_invite">Zaproszenie</string>
+    <string name="title_install_app">Zainstaluj naszą aplikację mobilną</string>
+    <string name="title_regitration">Bonus za rejestrację</string>
+    <string name="title_install_desktop">Zainstaluj naszą aplikację na komputer</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
 </resources>

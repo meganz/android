@@ -3338,15 +3338,15 @@
     <!-- Subtitle of the quota-warning upsell screen when storage is over the limit -->
     <string name="subscription_quota_storage_over_subtitle">Upgrade your plan to get more storage and upload more files</string>
     <!-- Title of the quota-warning upsell screen when transfer quota is running low (free or logged-out users) -->
-    <string name="subscription_quota_transfer_limited_title">Limited transfer quota</string>
+    <string name="subscription_quota_transfer_low_title">Your transfer quota is running low</string>
     <!-- Title of the quota-warning upsell screen when a Pro user's transfer quota is running low. %1$d is the used percentage, e.g. "You've used 80% of your transfer quota" -->
     <string name="subscription_quota_transfer_percentage_used_title">You’ve used %1$d%% of your transfer quota</string>
     <!-- Title of the quota-warning upsell screen when transfer quota has been exceeded -->
     <string name="subscription_quota_transfer_over_title">Transfer quota exceeded</string>
-    <!-- Subtitle of the quota-warning upsell screen when transfer quota is running low (free or logged-out users). Followed by a 'Learn more' link -->
-    <string name="subscription_quota_transfer_low_subtitle">Your transfer quota may be running low. As a result, your downloads or streams may be interrupted. Upgrade your plan for more transfer quota.</string>
-    <!-- Subtitle of the quota-warning upsell screen when a Pro user's transfer quota is running low. Followed by a 'Learn more' link -->
-    <string name="subscription_quota_transfer_low_pro_subtitle">Upgrade your plan to get more transfer quota.</string>
+    <!-- Subtitle of the quota-warning upsell screen when transfer quota is running low during a download. Followed by a 'Learn more' link -->
+    <string name="subscription_quota_transfer_low_download_subtitle">As a result, your download may be interrupted. Upgrade your plan to get more transfer quota.</string>
+    <!-- Subtitle of the quota-warning upsell screen when transfer quota is running low during media streaming. Followed by a 'Learn more' link -->
+    <string name="subscription_quota_transfer_low_streaming_subtitle">As a result, media playback may be interrupted. Upgrade your plan to get more transfer quota.</string>
     <!-- Subtitle of the quota-warning upsell screen when transfer quota is exceeded during a download. Followed by a 'Learn more' link -->
     <string name="subscription_quota_transfer_over_download_subtitle">To continue your download, upgrade your plan to get more transfer quota.</string>
     <!-- Subtitle of the quota-warning upsell screen when transfer quota is exceeded during media streaming. Followed by a 'Learn more' link -->
@@ -3475,8 +3475,10 @@
     <string name="file_type_name_7zip_compressed">7-Zip compressed</string>
     <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is out of storage. The text between [A] and [/A] is a link to mega.io -->
     <string name="subscription_quota_storage_highest_plan_subtitle">Make room in Cloud drive, or manage your plan at [A]mega.io[/A] for more storage</string>
-    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is running low on transfer quota. The text between [A] and [/A] is a link to mega.io -->
-    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Manage your plan at [A]mega.io[/A] for more transfer quota</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is running low on transfer quota during a download. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_low_download_highest_plan_subtitle">As a result, your download may be interrupted. Manage your plan at [A]mega.io[/A] for more transfer quota</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is running low on transfer quota during media streaming. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_low_streaming_highest_plan_subtitle">As a result, media playback may be interrupted. Manage your plan at [A]mega.io[/A] for more transfer quota</string>
     <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) has exceeded their transfer quota during a download. The text between [A] and [/A] is a link to mega.io -->
     <string name="subscription_quota_transfer_over_download_highest_plan_subtitle">To continue your download, manage your plan at [A]mega.io[/A] for more transfer quota</string>
     <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) has exceeded their transfer quota during media streaming. The text between [A] and [/A] is a link to mega.io -->
@@ -3972,6 +3974,14 @@
     </plurals>
     <!-- Checkbox label in the new text file dialog to create a rich text (.md) file instead of a plain text file -->
     <string name="new_text_file_rich_text_formatting_label">Rich text formatting</string>
+    <!-- Title of the quota-warning upsell screen when transfer quota is running low (free or logged-out users) -->
+    <string name="subscription_quota_transfer_limited_title">Limited transfer quota</string>
+    <!-- Subtitle of the quota-warning upsell screen when transfer quota is running low (free or logged-out users). Followed by a 'Learn more' link -->
+    <string name="subscription_quota_transfer_low_subtitle">Your transfer quota may be running low. As a result, your downloads or streams may be interrupted. Upgrade your plan for more transfer quota.</string>
+    <!-- Subtitle of the quota-warning upsell screen when a Pro user's transfer quota is running low. Followed by a 'Learn more' link -->
+    <string name="subscription_quota_transfer_low_pro_subtitle">Upgrade your plan to get more transfer quota.</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is running low on transfer quota. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_low_highest_plan_subtitle">Manage your plan at [A]mega.io[/A] for more transfer quota</string>
     <!-- Meetings list: section header shown above meetings scheduled for the current day -->
     <string name="meetings_list_header_today">Today</string>
     <!-- Meetings list: section header shown above meetings that have already taken place -->
@@ -3995,11 +4005,11 @@
     <!-- Achievements info screen: "How it works" section heading -->
     <string name="title_achievement_invite_friends">How it works</string>
     <!-- Achievements info screen: description shown after the user was awarded storage for installing the mobile app. %1$s is the storage amount, e.g. "1 GB" -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">You’ve received %1$s extra storage space for installing our mobile app</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">You received %1$s of extra storage for installing our mobile app.</string>
     <!-- Achievements info screen: description shown after the user was awarded storage for installing the desktop app. %1$s is the storage amount, e.g. "1 GB" -->
-    <string name="result_paragraph_info_achievement_install_desktop">You’ve received %1$s extra storage space for installing our desktop app</string>
+    <string name="result_paragraph_info_achievement_install_desktop">You received %1$s of extra storage for installing our desktop app.</string>
     <!-- Achievements info screen: description shown after the user was awarded the signup bonus storage. %1$s is the storage amount, e.g. "1 GB" -->
-    <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free signup bonus.</string>
+    <string name="result_paragraph_info_achievement_registration">You received %1$s of extra storage as a sign up bonus.</string>
     <!-- Achievements info screen: number of days until an awarded bonus expires. %1$d is the day count -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="one">Bonus expires in %1$d day</item>
