@@ -14,7 +14,9 @@ import mega.privacy.android.feature.photos.presentation.timeline.revamp.Timeline
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.MediaScreenSortByNewestDateTakenSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenSortByNewestSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenSortByOldestDateTakenSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenSortByOldestSelectedEvent
 
 /**
@@ -41,7 +43,7 @@ internal fun TimelineRevampSortBottomSheet(
         onDismissRequest = onDismissRequest,
         onSortOptionSelected = { result ->
             result?.let {
-                trackSortDirection(it.sortDirection)
+                trackSortSelection(it.sortOptionItem, it.sortDirection)
                 onSortChange(
                     TimelineRevampSortConfiguration(
                         option = it.sortOptionItem,
@@ -53,10 +55,17 @@ internal fun TimelineRevampSortBottomSheet(
     )
 }
 
-private fun trackSortDirection(direction: SortDirection) {
-    val event = when (direction) {
-        SortDirection.Descending -> MediaScreenSortByNewestSelectedEvent
-        SortDirection.Ascending -> MediaScreenSortByOldestSelectedEvent
+private fun trackSortSelection(option: TimelineRevampSortOption, direction: SortDirection) {
+    val event = when (option) {
+        TimelineRevampSortOption.DateTaken -> when (direction) {
+            SortDirection.Descending -> MediaScreenSortByNewestDateTakenSelectedEvent
+            SortDirection.Ascending -> MediaScreenSortByOldestDateTakenSelectedEvent
+        }
+
+        TimelineRevampSortOption.DateAdded -> when (direction) {
+            SortDirection.Descending -> MediaScreenSortByNewestSelectedEvent
+            SortDirection.Ascending -> MediaScreenSortByOldestSelectedEvent
+        }
     }
     Analytics.tracker.trackEvent(event)
 }
