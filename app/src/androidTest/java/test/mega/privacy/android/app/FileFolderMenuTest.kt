@@ -51,7 +51,6 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaSearchFilter
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -139,12 +138,6 @@ class FileFolderMenuTest {
 
         // Boot the test process through the production initialiser units. See CloudDriveUploadTest.
         TestAppBoot.runCoreInitializers()
-
-        // Node lists resolve through getChildren/searchWithFilter with an SDK filter object;
-        // answer from the fake tree using the filter's location handle so navigating into a
-        // folder (copy/move targets, the Rubbish bin) lists that folder's children.
-        fakeMegaApi.stub(MegaApiGateway::getChildren) { arguments -> childrenFor(arguments) }
-        fakeMegaApi.stub(MegaApiGateway::searchWithFilter) { arguments -> childrenFor(arguments) }
 
         // Persist a logged-in session through the app's real credentials path; account details are
         // fetched eagerly because account-detail dependent features wait for a non-empty value.
@@ -556,15 +549,6 @@ class FileFolderMenuTest {
             request = StubMegaRequest(type = MegaRequest.TYPE_EXPORT, link = link),
             matcher = { arguments -> (arguments.getOrNull(0) as? MegaNode)?.handle == handle },
         )
-    }
-
-    /** Resolves the fake tree children for a getChildren/searchWithFilter gateway call. */
-    private fun childrenFor(arguments: List<Any?>): List<MegaNode> {
-        val locationHandle = (arguments.firstOrNull() as? MegaSearchFilter)
-            ?.byLocationHandle()
-            ?.takeIf { it != -1L }
-            ?: rootHandle
-        return fakeMegaApi.nodeTree.childrenOf(locationHandle)
     }
 
     /**

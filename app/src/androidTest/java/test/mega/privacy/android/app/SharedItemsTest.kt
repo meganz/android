@@ -18,14 +18,12 @@ import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.boot.TestAppBoot
 import mega.privacy.android.app.di.FakeFeatureFlagValueProvider
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.test.gateway.FakeMegaApiGateway
 import mega.privacy.android.data.test.stub.StubMegaNode
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaShare
 import org.junit.After
 import org.junit.Before
@@ -119,18 +117,6 @@ class SharedItemsTest {
         // The Info action must open the revamped Compose file info screen; the legacy
         // FileInfoActivity accesses the SDK directly and cannot run on the fake gateways.
         fakeFlags.set(ApiFeatures.FileInfoRevamp, true)
-
-        // Children are resolved through the fake node tree by the filter's parent handle. A
-        // blanket root answer must not be used: NodeRepositoryImpl.isChildrenEmpty recurses into
-        // folder children, and answering every parent with the root's children (which contain the
-        // seeded share folders themselves) recurses forever.
-        fakeMegaApi.stub(MegaApiGateway::getChildren) { arguments ->
-            val parentHandle = (arguments.firstOrNull() as? MegaSearchFilter)
-                ?.byLocationHandle()
-                ?.takeIf { it != MegaApiJava.INVALID_HANDLE }
-                ?: rootHandle
-            fakeMegaApi.nodeTree.childrenOf(parentHandle)
-        }
 
         // Production registers this in MegaApplication.onCreate; under the Hilt test application
         // nothing does, and SnackBarHandlerImpl silently drops messages when it cannot resolve a

@@ -27,7 +27,6 @@ import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCa
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.preference.SetCustomiseNavigationTooltipShownUseCase
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaUser
 import org.junit.After
 import org.junit.Before
@@ -132,12 +131,6 @@ class ContactSharedFoldersJourneyTest {
             ),
             parentHandle = HOLIDAY_HANDLE,
         )
-
-        // Node lists resolve through getChildren/searchWithFilter with an SDK filter object;
-        // answer from the fake tree using the filter's location handle so navigating into a
-        // shared folder lists that folder's children.
-        fakeMegaApi.stub(MegaApiGateway::getChildren) { arguments -> childrenFor(arguments) }
-        fakeMegaApi.stub(MegaApiGateway::searchWithFilter) { arguments -> childrenFor(arguments) }
 
         // The contact info "Shared folders" row count resolves through getInShares. Stubs are
         // keyed by method name, so the by-user and by-order overloads share this answer.
@@ -259,15 +252,6 @@ class ContactSharedFoldersJourneyTest {
             ),
             parentHandle = IN_SHARES_PARENT_HANDLE,
         )
-    }
-
-    /** Resolves the fake tree children for a getChildren/searchWithFilter gateway call. */
-    private fun childrenFor(arguments: List<Any?>): List<MegaNode> {
-        val locationHandle = (arguments.firstOrNull() as? MegaSearchFilter)
-            ?.byLocationHandle()
-            ?.takeIf { it != -1L }
-            ?: fakeMegaApi.nodeTree.rootNode.handle
-        return fakeMegaApi.nodeTree.childrenOf(locationHandle)
     }
 
     /**

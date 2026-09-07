@@ -25,9 +25,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.shared.resources.R as sharedR
-import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaTransfer
 import org.junit.After
 import org.junit.Before
@@ -55,9 +53,8 @@ import javax.inject.Inject
  * text file opens its full preview) and tc10 (tapping a folder shows its sub-contents).
  *
  * Not ported:
- * - tc04 (matching a name portion): the fake answers `searchWithFilter` by method and ignores the
- *   filter, so "exactly 2 of N match" cannot be reproduced. The matching is SDK-side anyway — the
- *   app only forwards the typed query.
+ * - tc04 (matching a name portion): the matching is SDK-side — the app only forwards the typed
+ *   query.
  * - tc08 and tc09 (image preview, audio playback): both need fake capabilities that do not exist
  *   yet (real preview bytes, a playable local link).
  */
@@ -103,12 +100,6 @@ class CloudDriveInteractionsTest {
 
         // Boot the test process through the production initialiser units. See CloudDriveUploadTest.
         TestAppBoot.runCoreInitializers()
-
-        // Node lists resolve through getChildren/searchWithFilter with an opaque SDK filter object;
-        // answer from the fake tree using the filter's location handle so navigating into a folder
-        // lists that folder's children rather than the root's.
-        fakeMegaApi.stub(MegaApiGateway::getChildren) { arguments -> childrenFor(arguments) }
-        fakeMegaApi.stub(MegaApiGateway::searchWithFilter) { arguments -> childrenFor(arguments) }
 
         // Persist a logged-in session through the app's real credentials path; account details are
         // fetched eagerly because account-detail dependent features wait for a non-empty value.
@@ -156,8 +147,7 @@ class CloudDriveInteractionsTest {
     @Test
     fun cloudDriveSearchFindsSeededFile() {
         val fileName = "sm4tc02.txt"
-        val file = seedFile(handle = FILE_HANDLE, name = fileName)
-        answerSearchWith(file)
+        seedFile(handle = FILE_HANDLE, name = fileName)
 
         launchCloudDrive()
         searchCloudDriveFor(fileName)
@@ -169,8 +159,7 @@ class CloudDriveInteractionsTest {
     @Test
     fun cloudDriveSearchFindsSeededFolder() {
         val folderName = "f-sm4tc03"
-        val folder = seedFolder(handle = FOLDER_HANDLE, name = folderName)
-        answerSearchWith(folder)
+        seedFolder(handle = FOLDER_HANDLE, name = folderName)
 
         launchCloudDrive()
         searchCloudDriveFor(folderName)
@@ -312,24 +301,6 @@ class CloudDriveInteractionsTest {
         )
         fakeMegaApi.nodeTree.addNode(node, parentHandle = parentHandle)
         return node
-    }
-
-    /**
-     * Answers every node search with [nodes]. The search filter is an opaque native SDK object, so
-     * the query it carries cannot be inspected — the search is answered by method instead, which
-     * is enough for scenarios that look a seeded node up by its exact name.
-     */
-    private fun answerSearchWith(vararg nodes: MegaNode) {
-        fakeMegaApi.stub(MegaApiGateway::searchWithFilter) { nodes.toList() }
-    }
-
-    /** Resolves the fake tree children for a getChildren/searchWithFilter gateway call. */
-    private fun childrenFor(arguments: List<Any?>): List<MegaNode> {
-        val locationHandle = (arguments.firstOrNull() as? MegaSearchFilter)
-            ?.byLocationHandle()
-            ?.takeIf { it != -1L }
-            ?: rootHandle
-        return fakeMegaApi.nodeTree.childrenOf(locationHandle)
     }
 
     private fun scrollableFileName(index: Int) = "sm4tc01-%02d.txt".format(index + 1)
