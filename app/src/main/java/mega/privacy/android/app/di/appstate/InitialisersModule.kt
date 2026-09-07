@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.appstate.global.initialisation.appstart.FileServiceReclaimOptionsInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appstart.DownloadOverQuotaInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.appstart.MigrateVideoPlaybackInfoInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appstart.StreamOverQuotaInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CameraUploadsSyncHandlesUpdaterInitializer
@@ -245,6 +246,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideCameraUploadAutoStartInitializer(initialiser: CameraUploadAutoStartInitializer): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideMigrateVideoPlaybackInfoInitialiser(initialiser: MigrateVideoPlaybackInfoInitialiser): AppStartInitialiser =
         initialiser
 
     @Provides

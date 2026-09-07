@@ -613,10 +613,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
         )
     }
 
-    override suspend fun insertOrUpdatePlaybackInfos(infos: List<MediaPlaybackInfo>) {
-        val updatedAt = deviceGateway.getCurrentTimeInMillis()
-        mediaPlaybackInfoDao.get().insertAndPruneAll(
-            infos.map { info -> mediaPlaybackInfoEntityMapper(info, updatedAt) }
+    override suspend fun insertMigratedPlaybackInfos(infos: List<MediaPlaybackInfo>) {
+        mediaPlaybackInfoDao.get().insertMigratedAndPrune(
+            infos.map { info -> mediaPlaybackInfoEntityMapper(info, MIGRATED_UPDATED_AT) }
         )
     }
 
@@ -685,5 +684,13 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     companion object {
         internal const val MAX_INSERT_LIST_SIZE = 200
+
+        /**
+         * Timestamp stamped on rows carried over from a legacy store. The legacy formats have no
+         * timestamp of their own, so their true age is unknown; zero matches the column's
+         * documented meaning for rows that predate it and makes a genuinely recent position win
+         * when the store is trimmed to its retention limit.
+         */
+        internal const val MIGRATED_UPDATED_AT = 0L
     }
 }

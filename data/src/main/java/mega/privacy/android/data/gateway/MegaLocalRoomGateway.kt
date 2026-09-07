@@ -594,11 +594,12 @@ interface MegaLocalRoomGateway {
     suspend fun insertOrUpdatePlaybackInfo(info: MediaPlaybackInfo)
 
     /**
-     * Insert or update a list of playback infos
+     * Insert or update playback infos carried over from a legacy store
      *
-     * @param infos the list of [MediaPlaybackInfo] to insert or update
+     * @param infos the list of [MediaPlaybackInfo] to insert or update, stamped as older than any
+     * row written from live playback
      */
-    suspend fun insertOrUpdatePlaybackInfos(infos: List<MediaPlaybackInfo>)
+    suspend fun insertMigratedPlaybackInfos(infos: List<MediaPlaybackInfo>)
 
     /**
      * Get media playback info by handle

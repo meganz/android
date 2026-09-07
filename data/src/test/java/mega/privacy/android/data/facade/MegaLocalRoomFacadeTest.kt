@@ -999,22 +999,21 @@ internal class MegaLocalRoomFacadeTest {
     }
 
     @Test
-    fun `test that insertOrUpdatePlaybackInfos insert the mapped entities`() = runTest {
-        val testItems = (1..100).map {
-            mock<MediaPlaybackInfo>()
-        }
-        val testEntities = (1..100).map {
-            mock<MediaPlaybackInfoEntity>()
-        }
-        testItems.forEachIndexed { index, item ->
-            whenever(mediaPlaybackInfoEntityMapper(item, testUpdatedAt))
-                .thenReturn(testEntities[index])
-        }
+    fun `test that insertMigratedPlaybackInfos stamps the rows as older than any live write`() =
+        runTest {
+            val testItem = mock<MediaPlaybackInfo>()
+            val testEntity = mock<MediaPlaybackInfoEntity>()
+            whenever(mediaPlaybackInfoEntityMapper(testItem, 0L)).thenReturn(testEntity)
 
-        underTest.insertOrUpdatePlaybackInfos(testItems)
-        verify(mediaPlaybackInfoDao)
-            .insertAndPruneAll(testEntities, MediaPlaybackInfoDao.MAX_STORED_PLAYBACK_INFOS)
-    }
+            underTest.insertMigratedPlaybackInfos(listOf(testItem))
+
+            verify(mediaPlaybackInfoDao)
+                .insertMigratedAndPrune(
+                    listOf(testEntity),
+                    MediaPlaybackInfoDao.MAX_STORED_PLAYBACK_INFOS,
+                )
+            verify(deviceGateway, never()).getCurrentTimeInMillis()
+        }
 
     @Test
     fun `test that monitorAllPlaybackInfos returns as expected`() =

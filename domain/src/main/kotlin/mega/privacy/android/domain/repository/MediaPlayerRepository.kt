@@ -456,4 +456,33 @@ interface MediaPlayerRepository {
      * @return [MediaPlaybackInfo] if exists, otherwise null
      */
     suspend fun getMediaPlaybackInfo(handle: Long): MediaPlaybackInfo?
+
+    /**
+     * Insert playback infos carried over from the legacy DataStore store
+     *
+     * These rows are stamped as older than any real one: the legacy format has no timestamp, so
+     * their true age is unknown, and a genuinely recent position must outrank them when the store
+     * is trimmed to its retention limit.
+     *
+     * @param infos the migrated playback infos
+     */
+    suspend fun insertMigratedVideoPlaybackInfos(infos: List<MediaPlaybackInfo>)
+
+    /**
+     * Read the video playback positions still held in the legacy DataStore record
+     *
+     * @return the legacy positions keyed by media handle, or null when the record is absent or
+     * unreadable
+     */
+    suspend fun getLegacyVideoPlaybackInfos(): List<MediaPlaybackInfo>?
+
+    /**
+     * Whether the legacy video playback positions have already been carried over
+     */
+    suspend fun isVideoPlaybackInfoMigrated(): Boolean
+
+    /**
+     * Record that the legacy video playback positions have been carried over
+     */
+    suspend fun setVideoPlaybackInfoMigrated()
 }

@@ -252,49 +252,6 @@ class MediaPlaybackInfoDaoTest {
         }
 
     @Test
-    fun `test_that_corresponding_items_are_updated_after_call_insertOrUpdatePlaybackInfos`() =
-        runTest {
-            val testHandles = (1..10L).toList()
-            (1..100L).map {
-                val entity = MediaPlaybackInfoEntity(
-                    mediaHandle = it,
-                    mediaType = MediaType.Video,
-                    currentPosition = it * 1000L,
-                    totalDuration = it * 2000L,
-                )
-                mediaPlaybackInfoDao.insertOrUpdatePlaybackInfo(entity)
-            }
-
-            testHandles.forEach { handle ->
-                val testInfo = mediaPlaybackInfoDao.getAllPlaybackInfos().first()
-                    .firstOrNull { it.mediaHandle == handle }
-                assertThat(testInfo?.mediaHandle).isEqualTo(handle)
-                assertThat(testInfo?.mediaType).isEqualTo(MediaType.Video)
-                assertThat(testInfo?.currentPosition).isEqualTo(handle * 1000L)
-                assertThat(testInfo?.totalDuration).isEqualTo(handle * 2000L)
-            }
-
-            testHandles.map { handle ->
-                val newEntity = MediaPlaybackInfoEntity(
-                    mediaHandle = handle,
-                    mediaType = MediaType.Audio,
-                    currentPosition = handle * 10L,
-                    totalDuration = handle * 20L,
-                )
-                mediaPlaybackInfoDao.insertOrUpdatePlaybackInfo(newEntity)
-            }
-
-            testHandles.forEach { handle ->
-                val newTestInfo = mediaPlaybackInfoDao.getAllPlaybackInfos().first()
-                    .firstOrNull { it.mediaHandle == handle }
-                assertThat(newTestInfo?.mediaHandle).isEqualTo(handle)
-                assertThat(newTestInfo?.mediaType).isEqualTo(MediaType.Audio)
-                assertThat(newTestInfo?.currentPosition).isEqualTo(handle * 10L)
-                assertThat(newTestInfo?.totalDuration).isEqualTo(handle * 20L)
-            }
-        }
-
-    @Test
     fun `test_that_insert_and_prune_keeps_only_the_newest_rows`() = runTest {
         (1..10L).forEach { handle ->
             mediaPlaybackInfoDao.insertAndPrune(
@@ -417,21 +374,142 @@ class MediaPlaybackInfoDaoTest {
     }
 
     @Test
-    fun `test_that_insert_and_prune_all_prunes_after_the_batch`() = runTest {
-        mediaPlaybackInfoDao.insertAndPruneAll(
-            entities = (1..10L).map { handle ->
+    fun `test_that_migrated_rows_never_evict_a_row_written_from_live_playback`() = runTest {
+        // A position saved while playing carries a real timestamp.
+        mediaPlaybackInfoDao.insertAndPrune(
+            entity = MediaPlaybackInfoEntity(
+                mediaHandle = LIVE_HANDLE,
+                mediaType = MediaType.Audio,
+                currentPosition = 5_000L,
+                totalDuration = 600_000L,
+                updatedAt = LIVE_UPDATED_AT,
+            ),
+            maxItems = 2,
+        )
+
+        // The migration writes its whole batch with the zero timestamp the facade stamps on it,
+        // because the legacy record carries no age of its own.
+        mediaPlaybackInfoDao.insertMigratedAndPrune(
+            entities = (1..3L).map { handle ->
                 MediaPlaybackInfoEntity(
                     mediaHandle = handle,
                     mediaType = MediaType.Video,
                     currentPosition = handle * 1000L,
                     totalDuration = handle * 2000L,
-                    updatedAt = handle,
+                    updatedAt = MIGRATED_UPDATED_AT,
                 )
             },
-            maxItems = 4,
+            maxItems = 2,
         )
 
         val remaining = mediaPlaybackInfoDao.getAllPlaybackInfos().first()
-        assertThat(remaining.map { it.mediaHandle }).containsExactly(10L, 9L, 8L, 7L)
+        assertThat(remaining.map { it.mediaHandle }).containsExactly(LIVE_HANDLE, 3L)
+    }
+
+    @Test
+    fun `test_that_a_migrated_row_never_overwrites_one_already_in_the_store`() = runTest {
+        // The dual write can land before the migration finishes reading the legacy record.
+        mediaPlaybackInfoDao.insertAndPrune(
+            entity = MediaPlaybackInfoEntity(
+                mediaHandle = 1L,
+                mediaType = MediaType.Video,
+                currentPosition = 90_000L,
+                totalDuration = 120_000L,
+                updatedAt = LIVE_UPDATED_AT,
+            ),
+            maxItems = 4,
+        )
+
+        // The migration then arrives with a stale position for the same item.
+        mediaPlaybackInfoDao.insertMigratedAndPrune(
+            entities = listOf(
+                MediaPlaybackInfoEntity(
+                    mediaHandle = 1L,
+                    mediaType = MediaType.Video,
+                    currentPosition = 1_000L,
+                    totalDuration = 120_000L,
+                    updatedAt = MIGRATED_UPDATED_AT,
+                ),
+                MediaPlaybackInfoEntity(
+                    mediaHandle = 2L,
+                    mediaType = MediaType.Video,
+                    currentPosition = 2_000L,
+                    totalDuration = 120_000L,
+                    updatedAt = MIGRATED_UPDATED_AT,
+                ),
+            ),
+            maxItems = 4,
+        )
+
+        val stored = mediaPlaybackInfoDao.getAllPlaybackInfos().first().associateBy { it.mediaHandle }
+        // The live position and its timestamp survive untouched...
+        assertThat(stored[1L]?.currentPosition).isEqualTo(90_000L)
+        assertThat(stored[1L]?.updatedAt).isEqualTo(LIVE_UPDATED_AT)
+        // ...while an item the store did not have yet is still carried over.
+        assertThat(stored[2L]?.currentPosition).isEqualTo(2_000L)
+        assertThat(stored[2L]?.updatedAt).isEqualTo(MIGRATED_UPDATED_AT)
+    }
+
+    @Test
+    fun `test_that_replaying_a_migrated_item_restores_its_place_in_the_retention_order`() =
+        runTest {
+            // Two migrated items and one position saved while playing, none of them pruned yet.
+            mediaPlaybackInfoDao.insertMigratedAndPrune(
+                entities = (1..2L).map { handle ->
+                    MediaPlaybackInfoEntity(
+                        mediaHandle = handle,
+                        mediaType = MediaType.Video,
+                        currentPosition = handle * 1000L,
+                        totalDuration = handle * 2000L,
+                        updatedAt = MIGRATED_UPDATED_AT,
+                    )
+                },
+                maxItems = 4,
+            )
+            mediaPlaybackInfoDao.insertAndPrune(
+                entity = MediaPlaybackInfoEntity(
+                    mediaHandle = LIVE_HANDLE,
+                    mediaType = MediaType.Audio,
+                    currentPosition = 5_000L,
+                    totalDuration = 600_000L,
+                    updatedAt = LIVE_UPDATED_AT,
+                ),
+                maxItems = 4,
+            )
+
+            // Playing migrated item 1 again rewrites its row with a real timestamp. Rewriting an
+            // existing row cannot push the table over the limit, so this write does not prune.
+            mediaPlaybackInfoDao.insertAndPrune(
+                entity = MediaPlaybackInfoEntity(
+                    mediaHandle = 1L,
+                    mediaType = MediaType.Video,
+                    currentPosition = 20_000L,
+                    totalDuration = 2_000L,
+                    updatedAt = LIVE_UPDATED_AT + 1_000L,
+                ),
+                maxItems = 4,
+            )
+
+            // Opening a new item is what trims the store, and item 2 — still carrying the
+            // migration timestamp — is the one that loses its place, not the replayed item 1.
+            mediaPlaybackInfoDao.insertAndPrune(
+                entity = MediaPlaybackInfoEntity(
+                    mediaHandle = 3L,
+                    mediaType = MediaType.Video,
+                    currentPosition = 3_000L,
+                    totalDuration = 6_000L,
+                    updatedAt = LIVE_UPDATED_AT + 2_000L,
+                ),
+                maxItems = 3,
+            )
+
+            val remaining = mediaPlaybackInfoDao.getAllPlaybackInfos().first()
+            assertThat(remaining.map { it.mediaHandle }).containsExactly(3L, 1L, LIVE_HANDLE)
+        }
+
+    private companion object {
+        const val MIGRATED_UPDATED_AT = 0L
+        const val LIVE_UPDATED_AT = 1_700_000_000_000L
+        const val LIVE_HANDLE = 100L
     }
 }

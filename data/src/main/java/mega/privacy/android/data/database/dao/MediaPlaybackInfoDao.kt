@@ -50,8 +50,11 @@ internal interface MediaPlaybackInfoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdatePlaybackInfo(entity: MediaPlaybackInfoEntity)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdatePlaybackInfos(entities: List<MediaPlaybackInfoEntity>)
+    /**
+     * Insert only the rows whose media handle is not stored yet, leaving existing rows untouched.
+     */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertPlaybackInfosIfAbsent(entities: List<MediaPlaybackInfoEntity>)
 
     /**
      * Insert or update a playback info and prune excess items.
@@ -71,14 +74,18 @@ internal interface MediaPlaybackInfoDao {
     }
 
     /**
-     * Insert or update playback infos in a single transaction and prune excess items.
+     * Insert playback infos carried over from a legacy store and prune excess items.
+     *
+     * A row already present was written either by live playback or by an earlier run of the same
+     * migration; the first is newer and authoritative and the second is identical, so neither may
+     * be overwritten with data whose age is unknown.
      */
     @Transaction
-    suspend fun insertAndPruneAll(
+    suspend fun insertMigratedAndPrune(
         entities: List<MediaPlaybackInfoEntity>,
         maxItems: Int = MAX_STORED_PLAYBACK_INFOS,
     ) {
-        insertOrUpdatePlaybackInfos(entities)
+        insertPlaybackInfosIfAbsent(entities)
         deleteExcessItems(maxItems)
     }
 

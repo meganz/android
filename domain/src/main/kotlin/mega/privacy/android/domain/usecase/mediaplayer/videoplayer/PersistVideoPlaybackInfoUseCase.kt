@@ -36,14 +36,10 @@ class PersistVideoPlaybackInfoUseCase @Inject constructor(
         if (info.mediaHandle == INVALID_MEDIA_HANDLE) return
         if (info.totalDuration <= 0) return
 
-        val isBackAtStart = info.currentPosition <= CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
-        val isWatchedThrough =
-            info.totalDuration - info.currentPosition < CWLO_NEAR_COMPLETION_THRESHOLD_MS
-
-        if (isBackAtStart || isWatchedThrough) {
-            mediaPlayerRepository.deleteMediaPlaybackInfo(info.mediaHandle)
-        } else {
+        if (info.isPlaybackPositionWorthKeeping()) {
             mediaPlayerRepository.updateAndPersistPlaybackInfo(info)
+        } else {
+            mediaPlayerRepository.deleteMediaPlaybackInfo(info.mediaHandle)
         }
     }
 }

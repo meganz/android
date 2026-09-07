@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.gson.Gson
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -23,6 +24,7 @@ import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.FileNode
@@ -38,6 +40,7 @@ import nz.mega.sdk.MegaSearchFilter
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -45,6 +48,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -560,6 +564,102 @@ class DefaultMediaPlayerRepositoryTest {
 
             verify(megaLocalRoomGateway).insertOrUpdatePlaybackInfo(playbackInfo)
         }
+
+    @Test
+    fun `test that getLegacyVideoPlaybackInfos maps the stored record to video playback infos`() =
+        runTest {
+            whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
+                flowOf(Gson().toJson(mapOf(expectedMediaId to createPlaybackInformation())))
+            )
+
+            val actual = underTest.getLegacyVideoPlaybackInfos()
+
+            assertThat(actual).containsExactly(
+                MediaPlaybackInfo(
+                    mediaHandle = expectedMediaId,
+                    totalDuration = expectedTotalDuration,
+                    currentPosition = expectedCurrentPosition,
+                    mediaType = MediaType.Video,
+                )
+            )
+        }
+
+    @Test
+    fun `test that getLegacyVideoPlaybackInfos maps records with no progress without filtering them`() =
+        runTest {
+            val zeroPosition = createPlaybackInformation().copy(currentPosition = 0)
+            whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
+                flowOf(Gson().toJson(mapOf(expectedMediaId to zeroPosition)))
+            )
+
+            assertThat(underTest.getLegacyVideoPlaybackInfos()).hasSize(1)
+        }
+
+    @Test
+    fun `test that getLegacyVideoPlaybackInfos rethrows when the record cannot be read`() =
+        runTest {
+            whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull()))
+                .thenReturn(flow { throw RuntimeException("read failed") })
+
+            assertThrows<RuntimeException> { underTest.getLegacyVideoPlaybackInfos() }
+        }
+
+    @Test
+    fun `test that getLegacyVideoPlaybackInfos returns null when the record is unreadable`() =
+        runTest {
+            whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull()))
+                .thenReturn(flowOf("not json at all"))
+
+            assertThat(underTest.getLegacyVideoPlaybackInfos()).isNull()
+        }
+
+    @Test
+    fun `test that getLegacyVideoPlaybackInfos returns null when the record is absent`() = runTest {
+        whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull()))
+            .thenReturn(flowOf(null))
+
+        assertThat(underTest.getLegacyVideoPlaybackInfos()).isNull()
+    }
+
+    @Test
+    fun `test that isVideoPlaybackInfoMigrated rethrows when the flag cannot be read`() = runTest {
+        whenever(appPreferencesGateway.monitorBoolean(anyOrNull(), anyOrNull()))
+            .thenReturn(flow { throw RuntimeException("read failed") })
+
+        assertThrows<RuntimeException> { underTest.isVideoPlaybackInfoMigrated() }
+    }
+
+    @Test
+    fun `test that insertMigratedVideoPlaybackInfos delegates to megaLocalRoomGateway`() = runTest {
+        val infos = listOf(mock<MediaPlaybackInfo>())
+
+        underTest.insertMigratedVideoPlaybackInfos(infos)
+
+        verify(megaLocalRoomGateway).insertMigratedPlaybackInfos(infos)
+    }
+
+    @Test
+    fun `test that isVideoPlaybackInfoMigrated returns the stored flag`() = runTest {
+        whenever(appPreferencesGateway.monitorBoolean(anyOrNull(), any())).thenReturn(flowOf(true))
+
+        assertThat(underTest.isVideoPlaybackInfoMigrated()).isTrue()
+    }
+
+    @Test
+    fun `test that isVideoPlaybackInfoMigrated returns false when the flag has never been set`() =
+        runTest {
+            whenever(appPreferencesGateway.monitorBoolean(anyOrNull(), any()))
+                .thenReturn(flowOf(false))
+
+            assertThat(underTest.isVideoPlaybackInfoMigrated()).isFalse()
+        }
+
+    @Test
+    fun `test that setVideoPlaybackInfoMigrated stores the flag`() = runTest {
+        underTest.setVideoPlaybackInfoMigrated()
+
+        verify(appPreferencesGateway).putBoolean(any(), eq(true))
+    }
 
     @Test
     fun `test that clearAllPlaybackInfos of megaLocalRoomGateway is invoked`() = runTest {

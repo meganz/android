@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -26,6 +27,7 @@ import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
@@ -343,6 +345,51 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getMediaPlaybackInfo(handle)
         }
+
+    override suspend fun insertMigratedVideoPlaybackInfos(infos: List<MediaPlaybackInfo>) =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.insertMigratedPlaybackInfos(infos)
+        }
+
+    override suspend fun getLegacyVideoPlaybackInfos(): List<MediaPlaybackInfo>? =
+        withContext(ioDispatcher) {
+            // A failure to read the record is left to propagate. Swallowing it would look like an
+            // absent record to the caller, which marks the migration done and drops every legacy
+            // position for good; letting it through costs one retry on the next start instead.
+            val json = appPreferencesGateway
+                .monitorString(PREFERENCE_KEY_VIDEO_EXIT_TIME, null)
+                .firstOrNull()
+                ?: return@withContext null
+
+            // Content that cannot be parsed is a different case: retrying will not fix it, so the
+            // record is dropped and the migration is allowed to complete.
+            runCatching {
+                Gson().fromJson<Map<Long, PlaybackInformation>>(
+                    json,
+                    object : TypeToken<Map<Long, PlaybackInformation>>() {}.type
+                )
+            }.onFailure {
+                Timber.e(it, "Legacy video playback record unreadable, dropping it")
+            }.getOrNull()
+                ?.map { (handle, info) ->
+                    MediaPlaybackInfo(
+                        mediaHandle = handle,
+                        totalDuration = info.totalDuration,
+                        currentPosition = info.currentPosition,
+                        mediaType = MediaType.Video,
+                    )
+                }
+        }
+
+    override suspend fun isVideoPlaybackInfoMigrated(): Boolean = withContext(ioDispatcher) {
+        appPreferencesGateway
+            .monitorBoolean(PREFERENCE_KEY_VIDEO_PLAYBACK_MIGRATED, false)
+            .firstOrNull() ?: false
+    }
+
+    override suspend fun setVideoPlaybackInfoMigrated() = withContext(ioDispatcher) {
+        appPreferencesGateway.putBoolean(PREFERENCE_KEY_VIDEO_PLAYBACK_MIGRATED, true)
+    }
 
     private suspend fun getMegaNodeByHandle(nodeId: NodeId, attemptFromFolderApi: Boolean = false) =
         megaApi.getMegaNodeByHandle(nodeId.longValue)
@@ -662,5 +709,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     companion object {
         private const val PREFERENCE_KEY_VIDEO_EXIT_TIME = "PREFERENCE_KEY_VIDEO_EXIT_TIME"
+        private const val PREFERENCE_KEY_VIDEO_PLAYBACK_MIGRATED =
+            "PREFERENCE_KEY_VIDEO_PLAYBACK_MIGRATED"
     }
 }
