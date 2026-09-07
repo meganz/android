@@ -18,6 +18,7 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.formatter.stripChatFormatTags
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
@@ -28,7 +29,6 @@ import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationD
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
-import mega.privacy.android.shared.original.core.ui.controls.chat.messages.toFormattedText
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -118,7 +118,7 @@ class ChatMessageNotificationManager @Inject constructor(
             Person.Builder().apply { setName(title) }.build()
         ).also {
             it.addMessage(
-                if (isNormalTypeMsg) msgContent.toFormattedText() else msgContent,
+                if (isNormalTypeMsg) msgContent.stripChatFormatTags() else msgContent,
                 msg.timestamp,
                 Person.Builder().apply { setName(senderName) }.build()
             )

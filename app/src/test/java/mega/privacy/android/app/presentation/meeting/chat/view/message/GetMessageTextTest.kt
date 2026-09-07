@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message
 
 import com.google.common.truth.Truth
+import mega.privacy.android.core.formatter.stripChatFormatTags
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.toFormattedText
+import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
@@ -21,6 +23,26 @@ internal class GetMessageTextTest {
         expectedText: String,
     ) {
         Truth.assertThat(inputText.toFormattedText(links).toString()).isEqualTo(expectedText)
+    }
+
+    /**
+     * The notification path renders the same message as plain text, so both must agree.
+     *
+     * They only part ways when nested tags are unbalanced ([UNBALANCED_NESTED_TAGS]):
+     * [toFormattedText] abandons the whole match and shows every tag, while
+     * [stripChatFormatTags] pairs each tag on its own and removes the ones that do match.
+     * Both are acceptable renderings of malformed input.
+     */
+    @ParameterizedTest(name = " if input text is {0} and links is {1}: {2} ")
+    @ArgumentsSource(FormatTextArgumentsProvider::class)
+    fun `test that the plain text used for notifications matches the formatted text`(
+        inputText: String,
+        links: List<String>,
+        expectedText: String,
+    ) {
+        Assumptions.assumeTrue(inputText !in UNBALANCED_NESTED_TAGS)
+
+        Truth.assertThat(inputText.stripChatFormatTags()).isEqualTo(expectedText)
     }
 
     internal class FormatTextArgumentsProvider : ArgumentsProvider {
@@ -376,6 +398,33 @@ internal class GetMessageTextTest {
                 listOf("www.notpresent.io"),
                 "Hello world"
             ),
+            Arguments.of(
+                "*_*",
+                emptyList<String>(),
+                "_"
+            ),
+            Arguments.of(
+                "_*_",
+                emptyList<String>(),
+                "*"
+            ),
+            Arguments.of(
+                "*~*",
+                emptyList<String>(),
+                "~"
+            ),
+            Arguments.of(
+                "~_~",
+                emptyList<String>(),
+                "_"
+            ),
+        )
+    }
+
+    private companion object {
+        val UNBALANCED_NESTED_TAGS = listOf(
+            "*Text with bold _~italicstrikethrough_~ `quote` format*",
+            "*Text with bold _`~italicstrikethroughquote`_~ `quote` format*",
         )
     }
 }

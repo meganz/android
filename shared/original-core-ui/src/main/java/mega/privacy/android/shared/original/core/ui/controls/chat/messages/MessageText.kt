@@ -451,6 +451,10 @@ private fun findExtraFormatTypes(
     startIndex: Int,
     endIndex: Int,
 ): FormatType? {
+    if (startIndex >= endIndex || startIndex !in text.indices || endIndex !in text.indices) {
+        return null
+    }
+
     val nextStartChar = text[startIndex]
     val previousEndChar = text[endIndex]
 
