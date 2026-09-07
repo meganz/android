@@ -4005,4 +4005,32 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
+    <!-- Achievements overview screen: header title above the total unlocked storage reward -->
+    <string name="unlocked_rewards_title">Unlocked rewards</string>
+    <!-- Achievements overview screen: caption below the total unlocked storage reward -->
+    <string name="unlocked_storage_title">Storage quota</string>
+    <!-- Achievements overview screen: caption shown under an awarded storage amount -->
+    <string name="storage_space">Storage</string>
+    <!-- Achievements overview screen: button to invite friends to MEGA -->
+    <string name="contact_invite">Invite</string>
+    <!-- Achievements overview screen: title of the "install our mobile app" reward row -->
+    <string name="title_install_app">Install our mobile app</string>
+    <!-- Achievements overview screen: title of the signup bonus reward row -->
+    <string name="title_regitration">Signup bonus</string>
+    <!-- Achievements overview screen: title of the "install our desktop app" reward row -->
+    <string name="title_install_desktop">Install our desktop app</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
 </resources>

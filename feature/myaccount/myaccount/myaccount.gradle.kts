@@ -44,6 +44,7 @@ dependencies {
     implementation(androidx.navigation3.runtime)
     implementation(androidx.constraintlayout.compose)
     implementation(lib.kotlin.serialisation)
+    implementation(lib.compose.state.events)
     implementation(lib.mega.analytics)
     implementation(lib.mega.core.ui)
     implementation(lib.logging.timber)
