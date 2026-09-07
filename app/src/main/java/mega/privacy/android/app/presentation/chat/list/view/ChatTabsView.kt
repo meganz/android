@@ -350,6 +350,7 @@ private fun FabButton(
             modifier = modifier,
             onClick = { onStartChatClick(true) },
             painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
+            contentDescription = stringResource(R.string.fab_label_new_chat),
         )
     } else {
         FloatingActionButton(

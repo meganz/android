@@ -132,6 +132,7 @@ internal fun FileContactScreen(
                 MegaFab(
                     onClick = addContact,
                     painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.UserPlus),
+                    contentDescription = stringResource(R.string.menu_add_contact),
                 )
             }
         }

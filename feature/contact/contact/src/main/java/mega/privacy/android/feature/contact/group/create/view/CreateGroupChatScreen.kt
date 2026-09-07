@@ -103,6 +103,7 @@ internal fun CreateGroupChatScreenContent(
             selectedCount = selectionState.selectedItemsCount,
             emptySelectionTitle = stringResource(sharedR.string.general_new_group_chat),
             fabIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
+            fabDescription = stringResource(sharedR.string.button_continue),
             tagPrefix = CREATE_GROUP_CHAT_TAG_PREFIX,
             showFab = selectionState.selectedItemsCount > 0 || allowEmptyGroup,
             onSearchQueryChange = onSearchQueryChange,

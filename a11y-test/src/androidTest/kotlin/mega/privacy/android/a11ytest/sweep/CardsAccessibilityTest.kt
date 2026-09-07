@@ -49,10 +49,11 @@ class CardsAccessibilityTest {
     }
 
     @Test
-    fun test_that_plans_card_passes_accessibility_checks_when_the_link_touch_target_baseline_is_suppressed() {
-        // The plans card renders its link as a plain clickable text only 40dp tall, below the
-        // 48dp touch target minimum. This cannot be fixed in this repository, so
-        // TouchTargetSizeCheck is baselined for this test only.
+    fun test_that_plans_card_passes_accessibility_checks_when_the_feature_row_touch_target_baseline_is_suppressed() {
+        // The plans card renders each plan feature as a list item that stays clickable even though
+        // the card wires no click to it, and those rows are only 40dp tall, below the 48dp touch
+        // target minimum. This cannot be fixed in this repository, so TouchTargetSizeCheck is
+        // baselined for this test only.
         val sweep = composeTestRule.setSweepContent(
             reporters = reporters,
             baselineSuppressions = matchesCheck(TouchTargetSizeCheck::class.java),

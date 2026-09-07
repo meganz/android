@@ -488,6 +488,7 @@
 		android:id="@+id/fab_button_next"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:contentDescription="@string/general_next"
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
 		android:padding="16dp" />

@@ -121,6 +121,7 @@ internal fun SettingsStep(
                     }
                 },
                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Check),
+                contentDescription = stringResource(sharedR.string.general_create_label),
             )
         },
     ) { padding ->

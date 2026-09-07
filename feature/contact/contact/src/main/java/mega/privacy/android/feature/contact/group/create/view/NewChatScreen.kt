@@ -111,6 +111,11 @@ internal fun NewChatScreenContent(
             } else {
                 rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight)
             },
+            fabDescription = if (selectedCount == 1) {
+                stringResource(sharedR.string.general_confirm_button)
+            } else {
+                stringResource(sharedR.string.button_continue)
+            },
             tagPrefix = NEW_CHAT_TAG_PREFIX,
             showFab = selectedCount > 0,
             onSearchQueryChange = onSearchQueryChange,

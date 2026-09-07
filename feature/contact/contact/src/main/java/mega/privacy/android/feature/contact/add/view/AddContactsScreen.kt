@@ -239,6 +239,7 @@ internal fun AddContactsScreen(
                         )
                     },
                     painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.SendHorizontal),
+                    contentDescription = stringResource(sharedR.string.general_confirm_button),
                 )
             }
         },

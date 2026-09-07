@@ -289,6 +289,7 @@ internal fun InviteContactsScreen(
                         )
                     },
                     painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.SendHorizontal),
+                    contentDescription = stringResource(sharedR.string.invite_contacts_action_label),
                 )
             }
         },

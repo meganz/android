@@ -84,6 +84,7 @@ internal fun ContactGroupsContent(
                         .applyScrollToHideFabBehavior(),
                     onClick = onCreateGroupClick,
                     painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
+                    contentDescription = stringResource(sharedR.string.general_new_group_chat),
                 )
             }
         },

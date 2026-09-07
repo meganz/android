@@ -439,7 +439,8 @@ internal fun InviteContactScreen(
                     onClick = {
                         isInviteButtonEnabled = false
                         onInviteContactClick()
-                    }
+                    },
+                    contentDescription = stringResource(sharedR.string.invite_contacts_action_label),
                 )
             }
         }

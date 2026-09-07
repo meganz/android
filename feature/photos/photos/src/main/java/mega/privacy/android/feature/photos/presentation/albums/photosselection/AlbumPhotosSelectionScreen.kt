@@ -154,6 +154,7 @@ fun AlbumPhotosSelectionScreen(
             if (album != null && photos.isNotEmpty() && (albumFlow == AlbumFlow.Creation || albumFlow == AlbumFlow.Addition && selectedPhotoIds.isNotEmpty())) {
                 MegaFab(
                     painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Check),
+                    contentDescription = stringResource(sharedR.string.album_content_action_add_items),
                     onClick = {
                         when (albumFlow) {
                             AlbumFlow.Creation -> Analytics.tracker.trackEvent(

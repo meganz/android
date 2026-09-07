@@ -6,9 +6,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesCheck
-import com.google.android.apps.common.testing.accessibility.framework.checks.TouchTargetSizeCheck
-import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.a11ytest.ThemeReporters
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.feature.transfers.presentation.settings.model.TransfersSettingsUiState
@@ -55,15 +52,8 @@ class TransfersSettingsScreenAccessibilityTest {
     }
 
     @Test
-    fun test_that_the_connections_modal_passes_accessibility_checks_when_the_drag_handle_touch_target_baseline_is_suppressed() {
-        // The options modal is a partially expandable sheet, so it renders a drag handle that is
-        // clickable but only 32dp wide, below the 48dp touch target minimum. The handle belongs to
-        // the prebuilt core-ui sheet and cannot be fixed in this repository, so TouchTargetSizeCheck
-        // is baselined for this test only.
-        val sweep = composeTestRule.setScreenContent(
-            reporters = reporters,
-            baselineSuppressions = matchesCheck(TouchTargetSizeCheck::class.java),
-        ) {
+    fun test_that_the_connections_modal_passes_accessibility_checks() {
+        val sweep = composeTestRule.setScreenContent(reporters) {
             TransfersSettingsView(
                 uiState = TransfersSettingsUiState.Data(
                     maxDownloadConnections = 4,
@@ -89,13 +79,6 @@ class TransfersSettingsScreenAccessibilityTest {
         sweep.checkInEachTheme {
             onNodeWithText(UNLABELLED_CONNECTIONS_OPTION).tryPerformAccessibilityChecks()
         }
-
-        val suppressedBaseline = reporters.entries.filter {
-            it.checkName == "TouchTargetSizeCheck" &&
-                it.resultType == "SUPPRESSED" &&
-                it.metadata.containsKey(TouchTargetSizeCheck.KEY_WIDTH)
-        }
-        assertThat(suppressedBaseline).isNotEmpty()
     }
 
     @Test

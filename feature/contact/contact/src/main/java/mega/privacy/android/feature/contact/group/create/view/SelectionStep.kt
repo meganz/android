@@ -54,6 +54,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param selectedCount the number of selected items.
  * @param emptySelectionTitle the top-bar title shown when nothing is selected.
  * @param fabIcon the FAB icon painter.
+ * @param fabDescription the label accessibility services announce for the FAB.
  * @param tagPrefix the prefix for this step's test tags.
  * @param showFab whether the FAB should be shown for the current selection.
  * @param onSearchQueryChange invoked with the new query text, or null when the search is cleared.
@@ -70,6 +71,7 @@ internal fun SelectionStep(
     selectedCount: Int,
     emptySelectionTitle: String,
     fabIcon: Painter,
+    fabDescription: String,
     tagPrefix: String,
     showFab: Boolean,
     onSearchQueryChange: (String?) -> Unit,
@@ -125,6 +127,7 @@ internal fun SelectionStep(
                         onNext()
                     },
                     painter = fabIcon,
+                    contentDescription = fabDescription,
                 )
             }
         },
@@ -232,6 +235,7 @@ private fun SelectionStepPreview(
             selectedCount = 1,
             emptySelectionTitle = stringResource(sharedR.string.general_new_group_chat),
             fabIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
+            fabDescription = stringResource(sharedR.string.button_continue),
             tagPrefix = "preview",
             showFab = true,
             onSearchQueryChange = {},

@@ -35,6 +35,7 @@
         android:id="@+id/floating_button_contact_file_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/menu_add_contact"
         android:elevation="@dimen/elevation_low"
         android:padding="16dp"
         android:stateListAnimator="@anim/button_elevation"

@@ -15,17 +15,12 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.tryPerformAccessibilityChecks
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.apps.common.testing.accessibility.framework.AccessibilityCheckResultUtils.matchesCheck
-import com.google.android.apps.common.testing.accessibility.framework.checks.SpeakableTextPresentCheck
-import com.google.android.apps.common.testing.accessibility.framework.checks.TouchTargetSizeCheck
-import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.components.tooltip.popup.interactive.InteractiveRightDirectionTooltipPopup
 import mega.android.core.ui.components.tooltip.popup.interactive.InteractiveTooltipButtonProperties
 import mega.android.core.ui.components.tooltip.popup.interactive.InteractiveTooltipStepCounterProperties
 import mega.android.core.ui.components.tooltip.popup.simple.SimpleLeftDirectionTooltipPopup
 import mega.android.core.ui.components.tooltip.popup.simple.SimpleTooltipContentTitleAndBody
 import mega.privacy.android.a11ytest.ThemeReporters
-import org.hamcrest.CoreMatchers.anyOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -68,18 +63,8 @@ class TooltipsAccessibilityTest {
     }
 
     @Test
-    fun test_that_interactive_tooltip_passes_accessibility_checks_when_the_baseline_is_suppressed() {
-        // Two interactive tooltip findings cannot be fixed in this repository and are baselined
-        // for this test only: the close icon is a clickable without speakable text, and the
-        // inline text buttons are clickables only 28dp tall, below the 48dp touch target
-        // minimum.
-        val sweep = composeTestRule.setSweepContent(
-            reporters = reporters,
-            baselineSuppressions = anyOf(
-                matchesCheck(SpeakableTextPresentCheck::class.java),
-                matchesCheck(TouchTargetSizeCheck::class.java),
-            ),
-        ) {
+    fun test_that_interactive_tooltip_passes_accessibility_checks() {
+        val sweep = composeTestRule.setSweepContent(reporters) {
             var anchorCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
             Box(
                 modifier = Modifier
@@ -112,16 +97,5 @@ class TooltipsAccessibilityTest {
         sweep.checkInEachTheme {
             onNodeWithText("Sync your folders").tryPerformAccessibilityChecks()
         }
-
-        val suppressedMissingLabel = reporters.entries.filter {
-            it.checkName == "SpeakableTextPresentCheck" && it.resultType == "SUPPRESSED"
-        }
-        assertThat(suppressedMissingLabel).isNotEmpty()
-        val suppressedTouchTarget = reporters.entries.filter {
-            it.checkName == "TouchTargetSizeCheck" &&
-                it.resultType == "SUPPRESSED" &&
-                it.metadata.containsKey(TouchTargetSizeCheck.KEY_HEIGHT)
-        }
-        assertThat(suppressedTouchTarget).isNotEmpty()
     }
 }

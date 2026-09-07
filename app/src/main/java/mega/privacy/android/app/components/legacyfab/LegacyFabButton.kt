@@ -12,6 +12,13 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.theme.AndroidTheme
 
+/**
+ * Base class for the XML-hosted floating action buttons, backed by a Compose
+ * [mega.android.core.ui.components.fab.MegaFab].
+ *
+ * Declare `android:contentDescription` on the view in the layout: it is what accessibility services
+ * announce for the button.
+ */
 abstract class LegacyFabButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -29,6 +36,10 @@ abstract class LegacyFabButton @JvmOverloads constructor(
         this.clipChildren = false
         this.clipToOutline = false
         this.clipToPadding = false
+        // The container is decoration only: the hosted FAB is the actionable node, so it takes over
+        // the label declared in XML and the container stops exposing it as a duplicate.
+        val fabContentDescription = contentDescription?.toString().orEmpty()
+        contentDescription = null
         val childView =
             ComposeView(context).apply {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -37,6 +48,7 @@ abstract class LegacyFabButton @JvmOverloads constructor(
                         MegaFab(
                             onClick = { clickListener() },
                             painter = rememberVectorPainter(iconImageVector),
+                            contentDescription = fabContentDescription,
                         )
                     }
                 }

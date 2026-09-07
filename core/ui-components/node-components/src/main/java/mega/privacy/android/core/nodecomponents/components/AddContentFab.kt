@@ -8,8 +8,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.fab.MegaFab
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * FAB with plus icon with delayed visibility behavior
@@ -30,7 +32,8 @@ fun AddContentFab(
         MegaFab(
             onClick = onClick,
             painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
-            modifier = modifier
+            modifier = modifier,
+            contentDescription = stringResource(sharedR.string.album_content_action_add_items),
         )
     }
 
