@@ -4,6 +4,7 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaChatScheduledMeeting
 
 /**
  * Mutable chat-side defaults backing a fake [mega.privacy.android.data.gateway.api.MegaChatApiGateway].
@@ -56,6 +57,20 @@ class FakeChatState {
     val chatListItems: MutableMap<Long, MegaChatListItem> = mutableMapOf()
 
     /**
+     * Scheduled meetings by chat id; the scheduled-meeting reads on the fake gateway
+     * (`getScheduledMeetingsByChat` / `getScheduledMeeting` / `getAllScheduledMeetings`) resolve
+     * through this map. Seed a room's meeting here for the chat list Meetings tab to decorate it
+     * (headers, upcoming / recurring labels). Occurrences are not modelled — the domain falls back
+     * to the scheduled meeting's own start / end times.
+     */
+    val scheduledMeetings: MutableMap<Long, MutableList<MegaChatScheduledMeeting>> = mutableMapOf()
+
+    /** Register [meeting] as a scheduled meeting of [chatId], creating the list if needed. */
+    fun addScheduledMeeting(chatId: Long, meeting: MegaChatScheduledMeeting) {
+        scheduledMeetings.getOrPut(chatId) { mutableListOf() }.add(meeting)
+    }
+
+    /**
      * Message history by chat id, ordered oldest first. `loadMessages` on the fake gateway
      * delivers these newest to oldest, as the SDK does; give each message a unique `msgId` and
      * distinct timestamps so the app's message store keeps them in order.
@@ -81,6 +96,7 @@ class FakeChatState {
         myEmail = "test@mega.nz"
         chatRooms.clear()
         chatListItems.clear()
+        scheduledMeetings.clear()
         chatMessages.clear()
     }
 }

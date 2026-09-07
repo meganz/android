@@ -655,20 +655,20 @@ class FakeMegaChatApiGateway(
 
     override fun getAllScheduledMeetings(): List<MegaChatScheduledMeeting>? =
         engine.dispatchBlocking(MegaChatApiGateway::getAllScheduledMeetings, emptyList()) {
-            emptyList()
+            chatState.scheduledMeetings.values.flatten()
         }
 
     override fun getScheduledMeeting(chatId: Long, schedId: Long): MegaChatScheduledMeeting? =
         engine.dispatchBlocking(
             MegaChatApiGateway::getScheduledMeeting,
             listOf(chatId, schedId),
-        ) { null }
+        ) { chatState.scheduledMeetings[chatId]?.firstOrNull { it.schedId() == schedId } }
 
     override fun getScheduledMeetingsByChat(chatId: Long): List<MegaChatScheduledMeeting>? =
         engine.dispatchBlocking(
             MegaChatApiGateway::getScheduledMeetingsByChat,
             listOf(chatId),
-        ) { emptyList() }
+        ) { chatState.scheduledMeetings[chatId].orEmpty() }
 
     override fun fetchScheduledMeetingOccurrencesByChat(
         chatId: Long,
