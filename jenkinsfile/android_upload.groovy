@@ -43,7 +43,8 @@ DEVICE_TEST_RESULTS_FOLDER = "app/build/outputs/androidTest-results/managedDevic
 DEVICE_TEST_REPORT_FOLDER = "app/build/reports/androidTests/managedDevice/debug/flavors/gms"
 
 /**
- * Zip of the HTML test report, uploaded to Artifactory so it can be downloaded from the MR.
+ * Zip of the HTML test report and the per-test logcat, uploaded to Artifactory so it can be
+ * downloaded from the MR.
  */
 DEVICE_TEST_REPORT_ZIP = "device_test_report.zip"
 
@@ -358,10 +359,12 @@ pipeline {
                 always {
                     junit(testResults: "${DEVICE_TEST_RESULTS_FOLDER}/**/*.xml", allowEmptyResults: true)
                     archiveArtifacts(artifacts: "${DEVICE_TEST_REPORT_FOLDER}/**", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "${DEVICE_TEST_RESULTS_FOLDER}/**/logcat-*.txt", allowEmptyArchive: true)
                     script {
                         try {
                             if (fileExists(DEVICE_TEST_REPORT_FOLDER)) {
                                 sh "cd ${DEVICE_TEST_REPORT_FOLDER} && zip -qr ${WORKSPACE}/${DEVICE_TEST_REPORT_ZIP} ."
+                                stageDeviceTestLogcat()
                                 DEVICE_TEST_REPORT_LINK = common.uploadFileToArtifactory("android_upload", DEVICE_TEST_REPORT_ZIP)
                             }
                         } catch (Exception e) {
@@ -529,6 +532,23 @@ private String readDeviceTestSummary() {
             """,
             returnStdout: true
     ).trim()
+}
+
+/**
+ * Add the managed device's per-test logcat files to the uploaded test report zip.
+ *
+ * A crash that kills the instrumentation process explains itself only in logcat; the HTML report
+ * records that the run died but not why. The files are added under the device folder they were
+ * produced in, so each one sits beside the HTML for the same run.
+ */
+private void stageDeviceTestLogcat() {
+    sh """
+        if ls ${DEVICE_TEST_RESULTS_FOLDER}/*/logcat-*.txt > /dev/null 2>&1; then
+            cd ${DEVICE_TEST_RESULTS_FOLDER} && zip -qr ${WORKSPACE}/${DEVICE_TEST_REPORT_ZIP} . -i '*/logcat-*.txt'
+        else
+            echo "No device test logcat files to add to ${DEVICE_TEST_REPORT_ZIP}"
+        fi
+    """
 }
 
 /**

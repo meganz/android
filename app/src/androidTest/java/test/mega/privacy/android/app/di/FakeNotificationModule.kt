@@ -17,17 +17,12 @@ import org.mockito.kotlin.mock
 import javax.inject.Singleton
 
 /**
- * Replaces [NotificationModule] so instrumented tests never ask Firebase for a push token.
+ * Replaces [NotificationModule] so instrumented tests never request a real push token.
  *
- * Every journey logs in, which runs `PushTokenPostLoginInitialiser` and requests a token.
- * Firebase answers by starting `MegaMessageService`, whose `@AndroidEntryPoint` injection
- * resolves the Hilt component — but under `HiltTestApplication` that component only exists while
- * a `HiltAndroidRule` holds it, so creating the service throws
- * `IllegalStateException: The component was not created` and kills the app process. Landing
- * between tests it is survivable; landing inside one it aborts the whole instrumentation run.
- *
- * Handing out a [FirebaseMessaging] that reports no token keeps the initialiser on its
- * "no need to register" path, so nothing ever starts the service.
+ * Every journey logs in, which runs `PushTokenPostLoginInitialiser` and asks Firebase for an FCM
+ * token. Handing out a [FirebaseMessaging] that reports none keeps the initialiser on its
+ * "no need to register" path, so tests neither register a device against the API nor depend on
+ * Play services being reachable.
  */
 @Module
 @TestInstallIn(
