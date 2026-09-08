@@ -1,15 +1,13 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
-import android.content.Intent
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.di.DatabaseEntryPoint
-import mega.privacy.android.app.di.getDbHandler
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint
 import mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
@@ -17,7 +15,6 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.data.database.DatabaseHandler
-import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -36,7 +33,12 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
      */
     private var onlyDBUpdate = false
     private var holderPosition = 0
-    private val databaseHandler: DatabaseHandler by lazy { getDbHandler() }
+    private val databaseHandler: DatabaseHandler by lazy {
+        EntryPointAccessors.fromApplication(
+            context,
+            DatabaseHandlerEntryPoint::class.java
+        ).dbH
+    }
 
     private val databaseEntryPoint: DatabaseEntryPoint by lazy {
         EntryPointAccessors.fromApplication(context.applicationContext)

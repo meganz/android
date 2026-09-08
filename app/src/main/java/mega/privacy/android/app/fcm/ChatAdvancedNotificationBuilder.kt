@@ -11,13 +11,13 @@ import android.os.Build
 import android.view.View
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.EntryPointAccessors.fromApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.di.ChatComponentsEntryPoint
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint
 import mega.privacy.android.app.di.GlobalManagementEntryPoint
 import mega.privacy.android.app.di.MegaApiEntryPoint
-import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.CallNotificationIntentService
@@ -43,21 +43,24 @@ class ChatAdvancedNotificationBuilder(
     private var notificationManager: NotificationManager?,
 ) {
     private val context: Context = context.applicationContext
-    var dbH: DatabaseHandler = getDbHandler()
-    var megaApi: MegaApiAndroid = EntryPointAccessors.fromApplication(
+    var dbH: DatabaseHandler = fromApplication(
+        context,
+        DatabaseHandlerEntryPoint::class.java
+    ).dbH
+    var megaApi: MegaApiAndroid = fromApplication(
         context,
         MegaApiEntryPoint::class.java,
     ).megaApi()
-    var megaChatApi: MegaChatApiAndroid = EntryPointAccessors.fromApplication(
+    var megaChatApi: MegaChatApiAndroid = fromApplication(
         context,
         MegaApiEntryPoint::class.java,
     ).megaChatApi()
-    private val chatManagement: ChatManagement = EntryPointAccessors.fromApplication(
+    private val chatManagement: ChatManagement = fromApplication(
         context,
         ChatComponentsEntryPoint::class.java,
     ).chatManagement()
     private val activityLifecycleHandler: ActivityLifecycleHandler =
-        EntryPointAccessors.fromApplication(
+        fromApplication(
             context,
             GlobalManagementEntryPoint::class.java,
         ).activityLifecycleHandler()

@@ -1,9 +1,10 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
-import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.app.di.getDbHandler
+import dagger.hilt.android.EntryPointAccessors
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.data.database.DatabaseHandler
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -18,12 +19,17 @@ import timber.log.Timber
  * @property position Integer
  */
 class GetUserEmailListener(
-    val context: Context?,
+    val context: Context,
     val callback: OnUserEmailUpdateCallback? = null,
     val position: Int = INVALID_POSITION,
 ) : MegaRequestListenerInterface {
 
-    private val databaseHandler: DatabaseHandler by lazy { getDbHandler() }
+    private val databaseHandler: DatabaseHandler by lazy {
+        EntryPointAccessors.fromApplication(
+            context,
+            DatabaseHandlerEntryPoint::class.java
+        ).dbH
+    }
 
     /**
      * Callback function for onRequestStart

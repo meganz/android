@@ -5,9 +5,10 @@ import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.DatabaseEntryPoint
-import mega.privacy.android.app.di.getDbHandler
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.database.DatabaseHandler
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -24,6 +25,13 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
 
     private val databaseEntryPoint: DatabaseEntryPoint by lazy {
         EntryPointAccessors.fromApplication(context.applicationContext)
+    }
+
+    private val dbHandler: DatabaseHandler by lazy {
+        EntryPointAccessors.fromApplication(
+            context,
+            DatabaseHandlerEntryPoint::class.java
+        ).dbH
     }
 
     /**
@@ -141,7 +149,7 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
         if (map != null && map.size() > 0 && !map["h"].isNullOrBlank()) {
             val handle = MegaApiJava.base64ToHandle(map["h"])
             if (handle != MegaApiJava.INVALID_HANDLE) {
-                getDbHandler().myChatFilesFolderHandle = handle
+                dbHandler.myChatFilesFolderHandle = handle
             }
         }
     }

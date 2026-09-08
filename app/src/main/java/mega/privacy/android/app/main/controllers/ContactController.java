@@ -5,12 +5,11 @@ import static mega.privacy.android.app.utils.Util.isOnline;
 
 import android.content.Context;
 
-import dagger.hilt.android.EntryPointAccessors;
-
 import java.util.ArrayList;
 
+import dagger.hilt.android.EntryPointAccessors;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.di.DbHandlerModuleKt;
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint;
 import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.legacycontact.AddContactActivity;
@@ -44,7 +43,9 @@ public class ContactController {
         }
 
         if (dbH == null) {
-            dbH = DbHandlerModuleKt.getDbHandler();
+            dbH = EntryPointAccessors.fromApplication(
+                    context,
+                    DatabaseHandlerEntryPoint.class).getDbH();
         }
     }
 

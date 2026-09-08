@@ -5,7 +5,7 @@ import android.content.Context;
 import androidx.recyclerview.widget.RecyclerView;
 
 import dagger.hilt.android.EntryPointAccessors;
-import mega.privacy.android.app.di.DbHandlerModuleKt;
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint;
 import mega.privacy.android.app.di.MegaApiEntryPoint;
 import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaApiAndroid;
@@ -42,7 +42,9 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         this.userHandle = userHandle;
         this.isPreview = isPreview;
 
-        dbH = DbHandlerModuleKt.getDbHandler();
+        dbH = EntryPointAccessors.fromApplication(
+                context,
+                DatabaseHandlerEntryPoint.class).getDbH();
 
         if (megaApi == null) {
             megaApi = EntryPointAccessors.fromApplication(context, MegaApiEntryPoint.class).megaApi();

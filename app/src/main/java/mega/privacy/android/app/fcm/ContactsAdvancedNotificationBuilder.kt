@@ -9,9 +9,10 @@ import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.di.getDbHandler
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants
@@ -30,13 +31,12 @@ import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 
 class ContactsAdvancedNotificationBuilder(
-    context: Context,
+    val context: Context,
     private var notificationManager: NotificationManager?,
     var megaApi: MegaApiAndroid,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    val dbH: DatabaseHandler,
 ) : MegaRequestListenerInterface {
-    private val context: Context = context.applicationContext
-    var dbH: DatabaseHandler? = getDbHandler()
     private var counter = 0
     private var email = ""
     private var firstName = ""
@@ -471,7 +471,11 @@ class ContactsAdvancedNotificationBuilder(
                 context = safeContext,
                 notificationManager = notificationManager,
                 megaApi = megaApi,
-                applicationScope = applicationScope
+                applicationScope = applicationScope,
+                dbH = EntryPointAccessors.fromApplication(
+                    context,
+                    DatabaseHandlerEntryPoint::class.java
+                ).dbH
             )
         }
     }
