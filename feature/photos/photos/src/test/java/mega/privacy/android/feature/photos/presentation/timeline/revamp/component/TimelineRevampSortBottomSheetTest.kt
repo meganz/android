@@ -13,11 +13,16 @@ import mega.privacy.android.feature.photos.presentation.timeline.revamp.TIMELINE
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TIMELINE_SORT_OPTION_DATE_TAKEN_TAG
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampSortConfiguration
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampSortOption
+import mega.privacy.mobile.analytics.event.MediaScreenSortByNewestDateTakenSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenSortByNewestSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenSortByOldestDateTakenSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenSortByOldestSelectedEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
@@ -27,9 +32,12 @@ class TimelineRevampSortBottomSheetTest {
     @get:Rule
     var composeRule = createComposeRule()
 
+    private lateinit var analyticsTracker: AnalyticsTracker
+
     @Before
     fun setup() {
-        Analytics.initialise(mock<AnalyticsTracker>())
+        analyticsTracker = mock<AnalyticsTracker>()
+        Analytics.initialise(analyticsTracker)
     }
 
     private fun setContent(
@@ -88,5 +96,51 @@ class TimelineRevampSortBottomSheetTest {
                 direction = SortDirection.Ascending,
             )
         )
+    }
+
+    @Test
+    fun `test that selecting Date taken newest first tracks the date taken newest event`() {
+        setContent()
+
+        composeRule.onNodeWithTag(TIMELINE_SORT_OPTION_DATE_TAKEN_TAG).performClick()
+
+        verify(analyticsTracker).trackEvent(MediaScreenSortByNewestDateTakenSelectedEvent)
+    }
+
+    @Test
+    fun `test that toggling Date taken to oldest first tracks the date taken oldest event`() {
+        setContent(
+            selected = TimelineRevampSortConfiguration(
+                option = TimelineRevampSortOption.DateTaken,
+                direction = SortDirection.Descending,
+            )
+        )
+
+        composeRule.onNodeWithTag(TIMELINE_SORT_OPTION_DATE_TAKEN_TAG).performClick()
+
+        verify(analyticsTracker).trackEvent(MediaScreenSortByOldestDateTakenSelectedEvent)
+    }
+
+    @Test
+    fun `test that selecting Date added newest first tracks the date added newest event`() {
+        setContent(
+            selected = TimelineRevampSortConfiguration(
+                option = TimelineRevampSortOption.DateTaken,
+                direction = SortDirection.Descending,
+            )
+        )
+
+        composeRule.onNodeWithTag(TIMELINE_SORT_OPTION_DATE_ADDED_TAG).performClick()
+
+        verify(analyticsTracker).trackEvent(MediaScreenSortByNewestSelectedEvent)
+    }
+
+    @Test
+    fun `test that toggling Date added to oldest first tracks the date added oldest event`() {
+        setContent()
+
+        composeRule.onNodeWithTag(TIMELINE_SORT_OPTION_DATE_ADDED_TAG).performClick()
+
+        verify(analyticsTracker).trackEvent(MediaScreenSortByOldestSelectedEvent)
     }
 }
