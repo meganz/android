@@ -4043,4 +4043,6 @@
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <!-- Audio player: snackbar shown when the user tries to control playback while a MEGA call is ongoing -->
+    <string name="audio_player_not_allowed_during_call">It is not possible to play media files while there is a call in progress.</string>
 </resources>

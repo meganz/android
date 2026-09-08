@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -33,6 +36,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPl
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.feature.mediaplayer.data.AudioPlayerError
@@ -72,6 +76,7 @@ class AudioPlayerViewModel @Inject constructor(
     private val gateway: AudioMediaControllerGateway,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val setAudioShuffleEnabledUseCase: SetAudioShuffleEnabledUseCase,
     private val setAudioRepeatModeUseCase: SetAudioRepeatModeUseCase,
     private val deleteAudioPlaybackInfoUseCase: DeleteAudioPlaybackInfoUseCase,
@@ -138,6 +143,14 @@ class AudioPlayerViewModel @Inject constructor(
     val sessionEnded: StateFlow<Boolean> = _sessionEnded.asStateFlow()
 
     private var hadActiveSession = false
+
+    private val _controlBlockedByCall = MutableStateFlow<StateEvent>(consumed)
+
+    /**
+     * Triggered when a playback control was refused because a MEGA call is ongoing; the screen
+     * announces it with a snackbar and consumes it via [onControlBlockedByCallConsumed].
+     */
+    val controlBlockedByCall: StateFlow<StateEvent> = _controlBlockedByCall.asStateFlow()
 
     private var currentControllerState: AudioControllerState? = null
     private var lastMediaItemId: String? = null
@@ -232,6 +245,29 @@ class AudioPlayerViewModel @Inject constructor(
     /** Marks the session-ended signal as handled so it fires at most once per session. */
     fun onSessionEndedConsumed() {
         _sessionEnded.value = false
+    }
+
+    /** Marks the blocked-by-call announcement as shown. */
+    fun onControlBlockedByCallConsumed() {
+        _controlBlockedByCall.value = consumed
+    }
+
+    /**
+     * Runs [action] unless a MEGA call is ongoing: starting or steering playback would grab
+     * audio focus from the call, so the attempt is refused and announced instead. Pausing is
+     * never routed through here — silencing the player during a call is always allowed.
+     */
+    private fun runUnlessInCall(action: () -> Unit) {
+        viewModelScope.launch {
+            val inCall = runCatching { isParticipatingInChatCallUseCase() }
+                .onFailure { Timber.e(it, "Failed to check ongoing call state") }
+                .getOrDefault(false)
+            if (inCall) {
+                _controlBlockedByCall.value = triggered
+            } else {
+                action()
+            }
+        }
     }
 
     private fun observeResumeEvents() {
@@ -453,19 +489,23 @@ class AudioPlayerViewModel @Inject constructor(
 
     fun togglePlayPause() {
         val state = currentControllerState ?: return
-        if (state.isPlaying) gateway.pause() else gateway.play()
+        if (state.isPlaying) {
+            gateway.pause()
+        } else {
+            runUnlessInCall { gateway.play() }
+        }
     }
 
     fun seekTo(positionMs: Long) {
-        gateway.seekTo(positionMs)
+        runUnlessInCall { gateway.seekTo(positionMs) }
     }
 
     fun skipToNext() {
-        gateway.skipToNext()
+        runUnlessInCall { gateway.skipToNext() }
     }
 
     fun skipToPrevious() {
-        gateway.skipToPrevious()
+        runUnlessInCall { gateway.skipToPrevious() }
     }
 
     fun toggleShuffle() {
@@ -486,12 +526,12 @@ class AudioPlayerViewModel @Inject constructor(
         } else {
             state.currentPositionMs + SEEK_15_SECONDS_MS
         }
-        gateway.seekTo(target)
+        runUnlessInCall { gateway.seekTo(target) }
     }
 
     fun seekBackward15() {
         val state = currentControllerState ?: return
-        gateway.seekTo(maxOf(0L, state.currentPositionMs - SEEK_15_SECONDS_MS))
+        runUnlessInCall { gateway.seekTo(maxOf(0L, state.currentPositionMs - SEEK_15_SECONDS_MS)) }
     }
 
     /**

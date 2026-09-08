@@ -4,12 +4,15 @@ import androidx.media3.common.Player
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioContinuousPlaybackEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioContinuousPlaybackEnabledUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
@@ -22,7 +25,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -38,6 +43,7 @@ class AudioPlayerQueueViewModelTest {
 
     private val gateway = mock<AudioMediaControllerGateway>()
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
+    private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
     private val monitorAudioContinuousPlaybackEnabledUseCase =
         mock<MonitorAudioContinuousPlaybackEnabledUseCase>()
     private val setAudioContinuousPlaybackEnabledUseCase =
@@ -59,6 +65,7 @@ class AudioPlayerQueueViewModelTest {
         underTest = AudioPlayerQueueViewModel(
             gateway = gateway,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
+            isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             monitorAudioContinuousPlaybackEnabledUseCase = monitorAudioContinuousPlaybackEnabledUseCase,
             setAudioContinuousPlaybackEnabledUseCase = setAudioContinuousPlaybackEnabledUseCase,
         )
@@ -69,6 +76,7 @@ class AudioPlayerQueueViewModelTest {
         reset(
             gateway,
             getNodeByHandleUseCase,
+            isParticipatingInChatCallUseCase,
             monitorAudioContinuousPlaybackEnabledUseCase,
             setAudioContinuousPlaybackEnabledUseCase,
         )
@@ -336,6 +344,39 @@ class AudioPlayerQueueViewModelTest {
             underTest.seekToQueueItem(3)
             verify(gateway).seekToMediaItem(3)
         }
+
+    @Test
+    fun `test that seekToQueueItem is refused when a call is ongoing`() = runTest {
+        whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
+
+        underTest.uiState.test {
+            awaitItem() // Loading
+            playerStateFlow.emit(AudioControllerState())
+            awaitDataState()
+
+            underTest.seekToQueueItem(3)
+
+            awaitDataStateUntil { it.controlBlockedByCall == triggered }
+        }
+        verify(gateway, never()).seekToMediaItem(any())
+    }
+
+    @Test
+    fun `test that onControlBlockedByCallConsumed clears the announcement`() = runTest {
+        whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
+
+        underTest.uiState.test {
+            awaitItem() // Loading
+            playerStateFlow.emit(AudioControllerState())
+            awaitDataState()
+            underTest.seekToQueueItem(3)
+            awaitDataStateUntil { it.controlBlockedByCall == triggered }
+
+            underTest.onControlBlockedByCallConsumed()
+
+            awaitDataStateUntil { it.controlBlockedByCall == consumed }
+        }
+    }
 
     @Test
     fun `test that setContinuousPlayback saves the preference when enabled is true`() = runTest {

@@ -15,6 +15,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.consumed
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
@@ -35,6 +37,7 @@ import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerQueueVie
 import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerScreen
 import mega.privacy.android.feature.mediaplayer.presentation.AudioPlayerViewModel
 import mega.privacy.android.feature.mediaplayer.presentation.SleepTimerBottomSheet
+import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerQueueUiState
 import mega.privacy.android.feature.mediaplayer.presentation.model.AudioPlayerUiState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
@@ -136,6 +139,21 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
             )
         }
 
+        val controlBlockedByCall by viewModel.controlBlockedByCall.collectAsStateWithLifecycle()
+        EventEffect(
+            event = controlBlockedByCall,
+            onConsumed = viewModel::onControlBlockedByCallConsumed,
+        ) {
+            snackBarQueue.queueMessage(
+                SnackbarAttributes(
+                    message = context.getString(
+                        sharedR.string.audio_player_not_allowed_during_call
+                    ),
+                    duration = SnackbarDuration.Short,
+                )
+            )
+        }
+
         val sessionEnded by viewModel.sessionEnded.collectAsStateWithLifecycle()
         LaunchedEffect(sessionEnded) {
             // The flow is the authority, not the composed snapshot: a session that ended while
@@ -220,6 +238,22 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
 private fun AudioPlayerQueue(modifier: Modifier = Modifier) {
     val viewModel = hiltViewModel<AudioPlayerQueueViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val snackBarQueue = rememberSnackBarQueue()
+    val context = LocalContext.current
+    EventEffect(
+        event = (uiState as? AudioPlayerQueueUiState.Data)?.controlBlockedByCall ?: consumed,
+        onConsumed = viewModel::onControlBlockedByCallConsumed,
+    ) {
+        snackBarQueue.queueMessage(
+            SnackbarAttributes(
+                message = context.getString(
+                    sharedR.string.audio_player_not_allowed_during_call
+                ),
+                duration = SnackbarDuration.Short,
+            )
+        )
+    }
 
     AudioPlayerQueueContent(
         uiState = uiState,

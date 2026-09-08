@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.mediaplayer.presentation.model
 
 import androidx.compose.runtime.Stable
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.feature.mediaplayer.data.model.AudioQueueItem
 
@@ -24,6 +26,8 @@ sealed interface AudioPlayerQueueUiState {
      * @property currentThumbnailData Thumbnail data for the currently playing node.
      * @property isContinuousPlayback Whether playback moves on to the next queue item automatically.
      * @property playingFromName Name of the folder or source the queue is playing from.
+     * @property controlBlockedByCall Triggered when starting a queue item was refused because a
+     * MEGA call is ongoing.
      */
     data class Data(
         val items: List<AudioQueueItem>,
@@ -34,5 +38,6 @@ sealed interface AudioPlayerQueueUiState {
         val currentThumbnailData: ThumbnailData?,
         val isContinuousPlayback: Boolean,
         val playingFromName: String?,
+        val controlBlockedByCall: StateEvent = consumed,
     ) : AudioPlayerQueueUiState
 }

@@ -3,8 +3,12 @@ package mega.privacy.android.feature.mediaplayer.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -13,9 +17,12 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioContinuousPlaybackEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioContinuousPlaybackEnabledUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
@@ -35,9 +42,21 @@ import timber.log.Timber
 internal class AudioPlayerQueueViewModel @Inject constructor(
     private val gateway: AudioMediaControllerGateway,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
+    private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val monitorAudioContinuousPlaybackEnabledUseCase: MonitorAudioContinuousPlaybackEnabledUseCase,
     private val setAudioContinuousPlaybackEnabledUseCase: SetAudioContinuousPlaybackEnabledUseCase,
 ) : ViewModel() {
+
+    /**
+     * Triggered when starting a queue item was refused because a MEGA call is ongoing; carried
+     * inside [uiState] and consumed via [onControlBlockedByCallConsumed].
+     */
+    private val controlBlockedByCallChannel = Channel<StateEvent>(Channel.BUFFERED)
+
+    /** Marks the blocked-by-call announcement as shown. */
+    fun onControlBlockedByCallConsumed() {
+        controlBlockedByCallChannel.trySend(consumed)
+    }
 
     val uiState: StateFlow<AudioPlayerQueueUiState> by lazy(LazyThreadSafetyMode.NONE) {
         val playingFromNameFlow = gateway.playerState
@@ -76,7 +95,9 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
                 .catch { Timber.e(it, "Failed to collect player state in queue ViewModel") },
             playingFromNameFlow,
             continuousPlaybackFlow,
-        ) { state, playingFromName, continuousPlaybackEnabled ->
+            controlBlockedByCallChannel.receiveAsFlow()
+                .onStart { emit(consumed) },
+        ) { state, playingFromName, continuousPlaybackEnabled, controlBlockedByCall ->
             val enrichedItems = state.queueItems.mapIndexed { index, item ->
                 if (index == state.currentQueueIndex) {
                     item.copy(
@@ -98,6 +119,7 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
                 },
                 isContinuousPlayback = continuousPlaybackEnabled,
                 playingFromName = playingFromName,
+                controlBlockedByCall = controlBlockedByCall,
             )
         }.asUiStateFlow(
             viewModelScope,
@@ -105,9 +127,19 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
         )
     }
 
-    /** Seeks to the queue item at [index] and begins playback from its start. */
+    /** Seeks to the queue item at [index] and begins playback from its start. Refused while a
+     * MEGA call is ongoing, since starting playback would grab audio focus from the call. */
     fun seekToQueueItem(index: Int) {
-        gateway.seekToMediaItem(index)
+        viewModelScope.launch {
+            val inCall = runCatching { isParticipatingInChatCallUseCase() }
+                .onFailure { Timber.e(it, "Failed to check ongoing call state") }
+                .getOrDefault(false)
+            if (inCall) {
+                controlBlockedByCallChannel.send(triggered)
+            } else {
+                gateway.seekToMediaItem(index)
+            }
+        }
     }
 
     /**

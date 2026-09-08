@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.media3.common.Player
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,6 +25,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
@@ -68,6 +71,7 @@ class AudioPlayerViewModelTest {
     private val gateway = mock<AudioMediaControllerGateway>()
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
+    private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
     private val setAudioShuffleEnabledUseCase = mock<SetAudioShuffleEnabledUseCase>()
     private val setAudioRepeatModeUseCase = mock<SetAudioRepeatModeUseCase>()
     private val deleteAudioPlaybackInfoUseCase = mock<DeleteAudioPlaybackInfoUseCase>()
@@ -104,6 +108,7 @@ class AudioPlayerViewModelTest {
             gateway = gateway,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             setAudioShuffleEnabledUseCase = setAudioShuffleEnabledUseCase,
             setAudioRepeatModeUseCase = setAudioRepeatModeUseCase,
             deleteAudioPlaybackInfoUseCase = deleteAudioPlaybackInfoUseCase,
@@ -122,6 +127,7 @@ class AudioPlayerViewModelTest {
             gateway,
             getNodeByHandleUseCase,
             monitorNodeUpdatesUseCase,
+            isParticipatingInChatCallUseCase,
             setAudioShuffleEnabledUseCase,
             setAudioRepeatModeUseCase,
             deleteAudioPlaybackInfoUseCase,
@@ -1436,6 +1442,58 @@ class AudioPlayerViewModelTest {
                 assertThat(underTest.sleepTimerState.value).isEqualTo(SleepTimerState.EndOfTrack)
             }
         }
+
+    @Test
+    fun `test that togglePlayPause is refused when a call is ongoing and player is paused`() =
+        runTest {
+            whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(audioControllerState(isPlaying = false))
+                awaitItem() // Data
+
+                underTest.togglePlayPause()
+
+                verify(gateway, never()).play()
+                assertThat(underTest.controlBlockedByCall.value).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that togglePlayPause still pauses when a call is ongoing and player is playing`() =
+        runTest {
+            whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(audioControllerState(isPlaying = true))
+                awaitItem() // Data
+
+                underTest.togglePlayPause()
+
+                verify(gateway).pause()
+                assertThat(underTest.controlBlockedByCall.value).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that seekTo is refused when a call is ongoing`() = runTest {
+        whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
+
+        underTest.seekTo(5_000L)
+
+        verify(gateway, never()).seekTo(any())
+        assertThat(underTest.controlBlockedByCall.value).isEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that skipToNext is refused when a call is ongoing`() = runTest {
+        whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
+
+        underTest.skipToNext()
+
+        verify(gateway, never()).skipToNext()
+        assertThat(underTest.controlBlockedByCall.value).isEqualTo(triggered)
+    }
 
     @Test
     fun `test that sessionEnded emits when the service ends an active session`() = runTest {

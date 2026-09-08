@@ -32,6 +32,7 @@ dependencies {
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
+    implementation(lib.compose.state.events)
     implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)
     implementation(lib.coil3)
