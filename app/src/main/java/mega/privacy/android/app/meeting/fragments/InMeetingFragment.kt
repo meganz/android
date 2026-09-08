@@ -50,8 +50,8 @@ import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
-import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService.Companion.pauseAudioPlayer
-import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService.Companion.resumeAudioPlayerIfNotInCall
+import mega.privacy.android.app.mediaplayer.AudioPlayerCommands.pauseAudioPlayers
+import mega.privacy.android.app.mediaplayer.AudioPlayerCommands.resumeAudioPlayersIfNotInCall
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveX
 import mega.privacy.android.app.meeting.AnimationTool.moveY
@@ -598,7 +598,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pauseAudioPlayer(meetingActivity)
+        pauseAudioPlayers(meetingActivity)
 
         // Keep screen on
         meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -2872,7 +2872,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         removeUI()
         Timber.d("Fragment destroyed")
 
-        resumeAudioPlayerIfNotInCall(meetingActivity)
+        resumeAudioPlayersIfNotInCall(meetingActivity)
         RunOnUIThreadUtils.stop()
         bottomFloatingPanelViewHolder?.onDestroy()
     }

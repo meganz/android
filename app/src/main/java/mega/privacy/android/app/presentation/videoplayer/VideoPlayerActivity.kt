@@ -46,7 +46,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.MediaSessionHelper
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
-import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
+import mega.privacy.android.app.mediaplayer.AudioPlayerCommands
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.container.MegaAppContainer
@@ -240,7 +240,7 @@ class VideoPlayerActivity : AppCompatActivity(), MegaSnackbarShower {
             }
         }
         videoPlayerViewModelV2.initVideoPlayerData(intent)
-        LegacyAudioPlayerService.pauseAudioPlayer(this)
+        AudioPlayerCommands.pauseAudioPlayers(this)
         registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
         setupObserver()
         initMediaSession()
@@ -394,7 +394,7 @@ class VideoPlayerActivity : AppCompatActivity(), MegaSnackbarShower {
             mediaPlayerGateway.playerStop()
             mediaPlayerGateway.playerRelease()
         }
-        LegacyAudioPlayerService.resumeAudioPlayer(this)
+        AudioPlayerCommands.resumeAudioPlayers(this)
         unregisterReceiver(headsetPlugReceiver)
         if (audioManager != null) {
             ChatUtil.abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)

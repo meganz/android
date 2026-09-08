@@ -57,6 +57,7 @@ import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioResumePositionUseCase
@@ -160,6 +161,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     lateinit var isConnectedToInternetUseCase: IsConnectedToInternetUseCase
 
     @Inject
+    lateinit var isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase
+
+    @Inject
     lateinit var audioPlayerErrorEventQueue: AudioPlayerErrorEventQueue
 
     @Inject
@@ -189,6 +193,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private var isTransferOverQuota = false
     private var playbackRetryCount = 0
     private var retryJob: Job? = null
+    private var pausedByExternalCommand = false
 
     override fun onCreate() {
         super.onCreate()
@@ -450,6 +455,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             if (isPlaying) {
+                pausedByExternalCommand = false
                 isNotificationDismissed = false
                 MiniAudioPlayerController.notifyV2NotificationDismissed(false)
                 // Reconnect the mini player on every real resume: it is released while over
@@ -495,6 +501,20 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
         override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
             if (!playWhenReady) return
+            // Playback requests that bypass the player screen (Bluetooth buttons, the
+            // notification) must not grab audio focus from an ongoing MEGA call.
+            lifecycleScope.launch {
+                val inCall = runCatching { isParticipatingInChatCallUseCase() }
+                    .onFailure { Timber.e(it, "Failed to check ongoing call state") }
+                    .getOrDefault(false)
+                if (inCall) {
+                    // Mark the pause as external: the brief isPlaying=true from this blocked
+                    // attempt has already cleared the flag set by ACTION_PAUSE, and without
+                    // re-arming it the post-call ACTION_RESUME would refuse to restore playback.
+                    pausedByExternalCommand = true
+                    player?.pause()
+                }
+            }
             when {
                 isTransferOverQuota -> handlePlayRequestedWhileOverQuota()
                 player?.playbackState == Player.STATE_IDLE -> {
@@ -597,6 +617,26 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 isNotificationDismissed = true
                 MiniAudioPlayerController.notifyV2NotificationDismissed(true)
                 ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+                return START_NOT_STICKY
+            }
+
+            ACTION_PAUSE -> {
+                // playWhenReady, not isPlaying: a track still buffering would otherwise dodge
+                // the pause and start sounding mid-call once ready. Only intended playback
+                // earns an automatic resume — pausing a player the user already paused must
+                // not override their choice later.
+                if (player?.playWhenReady == true) {
+                    pausedByExternalCommand = true
+                    player?.pause()
+                }
+                return START_NOT_STICKY
+            }
+
+            ACTION_RESUME -> {
+                if (pausedByExternalCommand) {
+                    pausedByExternalCommand = false
+                    player?.play()
+                }
                 return START_NOT_STICKY
             }
         }
@@ -954,6 +994,10 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             "mega.privacy.android.app.mediaplayer.AudioPlayerService.STOP"
         private const val ACTION_DISMISS =
             "mega.privacy.android.app.mediaplayer.AudioPlayerService.DISMISS"
+        private const val ACTION_PAUSE =
+            "mega.privacy.android.app.mediaplayer.AudioPlayerService.PAUSE"
+        private const val ACTION_RESUME =
+            "mega.privacy.android.app.mediaplayer.AudioPlayerService.RESUME"
 
         /**
          * Returns true if [callerPackage] should be allowed to connect to the MediaSession.
@@ -998,6 +1042,36 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                     action = ACTION_STOP
                 }
             )
+        }
+
+        /**
+         * Pauses playback for an external interruption (a call starting, video playback).
+         * The pause is remembered so [resumeAudioPlayer] can undo it; a player the user had
+         * already paused is left alone.
+         */
+        fun pauseAudioPlayer(context: Context) {
+            sendCommand(context, ACTION_PAUSE)
+        }
+
+        /**
+         * Resumes playback previously paused by [pauseAudioPlayer]. A pause the user made
+         * themselves is not overridden.
+         */
+        fun resumeAudioPlayer(context: Context) {
+            sendCommand(context, ACTION_RESUME)
+        }
+
+        private fun sendCommand(context: Context, action: String) {
+            if (!isRunning) return
+            // startService can throw when the app is backgrounded without an active foreground
+            // service; a lost pause/resume for a player that is not audibly playing is harmless.
+            runCatching {
+                context.startService(
+                    Intent(context, AudioPlayerService::class.java).apply {
+                        this.action = action
+                    }
+                )
+            }.onFailure { Timber.w(it, "Failed to deliver $action to AudioPlayerService") }
         }
     }
 }
