@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,15 +21,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
 import kotlinx.collections.immutable.persistentListOf
-import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
@@ -61,6 +62,7 @@ import mega.privacy.mobile.analytics.event.ContactItemSelectedEvent
  * @param onStartCallTriggered
  * @param modifier
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContactListScreen(
     state: ContactListUiState,
@@ -102,7 +104,7 @@ fun ContactListScreen(
         ) { data -> onStartCallTriggered(data) }
     }
 
-    MegaScaffold(
+    MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
             .fillMaxSize()
             .testTag(CONTACT_LIST_SCREEN_TAG),
@@ -123,7 +125,9 @@ fun ContactListScreen(
         floatingActionButton = {
             if (state is ContactListUiState.Data) {
                 MegaFab(
-                    modifier = Modifier.testTag(CONTACT_LIST_FAB_TAG),
+                    modifier = Modifier
+                        .testTag(CONTACT_LIST_FAB_TAG)
+                        .applyScrollToHideFabBehavior(),
                     onClick = {
                         Analytics.tracker.trackEvent(AddContactFABEvent)
                         onAddContactClick()
@@ -146,7 +150,7 @@ fun ContactListScreen(
                         start = padding.calculateStartPadding(layoutDirection),
                         top = padding.calculateTopPadding(),
                         end = padding.calculateEndPadding(layoutDirection),
-                        bottom = padding.calculateBottomPadding() + FAB_BOTTOM_CLEARANCE,
+                        bottom = padding.calculateBottomPadding(),
                     ),
                     onContactClick = {
                         Analytics.tracker.trackEvent(ContactItemSelectedEvent)
@@ -220,8 +224,6 @@ private fun ContactListLoading(padding: PaddingValues) {
     )
 }
 
-
-private val FAB_BOTTOM_CLEARANCE = 88.dp
 
 internal const val CONTACT_LIST_SCREEN_TAG = "contact_list_screen"
 internal const val CONTACT_LIST_LOADING_TAG = "contact_list_screen:loading"
