@@ -19,4 +19,5 @@ enum class ImagePreviewFetcherSource {
     BACKUPS,
     RUBBISH_BIN,
     ZIP,
+    RECENTS_BUCKET,
 }

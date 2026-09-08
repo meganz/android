@@ -43,8 +43,9 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
         isPDFViewerEnabled: Boolean = false,
     ): NavKey? {
         val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceData.nodeSourceType)
-        val nodeIds = (nodeSourceData as? NodeSourceData.RecentsBucket)?.nodeIds
-        val isInShare = (nodeSourceData as? NodeSourceData.RecentsBucket)?.isInShare ?: false
+        val recentsBucket = nodeSourceData as? NodeSourceData.RecentsBucket
+        val nodeIds = recentsBucket?.nodeIds
+        val isInShare = recentsBucket?.isInShare ?: false
         val publicUrl = (nodeSourceData as? NodeSourceData.FileLink)?.url
             ?: (nodeSourceData as? NodeSourceData.FolderLink)?.url
 
@@ -85,9 +86,9 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                     fileNode.parentId.longValue
                 },
                 nodeSourceType = viewType,
-                nodeIds = nodeIds,
                 isInShare = isInShare,
-                url = publicUrl
+                url = publicUrl,
+                bucketId = recentsBucket?.bucketId,
             )
 
             is FileNodeContent.TextContent -> LegacyTextEditorNavKey(

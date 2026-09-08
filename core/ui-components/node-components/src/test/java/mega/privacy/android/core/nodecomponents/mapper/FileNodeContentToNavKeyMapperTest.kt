@@ -282,9 +282,10 @@ class FileNodeContentToNavKeyMapperTest {
     }
 
     @Test
-    fun `test that ImageForNode content maps to LegacyImageViewerNavKey with RecentsBucket sets nodeIds and isInShare`() {
+    fun `test that ImageForNode content maps to LegacyImageViewerNavKey with RecentsBucket sets bucketId and isInShare`() {
         val nodeHandle = 888L
         val parentHandle = 77L
+        val bucketId = "bucket-id"
         val nodeIds = listOf(1L, 2L, 3L)
         val isInShare = true
         val expectedViewType = NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER
@@ -302,15 +303,19 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceData = NodeSourceData.RecentsBucket(nodeIds = nodeIds, isInShare = isInShare)
+            nodeSourceData = NodeSourceData.RecentsBucket(
+                bucketId = bucketId,
+                nodeIds = nodeIds,
+                isInShare = isInShare,
+            )
         )
 
         val expected = LegacyImageViewerNavKey(
             nodeHandle = nodeHandle,
             parentNodeHandle = parentHandle,
             nodeSourceType = expectedViewType,
-            nodeIds = nodeIds,
-            isInShare = isInShare
+            isInShare = isInShare,
+            bucketId = bucketId,
         )
         assertThat(result).isEqualTo(expected)
     }
@@ -667,7 +672,11 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceData = NodeSourceData.RecentsBucket(nodeIds = nodeIds, isInShare = false),
+            nodeSourceData = NodeSourceData.RecentsBucket(
+                bucketId = "bucket-id",
+                nodeIds = nodeIds,
+                isInShare = false,
+            ),
             sortOrder = SortOrder.ORDER_DEFAULT_ASC,
             searchedItems = searchedItems
         )

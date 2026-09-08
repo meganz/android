@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetch
 import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.RecentsBucketImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
@@ -106,4 +107,9 @@ internal interface ImagePreviewModule {
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.CHAT)
     fun bindChatFetcher(fetcher: ChatImageNodeFetcher): ImageNodeFetcher
+
+    @Binds
+    @IntoMap
+    @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.RECENTS_BUCKET)
+    fun bindRecentsBucketFetcher(fetcher: RecentsBucketImageNodeFetcher): ImageNodeFetcher
 }

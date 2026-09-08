@@ -12,6 +12,7 @@ sealed class NodeSourceData(
      * Recents bucket node source type with required data
      */
     data class RecentsBucket(
+        val bucketId: String,
         val nodeIds: List<Long>,
         val isInShare: Boolean,
     ) : NodeSourceData(

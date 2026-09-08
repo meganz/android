@@ -7,6 +7,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.RecentsBucketImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.domain.entity.node.NodeId
@@ -23,16 +24,30 @@ fun EntryProviderScope<NavKey>.legacyImageViewerScreen(
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             val intent = when (key.nodeSourceType) {
-                NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER -> ImagePreviewActivity.createIntent(
-                    context = context,
-                    imageSource = ImagePreviewFetcherSource.DEFAULT,
-                    menuOptionsSource = if (key.isInShare) ImagePreviewMenuSource.SHARED_ITEMS else ImagePreviewMenuSource.DEFAULT,
-                    anchorImageNodeId = NodeId(key.nodeHandle),
-                    params = key.nodeIds?.let { nodeIds ->
-                        mapOf(DefaultImageNodeFetcher.NODE_IDS to nodeIds.toLongArray())
-                    } ?: emptyMap(),
-                    enableAddToAlbum = true,
-                )
+                NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER -> {
+                    val bucketId = key.bucketId
+                    ImagePreviewActivity.createIntent(
+                        context = context,
+                        imageSource = if (bucketId != null) {
+                            ImagePreviewFetcherSource.RECENTS_BUCKET
+                        } else {
+                            ImagePreviewFetcherSource.DEFAULT
+                        },
+                        menuOptionsSource = if (key.isInShare) ImagePreviewMenuSource.SHARED_ITEMS else ImagePreviewMenuSource.DEFAULT,
+                        anchorImageNodeId = NodeId(key.nodeHandle),
+                        params = if (bucketId != null) {
+                            mapOf(
+                                RecentsBucketImageNodeFetcher.BUCKET_ID to bucketId,
+                                RecentsBucketImageNodeFetcher.ANCHOR_NODE_ID to key.nodeHandle,
+                            )
+                        } else {
+                            key.nodeIds?.let { nodeIds ->
+                                mapOf(DefaultImageNodeFetcher.NODE_IDS to nodeIds.toLongArray())
+                            } ?: emptyMap()
+                        },
+                        enableAddToAlbum = true,
+                    )
+                }
 
                 NodeSourceTypeInt.FOLDER_LINK_ADAPTER -> ImagePreviewActivity.createIntent(
                     context = context,

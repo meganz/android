@@ -377,6 +377,7 @@ data class LegacyImageViewerNavKey(
     val nodeIds: List<Long>? = null,
     val isInShare: Boolean = false,
     val url: String? = null,
+    val bucketId: String? = null,
 ) : NoSessionNavKey.Optional
 
 /**

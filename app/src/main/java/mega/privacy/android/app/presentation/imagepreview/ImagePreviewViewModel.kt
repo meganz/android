@@ -603,6 +603,7 @@ class ImagePreviewViewModel @Inject constructor(
             ImagePreviewFetcherSource.CLOUD_DRIVE,
             ImagePreviewFetcherSource.FAVOURITE,
             ImagePreviewFetcherSource.SHARED_ITEMS,
+            ImagePreviewFetcherSource.RECENTS_BUCKET,
         )
         val isSupportedImage = runCatching {
             isEditableImageUseCase(imageNode.type)

@@ -197,8 +197,9 @@ fun RecentsBucketScreen(
                 coroutineScope = coroutineScope,
                 onActionHandled = { openedFileNode = null },
                 nodeSourceData = NodeSourceData.RecentsBucket(
+                    bucketId = viewModel.args.identifier,
                     nodeIds = uiState.nodeIds,
-                    isInShare = uiState.nodeSourceType.isSharedSource()
+                    isInShare = uiState.nodeSourceType.isSharedSource(),
                 ),
                 onDownloadEvent = transferHandler::setTransferEvent,
                 onNavigate = onNavigate,
