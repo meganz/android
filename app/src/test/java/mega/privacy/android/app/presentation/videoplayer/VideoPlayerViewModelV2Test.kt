@@ -110,6 +110,7 @@ import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.GetMediaPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
@@ -267,6 +268,7 @@ class VideoPlayerViewModelV2Test {
     private lateinit var testArgs: VideoPlayerViewModelV2.Args
     private val trackPlaybackPositionUseCase = mock<TrackPlaybackPositionUseCase>()
     private val monitorPlaybackTimesUseCase = mock<MonitorPlaybackTimesUseCase>()
+    private val getMediaPlaybackInfoUseCase = mock<GetMediaPlaybackInfoUseCase>()
     private val savePlaybackTimesUseCase = mock<SavePlaybackTimesUseCase>()
     private val getSRTSubtitleFileListUseCase = mock<GetSRTSubtitleFileListUseCase>()
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
@@ -351,6 +353,7 @@ class VideoPlayerViewModelV2Test {
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             trackPlaybackPositionUseCase = trackPlaybackPositionUseCase,
             monitorPlaybackTimesUseCase = monitorPlaybackTimesUseCase,
+            getMediaPlaybackInfoUseCase = getMediaPlaybackInfoUseCase,
             savePlaybackTimesUseCase = savePlaybackTimesUseCase,
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
@@ -452,6 +455,7 @@ class VideoPlayerViewModelV2Test {
             isParticipatingInChatCallUseCase,
             trackPlaybackPositionUseCase,
             monitorPlaybackTimesUseCase,
+            getMediaPlaybackInfoUseCase,
             savePlaybackTimesUseCase,
             getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase,
@@ -2702,6 +2706,124 @@ class VideoPlayerViewModelV2Test {
             verify(mediaPlayerGateway).playerSeekToPositionInMs(100)
             assertThat(underTest.uiState.value.showPlaybackDialog).isFalse()
             assertThat(underTest.uiState.value.playbackPosition).isNull()
+        }
+
+    @Test
+    fun `test that the saved position is read from the database when VideoPlaybackFromDatabase is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlaybackFromDatabase))
+                .thenReturn(true)
+            val storedInfo = mock<MediaPlaybackInfo> {
+                on { currentPosition }.thenReturn(250)
+                on { mediaType }.thenReturn(MediaType.Video)
+            }
+            whenever(getMediaPlaybackInfoUseCase(testHandle)).thenReturn(storedInfo)
+            testArgs = testArgs.copy(handle = testHandle)
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock<Uri>(),
+                handle = testHandle,
+                fileName = testFileName
+            )
+            whenever(getVideoNodesUseCase(any())).thenReturn(emptyList())
+            initViewModel()
+            // The flag is cached by a coroutine started in init; let it settle before the launch
+            // path reads it, otherwise the resume check falls back to DataStore.
+            advanceUntilIdle()
+            underTest.initVideoPlayerData(intent)
+
+            verify(mediaPlayerGateway).playerSeekToPositionInMs(250)
+            verifyNoInteractions(monitorPlaybackTimesUseCase)
+        }
+
+    @Test
+    fun `test that the saved position is read from DataStore when VideoPlaybackFromDatabase is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlaybackFromDatabase))
+                .thenReturn(false)
+            val playbackInfo = mock<PlaybackInformation> {
+                on { currentPosition }.thenReturn(100)
+            }
+            whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(mapOf(testHandle to playbackInfo)))
+            testArgs = testArgs.copy(handle = testHandle)
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock<Uri>(),
+                handle = testHandle,
+                fileName = testFileName
+            )
+            whenever(getVideoNodesUseCase(any())).thenReturn(emptyList())
+            initViewModel()
+            // Let the cached flag settle to its stubbed false, so this exercises the disabled
+            // path rather than the value the field happens to be initialised with.
+            advanceUntilIdle()
+            underTest.initVideoPlayerData(intent)
+
+            verify(mediaPlayerGateway).playerSeekToPositionInMs(100)
+            verifyNoInteractions(getMediaPlaybackInfoUseCase)
+        }
+
+    @Test
+    fun `test that a stored position of another media type is not resumed`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlaybackFromDatabase))
+            .thenReturn(true)
+        val audioInfo = mock<MediaPlaybackInfo> {
+            on { currentPosition }.thenReturn(250)
+            on { mediaType }.thenReturn(MediaType.Audio)
+        }
+        whenever(getMediaPlaybackInfoUseCase(testHandle)).thenReturn(audioInfo)
+        testArgs = testArgs.copy(handle = testHandle)
+        val intent = mock<Intent>()
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = VIDEO_BROWSE_ADAPTER,
+            data = mock<Uri>(),
+            handle = testHandle,
+            fileName = testFileName
+        )
+        whenever(getVideoNodesUseCase(any())).thenReturn(emptyList())
+        initViewModel()
+        advanceUntilIdle()
+        underTest.initVideoPlayerData(intent)
+
+        assertThat(underTest.uiState.value.playbackPosition).isNull()
+        verify(mediaPlayerGateway, never()).playerSeekToPositionInMs(250)
+    }
+
+    @Test
+    fun `test that the saved position is read from DataStore when the feature flag cannot be read`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlaybackFromDatabase))
+                .thenThrow(RuntimeException("flag error"))
+            val playbackInfo = mock<PlaybackInformation> {
+                on { currentPosition }.thenReturn(100)
+            }
+            whenever(monitorPlaybackTimesUseCase())
+                .thenReturn(flowOf(mapOf(testHandle to playbackInfo)))
+            testArgs = testArgs.copy(handle = testHandle)
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock<Uri>(),
+                handle = testHandle,
+                fileName = testFileName
+            )
+            whenever(getVideoNodesUseCase(any())).thenReturn(emptyList())
+            initViewModel()
+            advanceUntilIdle()
+            underTest.initVideoPlayerData(intent)
+
+            verify(mediaPlayerGateway).playerSeekToPositionInMs(100)
+            verifyNoInteractions(getMediaPlaybackInfoUseCase)
         }
 
     @ParameterizedTest(name = "when state is {0}")

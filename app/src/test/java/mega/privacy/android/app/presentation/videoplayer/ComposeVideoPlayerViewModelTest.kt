@@ -104,6 +104,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.GetMediaPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
@@ -253,6 +254,7 @@ class ComposeVideoPlayerViewModelTest {
     private lateinit var testArgs: ComposeVideoPlayerViewModel.Args
     private val trackPlaybackPositionUseCase = mock<TrackPlaybackPositionUseCase>()
     private val monitorPlaybackTimesUseCase = mock<MonitorPlaybackTimesUseCase>()
+    private val getMediaPlaybackInfoUseCase = mock<GetMediaPlaybackInfoUseCase>()
     private val savePlaybackTimesUseCase = mock<SavePlaybackTimesUseCase>()
     private val getSRTSubtitleFileListUseCase = mock<GetSRTSubtitleFileListUseCase>()
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
@@ -334,6 +336,7 @@ class ComposeVideoPlayerViewModelTest {
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             trackPlaybackPositionUseCase = trackPlaybackPositionUseCase,
             monitorPlaybackTimesUseCase = monitorPlaybackTimesUseCase,
+            getMediaPlaybackInfoUseCase = getMediaPlaybackInfoUseCase,
             savePlaybackTimesUseCase = savePlaybackTimesUseCase,
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
@@ -423,6 +426,7 @@ class ComposeVideoPlayerViewModelTest {
             isParticipatingInChatCallUseCase,
             trackPlaybackPositionUseCase,
             monitorPlaybackTimesUseCase,
+            getMediaPlaybackInfoUseCase,
             savePlaybackTimesUseCase,
             getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase,

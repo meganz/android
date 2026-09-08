@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
+package mega.privacy.android.domain.usecase.mediaplayer
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest

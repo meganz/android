@@ -65,6 +65,18 @@ enum class ApiFeatures(
     ),
 
     /**
+     * Video playback positions read from the database.
+     * When enabled, the video player resumes from the `media_playback_info` table instead of the
+     * legacy DataStore record. Writes always go to both stores, so the DataStore copy stays
+     * current and turning this off is a real rollback.
+     */
+    VideoPlaybackFromDatabase(
+        experimentName = "vpdb",
+        description = "Read video playback positions from the database instead of DataStore",
+        defaultValue = false,
+    ),
+
+    /**
      * Enables file info revamp
      */
     FileInfoRevamp(

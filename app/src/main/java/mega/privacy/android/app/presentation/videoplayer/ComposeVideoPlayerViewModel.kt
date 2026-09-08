@@ -124,6 +124,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.GetMediaPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
@@ -250,6 +251,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     @Assisted private val args: Args,
     @Assisted private val initialLaunchSource: VideoPlayerLaunchSource?,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getMediaPlaybackInfoUseCase: GetMediaPlaybackInfoUseCase,
 ) : ViewModel() {
 
     val uiState: StateFlow<VideoPlayerUiState>
@@ -275,6 +277,13 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     private var isPausedByUser = false
     private var allowUpdatePausedByUser = true
     private var wasPlayingBeforeSubtitleDialog = false
+
+    /**
+     * Cached at construction so the resume check does not have to resolve the flag on the launch
+     * path. A launch that beats this read falls back to DataStore, which is written on every tick
+     * and therefore holds the same position.
+     */
+    private var isPlaybackFromDatabaseEnabled = false
 
     /**
      * The [ExoPlayer] owned by this ViewModel and shared with the UI. Built by [MediaPlayerManager]
@@ -305,6 +314,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         updateNameWhenNodeUpdates()
         monitorConnectivity()
         loadPipFeatureFlag()
+        loadPlaybackSourceFeatureFlag()
         checkLaunchSource()
     }
 
@@ -313,6 +323,17 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             initVideoPlayerData(source)
             handleAutoReplayIfPaused()
         } ?: uiState.update { it.copy(invalidLaunchSourceEvent = triggered) }
+    }
+
+    private fun loadPlaybackSourceFeatureFlag() {
+        viewModelScope.launch {
+            runCatching {
+                isPlaybackFromDatabaseEnabled =
+                    getFeatureFlagValueUseCase(ApiFeatures.VideoPlaybackFromDatabase)
+            }.onFailure {
+                Timber.e(it, "Failed to load VideoPlaybackFromDatabase feature flag")
+            }
+        }
     }
 
     private fun loadPipFeatureFlag() {
@@ -1755,12 +1776,42 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         uiState.update { it.copy(isLocked = value) }
     }
 
+    /**
+     * The saved position to resume [handle] from.
+     *
+     * The flag only decides which store is read. The DataStore path is written on every tick, so
+     * falling back to it while the flag is still loading always yields a current position. The
+     * database write is deduplicated and is skipped for snapshots with an unknown duration, so the
+     * two stores are not guaranteed to hold identical rows — only to be current enough to resume
+     * from. The flag is read once at construction rather than here: this runs on the launch path,
+     * and resolving it per call would put another suspension point between opening the player and
+     * starting playback.
+     *
+     * A storage failure resolves to no saved position instead of propagating. The caller has to
+     * reach its `noPlaybackPosition` callback for playback to start at all, so letting the read
+     * throw would both crash the scope and leave the player stalled before the first frame.
+     */
+    private suspend fun savedPlaybackPosition(handle: Long): Long? = runCatching {
+        if (isPlaybackFromDatabaseEnabled) {
+            // The store is shared with the audio player, and local files on both sides derive
+            // their handle from the same file.name.hashCode(), so a record of another media type
+            // is ignored rather than resumed here.
+            getMediaPlaybackInfoUseCase(handle)
+                ?.takeIf { it.mediaType == MediaType.Video }
+                ?.currentPosition
+        } else {
+            monitorPlaybackTimesUseCase().firstOrNull()?.get(handle)?.currentPosition
+        }
+    }.onFailure {
+        if (it is CancellationException) throw it
+        Timber.e(it, "Failed to read the saved playback position")
+    }.getOrNull()
+
     private fun checkPlaybackPositionBeforePlayback(handle: Long, noPlaybackPosition: () -> Unit) {
         playbackPositionJob?.cancel()
         playbackPositionJob = viewModelScope.launch {
             val currentItemName = uiState.value.currentPlayingItemName ?: args.fileName
-            val playbackPosition =
-                monitorPlaybackTimesUseCase().firstOrNull()?.get(handle)?.currentPosition
+            val playbackPosition = savedPlaybackPosition(handle)
 
             if (playbackPosition != null && playbackPosition > 0) {
                 uiState.update {

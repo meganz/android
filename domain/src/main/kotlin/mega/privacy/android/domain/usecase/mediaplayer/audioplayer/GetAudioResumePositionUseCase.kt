@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 import mega.privacy.android.domain.entity.continuewhereleftoff.AUDIO_RESUME_FINISHED_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.AUDIO_RESUME_MINIMUM_DURATION_MS
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
+import mega.privacy.android.domain.usecase.mediaplayer.GetMediaPlaybackInfoUseCase
 import javax.inject.Inject
 
 /**

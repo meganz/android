@@ -15,8 +15,9 @@ import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.LegacyAudioPlayerUiState
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
+import mega.privacy.android.domain.usecase.mediaplayer.GetMediaPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetMediaPlaybackInfoUseCase
 
 @HiltViewModel
 class LegacyAudioPlayerViewModel @Inject constructor(
@@ -73,7 +74,11 @@ class LegacyAudioPlayerViewModel @Inject constructor(
     ) {
         playbackPositionJob?.cancel()
         playbackPositionJob = viewModelScope.launch {
-            val playbackPosition = getMediaPlaybackInfoUseCase(handle)?.currentPosition
+            // The store is shared with the video player, so a record of any other media type is
+            // ignored rather than resumed under the audio player's rules.
+            val playbackPosition = getMediaPlaybackInfoUseCase(handle)
+                ?.takeIf { it.mediaType == MediaType.Audio }
+                ?.currentPosition
             if (playbackPosition != null && playbackPosition > 0) {
                 mediaPlayerGateway.setPlayWhenReady(false)
                 when (status) {

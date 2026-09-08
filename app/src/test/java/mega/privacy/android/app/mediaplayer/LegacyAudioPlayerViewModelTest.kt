@@ -10,8 +10,9 @@ import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
+import mega.privacy.android.domain.usecase.mediaplayer.GetMediaPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetMediaPlaybackInfoUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -124,6 +126,7 @@ class LegacyAudioPlayerViewModelTest {
             val testPlaybackInfo = mock<MediaPlaybackInfo> {
                 on { mediaHandle }.thenReturn(testHandle)
                 on { currentPosition }.thenReturn(testPosition)
+                on { mediaType }.thenReturn(MediaType.Audio)
             }
             whenever(getMediaPlaybackInfoUseCase(testHandle)).thenReturn(testPlaybackInfo)
             initUnderTest()
@@ -153,6 +156,7 @@ class LegacyAudioPlayerViewModelTest {
             val testPlaybackInfo = mock<MediaPlaybackInfo> {
                 on { mediaHandle }.thenReturn(testHandle)
                 on { currentPosition }.thenReturn(testPosition)
+                on { mediaType }.thenReturn(MediaType.Audio)
             }
             whenever(getMediaPlaybackInfoUseCase(testHandle)).thenReturn(testPlaybackInfo)
             initUnderTest()
@@ -174,6 +178,34 @@ class LegacyAudioPlayerViewModelTest {
                 verify(mockPlaybackPositionStatusCallback).invoke(PlaybackPositionStatus.DialogShowing)
             }
             verifyNoInteractions(deleteAudioPlaybackInfoUseCase)
+        }
+
+    @Test
+    fun `test that checkPlaybackPositionOfPlayingItem ignores a stored position of another media type`() =
+        runTest {
+            val mockPlaybackPositionStatusCallback = mock<(PlaybackPositionStatus) -> Unit>()
+            val testPlaybackInfo = mock<MediaPlaybackInfo> {
+                on { mediaHandle }.thenReturn(testHandle)
+                on { currentPosition }.thenReturn(testPosition)
+                on { mediaType }.thenReturn(MediaType.Video)
+            }
+            whenever(getMediaPlaybackInfoUseCase(testHandle)).thenReturn(testPlaybackInfo)
+            initUnderTest()
+
+            underTest.checkPlaybackPositionOfPlayingItem(
+                handle = testHandle,
+                name = testName,
+                status = PlaybackPositionStatus.Initial,
+                isResume = true,
+                playbackPositionStatusCallback = mockPlaybackPositionStatusCallback
+            )
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showPlaybackDialog).isFalse()
+            }
+            verify(mediaPlayerGateway, never()).setPlayWhenReady(false)
+            verifyNoInteractions(mockPlaybackPositionStatusCallback)
         }
 
     @ParameterizedTest(name = "and playback status is {0}")
