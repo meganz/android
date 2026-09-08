@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.sync.domain.entity
 
+import kotlinx.serialization.Serializable
+
 /**
  * A single name, subtree or path rule of a `.megaignore` file.
  *
@@ -29,6 +31,7 @@ package mega.privacy.android.feature.sync.domain.entity
  * position the SDK reads it in; placed after any whitespace it makes the line a
  * syntax error instead of a comment
  */
+@Serializable
 data class SyncExclusionRule(
     val pattern: String,
     val exclusionClass: SyncExclusionClass = SyncExclusionClass.Exclude,

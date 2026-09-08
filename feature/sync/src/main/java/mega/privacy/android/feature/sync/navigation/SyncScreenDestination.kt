@@ -264,6 +264,8 @@ fun EntryProviderScope<NavKey>.syncScreens(
             )
         }
     }
+
+    syncExclusionScreens()
 }
 
 /**
