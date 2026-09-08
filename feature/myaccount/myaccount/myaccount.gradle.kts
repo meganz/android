@@ -31,6 +31,7 @@ dependencies {
     implementation(project(":shared:original-core-ui"))
     implementation(project(":shared:account"))
     implementation(project(":legacy-core-ui"))
+    implementation(project(":feature:myaccount:myaccount-snowflake-components"))
     implementation(project(":core:ui-components:shared-components"))
     implementation(project(":core:formatter"))
     implementation(project(":third-party-lib:twemoji"))

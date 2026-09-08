@@ -18,5 +18,7 @@ class MyAccountFeatureDestination : FeatureDestination {
         { _, _ ->
             achievementsInfo()
             referralBonus()
+            megaVpnFreeTrial()
+            megaPassFreeTrial()
         }
 }
