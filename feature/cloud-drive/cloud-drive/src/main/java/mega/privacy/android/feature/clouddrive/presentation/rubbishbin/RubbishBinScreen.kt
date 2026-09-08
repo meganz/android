@@ -37,6 +37,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -48,6 +49,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.rememberScrollUpVisibility
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.ClearRubbishBinDialog
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.RubbishBinAppBarAction
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -63,6 +65,7 @@ import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.ScrollToHideNodeHeaderItem
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
@@ -142,11 +145,15 @@ internal fun RubbishBinScreen(
         )
     }
 
+    val scrollToHideBehavior = rememberScrollToHideBehavior()
+    val showNodeHeader = rememberScrollUpVisibility(scrollToHideBehavior)
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true }
             .navigationBarsPadding(),
+        scrollToHideBehavior = scrollToHideBehavior,
         topBar = {
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
@@ -259,6 +266,14 @@ internal fun RubbishBinScreen(
                 }
 
                 else -> {
+                    ScrollToHideNodeHeaderItem(
+                        visible = showNodeHeader,
+                        onSortOrderClick = { showSortBottomSheet = true },
+                        onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
+                        sortConfiguration = uiState.sortConfiguration,
+                        isListView = uiState.currentViewType == ViewType.LIST,
+                    )
+
                     NodesView(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -286,6 +301,8 @@ internal fun RubbishBinScreen(
                         isListView = uiState.currentViewType == ViewType.LIST,
                         onSortOrderClick = { showSortBottomSheet = true },
                         onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
+                        showSortOrder = false,
+                        showChangeViewType = false,
                         spanCount = spanCount,
                         showHiddenNodes = true,
                         isHiddenNodesEnabled = uiState.accountType?.isPaid == true && !uiState.isBusinessAccountExpired,

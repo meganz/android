@@ -28,6 +28,7 @@ import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
@@ -36,6 +37,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.rememberScrollUpVisibility
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
@@ -139,10 +141,14 @@ internal fun SharesScreen(
         Analytics.tracker.trackEvent(SharesScreenEvent)
     }
 
+    val scrollToHideBehavior = rememberScrollToHideBehavior()
+    val showNodeHeader = rememberScrollUpVisibility(scrollToHideBehavior)
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
+        scrollToHideBehavior = scrollToHideBehavior,
         topBar = {
             if (isInSelectionMode) {
                 NodeSelectionModeAppBar(
@@ -227,6 +233,7 @@ internal fun SharesScreen(
                             )
                         },
                         onSortOrderClick = { showSortBottomSheet = true },
+                        showNodeHeader = showNodeHeader,
                         contentPadding = PaddingValues(
                             bottom = paddingValues.calculateBottomPadding()
                         ),
@@ -252,6 +259,7 @@ internal fun SharesScreen(
                             )
                         },
                         onSortOrderClick = { showSortBottomSheet = true },
+                        showNodeHeader = showNodeHeader,
                         contentPadding = PaddingValues(
                             bottom = paddingValues.calculateBottomPadding()
                         ),
@@ -277,6 +285,7 @@ internal fun SharesScreen(
                             )
                         },
                         onSortOrderClick = { showSortBottomSheet = true },
+                        showNodeHeader = showNodeHeader,
                         onTransfer = onTransfer,
                         contentPadding = PaddingValues(
                             bottom = paddingValues.calculateBottomPadding()

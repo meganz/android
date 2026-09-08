@@ -37,6 +37,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -53,6 +54,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveEmptyView
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.rememberScrollUpVisibility
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.trackAnalyticsEvent
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
@@ -77,6 +79,7 @@ import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.ScrollToHideNodeHeaderItem
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
@@ -124,7 +127,16 @@ internal fun FolderLinkScreen(
         }
     )
 
+    val scrollToHideBehavior = rememberScrollToHideBehavior()
+    val showNodeHeader = rememberScrollUpVisibility(scrollToHideBehavior)
+
+    // Folders open within this screen, so the new folder starts at the top of an unscrolled list
+    LaunchedEffect(uiState.currentFolderNode?.id) {
+        scrollToHideBehavior.reset()
+    }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
+        scrollToHideBehavior = scrollToHideBehavior,
         topBar = {
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
@@ -236,6 +248,7 @@ internal fun FolderLinkScreen(
         FolderLinkContent(
             uiState = uiState,
             isListView = isListView,
+            showNodeHeader = showNodeHeader,
             spanCount = spanCount,
             onNavigate = onNavigate,
             onAction = { action ->
@@ -331,6 +344,7 @@ internal fun FolderLinkContent(
     onLoginClicked: () -> Unit,
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
+    showNodeHeader: Boolean = true,
     onShowSortBottomSheet: () -> Unit = {},
 ) {
     Column(modifier = modifier) {
@@ -376,6 +390,20 @@ internal fun FolderLinkContent(
                 )
 
             FolderLinkContentState.Loaded -> {
+                if (uiState.items.isNotEmpty()) {
+                    ScrollToHideNodeHeaderItem(
+                        visible = showNodeHeader,
+                        onSortOrderClick = onShowSortBottomSheet,
+                        onChangeViewTypeClick = {
+                            onAction(FolderLinkAction.ChangeViewTypeClicked)
+                        },
+                        onEnterMediaDiscoveryClick = onMediaDiscoveryClicked,
+                        sortConfiguration = uiState.selectedSortConfiguration,
+                        isListView = isListView,
+                        showMediaDiscoveryButton = uiState.hasMediaItems,
+                    )
+                }
+
                 AnimatedContent(
                     targetState = uiState.currentFolderNode?.id,
                     transitionSpec = { fadeTransition },
@@ -427,6 +455,8 @@ internal fun FolderLinkContent(
                                 onChangeViewTypeClicked = {
                                     onAction(FolderLinkAction.ChangeViewTypeClicked)
                                 },
+                                showSortOrder = false,
+                                showChangeViewType = false,
                                 showMediaDiscoveryButton = uiState.hasMediaItems,
                                 onEnterMediaDiscoveryClick = onMediaDiscoveryClicked,
                                 inSelectionMode = uiState.isInSelectionMode,

@@ -19,6 +19,10 @@ import mega.android.core.ui.modifiers.ScrollToHideBehavior
  * [scrollThreshold] keeps small scrolls and accidental touches from flipping it, matching the
  * threshold the floating action button uses so both react to the same gesture.
  *
+ * [ScrollToHideBehavior.reset] makes the content visible again, so a screen that swaps the
+ * scrolled content in place — switching tabs, or navigating to another folder — resets the
+ * behavior rather than leaving a list that sits at the top with its header hidden.
+ *
  * @param scrollToHideBehavior the behavior provided by the enclosing scaffold, or null to stay visible
  * @param scrollThreshold the minimum scroll distance required to change the visibility
  */
@@ -33,6 +37,7 @@ internal fun rememberScrollUpVisibility(
         derivedStateOf {
             val offset = scrollToHideBehavior?.scrollDirectionOffset ?: return@derivedStateOf null
             when {
+                offset == 0f -> true
                 offset <= -threshold -> false
                 offset >= threshold -> true
                 else -> null

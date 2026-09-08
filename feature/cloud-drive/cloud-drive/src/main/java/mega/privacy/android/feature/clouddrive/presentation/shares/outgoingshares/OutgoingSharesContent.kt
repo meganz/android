@@ -28,6 +28,7 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.ScrollToHideNodeHeaderItem
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.shared.resources.R as SharedR
 
@@ -40,6 +41,7 @@ fun OutgoingSharesContent(
     onSortOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    showNodeHeader: Boolean = true,
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
 ) {
@@ -66,30 +68,42 @@ fun OutgoingSharesContent(
                 )
             }
 
-            else -> NodesView(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                listContentPadding = PaddingValues(
-                    top = 12.dp,
-                    bottom = contentPadding.calculateSafeBottomPadding(),
-                ),
-                listState = listState,
-                gridState = gridState,
-                spanCount = spanCount,
-                items = uiState.items,
-                isNextPageLoading = false,
-                isHiddenNodesEnabled = false,
-                showHiddenNodes = true,
-                onMenuClicked = { onShowNodeOptions(it.id) },
-                onItemClicked = { onAction(OutgoingSharesAction.ItemClicked(it)) },
-                onLongClicked = { onAction(OutgoingSharesAction.ItemLongClicked(it)) },
-                sortConfiguration = uiState.selectedSortConfiguration,
-                isListView = isListView,
-                onSortOrderClick = onSortOrderClick,
-                onChangeViewTypeClicked = { onAction(OutgoingSharesAction.ChangeViewTypeClicked) },
-                inSelectionMode = uiState.isInSelectionMode,
-            )
+            else -> {
+                ScrollToHideNodeHeaderItem(
+                    visible = showNodeHeader,
+                    onSortOrderClick = onSortOrderClick,
+                    onChangeViewTypeClick = { onAction(OutgoingSharesAction.ChangeViewTypeClicked) },
+                    sortConfiguration = uiState.selectedSortConfiguration,
+                    isListView = isListView,
+                )
+
+                NodesView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    listContentPadding = PaddingValues(
+                        top = 12.dp,
+                        bottom = contentPadding.calculateSafeBottomPadding(),
+                    ),
+                    listState = listState,
+                    gridState = gridState,
+                    spanCount = spanCount,
+                    items = uiState.items,
+                    isNextPageLoading = false,
+                    isHiddenNodesEnabled = false,
+                    showHiddenNodes = true,
+                    onMenuClicked = { onShowNodeOptions(it.id) },
+                    onItemClicked = { onAction(OutgoingSharesAction.ItemClicked(it)) },
+                    onLongClicked = { onAction(OutgoingSharesAction.ItemLongClicked(it)) },
+                    sortConfiguration = uiState.selectedSortConfiguration,
+                    isListView = isListView,
+                    onSortOrderClick = onSortOrderClick,
+                    showSortOrder = false,
+                    showChangeViewType = false,
+                    onChangeViewTypeClicked = { onAction(OutgoingSharesAction.ChangeViewTypeClicked) },
+                    inSelectionMode = uiState.isInSelectionMode,
+                )
+            }
         }
     }
 
