@@ -184,7 +184,9 @@ private fun QueueContent(
                 )
             }
         },
-        dragEnabled = { it is QueueRowModel.Track },
+        // Dragging is timeline reordering; under shuffle the displayed order is the playback
+        // order, which Media3 cannot reorder directly, so dragging is disabled.
+        dragEnabled = { it is QueueRowModel.Track && !uiState.isShuffleEnabled },
     ) { row ->
         when (row) {
             QueueRowModel.ContinuousPlayback -> ContinuousPlaybackRow(
@@ -214,12 +216,7 @@ private fun QueueContent(
             is QueueRowModel.Track -> QueueItemRow(
                 item = row.item,
                 isCurrentlyPlaying = row.item.mediaId == currentMediaId,
-                onClick = {
-                    val queueIndex = localRows.indexOf(row) - headerRowCount
-                    if (queueIndex >= 0) {
-                        onQueueItemClick(queueIndex)
-                    }
-                },
+                onClick = { onQueueItemClick(row.item.playerIndex) },
             )
 
             QueueRowModel.BottomInset -> Spacer(

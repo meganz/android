@@ -49,7 +49,7 @@ interface AudioMediaControllerGateway {
     /** Sets the playback speed. A value of `1.0` is normal speed. */
     fun setPlaybackSpeed(speed: Float)
 
-    /** Seeks to the media item at [index] in the queue and starts from its default position. No-op if [index] is out of range. */
+    /** Seeks to the media item at player [index] (see [mega.privacy.android.feature.mediaplayer.data.model.AudioQueueItem.playerIndex]) and starts from its default position. No-op if [index] is out of range. */
     fun seekToMediaItem(index: Int)
 
     /** Moves the media item at [fromIndex] to [toIndex] in the queue. No-op if either index is out of range. */

@@ -339,6 +339,18 @@ class AudioPlayerQueueViewModelTest {
     }
 
     @Test
+    fun `test that isShuffleEnabled in uiState reflects the player shuffle state`() = runTest {
+        underTest.uiState.test {
+            awaitItem() // Loading
+            playerStateFlow.emit(AudioControllerState(shuffleEnabled = true, mediaItemCount = 1))
+
+            val state = awaitItem() as AudioPlayerQueueUiState.Data
+
+            assertThat(state.isShuffleEnabled).isTrue()
+        }
+    }
+
+    @Test
     fun `test that seekToQueueItem calls seekToMediaItem on gateway with the given index`() =
         runTest {
             underTest.seekToQueueItem(3)

@@ -51,6 +51,24 @@ data class AudioPlayQueueParams(
     val sortOrder: SortOrder,
     val needStopHttpServer: Boolean,
 ) {
+
+    /**
+     * Whether [other] would build the same play queue as this: same source and same queue
+     * composition inputs. The launched item ([handle]/[uri]/[fileName]) and bookkeeping flags
+     * are deliberately excluded — relaunching another track of the same queue is still the
+     * same queue.
+     */
+    fun isSameQueue(other: AudioPlayQueueParams): Boolean =
+        adapterType == other.adapterType &&
+                parentHandle == other.parentHandle &&
+                isPlayQueue == other.isPlayQueue &&
+                offlineParentId == other.offlineParentId &&
+                zipPath == other.zipPath &&
+                contactEmail == other.contactEmail &&
+                handles == other.handles &&
+                searchHandles == other.searchHandles &&
+                sortOrder == other.sortOrder
+
     companion object {
         /**
          * Extract [AudioPlayQueueParams] from a start-command [Intent].

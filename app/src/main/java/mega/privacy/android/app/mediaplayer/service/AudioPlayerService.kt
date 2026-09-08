@@ -648,6 +648,16 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         val params = AudioPlayQueueParams.from(safeIntent) ?: return START_STICKY
         // Accumulate the needStopHttpServer flag from intents across play queue rebuilds.
         needStopStreamingServer = needStopStreamingServer || params.needStopHttpServer
+        // Relaunching into the queue the player already holds must not rebuild it: a rebuild
+        // regenerates every media ID and resets the player, audibly interrupting playback of
+        // the very track the user just tapped.
+        if (lastPlayQueueParams?.isSameQueue(params) == true &&
+            absorbSamePlaylistLaunch(params.handle)
+        ) {
+            lastPlayQueueParams = params
+            MiniAudioPlayerController.notifyV2AudioPlayerPlaying(true)
+            return START_STICKY
+        }
         lastPlayQueueParams = params
         rebuildPlayQueue(params)
         MiniAudioPlayerController.notifyV2AudioPlayerPlaying(true)
@@ -711,6 +721,48 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         val last = lastPlaybackInfo?.takeIf { it.mediaHandle == oldHandle } ?: return
         lastPlaybackInfo = null
         persistPlaybackInfo(last.copy(currentPosition = oldPosition.positionMs))
+    }
+
+    /**
+     * Handles a launch into the already-loaded queue without rebuilding it: the same track
+     * just keeps playing, another track is sought within the existing timeline (resuming from
+     * its saved position like a rebuild would, announcement included).
+     *
+     * @return true when the launch was absorbed; false when a full rebuild is still required
+     */
+    private fun absorbSamePlaylistLaunch(handle: Long): Boolean {
+        val currentPlayer = player ?: return false
+        if (currentPlayer.playbackState == Player.STATE_IDLE || currentPlayer.mediaItemCount == 0) {
+            return false
+        }
+        val currentHandle = currentPlayer.currentMediaItem?.mediaId
+            ?.let { mediaHandleStore.getHandle(it) }
+        if (currentHandle == handle) {
+            currentPlayer.play()
+            return true
+        }
+        val targetIndex = (0 until currentPlayer.mediaItemCount).firstOrNull { index ->
+            mediaHandleStore.getHandle(currentPlayer.getMediaItemAt(index).mediaId) == handle
+        } ?: return false
+        lifecycleScope.launch {
+            // Switching items invalidates an announcement the player screen never showed,
+            // exactly like the rebuild path does.
+            audioResumeEventQueue.consume()
+            val resumePositionMs = runCatching { getAudioResumePositionUseCase(handle) }
+                .onFailure {
+                    if (it is CancellationException) throw it
+                    Timber.e(it, "Failed to resolve audio resume position")
+                }
+                .getOrNull()
+            if (resumePositionMs != null) {
+                currentPlayer.seekTo(targetIndex, resumePositionMs)
+                audioResumeEventQueue.emit(AudioResumeEvent(handle, resumePositionMs))
+            } else {
+                currentPlayer.seekToDefaultPosition(targetIndex)
+            }
+            currentPlayer.play()
+        }
+        return true
     }
 
     private fun rebuildPlayQueue(params: AudioPlayQueueParams) {

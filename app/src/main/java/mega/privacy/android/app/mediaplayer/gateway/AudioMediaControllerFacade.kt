@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
@@ -157,18 +158,36 @@ internal class AudioMediaControllerFacade @Inject constructor(
                 )
             },
             queueItems = buildQueueItems(c),
-            currentQueueIndex = c.safeQueueIndex(),
+            currentQueueIndex = c.displayQueueIndex(),
         )
         _playerState.value = currentState
     }
 
     /**
-     * Media3 returns -1 when no item is active; clamp to 0 as a safe sentinel.
+     * Timeline indices in playback order. With shuffle off this is simply 0..n-1; with shuffle
+     * on it is the order the player will actually follow, which is what the queue displays.
      */
-    private fun MediaController.safeQueueIndex(): Int = currentMediaItemIndex.coerceAtLeast(0)
+    private fun MediaController.playbackOrderIndices(): List<Int> = buildList {
+        val timeline = currentTimeline
+        if (timeline.isEmpty) return@buildList
+        var index = timeline.getFirstWindowIndex(shuffleModeEnabled)
+        while (index != C.INDEX_UNSET) {
+            add(index)
+            index = timeline.getNextWindowIndex(index, Player.REPEAT_MODE_OFF, shuffleModeEnabled)
+        }
+    }
+
+    /**
+     * The playing item's position within the displayed (playback-order) queue. Media3 returns
+     * -1 when no item is active; clamp to 0 as a safe sentinel.
+     */
+    private fun MediaController.displayQueueIndex(): Int =
+        playbackOrderIndices().indexOf(currentMediaItemIndex).coerceAtLeast(0)
 
     private fun buildQueueItems(c: MediaController): List<AudioQueueItem> =
-        audioQueueItemFactory.buildQueueItems(List(c.mediaItemCount) { c.getMediaItemAt(it) })
+        audioQueueItemFactory.buildQueueItems(
+            c.playbackOrderIndices().map { it to c.getMediaItemAt(it) }
+        )
 
     private fun updateState(update: AudioControllerState.() -> AudioControllerState) {
         currentState = currentState.update()
@@ -213,7 +232,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
                 copy(
                     currentMediaItemId = mediaItem?.mediaId,
                     currentMediaItemHandle = mediaItem?.mediaId?.let { mediaHandleStore.getHandle(it) },
-                    currentQueueIndex = ctrl.safeQueueIndex(),
+                    currentQueueIndex = ctrl.displayQueueIndex(),
                     currentPositionMs = ctrl.currentPosition.coerceAtLeast(0L),
                     durationMs = ctrl.duration.coerceAtLeast(0L),
                 )
@@ -236,7 +255,16 @@ internal class AudioMediaControllerFacade @Inject constructor(
         }
 
         override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-            updateState { copy(shuffleEnabled = shuffleModeEnabled) }
+            // The displayed order follows the playback order, so toggling shuffle reorders the
+            // whole queue, not just the flag.
+            val ctrl = controller
+            updateState {
+                copy(
+                    shuffleEnabled = shuffleModeEnabled,
+                    queueItems = ctrl?.let { buildQueueItems(it) } ?: queueItems,
+                    currentQueueIndex = ctrl?.displayQueueIndex() ?: currentQueueIndex,
+                )
+            }
         }
 
         override fun onRepeatModeChanged(repeatMode: Int) {
@@ -246,7 +274,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
             val ctrl = controller ?: return
             val newQueueItems = buildQueueItems(ctrl)
-            val newQueueIndex = ctrl.safeQueueIndex()
+            val newQueueIndex = ctrl.displayQueueIndex()
             // Drop cached tag metadata for items no longer in the queue (e.g. playlist replaced).
             audioQueueItemFactory.pruneCache(newQueueItems.mapTo(hashSetOf()) { it.mediaId })
             updateState {

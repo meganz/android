@@ -10,6 +10,7 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -118,6 +119,7 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
                     ThumbnailRequest.fromHandle(it)
                 },
                 isContinuousPlayback = continuousPlaybackEnabled,
+                isShuffleEnabled = state.shuffleEnabled,
                 playingFromName = playingFromName,
                 controlBlockedByCall = controlBlockedByCall,
             )
@@ -127,8 +129,9 @@ internal class AudioPlayerQueueViewModel @Inject constructor(
         )
     }
 
-    /** Seeks to the queue item at [index] and begins playback from its start. Refused while a
-     * MEGA call is ongoing, since starting playback would grab audio focus from the call. */
+    /** Seeks to the queue item at player [index] ([mega.privacy.android.feature.mediaplayer.data.model.AudioQueueItem.playerIndex])
+     * and begins playback from its start. Refused while a MEGA call is ongoing, since starting
+     * playback would grab audio focus from the call. */
     fun seekToQueueItem(index: Int) {
         viewModelScope.launch {
             val inCall = runCatching { isParticipatingInChatCallUseCase() }

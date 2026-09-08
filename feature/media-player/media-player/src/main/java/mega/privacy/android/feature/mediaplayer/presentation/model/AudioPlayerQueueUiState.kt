@@ -37,6 +37,7 @@ sealed interface AudioPlayerQueueUiState {
         val currentArtworkUri: String?,
         val currentThumbnailData: ThumbnailData?,
         val isContinuousPlayback: Boolean,
+        val isShuffleEnabled: Boolean = false,
         val playingFromName: String?,
         val controlBlockedByCall: StateEvent = consumed,
     ) : AudioPlayerQueueUiState

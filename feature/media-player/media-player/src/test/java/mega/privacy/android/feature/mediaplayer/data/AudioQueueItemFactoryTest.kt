@@ -90,6 +90,20 @@ internal class AudioQueueItemFactoryTest {
     }
 
     @Test
+    fun `test that buildQueueItems carries each item player index through`() {
+        val result = underTest.buildQueueItems(
+            listOf(
+                2 to mediaItem(mediaId = "id-c"),
+                0 to mediaItem(mediaId = "id-a"),
+                1 to mediaItem(mediaId = "id-b"),
+            )
+        )
+
+        assertThat(result.map { it.playerIndex }).containsExactly(2, 0, 1).inOrder()
+        assertThat(result.map { it.mediaId }).containsExactly("id-c", "id-a", "id-b").inOrder()
+    }
+
+    @Test
     fun `test that buildQueueItems falls back to display title when item has no tag title`() {
         val result = underTest.buildQueueItems(
             listOf(mediaItem(mediaId = "id-1", displayTitle = "file.mp3"))
@@ -179,3 +193,10 @@ internal class AudioQueueItemFactoryTest {
         assertThat(result[0].title).isEqualTo("file.mp3")
     }
 }
+
+/**
+ * Most cases only care about metadata resolution; index items implicitly so the production
+ * signature (display-ordered pairs of player index and item) stays exercised.
+ */
+private fun AudioQueueItemFactory.buildQueueItems(items: List<MediaItem>) =
+    buildQueueItems(items.mapIndexed { index, item -> index to item })

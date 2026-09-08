@@ -37,14 +37,20 @@ class AudioQueueItemFactory @Inject constructor(
         return true
     }
 
-    fun buildQueueItems(items: List<MediaItem>): List<AudioQueueItem> =
-        items.map { item ->
+    /**
+     * Builds the queue items from [items], each paired with its player index. The list order is
+     * the display order (playback order under shuffle), which is why the player index must
+     * travel with each item.
+     */
+    fun buildQueueItems(items: List<Pair<Int, MediaItem>>): List<AudioQueueItem> =
+        items.map { (playerIndex, item) ->
             val parsed = parsedTagMetadata[item.mediaId]
             AudioQueueItem(
                 mediaId = item.mediaId,
                 title = parsed?.title ?: resolveTitle(item.mediaMetadata),
                 artist = parsed?.artist ?: item.mediaMetadata.artist?.toString(),
                 handle = mediaHandleStore.getHandle(item.mediaId),
+                playerIndex = playerIndex,
             )
         }
 

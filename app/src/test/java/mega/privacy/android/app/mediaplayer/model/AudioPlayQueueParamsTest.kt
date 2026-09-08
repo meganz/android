@@ -9,6 +9,8 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -126,10 +128,68 @@ class AudioPlayQueueParamsTest {
         assertThat(result?.sortOrder).isEqualTo(SortOrder.ORDER_DEFAULT_ASC)
     }
 
+    @Test
+    fun `test that isSameQueue is true for another track of the same queue`() {
+        val first = params(handle = 1L, fileName = "a.mp3")
+        val second = params(handle = 2L, fileName = "b.mp3")
+
+        assertThat(first.isSameQueue(second)).isTrue()
+    }
+
+    @Test
+    fun `test that isSameQueue is false when the adapter type differs`() {
+        assertThat(params().isSameQueue(params(adapterType = FILE_BROWSER_ADAPTER))).isFalse()
+    }
+
+    @Test
+    fun `test that isSameQueue is false when the parent handle differs`() {
+        assertThat(params().isSameQueue(params(parentHandle = 77L))).isFalse()
+    }
+
+    @Test
+    fun `test that isSameQueue is false when the sort order differs`() {
+        assertThat(params().isSameQueue(params(sortOrder = SortOrder.ORDER_DEFAULT_DESC))).isFalse()
+    }
+
+    @Test
+    fun `test that isSameQueue is false when the handle lists differ`() {
+        val first = params(handles = listOf(1L, 2L))
+        val second = params(handles = listOf(1L, 3L))
+
+        assertThat(first.isSameQueue(second)).isFalse()
+    }
+
     private fun buildValidIntent(): Intent = mock<Intent>().also {
         whenever(it.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)).thenReturn(1)
         doReturn(mock<Uri>()).whenever(it).data
         whenever(it.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)).thenReturn(123L)
         whenever(it.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)).thenReturn("track.mp3")
     }
+
+    private fun params(
+        adapterType: Int = AUDIO_BROWSE_ADAPTER,
+        handle: Long = 1L,
+        fileName: String = "a.mp3",
+        parentHandle: Long = INVALID_HANDLE,
+        offlineParentId: Int = -1,
+        zipPath: String? = null,
+        contactEmail: String? = null,
+        handles: List<Long>? = null,
+        searchHandles: List<Long>? = null,
+        sortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
+    ) = AudioPlayQueueParams(
+        adapterType = adapterType,
+        handle = handle,
+        fileName = fileName,
+        uri = mock<Uri>(),
+        parentHandle = parentHandle,
+        isPlayQueue = true,
+        offlineParentId = offlineParentId,
+        zipPath = zipPath,
+        contactEmail = contactEmail,
+        handles = handles,
+        searchHandles = searchHandles,
+        sortOrder = sortOrder,
+        needStopHttpServer = false,
+    )
 }
