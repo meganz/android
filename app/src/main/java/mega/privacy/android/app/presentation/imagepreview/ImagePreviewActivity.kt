@@ -73,7 +73,6 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_INDEX
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_TOTAL_COUNT
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
@@ -835,7 +834,7 @@ class ImagePreviewActivity : BaseActivity() {
             parentNodeId: Long,
             nodeSourceType: Int?,
         ): Intent? {
-            val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
+            val (imageSource, menuOptionsSource, parentIdParamKey) = when (nodeSourceType) {
                 NodeSourceTypeInt.FILE_BROWSER_ADAPTER -> Triple(
                     ImagePreviewFetcherSource.CLOUD_DRIVE,
                     ImagePreviewMenuSource.CLOUD_DRIVE,
@@ -871,7 +870,7 @@ class ImagePreviewActivity : BaseActivity() {
                 NodeSourceTypeInt.FAVOURITES_ADAPTER -> Triple(
                     ImagePreviewFetcherSource.FAVOURITE,
                     ImagePreviewMenuSource.FAVOURITE,
-                    FavouriteImageNodeFetcher.NODE_ID
+                    null,
                 )
 
                 else -> {
@@ -880,11 +879,7 @@ class ImagePreviewActivity : BaseActivity() {
                 }
             }
 
-            val params = if (nodeSourceType == NodeSourceTypeInt.FAVOURITES_ADAPTER) {
-                mapOf(paramKey to fileNodeId)
-            } else {
-                mapOf(paramKey to parentNodeId)
-            }
+            val params = parentIdParamKey?.let { mapOf(it to parentNodeId) } ?: emptyMap()
 
             return createIntent(
                 context = context,
