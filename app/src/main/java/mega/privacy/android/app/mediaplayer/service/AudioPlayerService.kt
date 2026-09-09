@@ -211,6 +211,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private var isTransferOverQuota = false
     private var playbackRetryCount = 0
     private var retryJob: Job? = null
+    private var absorbJob: Job? = null
     private var pausedByExternalCommand = false
 
     private val cacheEventListener = object : CacheDataSource.EventListener {
@@ -513,6 +514,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
      * re-checks the quota (see onPlayWhenReadyChanged).
      */
     private fun enterOverQuotaPausedState() {
+        // Kill any pending retry backoff: its delayed prepare() would re-request the stream
+        // right after this stop and re-raise the over-quota warning.
+        retryJob?.cancel()
         player?.pause()
         player?.stop()
         MiniAudioPlayerController.notifyV2AudioPlayerPlaying(false)
@@ -640,7 +644,13 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                         // Immediate retries would burn the whole budget inside a single
                         // transient network blip; back off a little longer on each attempt.
                         delay(PLAYBACK_RETRY_BACKOFF * playbackRetryCount)
-                        player?.prepare()
+                        // The over-quota event can land during the backoff; a prepare() now
+                        // would re-request the stream and re-raise the warning, so bail out.
+                        if (isTransferOverQuota) {
+                            enterOverQuotaPausedState()
+                        } else {
+                            player?.prepare()
+                        }
                     }
 
                     else -> enterPlaybackErrorState(
@@ -722,6 +732,19 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         }
         super.onStartCommand(intent, flags, startId)
         val safeIntent = intent ?: return START_STICKY
+        // stopPlayerAndSelf() releases the session before onDestroy() runs; a start intent
+        // landing in that teardown window would drive playback on a service with no session
+        // (onGetSession returns null, no controller can connect, no notification) and leave the
+        // startForegroundService contract unmet -> FGS timeout crash. Reject it; the service is
+        // about to die and a fresh launch will recreate it.
+        if (mediaSession == null) {
+            // stopSelf, not a bare return: a startForegroundService() call carries a promote-to-
+            // foreground obligation, and simply returning would leave the (re-started) service
+            // owing a startForeground() it can never make -> FGS timeout crash. Stopping this
+            // startId discharges the obligation via the "service stopped in time" exemption.
+            stopSelf(startId)
+            return START_NOT_STICKY
+        }
         if (!safeIntent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
             return START_STICKY
         }
@@ -818,13 +841,24 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         val currentHandle = currentPlayer.currentMediaItem?.mediaId
             ?.let { mediaHandleStore.getHandle(it) }
         if (currentHandle == handle) {
+            // A track that played to its end sits in STATE_ENDED with playWhenReady still true,
+            // so a bare play() is a no-op — Media3 needs a seek to leave ENDED. Without this the
+            // relaunch neither plays nor fires a player event, so startForegroundService goes
+            // unsatisfied and the service is killed for not starting in time.
+            if (currentPlayer.playbackState == Player.STATE_ENDED) {
+                currentPlayer.seekToDefaultPosition()
+            }
             currentPlayer.play()
             return true
         }
         val targetIndex = (0 until currentPlayer.mediaItemCount).firstOrNull { index ->
             mediaHandleStore.getHandle(currentPlayer.getMediaItemAt(index).mediaId) == handle
         } ?: return false
-        lifecycleScope.launch {
+        // Cancel a still-running absorb before relaunching: two quick same-playlist taps would
+        // otherwise leave two coroutines racing the resume-position seek, and the stale one could
+        // land last.
+        absorbJob?.cancel()
+        absorbJob = lifecycleScope.launch {
             // Switching items invalidates an announcement the player screen never showed,
             // exactly like the rebuild path does.
             audioResumeEventQueue.consume()
@@ -850,22 +884,41 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         // A new session gets a fresh retry budget, and an in-flight backoff from the previous
         // session must not fire a stray prepare() into it.
         retryJob?.cancel()
+        // A pending same-playlist absorb resolves a resume position then seeks; against the new
+        // timeline that seek could target a stale index (IllegalSeekPositionException).
+        absorbJob?.cancel()
         playbackRetryCount = 0
         playQueueBuildJob = lifecycleScope.launch {
             // Starting new playback invalidates any terminal error the screen never showed.
             audioPlayerErrorEventQueue.clear()
             val isOpeningDifferentItem = player?.currentMediaItem?.mediaId
                 ?.let { mediaHandleStore.getHandle(it) } != params.handle
+            // Relaunching the track already playing (e.g. tapping it again from a different
+            // source, so isSameQueue misses and a full rebuild runs) must keep its live
+            // position: the persisted position is null for tracks under the resume threshold,
+            // which would otherwise restart a mid-play track from zero. Snapshot before the
+            // suspending query so a track change during it cannot skew the value.
+            val livePositionMs = if (!isOpeningDifferentItem &&
+                player?.playbackState != Player.STATE_ENDED
+            ) {
+                player?.currentPosition?.takeIf { it > 0 }
+            } else {
+                // A finished track sits at its duration; carrying that into the rebuild would
+                // start it at the very end and immediately finish. Fall back to the persisted
+                // position (or 0) so it restarts instead.
+                null
+            }
             // Switching items invalidates an announcement the player screen never showed —
             // the queue outlives the screen's ViewModel, and a leftover event would otherwise
             // be announced against this item and let Restart discard its saved position.
             if (isOpeningDifferentItem) audioResumeEventQueue.consume()
-            val resumePositionMs = runCatching { getAudioResumePositionUseCase(params.handle) }
-                .onFailure {
-                    if (it is CancellationException) throw it
-                    Timber.e(it, "Failed to resolve audio resume position")
-                }
-                .getOrNull()
+            val resumePositionMs = livePositionMs
+                ?: runCatching { getAudioResumePositionUseCase(params.handle) }
+                    .onFailure {
+                        if (it is CancellationException) throw it
+                        Timber.e(it, "Failed to resolve audio resume position")
+                    }
+                    .getOrNull()
             shouldAnnounceResume = isOpeningDifferentItem && resumePositionMs != null
             var anySourcesApplied = false
             audioPlayQueueBuilder(params)
@@ -899,6 +952,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private fun rebuildPlayQueueForFilterChange(params: AudioPlayQueueParams) {
         playQueueBuildJob?.cancel()
         retryJob?.cancel()
+        absorbJob?.cancel()
         playbackRetryCount = 0
         playQueueBuildJob = lifecycleScope.launch {
             val currentHandle = player?.currentMediaItem?.mediaId
@@ -1021,12 +1075,18 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 startIndex,
                 resumePositionMs ?: 0L,
             )
-            currentPlayer.prepare()
-            currentPlayer.play()
-            if (shouldAnnounceResume && resumePositionMs != null) {
-                shouldAnnounceResume = false
-                targetMediaId?.let { mediaHandleStore.getHandle(it) }?.let { handle ->
-                    audioResumeEventQueue.emit(AudioResumeEvent(handle, resumePositionMs))
+            // Over quota: keep the queue set but do not re-request the stream. An in-flight
+            // full-queue emission reaches this branch after the over-quota stop (which leaves
+            // the player IDLE), and prepare()/play() here would grab the stream again and
+            // re-raise the warning the stop just handled.
+            if (!isTransferOverQuota) {
+                currentPlayer.prepare()
+                currentPlayer.play()
+                if (shouldAnnounceResume && resumePositionMs != null) {
+                    shouldAnnounceResume = false
+                    targetMediaId?.let { mediaHandleStore.getHandle(it) }?.let { handle ->
+                        audioResumeEventQueue.emit(AudioResumeEvent(handle, resumePositionMs))
+                    }
                 }
             }
         }
@@ -1065,6 +1125,12 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     private fun stopPlayerAndSelf() {
+        // Cancel in-flight work before releasing: onDestroy() is deferred until bound clients
+        // unbind, and a queue build / retry backoff / absorb seek completing in that window
+        // would re-start playback on a service the user just stopped.
+        playQueueBuildJob?.cancel()
+        retryJob?.cancel()
+        absorbJob?.cancel()
         forceSaveCurrentPlaybackInfo()
         MiniAudioPlayerController.notifyV2AudioPlayerPlaying(false)
         // Stop audio immediately so playback cannot continue even if the service is kept alive
