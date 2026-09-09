@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.domain.entity.user.UserCredentials
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -67,6 +68,10 @@ internal class CredentialsPreferencesDataStore @Inject constructor(
     override fun monitorCredentials(): Flow<UserCredentials?> = dataStore.data.map {
         val session = it[sessionKey]
         if (session.isNullOrBlank()) return@map null
+        if (session.length < MIN_USABLE_SESSION_LENGTH) {
+            Timber.w("Discarding a stored session of ${session.length} chars, too short to be usable")
+            return@map null
+        }
         return@map UserCredentials(
             email = it[emailKey],
             session = session,
@@ -77,6 +82,13 @@ internal class CredentialsPreferencesDataStore @Inject constructor(
     }
 
     companion object {
+        /**
+         * Shortest session the chat SDK can derive its cache path from. A shorter one makes
+         * `MegaChatApi.init` abort the process natively, which no Kotlin caller can catch, so
+         * such a session is reported as no credentials at all and the user is sent to login.
+         */
+        private const val MIN_USABLE_SESSION_LENGTH = 50
+
         private val emailKey = stringPreferencesKey("email")
         private val sessionKey = stringPreferencesKey("session")
         private val firstNameKey = stringPreferencesKey("firstName")

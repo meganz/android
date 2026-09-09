@@ -2,6 +2,7 @@ package mega.privacy.android.data.test.gateway
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.test.state.FakeAccountState
 import mega.privacy.android.data.test.stub.StubMegaNode
 import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.BeforeEach
@@ -27,7 +28,7 @@ class FakeMegaApiGatewayStateTest {
         assertThat(underTest.myUserHandle).isEqualTo(111L)
         assertThat(underTest.getMyUserHandleBinary()).isEqualTo(111L)
         assertThat(underTest.accountEmail).isEqualTo("test@mega.nz")
-        assertThat(underTest.dumpSession).isEqualTo("fake-session")
+        assertThat(underTest.dumpSession).isEqualTo(FakeAccountState.DEFAULT_SESSION)
         assertThat(underTest.myCredentials).isEqualTo("fake-credentials")
         assertThat(underTest.isBusinessAccount).isFalse()
         assertThat(underTest.isAchievementsEnabled).isTrue()

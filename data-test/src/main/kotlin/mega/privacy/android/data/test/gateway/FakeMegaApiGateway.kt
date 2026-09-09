@@ -203,7 +203,7 @@ class FakeMegaApiGateway(
         account.isLoggedIn = true
         account.email = "test@mega.nz"
         account.myUserHandle = 111L
-        account.session = "fake-session"
+        account.session = FakeAccountState.DEFAULT_SESSION
         account.isBusinessAccount = false
         account.isAchievementsEnabled = true
     }

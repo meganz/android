@@ -18,7 +18,7 @@ class FakeAccountState {
     var myUserHandle: Long = 111L
 
     /** Session key returned by session dumps. */
-    var session: String = "fake-session"
+    var session: String = DEFAULT_SESSION
 
     /** Whether the account is a business account. */
     var isBusinessAccount: Boolean = false
@@ -46,7 +46,7 @@ class FakeAccountState {
         isLoggedIn = true
         email = "test@mega.nz"
         myUserHandle = 111L
-        session = "fake-session"
+        session = DEFAULT_SESSION
         isBusinessAccount = false
         isMasterBusinessAccount = false
         isBusinessAccountActive = true
@@ -54,5 +54,17 @@ class FakeAccountState {
         isAchievementsEnabled = true
         isEphemeralPlusPlus = false
         myCredentials = "fake-credentials"
+    }
+
+    companion object {
+
+        /**
+         * Instrumented tests share the app package, so whatever the fakes report as a session is
+         * persisted to the real credential store and read back on the next ordinary launch. It is
+         * padded to the length of a session the SDK would actually issue, because a shorter one is
+         * rejected by the chat SDK and treated as no credentials at all.
+         */
+        const val DEFAULT_SESSION =
+            "fake-session-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
     }
 }
