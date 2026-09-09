@@ -179,6 +179,7 @@ class MediaDiscoveryViewModelTest {
             monitorAlmostFullStorageBannerClosingTimestampUseCase = monitorAlmostFullStorageBannerClosingTimestampUseCase,
             storageCapacityMapper = storageCapacityMapper,
             durationInSecondsTextMapper = DurationInSecondsTextMapper(),
+            context = mock(),
         )
     }
 

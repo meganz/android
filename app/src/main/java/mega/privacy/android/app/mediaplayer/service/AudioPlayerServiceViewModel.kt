@@ -15,7 +15,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,6 +27,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_NEXT
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PLAYING
@@ -1558,7 +1558,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }
 
     private fun isOnMegaDownloads(node: TypedFileNode): Boolean =
-        File(getDownloadLocation(), node.name).let { file ->
+        File(getDownloadLocation(context), node.name).let { file ->
             isFileAvailable(file) && file.length() == node.size
         }
 

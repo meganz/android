@@ -3,13 +3,13 @@ package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
-import static mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
+import static mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.content.Context;
@@ -36,14 +36,14 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+import dagger.hilt.android.EntryPointAccessors;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.di.DbHandlerModuleKt;
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.MegaPreferences;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
@@ -55,10 +55,6 @@ public class FileUtil {
     public static final String CAMERA_FOLDER = "Camera";
 
     public static final String DOWNLOAD_DIR = "MEGA Downloads";
-
-    public static final String OLD_MK_FILE = MAIN_DIR + File.separator + "MEGAMasterKey.txt";
-
-    public static final String OLD_RK_FILE = MAIN_DIR + File.separator + "MEGARecoveryKey.txt";
 
     public static final String JPG_EXTENSION = ".jpg";
     public static final String TXT_EXTENSION = ".txt";
@@ -93,15 +89,10 @@ public class FileUtil {
         return !MimeTypeList.typeForName(node.getName()).isVideoNotSupported() && !MimeTypeList.typeForName(node.getName()).isAudioNotSupported();
     }
 
-    private static boolean isOnMegaDownloads(MegaNode node) {
-        File f = new File(getDownloadLocation(), node.getName());
+    private static boolean isOnMegaDownloads(MegaNode node, Context context) {
+        File f = new File(getDownloadLocation(context), node.getName());
 
         return isFileAvailable(f) && f.length() == node.getSize();
-    }
-
-    public static boolean isLocalFile(MegaNode node, MegaApiAndroid megaApi, String localPath) {
-        String fingerprintNode = node.getFingerprint();
-        return localPath != null && (isOnMegaDownloads(node) || (fingerprintNode != null && fingerprintNode.equals(megaApi.getFingerprint(localPath))));
     }
 
     public static boolean setLocalIntentParams(Context context, MegaOffline offline, Intent intent,
@@ -419,14 +410,16 @@ public class FileUtil {
         return downloadsDir != null ? downloadsDir : context.getCacheDir();
     }
 
-    public static String getDownloadLocation() {
+    public static String getDownloadLocation(Context context) {
         if (isAndroid11OrUpper()) {
             File file = buildDefaultDownloadDir(applicationContext);
             file.mkdirs();
             return file.getAbsolutePath();
         }
 
-        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
+        DatabaseHandler dbH = EntryPointAccessors.fromApplication(
+                context,
+                DatabaseHandlerEntryPoint.class).getDbH();
         MegaPreferences prefs = dbH.getPreferences();
 
         if (prefs != null

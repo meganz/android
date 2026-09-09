@@ -1091,7 +1091,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     }
 
     private fun isOnMegaDownloads(node: TypedFileNode): Boolean =
-        File(FileUtil.getDownloadLocation(), node.name).let { file ->
+        File(FileUtil.getDownloadLocation(context), node.name).let { file ->
             FileUtil.isFileAvailable(file) && file.length() == node.size
         }
 

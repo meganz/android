@@ -1,10 +1,12 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
@@ -126,6 +128,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val monitorAlmostFullStorageBannerClosingTimestampUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MediaDiscoveryViewState())
@@ -655,7 +658,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     ): String? =
         getNodeByHandle(handle)?.let { node ->
             val localPath = FileUtil.getLocalFile(node)
-            File(FileUtil.getDownloadLocation(), node.name).let { file ->
+            File(FileUtil.getDownloadLocation(context), node.name).let { file ->
                 if (localPath != null && ((FileUtil.isFileAvailable(file) && file.length() == node.size)
                             || (node.fingerprint == getFingerprintUseCase(localPath)))
                 ) {

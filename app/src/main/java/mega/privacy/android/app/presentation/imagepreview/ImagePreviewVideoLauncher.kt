@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.imagepreview
 
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.utils.Constants
@@ -32,6 +33,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
     private val megaNavigator: MegaNavigator,
+    @ApplicationContext private val context: Context,
 ) {
 
     suspend fun launchVideoScreen(
@@ -137,7 +139,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
         node: MegaNode,
     ): String? {
         val localPath = FileUtil.getLocalFile(node)
-        return File(FileUtil.getDownloadLocation(), node.name).let { file ->
+        return File(FileUtil.getDownloadLocation(context), node.name).let { file ->
             if (localPath != null && ((FileUtil.isFileAvailable(file) && file.length() == node.size)
                         || (node.fingerprint == getFingerprintUseCase(localPath)))
             ) {

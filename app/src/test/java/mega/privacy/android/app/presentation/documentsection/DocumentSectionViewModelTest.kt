@@ -170,7 +170,8 @@ class DocumentSectionViewModelTest {
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
             getRubbishBinFolderUseCase = getRubbishBinFolderUseCase,
-            getNodeAccessUseCase = getNodeAccessUseCase
+            getNodeAccessUseCase = getNodeAccessUseCase,
+            context = mock()
         )
     }
 

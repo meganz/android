@@ -1,14 +1,15 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.content.Context
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import mega.privacy.android.feature.mediaplayer.data.mapper.AudioNodeToMediaItemMapper
 import mega.privacy.android.app.mediaplayer.model.AudioPlayQueueParams
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
@@ -20,7 +21,6 @@ import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
-
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodes
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudiosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.mediaplayer.data.mapper.AudioNodeToMediaItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
@@ -111,6 +112,7 @@ class AudioPlayQueueBuilder @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val audioNodeToMediaItemMapper: AudioNodeToMediaItemMapper,
+    @ApplicationContext private val context: Context,
 ) {
 
     /**
@@ -502,7 +504,7 @@ class AudioPlayQueueBuilder @Inject constructor(
     }
 
     private fun isOnMegaDownloads(node: TypedFileNode): Boolean =
-        File(getDownloadLocation(), node.name).let { file ->
+        File(getDownloadLocation(context), node.name).let { file ->
             isFileAvailable(file) && file.length() == node.size
         }
 

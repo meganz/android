@@ -165,6 +165,7 @@ class AudioPlayQueueBuilderTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             audioNodeToMediaItemMapper = audioNodeToMediaItemMapper,
+            context = mock(),
         )
     }
 

@@ -1,10 +1,12 @@
 package mega.privacy.android.app.presentation.documentsection
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -85,6 +87,7 @@ class DocumentSectionViewModel @Inject constructor(
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
     private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
     private val getNodeAccessUseCase: GetNodeAccessUseCase,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DocumentSectionUiState())
     internal val uiState = _uiState.asStateFlow()
@@ -234,7 +237,7 @@ class DocumentSectionViewModel @Inject constructor(
     internal suspend fun getLocalFilePath(handle: Long): String? =
         getNodeByHandle(handle)?.let { node ->
             val localPath = FileUtil.getLocalFile(node)
-            val file = File(FileUtil.getDownloadLocation(), node.name)
+            val file = File(FileUtil.getDownloadLocation(context), node.name)
             if (localPath != null && ((FileUtil.isFileAvailable(file) && file.length() == node.size)
                         || (node.fingerprint == getFingerprintUseCase(localPath)))
             ) {

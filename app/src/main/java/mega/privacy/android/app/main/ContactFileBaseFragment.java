@@ -75,7 +75,7 @@ public class ContactFileBaseFragment extends RotatableFragment {
 
         prefs = dbH.getPreferences();
 
-        downloadLocationDefaultPath = getDownloadLocation();
+        downloadLocationDefaultPath = getDownloadLocation(context);
 
         lastPositionStack = new Stack<>();
 
