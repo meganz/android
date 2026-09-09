@@ -15,9 +15,10 @@ import mega.privacy.android.navigation.contract.TransferHandler
  */
 class MyAccountFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(navigationHandler: NavigationHandler, transferHandler: TransferHandler) -> Unit =
-        { _, _ ->
+        { navigationHandler, _ ->
             achievementsInfo()
             referralBonus()
+            inviteFriends(navigationHandler)
             megaVpnFreeTrial()
             megaPassFreeTrial()
         }
