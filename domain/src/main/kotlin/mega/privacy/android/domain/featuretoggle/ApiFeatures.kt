@@ -22,6 +22,16 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * Makes a sync's `.megaignore` editable from the app: exclusions staged while a sync is being
+     * set up, and managed on an existing one.
+     */
+    SyncExclusions(
+        experimentName = "syncx",
+        description = "Enable sync exclusions",
+        defaultValue = false,
+    ),
+
+    /**
      * WYSIWYG Markdown editing in the text editor: live styling while editing .md files,
      * formatting toolbar above the keyboard, and a live-preview/source toggle.
      * Rendering itself remains gated by the remote ApiFeatures.TextEditorMarkdownRendering flag.

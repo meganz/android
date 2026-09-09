@@ -18,21 +18,26 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.repository.BackupRepository.Companion.BACKUPS_FOLDER_DEFAULT_NAME
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.exception.BackupAlreadyExistsException
 import mega.privacy.android.feature.sync.domain.usecase.backup.MyBackupsFolderExistsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.backup.SetMyBackupsFolderUseCase
+import mega.privacy.android.feature.sync.domain.usecase.exclusion.PreSeedSyncExclusionsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncRemoteFolderValidityMapper
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityMapper
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncValidityResult
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = SyncNewFolderViewModel.SyncNewFolderViewModelFactory::class)
@@ -51,6 +56,8 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     private val syncUriValidityMapper: SyncUriValidityMapper,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val syncRemoteFolderValidityMapper: SyncRemoteFolderValidityMapper,
+    private val preSeedSyncExclusionsUseCase: PreSeedSyncExclusionsUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -157,9 +164,12 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
 
                         is SyncValidityResult.ValidFolderSelected -> {
                             _state.update { state ->
+                                val localRoot = validityResult.localFolderUri.value
                                 state.copy(
-                                    selectedLocalFolder = validityResult.localFolderUri.value,
-                                    selectedFolderName = validityResult.folderName
+                                    selectedLocalFolder = localRoot,
+                                    selectedFolderName = validityResult.folderName,
+                                    stagedExclusions = state.stagedExclusions
+                                        ?.takeIf { localRoot == state.selectedLocalFolder },
                                 )
                             }
                         }
@@ -169,11 +179,18 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                             _state.update { state ->
                                 state.copy(
                                     selectedLocalFolder = "",
-                                    selectedFolderName = ""
+                                    selectedFolderName = "",
+                                    stagedExclusions = null,
                                 )
                             }
                         }
                     }
+                }
+            }
+
+            is SyncNewFolderAction.ExclusionsStaged -> {
+                _state.update { state ->
+                    state.copy(stagedExclusions = action.exclusions)
                 }
             }
 
@@ -315,10 +332,15 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                                                 }
 
                                                 is SyncValidityResult.ValidFolderSelected -> {
+                                                    val localRoot =
+                                                        state.value.selectedLocalFolder
+                                                    if (preSeedStagedExclusions(localRoot).not()) {
+                                                        return@launch
+                                                    }
                                                     syncFolderPairUseCase(
                                                         syncType = state.value.syncType,
                                                         name = remoteFolder.name,
-                                                        localPath = state.value.selectedLocalFolder,
+                                                        localPath = localRoot,
                                                         remotePath = remoteFolder,
                                                     )
                                                 }
@@ -352,11 +374,13 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     }
 
     private suspend fun createBackup(): Boolean {
+        val localRoot = state.value.selectedLocalFolder
+        if (preSeedStagedExclusions(localRoot).not()) return false
         runCatching {
             syncFolderPairUseCase(
                 syncType = state.value.syncType,
                 name = null,
-                localPath = state.value.selectedLocalFolder,
+                localPath = localRoot,
                 remotePath = RemoteFolder(NodeId(-1L), ""),
             )
         }.onSuccess { result ->
@@ -375,6 +399,41 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
         }
         return false
     }
+
+    /**
+     * Writes the staged exclusions to [localRoot], reporting whether creation may go ahead. The SDK
+     * seeds its predefined exclusions only into a root with no `.megaignore`, so the file has to be
+     * in place first, and a pair created after a failed write would upload everything the user
+     * excluded. Nothing is written while [ApiFeatures.SyncExclusions] is off.
+     *
+     * @param localRoot read once by the caller, so the file and the pair cannot land on two folders
+     */
+    private suspend fun preSeedStagedExclusions(localRoot: String): Boolean {
+        val staged = state.value.stagedExclusions ?: return true
+        if (isSyncExclusionsEnabled().not()) return true
+        return preSeedSyncExclusionsUseCase(
+            localRoot = UriPath(localRoot),
+            staged = staged,
+        ).onFailure { error ->
+            Timber.e(error)
+            _state.update { state ->
+                state.copy(
+                    showSnackbar = triggered(
+                        LocalizedText.StringRes(sharedR.string.general_sync_could_not_create_ignore_file)
+                    ),
+                    isLoading = false,
+                )
+            }
+        }.isSuccess
+    }
+
+    /**
+     * An unreadable flag counts as off: exclusions must not be able to fail a sync.
+     */
+    private suspend fun isSyncExclusionsEnabled(): Boolean =
+        runCatching { getFeatureFlagValueUseCase(ApiFeatures.SyncExclusions) }
+            .onFailure { Timber.e(it) }
+            .getOrDefault(false)
 
     /**
      * Consumes the event of showing snackbar.

@@ -5,6 +5,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.feature.sync.domain.entity.ParsedMegaIgnore
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
 /**
@@ -15,6 +16,7 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
  * @property selectedLocalFolder selected local folder
  * @property selectedFolderName name of the selected folder
  * @property selectedMegaFolder selected MEGA folder
+ * @property stagedExclusions exclusions configured before the folder pair exists, or null if none
  * @property showDisableBatteryOptimizationsBanner True if have to show the disable battery optimizations banner, False otherwise
  * @property showAllFilesAccessBanner True if have to show the all files access banner, False otherwise
  * @property showStorageOverQuota True if have to show the storage over quota message, False otherwise
@@ -28,6 +30,7 @@ internal data class SyncNewFolderState(
     val selectedLocalFolder: String = "",
     val selectedFolderName: String = "",
     val selectedMegaFolder: RemoteFolder? = null,
+    val stagedExclusions: ParsedMegaIgnore? = null,
     val showDisableBatteryOptimizationsBanner: Boolean = false,
     val showAllFilesAccessBanner: Boolean = false,
     val isStorageOverQuota: Boolean = false,
