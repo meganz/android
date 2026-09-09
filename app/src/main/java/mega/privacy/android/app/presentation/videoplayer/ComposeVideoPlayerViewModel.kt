@@ -141,6 +141,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByPa
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SaveVideoPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -241,6 +242,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val trackPlaybackPositionUseCase: TrackPlaybackPositionUseCase,
+    private val saveVideoPlaybackInfoUseCase: SaveVideoPlaybackInfoUseCase,
     private val monitorPlaybackTimesUseCase: MonitorPlaybackTimesUseCase,
     private val savePlaybackTimesUseCase: SavePlaybackTimesUseCase,
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
@@ -264,6 +266,14 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
 
     private var needStopStreamingServer = false
     private var playerRetry = 0
+
+    /**
+     * The last snapshot handed to an immediate save. Leaving the player while paused fires more
+     * than one save point for the same position, and each one rewrites the whole DataStore map,
+     * so an unchanged snapshot is skipped. Only touched from the main thread, where every save
+     * point is invoked.
+     */
+    private var lastSavedPlaybackInfo: MediaPlaybackInfo? = null
 
     private val snackbarMessage = SingleLiveEvent<Int>()
     private var searchQuery: String = ""
@@ -473,15 +483,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         viewModelScope.launch {
             buildPlaybackSources(launchSource)
             runCatching {
-                trackPlaybackPositionUseCase {
-                    MediaPlaybackInfo(
-                        mediaHandle = mediaPlayerManager.getCurrentMediaItem()?.mediaId
-                            ?.toLongOrNull() ?: MediaPlaybackInfo.INVALID_MEDIA_HANDLE,
-                        totalDuration = mediaPlayerManager.getCurrentItemDuration(),
-                        currentPosition = mediaPlayerManager.getCurrentPlayingPosition(),
-                        mediaType = MediaType.Video,
-                    )
-                }
+                trackPlaybackPositionUseCase(::currentVideoPlaybackInfo)
             }.onFailure {
                 if (it is CancellationException) throw it
                 Timber.e(it, "Failed to track playback position")
@@ -1117,11 +1119,39 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     private fun clear() {
         searchJob?.cancel()
         saveRecentlyUsedItemIfQualifies()
+        // Taken here rather than inside the coroutine: by the time that is scheduled the player
+        // can already be released, and the final position would be lost.
+        saveVideoPlaybackInfo(currentVideoPlaybackInfo())
         applicationScope.launch {
             if (needStopStreamingServer) {
                 httpServerStopUseCase()
             }
-            savePlaybackTimesUseCase()
+        }
+    }
+
+    private fun currentVideoPlaybackInfo() = MediaPlaybackInfo(
+        mediaHandle = mediaPlayerManager.getCurrentMediaItem()?.mediaId?.toLongOrNull()
+            ?: MediaPlaybackInfo.INVALID_MEDIA_HANDLE,
+        totalDuration = mediaPlayerManager.getCurrentItemDuration(),
+        currentPosition = mediaPlayerManager.getCurrentPlayingPosition(),
+        mediaType = MediaType.Video,
+    )
+
+    /**
+     * Saves the player's current position immediately on every event that interrupts playback or
+     * leaves the player (pause, app backgrounding, exit), so the periodic save interval only
+     * bounds how much position is lost on a hard kill or crash.
+     */
+    private fun forceSaveVideoPlaybackInfo() = saveVideoPlaybackInfo(currentVideoPlaybackInfo())
+
+    private fun saveVideoPlaybackInfo(info: MediaPlaybackInfo) {
+        if (info == lastSavedPlaybackInfo) return
+        lastSavedPlaybackInfo = info
+        applicationScope.launch {
+            runCatching { saveVideoPlaybackInfoUseCase(info) }
+                .onFailure { Timber.e(it, "Failed to save the video playback info") }
+            runCatching { savePlaybackTimesUseCase() }
+                .onFailure { Timber.e(it, "Failed to flush the playback times") }
         }
     }
 
@@ -1339,6 +1369,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                 isAutoReplay = wasPlaying,
             )
         }
+        forceSaveVideoPlaybackInfo()
     }
 
     /**
@@ -1366,6 +1397,9 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             }
         }
         allowUpdatePausedByUser = true
+        if (state == MediaPlaybackState.Paused) {
+            forceSaveVideoPlaybackInfo()
+        }
     }
 
     /**

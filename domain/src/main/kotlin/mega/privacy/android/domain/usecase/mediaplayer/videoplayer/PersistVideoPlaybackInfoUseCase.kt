@@ -20,9 +20,9 @@ import javax.inject.Inject
  * - everything in between is written straight to storage.
  *
  * Removal from the Continue Where Left Off index is deliberately **not** done here. While the
- * video player dual-writes to DataStore, [TrackPlaybackPositionUseCase] still owns that side
- * effect; doing it in both places would fire the same removal twice per tick. It moves here when
- * the DataStore path is deleted.
+ * video player dual-writes to DataStore, [SaveVideoPlaybackInfoUseCase] still owns that side
+ * effect on the DataStore branch; doing it in both places would fire the same removal twice per
+ * save. It moves here when the DataStore path is deleted.
  */
 class PersistVideoPlaybackInfoUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,

@@ -40,6 +40,7 @@ import mega.privacy.android.domain.repository.MediaPlayerRepository
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 /**
@@ -63,7 +64,10 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : MediaPlayerRepository {
 
-    private val playbackInfoMap = mutableMapOf<Long, PlaybackInformation>()
+    // Written from the player's ticker on the main thread and serialised from the application
+    // scope's background threads, so it must tolerate concurrent access. The declared type stays
+    // MutableMap so kotlinx serialization still resolves a Map serializer for it.
+    private val playbackInfoMap: MutableMap<Long, PlaybackInformation> = ConcurrentHashMap()
     private var latestAudioPlaybackInfo: MediaPlaybackInfo? = null
 
     override suspend fun getAudioNodes(order: SortOrder): List<TypedAudioNode> =

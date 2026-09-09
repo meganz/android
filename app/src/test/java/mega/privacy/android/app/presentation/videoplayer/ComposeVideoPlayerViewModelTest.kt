@@ -67,6 +67,8 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
@@ -121,6 +123,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByPa
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SaveVideoPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -253,6 +256,7 @@ class ComposeVideoPlayerViewModelTest {
     private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
     private lateinit var testArgs: ComposeVideoPlayerViewModel.Args
     private val trackPlaybackPositionUseCase = mock<TrackPlaybackPositionUseCase>()
+    private val saveVideoPlaybackInfoUseCase = mock<SaveVideoPlaybackInfoUseCase>()
     private val monitorPlaybackTimesUseCase = mock<MonitorPlaybackTimesUseCase>()
     private val getMediaPlaybackInfoUseCase = mock<GetMediaPlaybackInfoUseCase>()
     private val savePlaybackTimesUseCase = mock<SavePlaybackTimesUseCase>()
@@ -335,6 +339,7 @@ class ComposeVideoPlayerViewModelTest {
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             trackPlaybackPositionUseCase = trackPlaybackPositionUseCase,
+            saveVideoPlaybackInfoUseCase = saveVideoPlaybackInfoUseCase,
             monitorPlaybackTimesUseCase = monitorPlaybackTimesUseCase,
             getMediaPlaybackInfoUseCase = getMediaPlaybackInfoUseCase,
             savePlaybackTimesUseCase = savePlaybackTimesUseCase,
@@ -425,6 +430,7 @@ class ComposeVideoPlayerViewModelTest {
             durationInSecondsTextMapper,
             isParticipatingInChatCallUseCase,
             trackPlaybackPositionUseCase,
+            saveVideoPlaybackInfoUseCase,
             monitorPlaybackTimesUseCase,
             getMediaPlaybackInfoUseCase,
             savePlaybackTimesUseCase,
@@ -3094,6 +3100,59 @@ class ComposeVideoPlayerViewModelTest {
             advanceUntilIdle()
             assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackMp4StartedEvent>()).isNotEmpty()
         }
+
+    private fun stubPlaybackSnapshot(
+        handle: Long = 123456L,
+        totalDuration: Long = 200_000L,
+        currentPosition: Long = 16_000L,
+    ) = MediaPlaybackInfo(
+        mediaHandle = handle,
+        totalDuration = totalDuration,
+        currentPosition = currentPosition,
+        mediaType = MediaType.Video,
+    ).also {
+        whenever(mediaPlayerManager.getCurrentMediaItem())
+            .thenReturn(MediaItem.Builder().setMediaId(handle.toString()).build())
+        whenever(mediaPlayerManager.getCurrentItemDuration()).thenReturn(totalDuration)
+        whenever(mediaPlayerManager.getCurrentPlayingPosition()).thenReturn(currentPosition)
+    }
+
+    @Test
+    fun `test that onPlayWhenReadyChanged saves the current position when playback pauses`() =
+        runTest {
+            val expected = stubPlaybackSnapshot()
+            initViewModel()
+
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+
+            verify(saveVideoPlaybackInfoUseCase).invoke(expected)
+            verify(savePlaybackTimesUseCase).invoke()
+        }
+
+    @Test
+    fun `test that onPlayWhenReadyChanged does not save the current position when playback resumes`() =
+        runTest {
+            stubPlaybackSnapshot()
+            initViewModel()
+
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Playing, isPausedByUser = false)
+            advanceUntilIdle()
+
+            verify(saveVideoPlaybackInfoUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that pauseForBackground saves the current position`() = runTest {
+        val expected = stubPlaybackSnapshot()
+        initViewModel()
+
+        underTest.pauseForBackground()
+        advanceUntilIdle()
+
+        verify(saveVideoPlaybackInfoUseCase).invoke(expected)
+        verify(savePlaybackTimesUseCase).invoke()
+    }
 
     companion object {
         @JvmField
