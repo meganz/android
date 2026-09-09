@@ -97,8 +97,34 @@ class RichSpanOutputTransformation(
                 addStyle(styles.forStyle(span.style), span.start, span.end)
             }
         }
+        decorationIntersections(state.spans).forEach { (start, end) ->
+            if (end <= length) addStyle(styles.underlineStrikethrough, start, end)
+        }
         addDocumentSelectionHighlight(styles, documentSelection)
     }
+}
+
+/**
+ * Overlaps between underline-decorated spans (underline, links) and strikethrough: merged
+ * span styles keep only the last textDecoration, so these segments are repainted with the
+ * combined decoration.
+ */
+internal fun decorationIntersections(spans: List<RichSpan>): List<Pair<Int, Int>> {
+    val underlines = spans.filter {
+        it.style == RichSpanStyle.Underline || it.style is RichSpanStyle.Link
+    }
+    if (underlines.isEmpty()) return emptyList()
+    val strikes = spans.filter { it.style == RichSpanStyle.Strikethrough }
+    if (strikes.isEmpty()) return emptyList()
+    val intersections = mutableListOf<Pair<Int, Int>>()
+    underlines.forEach { underline ->
+        strikes.forEach { strike ->
+            val start = maxOf(underline.start, strike.start)
+            val end = minOf(underline.end, strike.end)
+            if (start < end) intersections += start to end
+        }
+    }
+    return intersections
 }
 
 /**
@@ -172,6 +198,8 @@ data class RichSpanVisualStyles(
     val bold: SpanStyle,
     val italic: SpanStyle,
     val strikethrough: SpanStyle,
+    val underline: SpanStyle,
+    val underlineStrikethrough: SpanStyle,
     val code: SpanStyle,
     val link: SpanStyle,
     val selectionHighlight: SpanStyle,
@@ -180,6 +208,7 @@ data class RichSpanVisualStyles(
         RichSpanStyle.Bold -> bold
         RichSpanStyle.Italic -> italic
         RichSpanStyle.Strikethrough -> strikethrough
+        RichSpanStyle.Underline -> underline
         RichSpanStyle.Code -> code
         is RichSpanStyle.Link -> link
     }
@@ -193,6 +222,8 @@ fun rememberRichSpanVisualStyles(): RichSpanVisualStyles {
             bold = MarkdownInlineStyles.bold,
             italic = MarkdownInlineStyles.italic,
             strikethrough = MarkdownInlineStyles.strikethrough,
+            underline = MarkdownInlineStyles.underline,
+            underlineStrikethrough = MarkdownInlineStyles.underlineStrikethrough,
             code = MarkdownInlineStyles.code(colors),
             link = MarkdownInlineStyles.link(colors),
             // Same swatch as the editor's native field selection palette, so the

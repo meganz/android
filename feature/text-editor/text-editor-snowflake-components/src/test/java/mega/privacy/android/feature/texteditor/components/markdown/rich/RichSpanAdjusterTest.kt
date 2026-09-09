@@ -182,4 +182,35 @@ internal class RichSpanAdjusterTest {
             RichSpan(2, 5, italic),
         ).inOrder()
     }
+
+    @Test
+    fun `test that decorationIntersections reports underline and strikethrough overlaps`() {
+        val spans = listOf(
+            RichSpan(0, 10, RichSpanStyle.Underline),
+            RichSpan(5, 15, RichSpanStyle.Strikethrough),
+            RichSpan(20, 25, RichSpanStyle.Link("https://mega.io")),
+            RichSpan(18, 22, RichSpanStyle.Strikethrough),
+        )
+
+        assertThat(decorationIntersections(spans))
+            .containsExactly(5 to 10, 20 to 22)
+    }
+
+    @Test
+    fun `test that decorationIntersections is empty without overlap or without both styles`() {
+        assertThat(
+            decorationIntersections(
+                listOf(
+                    RichSpan(0, 5, RichSpanStyle.Underline),
+                    RichSpan(5, 10, RichSpanStyle.Strikethrough),
+                ),
+            ),
+        ).isEmpty()
+        assertThat(
+            decorationIntersections(listOf(RichSpan(0, 5, RichSpanStyle.Underline))),
+        ).isEmpty()
+        assertThat(
+            decorationIntersections(listOf(RichSpan(0, 5, RichSpanStyle.Bold))),
+        ).isEmpty()
+    }
 }

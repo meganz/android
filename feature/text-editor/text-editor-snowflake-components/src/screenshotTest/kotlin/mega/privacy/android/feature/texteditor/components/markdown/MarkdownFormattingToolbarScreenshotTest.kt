@@ -32,6 +32,7 @@ class MarkdownFormattingToolbarScreenshotTest {
                 formats = MarkdownSelectionFormats(
                     isBold = true,
                     isItalic = true,
+                    isUnderline = true,
                     headingLevel = 2,
                     isBulletList = true,
                 ),

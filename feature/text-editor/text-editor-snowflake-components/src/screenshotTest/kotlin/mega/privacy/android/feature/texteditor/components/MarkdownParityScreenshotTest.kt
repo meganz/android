@@ -27,7 +27,7 @@ class MarkdownParityScreenshotTest {
     private val textFixture = """
         # Trip notes
 
-        Planning the **spring** trip with *flexible* dates, `inline code` and a [booking link](https://mega.io).
+        Planning the **spring** trip with *flexible* dates, `inline code`, <u>underline</u>, <u>~~both lines~~</u> and a [booking link](https://mega.io).
         This hard-wrapped line renders as a line break in both surfaces.
 
         - Book flights

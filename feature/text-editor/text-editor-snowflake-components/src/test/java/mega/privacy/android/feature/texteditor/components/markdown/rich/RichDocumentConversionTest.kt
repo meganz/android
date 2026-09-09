@@ -39,6 +39,101 @@ internal class RichDocumentConversionTest {
     }
 
     @Test
+    fun `test that convert maps balanced underline tags to an underline span`() {
+        val document = toModel.convert("a <u>under</u> b")
+
+        val paragraph = document.blocks.single() as RichBlock.Paragraph
+        assertThat(paragraph.text.text).isEqualTo("a under b")
+        assertThat(paragraph.text.spans)
+            .containsExactly(RichSpan(2, 7, RichSpanStyle.Underline))
+    }
+
+    @Test
+    fun `test that underline round-trips through serialization`() {
+        assertThat(roundTrip("a <u>under</u> b")).isEqualTo("a <u>under</u> b")
+        assertThat(roundTrip("<u>**bold under**</u>")).isEqualTo("<u>**bold under**</u>")
+    }
+
+    @Test
+    fun `test that an unbalanced underline tag falls back to raw source`() {
+        val document = toModel.convert("a <u>under b")
+
+        assertThat(document.blocks.single())
+            .isEqualTo(RichBlock.RawSource("a <u>under b"))
+    }
+
+    @Test
+    fun `test that other inline html still falls back to raw source`() {
+        val document = toModel.convert("a <b>bold</b> b")
+
+        assertThat(document.blocks.single())
+            .isEqualTo(RichBlock.RawSource("a <b>bold</b> b"))
+    }
+
+    @Test
+    fun `test that a literal typed angle bracket stays escaped and not an underline`() {
+        val markdown = toMarkdown.convert(
+            RichDocument(listOf(RichBlock.Paragraph(RichText("a <u> b")))),
+        )
+
+        assertThat(markdown).isEqualTo("a \\<u> b")
+        val reparsed = toModel.convert(markdown)
+        assertThat(reparsed.blocks.single())
+            .isEqualTo(RichBlock.Paragraph(RichText("a <u> b")))
+    }
+
+    @Test
+    fun `test that a span crossing an outer span boundary keeps its tail when serialized`() {
+        val markdown = toMarkdown.convert(
+            RichDocument(
+                listOf(
+                    RichBlock.Paragraph(
+                        RichText(
+                            "abcdefgh",
+                            listOf(
+                                RichSpan(0, 5, RichSpanStyle.Strikethrough),
+                                RichSpan(3, 8, RichSpanStyle.Bold),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        assertThat(markdown).isEqualTo("~~abc**de**~~**fgh**")
+        val reparsed = toModel.convert(markdown).blocks.single() as RichBlock.Paragraph
+        assertThat(reparsed.text.text).isEqualTo("abcdefgh")
+        assertThat(reparsed.text.spans).containsExactly(
+            RichSpan(0, 5, RichSpanStyle.Strikethrough),
+            RichSpan(3, 5, RichSpanStyle.Bold),
+            RichSpan(5, 8, RichSpanStyle.Bold),
+        )
+    }
+
+    @Test
+    fun `test that cross boundary underline from a file round-trips without losing its tail`() {
+        assertThat(roundTrip("**a<u>b** c</u>")).isEqualTo("**a<u>b</u>**<u> c</u>")
+    }
+
+    @Test
+    fun `test that underline spans never open or close against a newline`() {
+        val markdown = toMarkdown.convert(
+            RichDocument(
+                listOf(
+                    RichBlock.Paragraph(
+                        RichText(
+                            "one" + "\n" + "two",
+                            listOf(RichSpan(3, 7, RichSpanStyle.Underline)),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        assertThat(markdown).isEqualTo("one\n<u>two</u>")
+    }
+
+    @Test
     fun `test that convert unescapes markdown specials into plain text`() {
         val document = toModel.convert("""2\*3 and \[brackets\]""")
 

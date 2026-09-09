@@ -258,14 +258,30 @@ class MarkdownToRichDocumentConverter @Inject constructor() {
         supported: () -> RichBlock,
     ): RichBlock = if (hasUnsupportedInline(node)) rawSource(node, source) else supported()
 
-    /** Images and inline HTML have no inline model; the whole block falls back to raw source. */
+    /**
+     * Images and inline HTML have no inline model, so the whole block falls back to raw
+     * source — except balanced `<u>`/`</u>` pairs, which map to [RichSpanStyle.Underline].
+     */
     private fun hasUnsupportedInline(parent: Node): Boolean {
-        var child = parent.firstChild
-        while (child != null) {
-            if (child is Image || child is HtmlInline || hasUnsupportedInline(child)) return true
-            child = child.next
+        var underlineDepth = 0
+        fun walk(node: Node): Boolean {
+            var child = node.firstChild
+            while (child != null) {
+                when {
+                    child is Image -> return true
+                    child is HtmlInline -> when (child.literal.trim().lowercase()) {
+                        UNDERLINE_OPEN -> underlineDepth++
+                        UNDERLINE_CLOSE -> if (--underlineDepth < 0) return true
+                        else -> return true
+                    }
+
+                    else -> if (walk(child)) return true
+                }
+                child = child.next
+            }
+            return false
         }
-        return false
+        return walk(parent) || underlineDepth != 0
     }
 
     private fun rawSource(node: Node, source: String): RichBlock.RawSource {
@@ -283,6 +299,7 @@ class MarkdownToRichDocumentConverter @Inject constructor() {
     private fun inlineText(parent: Node): RichText {
         val builder = StringBuilder()
         val spans = mutableListOf<RichSpan>()
+        val underlineStarts = ArrayDeque<Int>()
 
         fun walk(node: Node) {
             when (node) {
@@ -293,6 +310,17 @@ class MarkdownToRichDocumentConverter @Inject constructor() {
                 }
 
                 is SoftLineBreak, is HardLineBreak -> builder.append('\n')
+
+                is HtmlInline -> when (node.literal.trim().lowercase()) {
+                    UNDERLINE_OPEN -> underlineStarts.addLast(builder.length)
+                    UNDERLINE_CLOSE -> underlineStarts.removeLastOrNull()?.let { start ->
+                        if (start < builder.length) {
+                            spans += RichSpan(start, builder.length, RichSpanStyle.Underline)
+                        }
+                    }
+
+                    else -> Unit
+                }
 
                 else -> {
                     val walkChildren = {
@@ -338,3 +366,6 @@ class MarkdownToRichDocumentConverter @Inject constructor() {
         if (builder.length > start) spans += RichSpan(start, builder.length, style)
     }
 }
+
+private const val UNDERLINE_OPEN = "<u>"
+private const val UNDERLINE_CLOSE = "</u>"

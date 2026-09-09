@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.FormatStrikethrough
+import androidx.compose.material.icons.filled.FormatUnderlined
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.HorizontalDivider
@@ -38,6 +39,7 @@ import mega.android.core.ui.tokens.theme.DSTokens
 enum class MarkdownFormatAction {
     Bold,
     Italic,
+    Underline,
     Strikethrough,
     InlineCode,
     HeadingCycle,
@@ -107,6 +109,14 @@ fun MarkdownFormattingToolbar(
                     contentDescription = "Italic",
                     isActive = formats.isItalic,
                     enabled = MarkdownFormatAction.Italic !in disabledActions,
+                    onAction = onAction,
+                )
+                ToolbarToggleButton(
+                    action = MarkdownFormatAction.Underline,
+                    icon = Icons.Default.FormatUnderlined,
+                    contentDescription = "Underline",
+                    isActive = formats.isUnderline,
+                    enabled = MarkdownFormatAction.Underline !in disabledActions,
                     onAction = onAction,
                 )
                 ToolbarToggleButton(

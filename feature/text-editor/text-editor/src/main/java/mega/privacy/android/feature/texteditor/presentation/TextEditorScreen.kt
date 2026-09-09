@@ -882,6 +882,7 @@ private fun RichEditToolbar(
                     isBold = RichSpanStyle.Bold in covered,
                     isItalic = RichSpanStyle.Italic in covered,
                     isStrikethrough = RichSpanStyle.Strikethrough in covered,
+                    isUnderline = RichSpanStyle.Underline in covered,
                     isInlineCode = RichSpanStyle.Code in covered,
                 )
             } else {
@@ -920,6 +921,7 @@ private fun richSelectionFormats(
         isBold = active(RichSpanStyle.Bold),
         isItalic = active(RichSpanStyle.Italic),
         isStrikethrough = active(RichSpanStyle.Strikethrough),
+        isUnderline = active(RichSpanStyle.Underline),
         isInlineCode = active(RichSpanStyle.Code),
         isLink = spans.any {
             it.style is RichSpanStyle.Link &&
@@ -946,6 +948,7 @@ private val StructuralFormatActions = setOf(
 private val InlineToggleStyles = setOf(
     RichSpanStyle.Bold,
     RichSpanStyle.Italic,
+    RichSpanStyle.Underline,
     RichSpanStyle.Strikethrough,
     RichSpanStyle.Code,
 )

@@ -555,6 +555,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         when (action) {
             MarkdownFormatAction.Bold -> toggleFocusedStyle(rich, RichSpanStyle.Bold)
             MarkdownFormatAction.Italic -> toggleFocusedStyle(rich, RichSpanStyle.Italic)
+            MarkdownFormatAction.Underline -> toggleFocusedStyle(rich, RichSpanStyle.Underline)
             MarkdownFormatAction.Strikethrough ->
                 toggleFocusedStyle(rich, RichSpanStyle.Strikethrough)
 

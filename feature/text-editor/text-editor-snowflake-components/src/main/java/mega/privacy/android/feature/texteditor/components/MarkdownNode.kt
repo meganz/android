@@ -46,6 +46,7 @@ import org.commonmark.node.Emphasis
 import org.commonmark.node.FencedCodeBlock
 import org.commonmark.node.HardLineBreak
 import org.commonmark.node.Heading
+import org.commonmark.node.HtmlInline
 import org.commonmark.node.Image
 import org.commonmark.node.IndentedCodeBlock
 import org.commonmark.node.Link
@@ -187,6 +188,15 @@ internal object MarkdownInlineStyles {
     val bold = SpanStyle(fontWeight = FontWeight.Bold)
     val italic = SpanStyle(fontStyle = FontStyle.Italic)
     val strikethrough = SpanStyle(textDecoration = TextDecoration.LineThrough)
+    val underline = SpanStyle(textDecoration = TextDecoration.Underline)
+
+    // Overlapping decorations REPLACE each other when spans merge; intersections are
+    // repainted with this combined style so both lines render.
+    val underlineStrikethrough = SpanStyle(
+        textDecoration = TextDecoration.combine(
+            listOf(TextDecoration.Underline, TextDecoration.LineThrough),
+        ),
+    )
 
     fun code(colors: MarkdownColors): SpanStyle = SpanStyle(
         fontFamily = FontFamily.Monospace,
@@ -385,7 +395,33 @@ private fun TableRowView(
 internal fun rememberInline(parent: Node, colors: MarkdownColors): AnnotatedString =
     remember(parent, colors) {
         buildAnnotatedString { appendInlineChildren(parent, colors) }
+            .combineOverlappingDecorations()
     }
+
+/**
+ * Repaints every underline/strikethrough overlap with the combined decoration: merged span
+ * styles keep only the last [SpanStyle.textDecoration], so the intersection segments must be
+ * re-added (last wins) for both lines to show.
+ */
+internal fun AnnotatedString.combineOverlappingDecorations(): AnnotatedString {
+    val underlines = spanStyles.filter { it.item.textDecoration == TextDecoration.Underline }
+    if (underlines.isEmpty()) return this
+    val strikes = spanStyles.filter { it.item.textDecoration == TextDecoration.LineThrough }
+    if (strikes.isEmpty()) return this
+    val builder = AnnotatedString.Builder(this)
+    var added = false
+    underlines.forEach { underline ->
+        strikes.forEach { strike ->
+            val start = maxOf(underline.start, strike.start)
+            val end = minOf(underline.end, strike.end)
+            if (start < end) {
+                builder.addStyle(MarkdownInlineStyles.underlineStrikethrough, start, end)
+                added = true
+            }
+        }
+    }
+    return if (added) builder.toAnnotatedString() else this
+}
 
 private fun AnnotatedString.Builder.appendInlineChildren(parent: Node, colors: MarkdownColors) {
     var child = parent.firstChild
@@ -420,6 +456,14 @@ private fun AnnotatedString.Builder.appendInline(node: Node, colors: MarkdownCol
         ) { appendInlineChildren(node, colors) }
 
         is Image -> appendInlineChildren(node, colors) // v1: render alt text only, no remote load
+        // Underline tags arrive as SIBLING nodes, not parents, so the style is pushed and
+        // popped manually; runCatching keeps a stray close tag from popping an empty stack.
+        is HtmlInline -> when (node.literal.trim().lowercase()) {
+            "<u>" -> pushStyle(MarkdownInlineStyles.underline)
+            "</u>" -> runCatching { pop() }
+            else -> Unit
+        }
+
         // Soft breaks render as real line breaks (not the web-style space join): matches the
         // raw source, the rich editor, and Obsidian-style apps, so View <-> Edit never reflows.
         is SoftLineBreak, is HardLineBreak -> append("\n")

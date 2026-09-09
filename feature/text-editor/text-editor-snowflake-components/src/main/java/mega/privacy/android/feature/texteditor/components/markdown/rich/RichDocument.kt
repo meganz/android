@@ -76,6 +76,9 @@ sealed interface RichSpanStyle {
     data object Bold : RichSpanStyle
     data object Italic : RichSpanStyle
     data object Strikethrough : RichSpanStyle
+
+    /** Serialized as inline HTML `<u>...</u>`; Markdown has no native underline. */
+    data object Underline : RichSpanStyle
     data object Code : RichSpanStyle
     data class Link(val url: String) : RichSpanStyle
 }

@@ -130,10 +130,28 @@ class RichDocumentToMarkdownConverter @Inject constructor() {
      */
     private fun serializeInline(text: RichText, escapeLineStarts: Boolean): String {
         val out = StringBuilder()
-        serializeRange(text.text, text.spans.sortedWith(SpanOrder), 0, text.text.length, out)
+        val spans = trimUnderlineNewlines(text.text, text.spans)
+            .sortedWith(SpanOrder)
+            .toMutableList()
+        serializeRange(text.text, spans, 0, text.text.length, out)
         val result = out.toString()
         return if (escapeLineStarts) escapeBlockMarkers(result) else result
     }
+
+    /**
+     * An underline tag alone at a line start re-parses as an HTML BLOCK (CommonMark type 7)
+     * and would restructure the paragraph, so spans never open before or close after a
+     * newline; the newline itself needs no decoration anyway.
+     */
+    private fun trimUnderlineNewlines(text: String, spans: List<RichSpan>): List<RichSpan> =
+        spans.mapNotNull { span ->
+            if (span.style != RichSpanStyle.Underline) return@mapNotNull span
+            var start = span.start
+            var end = span.end.coerceAtMost(text.length)
+            while (start < end && text[start] == '\n') start++
+            while (end > start && text[end - 1] == '\n') end--
+            if (start < end) RichSpan(start, end, span.style) else null
+        }
 
     /**
      * [spans] must be sorted outer-first ([SpanOrder]): spans with equal ranges nest in list
@@ -141,7 +159,7 @@ class RichDocumentToMarkdownConverter @Inject constructor() {
      */
     private fun serializeRange(
         text: String,
-        spans: List<RichSpan>,
+        spans: MutableList<RichSpan>,
         from: Int,
         until: Int,
         out: StringBuilder,
@@ -158,8 +176,18 @@ class RichDocumentToMarkdownConverter @Inject constructor() {
             out.append(escapeInline(text.substring(cursor, span.start)))
             val children = mutableListOf<RichSpan>()
             var j = i + 1
+            var firstTail = -1
             while (j < spans.size && spans[j].start < end) {
-                children += if (spans[j].end <= end) spans[j] else spans[j].copy(end = end)
+                val child = spans[j]
+                if (child.end <= end) {
+                    children += child
+                } else {
+                    // A span crossing the outer boundary is split: the head nests here and
+                    // the tail is re-queued, so its formatting survives past the boundary.
+                    children += child.copy(end = end)
+                    spans[j] = child.copy(start = end)
+                    if (firstTail == -1) firstTail = j
+                }
                 j++
             }
             when (val style = span.style) {
@@ -169,6 +197,12 @@ class RichDocumentToMarkdownConverter @Inject constructor() {
 
                 RichSpanStyle.Italic -> wrap(out, "*") {
                     serializeRange(text, children, span.start, end, out)
+                }
+
+                RichSpanStyle.Underline -> {
+                    out.append("<u>")
+                    serializeRange(text, children, span.start, end, out)
+                    out.append("</u>")
                 }
 
                 RichSpanStyle.Strikethrough -> wrap(out, "~~") {
@@ -184,7 +218,9 @@ class RichDocumentToMarkdownConverter @Inject constructor() {
                 }
             }
             cursor = end
-            i = j
+            // Land on the first re-queued tail; fully consumed spans between it and j are
+            // skipped by the start-before-cursor guard above.
+            i = if (firstTail != -1) firstTail else j
         }
         out.append(escapeInline(text.substring(cursor, until)))
     }
@@ -255,6 +291,22 @@ class RichDocumentToMarkdownConverter @Inject constructor() {
         val LINE_START_SPECIALS = setOf('#', '>', '-', '+', '=')
 
         /** Outer-first ordering: earlier start wins, wider span wins on ties. */
-        val SpanOrder = compareBy<RichSpan>({ it.start }, { -(it.end - it.start) })
+        // The style rank breaks ties between spans covering the exact same range, so their
+        // nesting order in the output is deterministic instead of following parse order
+        // (which differs between `<u>**x**</u>` and `**<u>x</u>**` and would oscillate).
+        val SpanOrder = compareBy<RichSpan>(
+            { it.start },
+            { -(it.end - it.start) },
+            { styleRank(it.style) },
+        )
+
+        private fun styleRank(style: RichSpanStyle): Int = when (style) {
+            is RichSpanStyle.Link -> 0
+            RichSpanStyle.Underline -> 1
+            RichSpanStyle.Bold -> 2
+            RichSpanStyle.Italic -> 3
+            RichSpanStyle.Strikethrough -> 4
+            RichSpanStyle.Code -> 5
+        }
     }
 }
