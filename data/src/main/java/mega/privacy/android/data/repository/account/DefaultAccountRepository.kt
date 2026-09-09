@@ -827,9 +827,6 @@ internal class DefaultAccountRepository @Inject constructor(
             //Remove UI preferences
             getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE).edit { clear() }
 
-            //Remove sms dialog time checker preference
-            getSharedPreferences(LAST_SHOW_SMS_FILE, Context.MODE_PRIVATE).edit { clear() }
-
             //Remove Text editor, Offline warning, mobile data resolution and Audio player preferences
             PreferenceManager.getDefaultSharedPreferences(this).edit {
                 remove(SHOW_LINE_NUMBERS)
@@ -1649,7 +1646,6 @@ internal class DefaultAccountRepository @Inject constructor(
         private const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
         private const val SHOW_OFFLINE_WARNING = "SHOW_OFFLINE_WARNING"
         private const val KEY_MOBILE_DATA_HIGH_RESOLUTION = "setting_mobile_data_high_resolution"
-        private const val LAST_SHOW_SMS_FILE = "last_show_sms_timestamp_sp"
         private const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED =
             "settings_audio_background_play_enabled"
         private const val KEY_AUDIO_SHUFFLE_ENABLED = "settings_audio_shuffle_enabled"
