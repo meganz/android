@@ -54,7 +54,7 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
-import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
@@ -100,6 +100,7 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.navigation.destination.ChatNavKey
@@ -154,6 +155,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase
 
     companion object {
         private const val SCROLL_TEXT = "SCROLL_TEXT"
@@ -491,8 +495,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             R.id.chat_action_import -> importNode()
             R.id.chat_action_save_for_offline -> {
-                if (getStorageState() == StorageState.PayWall) {
-                    AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
+                    AlertsAndWarnings.showOverDiskQuotaPaywallWarning(this)
                 } else {
                     val msgId = intent.getLongExtra(LEGACY_MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
                     val chatId = intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, MEGACHAT_INVALID_HANDLE)

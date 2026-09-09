@@ -50,7 +50,6 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
@@ -476,8 +475,8 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
             videoSectionViewModel.state.map { it.navigateToVideoSelected }.distinctUntilChanged()
         ) {
             if (it) {
-                if (getStorageState() == StorageState.PayWall) {
-                    showOverDiskQuotaPaywallWarning()
+                if (videoSectionViewModel.getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning(this@VideoSectionActivity)
                 } else {
                     navigateToVideoSelectedActivity()
                 }

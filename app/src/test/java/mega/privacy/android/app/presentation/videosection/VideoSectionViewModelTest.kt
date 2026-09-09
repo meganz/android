@@ -47,6 +47,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -133,6 +134,7 @@ class VideoSectionViewModelTest {
         }.thenReturn(flowOf(false))
     }
     private val removeFavouritesUseCase = mock<RemoveFavouritesUseCase>()
+    private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
 
     private val expectedId = NodeId(1)
     private val expectedVideo = mock<VideoUIEntity> {
@@ -209,6 +211,8 @@ class VideoSectionViewModelTest {
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             removeFavouritesUseCase = removeFavouritesUseCase,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            context = mock(),
         )
     }
 
@@ -233,7 +237,8 @@ class VideoSectionViewModelTest {
             monitorVideoRecentlyWatchedUseCase,
             clearRecentlyWatchedVideosUseCase,
             removeRecentlyWatchedItemUseCase,
-            removeFavouritesUseCase
+            removeFavouritesUseCase,
+            monitorStorageStateEventUseCase
         )
     }
 

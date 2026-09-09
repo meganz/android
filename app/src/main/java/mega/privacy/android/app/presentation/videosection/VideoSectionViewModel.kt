@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.videosection
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,7 +29,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -60,6 +62,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
@@ -121,6 +124,8 @@ class VideoSectionViewModel @Inject constructor(
     private val removeRecentlyWatchedItemUseCase: RemoveRecentlyWatchedItemUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val removeFavouritesUseCase: RemoveFavouritesUseCase,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -1258,12 +1263,14 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
+    internal fun getStorageState(): StorageState = monitorStorageStateEventUseCase.getState()
+
     internal fun addFabButtonClicked() {
         if (_state.value.currentVideoPlaylist != null) {
             updateNavigateToVideoSelected(true)
         } else {
             if (getStorageState() == StorageState.PayWall) {
-                showOverDiskQuotaPaywallWarning()
+                showOverDiskQuotaPaywallWarning(context)
             } else {
                 updateShowCreateDialog(true)
                 val placeholderText = "New playlist"

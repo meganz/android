@@ -106,6 +106,7 @@ fun VideoPlaylistDetailView(
     errorMessage: Int? = null,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {
+    val context = LocalContext.current
     val items = playlist?.videos ?: emptyList()
     val lazyListState = rememberLazyListState()
     val isSystemVideoPlaylist = playlist?.isSystemVideoPlayer == true
@@ -274,7 +275,7 @@ fun VideoPlaylistDetailView(
                     onDeleteButtonClicked = {
                         showDeleteVideosDialog = false
                         if (isStorageOverQuota()) {
-                            showOverDiskQuotaPaywallWarning()
+                            showOverDiskQuotaPaywallWarning(context)
                         } else {
                             onDeleteVideosDialogPositiveButtonClicked(playlist)
                         }
@@ -371,7 +372,7 @@ fun VideoPlaylistDetailView(
                     customizeSheetState.hide()
                 }
                 if (isStorageOverQuota()) {
-                    showOverDiskQuotaPaywallWarning()
+                    showOverDiskQuotaPaywallWarning(context)
                 } else {
                     showRenameVideoPlaylistDialog = true
                 }
@@ -382,7 +383,7 @@ fun VideoPlaylistDetailView(
                     customizeSheetState.hide()
                 }
                 if (isStorageOverQuota()) {
-                    showOverDiskQuotaPaywallWarning()
+                    showOverDiskQuotaPaywallWarning(context)
                 } else {
                     showDeleteVideoPlaylistDialog = true
                 }

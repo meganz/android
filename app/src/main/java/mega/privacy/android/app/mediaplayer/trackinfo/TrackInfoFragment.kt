@@ -97,7 +97,7 @@ class TrackInfoFragment : Fragment() {
                         },
                         onCheckedChange = {
                             if (viewModel.getStorageState() == StorageState.PayWall) {
-                                showOverDiskQuotaPaywallWarning()
+                                showOverDiskQuotaPaywallWarning(requireContext())
                                 return@AudioTrackInfoView
                             }
 

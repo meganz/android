@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -32,7 +33,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.view.toolbar.NodeToolbarViewModel
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
@@ -87,6 +87,7 @@ internal fun VideoSectionComposeView(
     val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
     val tabState by videoSectionViewModel.tabState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     var showLocationBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showDurationBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -530,8 +531,8 @@ internal fun VideoSectionComposeView(
                     showPlaylistBottomSheet = false
                     playlistModalSheetState.hide()
                 }
-                if (getStorageState() == StorageState.PayWall) {
-                    showOverDiskQuotaPaywallWarning()
+                if (videoSectionViewModel.getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning(context)
                 } else {
                     showRenameVideoPlaylistDialog = true
                 }
@@ -541,8 +542,8 @@ internal fun VideoSectionComposeView(
                     showPlaylistBottomSheet = false
                     playlistModalSheetState.hide()
                 }
-                if (getStorageState() == StorageState.PayWall) {
-                    showOverDiskQuotaPaywallWarning()
+                if (videoSectionViewModel.getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning(context)
                 } else {
                     showDeleteVideoPlaylist = true
                 }

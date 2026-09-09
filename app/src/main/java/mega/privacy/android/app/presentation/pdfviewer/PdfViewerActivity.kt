@@ -61,7 +61,7 @@ import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
@@ -96,6 +96,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.navigation.ExtraConstant
@@ -163,6 +164,9 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
 
     @Inject
     lateinit var cookieEnabledCheckWrapper: CookieEnabledCheckWrapper
+
+    @Inject
+    lateinit var monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase
 
     private lateinit var binding: ActivityPdfviewerBinding
 
@@ -1606,8 +1610,8 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
             R.id.chat_pdf_viewer_import -> importNode()
 
             R.id.chat_pdf_viewer_save_for_offline -> {
-                if (getStorageState() == StorageState.PayWall) {
-                    AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
+                    AlertsAndWarnings.showOverDiskQuotaPaywallWarning(this)
                 } else {
                     viewModel.saveChatNodeToOffline(
                         chatId = chatId,

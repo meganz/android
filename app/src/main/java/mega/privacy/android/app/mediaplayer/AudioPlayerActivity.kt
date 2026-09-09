@@ -55,7 +55,7 @@ import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGatewa
 import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
-import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.AlertDialogUtil
@@ -96,6 +96,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
@@ -148,6 +149,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
     @Inject
     lateinit var monitorStreamOverQuotaEventUseCase: MonitorStreamOverQuotaEventUseCase
+
+    @Inject
+    lateinit var monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase
 
     private val transferOverQuotaWarningViewModel by viewModels<TransferOverQuotaWarningViewModel>()
 
@@ -567,8 +571,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.chat_save_for_offline -> {
-                    if (getStorageState() == StorageState.PayWall) {
-                        AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                    if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
+                        AlertsAndWarnings.showOverDiskQuotaPaywallWarning(this@AudioPlayerActivity)
                     } else {
                         viewModel.saveChatNodeToOffline(
                             chatId = getChatId(),
@@ -600,8 +604,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.copy -> {
-                    if (getStorageState() == StorageState.PayWall) {
-                        AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                    if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
+                        AlertsAndWarnings.showOverDiskQuotaPaywallWarning(this@AudioPlayerActivity)
                     } else {
                         selectFolderToCopyLauncher.launch(
                             Intent(this, FileExplorerActivity::class.java).apply {

@@ -15,7 +15,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
@@ -207,7 +206,7 @@ internal fun VideoSectionNavHost(
                     viewModel.removeFavourites()
                     viewModel.clearAllSelectedVideosOfPlaylist()
                 },
-                isStorageOverQuota = { getStorageState() == StorageState.PayWall },
+                isStorageOverQuota = { viewModel.getStorageState() == StorageState.PayWall },
             )
         }
 
@@ -456,7 +455,7 @@ internal fun VideoSectionNavHost(
                         viewModel.removeFavourites()
                         viewModel.clearAllSelectedVideosOfPlaylist()
                     },
-                    isStorageOverQuota = { getStorageState() == StorageState.PayWall },
+                    isStorageOverQuota = { viewModel.getStorageState() == StorageState.PayWall },
                     scaffoldState = scaffoldState,
                 )
             }

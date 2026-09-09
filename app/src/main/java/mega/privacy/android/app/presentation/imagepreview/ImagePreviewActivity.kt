@@ -60,7 +60,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentFactory
 import mega.privacy.android.app.presentation.container.SharedAppContainer
-import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.FETCHER_PARAMS
@@ -104,6 +104,7 @@ import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
@@ -160,6 +161,9 @@ class ImagePreviewActivity : BaseActivity() {
 
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
+
+    @Inject
+    lateinit var monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase
 
     private val selectMoveFolderLauncher: ActivityResultLauncher<LongArray> =
         registerForActivityResult(
@@ -491,8 +495,8 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun getNodeLink(imageNode: ImageNode, onGetLink: (ImageNode) -> Unit) {
         Analytics.tracker.trackEvent(ImagePreviewGetLinkMenuItemEvent)
-        if (getStorageState() == StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
+        if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning(this)
             return
         }
         onGetLink(imageNode)
