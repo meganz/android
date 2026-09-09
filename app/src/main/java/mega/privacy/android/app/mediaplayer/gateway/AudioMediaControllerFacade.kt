@@ -386,6 +386,10 @@ internal class AudioMediaControllerFacade @Inject constructor(
         val ctrl = controller ?: return
         if (index !in 0 until ctrl.mediaItemCount) return
         ctrl.seekToDefaultPosition(index)
+        // Seeking never touches playWhenReady, so without this a queue tap while paused (the
+        // normal state once continuous playback has auto-paused at a track end) would switch
+        // the track silently instead of playing it.
+        ctrl.play()
     }
 
     override fun moveMediaItem(fromIndex: Int, toIndex: Int) {

@@ -1158,7 +1158,11 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         playQueueBuildJob?.cancel()
         trackPlaybackInfoJob?.cancel()
         if (needStopStreamingServer) {
-            lifecycleScope.launch {
+            // applicationScope, not lifecycleScope: super.onDestroy() cancels the lifecycle
+            // scope before the first suspending stop call can resume, so the second stop —
+            // the folder-link server — would never execute and the server would leak for the
+            // rest of the process lifetime.
+            applicationScope.launch {
                 runCatching { megaApiHttpServerStopUseCase() }
                     .onFailure { Timber.e(it, "Failed to stop HTTP server") }
                 runCatching { megaApiFolderHttpServerStopUseCase() }

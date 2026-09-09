@@ -1126,6 +1126,27 @@ class AudioPlayerViewModelTest {
         }
 
     @Test
+    fun `test that startPlayback clears a stale resume announcement`() = runTest {
+        gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123L))
+
+        underTest.resumedFromPosition.test {
+            assertThat(awaitItem()).isNull()
+
+            // Latched while no screen was attached to consume it.
+            audioResumeEventQueue.emit(AudioResumeEvent(mediaHandle = 123L, resumePositionMs = 945_000L))
+            assertThat(awaitItem()).isEqualTo("15:45")
+
+            val intent = mock<Intent>().apply {
+                whenever(getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)).thenReturn(true)
+                whenever(getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, -1)).thenReturn(-1)
+            }
+            underTest.startPlayback(intent)
+
+            assertThat(awaitItem()).isNull()
+        }
+    }
+
+    @Test
     fun `test that onResumeEventConsumed clears the pending resume event`() = runTest {
         gatewayPlayerState.emit(audioControllerState(currentMediaItemHandle = 123L))
         val event = AudioResumeEvent(mediaHandle = 123L, resumePositionMs = 945_000L)

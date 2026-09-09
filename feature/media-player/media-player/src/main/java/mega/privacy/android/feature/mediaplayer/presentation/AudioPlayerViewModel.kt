@@ -483,6 +483,10 @@ class AudioPlayerViewModel @Inject constructor(
             // without a rebuild keeps the error: playback is still stopped by it, and the dialog
             // is what tells the user why.
             _playbackError.value = null
+            // Same reason for a resume announcement latched while no screen was attached: left
+            // in place it would be shown over the new session, and its Restart action would
+            // reset — and delete the saved position of — the wrong track.
+            _resumedFromPosition.value = null
             gateway.startService(intent)
         }
     }
