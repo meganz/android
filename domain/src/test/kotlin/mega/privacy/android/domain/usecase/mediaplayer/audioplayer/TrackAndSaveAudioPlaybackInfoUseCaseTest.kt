@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.continuewhereleftoff.AUDIO_PLAYBACK_INFO_SAVE_INTERVAL_MS
+import mega.privacy.android.domain.entity.continuewhereleftoff.PLAYBACK_INFO_SAVE_INTERVAL_MS
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.usecase.GetTickerUseCase
@@ -55,7 +55,7 @@ class TrackAndSaveAudioPlaybackInfoUseCaseTest {
 
         underTest { playbackInfo }
 
-        verify(getTickerUseCase).invoke(AUDIO_PLAYBACK_INFO_SAVE_INTERVAL_MS)
+        verify(getTickerUseCase).invoke(PLAYBACK_INFO_SAVE_INTERVAL_MS)
     }
 
     @Test

@@ -34,6 +34,8 @@ class MediaPlayerManagerTest {
     private val noOpRepeat: (RepeatToggleMode) -> Unit = {}
     private val noOpPlayWhenReady: (MediaPlaybackState, Boolean) -> Unit = { _, _ -> }
     private val noOpPlaybackState: (Int) -> Unit = {}
+    private val noOpPositionJumped: () -> Unit = {}
+    private val noOpMediaItemLeft: (String?, Long) -> Unit = { _, _ -> }
     private val noOpPlayerError: (Int) -> Unit = {}
     private val noOpVideoSize: (VideoSize) -> Unit = {}
 
@@ -57,6 +59,8 @@ class MediaPlayerManagerTest {
         onRepeatModeChanged: (RepeatToggleMode) -> Unit = noOpRepeat,
         onPlayWhenReadyChanged: (MediaPlaybackState, Boolean) -> Unit = noOpPlayWhenReady,
         onPlaybackStateChanged: (Int) -> Unit = noOpPlaybackState,
+        onPlaybackPositionJumped: () -> Unit = noOpPositionJumped,
+        onMediaItemLeft: (String?, Long) -> Unit = noOpMediaItemLeft,
         onPlayerError: (Int) -> Unit = noOpPlayerError,
         onVideoSizeChanged: (VideoSize) -> Unit = noOpVideoSize,
     ): MediaPlayerCallback {
@@ -66,6 +70,8 @@ class MediaPlayerManagerTest {
             onRepeatModeChanged = onRepeatModeChanged,
             onPlayWhenReadyChanged = onPlayWhenReadyChanged,
             onPlaybackStateChanged = onPlaybackStateChanged,
+            onPlaybackPositionJumped = onPlaybackPositionJumped,
+            onMediaItemLeft = onMediaItemLeft,
             onPlayerError = onPlayerError,
             onVideoSizeChanged = onVideoSizeChanged,
         )
@@ -85,7 +91,8 @@ class MediaPlayerManagerTest {
 
         val result = underTest.createPlayer(
             noOpMetadata, noOpTransition, noOpRepeat, noOpPlayWhenReady,
-            noOpPlaybackState, noOpPlayerError, noOpVideoSize,
+            noOpPlaybackState, noOpPositionJumped, noOpMediaItemLeft, noOpPlayerError,
+            noOpVideoSize,
         )
 
         assertThat(result).isEqualTo(player)
@@ -95,7 +102,8 @@ class MediaPlayerManagerTest {
     fun `test that createPlayer requests the gateway with repeat none`() {
         underTest.createPlayer(
             noOpMetadata, noOpTransition, noOpRepeat, noOpPlayWhenReady,
-            noOpPlaybackState, noOpPlayerError, noOpVideoSize,
+            noOpPlaybackState, noOpPositionJumped, noOpMediaItemLeft, noOpPlayerError,
+            noOpVideoSize,
         )
         verify(mediaPlayerGateway).createPlayer(
             anyOrNull(), anyOrNull(), eq(RepeatToggleMode.REPEAT_NONE), any(), any()
@@ -111,6 +119,8 @@ class MediaPlayerManagerTest {
             onRepeatModeChanged = noOpRepeat,
             onPlayWhenReadyChanged = noOpPlayWhenReady,
             onPlaybackStateChanged = noOpPlaybackState,
+            onPlaybackPositionJumped = noOpPositionJumped,
+            onMediaItemLeft = noOpMediaItemLeft,
             onPlayerError = noOpPlayerError,
             onVideoSizeChanged = noOpVideoSize,
         )
@@ -193,6 +203,28 @@ class MediaPlayerManagerTest {
         callback.onPlaybackStateChangedCallback(Player.STATE_READY)
 
         assertThat(received).isEqualTo(Player.STATE_READY)
+    }
+
+    @Test
+    fun `test that onPlaybackPositionJumpedCallback forwards the jump`() {
+        var called = false
+        val callback = captureMediaPlayerCallback(onPlaybackPositionJumped = { called = true })
+
+        callback.onPlaybackPositionJumpedCallback()
+
+        assertThat(called).isTrue()
+    }
+
+    @Test
+    fun `test that onMediaItemLeftCallback forwards handle and position`() {
+        var received: Pair<String?, Long>? = null
+        val callback = captureMediaPlayerCallback(
+            onMediaItemLeft = { handle, positionMs -> received = handle to positionMs }
+        )
+
+        callback.onMediaItemLeftCallback("handle", 16_000)
+
+        assertThat(received).isEqualTo("handle" to 16_000L)
     }
 
     @Test

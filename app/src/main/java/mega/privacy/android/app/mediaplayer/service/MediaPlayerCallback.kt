@@ -46,6 +46,21 @@ interface MediaPlayerCallback {
     fun onPlaybackStateChangedCallback(state: Int)
 
     /**
+     * Callback when the position jumps within the item that is already playing, either because
+     * the user seeked or because a repeat-one loop restarted it.
+     */
+    fun onPlaybackPositionJumpedCallback() = Unit
+
+    /**
+     * Callback when playback leaves a media item, reporting where that item was left. Its
+     * duration is not reported: the player already reports the duration of the item it moved to.
+     *
+     * @param handle MegaNode handle of the item being left
+     * @param positionMs the position the item was left at
+     */
+    fun onMediaItemLeftCallback(handle: String?, positionMs: Long) = Unit
+
+    /**
      * Callback from onPlayerError
      *
      * @param errorCode the ExoPlayer error code from [androidx.media3.common.PlaybackException]

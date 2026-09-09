@@ -31,11 +31,11 @@ const val CWLO_NEAR_COMPLETION_FRACTION: Float = 0.9f
 val AUDIO_RESUME_FINISHED_THRESHOLD_MS: Long = TimeUnit.SECONDS.toMillis(30)
 
 /**
- * Interval at which the playing audio item's position is persisted to storage. Position loss
- * on a hard kill or crash is bounded by this; session-ending events (pause, stop, seek, track
+ * Interval at which the playing audio or video item's position is persisted to storage. Position
+ * loss on a hard kill or crash is bounded by this; session-ending events (pause, stop, seek, track
  * change, app backgrounding) force an immediate save on top of the periodic one.
  */
-val AUDIO_PLAYBACK_INFO_SAVE_INTERVAL_MS: Long = TimeUnit.SECONDS.toMillis(3)
+val PLAYBACK_INFO_SAVE_INTERVAL_MS: Long = TimeUnit.SECONDS.toMillis(3)
 
 /**
  * Only audio items longer than this are silently resumed from their saved playback position

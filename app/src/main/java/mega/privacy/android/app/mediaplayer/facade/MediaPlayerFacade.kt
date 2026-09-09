@@ -347,6 +347,30 @@ class MediaPlayerFacade @Inject constructor(
                         mediaPlayerCallback.onPlaybackStateChangedCallback(playbackState)
                     }
 
+                    override fun onPositionDiscontinuity(
+                        oldPosition: Player.PositionInfo,
+                        newPosition: Player.PositionInfo,
+                        reason: Int,
+                    ) {
+                        when (reason) {
+                            Player.DISCONTINUITY_REASON_SEEK,
+                            Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT,
+                            Player.DISCONTINUITY_REASON_AUTO_TRANSITION,
+                            Player.DISCONTINUITY_REASON_SKIP,
+                            Player.DISCONTINUITY_REASON_REMOVE,
+                                -> if (oldPosition.mediaItemIndex == newPosition.mediaItemIndex) {
+                                mediaPlayerCallback.onPlaybackPositionJumpedCallback()
+                            } else {
+                                mediaPlayerCallback.onMediaItemLeftCallback(
+                                    handle = oldPosition.mediaItem?.mediaId,
+                                    positionMs = oldPosition.positionMs,
+                                )
+                            }
+
+                            else -> {}
+                        }
+                    }
+
                     override fun onPlayerError(error: PlaybackException) {
                         Timber.e(error)
                         mediaPlayerCallback.onPlayerErrorCallback(error.errorCode)

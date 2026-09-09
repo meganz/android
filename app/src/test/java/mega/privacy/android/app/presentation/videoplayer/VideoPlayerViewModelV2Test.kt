@@ -4088,6 +4088,75 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
+    fun `test that onPlaybackStateChanged saves the final position when playback ends`() = runTest {
+        val expected = stubPlaybackSnapshot(currentPosition = 199_000L)
+        initViewModel()
+        underTest.updatePlaybackState(MediaPlaybackState.Playing)
+
+        underTest.onPlaybackStateChanged(MEDIA_PLAYER_STATE_ENDED)
+        advanceUntilIdle()
+
+        verify(saveVideoPlaybackInfoUseCase).invoke(expected)
+    }
+
+    @Test
+    fun `test that onPlaybackPositionJumped saves the current position`() = runTest {
+        val expected = stubPlaybackSnapshot()
+        initViewModel()
+
+        underTest.onPlaybackPositionJumped()
+        advanceUntilIdle()
+
+        verify(saveVideoPlaybackInfoUseCase).invoke(expected)
+        verify(savePlaybackTimesUseCase).invoke()
+    }
+
+    @Test
+    fun `test that onMediaItemLeft saves the left item at its final position`() = runTest {
+        val handle = 123456L
+        val tracked = stubPlaybackSnapshot(handle = handle)
+        initViewModel()
+        underTest.onPlaybackPositionJumped()
+        advanceUntilIdle()
+
+        underTest.onMediaItemLeft(handle.toString(), positionMs = 100_000L)
+        advanceUntilIdle()
+
+        verify(saveVideoPlaybackInfoUseCase).invoke(tracked.copy(currentPosition = 100_000L))
+    }
+
+    @Test
+    fun `test that onMediaItemLeft does not save when no snapshot of the left item was tracked`() =
+        runTest {
+            stubPlaybackSnapshot(handle = 123456L)
+            initViewModel()
+            underTest.onPlaybackPositionJumped()
+            advanceUntilIdle()
+            clearInvocations(saveVideoPlaybackInfoUseCase)
+
+            underTest.onMediaItemLeft("654321", positionMs = 100_000L)
+            advanceUntilIdle()
+
+            verify(saveVideoPlaybackInfoUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that onMediaItemLeft saves the left item only once`() = runTest {
+        val handle = 123456L
+        stubPlaybackSnapshot(handle = handle)
+        initViewModel()
+        underTest.onPlaybackPositionJumped()
+        advanceUntilIdle()
+        clearInvocations(saveVideoPlaybackInfoUseCase)
+
+        underTest.onMediaItemLeft(handle.toString(), positionMs = 100_000L)
+        underTest.onMediaItemLeft(handle.toString(), positionMs = 100_000L)
+        advanceUntilIdle()
+
+        verify(saveVideoPlaybackInfoUseCase, times(1)).invoke(any())
+    }
+
+    @Test
     fun `test that pauseForBackground saves the current position`() = runTest {
         val expected = stubPlaybackSnapshot()
         initViewModel()

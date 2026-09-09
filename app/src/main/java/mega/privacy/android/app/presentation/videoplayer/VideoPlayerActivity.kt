@@ -307,6 +307,14 @@ class VideoPlayerActivity : AppCompatActivity(), MegaSnackbarShower {
                     videoPlayerViewModelV2.onPlaybackStateChanged(state)
                 }
 
+                override fun onPlaybackPositionJumpedCallback() {
+                    videoPlayerViewModelV2.onPlaybackPositionJumped()
+                }
+
+                override fun onMediaItemLeftCallback(handle: String?, positionMs: Long) {
+                    videoPlayerViewModelV2.onMediaItemLeft(handle, positionMs)
+                }
+
                 override fun onPlayerErrorCallback(errorCode: Int) =
                     videoPlayerViewModelV2.onPlayerError(errorCode)
 

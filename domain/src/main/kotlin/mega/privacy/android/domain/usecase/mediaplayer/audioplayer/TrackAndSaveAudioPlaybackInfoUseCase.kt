@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.domain.entity.continuewhereleftoff.AUDIO_PLAYBACK_INFO_SAVE_INTERVAL_MS
+import mega.privacy.android.domain.entity.continuewhereleftoff.PLAYBACK_INFO_SAVE_INTERVAL_MS
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.logging.Log
 import mega.privacy.android.domain.usecase.GetTickerUseCase
@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 /**
  * Tracks the playing audio and persists its playback position to storage every
- * [AUDIO_PLAYBACK_INFO_SAVE_INTERVAL_MS], so the saved position survives a process kill,
+ * [PLAYBACK_INFO_SAVE_INTERVAL_MS], so the saved position survives a process kill,
  * crash, or device restart. Each snapshot goes through [PersistAudioPlaybackInfoUseCase],
  * which also decides when the item counts as played through.
  *
@@ -34,7 +34,7 @@ class TrackAndSaveAudioPlaybackInfoUseCase @Inject constructor(
      */
     suspend operator fun invoke(getCurrentPlaybackInfo: () -> MediaPlaybackInfo) {
         var lastPersisted: MediaPlaybackInfo? = null
-        getTickerUseCase(AUDIO_PLAYBACK_INFO_SAVE_INTERVAL_MS)
+        getTickerUseCase(PLAYBACK_INFO_SAVE_INTERVAL_MS)
             .map { getCurrentPlaybackInfo() }
             .collect { info ->
                 if (info == lastPersisted) return@collect

@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.domain.entity.continuewhereleftoff.PLAYBACK_INFO_SAVE_INTERVAL_MS
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo.Companion.INVALID_MEDIA_HANDLE
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
@@ -65,6 +66,15 @@ class TrackPlaybackPositionUseCaseTest {
         mock<() -> MediaPlaybackInfo> {
             on { invoke() }.thenReturn(infos.first(), *infos.drop(1).toTypedArray())
         }
+
+    @Test
+    fun `test that invoke ticks at the shared playback info save interval`() = runTest {
+        whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit))
+
+        underTest(snapshotProvider(playbackInfo(currentPosition = 16_000)))
+
+        verify(getTicker).invoke(PLAYBACK_INFO_SAVE_INTERVAL_MS)
+    }
 
     @Test
     fun `test that invoke saves the snapshot when the video position is more than 15 seconds`() =

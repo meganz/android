@@ -323,6 +323,17 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
      */
     private var lastSavedPlaybackInfo: MediaPlaybackInfo? = null
 
+    /**
+     * The last snapshot taken of the playing item, whether or not it was saved. Kept so the item
+     * being left on a track change can be saved with its own duration, which the player already
+     * reports as the next item duration by the time that callback arrives.
+     *
+     * Written from the periodic tracker as well as from every immediate save, and read without
+     * synchronisation: both rely on the tracker collecting on the main thread. Giving the ticker
+     * its own dispatcher would make this a data race.
+     */
+    private var lastTrackedPlaybackInfo: MediaPlaybackInfo? = null
+
     private val snackbarMessage = SingleLiveEvent<Int>()
     private var searchQuery: String = ""
     private val mediaItemsDuringChanged = mutableListOf<MediaItem>()
@@ -1305,14 +1316,33 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         totalDuration = mediaPlayerGateway.getCurrentItemDuration(),
         currentPosition = mediaPlayerGateway.getCurrentPlayingPosition(),
         mediaType = MediaType.Video,
-    )
+    ).also {
+        if (it.mediaHandle != MediaPlaybackInfo.INVALID_MEDIA_HANDLE) lastTrackedPlaybackInfo = it
+    }
 
     /**
      * Saves the player's current position immediately on every event that interrupts playback or
-     * leaves the player (pause, app backgrounding, exit), so the periodic save interval only
-     * bounds how much position is lost on a hard kill or crash.
+     * leaves the player (pause, seek, track change, app backgrounding, exit), so the periodic save
+     * interval only bounds how much position is lost on a hard kill or crash.
      */
     private fun forceSaveVideoPlaybackInfo() = saveVideoPlaybackInfo(currentVideoPlaybackInfo())
+
+    /**
+     * The position jumped within the item that is already playing: the user seeked, or a
+     * repeat-one loop restarted it.
+     */
+    internal fun onPlaybackPositionJumped() = forceSaveVideoPlaybackInfo()
+
+    /**
+     * Playback left an item. Its final position is saved against the duration of the last tracked
+     * snapshot, because the player already reports the duration of the item it moved to.
+     */
+    internal fun onMediaItemLeft(handle: String?, positionMs: Long) {
+        val leftHandle = handle?.toLongOrNull() ?: return
+        val info = lastTrackedPlaybackInfo?.takeIf { it.mediaHandle == leftHandle } ?: return
+        lastTrackedPlaybackInfo = null
+        saveVideoPlaybackInfo(info.copy(currentPosition = positionMs))
+    }
 
     private fun saveVideoPlaybackInfo(info: MediaPlaybackInfo) {
         if (info == lastSavedPlaybackInfo) return
@@ -1482,6 +1512,10 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         when (state) {
             MEDIA_PLAYER_STATE_ENDED if playbackState == MediaPlaybackState.Playing -> {
                 saveRecentlyUsedItemIfQualifies()
+                // The periodic tracker cannot be relied on to catch the end of the item: at
+                // playback speeds above 1x it can step over the near-completion window entirely,
+                // leaving a finished item with a resume position pointing at its end.
+                forceSaveVideoPlaybackInfo()
                 updatePlaybackState(MediaPlaybackState.Paused)
             }
 

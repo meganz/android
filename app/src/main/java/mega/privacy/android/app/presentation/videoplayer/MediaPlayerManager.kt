@@ -33,6 +33,10 @@ class MediaPlayerManager @Inject constructor(
      * @param onPlayWhenReadyChanged invoked with the mapped [MediaPlaybackState] and whether the
      * pause was user-initiated.
      * @param onPlaybackStateChanged invoked with the raw ExoPlayer playback state.
+     * @param onPlaybackPositionJumped invoked when the position jumps within the item that is
+     * already playing (a seek, or a repeat-one loop).
+     * @param onMediaItemLeft invoked with the handle of the item playback left and the position it
+     * was left at.
      * @param onPlayerError invoked with the player error code.
      * @param onVideoSizeChanged invoked with a non-zero [VideoSize]; zero sizes are ignored.
      */
@@ -42,6 +46,8 @@ class MediaPlayerManager @Inject constructor(
         onRepeatModeChanged: (repeatToggleMode: RepeatToggleMode) -> Unit,
         onPlayWhenReadyChanged: (state: MediaPlaybackState, isPausedByUser: Boolean) -> Unit,
         onPlaybackStateChanged: (state: Int) -> Unit,
+        onPlaybackPositionJumped: () -> Unit,
+        onMediaItemLeft: (handle: String?, positionMs: Long) -> Unit,
         onPlayerError: (errorCode: Int) -> Unit,
         onVideoSizeChanged: (videoSize: VideoSize) -> Unit,
     ): ExoPlayer = mediaPlayerGateway.createPlayer(
@@ -66,6 +72,11 @@ class MediaPlayerManager @Inject constructor(
             }
 
             override fun onPlaybackStateChangedCallback(state: Int) = onPlaybackStateChanged(state)
+
+            override fun onPlaybackPositionJumpedCallback() = onPlaybackPositionJumped()
+
+            override fun onMediaItemLeftCallback(handle: String?, positionMs: Long) =
+                onMediaItemLeft(handle, positionMs)
 
             override fun onPlayerErrorCallback(errorCode: Int) = onPlayerError(errorCode)
 

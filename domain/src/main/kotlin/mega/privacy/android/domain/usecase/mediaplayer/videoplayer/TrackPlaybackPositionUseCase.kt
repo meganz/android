@@ -4,19 +4,19 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
+import mega.privacy.android.domain.entity.continuewhereleftoff.PLAYBACK_INFO_SAVE_INTERVAL_MS
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo.Companion.INVALID_MEDIA_HANDLE
 import mega.privacy.android.domain.logging.Log
 import mega.privacy.android.domain.usecase.GetTickerUseCase
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
- * Tracks the playing video and saves its position once per second through
+ * Tracks the playing video and saves its position every [PLAYBACK_INFO_SAVE_INTERVAL_MS] through
  * [SaveVideoPlaybackInfoUseCase]. The periodic save only bounds how much position is lost on a
- * hard kill or crash: the player also saves immediately when playback is paused, when the app
- * goes to the background, and when the player is left, so this interval is not what the user's
- * resume accuracy depends on.
+ * hard kill or crash: every action that interrupts playback or leaves the player — pause, seek,
+ * track change, app backgrounding, exit — saves immediately, so this interval is not what the
+ * user's resume accuracy depends on.
  *
  * A snapshot taken before the player is prepared carries no handle and no duration, and a
  * duration of zero would read as "watched through" further down: such snapshots are dropped
@@ -41,7 +41,7 @@ class TrackPlaybackPositionUseCase @Inject constructor(
      */
     suspend operator fun invoke(getCurrentPlaybackInfo: () -> MediaPlaybackInfo) {
         var lastSaved: MediaPlaybackInfo? = null
-        getTickerUseCase(TimeUnit.SECONDS.toMillis(1)).map { getCurrentPlaybackInfo() }
+        getTickerUseCase(PLAYBACK_INFO_SAVE_INTERVAL_MS).map { getCurrentPlaybackInfo() }
             .filter {
                 it.mediaHandle != INVALID_MEDIA_HANDLE
                         && it.totalDuration > 0
