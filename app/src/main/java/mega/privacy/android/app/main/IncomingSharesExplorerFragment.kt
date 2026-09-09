@@ -296,7 +296,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
         binding.fileGridViewBrowser.adapter = adapter
         binding.fastscroll.setRecyclerView(recyclerView)
 
-        getPreferences()?.let { prefs ->
+        context?.let { getPreferences(it) }?.let { prefs ->
             prefs.preferredSortOthers?.let {
                 orderParent = it.toInt()
             }

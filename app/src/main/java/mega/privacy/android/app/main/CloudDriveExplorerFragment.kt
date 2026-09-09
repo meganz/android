@@ -338,7 +338,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             }
         }
 
-        getPreferences().let { prefs ->
+        context?.let { getPreferences(it) }.let { prefs ->
             order = if (prefs != null && prefs.preferredSortCloud != null)
                 prefs.preferredSortCloud.toInt()
             else

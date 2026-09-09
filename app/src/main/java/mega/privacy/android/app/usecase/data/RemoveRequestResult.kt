@@ -56,10 +56,11 @@ data class RemoveRequestResult(
 
     /**
      * Resets the account details timestamp if some request finished with success.
+     * @param context [Context]
      */
-    fun resetAccountDetailsIfNeeded() {
+    fun resetAccountDetailsIfNeeded(context: Context) {
         if (successCount > 0) {
-            DBUtil.resetAccountDetailsTimeStamp()
+            DBUtil.resetAccountDetailsTimeStamp(context)
         }
     }
 }

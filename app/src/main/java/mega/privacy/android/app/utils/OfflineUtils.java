@@ -7,9 +7,10 @@ import android.content.Context;
 
 import java.io.File;
 
+import dagger.hilt.android.EntryPointAccessors;
 import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.di.DbHandlerModuleKt;
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
@@ -21,7 +22,9 @@ public class OfflineUtils {
 
 
     public static boolean availableOffline(Context context, MegaNode node) {
-        LegacyDatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
+        LegacyDatabaseHandler dbH = EntryPointAccessors.fromApplication(
+                context,
+                DatabaseHandlerEntryPoint.class).getDbH();
 
         if (dbH.exists(node.getHandle())) {
             Timber.d("Exists OFFLINE in the DB!!!");

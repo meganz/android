@@ -41,8 +41,8 @@ import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.SortByHeaderBinding
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint
 import mega.privacy.android.app.di.MegaApiEntryPoint
-import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel.Companion.orderNameMap
 import mega.privacy.android.app.main.ContactFileListActivity
@@ -501,7 +501,10 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         this.adapterType = adapterType
         this.fragment = fragment
 
-        dbH = getDbHandler()
+        dbH = EntryPointAccessors.fromApplication(
+            context,
+            DatabaseHandlerEntryPoint::class.java
+        ).dbH
 
         when (type) {
             Constants.CONTACT_FILE_ADAPTER -> {

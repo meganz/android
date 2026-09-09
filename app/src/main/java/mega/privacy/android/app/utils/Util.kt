@@ -43,9 +43,10 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.di.getDbHandler
+import mega.privacy.android.app.di.DatabaseHandlerEntryPoint
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.data.model.MegaPreferences
@@ -672,8 +673,11 @@ object Util {
     }
 
     @JvmStatic
-    fun getPreferences(): MegaPreferences? {
-        return getDbHandler().preferences
+    fun getPreferences(context: Context): MegaPreferences? {
+        return EntryPointAccessors.fromApplication(
+            context,
+            DatabaseHandlerEntryPoint::class.java
+        ).dbH.preferences
     }
 
     @JvmStatic

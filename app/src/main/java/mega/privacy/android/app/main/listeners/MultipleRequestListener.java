@@ -135,7 +135,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         message = context.getString(R.string.number_correctly_copied, max_items);
                     }
 
-                    resetAccountDetailsTimeStamp();
+                    resetAccountDetailsTimeStamp(context);
                     break;
                 }
                 case MegaRequest.TYPE_INVITE_CONTACT: {
